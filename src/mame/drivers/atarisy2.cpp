@@ -195,7 +195,7 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-void atarisy2_state::machine_start_atarisy2()
+MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_start();
 
@@ -209,7 +209,7 @@ void atarisy2_state::machine_start_atarisy2()
 }
 
 
-void atarisy2_state::machine_reset_atarisy2()
+MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_reset();
 	m_slapstic->slapstic_reset();
@@ -1191,8 +1191,8 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_atarisy2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atarisy2, this));
+	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
+	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/32) // 625 kHz
 	MCFG_ADC0808_IN0_CB(IOPORT("ADC0")) // J102 pin 5 (POT1)
@@ -1233,7 +1233,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_atarisy2, this));
+	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)

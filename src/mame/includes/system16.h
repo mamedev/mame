@@ -195,7 +195,7 @@ public:
 	void init_goldnaxeb1();
 	void init_ddcrewbl();
 	void init_common();
-	void machine_reset_ddcrewbl();
+	DECLARE_MACHINE_RESET(ddcrewbl);
 	TILEMAP_MAPPER_MEMBER(sys16_bg_map);
 	TILEMAP_MAPPER_MEMBER(sys16_text_map);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -206,12 +206,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_infotxt);
 	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_info0);
 	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_info1);
-	void video_start_system16()             ATTR_COLD;
-	void video_start_system18old()          ATTR_COLD;
-	void video_start_s16a_bootleg_shinobi() ATTR_COLD;
-	void video_start_s16a_bootleg_passsht() ATTR_COLD;
-	void video_start_s16a_bootleg_wb3bl()   ATTR_COLD;
-	void video_start_s16a_bootleg()         ATTR_COLD;
+	DECLARE_VIDEO_START(system16);
+	DECLARE_VIDEO_START(system18old);
+	DECLARE_VIDEO_START(s16a_bootleg_shinobi);
+	DECLARE_VIDEO_START(s16a_bootleg_passsht);
+	DECLARE_VIDEO_START(s16a_bootleg_wb3bl);
+	DECLARE_VIDEO_START(s16a_bootleg);
 	uint32_t screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

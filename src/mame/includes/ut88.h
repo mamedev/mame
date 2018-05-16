@@ -60,10 +60,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ut88_8255_porta_w);
 	void init_ut88();
 	void init_ut88mini();
-	void machine_reset_ut88();
-	void video_start_ut88()       ATTR_COLD;
-	void machine_start_ut88mini() ATTR_COLD;
-	void machine_reset_ut88mini();
+	DECLARE_MACHINE_RESET(ut88);
+	DECLARE_VIDEO_START(ut88);
+	DECLARE_MACHINE_START(ut88mini);
+	DECLARE_MACHINE_RESET(ut88mini);
 	uint32_t screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ut88(machine_config &config);

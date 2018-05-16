@@ -1432,31 +1432,31 @@ static GFXDECODE_START( gfx_wbbc97 )
 GFXDECODE_END
 
 
-void aerofgt_state::machine_start_common()
+MACHINE_START_MEMBER(aerofgt_state,common)
 {
 }
 
-void aerofgt_state::machine_start_aerofgt()
+MACHINE_START_MEMBER(aerofgt_state,aerofgt)
 {
 	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-void aerofgt_state::machine_start_spinlbrk()
+MACHINE_START_MEMBER(aerofgt_state,spinlbrk)
 {
 	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base()+0x8000, 0x8000);
 
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-void aerofgt_state::machine_reset_common()
+MACHINE_RESET_MEMBER(aerofgt_state,common)
 {
 }
 
-void aerofgt_state::machine_reset_aerofgt()
+MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
 {
-	machine_reset_common();
+	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_soundbank->set_entry(0); /* needed by spinlbrk */
 }
@@ -1473,8 +1473,8 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1496,7 +1496,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1523,8 +1523,8 @@ MACHINE_CONFIG_START(aerofgt_state::spikes91)
 
 	/* + Z80 for sound */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1541,7 +1541,7 @@ MACHINE_CONFIG_START(aerofgt_state::spikes91)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	/* the sound hardware is completely different on this:
@@ -1559,8 +1559,8 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 	MCFG_DEVICE_PROGRAM_MAP(pspikesb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1577,7 +1577,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1604,8 +1604,8 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_DEVICE_PROGRAM_MAP(kickball_sound_map)
 	MCFG_DEVICE_IO_MAP(kickball_sound_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1627,7 +1627,7 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0) // still accessed as if it exists, in clone hardware?
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1651,8 +1651,8 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_DEVICE_PROGRAM_MAP(pspikesc_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1674,7 +1674,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1695,8 +1695,8 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1723,7 +1723,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_karatblz, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1752,8 +1752,8 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 	MCFG_DEVICE_PROGRAM_MAP(karatblzbl_sound_map)
 	MCFG_DEVICE_IO_MAP(karatblzbl_sound_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1780,7 +1780,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_karatblz, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1809,8 +1809,8 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_DEVICE_IO_MAP(spinlbrk_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_spinlbrk, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,spinlbrk)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1838,7 +1838,7 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spinlbrk, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1868,8 +1868,8 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1896,7 +1896,7 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1926,8 +1926,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_DEVICE_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1955,7 +1955,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1985,8 +1985,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_DEVICE_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	MCFG_DEVICE_ADD("io", VS9209, 0)
 	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
@@ -2019,7 +2019,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2047,8 +2047,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(aerfboot_sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2066,7 +2066,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2087,8 +2087,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 	MCFG_DEVICE_PROGRAM_MAP(aerfboo2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq2_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2106,7 +2106,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2125,8 +2125,8 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(wbbc97_sound_map)
 								/* IRQs are triggered by the YM3812 */
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2147,7 +2147,7 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wbbc97, this));
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

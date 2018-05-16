@@ -62,8 +62,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void video_start_rpunch()  ATTR_COLD;
-	void video_start_svolley() ATTR_COLD;
+	DECLARE_VIDEO_START(rpunch);
+	DECLARE_VIDEO_START(svolley);
 
 
 	uint32_t screen_update_rpunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

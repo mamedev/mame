@@ -159,10 +159,10 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void machine_start_fm7()    ATTR_COLD;
-	void machine_start_fm77av() ATTR_COLD;
-	void machine_start_fm11()   ATTR_COLD;
-	void machine_start_fm16()   ATTR_COLD;
+	DECLARE_MACHINE_START(fm7);
+	DECLARE_MACHINE_START(fm77av);
+	DECLARE_MACHINE_START(fm11);
+	DECLARE_MACHINE_START(fm16);
 
 	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_drq_w);

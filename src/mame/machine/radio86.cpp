@@ -143,7 +143,7 @@ WRITE8_MEMBER(radio86_state::radio_io_w)
 	m_maincpu->space(AS_PROGRAM).write_byte((offset << 8) + offset,data);
 }
 
-void radio86_state::machine_reset_radio86()
+MACHINE_RESET_MEMBER(radio86_state,radio86)
 {
 	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);

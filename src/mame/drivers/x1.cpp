@@ -2089,7 +2089,7 @@ TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
 	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //roll over
 }
 
-void x1_state::machine_reset_x1()
+MACHINE_RESET_MEMBER(x1_state,x1)
 {
 	//uint8_t *ROM = memregion("x1_cpu")->base();
 	int i;
@@ -2133,9 +2133,9 @@ void x1_state::machine_reset_x1()
 //  m_old_vpos = -1;
 }
 
-void x1_state::machine_reset_x1turbo()
+MACHINE_RESET_MEMBER(x1_state,x1turbo)
 {
-	machine_reset_x1();
+	MACHINE_RESET_CALL_MEMBER( x1 );
 	m_is_turbo = 1;
 	m_ex_bank = 0x10;
 
@@ -2153,7 +2153,7 @@ static const gfx_layout x1_pcg_8x8 =
 	8*8
 };
 
-void x1_state::machine_start_x1()
+MACHINE_START_MEMBER(x1_state,x1)
 {
 	/* set up RTC */
 	{
@@ -2229,8 +2229,8 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_x1, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_x1, this));
+	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
+	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2249,7 +2249,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_x1, this));
+	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
@@ -2294,7 +2294,7 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	MCFG_DEVICE_MODIFY("x1_cpu")
 	MCFG_DEVICE_PROGRAM_MAP(x1turbo_mem)
 	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_x1turbo, this));
+	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
 	MCFG_DEVICE_MODIFY("iobank")
 	MCFG_DEVICE_PROGRAM_MAP(x1turbo_io_banks)

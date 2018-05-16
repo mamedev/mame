@@ -96,7 +96,7 @@ void pc1251_state::machine_start()
 	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x4800);
 }
 
-void pc1251_state::machine_start_pc1260()
+MACHINE_START_MEMBER(pc1251_state,pc1260 )
 {
 	uint8_t *ram = memregion("maincpu")->base() + 0x4000;
 	uint8_t *cpu = m_maincpu->internal_ram();

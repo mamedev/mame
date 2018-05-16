@@ -1214,7 +1214,7 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
 	MCFG_PALETTE_ENTRIES(4096)
 
 	MCFG_PALETTE_INIT_OWNER(astrocde_state,profpac)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_profpac, this));
+	MCFG_VIDEO_START_OVERRIDE(astrocde_state,profpac)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_profpac)

@@ -200,7 +200,7 @@ void ssv_state::video_start()
 	save_item(NAME(m_shadow_pen_shift));
 }
 
-void ssv_state::video_start_eaglshot()
+VIDEO_START_MEMBER(ssv_state,eaglshot)
 {
 	ssv_state::video_start();
 
@@ -225,7 +225,7 @@ WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
 	m_gdfs_tmap->mark_tile_dirty(offset);
 }
 
-void ssv_state::video_start_gdfs()
+VIDEO_START_MEMBER(ssv_state,gdfs)
 {
 	ssv_state::video_start();
 

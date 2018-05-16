@@ -509,8 +509,8 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 	MCFG_CPU_FORCE_NO_DRC()
 
 
-//  set_machine_start_cb(config, driver_callback_delegate(&machine_start_hikaru, this));
-//  set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hikaru, this));
+//  MCFG_MACHINE_START_OVERRIDE(hikaru_state, hikaru )
+//  MCFG_MACHINE_RESET_OVERRIDE(hikaru_state, hikaru )
 
 //  MCFG_NVRAM_HANDLER(hikaru_eeproms)
 

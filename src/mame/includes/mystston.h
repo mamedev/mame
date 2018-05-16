@@ -52,8 +52,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void video_start_mystston() ATTR_COLD;
-	void video_reset_mystston() ATTR_COLD;
+	DECLARE_VIDEO_START(mystston);
+	DECLARE_VIDEO_RESET(mystston);
 	uint32_t screen_update_mystston(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void set_palette();

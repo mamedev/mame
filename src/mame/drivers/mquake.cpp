@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(mquake_state,amiga)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga, this));
+	MCFG_VIDEO_START_OVERRIDE(mquake_state,amiga)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

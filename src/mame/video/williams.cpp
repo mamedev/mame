@@ -167,7 +167,7 @@ void williams_state::state_save_register()
 }
 
 
-void williams_state::video_start_williams()
+VIDEO_START_MEMBER(williams_state,williams)
 {
 	blitter_init(m_blitter_config, nullptr);
 	create_palette_lookup();
@@ -175,7 +175,7 @@ void williams_state::video_start_williams()
 }
 
 
-void blaster_state::video_start_blaster()
+VIDEO_START_MEMBER(blaster_state,blaster)
 {
 	blitter_init(m_blitter_config, memregion("proms")->base());
 	create_palette_lookup();
@@ -185,7 +185,7 @@ void blaster_state::video_start_blaster()
 }
 
 
-void williams2_state::video_start_williams2()
+VIDEO_START_MEMBER(williams2_state,williams2)
 {
 	blitter_init(m_blitter_config, nullptr);
 

@@ -75,7 +75,7 @@ void midvunit_state::machine_reset()
 }
 
 
-void midvunit_state::machine_reset_midvplus()
+MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 {
 	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
@@ -1130,7 +1130,7 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	MCFG_DEVICE_PROGRAM_MAP(midvplus_map)
 	MCFG_TMS3203X_XF1_CB(WRITE8(*this, midvunit_state, midvplus_xf1_w))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midvplus, this));
+	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)

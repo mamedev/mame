@@ -15,7 +15,7 @@
 /*                                                     */
 /*******************************************************/
 
-void _8080bw_state::machine_start_extra_8080bw_sh()
+MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 {
 	save_item(NAME(m_port_1_last_extra));
 	save_item(NAME(m_port_2_last_extra));
@@ -970,7 +970,7 @@ void _8080bw_state::schaser_reinit_555_time_remain()
 }
 
 
-void _8080bw_state::machine_start_schaser_sh()
+MACHINE_START_MEMBER(_8080bw_state,schaser_sh)
 {
 	save_item(NAME(m_schaser_explosion));
 	save_item(NAME(m_schaser_effect_555_is_low));
@@ -980,7 +980,7 @@ void _8080bw_state::machine_start_schaser_sh()
 }
 
 
-void _8080bw_state::machine_reset_schaser_sh()
+MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

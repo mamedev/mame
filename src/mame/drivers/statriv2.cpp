@@ -119,7 +119,7 @@ public:
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(statriv2);
-	void video_start_vertical() ATTR_COLD;
+	DECLARE_VIDEO_START(vertical);
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 	void statriv2(machine_config &config);
@@ -177,7 +177,7 @@ void statriv2_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info), this), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
 }
 
-void statriv2_state::video_start_vertical()
+VIDEO_START_MEMBER(statriv2_state,vertical)
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2v)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_vertical, this));
+	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_vertical)
 MACHINE_CONFIG_END
 

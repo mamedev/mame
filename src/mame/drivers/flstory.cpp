@@ -713,9 +713,9 @@ void flstory_state::machine_start()
 
 
 
-void flstory_state::machine_reset_flstory()
+MACHINE_RESET_MEMBER(flstory_state,flstory)
 {
-//  machine_reset_ta7630();
+//  MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
 	m_gfxctrl = 0;
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_flstory, this));
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -766,7 +766,7 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_flstory, this));
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_flstory, this));
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -835,7 +835,7 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_flstory, this));
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -898,7 +898,7 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_flstory, this));
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -915,7 +915,7 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_victnine, this));
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -971,7 +971,7 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_flstory, this));
+	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -988,7 +988,7 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rumba, this));
+	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

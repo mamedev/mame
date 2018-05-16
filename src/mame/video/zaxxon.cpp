@@ -150,13 +150,13 @@ void zaxxon_state::video_start()
 }
 
 
-void zaxxon_state::video_start_razmataz()
+VIDEO_START_MEMBER(zaxxon_state,razmataz)
 {
 	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),this));
 }
 
 
-void zaxxon_state::video_start_congo()
+VIDEO_START_MEMBER(zaxxon_state,congo)
 {
 	/* allocate our own spriteram since it is not accessible by the main CPU */
 	m_spriteram.allocate(0x100);

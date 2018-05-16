@@ -65,12 +65,12 @@ public:
 
 	void init_hp48();
 	DECLARE_PALETTE_INIT(hp48);
-	void machine_start_hp49g()  ATTR_COLD;
-	void machine_start_hp48gx() ATTR_COLD;
-	void machine_start_hp48g()  ATTR_COLD;
-	void machine_start_hp48gp() ATTR_COLD;
-	void machine_start_hp48sx() ATTR_COLD;
-	void machine_start_hp48s()  ATTR_COLD;
+	DECLARE_MACHINE_START(hp49g);
+	DECLARE_MACHINE_START(hp48gx);
+	DECLARE_MACHINE_START(hp48g);
+	DECLARE_MACHINE_START(hp48gp);
+	DECLARE_MACHINE_START(hp48sx);
+	DECLARE_MACHINE_START(hp48s);
 	uint32_t screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(io_r);

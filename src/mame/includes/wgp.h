@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE16_MEMBER(piv_ctrl_word_w);
 	void init_wgp();
 	void init_wgp2();
-	void video_start_wgp2() ATTR_COLD;
+	DECLARE_VIDEO_START(wgp2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpub_interrupt);
 

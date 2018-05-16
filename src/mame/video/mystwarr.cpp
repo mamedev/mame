@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
 }
 
-void mystwarr_state::video_start_gaiapols()
+VIDEO_START_MEMBER(mystwarr_state, gaiapols)
 {
 	m_gametype = 0;
 
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
 }
 
-void mystwarr_state::video_start_dadandrn()
+VIDEO_START_MEMBER(mystwarr_state, dadandrn)
 {
 	m_gametype = 1;
 
@@ -203,7 +203,7 @@ void mystwarr_state::video_start_dadandrn()
 	m_ult_936_tilemap->set_transparent_pen(0);
 }
 
-void mystwarr_state::video_start_mystwarr()
+VIDEO_START_MEMBER(mystwarr_state, mystwarr)
 {
 	m_gametype = 0;
 
@@ -219,7 +219,7 @@ void mystwarr_state::video_start_mystwarr()
 	m_cbparam = 0;
 }
 
-void mystwarr_state::video_start_metamrph()
+VIDEO_START_MEMBER(mystwarr_state, metamrph)
 {
 	m_gametype = 0;
 
@@ -234,7 +234,7 @@ void mystwarr_state::video_start_metamrph()
 	m_k056832->set_layer_offs(3,  3+4, 0); // attract sky background to sea
 }
 
-void mystwarr_state::video_start_viostorm()
+VIDEO_START_MEMBER(mystwarr_state, viostorm)
 {
 	m_gametype = 0;
 
@@ -248,7 +248,7 @@ void mystwarr_state::video_start_viostorm()
 	m_k056832->set_layer_offs(3,  3+1, 0);
 }
 
-void mystwarr_state::video_start_martchmp()
+VIDEO_START_MEMBER(mystwarr_state, martchmp)
 {
 	m_gametype = 0;
 

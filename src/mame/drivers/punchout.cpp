@@ -616,7 +616,7 @@ WRITE_LINE_MEMBER(punchout_state::vblank_irq)
 }
 
 
-void punchout_state::machine_reset_spnchout()
+MACHINE_RESET_MEMBER(punchout_state, spnchout)
 {
 	m_rp5h01->enable_w(0); // _CE -> GND
 }
@@ -692,7 +692,7 @@ MACHINE_CONFIG_START(punchout_state::spnchout)
 	MCFG_RP5C01_REMOVE_BATTERY()
 	MCFG_RP5H01_ADD("rp5h01")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_spnchout, this));
+	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
 MACHINE_CONFIG_END
 
 
@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(punchout_state::armwrest)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_armwrest)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_armwrest, this));
+	MCFG_VIDEO_START_OVERRIDE(punchout_state, armwrest)
 	MCFG_SCREEN_MODIFY("top")
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_armwrest_top)
 	MCFG_SCREEN_MODIFY("bottom")

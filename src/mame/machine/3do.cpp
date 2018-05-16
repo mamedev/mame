@@ -1030,7 +1030,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 
 /* 9 -> 5 bits translation */
 
-void _3do_state::video_start__3do()
+VIDEO_START_MEMBER(_3do_state,_3do)
 {
 	/* We only keep the odd bits and get rid of the even bits */
 //  for ( int i = 0; i < 512; i++ )

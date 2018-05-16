@@ -64,8 +64,8 @@ public:
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
 	void init_drill();
-	void machine_start_drill() ATTR_COLD;
-	void machine_reset_drill();
+	DECLARE_MACHINE_START(drill);
+	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 	void tile_decode();
@@ -339,14 +339,14 @@ WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
 }
 
 
-void _2mindril_state::machine_start_drill()
+MACHINE_START_MEMBER(_2mindril_state,drill)
 {
 	save_item(NAME(m_defender_sensor));
 	save_item(NAME(m_shutter_sensor));
 	save_item(NAME(m_irq_reg));
 }
 
-void _2mindril_state::machine_reset_drill()
+MACHINE_RESET_MEMBER(_2mindril_state,drill)
 {
 	m_defender_sensor = 0;
 	m_shutter_sensor = 0;
@@ -368,8 +368,8 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, _2mindril_state, coins_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("COINS"))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_drill, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_drill, this));
+	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
+	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_f3, this));
+	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

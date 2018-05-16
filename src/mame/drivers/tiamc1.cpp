@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	MCFG_DEVICE_IO_MAP(kotrybolov_io_map)
 
 	MCFG_SCREEN_MODIFY("screen")
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kot, this));
+	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_kot)

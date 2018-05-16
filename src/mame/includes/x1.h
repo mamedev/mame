@@ -132,11 +132,11 @@ public:
 	DECLARE_WRITE8_MEMBER(x1_portb_w);
 	DECLARE_WRITE8_MEMBER(x1_portc_w);
 	void init_x1_kanji();
-	void machine_start_x1() ATTR_COLD;
-	void machine_reset_x1();
-	void video_start_x1()   ATTR_COLD;
+	DECLARE_MACHINE_START(x1);
+	DECLARE_MACHINE_RESET(x1);
+	DECLARE_VIDEO_START(x1);
 	DECLARE_PALETTE_INIT(x1);
-	void machine_reset_x1turbo();
+	DECLARE_MACHINE_RESET(x1turbo);
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);

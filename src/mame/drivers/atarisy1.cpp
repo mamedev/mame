@@ -218,7 +218,7 @@ void atarisy1_state::update_interrupts()
 }
 
 
-void atarisy1_state::machine_start_atarisy1()
+MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 {
 	atarigen_state::machine_start();
 
@@ -227,7 +227,7 @@ void atarisy1_state::machine_start_atarisy1()
 }
 
 
-void atarisy1_state::machine_reset_atarisy1()
+MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
 {
 	atarigen_state::machine_reset();
 
@@ -716,8 +716,8 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_atarisy1, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atarisy1, this));
+	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
+	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
 	MCFG_ADC0808_EOC_CB(WRITELINE("ajsint", input_merger_device, in_w<1>))
@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy1_state, video_int_write_line))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_atarisy1, this));
+	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))

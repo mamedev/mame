@@ -1750,7 +1750,7 @@ MACHINE_CONFIG_START(ms32_state::f1superb)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1superb)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_f1superb, this));
+	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 MACHINE_CONFIG_END
 
 

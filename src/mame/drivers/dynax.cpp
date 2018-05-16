@@ -359,7 +359,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_reset_kludge_w)
 	m_resetkludge = state;
 }
 
-void dynax_state::machine_reset_adpcm()
+MACHINE_RESET_MEMBER(dynax_state,adpcm)
 {
 	/* start with the MSM5205 reset */
 	m_resetkludge = 0;
@@ -4121,7 +4121,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void dynax_state::machine_start_dynax()
+MACHINE_START_MEMBER(dynax_state,dynax)
 {
 	m_blitter_irq_mask = 1;
 	m_blitter2_irq_mask = 1;
@@ -4149,10 +4149,10 @@ void dynax_state::machine_start_dynax()
 	save_item(NAME(m_palette_ram));
 }
 
-void dynax_state::machine_reset_dynax()
+MACHINE_RESET_MEMBER(dynax_state,dynax)
 {
 	if (m_msm != nullptr)
-		machine_reset_adpcm();
+		MACHINE_RESET_CALL_MEMBER(adpcm);
 
 	m_blitter_irq = 0;
 	m_blitter2_irq = 0;
@@ -4177,20 +4177,20 @@ void dynax_state::machine_reset_dynax()
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 }
 
-void dynax_state::machine_start_hjingi()
+MACHINE_START_MEMBER(dynax_state,hjingi)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 
-	machine_start_dynax();
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
-void dynax_state::machine_start_hanamai()
+MACHINE_START_MEMBER(dynax_state,hanamai)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
 
-	machine_start_dynax();
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
 /***************************************************************************
@@ -4205,8 +4205,8 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_DEVICE_IO_MAP(cdracula_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)  // IM 0 needs an opcode on the data bus
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dynax, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
 
@@ -4231,7 +4231,7 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hanamai, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4253,8 +4253,8 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_DEVICE_IO_MAP(hanamai_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanamai, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4284,7 +4284,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hanamai, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4321,8 +4321,8 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	MCFG_DEVICE_IO_MAP(hnoridur_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dynax, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(hnoridur_banked_map)
@@ -4357,7 +4357,7 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hnoridur, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4388,8 +4388,8 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	MCFG_DEVICE_IO_MAP(hjingi_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hjingi, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(hjingi_banked_map)
@@ -4426,7 +4426,7 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hnoridur, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4457,8 +4457,8 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_DEVICE_IO_MAP(sprtmtch_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanamai, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4485,7 +4485,7 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sprtmtch, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,sprtmtch)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4518,8 +4518,8 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 	MCFG_DEVICE_PROGRAM_MAP(sprtmtch_mem_map)
 	MCFG_DEVICE_IO_MAP(mjfriday_io_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanamai, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4546,7 +4546,7 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjdialq2, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4622,7 +4622,7 @@ MACHINE_CONFIG_START(dynax_state::mcnpshnt)
 	MCFG_DEVICE_PROGRAM_MAP(mcnpshnt_mem_map)
 	MCFG_DEVICE_IO_MAP(mcnpshnt_io_map)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mcnpshnt, this)); // different priorities
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mcnpshnt) // different priorities
 MACHINE_CONFIG_END
 
 
@@ -4647,7 +4647,7 @@ MACHINE_CONFIG_END
 
 // dual monitor, 2 CPU's, 2 blitters
 
-void dynax_state::machine_start_jantouki()
+MACHINE_START_MEMBER(dynax_state,jantouki)
 {
 	uint8_t *MAIN = memregion("maincpu")->base();
 	uint8_t *SOUND = memregion("soundcpu")->base();
@@ -4655,7 +4655,7 @@ void dynax_state::machine_start_jantouki()
 	membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
 	membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
 
-	machine_start_dynax();
+	MACHINE_START_CALL_MEMBER(dynax);
 }
 
 
@@ -4672,8 +4672,8 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_DEVICE_IO_MAP(jantouki_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_pos_buffer_device, inta_cb)    // IM 0 needs an opcode on the data bus
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_jantouki, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4716,7 +4716,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_bottom)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_jantouki, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,jantouki)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4784,7 +4784,7 @@ MACHINE_CONFIG_START(dynax_state::mjelctrn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjelctrn, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::mjembase)
@@ -4800,7 +4800,7 @@ MACHINE_CONFIG_START(dynax_state::mjembase)
 
 	MCFG_DEVICE_REMOVE("outlatch")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjembase, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjembase)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -4814,7 +4814,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::neruton)
 	mjelctrn(config);
-	set_video_start_cb(config, driver_callback_delegate(&video_start_neruton, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
 MACHINE_CONFIG_END
 
 
@@ -4863,8 +4863,8 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dynax, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4888,7 +4888,7 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_tenkai, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,tenkai)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4936,8 +4936,8 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dynax, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4963,7 +4963,7 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjdialq2, this));
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

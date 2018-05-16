@@ -165,7 +165,7 @@ MACHINE_CONFIG_START(_3do_state::_3do)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start__3do, this));
+	MCFG_VIDEO_START_OVERRIDE(_3do_state, _3do )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )

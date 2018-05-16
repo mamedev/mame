@@ -176,7 +176,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void machine_reset_drivedge();
+	DECLARE_MACHINE_RESET(drivedge);
 	void init_program_rom();
 	void init_sftm_common(int prot_addr);
 	void init_shuffle_bowl_common(int prot_addr);

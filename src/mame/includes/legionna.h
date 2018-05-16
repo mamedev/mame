@@ -82,12 +82,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info_denji);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	void video_start_legionna() ATTR_COLD;
-	void video_start_heatbrl()  ATTR_COLD;
-	void video_start_godzilla() ATTR_COLD;
-	void video_start_denjinmk() ATTR_COLD;
-	void video_start_grainbow() ATTR_COLD;
-	void video_start_cupsoc()   ATTR_COLD;
+	DECLARE_VIDEO_START(legionna);
+	DECLARE_VIDEO_START(heatbrl);
+	DECLARE_VIDEO_START(godzilla);
+	DECLARE_VIDEO_START(denjinmk);
+	DECLARE_VIDEO_START(grainbow);
+	DECLARE_VIDEO_START(cupsoc);
 	uint32_t screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_heatbrl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

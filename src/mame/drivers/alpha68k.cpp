@@ -1821,7 +1821,7 @@ WRITE8_MEMBER(alpha68k_state::porta_w)
 /******************************************************************************/
 
 
-void alpha68k_state::machine_start_common()
+MACHINE_START_MEMBER(alpha68k_state,common)
 {
 	save_item(NAME(m_trigstate));
 	save_item(NAME(m_deposits1));
@@ -1833,7 +1833,7 @@ void alpha68k_state::machine_start_common()
 	save_item(NAME(m_flipscreen));
 }
 
-void alpha68k_state::machine_reset_common()
+MACHINE_RESET_MEMBER(alpha68k_state,common)
 {
 	m_trigstate = 0;
 	m_deposits1 = 0;
@@ -1845,13 +1845,13 @@ void alpha68k_state::machine_reset_common()
 	m_flipscreen = 0;
 }
 
-void alpha68k_state::machine_start_alpha68k_V()
+MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_last_bank));
@@ -1859,17 +1859,17 @@ void alpha68k_state::machine_start_alpha68k_V()
 	save_item(NAME(m_sound_pa_latch));
 }
 
-void alpha68k_state::machine_reset_alpha68k_V()
+MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
 {
-	machine_reset_common();
+	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_bank_base = 0;
 	m_last_bank = 0;
 }
 
-void alpha68k_state::machine_reset_alpha68k_II()
+MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
 {
-	machine_reset_common();
+	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_bank_base = 0;
 	m_last_bank = 0;
@@ -1878,13 +1878,13 @@ void alpha68k_state::machine_reset_alpha68k_II()
 	m_buffer_68 = 0;
 }
 
-void alpha68k_state::machine_start_alpha68k_II()
+MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 28, &ROM[0x10000], 0x4000);
 
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_last_bank));
@@ -1928,8 +1928,8 @@ MACHINE_CONFIG_START(alpha68k_state::sstingry)
 //  MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alpha68k_state, saiyugoub1_adpcm_control_w))
 	MCFG_DEVICE_DISABLE()
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1980,8 +1980,8 @@ MACHINE_CONFIG_START(alpha68k_state::kyros)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2031,8 +2031,8 @@ MACHINE_CONFIG_START(alpha68k_state::jongbou)
 	MCFG_DEVICE_IO_MAP(jongbou_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  160*60)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2070,8 +2070,8 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // 4Mhz seems to yield the correct tone
 	MCFG_DEVICE_PROGRAM_MAP(alpha68k_I_s_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2117,8 +2117,8 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, 7614)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_alpha68k_II, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_alpha68k_II, this));
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2134,7 +2134,7 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_alpha68k, this));
+	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2179,8 +2179,8 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_alpha68k_V, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_alpha68k_V, this));
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2196,7 +2196,7 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_alpha68k, this));
+	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2234,8 +2234,8 @@ MACHINE_CONFIG_START(alpha68k_state::tnextspc)
 	MCFG_DEVICE_PROGRAM_MAP(tnextspc_sound_map)
 	MCFG_DEVICE_IO_MAP(tnextspc_sound_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

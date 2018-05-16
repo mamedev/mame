@@ -877,14 +877,14 @@ void jack_state::machine_reset()
 }
 
 
-void jack_state::machine_start_striv()
+MACHINE_START_MEMBER(jack_state,striv)
 {
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
 }
 
-void jack_state::machine_reset_striv()
+MACHINE_RESET_MEMBER(jack_state,striv)
 {
 	m_question_address = 0;
 	m_question_rom = 0;
@@ -894,7 +894,7 @@ void jack_state::machine_reset_striv()
 }
 
 
-void jack_state::machine_start_joinem()
+MACHINE_START_MEMBER(jack_state,joinem)
 {
 	m_joinem_palette_bank = 0;
 
@@ -902,7 +902,7 @@ void jack_state::machine_start_joinem()
 	save_item(NAME(m_joinem_palette_bank));
 }
 
-void jack_state::machine_reset_joinem()
+MACHINE_RESET_MEMBER(jack_state,joinem)
 {
 	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
 }
@@ -962,8 +962,8 @@ MACHINE_CONFIG_START(jack_state::striv)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(striv_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_striv, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_striv, this));
+	MCFG_MACHINE_START_OVERRIDE(jack_state,striv)
+	MCFG_MACHINE_RESET_OVERRIDE(jack_state,striv)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -988,8 +988,8 @@ MACHINE_CONFIG_START(jack_state::joinem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 250) // ??? controls game speed
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_joinem, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_joinem, this));
+	MCFG_MACHINE_START_OVERRIDE(jack_state,joinem)
+	MCFG_MACHINE_RESET_OVERRIDE(jack_state,joinem)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1001,7 +1001,7 @@ MACHINE_CONFIG_START(jack_state::joinem)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(jack_state, joinem)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_joinem, this));
+	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
 MACHINE_CONFIG_END
 
 

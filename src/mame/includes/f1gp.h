@@ -91,12 +91,12 @@ public:
 	TILE_GET_INFO_MEMBER(f1gp_get_roz_tile_info);
 	TILE_GET_INFO_MEMBER(f1gp2_get_roz_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void machine_start_f1gp()  ATTR_COLD;
-	void machine_reset_f1gp();
-	void video_start_f1gp()    ATTR_COLD;
-	void machine_start_f1gpb() ATTR_COLD;
-	void video_start_f1gpb()   ATTR_COLD;
-	void video_start_f1gp2()   ATTR_COLD;
+	DECLARE_MACHINE_START(f1gp);
+	DECLARE_MACHINE_RESET(f1gp);
+	DECLARE_VIDEO_START(f1gp);
+	DECLARE_MACHINE_START(f1gpb);
+	DECLARE_VIDEO_START(f1gpb);
+	DECLARE_VIDEO_START(f1gp2);
 	uint32_t screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

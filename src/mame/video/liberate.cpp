@@ -202,7 +202,7 @@ WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
 
 /***************************************************************************/
 
-void liberate_state::video_start_prosoccr()
+VIDEO_START_MEMBER(liberate_state,prosoccr)
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
@@ -216,7 +216,7 @@ void liberate_state::video_start_prosoccr()
 	save_pointer(NAME(m_fg_gfx), 0x6000);
 }
 
-void liberate_state::video_start_boomrang()
+VIDEO_START_MEMBER(liberate_state,boomrang)
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
@@ -225,7 +225,7 @@ void liberate_state::video_start_boomrang()
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-void liberate_state::video_start_liberate()
+VIDEO_START_MEMBER(liberate_state,liberate)
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
@@ -233,7 +233,7 @@ void liberate_state::video_start_liberate()
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-void liberate_state::video_start_prosport()
+VIDEO_START_MEMBER(liberate_state,prosport)
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::prosport_get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);

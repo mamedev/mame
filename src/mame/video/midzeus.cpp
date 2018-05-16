@@ -276,7 +276,7 @@ midzeus_renderer::midzeus_renderer(midzeus_state &state)
 		m_state(state)
 {}
 
-void midzeus_state::video_start_midzeus()
+VIDEO_START_MEMBER(midzeus_state,midzeus)
 {
 	int i;
 

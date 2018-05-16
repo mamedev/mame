@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(snookr10_state::apple10)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, apple10)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_apple10, this));
+	MCFG_VIDEO_START_OVERRIDE(snookr10_state, apple10)
 
 MACHINE_CONFIG_END
 
@@ -1101,7 +1101,7 @@ MACHINE_CONFIG_START(snookr10_state::crystalc)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, crystalc)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_crystalc, this));
+	MCFG_VIDEO_START_OVERRIDE(snookr10_state, crystalc)
 
 MACHINE_CONFIG_END
 

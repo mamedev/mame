@@ -60,12 +60,12 @@ public:
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_tx_tile_info);
 	DECLARE_PALETTE_INIT(galivan);
-	void machine_start_galivan()  ATTR_COLD;
-	void machine_reset_galivan();
-	void video_start_galivan()    ATTR_COLD;
-	void machine_start_ninjemak() ATTR_COLD;
-	void machine_reset_ninjemak();
-	void video_start_ninjemak()   ATTR_COLD;
+	DECLARE_MACHINE_START(galivan);
+	DECLARE_MACHINE_RESET(galivan);
+	DECLARE_VIDEO_START(galivan);
+	DECLARE_MACHINE_START(ninjemak);
+	DECLARE_MACHINE_RESET(ninjemak);
+	DECLARE_VIDEO_START(ninjemak);
 	uint32_t screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

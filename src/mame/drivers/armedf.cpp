@@ -1225,7 +1225,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void armedf_state::machine_start_armedf()
+MACHINE_START_MEMBER(armedf_state,armedf)
 {
 	save_item(NAME(m_old_mcu_mode));
 	save_item(NAME(m_scroll_msb));
@@ -1237,7 +1237,7 @@ void armedf_state::machine_start_armedf()
 	save_item(NAME(m_bg_scrolly));
 }
 
-void armedf_state::machine_reset_armedf()
+MACHINE_RESET_MEMBER(armedf_state,armedf)
 {
 	m_old_mcu_mode = 0;
 	m_scroll_msb = 0;
@@ -1277,8 +1277,8 @@ MACHINE_CONFIG_START(armedf_state::terraf)
 	MCFG_DEVICE_PROGRAM_MAP(terraf_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
@@ -1290,7 +1290,7 @@ MACHINE_CONFIG_START(armedf_state::terraf)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_terraf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
@@ -1321,8 +1321,8 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_DEVICE_PROGRAM_MAP(terrafjb_extraz80_map)
 	MCFG_DEVICE_IO_MAP(terrafjb_extraz80_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1332,7 +1332,7 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_terraf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
@@ -1369,8 +1369,8 @@ MACHINE_CONFIG_START(armedf_state::kozure)
 	MCFG_DEVICE_PROGRAM_MAP(kozure_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
@@ -1382,7 +1382,7 @@ MACHINE_CONFIG_START(armedf_state::kozure)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 ) // 320 x 240, trusted
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_terraf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
@@ -1408,8 +1408,8 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1419,7 +1419,7 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_armedf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
@@ -1456,8 +1456,8 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
@@ -1469,7 +1469,7 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_terraf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
@@ -1506,8 +1506,8 @@ MACHINE_CONFIG_START(armedf_state::legion)
 	MCFG_DEVICE_IO_MAP(sound_3526_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
@@ -1519,7 +1519,7 @@ MACHINE_CONFIG_START(armedf_state::legion)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_terraf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
@@ -1556,8 +1556,8 @@ MACHINE_CONFIG_START(armedf_state::legionjb)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1567,7 +1567,7 @@ MACHINE_CONFIG_START(armedf_state::legionjb)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_terraf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
@@ -1603,15 +1603,15 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	MCFG_DEVICE_IO_MAP(bigfghtr_mcu_io_map)
 	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0xdf)) // bit 5: bus contention related?
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_armedf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_armedf, this));
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_armedf, this));
+	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 

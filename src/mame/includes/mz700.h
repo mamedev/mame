@@ -63,8 +63,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
 	void init_mz800();
 	void init_mz700();
-	void machine_reset_mz700();
-	void machine_reset_mz800();
+	DECLARE_MACHINE_RESET(mz700);
+	DECLARE_MACHINE_RESET(mz800);
 	virtual void machine_start() override;
 	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

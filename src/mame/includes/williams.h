@@ -86,13 +86,13 @@ public:
 	void init_alienar();
 	void init_robotron();
 	void init_bubbles();
-	void machine_start_defender() ATTR_COLD;
-	void machine_reset_defender();
-	void video_start_williams()   ATTR_COLD;
-	void machine_start_williams() ATTR_COLD;
-	void machine_reset_williams();
-	void machine_start_williams_common() ATTR_COLD;
-	void machine_reset_williams_common();
+	DECLARE_MACHINE_START(defender);
+	DECLARE_MACHINE_RESET(defender);
+	DECLARE_VIDEO_START(williams);
+	DECLARE_MACHINE_START(williams);
+	DECLARE_MACHINE_RESET(williams);
+	DECLARE_MACHINE_START(williams_common);
+	DECLARE_MACHINE_RESET(williams_common);
 	uint32_t screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(williams_count240_off_callback);
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
@@ -169,9 +169,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(williams_snd_irq_b);
 
 	void init_blaster();
-	void machine_start_blaster() ATTR_COLD;
-	void machine_reset_blaster();
-	void video_start_blaster()   ATTR_COLD;
+	DECLARE_MACHINE_START(blaster);
+	DECLARE_MACHINE_RESET(blaster);
+	DECLARE_VIDEO_START(blaster);
 	uint32_t screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	inline void update_blaster_banking();
@@ -222,9 +222,9 @@ public:
 	void init_mysticm();
 	void init_tshoot();
 	void init_inferno();
-	void machine_start_williams2() ATTR_COLD;
-	void machine_reset_williams2();
-	void video_start_williams2()   ATTR_COLD;
+	DECLARE_MACHINE_START(williams2);
+	DECLARE_MACHINE_RESET(williams2);
+	DECLARE_VIDEO_START(williams2);
 	uint32_t screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void williams2(machine_config &config);
 	void mysticm(machine_config &config);
@@ -264,8 +264,8 @@ public:
 	uint16_t m_joust2_current_sound_data;
 
 	void init_joust2();
-	void machine_start_joust2() ATTR_COLD;
-	void machine_reset_joust2();
+	DECLARE_MACHINE_START(joust2);
+	DECLARE_MACHINE_RESET(joust2);
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
 	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);

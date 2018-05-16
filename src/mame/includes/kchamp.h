@@ -71,8 +71,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(kchamp);
-	void machine_start_kchampvs() ATTR_COLD;
-	void machine_start_kchamp()   ATTR_COLD;
+	DECLARE_MACHINE_START(kchampvs);
+	DECLARE_MACHINE_START(kchamp);
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

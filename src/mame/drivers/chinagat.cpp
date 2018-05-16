@@ -95,9 +95,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
 	void init_chinagat();
-	void machine_start_chinagat() ATTR_COLD;
-	void machine_reset_chinagat();
-	void video_start_chinagat() ATTR_COLD;
+	DECLARE_MACHINE_START(chinagat);
+	DECLARE_MACHINE_RESET(chinagat);
+	DECLARE_VIDEO_START(chinagat);
 	DECLARE_WRITE8_MEMBER(interrupt_w);
 	DECLARE_WRITE8_MEMBER(video_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -123,7 +123,7 @@ public:
 };
 
 
-void chinagat_state::video_start_chinagat()
+VIDEO_START_MEMBER(chinagat_state,chinagat)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -519,7 +519,7 @@ static GFXDECODE_START( gfx_chinagat )
 GFXDECODE_END
 
 
-void chinagat_state::machine_start_chinagat()
+MACHINE_START_MEMBER(chinagat_state,chinagat)
 {
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -540,7 +540,7 @@ void chinagat_state::machine_start_chinagat()
 }
 
 
-void chinagat_state::machine_reset_chinagat()
+MACHINE_RESET_MEMBER(chinagat_state,chinagat)
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
@@ -572,8 +572,8 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_chinagat, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_chinagat, this));
+	MCFG_MACHINE_START_OVERRIDE(chinagat_state,chinagat)
+	MCFG_MACHINE_RESET_OVERRIDE(chinagat_state,chinagat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_chinagat, this));
+	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -626,8 +626,8 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* heavy interleaving to sync up sprite<->main cpu's */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_chinagat, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_chinagat, this));
+	MCFG_MACHINE_START_OVERRIDE(chinagat_state,chinagat)
+	MCFG_MACHINE_RESET_OVERRIDE(chinagat_state,chinagat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -639,7 +639,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_chinagat, this));
+	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -673,8 +673,8 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_chinagat, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_chinagat, this));
+	MCFG_MACHINE_START_OVERRIDE(chinagat_state,chinagat)
+	MCFG_MACHINE_RESET_OVERRIDE(chinagat_state,chinagat)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_chinagat, this));
+	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

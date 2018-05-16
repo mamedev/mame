@@ -40,7 +40,7 @@ protected:
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(blstroid_halt_until_hblank_0_w);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	void video_start_blstroid() ATTR_COLD;
+	DECLARE_VIDEO_START(blstroid);
 	uint32_t screen_update_blstroid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);

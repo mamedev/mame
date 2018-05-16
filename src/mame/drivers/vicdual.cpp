@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(vicdual_state::frogs)
 	MCFG_DEVICE_PROGRAM_MAP(frogs_map)
 	MCFG_DEVICE_IO_MAP(frogs_io_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_frogs_audio, this));
+	MCFG_MACHINE_START_OVERRIDE(vicdual_state,frogs_audio)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -991,7 +991,7 @@ static INPUT_PORTS_START( digger )
 INPUT_PORTS_END
 
 
-void vicdual_state::machine_reset_headon2()
+MACHINE_RESET_MEMBER( vicdual_state, headon2 )
 {
 	m_palette_bank = 3;
 }
@@ -1005,7 +1005,7 @@ MACHINE_CONFIG_START(vicdual_state::headon2)
 	MCFG_DEVICE_PROGRAM_MAP(headon2_map)
 	MCFG_DEVICE_IO_MAP(headon2_io_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_headon2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vicdual_state, headon2)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2348,7 +2348,7 @@ static INPUT_PORTS_START( samurai )
 INPUT_PORTS_END
 
 
-void vicdual_state::machine_start_samurai()
+MACHINE_START_MEMBER(vicdual_state,samurai)
 {
 	m_samurai_protection_data = 0;
 	save_item(NAME(m_samurai_protection_data));
@@ -2364,7 +2364,7 @@ MACHINE_CONFIG_START(vicdual_state::samurai)
 	MCFG_DEVICE_PROGRAM_MAP(samurai_map)
 	MCFG_DEVICE_IO_MAP(samurai_io_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_samurai, this));
+	MCFG_MACHINE_START_OVERRIDE(vicdual_state,samurai)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2524,7 +2524,7 @@ static INPUT_PORTS_START( nsub )
 INPUT_PORTS_END
 
 
-void nsub_state::machine_start_nsub()
+MACHINE_START_MEMBER(nsub_state, nsub)
 {
 	m_nsub_play_counter = 0;
 	save_item(NAME(m_nsub_coin_counter));
@@ -2537,7 +2537,7 @@ void nsub_state::machine_start_nsub()
 	m_nsub_coinage_timer->adjust(attotime::zero, 0, attotime::from_msec(150));
 }
 
-void nsub_state::machine_reset_nsub()
+MACHINE_RESET_MEMBER(nsub_state, nsub)
 {
 	m_nsub_coin_counter = m_coinage->read() & 7;
 
@@ -2559,8 +2559,8 @@ MACHINE_CONFIG_START(nsub_state::nsub)
 	MCFG_SCREEN_UPDATE_DRIVER(nsub_state, screen_update_color)
 	MCFG_S97269PB_ADD("s97269pb")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_nsub, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_nsub, this));
+	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsub)
+	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
 
 	/* audio hardware */
 	MCFG_S97271P_ADD("s97271p")

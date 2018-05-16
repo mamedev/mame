@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(midwunit_state::wunit)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midwunit, this));
+	MCFG_MACHINE_RESET_OVERRIDE(midwunit_state,midwunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(midwunit_state::wunit)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midwunit, this));
+	MCFG_VIDEO_START_OVERRIDE(midwunit_state,midwunit)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)

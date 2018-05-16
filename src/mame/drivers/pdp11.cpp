@@ -113,8 +113,8 @@ public:
 	uint8_t m_teletype_data;
 	uint16_t m_teletype_status;
 	virtual void machine_reset() override;
-	void machine_reset_pdp11ub2();
-	void machine_reset_pdp11qb();
+	DECLARE_MACHINE_RESET(pdp11ub2);
+	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
 	void pdp11ub2(machine_config &config);
 	void pdp11(machine_config &config);
@@ -310,7 +310,7 @@ void pdp11_state::load9312prom(uint8_t *desc, uint8_t *src, int size)
 	}
 }
 
-void pdp11_state::machine_reset_pdp11ub2()
+MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
 {
 	// Load M9312
 	uint8_t* user1 = memregion("consproms")->base() + ioport("CONSPROM")->read() * 0x0400;
@@ -341,7 +341,7 @@ void pdp11_state::machine_reset_pdp11ub2()
 
 }
 
-void pdp11_state::machine_reset_pdp11qb()
+MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 {
 	m_maincpu->set_state_int(T11_PC, 0xea00);
 }
@@ -369,12 +369,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pdp11_state::pdp11ub2)
 	pdp11(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pdp11ub2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11ub2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pdp11_state::pdp11qb)
 	pdp11(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pdp11qb, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_T11_INITIAL_MODE(0 << 13)

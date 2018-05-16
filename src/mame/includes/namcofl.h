@@ -71,9 +71,9 @@ public:
 	DECLARE_WRITE32_MEMBER(namcofl_spritebank_w);
 	void init_speedrcr();
 	void init_finalapr();
-	void machine_start_namcofl() ATTR_COLD;
-	void machine_reset_namcofl();
-	void video_start_namcofl()   ATTR_COLD;
+	DECLARE_MACHINE_START(namcofl);
+	DECLARE_MACHINE_RESET(namcofl);
+	DECLARE_VIDEO_START(namcofl);
 	uint32_t screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);

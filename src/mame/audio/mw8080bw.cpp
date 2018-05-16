@@ -18,7 +18,7 @@
  *
  *************************************/
 
-void mw8080bw_state::sound_start_samples()
+SOUND_START_MEMBER( mw8080bw_state, samples )
 {
 	/* setup for save states */
 	save_item(NAME(m_port_1_last));
@@ -145,7 +145,7 @@ static const char *const seawolf_sample_names[] =
 };
 
 MACHINE_CONFIG_START(mw8080bw_state::seawolf_audio)
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_samples, this));
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
@@ -199,7 +199,7 @@ static const char *const gunfight_sample_names[] =
 
 
 MACHINE_CONFIG_START(mw8080bw_state::gunfight_audio)
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_samples, this));
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1544,7 +1544,7 @@ static const char *const gmissile_sample_names[] =
 };
 
 MACHINE_CONFIG_START(mw8080bw_state::gmissile_audio)
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_samples, this));
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1638,7 +1638,7 @@ static const char *const m4_sample_names[] =
 
 
 MACHINE_CONFIG_START(mw8080bw_state::m4_audio)
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_samples, this));
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1894,7 +1894,7 @@ static const char *const clowns_sample_names[] =
 };
 
 MACHINE_CONFIG_START(mw8080bw_state::clowns_audio)
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_samples, this));
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -3263,7 +3263,7 @@ static const char *const phantom2_sample_names[] =
 };
 
 MACHINE_CONFIG_START(mw8080bw_state::phantom2_audio)
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_samples, this));
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
@@ -3507,7 +3507,7 @@ static const char *const invaders_sample_names[] =
 
 /* left in for all games that hack into invaders samples for audio */
 MACHINE_CONFIG_START(mw8080bw_state::invaders_samples_audio)
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_samples, this));
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
 

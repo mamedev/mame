@@ -97,9 +97,9 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_pgm_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_pgm_bg_tilemap_tile_info);
-	void video_start_pgm()   ATTR_COLD;
-	void machine_start_pgm() ATTR_COLD;
-	void machine_reset_pgm();
+	DECLARE_VIDEO_START(pgm);
+	DECLARE_MACHINE_START(pgm);
+	DECLARE_MACHINE_RESET(pgm);
 	uint32_t screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);

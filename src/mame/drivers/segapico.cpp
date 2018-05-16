@@ -167,7 +167,7 @@ public:
 	m_picocart(*this, "picoslot") { }
 
 	required_device<pico_cart_slot_device> m_picocart;
-	void machine_start_pico() ATTR_COLD;
+	DECLARE_MACHINE_START(pico);
 	void pico(machine_config &config);
 	void picopal(machine_config &config);
 };
@@ -378,7 +378,7 @@ static void pico_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
 }
 
-void pico_state::machine_start_pico()
+MACHINE_START_MEMBER(pico_state,pico)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
@@ -397,8 +397,8 @@ MACHINE_CONFIG_START(pico_state::pico)
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pico, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
+	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
@@ -418,8 +418,8 @@ MACHINE_CONFIG_START(pico_state::picopal)
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pico, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
+	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
@@ -563,7 +563,7 @@ public:
 	m_picocart(*this, "coperaslot") { }
 
 	required_device<copera_cart_slot_device> m_picocart;
-	void machine_start_copera() ATTR_COLD;
+	DECLARE_MACHINE_START(copera);
 	void copera(machine_config &config);
 	void copera_mem(address_map &map);
 };
@@ -590,7 +590,7 @@ static void copera_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
 }
 
-void copera_state::machine_start_copera()
+MACHINE_START_MEMBER(copera_state,copera)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
@@ -613,8 +613,8 @@ MACHINE_CONFIG_START(copera_state::copera)
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_copera, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
+	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
 	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")

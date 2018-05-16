@@ -120,15 +120,14 @@ public:
 
 	void init_dland();
 	void init_common();
-	void machine_start_tokio()    ATTR_COLD;
-	void machine_reset_tokio();
-	void machine_start_bublbobl() ATTR_COLD;
-	void machine_reset_bublbobl();
-	void machine_start_boblbobl() ATTR_COLD;
-	void machine_reset_boblbobl();
-	void machine_start_common()   ATTR_COLD;
-	void machine_reset_common();
-
+	DECLARE_MACHINE_START(tokio);
+	DECLARE_MACHINE_RESET(tokio);
+	DECLARE_MACHINE_START(bublbobl);
+	DECLARE_MACHINE_RESET(bublbobl);
+	DECLARE_MACHINE_START(boblbobl);
+	DECLARE_MACHINE_RESET(boblbobl);
+	DECLARE_MACHINE_START(common);
+	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void configure_banks();
 
@@ -173,8 +172,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
 
-	void machine_start_bub68705() ATTR_COLD;
-	void machine_reset_bub68705();
+	DECLARE_MACHINE_START(bub68705);
+	DECLARE_MACHINE_RESET(bub68705);
 
 	void bub68705(machine_config &config);
 protected:

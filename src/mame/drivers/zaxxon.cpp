@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	MCFG_DEVICE_REMOVE("ppi8255")
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_razmataz, this));
+	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,razmataz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
 
@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_congo, this));
+	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
 

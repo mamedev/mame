@@ -1048,7 +1048,7 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sngkace, this));
+	MCFG_VIDEO_START_OVERRIDE(psikyo_state,sngkace)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1094,7 +1094,7 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_psikyo, this));
+	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1135,7 +1135,7 @@ MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unp
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_psikyo, this));
+	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_psikyo, this));
+	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

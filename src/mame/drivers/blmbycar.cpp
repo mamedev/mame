@@ -18,7 +18,7 @@ To Do:
 
 Blomby Car is said to be a bootleg of Gaelco's World Rally and uses many
 of the same fonts
-(Update: it actually is a bootleg of World Rally by looking how much
+(Update: it actually is a bootleg of World Rally by looking how much 
 similar the two HWs are, down to the dipswitches!)
 
 Waterball
@@ -213,10 +213,10 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P1_P2") /* $700002.w */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN   ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN   ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18) 
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gear Shift") PORT_TOGGLE PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( blmbycar )
 
 	PORT_START("OPT_WHEEL") /* $700004.w */
 	PORT_BIT ( 0x00ff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_REVERSE PORT_CONDITION("DSW", 0x18, EQUALS, 0x08) PORT_NAME("P1 Opt Wheel")
-
+	
 	PORT_START("POT_WHEEL")
 	PORT_BIT ( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_REVERSE PORT_CONDITION("DSW", 0x18, EQUALS, 0x10) PORT_NAME("P1 Pot Wheel")
 
@@ -333,11 +333,13 @@ GFXDECODE_END
 
 /***************************************************************************
 
+
                                 Machine Drivers
+
 
 ***************************************************************************/
 
-void blmbycar_state::machine_start_blmbycar()
+MACHINE_START_MEMBER(blmbycar_state,blmbycar)
 {
 	save_item(NAME(m_pot_wheel));
 	save_item(NAME(m_old_val));
@@ -345,11 +347,12 @@ void blmbycar_state::machine_start_blmbycar()
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-void blmbycar_state::machine_reset_blmbycar()
+MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 {
 	m_pot_wheel = 0;
 	m_old_val = 0;
 }
+
 
 MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
@@ -358,8 +361,8 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 	MCFG_DEVICE_PROGRAM_MAP(blmbycar_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_blmbycar, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_blmbycar, this));
+	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,blmbycar)
+	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,blmbycar)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -386,14 +389,14 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 MACHINE_CONFIG_END
 
 
-void blmbycar_state::machine_start_watrball()
+MACHINE_START_MEMBER(blmbycar_state,watrball)
 {
 	save_item(NAME(m_retvalue));
 
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-void blmbycar_state::machine_reset_watrball()
+MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 {
 	m_retvalue = 0;
 }
@@ -405,8 +408,8 @@ MACHINE_CONFIG_START(blmbycar_state::watrball)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(watrball_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_watrball, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_watrball, this));
+	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,watrball)
+	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,watrball)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

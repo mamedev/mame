@@ -120,8 +120,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 
-	void machine_reset_r2dx_v33();
-	void machine_reset_nzeroteam();
+	DECLARE_MACHINE_RESET(r2dx_v33);
+	DECLARE_MACHINE_RESET(nzeroteam);
 
 	void nzerotea(machine_config &config);
 	void rdx_v33(machine_config &config);
@@ -765,12 +765,12 @@ static INPUT_PORTS_START( zerotm2k )
 INPUT_PORTS_END
 
 
-void r2dx_v33_state::machine_reset_r2dx_v33()
+MACHINE_RESET_MEMBER(r2dx_v33_state,r2dx_v33)
 {
 	common_reset();
 }
 
-void r2dx_v33_state::machine_reset_nzeroteam()
+MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
 {
 	common_reset();
 
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_DEVICE_PROGRAM_MAP(rdx_v33_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_r2dx_v33, this));
+	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -807,7 +807,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_raiden2, this));
+	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_DEVICE_PROGRAM_MAP(nzerotea_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_nzeroteam, this));
+	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_raiden2, this));
+	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))

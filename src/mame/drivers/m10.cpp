@@ -168,7 +168,7 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 	}
 }
 
-void m10_state::machine_start_m10()
+MACHINE_START_MEMBER(m10_state,m10)
 {
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
 
@@ -177,7 +177,7 @@ void m10_state::machine_start_m10()
 	save_item(NAME(m_last));
 }
 
-void m10_state::machine_reset_m10()
+MACHINE_RESET_MEMBER(m10_state,m10)
 {
 	m_bottomline = 0;
 	m_flip = 0;
@@ -818,8 +818,8 @@ MACHINE_CONFIG_START(m10_state::m10)
 	MCFG_DEVICE_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(m10_main)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_m10, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_m10, this));
+	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
+	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
 
@@ -833,7 +833,7 @@ MACHINE_CONFIG_START(m10_state::m10)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_m10, this));
+	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
 
 	/* 74LS123 */
 
@@ -882,8 +882,8 @@ MACHINE_CONFIG_START(m10_state::m15)
 	MCFG_DEVICE_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(m15_main)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_m10, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_m10, this));
+	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
+	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
 
@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(m10_state::m15)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_m15, this));
+	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -49,7 +49,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_barricad() ATTR_COLD;
+	DECLARE_VIDEO_START(barricad);
 	uint32_t screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t read_port_and_t0( int port );

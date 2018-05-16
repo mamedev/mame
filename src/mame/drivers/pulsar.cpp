@@ -60,7 +60,7 @@ public:
 		{ }
 
 	void init_pulsar();
-	void machine_reset_pulsar();
+	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(baud_w);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
@@ -188,7 +188,7 @@ static void pulsar_floppies(device_slot_interface &device)
 static INPUT_PORTS_START( pulsar )
 INPUT_PORTS_END
 
-void pulsar_state::machine_reset_pulsar()
+MACHINE_RESET_MEMBER( pulsar_state, pulsar )
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
@@ -217,7 +217,7 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_DEVICE_PROGRAM_MAP(pulsar_mem)
 	MCFG_DEVICE_IO_MAP(pulsar_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pulsar, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pulsar_state, pulsar)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255, 0)

@@ -61,10 +61,10 @@ public:
 	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
 	void init_mutantf();
 	void init_cninjabl2();
-	void machine_start_robocop2() ATTR_COLD;
-	void machine_reset_robocop2();
-	void video_start_stoneage()   ATTR_COLD;
-	void video_start_mutantf()    ATTR_COLD;
+	DECLARE_MACHINE_START(robocop2);
+	DECLARE_MACHINE_RESET(robocop2);
+	DECLARE_VIDEO_START(stoneage);
+	DECLARE_VIDEO_START(mutantf);
 	uint32_t screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cninjabl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cninjabl2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -20,7 +20,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(bgbank_w);
 	DECLARE_WRITE8_MEMBER(dig0_w);
-	void machine_reset_s11a();
+	DECLARE_MACHINE_RESET(s11a);
 	void init_s11a();
 
 	void s11a(machine_config &config);

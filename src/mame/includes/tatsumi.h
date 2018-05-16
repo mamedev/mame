@@ -91,8 +91,8 @@ public:
 	DECLARE_WRITE8_MEMBER(apache3_road_x_w);
 
 	void init_apache3();
-	void machine_reset_apache3();
-	void video_start_apache3() ATTR_COLD;
+	DECLARE_MACHINE_RESET(apache3);
+	DECLARE_VIDEO_START(apache3);
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
 
@@ -145,7 +145,7 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_crt_w);
 
 	void init_roundup5();
-	void video_start_roundup5() ATTR_COLD;
+	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void roundup5(machine_config &config);
@@ -193,8 +193,8 @@ public:
 
 	void init_cyclwarr();
 	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_bigfight);
-	void video_start_cyclwarr() ATTR_COLD;
-	void video_start_bigfight() ATTR_COLD;
+	DECLARE_VIDEO_START(cyclwarr);
+	DECLARE_VIDEO_START(bigfight);
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -212,7 +212,7 @@ private:
 	required_shared_ptr<uint16_t> m_cyclwarr_cpub_ram;
 	required_shared_ptr_array<uint16_t, 2> m_cyclwarr_videoram;
 	required_region_ptr<uint8_t> m_cyclwarr_tileclut;
-
+	
 	std::vector<uint8_t> m_mask;
 	tilemap_t *m_layer[4];
 

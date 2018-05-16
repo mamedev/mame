@@ -134,7 +134,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_cpokerpk() ATTR_COLD;
+	DECLARE_VIDEO_START(cpokerpk);
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
@@ -238,7 +238,7 @@ uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_i
 	return 0;
 }
 
-void igspoker_state::video_start_cpokerpk()
+VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
@@ -1964,7 +1964,7 @@ MACHINE_CONFIG_START(igspoker_state::number10)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cpokerpk, this));
+	MCFG_VIDEO_START_OVERRIDE(igspoker_state,cpokerpk)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

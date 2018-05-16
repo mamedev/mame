@@ -430,7 +430,7 @@ public:
 	void init_terabrst();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void machine_reset_hornet_2board();
+	DECLARE_MACHINE_RESET(hornet_2board);
 	uint32_t screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);

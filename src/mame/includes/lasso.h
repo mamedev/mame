@@ -72,11 +72,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lasso);
-	void machine_start_wwjgtin() ATTR_COLD;
-	void machine_reset_wwjgtin();
-	void video_start_wwjgtin()   ATTR_COLD;
+	DECLARE_MACHINE_START(wwjgtin);
+	DECLARE_MACHINE_RESET(wwjgtin);
+	DECLARE_VIDEO_START(wwjgtin);
 	DECLARE_PALETTE_INIT(wwjgtin);
-	void video_start_pinbo()     ATTR_COLD;
+	DECLARE_VIDEO_START(pinbo);
 	uint32_t screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

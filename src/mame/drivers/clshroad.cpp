@@ -303,7 +303,7 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_firebatl, this));
+	MCFG_VIDEO_START_OVERRIDE(clshroad_state,firebatl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_clshroad, this));
+	MCFG_VIDEO_START_OVERRIDE(clshroad_state,clshroad)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

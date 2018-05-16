@@ -68,7 +68,7 @@ const atari_motion_objects_config badlands_state::s_mob_config =
 	0,                  /* resulting value to indicate "special" */
 };
 
-void badlands_state::video_start_badlands()
+VIDEO_START_MEMBER(badlands_state,badlands)
 {
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));

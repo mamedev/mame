@@ -85,7 +85,7 @@ public:
 
 	void init_niyanpai();
 	virtual void video_start() override;
-	void machine_start_musobana() ATTR_COLD;
+	DECLARE_MACHINE_START(musobana);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int blitter_r(int vram, int offset);

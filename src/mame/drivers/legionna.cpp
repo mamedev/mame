@@ -1255,7 +1255,7 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_legionna, this));
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1308,7 +1308,7 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_heatbrl, this));
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1362,7 +1362,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_godzilla, this));
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1415,7 +1415,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_denjinmk, this));
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1468,7 +1468,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_grainbow, this));
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1522,7 +1522,7 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cupsoc, this));
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -2038,7 +2038,7 @@ PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
-void pc9801_state::machine_start_pc9801_common()
+MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -2056,45 +2056,45 @@ void pc9801_state::machine_start_pc9801_common()
 	save_pointer(NAME(m_egc.regs), 8);
 }
 
-void pc9801_state::machine_start_pc9801f()
+MACHINE_START_MEMBER(pc9801_state,pc9801f)
 {
-	machine_start_pc9801_common();
+	MACHINE_START_CALL_MEMBER(pc9801_common);
 
 	m_fdc_2hd->set_rate(500000);
 	m_fdc_2dd->set_rate(250000);
 	m_sys_type = 0x00 >> 6;
 }
 
-void pc9801_state::machine_start_pc9801rs()
+MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 {
-	machine_start_pc9801_common();
+	MACHINE_START_CALL_MEMBER(pc9801_common);
 
 	m_sys_type = 0x80 >> 6;
 }
 
-void pc9801_state::machine_start_pc9801bx2()
+MACHINE_START_MEMBER(pc9801_state,pc9801bx2)
 {
-	machine_start_pc9801rs();
+	MACHINE_START_CALL_MEMBER(pc9801rs);
 
 	save_pointer(NAME(m_sdip), 24);
 }
 
 
-void pc9801_state::machine_start_pc9821()
+MACHINE_START_MEMBER(pc9801_state,pc9821)
 {
-	machine_start_pc9801rs();
+	MACHINE_START_CALL_MEMBER(pc9801rs);
 
 	save_pointer(NAME(m_sdip), 24);
 }
 
-void pc9801_state::machine_start_pc9821ap2()
+MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 {
-	machine_start_pc9821();
+	MACHINE_START_CALL_MEMBER(pc9821);
 
 	// ...
 }
 
-void pc9801_state::machine_reset_pc9801_common()
+MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
 	memset(m_tvram.get(), 0, sizeof(uint16_t) * 0x2000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
@@ -2120,9 +2120,9 @@ void pc9801_state::machine_reset_pc9801_common()
 	memset(&m_egc, 0, sizeof(m_egc));
 }
 
-void pc9801_state::machine_reset_pc9801f()
+MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 {
-	machine_reset_pc9801_common();
+	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
 	uint8_t op_mode;
 	uint8_t *ROM;
@@ -2142,9 +2142,9 @@ void pc9801_state::machine_reset_pc9801f()
 		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
 }
 
-void pc9801_state::machine_reset_pc9801rs()
+MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 {
-	machine_reset_pc9801_common();
+	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
 	m_gate_a20 = 0;
 	m_fdc_ctrl = 3;
@@ -2161,9 +2161,9 @@ void pc9801_state::machine_reset_pc9801rs()
 	}
 }
 
-void pc9801_state::machine_reset_pc9821()
+MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 {
-	machine_reset_pc9801rs();
+	MACHINE_RESET_CALL_MEMBER(pc9801rs);
 
 	m_pc9821_window_bank = 0x08;
 }
@@ -2391,8 +2391,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 
 	pc9801_common(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801f, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9801f, this));
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
 
 	// TODO: maybe force dips to avoid beep error
 	MCFG_RAM_ADD(RAM_TAG)
@@ -2432,8 +2432,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x18000)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801rs, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9801rs, this));
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
 	MCFG_DEVICE_MODIFY("i8237")
 	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
@@ -2462,8 +2462,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801vm)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("640K")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9801_common, this));
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801_common)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801ux)
@@ -2483,7 +2483,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801bx2)
 	MCFG_DEVICE_IO_MAP(pc9821_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801bx2, this));
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9821)
@@ -2498,8 +2498,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9821)
 	MCFG_PIT8253_CLK1(MAIN_CLOCK_X2)
 	MCFG_PIT8253_CLK2(MAIN_CLOCK_X2)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9821, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9821, this));
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
 
 	MCFG_DEVICE_MODIFY("i8237")
 	MCFG_DEVICE_CLOCK(16000000); // unknown clock
@@ -2516,7 +2516,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9821ap2)
 	MCFG_DEVICE_IO_MAP(pc9821_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9821ap2, this));
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9821v20)

@@ -552,7 +552,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
 }
 
 
-void namcofl_state::machine_start_namcofl()
+MACHINE_START_MEMBER(namcofl_state,namcofl)
 {
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
@@ -568,7 +568,7 @@ void namcofl_state::machine_start_namcofl()
 }
 
 
-void namcofl_state::machine_reset_namcofl()
+MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 {
 	m_network_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 3));
 	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 1));
@@ -592,8 +592,8 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcofl_state, mcu_irq2_cb, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcofl_state, mcu_adc_cb, attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcofl, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcofl, this));
+	MCFG_MACHINE_START_OVERRIDE(namcofl_state,namcofl)
+	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -610,7 +610,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_namcofl, this));
+	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -51,7 +51,7 @@ public:
 		, m_clock(*this, "acia_clock")
 	{ }
 
-	void machine_reset_votrtnt();
+	DECLARE_MACHINE_RESET(votrtnt);
 
 	void votrtnt(machine_config &config);
 	void _6802_mem(address_map &map);
@@ -112,7 +112,7 @@ static INPUT_PORTS_START(votrtnt)
 	PORT_DIPSETTING(    0x80, "9600" )
 INPUT_PORTS_END
 
-void votrtnt_state::machine_reset_votrtnt()
+MACHINE_RESET_MEMBER( votrtnt_state, votrtnt )
 {
 	// Read the dips, whichever one is found to be on first is accepted
 	u8 dips = ioport("DSW1")->read();
@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(votrtnt_state::votrtnt)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(2'457'600))  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
 	MCFG_DEVICE_PROGRAM_MAP(_6802_mem)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_votrtnt, this));
+	MCFG_MACHINE_RESET_OVERRIDE(votrtnt_state, votrtnt)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_votrtnt)

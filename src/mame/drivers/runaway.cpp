@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(runaway_state::qwak)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_qwak)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_qwak, this));
+	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_qwak)
 

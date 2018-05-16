@@ -282,7 +282,7 @@ uint32_t super80_state::screen_update_super80m(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-void super80_state::video_start_super80()
+VIDEO_START_MEMBER(super80_state,super80)
 {
 	m_vidpg = 0xfe00;
 }

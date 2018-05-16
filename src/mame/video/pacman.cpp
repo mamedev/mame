@@ -157,7 +157,7 @@ void pacman_state::init_save_state()
 }
 
 
-void pacman_state::video_start_pacman()
+VIDEO_START_MEMBER(pacman_state,pacman)
 {
 	init_save_state();
 
@@ -176,9 +176,9 @@ void pacman_state::video_start_pacman()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
 }
 
-void pacman_state::video_start_birdiy()
+VIDEO_START_MEMBER(pacman_state,birdiy)
 {
-	video_start_pacman();
+	VIDEO_START_CALL_MEMBER( pacman );
 	m_xoffsethack = 0;
 	m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour
 }
@@ -309,7 +309,7 @@ uint32_t pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 
 
 **************************************************************************/
 
-void pacman_state::video_start_pengo()
+VIDEO_START_MEMBER(pacman_state,pengo)
 {
 	init_save_state();
 
@@ -363,7 +363,7 @@ TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,attr & 0x1f,0);
 }
 
-void pacman_state::video_start_s2650games()
+VIDEO_START_MEMBER(pacman_state,s2650games)
 {
 	init_save_state();
 
@@ -531,7 +531,7 @@ void pacman_state::jrpacman_mark_tile_dirty( int offset )
 	}
 }
 
-void pacman_state::video_start_jrpacman()
+VIDEO_START_MEMBER(pacman_state,jrpacman)
 {
 	init_save_state();
 

@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 
 ***************************************************************************/
 
-void galivan_state::video_start_galivan()
+VIDEO_START_MEMBER(galivan_state,galivan)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
@@ -182,7 +182,7 @@ void galivan_state::video_start_galivan()
 	m_tx_tilemap->set_transparent_pen(15);
 }
 
-void galivan_state::video_start_ninjemak()
+VIDEO_START_MEMBER(galivan_state,ninjemak)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 512, 32);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);

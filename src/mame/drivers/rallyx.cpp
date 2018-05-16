@@ -795,7 +795,7 @@ static const char *const rallyx_sample_names[] =
  *
  *************************************/
 
-void rallyx_state::machine_start_rallyx()
+MACHINE_START_MEMBER(rallyx_state,rallyx)
 {
 	save_item(NAME(m_last_bang));
 	save_item(NAME(m_stars_enable));
@@ -833,7 +833,7 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_rallyx, this));
+	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_INIT_OWNER(rallyx_state,rallyx)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rallyx, this));
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -885,7 +885,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_rallyx, this));
+	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_INIT_OWNER(rallyx_state,jungler)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_jungler, this));
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("timeplt_audio", LOCOMOTN_AUDIO)
@@ -916,7 +916,7 @@ MACHINE_CONFIG_START(rallyx_state::tactcian)
 	/* basic machine hardware */
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_locomotn, this));
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
 MACHINE_CONFIG_END
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(rallyx_state::locomotn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_locomotn, this));
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
 MACHINE_CONFIG_END
 
 
@@ -944,7 +944,7 @@ MACHINE_CONFIG_START(rallyx_state::commsega)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_commsega, this));
+	MCFG_VIDEO_START_OVERRIDE(rallyx_state,commsega)
 MACHINE_CONFIG_END
 
 

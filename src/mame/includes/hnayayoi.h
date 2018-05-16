@@ -43,7 +43,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_untoucha() ATTR_COLD;
+	DECLARE_VIDEO_START(untoucha);
 	MC6845_UPDATE_ROW(hnayayoi_update_row);
 	MC6845_UPDATE_ROW(untoucha_update_row);
 	void common_vh_start( int num_pixmaps );

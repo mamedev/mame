@@ -371,7 +371,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(videopkr);
-	void video_start_vidadcba() ATTR_COLD;
+	DECLARE_VIDEO_START(vidadcba);
 	DECLARE_PALETTE_INIT(babypkr);
 	DECLARE_PALETTE_INIT(fortune1);
 	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -546,7 +546,7 @@ void videopkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-void videopkr_state::video_start_vidadcba()
+VIDEO_START_MEMBER(videopkr_state,vidadcba)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
@@ -1333,7 +1333,7 @@ MACHINE_CONFIG_START(videopkr_state::videodad)
 	MCFG_SCREEN_VISIBLE_AREA(4*16, 31*16-1, 2*8, 30*8-1)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_vidadcba, this));
+	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 MACHINE_CONFIG_END
 
 
@@ -1364,7 +1364,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,babypkr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_vidadcba, this));
+	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)

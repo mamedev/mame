@@ -88,8 +88,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	void machine_reset_s3();
-	void machine_reset_s3a();
+	DECLARE_MACHINE_RESET(s3);
+	DECLARE_MACHINE_RESET(s3a);
 	void s3a(machine_config &config);
 	void s3(machine_config &config);
 	void s3_audio_map(address_map &map);
@@ -273,13 +273,13 @@ static INPUT_PORTS_START( s3 )
 	PORT_DIPSETTING(    0x07, "31" )
 INPUT_PORTS_END
 
-void s3_state::machine_reset_s3()
+MACHINE_RESET_MEMBER( s3_state, s3 )
 {
 	m_t_c = 0;
 	m_chimes = 1;
 }
 
-void s3_state::machine_reset_s3a()
+MACHINE_RESET_MEMBER( s3_state, s3a )
 {
 	m_t_c = 0;
 	m_chimes = 0;
@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(s3_state::s3)
 	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s3_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s3_state, irq, attotime::from_hz(250))
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s3)
@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(s3_state::s3a)
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6802, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s3_audio_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s3a, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3a)
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

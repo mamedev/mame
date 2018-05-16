@@ -160,14 +160,14 @@ TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
 }
 
 
-void turbo_state::video_start_turbo()
+VIDEO_START_MEMBER(turbo_state,turbo)
 {
 	/* initialize the foreground tilemap */
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 }
 
 
-void turbo_state::video_start_buckrog()
+VIDEO_START_MEMBER(turbo_state,buckrog)
 {
 	/* initialize the foreground tilemap */
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);

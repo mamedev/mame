@@ -664,7 +664,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-void fortyl_state::machine_start_40love()
+MACHINE_START_MEMBER(fortyl_state,40love)
 {
 	/* video */
 	save_item(NAME(m_pix1));
@@ -680,9 +680,9 @@ void fortyl_state::machine_start_40love()
 }
 
 
-void fortyl_state::machine_reset_common()
+MACHINE_RESET_MEMBER(fortyl_state,common)
 {
-	//machine_reset_ta7630();
+	//MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
 	m_pix1 = 0;
@@ -697,9 +697,9 @@ void fortyl_state::machine_reset_common()
 	m_snd_ctrl3 = 0;
 }
 
-void fortyl_state::machine_reset_40love()
+MACHINE_RESET_MEMBER(fortyl_state,40love)
 {
-	machine_reset_common();
+	MACHINE_RESET_CALL_MEMBER(common);
 }
 
 MACHINE_CONFIG_START(fortyl_state::_40love)
@@ -724,8 +724,8 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6) /* OK */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* high interleave to ensure proper synchronization of CPUs */
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_40love, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_40love, this));
+	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
+	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -790,8 +790,8 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_40love, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_40love, this));  /* init machine */
+	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
+	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)  /* init machine */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

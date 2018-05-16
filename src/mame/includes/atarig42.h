@@ -43,7 +43,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
-	void video_start_atarig42() ATTR_COLD;
+	DECLARE_VIDEO_START(atarig42);
 	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarig42(machine_config &config);
 	void main_map(address_map &map);

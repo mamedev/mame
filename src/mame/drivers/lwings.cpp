@@ -1037,7 +1037,7 @@ MACHINE_CONFIG_START(lwings_state::trojan)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_trojan)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_trojan, this));
+	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_trojan)
 
@@ -1062,13 +1062,13 @@ MACHINE_CONFIG_START(lwings_state::avengers)
 	MCFG_DEVICE_IO_MAP(avengers_adpcm_io_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_avengers, this));
+	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lwings_state::avengersb)
 	avengers(config);
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_avengersb, this));
+	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
 MACHINE_CONFIG_END
 
 

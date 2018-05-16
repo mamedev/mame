@@ -791,14 +791,14 @@ void seibuspi_state::video_start()
 	register_video_state();
 }
 
-void seibuspi_state::video_start_ejanhs()
+VIDEO_START_MEMBER(seibuspi_state,ejanhs)
 {
 	video_start();
 
 	memset(m_alpha_table, 0, 0x2000); // no alpha blending
 }
 
-void seibuspi_state::video_start_sys386f()
+VIDEO_START_MEMBER(seibuspi_state,sys386f)
 {
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;

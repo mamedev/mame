@@ -226,7 +226,7 @@ void seta2_state::gundamex_map(address_map &map)
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-void seta2_state::machine_start_mj4simai()
+MACHINE_START_MEMBER(seta2_state, mj4simai)
 {
 	save_item(NAME(m_keyboard_row));
 }
@@ -2559,7 +2559,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::mj4simai)
 	seta2(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mj4simai, this));
+	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
 
 MACHINE_CONFIG_END
 
@@ -2601,7 +2601,7 @@ MACHINE_CONFIG_START(seta2_state::myangel)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_yoffset, this));
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2614,7 +2614,7 @@ MACHINE_CONFIG_START(seta2_state::myangel2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_yoffset, this));
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2663,7 +2663,7 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x80, 0x170-1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_xoffset, this));
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset)
 MACHINE_CONFIG_END
 
 
@@ -2717,7 +2717,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0xff, 0x1ef-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_xoffset1, this));
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset1)
 MACHINE_CONFIG_END
 
 
@@ -2736,13 +2736,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-void seta2_state::machine_start_funcube()
+MACHINE_START_MEMBER(seta2_state, funcube)
 {
 	save_item(NAME(m_funcube_coin_start_cycles));
 	save_item(NAME(m_funcube_hopper_motor));
 }
 
-void seta2_state::machine_reset_funcube()
+MACHINE_RESET_MEMBER(seta2_state, funcube)
 {
 	m_funcube_coin_start_cycles = 0;
 	m_funcube_hopper_motor = 0;
@@ -2767,8 +2767,8 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_funcube, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_funcube, this));
+	MCFG_MACHINE_START_OVERRIDE(seta2_state, funcube)
+	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

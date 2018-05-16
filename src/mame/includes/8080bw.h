@@ -128,20 +128,20 @@ public:
 	void init_vortex();
 	void init_attackfc();
 
-	void machine_start_extra_8080bw()    ATTR_COLD;
-	void machine_start_rollingc()        ATTR_COLD;
-	void machine_start_sflush()          ATTR_COLD;
-	void machine_start_schaser()         ATTR_COLD;
-	void machine_start_schasercv()       ATTR_COLD;
-	void machine_reset_schaser();
-	void machine_start_polaris()         ATTR_COLD;
-	void machine_start_darthvdr()        ATTR_COLD;
-	void machine_reset_darthvdr();
-	void machine_start_extra_8080bw_sh() ATTR_COLD;
-	void machine_start_extra_8080bw_vh() ATTR_COLD;
-	void machine_start_schaser_sh()      ATTR_COLD;
-	void machine_reset_schaser_sh();
-	void machine_start_claybust()        ATTR_COLD;
+	DECLARE_MACHINE_START(extra_8080bw);
+	DECLARE_MACHINE_START(rollingc);
+	DECLARE_MACHINE_START(sflush);
+	DECLARE_MACHINE_START(schaser);
+	DECLARE_MACHINE_START(schasercv);
+	DECLARE_MACHINE_RESET(schaser);
+	DECLARE_MACHINE_START(polaris);
+	DECLARE_MACHINE_START(darthvdr);
+	DECLARE_MACHINE_RESET(darthvdr);
+	DECLARE_MACHINE_START(extra_8080bw_sh);
+	DECLARE_MACHINE_START(extra_8080bw_vh);
+	DECLARE_MACHINE_START(schaser_sh);
+	DECLARE_MACHINE_RESET(schaser_sh);
+	DECLARE_MACHINE_START(claybust);
 
 	DECLARE_PALETTE_INIT(rollingc);
 	DECLARE_PALETTE_INIT(sflush);

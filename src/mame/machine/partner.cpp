@@ -348,7 +348,7 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 	}
 }
 
-void partner_state::machine_reset_partner()
+MACHINE_RESET_MEMBER(partner_state,partner)
 {
 	m_mem_page = 0;
 	m_win_mem_page = 0;

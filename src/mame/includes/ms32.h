@@ -118,7 +118,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_f1superb() ATTR_COLD;
+	DECLARE_VIDEO_START(f1superb);
 	uint32_t screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);

@@ -44,8 +44,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(microvision);
-	void machine_start_microvision() ATTR_COLD;
-	void machine_reset_microvision();
+	DECLARE_MACHINE_START(microvision);
+	DECLARE_MACHINE_RESET(microvision);
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
@@ -145,7 +145,7 @@ PALETTE_INIT_MEMBER(microvision_state,microvision)
 }
 
 
-void microvision_state::machine_start_microvision()
+MACHINE_START_MEMBER(microvision_state, microvision)
 {
 	m_paddle_timer = timer_alloc(TIMER_PADDLE);
 
@@ -163,7 +163,7 @@ void microvision_state::machine_start_microvision()
 }
 
 
-void microvision_state::machine_reset_microvision()
+MACHINE_RESET_MEMBER(microvision_state, microvision)
 {
 	for (auto & elem : m_lcd_latch)
 	{
@@ -652,8 +652,8 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_microvision, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_microvision, this));
+	MCFG_MACHINE_START_OVERRIDE(microvision_state, microvision )
+	MCFG_MACHINE_RESET_OVERRIDE(microvision_state, microvision )
 
 	MCFG_SCREEN_UPDATE_DRIVER(microvision_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, microvision_state, screen_vblank))

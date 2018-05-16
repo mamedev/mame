@@ -281,8 +281,8 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sms, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sms, this));
+	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
+	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

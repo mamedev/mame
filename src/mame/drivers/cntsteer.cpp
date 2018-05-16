@@ -106,12 +106,12 @@ public:
 	void init_zerotrgt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void machine_start_cntsteer() ATTR_COLD;
-	void machine_reset_cntsteer();
-	void video_start_cntsteer() ATTR_COLD;
-	void machine_start_zerotrgt() ATTR_COLD;
-	void machine_reset_zerotrgt();
-	void video_start_zerotrgt() ATTR_COLD;
+	DECLARE_MACHINE_START(cntsteer);
+	DECLARE_MACHINE_RESET(cntsteer);
+	DECLARE_VIDEO_START(cntsteer);
+	DECLARE_MACHINE_START(zerotrgt);
+	DECLARE_MACHINE_RESET(zerotrgt);
+	DECLARE_VIDEO_START(zerotrgt);
 	DECLARE_PALETTE_INIT(zerotrgt);
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -175,7 +175,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
 }
 
-void cntsteer_state::video_start_cntsteer()
+VIDEO_START_MEMBER(cntsteer_state,cntsteer)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
@@ -185,7 +185,7 @@ void cntsteer_state::video_start_cntsteer()
 	//m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
-void cntsteer_state::video_start_zerotrgt()
+VIDEO_START_MEMBER(cntsteer_state,zerotrgt)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
@@ -873,7 +873,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-void cntsteer_state::machine_start_cntsteer()
+MACHINE_START_MEMBER(cntsteer_state,cntsteer)
 {
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bg_bank));
@@ -888,14 +888,14 @@ void cntsteer_state::machine_start_cntsteer()
 	save_item(NAME(m_disable_roz));
 }
 
-void cntsteer_state::machine_start_zerotrgt()
+MACHINE_START_MEMBER(cntsteer_state,zerotrgt)
 {
 	save_item(NAME(m_nmimask));
-	machine_start_cntsteer();
+	MACHINE_START_CALL_MEMBER(cntsteer);
 }
 
 
-void cntsteer_state::machine_reset_zerotrgt()
+MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
 {
 	m_flipscreen = 0;
 	m_bg_bank = 0;
@@ -912,10 +912,10 @@ void cntsteer_state::machine_reset_zerotrgt()
 }
 
 
-void cntsteer_state::machine_reset_cntsteer()
+MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine_reset_zerotrgt();
+	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
 MACHINE_CONFIG_START(cntsteer_state::cntsteer)
@@ -932,8 +932,8 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cntsteer, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cntsteer, this));
+	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,cntsteer)
+	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -953,7 +953,7 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	MCFG_PALETTE_ADD("palette", 256)
 //  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cntsteer, this));
+	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -989,8 +989,8 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_zerotrgt, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_zerotrgt, this));
+	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,zerotrgt)
+	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1005,7 +1005,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_zerotrgt, this));
+	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

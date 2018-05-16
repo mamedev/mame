@@ -58,12 +58,12 @@ public:
 	DECLARE_READ8_MEMBER(vsgongf_a100_r);
 	DECLARE_WRITE8_MEMBER(vsgongf_sound_command_w);
 
-	void machine_start_m660()     ATTR_COLD;
-	void machine_start_tsamurai() ATTR_COLD;
-	void machine_start_vsgongf()  ATTR_COLD;
-	void video_start_m660()       ATTR_COLD;
-	void video_start_tsamurai()   ATTR_COLD;
-	void video_start_vsgongf()    ATTR_COLD;
+	DECLARE_MACHINE_START(m660);
+	DECLARE_MACHINE_START(tsamurai);
+	DECLARE_MACHINE_START(vsgongf);
+	DECLARE_VIDEO_START(m660);
+	DECLARE_VIDEO_START(tsamurai);
+	DECLARE_VIDEO_START(vsgongf);
 	void init_the26thz();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -66,11 +66,11 @@ public:
 	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
 	void init_brailab4();
-	void video_start_homelab2() ATTR_COLD;
-	void machine_reset_homelab3();
-	void video_start_homelab3() ATTR_COLD;
-	void machine_reset_brailab4();
-	void video_start_brailab4() ATTR_COLD;
+	DECLARE_VIDEO_START(homelab2);
+	DECLARE_MACHINE_RESET(homelab3);
+	DECLARE_VIDEO_START(homelab3);
+	DECLARE_MACHINE_RESET(brailab4);
+	DECLARE_VIDEO_START(brailab4);
 	INTERRUPT_GEN_MEMBER(homelab_frame);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(homelab);
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -139,11 +139,11 @@ WRITE8_MEMBER( homelab_state::cass_w )
 		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
 }
 
-void homelab_state::machine_reset_homelab3()
+MACHINE_RESET_MEMBER(homelab_state,homelab3)
 {
 }
 
-void homelab_state::machine_reset_brailab4()
+MACHINE_RESET_MEMBER(homelab_state,brailab4)
 {
 	membank("bank1")->set_entry(0);
 }
@@ -561,17 +561,17 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-void homelab_state::video_start_homelab2()
+VIDEO_START_MEMBER(homelab_state,homelab2)
 {
 	m_p_videoram = memregion("maincpu")->base()+0xc000;
 }
 
-void homelab_state::video_start_homelab3()
+VIDEO_START_MEMBER(homelab_state,homelab3)
 {
 	m_p_videoram = memregion("maincpu")->base()+0xf800;
 }
 
-void homelab_state::video_start_brailab4()
+VIDEO_START_MEMBER(homelab_state,brailab4)
 {
 	m_p_videoram = memregion("maincpu")->base()+0x17800;
 }
@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_homelab2, this));
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -781,7 +781,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(homelab3_mem)
 	MCFG_DEVICE_IO_MAP(homelab3_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_homelab3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -789,7 +789,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_homelab3, this));
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(brailab4_mem)
 	MCFG_DEVICE_IO_MAP(brailab4_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_brailab4, this));
+	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -821,7 +821,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_brailab4, this));
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 

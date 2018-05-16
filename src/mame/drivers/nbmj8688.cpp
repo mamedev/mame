@@ -2474,7 +2474,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_12bit)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mbmj8688_pure_12bit, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_12bit)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2499,7 +2499,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
 	MCFG_PALETTE_ENTRIES(256)
 
 	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_8bit)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mbmj8688_8bit, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
@@ -2513,7 +2513,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
 	MCFG_PALETTE_ENTRIES(65536)
 
 	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_16bit)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mbmj8688_hybrid_16bit, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_16bit)
 MACHINE_CONFIG_END
 
 // --------------------------------------------------------------------------------
@@ -2565,7 +2565,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_h12bit)
 	MCFG_DEVICE_IO_MAP(secolove_io_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mbmj8688_hybrid_12bit, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_12bit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8688_state::citylove)
@@ -2616,7 +2616,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit)
 	MCFG_DEVICE_IO_MAP(secolove_io_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mbmj8688_pure_16bit, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
@@ -2667,7 +2667,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	MCFG_DEVICE_ADD("lcdc1", HD61830B, 5000000/2) // ???
 	MCFG_VIDEO_SET_SCREEN("lcd1")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mbmj8688_pure_16bit_LCD, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

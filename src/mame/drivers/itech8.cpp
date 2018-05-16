@@ -603,7 +603,7 @@ WRITE8_MEMBER(itech8_state::nmi_ack_w)
 
 
 
-void itech8_state::machine_start_sstrike()
+MACHINE_START_MEMBER(itech8_state,sstrike)
 {
 	/* we need to update behind the beam as well */
 	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);
@@ -1874,7 +1874,7 @@ MACHINE_CONFIG_START(itech8_state::slikshot_hi)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_slikshot)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_slikshot, this));
+	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
 MACHINE_CONFIG_END
 
 
@@ -1892,7 +1892,7 @@ MACHINE_CONFIG_START(itech8_state::slikshot_lo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_slikshot)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_slikshot, this));
+	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
 MACHINE_CONFIG_END
 
 
@@ -1913,7 +1913,7 @@ MACHINE_CONFIG_START(itech8_state::sstrike)
 	slikshot_lo(config);
 
 	/* basic machine hardware */
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sstrike, this));
+	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
 
 MACHINE_CONFIG_END
 

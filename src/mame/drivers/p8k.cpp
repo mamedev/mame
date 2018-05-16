@@ -94,7 +94,7 @@ public:
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
 	void init_p8k();
-	void machine_reset_p8k();
+	DECLARE_MACHINE_RESET(p8k);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(p8k_daisy_interrupt);
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( p8k )
 INPUT_PORTS_END
 
 
-void p8k_state::machine_reset_p8k()
+MACHINE_RESET_MEMBER(p8k_state,p8k)
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	MCFG_Z80_DAISY_CHAIN(p8k_daisy_chain)
 	MCFG_DEVICE_PROGRAM_MAP(p8k_memmap)
 	MCFG_DEVICE_IO_MAP(p8k_iomap)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_p8k, this));
+	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k)
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(4'000'000))

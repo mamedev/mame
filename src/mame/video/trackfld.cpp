@@ -167,7 +167,7 @@ TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-void trackfld_state::video_start_trackfld()
+VIDEO_START_MEMBER(trackfld_state,trackfld)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(trackfld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
@@ -175,9 +175,9 @@ void trackfld_state::video_start_trackfld()
 }
 
 
-void trackfld_state::video_start_atlantol()
+VIDEO_START_MEMBER(trackfld_state,atlantol)
 {
-	video_start_trackfld();
+	VIDEO_START_CALL_MEMBER( trackfld );
 	m_sprites_gfx_banked = 1;
 }
 

@@ -3748,7 +3748,7 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 	MCFG_SCREEN_PALETTE("vdp2:palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blzntrnd, this));
+	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_blzntrnd)
 
@@ -3774,7 +3774,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::gstrik2)
 	blzntrnd(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gstrik2)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gstrik2, this));
+	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-77, -19)

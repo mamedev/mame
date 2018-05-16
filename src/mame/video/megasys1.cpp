@@ -198,7 +198,7 @@ actual code sent to the hardware.
 
 
 
-void megasys1_state::video_start_megasys1()
+VIDEO_START_MEMBER(megasys1_state,megasys1)
 {
 	m_spriteram = &m_ram[0x8000/2];
 

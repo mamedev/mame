@@ -89,7 +89,7 @@ public:
 	void init_astoneag();
 	void init_showhanc();
 	void init_showhand();
-	void video_start_astrocorp() ATTR_COLD;
+	DECLARE_VIDEO_START(astrocorp);
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -107,7 +107,7 @@ public:
                                 Video
 ***************************************************************************/
 
-void astrocorp_state::video_start_astrocorp()
+VIDEO_START_MEMBER(astrocorp_state,astrocorp)
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_astrocorp, this));
+	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_astrocorp, this));
+	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -503,7 +503,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void deco_mlc_state::machine_reset_mlc()
+MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 {
 	m_vbl_i = 0xffffffff;
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_DEVICE_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
 	MCFG_DEVICE_PROGRAM_MAP(avengrgs_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mlc, this));
+	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mlc, this));
+	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_DEVICE_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
 	MCFG_DEVICE_PROGRAM_MAP(decomlc_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mlc, this));
+	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mlc, this));
+	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR

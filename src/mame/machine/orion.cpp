@@ -42,7 +42,7 @@ WRITE8_MEMBER(orion_state::orion_romdisk_portc_w)
 	m_romdisk_msb = data;
 }
 
-void orion_state::machine_start_orion128()
+MACHINE_START_MEMBER(orion_state,orion128)
 {
 	m_video_mode_mask = 7;
 }
@@ -139,7 +139,7 @@ WRITE8_MEMBER(orion_state::orion128_memory_page_w)
 	}
 }
 
-void orion_state::machine_reset_orion128()
+MACHINE_RESET_MEMBER(orion_state,orion128)
 {
 	m_orion128_video_page = 0;
 	m_orion128_video_mode = 0;
@@ -219,7 +219,7 @@ WRITE8_MEMBER(orion_state::orionz80_floppy_rtc_w)
 }
 
 
-void orion_state::machine_start_orionz80()
+MACHINE_START_MEMBER(orion_state,orionz80)
 {
 	m_video_mode_mask = 7;
 }
@@ -306,7 +306,7 @@ WRITE8_MEMBER(orion_state::orionz80_dispatcher_w)
 	orionz80_switch_bank();
 }
 
-void orion_state::machine_reset_orionz80()
+MACHINE_RESET_MEMBER(orion_state,orionz80)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -496,7 +496,7 @@ WRITE8_MEMBER(orion_state::orionpro_memory_page_w)
 	orionpro_bank_switch();
 }
 
-void orion_state::machine_reset_orionpro()
+MACHINE_RESET_MEMBER(orion_state,orionpro)
 {
 	radio86_init_keyboard();
 

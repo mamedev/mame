@@ -126,8 +126,8 @@ public:
 	void init_mslider();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_gdfs()     ATTR_COLD;
-	void video_start_eaglshot() ATTR_COLD;
+	DECLARE_VIDEO_START(gdfs);
+	DECLARE_VIDEO_START(eaglshot);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

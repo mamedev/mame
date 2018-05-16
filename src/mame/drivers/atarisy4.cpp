@@ -99,7 +99,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	void machine_reset_airrace();
+	DECLARE_MACHINE_RESET(airrace);
 	uint32_t screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void image_mem_to_screen( bool clip);
@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(atarisy4_state::airrace)
 	MCFG_DEVICE_IO_MAP(dsp1_io_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, atarisy4_state, dsp1_bio_r))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_airrace, this));
+	MCFG_MACHINE_RESET_OVERRIDE(atarisy4_state,airrace)
 MACHINE_CONFIG_END
 
 
@@ -1053,7 +1053,7 @@ void atarisy4_state::machine_reset()
 	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void atarisy4_state::machine_reset_airrace()
+MACHINE_RESET_MEMBER(atarisy4_state,airrace)
 {
 	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(arcadia_amiga_state,amiga)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga, this));
+	MCFG_VIDEO_START_OVERRIDE(arcadia_amiga_state,amiga)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

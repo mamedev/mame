@@ -74,7 +74,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
-	void video_start_wyvernf0() ATTR_COLD;
+	DECLARE_VIDEO_START(wyvernf0);
 	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
@@ -89,8 +89,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	void machine_start_wyvernf0() ATTR_COLD;
-	void machine_reset_wyvernf0();
+	DECLARE_MACHINE_START(wyvernf0);
+	DECLARE_MACHINE_RESET(wyvernf0);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	// MCU
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
-void wyvernf0_state::video_start_wyvernf0()
+VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -613,7 +613,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void wyvernf0_state::machine_start_wyvernf0()
+MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 {
 	uint8_t *ROM = memregion("rombank")->base();
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
@@ -631,7 +631,7 @@ void wyvernf0_state::machine_start_wyvernf0()
 	save_item(NAME(m_mcu_ready));
 }
 
-void wyvernf0_state::machine_reset_wyvernf0()
+MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
@@ -656,8 +656,8 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_wyvernf0, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_wyvernf0, this));
+	MCFG_MACHINE_START_OVERRIDE(wyvernf0_state,wyvernf0)
+	MCFG_MACHINE_RESET_OVERRIDE(wyvernf0_state,wyvernf0)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wyvernf0, this));
+	MCFG_VIDEO_START_OVERRIDE(wyvernf0_state,wyvernf0)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

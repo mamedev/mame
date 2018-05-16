@@ -370,7 +370,7 @@ void wardner_state::driver_start()
 
 void wardner_state::machine_reset()
 {
-	machine_reset_twincobr();
+	MACHINE_RESET_CALL_MEMBER(twincobr);
 
 	m_membank->set_bank(0);
 }
@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan0, this));
+	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

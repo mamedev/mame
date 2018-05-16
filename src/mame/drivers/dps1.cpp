@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	void init_dps1();
-	void machine_reset_dps1();
+	DECLARE_MACHINE_RESET(dps1);
 
 	void dps1(machine_config &config);
 	void io_map(address_map &map);
@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 	// else take /dack high (unsupported)
 }
 
-void dps1_state::machine_reset_dps1()
+MACHINE_RESET_MEMBER( dps1_state, dps1 )
 {
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(dps1_state::dps1)
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dps1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))

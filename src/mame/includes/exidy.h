@@ -96,7 +96,7 @@ public:
 	void init_phantoma();
 
 	virtual void video_start() override;
-	void machine_start_teetert() ATTR_COLD;
+	DECLARE_MACHINE_START(teetert);
 
 	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

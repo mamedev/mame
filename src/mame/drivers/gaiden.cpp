@@ -305,7 +305,7 @@ void gaiden_state::machine_reset()
 	m_spr_offset_y = 0;
 }
 
-void gaiden_state::machine_reset_raiga()
+MACHINE_RESET_MEMBER(gaiden_state,raiga)
 {
 	gaiden_state::machine_reset();
 	m_jumppoints = raiga_jumppoints_00;
@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_TECMO_MIXER_REVSPRITETILE
 	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x200)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaiden, this));
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -829,9 +829,9 @@ MACHINE_CONFIG_START(gaiden_state::raiga)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(raiga_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_raiga, this));
+	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_raiga, this));
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::drgnbowl)
@@ -860,7 +860,7 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_drgnbowl, this));
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -952,7 +952,7 @@ WRITE8_MEMBER(gaiden_state::adpcm_bankswitch_w)
 	m_adpcm_bank->set_entry(data & 7);
 }
 
-void gaiden_state::machine_start_mastninj()
+MACHINE_START_MEMBER(gaiden_state,mastninj)
 {
 	gaiden_state::machine_start();
 
@@ -999,7 +999,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(mastninj_sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mastninj, this));
+	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1018,7 +1018,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_drgnbowl, this));
+	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

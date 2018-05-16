@@ -296,7 +296,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void powerins_state::machine_start_powerinsa()
+MACHINE_START_MEMBER(powerins_state, powerinsa)
 {
 	membank("okibank")->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }
@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(powerins_state::powerinsa)
 
 	MCFG_DEVICE_REMOVE("soundcpu")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_powerinsa, this));
+	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
 	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 990000, okim6295_device::PIN7_LOW) // pin7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, powerinsa_oki_map)

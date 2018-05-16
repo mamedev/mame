@@ -582,37 +582,37 @@ void nbmj8688_state::postload()
 	m_screen_refresh = 1;
 }
 
-void nbmj8688_state::video_start_mbmj8688_8bit()
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_8bit)
 {
 	m_gfxmode = GFXTYPE_8BIT;
 	common_video_start();
 }
 
-void nbmj8688_state::video_start_mbmj8688_hybrid_12bit()
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_hybrid_12bit)
 {
 	m_gfxmode = GFXTYPE_HYBRID_12BIT;
 	common_video_start();
 }
 
-void nbmj8688_state::video_start_mbmj8688_pure_12bit()
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_12bit)
 {
 	m_gfxmode = GFXTYPE_PURE_12BIT;
 	common_video_start();
 }
 
-void nbmj8688_state::video_start_mbmj8688_hybrid_16bit()
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_hybrid_16bit)
 {
 	m_gfxmode = GFXTYPE_HYBRID_16BIT;
 	common_video_start();
 }
 
-void nbmj8688_state::video_start_mbmj8688_pure_16bit()
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit)
 {
 	m_gfxmode = GFXTYPE_PURE_16BIT;
 	common_video_start();
 }
 
-void nbmj8688_state::video_start_mbmj8688_pure_16bit_LCD()
+VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 {
 	m_gfxmode = GFXTYPE_PURE_16BIT;
 	common_video_start();

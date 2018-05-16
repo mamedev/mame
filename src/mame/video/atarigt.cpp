@@ -76,7 +76,7 @@ TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
  *
  *************************************/
 
-void atarigt_state::video_start_atarigt()
+VIDEO_START_MEMBER(atarigt_state,atarigt)
 {
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);

@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(trs80_state::model3)
 	MCFG_DEVICE_IO_MAP(model3_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt, 20.2752_MHz_XTAL / 10 / 67584)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_trs80m4, this));
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_trs80m4)
 
@@ -719,7 +719,7 @@ MACHINE_CONFIG_START(trs80_state::lnw80)
 	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 4) // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
 	MCFG_DEVICE_PROGRAM_MAP(lnw80_map)
 	MCFG_DEVICE_IO_MAP(lnw80_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lnw80, this));
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnw80)
 
@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(trs80_state::cp500)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(cp500_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cp500, this));
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, cp500)
 MACHINE_CONFIG_END
 
 /***************************************************************************

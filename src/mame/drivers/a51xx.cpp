@@ -26,8 +26,8 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void machine_reset_a5130();
-	void video_start_a5130() ATTR_COLD;
+	DECLARE_MACHINE_RESET(a5130);
+	DECLARE_VIDEO_START(a5130);
 	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -91,11 +91,11 @@ static INPUT_PORTS_START( a5130 )
 INPUT_PORTS_END
 
 
-void a51xx_state::machine_reset_a5130()
+MACHINE_RESET_MEMBER(a51xx_state,a5130)
 {
 }
 
-void a51xx_state::video_start_a5130()
+VIDEO_START_MEMBER(a51xx_state,a5130)
 {
 }
 
@@ -151,13 +151,13 @@ MACHINE_CONFIG_START(a51xx_state::a5130)
 	MCFG_DEVICE_PROGRAM_MAP(a5130_mem)
 	MCFG_DEVICE_IO_MAP(a5130_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_a5130, this));
+	MCFG_MACHINE_RESET_OVERRIDE(a51xx_state,a5130)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(a51xx_state, screen_update_a5130)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_a5130, this));
+	MCFG_VIDEO_START_OVERRIDE(a51xx_state,a5130)
 MACHINE_CONFIG_END
 
 /* ROM definition */

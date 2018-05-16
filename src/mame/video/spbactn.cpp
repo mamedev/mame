@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 
 
 
-void spbactn_state::video_start_spbactn()
+VIDEO_START_MEMBER(spbactn_state,spbactn)
 {
 	/* allocate bitmaps */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
@@ -55,9 +55,9 @@ void spbactn_state::video_start_spbactn()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-void spbactn_state::video_start_spbactnp()
+VIDEO_START_MEMBER(spbactn_state,spbactnp)
 {
-	video_start_spbactn();
+	VIDEO_START_CALL_MEMBER(spbactn);
 	// no idea..
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_extra_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 }

@@ -92,7 +92,7 @@ void centiped_state::init_common()
 }
 
 
-void centiped_state::video_start_centiped()
+VIDEO_START_MEMBER(centiped_state,centiped)
 {
 	init_common();
 	init_penmask();
@@ -101,7 +101,7 @@ void centiped_state::video_start_centiped()
 }
 
 
-void centiped_state::video_start_warlords()
+VIDEO_START_MEMBER(centiped_state,warlords)
 {
 	init_common();
 
@@ -109,7 +109,7 @@ void centiped_state::video_start_warlords()
 }
 
 
-void centiped_state::video_start_milliped()
+VIDEO_START_MEMBER(centiped_state,milliped)
 {
 	init_common();
 	init_penmask();
@@ -118,7 +118,7 @@ void centiped_state::video_start_milliped()
 }
 
 
-void centiped_state::video_start_bullsdrt()
+VIDEO_START_MEMBER(centiped_state,bullsdrt)
 {
 	init_common();
 	init_penmask();

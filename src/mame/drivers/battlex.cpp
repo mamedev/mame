@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(battlex_state::dodgeman)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(dodgeman_io_map)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dodgeman, this));
+	MCFG_VIDEO_START_OVERRIDE(battlex_state, dodgeman)
 
 	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'000'000)/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

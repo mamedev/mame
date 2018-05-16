@@ -94,11 +94,11 @@ public:
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromanc2_get_tile_info);
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromancr_get_tile_info);
 	virtual void machine_reset() override;
-	void machine_start_fromanc2() ATTR_COLD;
-	void video_start_fromanc2()   ATTR_COLD;
-	void video_start_fromancr()   ATTR_COLD;
-	void machine_start_fromanc4() ATTR_COLD;
-	void video_start_fromanc4()   ATTR_COLD;
+	DECLARE_MACHINE_START(fromanc2);
+	DECLARE_VIDEO_START(fromanc2);
+	DECLARE_VIDEO_START(fromancr);
+	DECLARE_MACHINE_START(fromanc4);
+	DECLARE_VIDEO_START(fromanc4);
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void fromanc2_dispvram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int vram, int layer );

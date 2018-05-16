@@ -386,7 +386,7 @@ static GFXDECODE_START( gfx_f1gp2 )
 GFXDECODE_END
 
 
-void f1gp_state::machine_start_f1gpb()
+MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
 	m_acia->write_cts(0);
 	m_acia->write_dcd(0);
@@ -397,14 +397,14 @@ void f1gp_state::machine_start_f1gpb()
 	save_item(NAME(m_scroll));
 }
 
-void f1gp_state::machine_start_f1gp()
+MACHINE_START_MEMBER(f1gp_state,f1gp)
 {
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
-	machine_start_f1gpb();
+	MACHINE_START_CALL_MEMBER(f1gpb);
 }
 
-void f1gp_state::machine_reset_f1gp()
+MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 {
 	m_roz_bank = 0;
 	m_flipscreen = 0;
@@ -430,8 +430,8 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_f1gp, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_f1gp, this));
+	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
+	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_f1gp, this));
+	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_WRAP(1)
@@ -504,8 +504,8 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	/* NO sound CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_f1gpb, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_f1gp, this));
+	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
+	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_f1gpb, this));
+	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -565,7 +565,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp2)
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-48, -21)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_f1gp2, this));
+	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp2)
 MACHINE_CONFIG_END
 
 

@@ -76,7 +76,7 @@ public:
 		{}
 
 	void init_sbrain();
-	void machine_reset_sbrain();
+	DECLARE_MACHINE_RESET(sbrain);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_READ8_MEMBER(ppi_pb_r);
@@ -475,7 +475,7 @@ static void sbrain_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-void sbrain_state::machine_reset_sbrain()
+MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
 	m_keydown = 0;
 	m_bankr0->set_entry(1); // point at rom
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
 	MCFG_DEVICE_IO_MAP(sbrain_subio)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sbrain, this));
+	MCFG_MACHINE_RESET_OVERRIDE(sbrain_state, sbrain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())

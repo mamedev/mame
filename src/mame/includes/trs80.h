@@ -115,9 +115,9 @@ public:
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_WRITE_LINE_MEMBER(trs80_fdc_intrq_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( trs80_cmd );
-	void machine_reset_trs80m4();
-	void machine_reset_lnw80();
-	void machine_reset_cp500();
+	DECLARE_MACHINE_RESET(trs80m4);
+	DECLARE_MACHINE_RESET(lnw80);
+	DECLARE_MACHINE_RESET(cp500);
 	DECLARE_PALETTE_INIT(lnw80);
 	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trs80m4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

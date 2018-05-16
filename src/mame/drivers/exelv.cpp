@@ -97,8 +97,8 @@ public:
 	DECLARE_WRITE8_MEMBER( tms7041_portd_w );
 	DECLARE_READ8_MEMBER( rom_r );
 
-	void machine_start_exl100() ATTR_COLD;
-	void machine_start_exeltel() ATTR_COLD;
+	DECLARE_MACHINE_START(exl100);
+	DECLARE_MACHINE_START(exeltel);
 
 	/* tms7020 i/o ports */
 	uint8_t   m_tms7020_portb;
@@ -452,7 +452,7 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-void exelv_state::machine_start_exl100()
+MACHINE_START_MEMBER( exelv_state, exl100)
 {
 	/* register for state saving */
 	save_item(NAME(m_tms7020_portb));
@@ -463,7 +463,7 @@ void exelv_state::machine_start_exl100()
 	save_item(NAME(m_wx319));
 }
 
-void exelv_state::machine_start_exeltel()
+MACHINE_START_MEMBER( exelv_state, exeltel)
 {
 	uint8_t *rom = memregion("user1")->base() + 0x0200;
 	membank("bank1")->configure_entry(0, rom);
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(exelv_state::exl100)
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7020_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_exl100, this));
+	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
 	MCFG_DEVICE_ADD("tms7041", TMS7041, XTAL(4'915'200))
 	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7041_porta_r))
@@ -544,7 +544,7 @@ MACHINE_CONFIG_START(exelv_state::exeltel)
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7020_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_exeltel, this));
+	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
 	MCFG_DEVICE_ADD("tms7042", TMS7042, XTAL(4'915'200))
 	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7041_porta_r))

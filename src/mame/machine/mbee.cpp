@@ -453,26 +453,26 @@ void mbee_state::machine_reset_common()
 		m_telcom->set_entry(0);
 }
 
-void mbee_state::machine_reset_mbee()
+MACHINE_RESET_MEMBER( mbee_state, mbee )
 {
 	machine_reset_common();
 	m_maincpu->set_pc(0x8000);
 }
 
-void mbee_state::machine_reset_mbee56()
+MACHINE_RESET_MEMBER( mbee_state, mbee56 )
 {
 	machine_reset_common();
 	m_maincpu->set_pc(0xE000);
 }
 
-void mbee_state::machine_reset_mbee128()
+MACHINE_RESET_MEMBER( mbee_state, mbee128 )
 {
 	machine_reset_common();
 	setup_banks(0, 1, 3); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
-void mbee_state::machine_reset_mbee256()
+MACHINE_RESET_MEMBER( mbee_state, mbee256 )
 {
 	m_mbee256_q_pos = 0;
 	machine_reset_common();
@@ -480,7 +480,7 @@ void mbee_state::machine_reset_mbee256()
 	m_maincpu->set_pc(0x8000);
 }
 
-void mbee_state::machine_reset_mbeett()
+MACHINE_RESET_MEMBER( mbee_state, mbeett )
 {
 	m_mbee256_q_pos = 0;
 	machine_reset_common();

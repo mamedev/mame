@@ -118,8 +118,8 @@ public:
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
 	void init_konamigq();
-	void machine_start_konamigq() ATTR_COLD;
-	void machine_reset_konamigq();
+	DECLARE_MACHINE_START(konamigq);
+	DECLARE_MACHINE_RESET(konamigq);
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 
@@ -316,14 +316,14 @@ void konamigq_state::init_konamigq()
 {
 }
 
-void konamigq_state::machine_start_konamigq()
+MACHINE_START_MEMBER(konamigq_state,konamigq)
 {
 	save_item(NAME(m_sector_buffer));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 }
 
-void konamigq_state::machine_reset_konamigq()
+MACHINE_RESET_MEMBER(konamigq_state,konamigq)
 {
 }
 
@@ -345,8 +345,8 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_DEVICE_DATA_MAP(konamigq_dasp_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(konamigq_state, tms_sync, 48000)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_konamigq, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_konamigq, this));
+	MCFG_MACHINE_START_OVERRIDE(konamigq_state, konamigq)
+	MCFG_MACHINE_RESET_OVERRIDE(konamigq_state, konamigq)
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

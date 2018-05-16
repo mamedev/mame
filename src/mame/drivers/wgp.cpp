@@ -971,7 +971,7 @@ MACHINE_CONFIG_START(wgp_state::wgp2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wgp2, this));
+	MCFG_VIDEO_START_OVERRIDE(wgp_state, wgp2)
 
 	MCFG_DEVICE_MODIFY("tc0100scn")
 	MCFG_TC0100SCN_OFFSETS(4, 2)

@@ -65,7 +65,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(espial);
-	void video_start_netwars() ATTR_COLD;
+	DECLARE_VIDEO_START(netwars);
 	uint32_t screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(espial_sound_nmi_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(espial_scanline);

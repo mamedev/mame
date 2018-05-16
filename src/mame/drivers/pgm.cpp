@@ -498,12 +498,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 		if (!m_irq4_disabled) m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-void pgm_state::machine_start_pgm()
+MACHINE_START_MEMBER(pgm_state,pgm)
 {
 //  machine().base_datetime(m_systime);
 }
 
-void pgm_state::machine_reset_pgm()
+MACHINE_RESET_MEMBER(pgm_state,pgm)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
@@ -519,8 +519,8 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_DEVICE_PROGRAM_MAP(pgm_z80_mem)
 	MCFG_DEVICE_IO_MAP(pgm_z80_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pgm, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pgm, this));
+	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
 	MCFG_NVRAM_ADD_0FILL("sram")
 
 	MCFG_V3021_ADD("rtc")
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_PALETTE_ADD("palette", 0x1200/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pgm, this));
+	MCFG_VIDEO_START_OVERRIDE(pgm_state,pgm)
 
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();

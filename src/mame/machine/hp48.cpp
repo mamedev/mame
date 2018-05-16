@@ -1031,32 +1031,32 @@ void hp48_state::base_machine_start(hp48_models model)
 
 }
 
-void hp48_state::machine_start_hp48s()
+MACHINE_START_MEMBER(hp48_state,hp48s)
 {
 	base_machine_start(HP48_S);
 }
 
-void hp48_state::machine_start_hp48sx()
+MACHINE_START_MEMBER(hp48_state,hp48sx)
 {
 	base_machine_start(HP48_SX);
 }
 
-void hp48_state::machine_start_hp48g()
+MACHINE_START_MEMBER(hp48_state,hp48g)
 {
 	base_machine_start(HP48_G);
 }
 
-void hp48_state::machine_start_hp48gx()
+MACHINE_START_MEMBER(hp48_state,hp48gx)
 {
 	base_machine_start(HP48_GX);
 }
 
-void hp48_state::machine_start_hp48gp()
+MACHINE_START_MEMBER(hp48_state,hp48gp)
 {
 	base_machine_start(HP48_GP);
 }
 
-void hp48_state::machine_start_hp49g()
+MACHINE_START_MEMBER(hp48_state,hp49g)
 {
 	base_machine_start(HP49_G);
 }

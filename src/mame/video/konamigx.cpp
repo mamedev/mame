@@ -1133,7 +1133,7 @@ void konamigx_state::common_init()
 }
 
 
-void konamigx_state::video_start_konamigx_5bpp()
+VIDEO_START_MEMBER(konamigx_state, konamigx_5bpp)
 {
 	common_init();
 
@@ -1145,7 +1145,7 @@ void konamigx_state::video_start_konamigx_5bpp()
 		konamigx_mixer_primode(4);
 }
 
-void konamigx_state::video_start_dragoonj()
+VIDEO_START_MEMBER(konamigx_state, dragoonj)
 {
 	common_init();
 
@@ -1155,20 +1155,20 @@ void konamigx_state::video_start_dragoonj()
 	m_k056832->set_layer_offs(3,  3+1, 0);
 }
 
-void konamigx_state::video_start_le2()
+VIDEO_START_MEMBER(konamigx_state, le2)
 {
 	common_init();
 
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
 }
 
-void konamigx_state::video_start_konamigx_6bpp()
+VIDEO_START_MEMBER(konamigx_state, konamigx_6bpp)
 {
 	common_init();
 	konamigx_mixer_primode(5);
 }
 
-void konamigx_state::video_start_konamigx_type3()
+VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1204,7 +1204,7 @@ void konamigx_state::video_start_konamigx_type3()
 	m_konamigx_palformat = 1;
 }
 
-void konamigx_state::video_start_konamigx_type4()
+VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1232,7 +1232,7 @@ void konamigx_state::video_start_konamigx_type4()
 
 }
 
-void konamigx_state::video_start_konamigx_type4_vsn()
+VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1259,7 +1259,7 @@ void konamigx_state::video_start_konamigx_type4_vsn()
 	m_konamigx_palformat = 0;
 }
 
-void konamigx_state::video_start_konamigx_type4_sd2()
+VIDEO_START_MEMBER(konamigx_state, konamigx_type4_sd2)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1289,7 +1289,7 @@ void konamigx_state::video_start_konamigx_type4_sd2()
 
 }
 
-void konamigx_state::video_start_opengolf()
+VIDEO_START_MEMBER(konamigx_state, opengolf)
 {
 	common_init();
 
@@ -1324,7 +1324,7 @@ void konamigx_state::video_start_opengolf()
 
 }
 
-void konamigx_state::video_start_racinfrc()
+VIDEO_START_MEMBER(konamigx_state, racinfrc)
 {
 	common_init();
 

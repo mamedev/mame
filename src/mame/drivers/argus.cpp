@@ -508,8 +508,8 @@ MACHINE_CONFIG_START(argus_state::argus)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_argus, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_argus, this));
+	MCFG_VIDEO_START_OVERRIDE(argus_state,argus)
+	MCFG_VIDEO_RESET_OVERRIDE(argus_state,argus)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -550,8 +550,8 @@ MACHINE_CONFIG_START(argus_state::valtric)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_valtric, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_valtric, this));
+	MCFG_VIDEO_START_OVERRIDE(argus_state,valtric)
+	MCFG_VIDEO_RESET_OVERRIDE(argus_state,valtric)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -598,8 +598,8 @@ MACHINE_CONFIG_START(argus_state::butasan)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_butasan, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_butasan, this));
+	MCFG_VIDEO_START_OVERRIDE(argus_state,butasan)
+	MCFG_VIDEO_RESET_OVERRIDE(argus_state,butasan)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

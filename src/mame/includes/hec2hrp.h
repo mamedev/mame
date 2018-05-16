@@ -159,13 +159,13 @@ public:
 	DECLARE_WRITE8_MEMBER(hector_io_8255_w);
 	DECLARE_WRITE8_MEMBER(hector_mx40_io_port_w);
 	DECLARE_WRITE8_MEMBER(hector_mx80_io_port_w);
-	void machine_start_hec2hrp()   ATTR_COLD;
-	void machine_reset_hec2hrp();
-	void video_start_hec2hrp()     ATTR_COLD;
-	void machine_start_hec2hrx()   ATTR_COLD;
-	void machine_reset_hec2hrx();
-	void machine_start_hec2mdhrx() ATTR_COLD;
-	void machine_reset_hec2mdhrx();
+	DECLARE_MACHINE_START(hec2hrp);
+	DECLARE_MACHINE_RESET(hec2hrp);
+	DECLARE_VIDEO_START(hec2hrp);
+	DECLARE_MACHINE_START(hec2hrx);
+	DECLARE_MACHINE_RESET(hec2hrx);
+	DECLARE_MACHINE_START(hec2mdhrx);
+	DECLARE_MACHINE_RESET(hec2mdhrx);
 	uint32_t screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(Callback_CK);
 

@@ -162,7 +162,7 @@ void redalert_state::get_panther_pens(pen_t *pens)
  *
  *************************************/
 
-void redalert_state::video_start_redalert()
+VIDEO_START_MEMBER(redalert_state,redalert)
 {
 	m_bitmap_colorram = std::make_unique<uint8_t[]>(0x0400);
 
@@ -171,9 +171,9 @@ void redalert_state::video_start_redalert()
 	m_control_xor = 0x00;
 }
 
-void redalert_state::video_start_ww3()
+VIDEO_START_MEMBER(redalert_state,ww3)
 {
-	video_start_redalert();
+	VIDEO_START_CALL_MEMBER( redalert );
 
 	m_control_xor = 0x04;
 }
@@ -413,14 +413,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::redalert_video)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_redalert, this));
+	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 	redalert_video_common(config);
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::ww3_video)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ww3, this));
+	MCFG_VIDEO_START_OVERRIDE(redalert_state, ww3 )
 	redalert_video_common(config);
 
 MACHINE_CONFIG_END
@@ -433,7 +433,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 MACHINE_CONFIG_START(redalert_state::demoneye_video)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_redalert, this));
+	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -446,7 +446,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::panther_video)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ww3, this));
+	MCFG_VIDEO_START_OVERRIDE(redalert_state,ww3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

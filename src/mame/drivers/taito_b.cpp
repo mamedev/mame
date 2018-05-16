@@ -1978,7 +1978,7 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2035,7 +2035,7 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2113,7 +2113,7 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2170,7 +2170,7 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2228,8 +2228,8 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hitice, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_hitice, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
+	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2291,7 +2291,7 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2349,7 +2349,7 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2412,7 +2412,7 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2475,7 +2475,7 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2532,7 +2532,7 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2595,7 +2595,7 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2652,7 +2652,7 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2714,7 +2714,7 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2771,7 +2771,7 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2837,7 +2837,7 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2901,7 +2901,7 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2956,7 +2956,7 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_realpunc, this));
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
 
 	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
 	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)

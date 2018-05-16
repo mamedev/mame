@@ -658,7 +658,7 @@ WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
 	apple3_irq_update();
 }
 
-void apple3_state::machine_reset_apple3()
+MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
 	m_indir_bank = 0;
 	m_sync = false;

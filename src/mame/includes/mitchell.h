@@ -123,9 +123,9 @@ public:
 	void init_blockbl();
 	void init_dokaben();
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void machine_start_mitchell() ATTR_COLD;
-	void machine_reset_mitchell();
-	void video_start_pang()       ATTR_COLD;
+	DECLARE_MACHINE_START(mitchell);
+	DECLARE_MACHINE_RESET(mitchell);
+	DECLARE_VIDEO_START(pang);
 	uint32_t screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mitchell_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

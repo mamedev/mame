@@ -115,7 +115,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
-	void machine_reset_s7();
+	DECLARE_MACHINE_RESET(s7);
 	void init_s7();
 	void s7(machine_config &config);
 	void s7_audio_map(address_map &map);
@@ -420,7 +420,7 @@ void s7_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
-void s7_state::machine_reset_s7()
+MACHINE_RESET_MEMBER( s7_state, s7 )
 {
 }
 
@@ -434,7 +434,7 @@ MACHINE_CONFIG_START(s7_state::s7)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6808, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s7_main_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s7, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s7_state, s7)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s7)

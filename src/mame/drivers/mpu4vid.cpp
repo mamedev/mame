@@ -274,9 +274,9 @@ public:
 	void init_skiltrek();
 	void init_crmaze3();
 	void init_cybcas();
-	void machine_start_mpu4_vid() ATTR_COLD;
-	void machine_reset_mpu4_vid();
-	void video_start_mpu4_vid() ATTR_COLD;
+	DECLARE_MACHINE_START(mpu4_vid);
+	DECLARE_MACHINE_RESET(mpu4_vid);
+	DECLARE_VIDEO_START(mpu4_vid);
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
@@ -435,7 +435,7 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 }
 
 
-void mpu4vid_state::video_start_mpu4_vid()
+VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 {
 	m_vid_vidram.allocate(0x20000/2);
 
@@ -1149,7 +1149,7 @@ WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 }
 
 /* machine start (called only once) */
-void mpu4vid_state::machine_start_mpu4_vid()
+MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 {
 	mpu4_config_common();
 
@@ -1161,7 +1161,7 @@ void mpu4vid_state::machine_start_mpu4_vid()
 	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
 
-void mpu4vid_state::machine_reset_mpu4_vid()
+MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
 {
 	m_vfd->reset(); //for debug ports only
 
@@ -1304,9 +1304,9 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(960))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mpu4_vid, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mpu4_vid, this));
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mpu4_vid, this));
+	MCFG_MACHINE_START_OVERRIDE(mpu4vid_state,mpu4_vid)
+	MCFG_MACHINE_RESET_OVERRIDE(mpu4vid_state,mpu4_vid)
+	MCFG_VIDEO_START_OVERRIDE (mpu4vid_state,mpu4_vid)
 
 	MCFG_PALETTE_ADD("palette", ef9369_device::NUMCOLORS)
 

@@ -619,7 +619,7 @@ void spectrum_state::init_spectrum()
 	}
 }
 
-void spectrum_state::machine_reset_spectrum()
+MACHINE_RESET_MEMBER(spectrum_state,spectrum)
 {
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_spectrum, this));
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_PALETTE_INIT_OWNER(spectrum_state, spectrum )
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spectrum)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spectrum, this));
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

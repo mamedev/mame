@@ -1037,7 +1037,7 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wizdfire, this));
+	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1125,7 +1125,7 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wizdfire, this));
+	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))

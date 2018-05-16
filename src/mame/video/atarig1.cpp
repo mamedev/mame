@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(atarig1_state::get_playfield_tile_info)
  *
  *************************************/
 
-void atarig1_state::video_start_atarig1()
+VIDEO_START_MEMBER(atarig1_state,atarig1)
 {
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x10);

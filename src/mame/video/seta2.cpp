@@ -457,21 +457,21 @@ void seta2_state::video_start()
 	m_yoffset = 0;
 }
 
-void seta2_state::video_start_xoffset()
+VIDEO_START_MEMBER(seta2_state,xoffset)
 {
 	video_start();
 
 	m_xoffset = 0x200;
 }
 
-void seta2_state::video_start_xoffset1()
+VIDEO_START_MEMBER(seta2_state,xoffset1)
 {
 	video_start();
 
 	m_xoffset = 0x1;
 }
 
-void seta2_state::video_start_yoffset()
+VIDEO_START_MEMBER(seta2_state,yoffset)
 {
 	video_start();
 

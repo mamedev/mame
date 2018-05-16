@@ -82,12 +82,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_fromance_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_nekkyoku_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_nekkyoku_fg_tile_info);
-	void machine_start_fromance() ATTR_COLD;
-	void machine_reset_fromance();
-	void video_start_nekkyoku()   ATTR_COLD;
-	void video_start_fromance()   ATTR_COLD;
-	void video_start_pipedrm()    ATTR_COLD;
-	void video_start_hatris()     ATTR_COLD;
+	DECLARE_MACHINE_START(fromance);
+	DECLARE_MACHINE_RESET(fromance);
+	DECLARE_VIDEO_START(nekkyoku);
+	DECLARE_VIDEO_START(fromance);
+	DECLARE_VIDEO_START(pipedrm);
+	DECLARE_VIDEO_START(hatris);
 	uint32_t screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);

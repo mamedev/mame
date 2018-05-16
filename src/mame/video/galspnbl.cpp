@@ -30,7 +30,7 @@ void galspnbl_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	}
 }
 
-void galspnbl_state::video_start_galspnbl()
+VIDEO_START_MEMBER(galspnbl_state,galspnbl)
 {
 	/* allocate bitmaps */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);

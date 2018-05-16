@@ -1292,7 +1292,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp48_state::hp48gx)
 	hp48_common(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hp48gx, this));
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gx )
 
 	/* expansion ports */
 	MCFG_HP48_PORT_ADD ( "port1", HP48_CE2,     128*1024 )
@@ -1305,7 +1305,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp48_state::hp48g)
 	hp48_common(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hp48g, this));
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48g )
 
 	/* serial I/O */
 	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
@@ -1315,7 +1315,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp48_state::hp48gp)
 	hp48_common(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hp48gp, this));
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gp )
 
 	/* serial I/O */
 	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
@@ -1327,7 +1327,7 @@ MACHINE_CONFIG_START(hp48_state::hp48sx)
 	hp48_common(config);
 	MCFG_DEVICE_MODIFY     ( "maincpu" )
 	MCFG_DEVICE_CLOCK      ( 2000000 )
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hp48sx, this));
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48sx )
 
 	/* expansion ports */
 	MCFG_HP48_PORT_ADD  ( "port1", HP48_CE1, 128*1024)
@@ -1341,7 +1341,7 @@ MACHINE_CONFIG_START(hp48_state::hp48s)
 	hp48_common(config);
 	MCFG_DEVICE_MODIFY     ( "maincpu" )
 	MCFG_DEVICE_CLOCK      ( 2000000 )
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hp48s, this));
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48s )
 
 	/* serial I/O */
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
@@ -1350,7 +1350,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hp48_state::hp49g)
 	hp48_common(config);
 	MCFG_DEVICE_MODIFY     ( "maincpu" )
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hp49g, this));
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp49g )
 
 	/* serial I/O */
 		//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )

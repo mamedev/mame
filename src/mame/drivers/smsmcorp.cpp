@@ -249,7 +249,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void machine_start_sureshot() ATTR_COLD;
+	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -530,7 +530,7 @@ void smsmfg_state::machine_start()
 	save_item(NAME(m_communication_port));
 }
 
-void smsmfg_state::machine_start_sureshot()
+MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));
@@ -586,7 +586,7 @@ MACHINE_CONFIG_START(smsmfg_state::sureshot)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sureshot_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sureshot, this));
+	MCFG_MACHINE_START_OVERRIDE(smsmfg_state,sureshot)
 MACHINE_CONFIG_END
 
 /*************************************

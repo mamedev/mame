@@ -1904,7 +1904,7 @@ MACHINE_CONFIG_START(suna8_state::hardhead)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_suna8_text, this));
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_text)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1963,7 +1963,7 @@ MACHINE_CONFIG_START(suna8_state::rranger)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_suna8_text, this));
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_text)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1992,7 +1992,7 @@ MACHINE_CONFIG_END
 
 /* 1 x 24 MHz crystal */
 
-void suna8_state::machine_reset_brickzn()
+MACHINE_RESET_MEMBER(suna8_state,brickzn)
 {
 	m_protection_val = m_prot2 = m_prot2_prev = 0xff;
 	m_paletteram_enab = 1;  // for brickzn11
@@ -2016,7 +2016,7 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	MCFG_DEVICE_PROGRAM_MAP(brickzn_pcm_map)
 	MCFG_DEVICE_IO_MAP(brickzn_pcm_io_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_brickzn, this));
+	MCFG_MACHINE_RESET_OVERRIDE(suna8_state, brickzn )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2032,7 +2032,7 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_suna8_brickzn, this));
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_brickzn)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2083,7 +2083,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 		if (m_nmi_enable)   m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-void suna8_state::machine_reset_hardhea2()
+MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	hardhea2_rambank_0_w(space,0,0);
@@ -2098,7 +2098,7 @@ MACHINE_CONFIG_START(suna8_state::hardhea2)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hardhea2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
@@ -2146,7 +2146,7 @@ MACHINE_CONFIG_START(suna8_state::starfigh)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_suna8_starfigh, this));
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_starfigh)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2200,7 +2200,7 @@ MACHINE_CONFIG_START(suna8_state::sparkman)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_suna8_sparkman, this));
+	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_sparkman)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

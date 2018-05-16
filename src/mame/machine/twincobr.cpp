@@ -243,7 +243,7 @@ WRITE16_MEMBER(twincobr_state::twincobr_sharedram_w)
 }
 
 
-void twincobr_state::machine_reset_twincobr()
+MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 {
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;

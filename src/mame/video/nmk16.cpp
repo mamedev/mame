@@ -101,7 +101,7 @@ void nmk16_state::nmk16_video_init()
 }
 
 
-void nmk16_state::video_start_bioship()
+VIDEO_START_MEMBER(nmk16_state,bioship)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,32,32);
@@ -116,7 +116,7 @@ void nmk16_state::video_start_bioship()
 
 }
 
-void nmk16_state::video_start_strahl()
+VIDEO_START_MEMBER(nmk16_state,strahl)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::strahl_get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
@@ -130,7 +130,7 @@ void nmk16_state::video_start_strahl()
 	nmk16_video_init();
 }
 
-void nmk16_state::video_start_macross()
+VIDEO_START_MEMBER(nmk16_state,macross)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,32,32);
@@ -140,7 +140,7 @@ void nmk16_state::video_start_macross()
 	nmk16_video_init();
 }
 
-void nmk16_state::video_start_gunnail()
+VIDEO_START_MEMBER(nmk16_state,gunnail)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
@@ -154,7 +154,7 @@ void nmk16_state::video_start_gunnail()
 	m_simple_scroll = 0;
 }
 
-void nmk16_state::video_start_macross2()
+VIDEO_START_MEMBER(nmk16_state,macross2)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_bg_tile_info<0>),this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_bg_tile_info<1>),this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
@@ -170,13 +170,13 @@ void nmk16_state::video_start_macross2()
 						/* from the other side of the tilemap (!) */
 }
 
-void nmk16_state::video_start_raphero()
+VIDEO_START_MEMBER(nmk16_state,raphero)
 {
-	video_start_macross2();
+	VIDEO_START_CALL_MEMBER( macross2 );
 	m_simple_scroll = 0;
 }
 
-void nmk16_state::video_start_bjtwin()
+VIDEO_START_MEMBER(nmk16_state,bjtwin)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::bjtwin_get_bg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
 
@@ -722,7 +722,7 @@ uint32_t nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &
 
 ***************************************************************************/
 
-void nmk16_state::video_start_afega()
+VIDEO_START_MEMBER(nmk16_state,afega)
 {
 	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
@@ -743,7 +743,7 @@ void nmk16_state::video_start_afega()
 }
 
 
-void nmk16_state::video_start_grdnstrm()
+VIDEO_START_MEMBER(nmk16_state,grdnstrm)
 {
 	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
@@ -765,7 +765,7 @@ void nmk16_state::video_start_grdnstrm()
 }
 
 
-void nmk16_state::video_start_firehawk()
+VIDEO_START_MEMBER(nmk16_state,firehawk)
 {
 	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);

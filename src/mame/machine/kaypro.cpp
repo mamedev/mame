@@ -221,13 +221,12 @@ WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
     Machine
 
 ************************************************************/
-
-void kaypro_state::machine_start_kayproii()
+MACHINE_START_MEMBER( kaypro_state,kayproii )
 {
 	m_pio_s->strobe_a(0);
 }
 
-void kaypro_state::machine_reset_kaypro()
+MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 {
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram

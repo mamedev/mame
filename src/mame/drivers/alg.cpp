@@ -56,7 +56,7 @@ public:
 	void init_ntsc();
 	void init_pal();
 
-	void video_start_alg() ATTR_COLD;
+	DECLARE_VIDEO_START(alg);
 
 	void alg_r2(machine_config &config);
 	void picmatic(machine_config &config);
@@ -116,10 +116,10 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
  *
  *************************************/
 
-void alg_state::video_start_alg()
+VIDEO_START_MEMBER(alg_state,alg)
 {
 	/* standard video start */
-	video_start_amiga();
+	VIDEO_START_CALL_MEMBER(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	m_palette->set_pen_color(4096, rgb_t(0,0,0,0));
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	MCFG_PALETTE_ADD("palette", 4097)
 	MCFG_PALETTE_INIT_OWNER(alg_state,amiga)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_alg, this));
+	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

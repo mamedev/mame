@@ -547,7 +547,7 @@ void spectrum_state::ts2068_mem(address_map &map)
 }
 
 
-void spectrum_state::machine_reset_ts2068()
+MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 {
 	m_port_ff_data = 0;
 	m_port_f4_data = 0;
@@ -557,7 +557,7 @@ void spectrum_state::machine_reset_ts2068()
 	m_dock_cart_type = m_dock_crt ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
 
 	ts2068_update_memory();
-	machine_reset_spectrum();
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 }
 
 
@@ -583,7 +583,7 @@ void spectrum_state::tc2048_mem(address_map &map)
 	map(0x4000, 0xffff).bankr("bank1").bankw("bank2");
 }
 
-void spectrum_state::machine_reset_tc2048()
+MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -591,7 +591,7 @@ void spectrum_state::machine_reset_tc2048()
 	membank("bank2")->set_base(messram);
 	m_port_ff_data = 0;
 	m_port_f4_data = -1;
-	machine_reset_spectrum();
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 }
 
 
@@ -694,7 +694,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ts2068, this));
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, ts2068 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ts2068, this));
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 
 	/* sound */
 	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'112'000)/8)        /* From Schematic; 1.764 MHz */
@@ -739,7 +739,7 @@ MACHINE_CONFIG_START(spectrum_state::tc2048)
 	MCFG_DEVICE_PROGRAM_MAP(tc2048_mem)
 	MCFG_DEVICE_IO_MAP(tc2048_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tc2048, this));
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, tc2048 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(spectrum_state::tc2048)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_tc2048)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spectrum_128, this));
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

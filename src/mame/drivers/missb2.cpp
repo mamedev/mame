@@ -40,8 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	void init_missb2();
-	void machine_start_missb2() ATTR_COLD;
-	void machine_reset_missb2();
+	DECLARE_MACHINE_START(missb2);
+	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void missb2(machine_config &config);
@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER(missb2_state::irqhandler)
 
 /* Machine Driver */
 
-void missb2_state::machine_start_missb2()
+MACHINE_START_MEMBER(missb2_state,missb2)
 {
 	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 
@@ -454,9 +454,9 @@ void missb2_state::machine_start_missb2()
 	save_item(NAME(m_sreset_old));
 }
 
-void missb2_state::machine_reset_missb2()
+MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
-	machine_reset_common();
+	MACHINE_RESET_CALL_MEMBER(common);
 	m_oki->reset();
 	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
@@ -481,8 +481,8 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_missb2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_missb2, this));
+	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
+	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

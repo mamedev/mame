@@ -73,7 +73,7 @@ void m90_state::video_start()
 	m_last_pf[1] = 2;
 }
 
-void m90_state::video_start_bomblord()
+VIDEO_START_MEMBER(m90_state,bomblord)
 {
 	common_tilemap_init();
 
@@ -83,7 +83,7 @@ void m90_state::video_start_bomblord()
 	m_pf_layer[0][1]->set_transparent_pen(0);
 }
 
-void m90_state::video_start_dynablsb()
+VIDEO_START_MEMBER(m90_state,dynablsb)
 {
 	common_tilemap_init();
 

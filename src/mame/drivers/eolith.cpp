@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, eolith_state, sound_p1_w))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_eolith, this));
+	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
 	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_eolith, this));
+	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1521,7 +1521,7 @@ ROM_START( hidctch3 )
 ROM_END
 
 
-void eolith_state::machine_reset_eolith()
+MACHINE_RESET_MEMBER(eolith_state,eolith)
 {
 	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }

@@ -261,16 +261,16 @@ private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void machine_start_pc9801_common() ATTR_COLD;
-	void machine_start_pc9801f()       ATTR_COLD;
-	void machine_start_pc9801rs()      ATTR_COLD;
-	void machine_start_pc9801bx2()     ATTR_COLD;
-	void machine_start_pc9821()        ATTR_COLD;
-	void machine_start_pc9821ap2()     ATTR_COLD;
-	void machine_reset_pc9801_common();
-	void machine_reset_pc9801f();
-	void machine_reset_pc9801rs();
-	void machine_reset_pc9821();
+	DECLARE_MACHINE_START(pc9801_common);
+	DECLARE_MACHINE_START(pc9801f);
+	DECLARE_MACHINE_START(pc9801rs);
+	DECLARE_MACHINE_START(pc9801bx2);
+	DECLARE_MACHINE_START(pc9821);
+	DECLARE_MACHINE_START(pc9821ap2);
+	DECLARE_MACHINE_RESET(pc9801_common);
+	DECLARE_MACHINE_RESET(pc9801f);
+	DECLARE_MACHINE_RESET(pc9801rs);
+	DECLARE_MACHINE_RESET(pc9821);
 
 	DECLARE_PALETTE_INIT(pc9801);
 	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);

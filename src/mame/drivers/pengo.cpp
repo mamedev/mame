@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pengo_state, vblank_irq))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pengo, this));
+	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(pengo_state::jrpacmbl)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pengo_state, jrpacman_spritebank_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pengo_state, jrpacman_charbank_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_jrpacman, this));
+	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 MACHINE_CONFIG_END
 
 

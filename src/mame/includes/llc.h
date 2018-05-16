@@ -46,9 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(llc2_port1_b_w);
 	void init_llc2();
 	void init_llc1();
-	void machine_start_llc1() ATTR_COLD;
-	void machine_reset_llc1();
-	void machine_reset_llc2();
+	DECLARE_MACHINE_START(llc1);
+	DECLARE_MACHINE_RESET(llc1);
+	DECLARE_MACHINE_RESET(llc2);
 	uint32_t screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

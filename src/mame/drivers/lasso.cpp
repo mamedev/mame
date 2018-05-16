@@ -472,7 +472,7 @@ void lasso_state::machine_start()
 	save_item(NAME(m_gfxbank));
 }
 
-void lasso_state::machine_start_wwjgtin()
+MACHINE_START_MEMBER(lasso_state,wwjgtin)
 {
 	lasso_state::machine_start();
 
@@ -484,7 +484,7 @@ void lasso_state::machine_reset()
 	m_gfxbank = 0;
 }
 
-void lasso_state::machine_reset_wwjgtin()
+MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 {
 	lasso_state::machine_reset();
 
@@ -565,8 +565,8 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(wwjgtin_audio_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_wwjgtin, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_wwjgtin, this));
+	MCFG_MACHINE_START_OVERRIDE(lasso_state,wwjgtin)
+	MCFG_MACHINE_RESET_OVERRIDE(lasso_state,wwjgtin)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_PALETTE_ADD("palette", 0x40 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_INIT_OWNER(lasso_state,wwjgtin)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wwjgtin, this));
+	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -601,7 +601,7 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pinbo)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pinbo, this));
+	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
 

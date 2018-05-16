@@ -2179,7 +2179,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_system16, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
@@ -2194,7 +2194,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::shinobi_datsu)
 	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s16a_bootleg_shinobi, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_shinobi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
@@ -2213,7 +2213,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::passshtb)
 	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
 	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(1,0,3,2,5,4,7,6)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s16a_bootleg_passsht, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_passsht )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
@@ -2233,7 +2233,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::passsht4b)
 	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
 	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(1,0,3,2,5,4,7,6)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s16a_bootleg_passsht, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_passsht )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg_passht4b)
 
@@ -2254,7 +2254,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::wb3bb)
 	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(4,0,5,1,6,2,7,3)
 	MCFG_BOOTLEG_SYS16A_SPRITES_YORIGIN(0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s16a_bootleg_wb3bl, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_wb3bl )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
@@ -2287,7 +2287,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_system16, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
@@ -2448,7 +2448,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_system18old, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
@@ -2504,7 +2504,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_system18old, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
@@ -2568,7 +2568,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::shdancbla)
 MACHINE_CONFIG_END
 
 
-void segas1x_bootleg_state::machine_reset_ddcrewbl()
+MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
 {
 	// set up the initial banks for this game
 	// because it doesn't appear to actually program banks 0-3.
@@ -2599,12 +2599,12 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_system18old, this));
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddcrewbl, this));
+	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -3046,13 +3046,13 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 *     Machine Start & Reset     *
 ********************************/
 
-void funworld_state::machine_start_lunapark()
+MACHINE_START_MEMBER(funworld_state, lunapark)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
-void funworld_state::machine_reset_lunapark()
+MACHINE_RESET_MEMBER(funworld_state, lunapark)
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
@@ -3094,7 +3094,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_funworld, this));
+	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 2MHz, veryfied on jollycrd & royalcrd */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -3138,7 +3138,7 @@ MACHINE_CONFIG_START(funworld_state::magicrd2)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(magicrd2_map)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_magicrd2, this));
+	MCFG_VIDEO_START_OVERRIDE(funworld_state, magicrd2)
 
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
@@ -3193,8 +3193,8 @@ MACHINE_CONFIG_START(funworld_state::lunapark)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lunapark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lunapark, this));
+	MCFG_MACHINE_START_OVERRIDE(funworld_state, lunapark)
+	MCFG_MACHINE_RESET_OVERRIDE(funworld_state, lunapark)
 MACHINE_CONFIG_END
 
 
@@ -3202,14 +3202,14 @@ MACHINE_CONFIG_START(funworld_state::chinatow)
 	fw2ndpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_chinatow, this));
+	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(funworld_state::rcdino4)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_chinatow, this));
+	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
 

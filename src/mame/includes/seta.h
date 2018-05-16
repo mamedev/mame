@@ -187,22 +187,22 @@ public:
 	void init_pairlove();
 	template<int Offset> TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
 	template<int Layer, int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
-	void video_start_seta_no_layers()     ATTR_COLD;
-	void video_start_kyustrkr_no_layers() ATTR_COLD;
-	void video_start_twineagl_1_layer()   ATTR_COLD;
-	void video_start_seta_1_layer()       ATTR_COLD;
-	void machine_reset_calibr50();
+	DECLARE_VIDEO_START(seta_no_layers);
+	DECLARE_VIDEO_START(kyustrkr_no_layers);
+	DECLARE_VIDEO_START(twineagl_1_layer);
+	DECLARE_VIDEO_START(seta_1_layer);
+	DECLARE_MACHINE_RESET(calibr50);
 	DECLARE_PALETTE_INIT(palette_init_RRRRRGGGGGBBBBB_proms);
 	DECLARE_PALETTE_INIT(usclssic);
-	void machine_start_usclssic()         ATTR_COLD;
-	void video_start_seta_2_layers()      ATTR_COLD;
+	DECLARE_MACHINE_START(usclssic);
+	DECLARE_VIDEO_START(seta_2_layers);
 	DECLARE_PALETTE_INIT(blandia);
 	DECLARE_PALETTE_INIT(zingzip);
-	void machine_start_wrofaero()         ATTR_COLD;
+	DECLARE_MACHINE_START(wrofaero);
 	DECLARE_PALETTE_INIT(gundhara);
 	DECLARE_PALETTE_INIT(jjsquawk);
-	void machine_start_keroppi()          ATTR_COLD;
-	void video_start_oisipuzl_2_layers()  ATTR_COLD;
+	DECLARE_MACHINE_START(keroppi);
+	DECLARE_VIDEO_START(oisipuzl_2_layers);
 	uint32_t screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -360,9 +360,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER(spritectrl_w);
 
-	void machine_reset_setaroul();
+	DECLARE_MACHINE_RESET(setaroul);
 
-	void video_start_setaroul_1_layer() ATTR_COLD;
+	DECLARE_VIDEO_START(setaroul_1_layer);
 	DECLARE_PALETTE_INIT(setaroul);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -414,7 +414,7 @@ public:
 
 	DECLARE_READ16_MEMBER(trackball_r);
 
-	void video_start_jockeyc_1_layer() ATTR_COLD;
+	DECLARE_VIDEO_START(jockeyc_1_layer);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 

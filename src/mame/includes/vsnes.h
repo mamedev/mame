@@ -77,14 +77,14 @@ public:
 	void init_platoon();
 	void init_rbibb();
 	void init_vsdual();
-	void machine_start_vsnes()  ATTR_COLD;
-	void machine_reset_vsnes();
-	void machine_start_vsdual() ATTR_COLD;
-	void machine_reset_vsdual();
-	void v_set_videorom_bank(int start, int count, int vrom_start_bank);
-	void mapper4_set_prg();
-	void mapper4_set_chr();
-	void mapper4_irq(int scanline, int vblank, int blanked);
+	DECLARE_MACHINE_START(vsnes);
+	DECLARE_MACHINE_RESET(vsnes);
+	DECLARE_MACHINE_START(vsdual);
+	DECLARE_MACHINE_RESET(vsdual);
+	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
+	void mapper4_set_prg(  );
+	void mapper4_set_chr(  );
+	void mapper4_irq( int scanline, int vblank, int blanked );
 
 	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
 	DECLARE_WRITE8_MEMBER(bootleg_sound_write);

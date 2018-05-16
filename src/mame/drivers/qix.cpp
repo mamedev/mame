@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(qix_state::mcu)
 	MCFG_M68705_PORTA_W_CB(WRITE8(*this, qix_state, qix_68705_portA_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, qix_state, qix_68705_portB_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_qixmcu, this));
+	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
 	MCFG_DEVICE_MODIFY("pia0")
 	MCFG_PIA_READPB_HANDLER(READ8(*this, qix_state, qixmcu_coin_r))

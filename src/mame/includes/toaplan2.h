@@ -130,14 +130,14 @@ public:
 	void init_enmadaio();
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void machine_start() override;
-	void machine_reset_toaplan2();
-	void video_start_toaplan2()   ATTR_COLD;
-	void machine_reset_ghox();
-	void video_start_truxton2()   ATTR_COLD;
-	void video_start_fixeightbl() ATTR_COLD;
-	void video_start_bgaregga()   ATTR_COLD;
-	void video_start_bgareggabl() ATTR_COLD;
-	void video_start_batrider()   ATTR_COLD;
+	DECLARE_MACHINE_RESET(toaplan2);
+	DECLARE_VIDEO_START(toaplan2);
+	DECLARE_MACHINE_RESET(ghox);
+	DECLARE_VIDEO_START(truxton2);
+	DECLARE_VIDEO_START(fixeightbl);
+	DECLARE_VIDEO_START(bgaregga);
+	DECLARE_VIDEO_START(bgareggabl);
+	DECLARE_VIDEO_START(batrider);
 
 	// Teki Paki sound
 	DECLARE_READ8_MEMBER(tekipaki_cmdavailable_r);

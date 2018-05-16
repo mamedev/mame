@@ -64,10 +64,10 @@ public:
 	DECLARE_READ8_MEMBER(borntofi_inputs_r);
 	DECLARE_WRITE8_MEMBER(borntofi_msm5205_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
-	void machine_start_fantland() ATTR_COLD;
-	void machine_reset_fantland();
-	void machine_start_borntofi() ATTR_COLD;
-	void machine_reset_borntofi();
+	DECLARE_MACHINE_START(fantland);
+	DECLARE_MACHINE_RESET(fantland);
+	DECLARE_MACHINE_START(borntofi);
+	DECLARE_MACHINE_RESET(borntofi);
 	uint32_t screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(fantland_irq);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);

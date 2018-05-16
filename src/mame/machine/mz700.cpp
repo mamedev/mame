@@ -93,7 +93,7 @@ void mz_state::machine_start()
 	mz700_bank_4_w(m_maincpu->space(AS_IO), 0, 0);
 }
 
-void mz_state::machine_reset_mz700()
+MACHINE_RESET_MEMBER( mz_state, mz700 )
 {
 	membank("bankr0")->set_entry(1); //rom
 	membank("bankw0")->set_entry(0); //ram
@@ -101,7 +101,7 @@ void mz_state::machine_reset_mz700()
 	m_banke->set_bank(1); //devices
 }
 
-void mz_state::machine_reset_mz800()
+MACHINE_RESET_MEMBER( mz_state, mz800 )
 {
 	// default to mz700 mode or mz1500 won't start.
 	membank("bankr0")->set_entry(1); //rom

@@ -1716,7 +1716,7 @@ MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_tetrisp2, this));
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1751,7 +1751,7 @@ MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_nndmseal, this));  // bg layer offset
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1784,7 +1784,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rockntread, this));
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1819,7 +1819,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rockntread, this));
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1870,7 +1870,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rocknms_right)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rocknms, this));
+	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rocknms)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1921,7 +1921,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_stepstag, this));
+	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -1994,7 +1994,7 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_stepstag, this));
+	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 

@@ -213,7 +213,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-void mystston_state::video_start_mystston()
+VIDEO_START_MEMBER(mystston_state,mystston)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
 
@@ -232,7 +232,7 @@ void mystston_state::video_start_mystston()
  *
  *************************************/
 
-void mystston_state::video_reset_mystston()
+VIDEO_RESET_MEMBER(mystston_state,mystston)
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
@@ -311,8 +311,8 @@ GFXDECODE_END
  *************************************/
 
 MACHINE_CONFIG_START(mystston_state::mystston_video)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mystston, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_mystston, this));
+	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
+	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mystston)
 	MCFG_PALETTE_ADD("palette", 0x40)

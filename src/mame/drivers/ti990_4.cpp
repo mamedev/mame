@@ -67,7 +67,7 @@ public:
 	void init_ti990_4();
 	void init_ti990_4v();
 
-	void machine_reset_ti990_4();
+	DECLARE_MACHINE_RESET(ti990_4);
 
 	void ti990_4v(machine_config &config);
 	void ti990_4(machine_config &config);
@@ -276,7 +276,7 @@ void ti990_4_state::cru_map_v(address_map &map)
     nullptr
 }; */
 
-void ti990_4_state::machine_reset_ti990_4()
+MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
 {
 	hold_load();
 	reset_int_lines();
@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti990_4, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
 	MCFG_DEVICE_ADD("asr733", ASR733, 0)
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti990_4, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)

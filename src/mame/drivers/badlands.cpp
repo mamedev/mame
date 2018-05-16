@@ -185,13 +185,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::sound_scanline)
 }
 
 
-void badlands_state::machine_start_badlands()
+MACHINE_START_MEMBER(badlands_state,badlands)
 {
 	save_item(NAME(m_pedal_value));
 }
 
 
-void badlands_state::machine_reset_badlands()
+MACHINE_RESET_MEMBER(badlands_state,badlands)
 {
 	m_pedal_value[0] = m_pedal_value[1] = 0x80;
 
@@ -451,8 +451,8 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlands_state, sound_scanline, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_badlands, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_badlands, this));
+	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
+	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_badlands, this));
+	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_2))

@@ -170,7 +170,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void snk6502_state::video_start_snk6502()
+VIDEO_START_MEMBER(snk6502_state,snk6502)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -186,9 +186,9 @@ void snk6502_state::postload()
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
-void snk6502_state::video_start_pballoon()
+VIDEO_START_MEMBER(snk6502_state,pballoon)
 {
-	video_start_snk6502();
+	VIDEO_START_CALL_MEMBER( snk6502 );
 
 	m_bg_tilemap->set_scrolldy(-16, -16);
 	m_fg_tilemap->set_scrolldy(-16, -16);
@@ -301,7 +301,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void snk6502_state::video_start_satansat()
+VIDEO_START_MEMBER(snk6502_state,satansat)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

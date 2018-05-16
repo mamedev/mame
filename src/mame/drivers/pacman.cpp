@@ -378,7 +378,7 @@ Boards:
  *
  *************************************/
 
-void pacman_state::machine_reset_mschamp()
+MACHINE_RESET_MEMBER(pacman_state,mschamp)
 {
 	uint8_t *rom = memregion("maincpu")->base() + 0x10000;
 	int whichbank = ioport("GAME")->read() & 1;
@@ -390,12 +390,12 @@ void pacman_state::machine_reset_mschamp()
 	membank("bank2")->set_entry(whichbank);
 }
 
-void pacman_state::machine_reset_superabc()
+MACHINE_RESET_MEMBER(pacman_state,superabc)
 {
 	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-void pacman_state::machine_reset_maketrax()
+MACHINE_RESET_MEMBER(pacman_state,maketrax)
 {
 	m_maketrax_counter = 0;
 	m_maketrax_offset = 0;
@@ -3552,7 +3552,7 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_irq))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pacman, this));
+	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3564,7 +3564,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::maketrax)
 	pacman(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_maketrax, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,maketrax)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::korosuke)
@@ -3597,7 +3597,7 @@ MACHINE_CONFIG_START(pacman_state::birdiy)
 	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_birdiy, this));
+	MCFG_VIDEO_START_OVERRIDE(pacman_state,birdiy)
 MACHINE_CONFIG_END
 
 
@@ -3702,8 +3702,8 @@ MACHINE_CONFIG_START(pacman_state::theglobp)
 	MCFG_DEVICE_PROGRAM_MAP(epos_map)
 	MCFG_DEVICE_IO_MAP(epos_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_theglobp, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_theglobp, this));
+	MCFG_MACHINE_START_OVERRIDE(pacman_state,theglobp)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,theglobp)
 MACHINE_CONFIG_END
 
 
@@ -3715,8 +3715,8 @@ MACHINE_CONFIG_START(pacman_state::acitya)
 	MCFG_DEVICE_PROGRAM_MAP(epos_map)
 	MCFG_DEVICE_IO_MAP(epos_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_acitya, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_acitya, this));
+	MCFG_MACHINE_START_OVERRIDE(pacman_state,acitya)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,acitya)
 MACHINE_CONFIG_END
 
 
@@ -3728,8 +3728,8 @@ MACHINE_CONFIG_START(pacman_state::eeekk)
 	MCFG_DEVICE_PROGRAM_MAP(epos_map)
 	MCFG_DEVICE_IO_MAP(epos_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_eeekk, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_eeekk, this));
+	MCFG_MACHINE_START_OVERRIDE(pacman_state,eeekk)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,eeekk)
 MACHINE_CONFIG_END
 
 
@@ -3805,7 +3805,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_s2650games)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, s2650_interrupt))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s2650games, this));
+	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("namco")
@@ -3862,7 +3862,7 @@ MACHINE_CONFIG_START(pacman_state::mschamp)
 	MCFG_DEVICE_PROGRAM_MAP(mschamp_map)
 	MCFG_DEVICE_IO_MAP(mschamp_portmap)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mschamp, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,mschamp)
 MACHINE_CONFIG_END
 
 
@@ -3875,7 +3875,7 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 
 	MCFG_NVRAM_ADD_0FILL("28c16.u17")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_superabc, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superabc)

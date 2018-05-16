@@ -74,8 +74,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(timeplt);
-	void video_start_chkun()  ATTR_COLD;
-	void video_start_psurge() ATTR_COLD;
+	DECLARE_VIDEO_START(chkun);
+	DECLARE_VIDEO_START(psurge);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

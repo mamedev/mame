@@ -24,8 +24,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lvcards);
-	void machine_start_lvpoker() ATTR_COLD;
-	void machine_reset_lvpoker();
+	DECLARE_MACHINE_START(lvpoker);
+	DECLARE_MACHINE_RESET(lvpoker);
 	uint32_t screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

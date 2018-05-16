@@ -656,8 +656,8 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sgb, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sgb, this));
+	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -697,8 +697,8 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sgb, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sgb, this));
+	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
@@ -734,8 +734,8 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_DEVICE_PROGRAM_MAP(gbc_map)
 	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gbc, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gbc, this));
+	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -788,8 +788,8 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_megaduck, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megaduck, this));
+	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck)
+	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck)
 
 	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_SIZE(20*8, 18*8)

@@ -317,10 +317,10 @@ public:
 	void init_hangplt();
 	void init_hangpltu();
 	void init_gticlub();
-	void machine_start_gticlub() ATTR_COLD;
-	void machine_reset_gticlub();
-	void machine_reset_hangplt();
-	void video_start_gticlub() ATTR_COLD;
+	DECLARE_MACHINE_START(gticlub);
+	DECLARE_MACHINE_RESET(gticlub);
+	DECLARE_MACHINE_RESET(hangplt);
+	DECLARE_VIDEO_START(gticlub);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
@@ -500,7 +500,7 @@ WRITE16_MEMBER(gticlub_state::soundtimer_count_w)
 
 /******************************************************************/
 
-void gticlub_state::machine_start_gticlub()
+MACHINE_START_MEMBER(gticlub_state,gticlub)
 {
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -833,7 +833,7 @@ ADC1038_INPUT_CB(gticlub_state::adc1038_input_callback)
 	return value;
 }
 
-void gticlub_state::machine_reset_gticlub()
+MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 {
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -844,7 +844,7 @@ void gticlub_state::gticlub_led_setreg(int offset, uint8_t data)
 }
 
 
-void gticlub_state::video_start_gticlub()
+VIDEO_START_MEMBER(gticlub_state,gticlub)
 {
 	m_gticlub_led_reg[0] = m_gticlub_led_reg[1] = 0x7f;
 	/*
@@ -968,8 +968,8 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gticlub, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gticlub, this));
+	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
+	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
 	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
@@ -987,7 +987,7 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gticlub, this));
+	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
 	MCFG_K001604_LAYER_SIZE(1)
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_START(gticlub_state::slrasslt)
 MACHINE_CONFIG_END
 
 
-void gticlub_state::machine_reset_hangplt()
+MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 {
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -1081,8 +1081,8 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gticlub, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hangplt, this));
+	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
+	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
 	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)

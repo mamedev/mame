@@ -894,7 +894,7 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_superbug)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_superbug, this));
+	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbug)
 
 	MCFG_PALETTE_MODIFY("palette")
@@ -918,7 +918,7 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_montecar)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_montecar, this));
+	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
 
 	MCFG_PALETTE_MODIFY("palette")

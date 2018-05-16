@@ -13,7 +13,7 @@
 #include "includes/special.h"
 
 
-void special_state::video_start_special()
+VIDEO_START_MEMBER(special_state,special)
 {
 	m_palette->set_pen_color(0, rgb_t::black());
 	m_palette->set_pen_color(1, rgb_t::white());
@@ -35,8 +35,7 @@ uint32_t special_state::screen_update_special(screen_device &screen, bitmap_ind1
 	}
 	return 0;
 }
-
-void special_state::video_start_specialp()
+VIDEO_START_MEMBER(special_state,specialp)
 {
 }
 
@@ -83,7 +82,7 @@ PALETTE_INIT_MEMBER(special_state,specimx)
 }
 
 
-void special_state::video_start_specimx()
+VIDEO_START_MEMBER(special_state,specimx)
 {
 	m_specimx_colorram = std::make_unique<uint8_t[]>(0x3000);
 }
@@ -123,7 +122,7 @@ PALETTE_INIT_MEMBER(special_state,erik)
 }
 
 
-void special_state::video_start_erik()
+VIDEO_START_MEMBER(special_state,erik)
 {
 }
 

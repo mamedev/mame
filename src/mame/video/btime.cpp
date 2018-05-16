@@ -116,14 +116,14 @@ Start the video hardware emulation.
 
 ***************************************************************************/
 
-void btime_state::video_start_disco()
+VIDEO_START_MEMBER(btime_state,disco)
 {
 	// graphics are in RAM
 	m_gfxdecode->gfx(0)->set_source(m_deco_charram);
 	m_gfxdecode->gfx(1)->set_source(m_deco_charram);
 }
 
-void btime_state::video_start_bnj()
+VIDEO_START_MEMBER(btime_state,bnj)
 {
 	/* the background area is twice as wide as the screen */
 	int width = 256;

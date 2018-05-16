@@ -128,8 +128,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
 	void init_shadfgtr();
 	void init_vcombat();
-	void machine_reset_vcombat();
-	void machine_reset_shadfgtr();
+	DECLARE_MACHINE_RESET(vcombat);
+	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -427,7 +427,7 @@ void vcombat_state::sound_map(address_map &map)
 }
 
 
-void vcombat_state::machine_reset_vcombat()
+MACHINE_RESET_MEMBER(vcombat_state,vcombat)
 {
 	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 	m_vid_1->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
@@ -435,7 +435,7 @@ void vcombat_state::machine_reset_vcombat()
 	m_crtc_select = 0;
 }
 
-void vcombat_state::machine_reset_shadfgtr()
+MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 {
 	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_vcombat, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
 
 /* Temporary hack for experimenting with timing. */
 #if 0
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(vcombat_state::shadfgtr)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_shadfgtr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 

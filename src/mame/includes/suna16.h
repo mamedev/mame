@@ -72,10 +72,10 @@ public:
 
 	void init_uballoon();
 	virtual void video_start() override;
-	void machine_start_bestbest() ATTR_COLD;
-	void machine_start_bssoccer() ATTR_COLD;
-	void machine_start_uballoon() ATTR_COLD;
-	void machine_reset_uballoon();
+	DECLARE_MACHINE_START(bestbest);
+	DECLARE_MACHINE_START(bssoccer);
+	DECLARE_MACHINE_START(uballoon);
+	DECLARE_MACHINE_RESET(uballoon);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -773,11 +773,11 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************************/
 
-void md_base_state::video_start_megadriv()
+VIDEO_START_MEMBER(md_base_state,megadriv)
 {
 }
 
-void md_base_state::machine_start_megadriv()
+MACHINE_START_MEMBER(md_base_state,megadriv)
 {
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
@@ -790,7 +790,7 @@ void md_base_state::machine_start_megadriv()
 	save_item(NAME(m_megadrive_io_tx_regs));
 }
 
-void md_base_state::machine_reset_megadriv()
+MACHINE_RESET_MEMBER(md_base_state,megadriv)
 {
 	/* default state of z80 = reset, with bus */
 	osd_printf_debug("Resetting Megadrive / Genesis\n");
@@ -894,8 +894,8 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_DEVICE_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_megadriv, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
 	megadriv_timers(config);
 
@@ -914,7 +914,7 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_megadriv, this));
+	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -951,8 +951,8 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_DEVICE_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_megadriv, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
 	megadriv_timers(config);
 
@@ -971,7 +971,7 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_megadriv, this));
+	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

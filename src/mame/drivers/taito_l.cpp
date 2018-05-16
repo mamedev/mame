@@ -123,7 +123,7 @@ void taitol_1cpu_state::state_register()
 }
 
 
-void taitol_state::machine_start_taito_l()
+MACHINE_START_MEMBER(taitol_state, taito_l)
 {
 	state_register();
 }
@@ -184,7 +184,7 @@ void taitol_1cpu_state::taito_machine_reset()
 }
 
 
-void taitol_state::machine_reset_taito_l()
+MACHINE_RESET_MEMBER(taitol_state, taito_l)
 {
 	taito_machine_reset();
 }
@@ -1479,7 +1479,7 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taito_l, this));
+	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 MACHINE_CONFIG_END
@@ -1509,8 +1509,8 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitol_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taito_l, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taito_l, this));
+	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);
@@ -1584,8 +1584,8 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taito_l, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taito_l, this));
+	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);
@@ -1628,8 +1628,8 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitol_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taito_l, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taito_l, this));
+	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);
@@ -1652,8 +1652,8 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 	MCFG_DEVICE_PROGRAM_MAP(plotting_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taito_l, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taito_l, this));
+	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);
@@ -1776,8 +1776,8 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 	MCFG_MB8421_INTL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taito_l, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taito_l, this));
+	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);

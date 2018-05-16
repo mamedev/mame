@@ -99,7 +99,7 @@ public:
 	void init_mephisto();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void machine_start_mm2() ATTR_COLD;
+	DECLARE_MACHINE_START(mm2);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
@@ -264,7 +264,7 @@ void mephisto_state::machine_start()
 	m_allowNMI = 1;
 }
 
-void mephisto_state::machine_start_mm2()
+MACHINE_START_MEMBER(mephisto_state,mm2)
 {
 	m_digits.resolve();
 	m_lcd_shift_counter = 3;
@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(mephisto_state::mm2)
 	mephisto(config);
 	MCFG_DEVICE_REPLACE("maincpu", M65C02, 3700000)
 	MCFG_DEVICE_PROGRAM_MAP(mm2_mem)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mm2, this));
+	MCFG_MACHINE_START_OVERRIDE(mephisto_state, mm2 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mephisto_state, update_irq, attotime::from_hz(450))

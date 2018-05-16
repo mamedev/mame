@@ -253,7 +253,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midxunit, this));
+	MCFG_MACHINE_RESET_OVERRIDE(midxunit_state,midxunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midxunit, this));
+	MCFG_VIDEO_START_OVERRIDE(midxunit_state,midxunit)
 
 	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
 	/* serial prefixes 419, 420 */

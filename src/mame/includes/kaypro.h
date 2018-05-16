@@ -55,9 +55,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_READ8_MEMBER(kaypro_videoram_r);
 	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
-	void machine_start_kayproii() ATTR_COLD;
-	void machine_reset_kaypro();
-	void video_start_kaypro()     ATTR_COLD;
+	DECLARE_MACHINE_START(kayproii);
+	DECLARE_MACHINE_RESET(kaypro);
+	DECLARE_VIDEO_START(kaypro);
 	DECLARE_PALETTE_INIT(kaypro);
 	void init_kaypro();
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -82,12 +82,12 @@ public:
 	void init_cannonb();
 	void init_dking();
 	void init_rpatrol();
-	void video_start_cclimber() ATTR_COLD;
+	DECLARE_VIDEO_START(cclimber);
 	DECLARE_PALETTE_INIT(cclimber);
-	void video_start_swimmer()  ATTR_COLD;
+	DECLARE_VIDEO_START(swimmer);
 	DECLARE_PALETTE_INIT(swimmer);
 	DECLARE_PALETTE_INIT(yamato);
-	void video_start_toprollr() ATTR_COLD;
+	DECLARE_VIDEO_START(toprollr);
 	DECLARE_PALETTE_INIT(toprollr);
 
 	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);

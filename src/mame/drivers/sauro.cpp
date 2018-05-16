@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(sauro_state::trckydoc)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trckydoc)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_trckydoc, this));
+	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_trckydoc)
 
@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sauro)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sauro, this));
+	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 

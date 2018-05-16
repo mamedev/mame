@@ -152,7 +152,7 @@ static INPUT_PORTS_START( trvquest )
 INPUT_PORTS_END
 
 
-void gameplan_state::machine_start_trvquest()
+MACHINE_START_MEMBER(gameplan_state,trvquest)
 {
 	/* register for save states */
 	save_item(NAME(m_video_x));
@@ -164,7 +164,7 @@ void gameplan_state::machine_start_trvquest()
 	m_via_0->write_pb5(1);
 }
 
-void gameplan_state::machine_reset_trvquest()
+MACHINE_RESET_MEMBER(gameplan_state,trvquest)
 {
 	m_video_x = 0;
 	m_video_y = 0;
@@ -185,8 +185,8 @@ MACHINE_CONFIG_START(gameplan_state::trvquest)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gameplan_state, trvquest_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_trvquest, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_trvquest, this));
+	MCFG_MACHINE_START_OVERRIDE(gameplan_state,trvquest)
+	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,trvquest)
 
 	/* video hardware */
 	trvquest_video(config);

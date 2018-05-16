@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(special_state::special)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
 	MCFG_DEVICE_PROGRAM_MAP(specialist_mem)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_special, this));
+	MCFG_MACHINE_RESET_OVERRIDE(special_state, special )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(special_state::special)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_special, this));
+	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(special_state::specialp)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specialp)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_specialp, this));
+	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(special_state::specialm)
@@ -437,13 +437,13 @@ MACHINE_CONFIG_START(special_state::specimx)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(specimx_mem)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_specimx, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_specimx, this));
+	MCFG_MACHINE_START_OVERRIDE (special_state, specimx )
+	MCFG_MACHINE_RESET_OVERRIDE (special_state, specimx )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specimx)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_specimx, this));
+	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(16)
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(erik_mem)
 	MCFG_DEVICE_IO_MAP(erik_io_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_erik, this));
+	MCFG_MACHINE_RESET_OVERRIDE(special_state, erik )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_erik, this));
+	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
 	MCFG_SCREEN_PALETTE("palette")
 

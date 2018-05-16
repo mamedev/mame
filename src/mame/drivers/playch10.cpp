@@ -705,8 +705,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(playch10_state::playch10_hboard)
 	playch10(config);
-	set_video_start_cb(config, driver_callback_delegate(&video_start_playch10_hboard, this));
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playch10_hboard, this));
+	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
+	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
 MACHINE_CONFIG_END
 
 /***************************************************************************

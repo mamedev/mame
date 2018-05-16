@@ -62,8 +62,8 @@ public:
 	void init_toto();
 	void init_hyperpac();
 	void init_yutnori();
-	void machine_reset_semiprot();
-	void machine_reset_finalttr();
+	DECLARE_MACHINE_RESET(semiprot);
+	DECLARE_MACHINE_RESET(finalttr);
 
 	uint32_t screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

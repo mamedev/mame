@@ -99,7 +99,7 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 	void kbd_put(u8 data);
-	void machine_reset_ravens2();
+	DECLARE_MACHINE_RESET(ravens2);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
@@ -202,7 +202,7 @@ WRITE8_MEMBER( ravens_state::port1c_w )
 	m_term_char = data;
 }
 
-void ravens_state::machine_reset_ravens2()
+MACHINE_RESET_MEMBER( ravens_state, ravens2 )
 {
 	m_term_data = 0x80;
 	m_digits[6] = 0;
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(ravens_state::ravens2)
 	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ravens2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

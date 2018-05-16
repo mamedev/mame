@@ -94,8 +94,8 @@ public:
 	required_ioport_array<8> m_kbdio;
 
 	void init_poisk1();
-	void machine_start_poisk1() ATTR_COLD;
-	void machine_reset_poisk1();
+	DECLARE_MACHINE_START(poisk1);
+	DECLARE_MACHINE_RESET(poisk1);
 
 	DECLARE_PALETTE_INIT(p1);
 	virtual void video_start() override;
@@ -604,12 +604,12 @@ void p1_state::init_poisk1()
 	membank("bank10")->set_base(m_ram->pointer());
 }
 
-void p1_state::machine_start_poisk1()
+MACHINE_START_MEMBER(p1_state, poisk1)
 {
 	DBG_LOG(0, "init", ("machine_start()\n"));
 }
 
-void p1_state::machine_reset_poisk1()
+MACHINE_RESET_MEMBER(p1_state, poisk1)
 {
 	DBG_LOG(0, "init", ("machine_reset()\n"));
 
@@ -648,8 +648,8 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_DEVICE_IO_MAP(poisk1_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_poisk1, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_poisk1, this));
+	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
+	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
 
 	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
 	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12) /* heartbeat IRQ */

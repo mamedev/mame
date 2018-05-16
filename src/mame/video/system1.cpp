@@ -156,7 +156,7 @@ void system1_state::video_start()
 }
 
 
-void system1_state::video_start_system2()
+VIDEO_START_MEMBER(system1_state,system2)
 {
 	video_start_common(8);
 }
