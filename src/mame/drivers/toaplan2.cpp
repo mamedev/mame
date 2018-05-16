@@ -394,7 +394,6 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
-#include "machine/input_merger.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
 #include "sound/ymz280b.h"
@@ -765,6 +764,19 @@ READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 	return m_z80_rom[offset];
 }
 
+// these two latches are always written together, via a single move.l instruction
+WRITE8_MEMBER(toaplan2_state::batrider_soundlatch_w)
+{
+	m_soundlatch->write(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+
+WRITE8_MEMBER(toaplan2_state::batrider_soundlatch2_w)
+{
+	m_soundlatch2->write(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
 
 WRITE16_MEMBER(toaplan2_state::batrider_unknown_sound_w)
 {
@@ -790,8 +802,7 @@ WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
 
 WRITE8_MEMBER(toaplan2_state::batrider_clear_nmi_w)
 {
-	m_soundlatch->acknowledge_w(space, offset, data, mem_mask);
-	m_soundlatch2->acknowledge_w(space, offset, data, mem_mask);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1255,8 +1266,8 @@ void toaplan2_state::batrider_68k_mem(address_map &map)
 	map(0x50000b, 0x50000b).r("soundlatch4", FUNC(generic_latch_8_device::read));
 	map(0x50000c, 0x50000d).r(this, FUNC(toaplan2_state::batrider_z80_busack_r));
 	map(0x500010, 0x500011).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
-	map(0x500021, 0x500021).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // TODO : seperated interrupt?
-	map(0x500023, 0x500023).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0x500021, 0x500021).w(this, FUNC(toaplan2_state::batrider_soundlatch_w));
+	map(0x500023, 0x500023).w(this, FUNC(toaplan2_state::batrider_soundlatch2_w));
 	map(0x500024, 0x500025).w(this, FUNC(toaplan2_state::batrider_unknown_sound_w));
 	map(0x500026, 0x500027).w(this, FUNC(toaplan2_state::batrider_clear_sndirq_w));
 	map(0x500061, 0x500061).w(this, FUNC(toaplan2_state::batrider_z80_busreq_w));
@@ -1281,8 +1292,8 @@ void toaplan2_state::bbakraid_68k_mem(address_map &map)
 	map(0x500008, 0x500009).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x500011, 0x500011).r("soundlatch3", FUNC(generic_latch_8_device::read));
 	map(0x500013, 0x500013).r("soundlatch4", FUNC(generic_latch_8_device::read));
-	map(0x500015, 0x500015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x500017, 0x500017).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0x500015, 0x500015).w(this, FUNC(toaplan2_state::batrider_soundlatch_w));
+	map(0x500017, 0x500017).w(this, FUNC(toaplan2_state::batrider_soundlatch2_w));
 	map(0x500018, 0x500019).r(this, FUNC(toaplan2_state::bbakraid_eeprom_r));
 	map(0x50001a, 0x50001b).w(this, FUNC(toaplan2_state::batrider_unknown_sound_w));
 	map(0x50001c, 0x50001d).w(this, FUNC(toaplan2_state::batrider_clear_sndirq_w));
@@ -3174,7 +3185,7 @@ static const gfx_layout batrider_tx_tilelayout =
 };
 
 static GFXDECODE_START( gfx_truxton2 )
-	GFXDECODE_RAM( "tx_gfxram16", 0, truxton2_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( nullptr, 0, truxton2_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_textrom )
@@ -3182,7 +3193,7 @@ static GFXDECODE_START( gfx_textrom )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_batrider )
-	GFXDECODE_RAM( "tx_gfxram16", 0, batrider_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( nullptr, 0, batrider_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 
@@ -4085,9 +4096,6 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_INPUT_MERGER_ANY_HIGH("batrider_sndirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	MCFG_DEVICE_ADD("dma_space", ADDRESS_MAP_BANK, 0)
@@ -4123,13 +4131,7 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 
 	// these two latches are always written together, via a single move.l instruction
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("batrider_sndirq", input_merger_any_high_device, in_w<0>))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("batrider_sndirq", input_merger_any_high_device, in_w<1>))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
@@ -4160,9 +4162,6 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(toaplan2_state, bbakraid_snd_interrupt,  448)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_INPUT_MERGER_ANY_HIGH("batrider_sndirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -4201,13 +4200,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	// these two latches are always written together, via a single move.l instruction
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("batrider_sndirq", input_merger_any_high_device, in_w<0>))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("batrider_sndirq", input_merger_any_high_device, in_w<1>))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 

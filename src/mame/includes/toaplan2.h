@@ -104,6 +104,8 @@ public:
 	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
 	DECLARE_WRITE8_MEMBER(batrider_z80_busreq_w);
 	DECLARE_READ16_MEMBER(batrider_z80rom_r);
+	DECLARE_WRITE8_MEMBER(batrider_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(batrider_soundlatch2_w);
 	DECLARE_WRITE16_MEMBER(batrider_unknown_sound_w);
 	DECLARE_WRITE16_MEMBER(batrider_clear_sndirq_w);
 	DECLARE_WRITE8_MEMBER(batrider_sndirq_w);

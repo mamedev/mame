@@ -91,6 +91,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	create_tx_tilemap(0x1d5, 0x16a);
@@ -135,6 +136,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	m_vdp[0]->disable_sprite_buffer(); // disable buffering on this game
 
 	/* Create the Text tilemap for this game */
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	create_tx_tilemap(0x1d4, 0x16b);
