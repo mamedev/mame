@@ -790,7 +790,7 @@ void trs80_state::machine_reset()
 	m_cassette_data = 0;
 }
 
-void trs80_state::machine_reset_trs80m4()
+MACHINE_RESET_MEMBER(trs80_state,trs80m4)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_cassette_data = 0;
@@ -836,7 +836,7 @@ void trs80_state::machine_reset_trs80m4()
 	trs80m4_84_w(mem, 0, 0);    /* switch in devices at power-on */
 }
 
-void trs80_state::machine_reset_lnw80()
+MACHINE_RESET_MEMBER(trs80_state,lnw80)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_cassette_data = 0;
@@ -844,10 +844,10 @@ void trs80_state::machine_reset_lnw80()
 	lnw80_fe_w(space, 0, 0);
 }
 
-void trs80_state::machine_reset_cp500()
+MACHINE_RESET_MEMBER(trs80_state,cp500)
 {
 	m_a11_flipflop = 0;
-	machine_reset_trs80m4();
+	MACHINE_RESET_CALL_MEMBER( trs80m4 );
 }
 
 

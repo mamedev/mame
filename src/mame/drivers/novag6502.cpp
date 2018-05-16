@@ -110,7 +110,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sexpert_lcd_data_w);
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
-	void machine_reset_sexpert();
+	DECLARE_MACHINE_RESET(sexpert);
 	void init_sexpert();
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_map(address_map &map);
@@ -453,7 +453,7 @@ void novag6502_state::sexpert_set_cpu_freq()
 	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
 }
 
-void novag6502_state::machine_reset_sexpert()
+MACHINE_RESET_MEMBER(novag6502_state, sexpert)
 {
 	novagbase_state::machine_reset();
 
@@ -928,7 +928,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sexpert, this));
+	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

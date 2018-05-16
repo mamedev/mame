@@ -190,9 +190,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(multigam);
-	void machine_start_multigm3() ATTR_COLD;
-	void machine_reset_multigm3();
-	void machine_start_supergm3() ATTR_COLD;
+	DECLARE_MACHINE_START(multigm3);
+	DECLARE_MACHINE_RESET(multigm3);
+	DECLARE_MACHINE_START(supergm3);
 	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
 	void set_videorom_bank( int start, int count, int bank, int bank_size_in_kb);
 	void set_videoram_bank( int start, int count, int bank, int bank_size_in_kb);
@@ -1145,7 +1145,7 @@ void multigam_state::machine_reset()
 {
 }
 
-void multigam_state::machine_reset_multigm3()
+MACHINE_RESET_MEMBER(multigam_state,multigm3)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* reset the ppu */
@@ -1165,7 +1165,7 @@ void multigam_state::machine_start()
 	membank("bank1")->set_base(memregion("gfx1")->base());
 }
 
-void multigam_state::machine_start_multigm3()
+MACHINE_START_MEMBER(multigam_state,multigm3)
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();
@@ -1187,7 +1187,7 @@ void multigam_state::machine_start_multigm3()
 	set_videorom_bank(0, 8, 0, 8);
 }
 
-void multigam_state::machine_start_supergm3()
+MACHINE_START_MEMBER(multigam_state,supergm3)
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();
@@ -1226,8 +1226,8 @@ MACHINE_CONFIG_START(multigam_state::multigm3)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multigm3_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_multigm3, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_multigm3, this));
+	MCFG_MACHINE_START_OVERRIDE(multigam_state, multigm3 )
+	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::multigmt)
@@ -1241,7 +1241,7 @@ MACHINE_CONFIG_START(multigam_state::supergm3)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(supergm3_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_supergm3, this));
+	MCFG_MACHINE_START_OVERRIDE(multigam_state,supergm3)
 MACHINE_CONFIG_END
 
 ROM_START( multigam )

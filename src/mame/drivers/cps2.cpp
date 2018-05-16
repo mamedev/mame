@@ -1297,7 +1297,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void cps_state::machine_start_cps2()
+MACHINE_START_MEMBER(cps_state,cps2)
 {
 	if (m_audiocpu != nullptr) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
@@ -1316,7 +1316,7 @@ MACHINE_CONFIG_START(cps_state::cps2)
 	MCFG_DEVICE_PROGRAM_MAP(qsound_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cps2, this));
+	MCFG_MACHINE_START_OVERRIDE(cps_state, cps2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1331,7 +1331,7 @@ MACHINE_CONFIG_START(cps_state::cps2)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cps2, this));
+	MCFG_VIDEO_START_OVERRIDE(cps_state, cps2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

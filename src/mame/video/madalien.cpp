@@ -117,7 +117,7 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 }
 
 
-void madalien_state::video_start_madalien()
+VIDEO_START_MEMBER(madalien_state,madalien)
 {
 	int i;
 
@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(madalien_state::madalien_video)
 	MCFG_PALETTE_ADD("palette", 0x30)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_madalien, this));
+	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

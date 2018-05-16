@@ -655,7 +655,7 @@ static GFXDECODE_START( gfx_ojankohs )
 	GFXDECODE_ENTRY( "gfx1", 0, ojankohs_bglayout,   0, 64 )
 GFXDECODE_END
 
-void ojankohs_state::machine_start_common()
+MACHINE_START_MEMBER(ojankohs_state,common)
 {
 	save_item(NAME(m_gfxreg));
 	save_item(NAME(m_flipscreen));
@@ -669,31 +669,31 @@ void ojankohs_state::machine_start_common()
 	save_item(NAME(m_vclk_left));
 }
 
-void ojankohs_state::machine_start_ojankohs()
+MACHINE_START_MEMBER(ojankohs_state,ojankohs)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
 
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-void ojankohs_state::machine_start_ojankoy()
+MACHINE_START_MEMBER(ojankohs_state,ojankoy)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
 
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 }
 
-void ojankohs_state::machine_start_ojankoc()
+MACHINE_START_MEMBER(ojankohs_state,ojankoc)
 {
 	uint8_t *ROM = memregion("user1")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 }
 
 void ojankohs_state::machine_reset()
@@ -720,7 +720,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_DEVICE_IO_MAP(ojankohs_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ojankohs, this));
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -737,7 +737,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ojankohs, this));
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -761,7 +761,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_DEVICE_IO_MAP(ojankoy_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ojankoy, this));
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(ojankohs_state,ojankoy)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ojankoy, this));
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -801,7 +801,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_DEVICE_IO_MAP(ccasino_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ojankohs, this));
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ccasino, this));
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ccasino)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -842,7 +842,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	MCFG_DEVICE_IO_MAP(ojankoc_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ojankoc, this));
+	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ojankoc, this));
+	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

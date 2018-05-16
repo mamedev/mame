@@ -30,7 +30,7 @@ public:
 		{ }
 
 	DECLARE_WRITE8_MEMBER(rint_w);
-	void machine_reset_stargame();
+	DECLARE_MACHINE_RESET(stargame);
 
 	void stargame(machine_config &config);
 	void audiocpu_io(address_map &map);
@@ -89,7 +89,7 @@ WRITE8_MEMBER( stargame_state::rint_w )
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-void stargame_state::machine_reset_stargame()
+MACHINE_RESET_MEMBER( stargame_state, stargame )
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // doesn't do anything? cpu should be stuck in reset until allowed to start by SRESET line
 }
@@ -112,7 +112,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	MCFG_DEVICE_PROGRAM_MAP(audiocpu_map)
 	MCFG_DEVICE_IO_MAP(audiocpu_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_stargame, this));
+	MCFG_MACHINE_RESET_OVERRIDE(stargame_state, stargame)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()

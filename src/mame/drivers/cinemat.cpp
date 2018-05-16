@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cinemat_state::sundance)
 	cinemat_jmi_8k(config);
 	sundance_sound(config);
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cinemat_16level, this));
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_16level)
 MACHINE_CONFIG_END
 
 
@@ -1110,7 +1110,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cinemat_state::solarq)
 	cinemat_jmi_16k(config);
 	solarq_sound(config);
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cinemat_64level, this));
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_64level)
 MACHINE_CONFIG_END
 
 
@@ -1119,7 +1119,7 @@ MACHINE_CONFIG_START(cinemat_state::boxingb)
 	boxingb_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cinemat_color, this));
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, mux_select_w))
@@ -1137,7 +1137,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cinemat_state::wotwc)
 	cinemat_jmi_16k(config);
 	wotw_sound(config);
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cinemat_color, this));
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 MACHINE_CONFIG_END
 
 
@@ -1157,7 +1157,7 @@ MACHINE_CONFIG_START(cinemat_state::qb3)
 	MCFG_DEVICE_IO_MAP(io_map_qb3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cinemat_qb3color, this));
+	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_qb3color)
 MACHINE_CONFIG_END
 
 

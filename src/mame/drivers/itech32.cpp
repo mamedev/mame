@@ -477,7 +477,7 @@ void itech32_state::machine_reset()
 }
 
 
-void itech32_state::machine_reset_drivedge()
+MACHINE_RESET_MEMBER(itech32_state,drivedge)
 {
 	itech32_state::machine_reset();
 
@@ -1769,7 +1769,7 @@ MACHINE_CONFIG_START(itech32_state::drivedge)
 
 //  MCFG_DEVICE_ADD("comm", M6803, 8000000/4) -- network CPU
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_drivedge, this));
+	MCFG_MACHINE_RESET_OVERRIDE(itech32_state,drivedge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_SCREEN_MODIFY("screen")

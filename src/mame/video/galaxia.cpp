@@ -83,7 +83,7 @@ void galaxia_state::init_common()
 	cvs_init_stars();
 }
 
-void galaxia_state::video_start_galaxia()
+VIDEO_START_MEMBER(galaxia_state,galaxia)
 {
 	init_common();
 
@@ -93,7 +93,7 @@ void galaxia_state::video_start_galaxia()
 
 }
 
-void galaxia_state::video_start_astrowar()
+VIDEO_START_MEMBER(galaxia_state,astrowar)
 {
 	init_common();
 

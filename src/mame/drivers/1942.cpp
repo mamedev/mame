@@ -646,7 +646,7 @@ MACHINE_CONFIG_START(_1942_state::_1942p)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942p)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_c1942p, this));
+	MCFG_VIDEO_START_OVERRIDE(_1942_state,c1942p)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

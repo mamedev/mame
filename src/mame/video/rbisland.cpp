@@ -69,7 +69,7 @@ the Y settings are active low.
 
 */
 
-void rbisland_state::video_start_jumping()
+VIDEO_START_MEMBER(rbisland_state,jumping)
 {
 	m_pc080sn->set_trans_pen(1, 15);
 

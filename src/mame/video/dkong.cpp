@@ -908,7 +908,7 @@ void dkong_state::check_palette()
 	}
 }
 
-void dkong_state::video_start_dkong_base()
+VIDEO_START_MEMBER(dkong_state,dkong_base)
 {
 	m_cd4049_b = (log(0.0 - log(cd4049_al)) - log(0.0 - log((1.0-cd4049_al))) ) / log(cd4049_vh/cd4049_vl);
 	m_cd4049_a = log(0.0 - log(cd4049_al)) - m_cd4049_b * log(cd4049_vh);
@@ -948,9 +948,9 @@ void dkong_state::video_start_dkong_base()
 
 }
 
-void dkong_state::video_start_dkong()
+VIDEO_START_MEMBER(dkong_state,dkong)
 {
-	video_start_dkong_base();
+	VIDEO_START_CALL_MEMBER(dkong_base);
 
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dkong_state::scanline_callback),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));

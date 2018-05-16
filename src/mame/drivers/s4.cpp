@@ -82,8 +82,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	void machine_reset_s4();
-	void machine_reset_s4a();
+	DECLARE_MACHINE_RESET(s4);
+	DECLARE_MACHINE_RESET(s4a);
 	void s4(machine_config &config);
 	void s4a(machine_config &config);
 	void s4_audio_map(address_map &map);
@@ -267,13 +267,13 @@ static INPUT_PORTS_START( s4 )
 	PORT_DIPSETTING(    0x07, "31" )
 INPUT_PORTS_END
 
-void s4_state::machine_reset_s4()
+MACHINE_RESET_MEMBER( s4_state, s4 )
 {
 	m_t_c = 0;
 	m_chimes = 1;
 }
 
-void s4_state::machine_reset_s4a()
+MACHINE_RESET_MEMBER( s4_state, s4a )
 {
 	m_t_c = 0;
 	m_chimes = 0;
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(s4_state::s4)
 	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s4_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s4_state, irq, attotime::from_hz(250))
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s4, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s4)
@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(s4_state::s4a)
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6808, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s4_audio_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s4a, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4a)
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

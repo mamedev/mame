@@ -264,7 +264,7 @@ void ti85_state::machine_start()
 	membank("bank2")->set_base(m_bios + 0x04000);
 }
 
-void ti85_state::machine_reset_ti85()
+MACHINE_RESET_MEMBER(ti85_state,ti85)
 {
 	m_PCR = 0xc0;
 }
@@ -312,7 +312,7 @@ READ8_MEMBER(ti85_state::ti83p_membank3_r)
 	return m_membank3->read8(space, offset);
 }
 
-void ti85_state::machine_reset_ti83p()
+MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
 	m_PCR = 0x00;
 
@@ -332,7 +332,7 @@ void ti85_state::machine_reset_ti83p()
 	}
 }
 
-void ti85_state::machine_start_ti83p()
+MACHINE_START_MEMBER(ti85_state,ti83p)
 {
 	m_model = TI83P;
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -419,28 +419,28 @@ void ti85_state::ti8xpse_init_common()
 }
 
 
-void ti85_state::machine_start_ti83pse()
+MACHINE_START_MEMBER(ti85_state,ti83pse)
 {
 	m_model = TI84PSE;
 
 	ti8xpse_init_common();
 }
 
-void ti85_state::machine_start_ti84pse()
+MACHINE_START_MEMBER(ti85_state,ti84pse)
 {
 	m_model = TI83PSE;
 
 	ti8xpse_init_common();
 }
 
-void ti85_state::machine_start_ti84p()
+MACHINE_START_MEMBER(ti85_state,ti84p)
 {
 	m_model = TI84P;
 
 	ti8xpse_init_common();
 }
 
-void ti85_state::machine_start_ti86()
+MACHINE_START_MEMBER(ti85_state,ti86)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();

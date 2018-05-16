@@ -129,13 +129,13 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
  *
  *************************************/
 
-void coolpool_state::machine_reset_amerdart()
+MACHINE_RESET_MEMBER(coolpool_state,amerdart)
 {
 	m_nvram_write_enable = 0;
 }
 
 
-void coolpool_state::machine_reset_coolpool()
+MACHINE_RESET_MEMBER(coolpool_state,coolpool)
 {
 	m_nvram_write_enable = 0;
 }
@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_amerdart, this));
+	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coolpool, this));
+	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)

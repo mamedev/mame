@@ -955,7 +955,7 @@ void thomson_state::to7_midi_init()
 
 
 
-void thomson_state::machine_reset_to7()
+MACHINE_RESET_MEMBER( thomson_state, to7 )
 {
 	LOG (( "to7: machine reset called\n" ));
 
@@ -986,7 +986,7 @@ void thomson_state::machine_reset_to7()
 
 
 
-void thomson_state::machine_start_to7()
+MACHINE_START_MEMBER( thomson_state, to7 )
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	uint8_t* mem = memregion("maincpu")->base();
@@ -1177,7 +1177,7 @@ WRITE8_MEMBER( thomson_state::to770_gatearray_w )
 
 
 
-void thomson_state::machine_reset_to770()
+MACHINE_RESET_MEMBER( thomson_state, to770 )
 {
 	LOG (( "to770: machine reset called\n" ));
 
@@ -1210,7 +1210,7 @@ void thomson_state::machine_reset_to770()
 
 
 
-void thomson_state::machine_start_to770()
+MACHINE_START_MEMBER( thomson_state, to770 )
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -1557,7 +1557,7 @@ WRITE8_MEMBER( thomson_state::mo5_ext_w )
 
 
 
-void thomson_state::machine_reset_mo5()
+MACHINE_RESET_MEMBER( thomson_state, mo5 )
 {
 	LOG (( "mo5: machine reset called\n" ));
 
@@ -1590,7 +1590,7 @@ void thomson_state::machine_reset_mo5()
 
 
 
-void thomson_state::machine_start_mo5()
+MACHINE_START_MEMBER( thomson_state, mo5 )
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -2497,7 +2497,7 @@ WRITE8_MEMBER( thomson_state::to9_timer_port_out )
 
 
 
-void thomson_state::machine_reset_to9()
+MACHINE_RESET_MEMBER( thomson_state, to9 )
 {
 	LOG (( "to9: machine reset called\n" ));
 
@@ -2532,7 +2532,7 @@ void thomson_state::machine_reset_to9()
 
 
 
-void thomson_state::machine_start_to9()
+MACHINE_START_MEMBER( thomson_state, to9 )
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -3494,7 +3494,7 @@ void thomson_state::to8_lightpen_cb( int step )
 
 
 
-void thomson_state::machine_reset_to8()
+MACHINE_RESET_MEMBER( thomson_state, to8 )
 {
 	LOG (( "to8: machine reset called\n" ));
 
@@ -3542,7 +3542,7 @@ void thomson_state::machine_reset_to8()
 
 
 
-void thomson_state::machine_start_to8()
+MACHINE_START_MEMBER( thomson_state, to8 )
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -3645,7 +3645,7 @@ WRITE8_MEMBER( thomson_state::to9p_timer_port_out )
 
 /* ------------ init / reset ------------ */
 
-void thomson_state::machine_reset_to9p()
+MACHINE_RESET_MEMBER( thomson_state, to9p )
 {
 	LOG (( "to9p: machine reset called\n" ));
 
@@ -3692,7 +3692,7 @@ void thomson_state::machine_reset_to9p()
 
 
 
-void thomson_state::machine_start_to9p()
+MACHINE_START_MEMBER( thomson_state, to9p )
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -4335,7 +4335,7 @@ WRITE8_MEMBER( thomson_state::mo6_vreg_w )
 
 
 
-void thomson_state::machine_reset_mo6()
+MACHINE_RESET_MEMBER( thomson_state, mo6 )
 {
 	LOG (( "mo6: machine reset called\n" ));
 
@@ -4377,7 +4377,7 @@ void thomson_state::machine_reset_mo6()
 
 
 
-void thomson_state::machine_start_mo6()
+MACHINE_START_MEMBER( thomson_state, mo6 )
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -4558,7 +4558,7 @@ void thomson_state::mo5nr_game_reset()
 
 
 
-void thomson_state::machine_reset_mo5nr()
+MACHINE_RESET_MEMBER( thomson_state, mo5nr )
 {
 	LOG (( "mo5nr: machine reset called\n" ));
 
@@ -4600,7 +4600,7 @@ void thomson_state::machine_reset_mo5nr()
 
 
 
-void thomson_state::machine_start_mo5nr()
+MACHINE_START_MEMBER( thomson_state, mo5nr )
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();

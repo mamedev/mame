@@ -41,8 +41,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg2);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_actionhwbg2);
-	void video_start_kickgoal() ATTR_COLD;
-	void video_start_actionhw() ATTR_COLD;
+	DECLARE_VIDEO_START(kickgoal);
+	DECLARE_VIDEO_START(actionhw);
 
 	INTERRUPT_GEN_MEMBER(kickgoal_interrupt);
 

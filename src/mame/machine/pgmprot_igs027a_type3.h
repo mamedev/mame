@@ -30,7 +30,7 @@ public:
 	void init_killbldp();
 	void init_dmnfrnt();
 	void init_happy6();
-	void machine_start_pgm_arm_type3() ATTR_COLD;
+	DECLARE_MACHINE_START(pgm_arm_type3);
 	DECLARE_WRITE32_MEMBER( svg_arm7_ram_sel_w );
 	DECLARE_READ32_MEMBER( svg_arm7_shareram_r );
 	DECLARE_WRITE32_MEMBER( svg_arm7_shareram_w );
@@ -56,7 +56,7 @@ public:
 	DECLARE_READ32_MEMBER( happy6_speedup_r );
 	DECLARE_READ32_MEMBER( svg_speedup_r );
 	DECLARE_READ32_MEMBER( svgpcb_speedup_r );
-	void machine_reset_pgm_arm_type3_reset();
+	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
 	void pgm_arm_type3(machine_config &config);
 	void _55857G_arm7_map(address_map &map);
 	void svg_68k_mem(address_map &map);

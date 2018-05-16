@@ -74,8 +74,8 @@ public:
 	void init_tg16();
 	void init_mess_pce();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void machine_start_pce() ATTR_COLD;
-	void machine_reset_mess_pce();
+	DECLARE_MACHINE_START(pce);
+	DECLARE_MACHINE_RESET(mess_pce);
 	void pce_common(machine_config &config);
 	void pce(machine_config &config);
 	void tg16(machine_config &config);

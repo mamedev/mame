@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_holeland)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_holeland, this));
+	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crzrally)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_crzrally, this));
+	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

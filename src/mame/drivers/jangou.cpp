@@ -100,10 +100,10 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jangou);
-	void machine_start_jngolady() ATTR_COLD;
-	void machine_reset_jngolady();
-	void machine_start_common() ATTR_COLD;
-	void machine_reset_common();
+	DECLARE_MACHINE_START(jngolady);
+	DECLARE_MACHINE_RESET(jngolady);
+	DECLARE_MACHINE_START(common);
+	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
@@ -815,14 +815,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void jangou_state::machine_start_common()
+MACHINE_START_MEMBER(jangou_state,common)
 {
 	save_item(NAME(m_mux_data));
 }
 
 void jangou_state::machine_start()
 {
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_cvsd_shiftreg));
 	save_item(NAME(m_cvsd_shift_cnt));
@@ -832,9 +832,9 @@ void jangou_state::machine_start()
 	m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 
-void jangou_state::machine_start_jngolady()
+MACHINE_START_MEMBER(jangou_state,jngolady)
 {
-	machine_start_common();
+	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_adpcm_byte));
 	save_item(NAME(m_msm5205_vclk_toggle));
@@ -842,22 +842,22 @@ void jangou_state::machine_start_jngolady()
 	save_item(NAME(m_z80_latch));
 }
 
-void jangou_state::machine_reset_common()
+MACHINE_RESET_MEMBER(jangou_state,common)
 {
 	m_mux_data = 0;
 }
 
 void jangou_state::machine_reset()
 {
-	machine_reset_common();
+	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_cvsd_shiftreg = 0;
 	m_cvsd_shift_cnt = 0;
 }
 
-void jangou_state::machine_reset_jngolady()
+MACHINE_RESET_MEMBER(jangou_state,jngolady)
 {
-	machine_reset_common();
+	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_adpcm_byte = 0;
 	m_msm5205_vclk_toggle = 0;
@@ -918,8 +918,8 @@ MACHINE_CONFIG_START(jangou_state::jngolady)
 	MCFG_DEVICE_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_jngolady, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_jngolady, this));
+	MCFG_MACHINE_START_OVERRIDE(jangou_state,jngolady)
+	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,jngolady)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("cvsd")
@@ -941,8 +941,8 @@ MACHINE_CONFIG_START(jangou_state::cntrygrl)
 
 	MCFG_DEVICE_REMOVE("cpu1")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("cvsd")
@@ -962,8 +962,8 @@ MACHINE_CONFIG_START(jangou_state::roylcrdn)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
+	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("cvsd")

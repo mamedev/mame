@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void jack_state::video_start_joinem()
+VIDEO_START_MEMBER(jack_state,joinem)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jack_state::joinem_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),this), 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);

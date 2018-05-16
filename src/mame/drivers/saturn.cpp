@@ -463,8 +463,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
 
-	void machine_start_saturn() ATTR_COLD;
-	void machine_reset_saturn();
+	DECLARE_MACHINE_START(saturn);
+	DECLARE_MACHINE_RESET(saturn);
 
 	DECLARE_READ8_MEMBER(saturn_cart_type_r);
 	DECLARE_READ32_MEMBER(abus_dummy_r);
@@ -595,7 +595,7 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 
-void sat_console_state::machine_start_saturn()
+MACHINE_START_MEMBER(sat_console_state, saturn)
 {
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
@@ -672,7 +672,7 @@ WRITE32_MEMBER(sat_console_state::saturn_null_ram_w)
 {
 }
 
-void sat_console_state::machine_reset_saturn()
+MACHINE_RESET_MEMBER(sat_console_state,saturn)
 {
 	m_scsp_last_line = 0;
 
@@ -821,8 +821,8 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
 	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_saturn, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_saturn, this));
+	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
+	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
 
@@ -834,7 +834,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_stv_vdp2, this));
+	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

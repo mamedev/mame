@@ -37,8 +37,8 @@ public:
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
-	void machine_reset_pentagon();
-	void video_start_pentagon() ATTR_COLD;
+	DECLARE_MACHINE_RESET(pentagon);
+	DECLARE_VIDEO_START(pentagon);
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -210,7 +210,7 @@ void pentagon_state::pentagon_switch(address_map &map)
 	map(0x4000, 0xffff).r(this, FUNC(pentagon_state::beta_disable_r));
 }
 
-void pentagon_state::machine_reset_pentagon()
+MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -237,7 +237,7 @@ void pentagon_state::machine_reset_pentagon()
 	pentagon_update_memory();
 }
 
-void pentagon_state::video_start_pentagon()
+VIDEO_START_MEMBER(pentagon_state,pentagon)
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;
@@ -281,12 +281,12 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_DEVICE_IO_MAP(pentagon_io)
 	MCFG_DEVICE_OPCODES_MAP(pentagon_switch)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pentagon, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pentagon, this));
+	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pentagon)

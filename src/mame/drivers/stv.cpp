@@ -1097,8 +1097,8 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
 	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_stv, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_stv, this));
+	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
+	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually AK93C45F */
 
@@ -1111,7 +1111,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_stv_vdp2, this));
+	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1209,7 +1209,7 @@ MACHINE_CONFIG_START(stv_state::hopper)
 	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
-void stv_state::machine_reset_stv()
+MACHINE_RESET_MEMBER(stv_state,stv)
 {
 	m_scsp_last_line = 0;
 
@@ -1282,7 +1282,7 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-void stv_state::machine_start_stv()
+MACHINE_START_MEMBER(stv_state,stv)
 {
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 

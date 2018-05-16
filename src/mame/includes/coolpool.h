@@ -68,8 +68,8 @@ public:
 	void init_coolpool();
 	void init_amerdart();
 	void init_9ballsht();
-	void machine_reset_amerdart();
-	void machine_reset_coolpool();
+	DECLARE_MACHINE_RESET(amerdart);
+	DECLARE_MACHINE_RESET(coolpool);
 	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);
 	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
 	void register_state_save();

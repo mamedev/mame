@@ -524,8 +524,8 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	//set_machine_start_cb(config, driver_callback_delegate(&machine_start_lastbank, this));
-	//set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lastbank, this));
+	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
+	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 
-//  set_video_start_cb(config, driver_callback_delegate(&video_start_lastbank, this));
+//  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

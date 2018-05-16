@@ -171,8 +171,8 @@ public:
 	void init_solvalou();
 	void init_cybsled();
 	void init_aircomb();
-	void machine_start_namcos21() ATTR_COLD;
-	void video_start_namcos21()   ATTR_COLD;
+	DECLARE_MACHINE_START(namcos21);
+	DECLARE_VIDEO_START(namcos21);
 	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_driveyes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

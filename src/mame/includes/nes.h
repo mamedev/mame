@@ -96,10 +96,10 @@ public:
 	void init_famicom();
 
 	// these are needed until we modernize the FDS controller
-	void machine_start_fds()      ATTR_COLD;
-	void machine_start_famitwin() ATTR_COLD;
-	void machine_reset_fds();
-	void machine_reset_famitwin();
+	DECLARE_MACHINE_START(fds);
+	DECLARE_MACHINE_START(famitwin);
+	DECLARE_MACHINE_RESET(fds);
+	DECLARE_MACHINE_RESET(famitwin);
 	void setup_disk(nes_disksys_device *slot);
 
 	void suborkbd(machine_config &config);

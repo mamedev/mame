@@ -621,8 +621,8 @@ static void cd90_640_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(thomson_state::to7)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_to7, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_to7, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 1000000)
@@ -646,7 +646,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
 	MCFG_PALETTE_INIT_OWNER(thomson_state, thom)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_thom, this));
+	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
 	SPEAKER(config, "speaker").front_center();
@@ -929,8 +929,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::to770)
 	to7(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_to770, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_to770, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to770)
@@ -1122,8 +1122,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::mo5)
 	to7(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mo5, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mo5, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo5)
@@ -1485,8 +1485,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::to9)
 	to7(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_to9, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_to9, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to9)
@@ -1709,8 +1709,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::to8)
 	to7(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_to8, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_to8, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to8)
@@ -1875,8 +1875,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::to9p)
 	to7(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_to9p, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_to9p, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to9p)
@@ -2224,8 +2224,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::mo6)
 	to7(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mo6, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mo6, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo6)
@@ -2494,8 +2494,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::mo5nr)
 	to7(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mo5nr, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mo5nr, this));
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( mo5nr)

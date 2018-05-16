@@ -33,7 +33,7 @@ public:
 	{ }
 
 	void init_rd100();
-	void machine_reset_rd100();
+	DECLARE_MACHINE_RESET(rd100);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void rd100(machine_config &config);
@@ -93,7 +93,7 @@ void rd100_state::init_rd100()
 {
 }
 
-void rd100_state::machine_reset_rd100()
+MACHINE_RESET_MEMBER( rd100_state, rd100 )
 {
 }
 
@@ -102,7 +102,7 @@ MACHINE_CONFIG_START(rd100_state::rd100)
 	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000)) // MC6809P???
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_rd100, this));
+	MCFG_MACHINE_RESET_OVERRIDE(rd100_state, rd100)
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 

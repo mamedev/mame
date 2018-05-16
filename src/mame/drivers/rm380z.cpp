@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(rm380z_state::rm480z)
 	MCFG_DEVICE_PROGRAM_MAP(rm480z_mem)
 	MCFG_DEVICE_IO_MAP(rm480z_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_rm480z, this));
+	MCFG_MACHINE_RESET_OVERRIDE(rm380z_state, rm480z)
 	/* video hardware */
 //  MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(50)

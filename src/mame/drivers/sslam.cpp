@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(sslam_state::sslam)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sslam, this));
+	MCFG_VIDEO_START_OVERRIDE(sslam_state,sslam)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(sslam_state::powerbls)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_powerbls, this));
+	MCFG_VIDEO_START_OVERRIDE(sslam_state,powerbls)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

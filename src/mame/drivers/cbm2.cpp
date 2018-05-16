@@ -140,12 +140,12 @@ public:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void machine_start_cbm2()       ATTR_COLD;
-	void machine_start_cbm2_ntsc()  ATTR_COLD;
-	void machine_start_cbm2_pal()   ATTR_COLD;
-	void machine_start_cbm2x_ntsc() ATTR_COLD;
-	void machine_start_cbm2x_pal()	ATTR_COLD;
-	void machine_reset_cbm2();
+	DECLARE_MACHINE_START( cbm2 );
+	DECLARE_MACHINE_START( cbm2_ntsc );
+	DECLARE_MACHINE_START( cbm2_pal );
+	DECLARE_MACHINE_START( cbm2x_ntsc );
+	DECLARE_MACHINE_START( cbm2x_pal );
+	DECLARE_MACHINE_RESET( cbm2 );
 
 	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
@@ -275,10 +275,10 @@ public:
 	required_device<mos6566_device> m_vic;
 	optional_shared_ptr<uint8_t> m_color_ram;
 
-	void machine_start_p500()      ATTR_COLD;
-	void machine_start_p500_ntsc() ATTR_COLD;
-	void machine_start_p500_pal()  ATTR_COLD;
-	void machine_reset_p500();
+	DECLARE_MACHINE_START( p500 );
+	DECLARE_MACHINE_START( p500_ntsc );
+	DECLARE_MACHINE_START( p500_pal );
+	DECLARE_MACHINE_RESET( p500 );
 
 	void read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
 		int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr);
@@ -2117,10 +2117,10 @@ void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 
 //-------------------------------------------------
-//  machine_start_cbm2()
+//  MACHINE_START( cbm2 )
 //-------------------------------------------------
 
-void cbm2_state::machine_start_cbm2()
+MACHINE_START_MEMBER( cbm2_state, cbm2 )
 {
 	// allocate memory
 	m_video_ram.allocate(m_video_ram_size);
@@ -2147,64 +2147,64 @@ void cbm2_state::machine_start_cbm2()
 
 
 //-------------------------------------------------
-//  machine_start_cbm2_ntsc()
+//  MACHINE_START( cbm2_ntsc )
 //-------------------------------------------------
 
-void cbm2_state::machine_start_cbm2_ntsc()
+MACHINE_START_MEMBER( cbm2_state, cbm2_ntsc )
 {
 	m_ntsc = 1;
 
-	machine_start_cbm2();
+	MACHINE_START_CALL_MEMBER(cbm2);
 }
 
 
 //-------------------------------------------------
-//  machine_start_cbm2_pal()
+//  MACHINE_START( cbm2_pal )
 //-------------------------------------------------
 
-void cbm2_state::machine_start_cbm2_pal()
+MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 {
 	m_ntsc = 0;
 
-	machine_start_cbm2();
+	MACHINE_START_CALL_MEMBER(cbm2);
 }
 
 
 //-------------------------------------------------
-//  machine_start_cbm2x_ntsc()
+//  MACHINE_START( cbm2x_ntsc )
 //-------------------------------------------------
 
-void cbm2_state::machine_start_cbm2x_ntsc()
+MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 {
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);
 
-	machine_start_cbm2_ntsc();
+	MACHINE_START_CALL_MEMBER(cbm2_ntsc);
 }
 
 
 //-------------------------------------------------
-//  machine_start_cbm2x_pal()
+//  MACHINE_START( cbm2x_pal )
 //-------------------------------------------------
 
-void cbm2_state::machine_start_cbm2x_pal()
+MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 {
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);
 
-	machine_start_cbm2_pal();
+	MACHINE_START_CALL_MEMBER(cbm2_pal);
 }
 
 
 //-------------------------------------------------
-//  machine_start_p500()
+//  MACHINE_START( p500 )
 //-------------------------------------------------
 
-void p500_state::machine_start_p500()
+MACHINE_START_MEMBER( p500_state, p500 )
 {
 	m_video_ram_size = 0x400;
 
-	machine_start_cbm2();
+	MACHINE_START_CALL_MEMBER(cbm2);
 
 	// allocate memory
 	m_color_ram.allocate(0x400);
@@ -2218,14 +2218,14 @@ void p500_state::machine_start_p500()
 
 
 //-------------------------------------------------
-//  machine_start_p500_ntsc()
+//  MACHINE_START( p500_ntsc )
 //-------------------------------------------------
 
-void p500_state::machine_start_p500_ntsc()
+MACHINE_START_MEMBER( p500_state, p500_ntsc )
 {
 	m_ntsc = 1;
 
-	machine_start_p500();
+	MACHINE_START_CALL_MEMBER(p500);
 }
 
 
@@ -2233,15 +2233,15 @@ void p500_state::machine_start_p500_ntsc()
 //  MACHINE_START( p500_pal )
 //-------------------------------------------------
 
-void p500_state::machine_start_p500_pal()
+MACHINE_START_MEMBER( p500_state, p500_pal )
 {
 	m_ntsc = 0;
 
-	machine_start_p500();
+	MACHINE_START_CALL_MEMBER(p500);
 }
 
 
-void cbm2_state::machine_reset_cbm2()
+MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 {
 	m_dramon = 1;
 	m_busen1 = 1;
@@ -2250,8 +2250,8 @@ void cbm2_state::machine_reset_cbm2()
 	m_tpi1_irq = CLEAR_LINE;
 	m_user_irq = CLEAR_LINE;
 
-	m_ext_tpi_pb = 0xff;
-	m_ext_cia_pb = 0xff;
+m_ext_tpi_pb = 0xff;
+m_ext_cia_pb = 0xff;
 
 	m_maincpu->reset();
 
@@ -2266,9 +2266,9 @@ void cbm2_state::machine_reset_cbm2()
 }
 
 
-void p500_state::machine_reset_p500()
+MACHINE_RESET_MEMBER( p500_state, p500 )
 {
-	machine_reset_cbm2();
+	MACHINE_RESET_CALL_MEMBER(cbm2);
 
 	m_vic->reset();
 
@@ -2310,8 +2310,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(p500_state::p500_ntsc)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_p500_ntsc, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_p500, this));
+	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_ntsc)
+	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(14'318'181)/14)
@@ -2426,8 +2426,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(p500_state::p500_pal)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_p500_pal, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_p500, this));
+	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_pal)
+	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(17'734'472)/18)
@@ -2539,8 +2539,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cbm2_ntsc, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cbm2, this));
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_ntsc)
+	MCFG_MACHINE_RESET_OVERRIDE(cbm2_state, cbm2)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(18'000'000)/9)
@@ -2669,7 +2669,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cbm2_state::cbm2lp_pal)
 	cbm2lp_ntsc(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cbm2_pal, this));
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_MODIFY(MOS6526_TAG)
 	MCFG_MOS6526_TOD(50)
@@ -2733,7 +2733,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cbm2hp_state::bx256hp)
 	b256hp(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cbm2x_ntsc, this));
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
 	MCFG_DEVICE_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(ext_mem)
@@ -2766,7 +2766,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cbm2_state::cbm2hp_pal)
 	cbm2hp_ntsc(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cbm2_pal, this));
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	// devices
 	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
@@ -2803,7 +2803,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cbm2hp_state::cbm730)
 	cbm720(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cbm2x_pal, this));
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
 	MCFG_DEVICE_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(ext_mem)

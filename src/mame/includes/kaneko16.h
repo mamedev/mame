@@ -79,9 +79,9 @@ public:
 	void init_bakubrkr();
 
 
-	void machine_reset_gtmr();
-	void video_start_kaneko16() ATTR_COLD;
-	void machine_reset_mgcrystl();
+	DECLARE_MACHINE_RESET(gtmr);
+	DECLARE_VIDEO_START(kaneko16);
+	DECLARE_MACHINE_RESET(mgcrystl);
 	uint32_t screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	template<class _BitmapClass>
@@ -174,7 +174,7 @@ public:
 	void init_berlwallt();
 	void init_berlwall_common();
 	DECLARE_PALETTE_INIT(berlwall);
-	void video_start_berlwall() ATTR_COLD;
+	DECLARE_VIDEO_START(berlwall);
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

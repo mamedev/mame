@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-void armedf_state::video_start_terraf()
+VIDEO_START_MEMBER(armedf_state,terraf)
 {
 	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
@@ -134,7 +134,7 @@ void armedf_state::video_start_terraf()
 	save_pointer(NAME(m_text_videoram.get()), 0x1000);
 }
 
-void armedf_state::video_start_armedf()
+VIDEO_START_MEMBER(armedf_state,armedf)
 {
 	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 

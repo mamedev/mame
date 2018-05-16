@@ -737,7 +737,7 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_jumping, this));
+	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
 	MCFG_PC080SN_GFX_REGION(1)

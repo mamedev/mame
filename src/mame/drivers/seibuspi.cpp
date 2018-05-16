@@ -1851,7 +1851,7 @@ void seibuspi_state::machine_start()
 	if (m_z80_rom != nullptr) save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
 }
 
-void seibuspi_state::machine_reset_spi()
+MACHINE_RESET_MEMBER(seibuspi_state,spi)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -1873,7 +1873,7 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_spi, this));
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
 	MCFG_DS2404_ADD("ds2404", 1995, 1, 1)
 
@@ -1916,7 +1916,7 @@ MACHINE_CONFIG_START(seibuspi_state::ejanhs)
 	spi(config);
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ejanhs, this));
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seibuspi_state::rdft2)
@@ -1928,7 +1928,7 @@ MACHINE_CONFIG_END
 
 /* single boards */
 
-void seibuspi_state::machine_reset_sxx2e()
+MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 {
 	m_z80_bank->set_entry(0);
 	m_z80_lastbank = 0;
@@ -1945,7 +1945,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2e)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxx2e_soundmap)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sxx2e, this));
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, sxx2e)
 
 	MCFG_DEVICE_REMOVE("soundflash1")
 	MCFG_DEVICE_REMOVE("soundflash2")
@@ -2077,7 +2077,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sys386f, this));
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 
 	/* sound hardware */
 	 // Single PCBs only output mono sound

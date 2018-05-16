@@ -944,7 +944,7 @@ void m62_state::machine_start()
 	m62_amplify_contrast(1);
 }
 
-void m62_state::machine_start_battroad()
+MACHINE_START_MEMBER(m62_state, battroad)
 {
 	machine_init_save();
 	m62_amplify_contrast(0);
@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(m62_state::kungfum)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kungfum)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kungfum, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,kungfum)
 MACHINE_CONFIG_END
 
 
@@ -1025,7 +1025,7 @@ MACHINE_CONFIG_START(m62_state::battroad)
 	MCFG_DEVICE_PROGRAM_MAP(battroad_map)
 	MCFG_DEVICE_IO_MAP(battroad_io_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_battroad, this));
+	MCFG_MACHINE_START_OVERRIDE(m62_state,battroad)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1037,7 +1037,7 @@ MACHINE_CONFIG_START(m62_state::battroad)
 	MCFG_PALETTE_ADD("fg_palette", 32)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62_battroad_fg)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_battroad, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,battroad)
 MACHINE_CONFIG_END
 
 
@@ -1049,7 +1049,7 @@ MACHINE_CONFIG_START(m62_state::ldrun2)
 	MCFG_DEVICE_PROGRAM_MAP(ldrun2_map)
 	MCFG_DEVICE_IO_MAP(ldrun2_io_map)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ldrun2, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
 MACHINE_CONFIG_END
@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(m62_state::ldrun3)
 	MCFG_DEVICE_IO_MAP(ldrun3_io_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ldrun2, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun3)
 MACHINE_CONFIG_END
@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(m62_state::ldrun4)
 	MCFG_DEVICE_IO_MAP(ldrun4_io_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ldrun4, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun4)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun4)
 MACHINE_CONFIG_END
@@ -1101,7 +1101,7 @@ MACHINE_CONFIG_START(m62_state::lotlot)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62_lotlot_fg)
 
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_lotlot, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,lotlot)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_lotlot)
 MACHINE_CONFIG_END
@@ -1118,7 +1118,7 @@ MACHINE_CONFIG_START(m62_state::kidniki)
 	/* video hardware */
 	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_kidniki)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kidniki, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,kidniki)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kidniki)
 MACHINE_CONFIG_END
@@ -1134,7 +1134,7 @@ MACHINE_CONFIG_START(m62_state::spelunkr)
 	/* video hardware */
 	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_spelunkr)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spelunkr, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunkr)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunkr)
 MACHINE_CONFIG_END
@@ -1156,7 +1156,7 @@ MACHINE_CONFIG_START(m62_state::spelunk2)
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(m62_state,spelunk2)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spelunk2, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunk2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunk2)
 MACHINE_CONFIG_END
@@ -1179,7 +1179,7 @@ MACHINE_CONFIG_START(m62_state::youjyudn)
 	MCFG_GFXDECODE_MODIFY("chr_decode", gfx_m62_tiles_youjyudn)
 	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_youjyudn)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_youjyudn, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,youjyudn)
 MACHINE_CONFIG_END
 
 
@@ -1195,7 +1195,7 @@ MACHINE_CONFIG_START(m62_state::horizon)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_horizon)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_horizon, this));
+	MCFG_VIDEO_START_OVERRIDE(m62_state,horizon)
 MACHINE_CONFIG_END
 
 

@@ -57,8 +57,8 @@ public:
 	required_ioport_array<12> m_kbdio;
 
 	void init_mc1502();
-	void machine_start_mc1502() ATTR_COLD;
-	void machine_reset_mc1502();
+	DECLARE_MACHINE_START(mc1502);
+	DECLARE_MACHINE_RESET(mc1502);
 
 	TIMER_CALLBACK_MEMBER(keyb_signal_callback);
 

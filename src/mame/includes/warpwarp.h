@@ -74,7 +74,7 @@ public:
 	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
 
 	virtual void machine_start() override;
-	void machine_reset_kaitei();
+	DECLARE_MACHINE_RESET(kaitei);
 	void init_navarone();
 	void init_geebee();
 	void init_kaitein();
@@ -82,11 +82,11 @@ public:
 	void init_sos();
 	void init_kaitei();
 	void init_bombbee();
-	void video_start_geebee()   ATTR_COLD;
+	DECLARE_VIDEO_START(geebee);
 	DECLARE_PALETTE_INIT(geebee);
-	void video_start_warpwarp() ATTR_COLD;
+	DECLARE_VIDEO_START(warpwarp);
 	DECLARE_PALETTE_INIT(warpwarp);
-	void video_start_navarone() ATTR_COLD;
+	DECLARE_VIDEO_START(navarone);
 	DECLARE_PALETTE_INIT(navarone);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);

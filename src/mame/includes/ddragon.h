@@ -98,9 +98,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	uint32_t screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void machine_start_ddragon() ATTR_COLD;
-	void machine_reset_ddragon();
-	void video_start_ddragon() ATTR_COLD;
+	DECLARE_MACHINE_START(ddragon);
+	DECLARE_MACHINE_RESET(ddragon);
+	DECLARE_VIDEO_START(ddragon);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
 

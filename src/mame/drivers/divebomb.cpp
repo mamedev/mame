@@ -431,10 +431,10 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_K051316_OFFSETS(-88, -16)
 	MCFG_K051316_CB(divebomb_state, zoom_callback_2)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_divebomb, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_divebomb, this));
+	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
+	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_divebomb, this));
+	MCFG_VIDEO_START_OVERRIDE(divebomb_state, divebomb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -549,7 +549,7 @@ ROM_END
  *
  *************************************/
 
-void divebomb_state::machine_start_divebomb()
+MACHINE_START_MEMBER(divebomb_state, divebomb)
 {
 	m_rozbank->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
 
@@ -558,7 +558,7 @@ void divebomb_state::machine_start_divebomb()
 }
 
 
-void divebomb_state::machine_reset_divebomb()
+MACHINE_RESET_MEMBER(divebomb_state, divebomb)
 {
 	for (int chip = 0; chip < 2; chip++)
 	{

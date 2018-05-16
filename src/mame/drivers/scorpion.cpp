@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
-	void machine_start_scorpion() ATTR_COLD;
-	void machine_reset_scorpion();
+	DECLARE_MACHINE_START(scorpion);
+	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 	void scorpion(machine_config &config);
 	void profi(machine_config &config);
@@ -206,7 +206,7 @@ void scorpion_state::scorpion_switch(address_map &map)
 	map(0x4000, 0xffff).r(this, FUNC(scorpion_state::beta_disable_r));
 }
 
-void scorpion_state::machine_reset_scorpion()
+MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -230,8 +230,7 @@ void scorpion_state::machine_reset_scorpion()
 	m_port_1ffd_data = 0;
 	scorpion_update_memory();
 }
-
-void scorpion_state::machine_start_scorpion()
+MACHINE_START_MEMBER(scorpion_state,scorpion)
 {
 }
 
@@ -297,8 +296,8 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 	MCFG_DEVICE_IO_MAP(scorpion_io)
 	MCFG_DEVICE_OPCODES_MAP(scorpion_switch)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_scorpion, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_scorpion, this));
+	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
+	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_scorpion)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)

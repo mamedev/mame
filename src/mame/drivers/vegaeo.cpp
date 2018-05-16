@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	void init_vegaeo();
-	void video_start_vega() ATTR_COLD;
+	DECLARE_VIDEO_START(vega);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vega(machine_config &config);
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( crazywar )
 INPUT_PORTS_END
 
 
-void vegaeo_state::video_start_vega()
+VIDEO_START_MEMBER(vegaeo_state,vega)
 {
 	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
 	save_pointer(NAME(m_vram.get()), 0x14000*2);
@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(vegaeo_state::vega)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(16)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_vega, this));
+	MCFG_VIDEO_START_OVERRIDE(vegaeo_state,vega)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

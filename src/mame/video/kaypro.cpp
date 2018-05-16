@@ -307,7 +307,7 @@ WRITE8_MEMBER( kaypro_state::kaypro484_videoram_w )
 	m_p_videoram[m_mc6845_video_address] = data;
 }
 
-void kaypro_state::video_start_kaypro()
+VIDEO_START_MEMBER(kaypro_state,kaypro)
 {
 	m_p_videoram = memregion("roms")->base()+0x3000;
 }

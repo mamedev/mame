@@ -227,8 +227,8 @@ public:
 	}
 
 	// Machine management
-	void machine_start_ti99_8() ATTR_COLD;
-	void machine_reset_ti99_8();
+	DECLARE_MACHINE_START(ti99_8);
+	DECLARE_MACHINE_RESET(ti99_8);
 
 	// Processor connections with the main board
 	DECLARE_READ8_MEMBER( cruread );
@@ -691,7 +691,7 @@ WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
 	m_mainboard->dbin_in(state);
 }
 
-void ti99_8_state::machine_start_ti99_8()
+MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 {
 	// Need to configure the speech ROM for inverse bit order
 	speechrom_device* mem = subdevice<speechrom_device>(TI998_SPEECHROM_REG);
@@ -703,7 +703,7 @@ void ti99_8_state::machine_start_ti99_8()
 	save_item(NAME(m_int2));
 }
 
-void ti99_8_state::machine_reset_ti99_8()
+MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 {
 	m_cpu->hold_line(CLEAR_LINE);
 
@@ -730,8 +730,8 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(*this, ti99_8_state, dbin_line) )
 	MCFG_TMS9995_HOLDA_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, holda_line) )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti99_8, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti99_8, this));
+	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
 	// 9901 configuration
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, XTAL(10'738'635)/4.0)

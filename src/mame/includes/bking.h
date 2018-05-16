@@ -88,9 +88,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(bking);
-	void machine_start_bking3() ATTR_COLD;
-	void machine_reset_bking3();
-	void machine_reset_common();
+	DECLARE_MACHINE_START(bking3);
+	DECLARE_MACHINE_RESET(bking3);
+	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bking);
 	void bking(machine_config &config);

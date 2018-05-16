@@ -33,8 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
 	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
 	void init_partner();
-	void machine_start_partner() ATTR_COLD;
-	void machine_reset_partner();
+	DECLARE_MACHINE_START(partner);
+	DECLARE_MACHINE_RESET(partner);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

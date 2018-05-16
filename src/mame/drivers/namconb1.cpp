@@ -1058,7 +1058,7 @@ GFXDECODE_END /* gfxdecodeinfo2 */
 
 /***************************************************************/
 
-void namconb1_state::machine_reset_namconb()
+MACHINE_RESET_MEMBER(namconb1_state, namconb)
 {
 	m_pos_irq_level = 0;
 	m_unk_irq_level = 0;
@@ -1077,7 +1077,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namconb, this));
+	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
 
@@ -1100,7 +1100,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_namconb1, this));
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1120,7 +1120,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namconb, this));
+	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namconb1_state, mcu_irq0_cb, attotime::from_hz(60))
@@ -1141,7 +1141,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_namconb2, this));
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

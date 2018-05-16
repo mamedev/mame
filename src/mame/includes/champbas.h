@@ -68,8 +68,8 @@ public:
 
 	DECLARE_PALETTE_INIT(champbas);
 	DECLARE_PALETTE_INIT(exctsccr);
-	void video_start_champbas() ATTR_COLD;
-	void video_start_exctsccr() ATTR_COLD;
+	DECLARE_VIDEO_START(champbas);
+	DECLARE_VIDEO_START(exctsccr);
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
 

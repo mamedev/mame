@@ -69,7 +69,7 @@ public:
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	uint16_t crypt_read_callback(uint32_t addr);
-	void machine_start_model2() ATTR_COLD;
+	DECLARE_MACHINE_START(model2);
 
 
 	/* Public for access by GAME() */
@@ -195,9 +195,9 @@ protected:
 	DECLARE_READ8_MEMBER(driveio_porth_r);
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
 	void push_geo_data(uint32_t data);
-	void video_start_model2() ATTR_COLD;
-	void machine_reset_model2_common();
-	void machine_reset_model2_scsp();
+	DECLARE_VIDEO_START(model2);
+	DECLARE_MACHINE_RESET(model2_common);
+	DECLARE_MACHINE_RESET(model2_scsp);
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
@@ -309,7 +309,7 @@ public:
 		  m_copro_tgp_bank(*this, "copro_tgp_bank")
 	{}
 
-	void machine_start_model2_tgp();
+	DECLARE_MACHINE_START(model2_tgp);
 
 protected:
 	required_device<mb86234_device> m_copro_tgp;
@@ -346,7 +346,7 @@ protected:
 	DECLARE_WRITE32_MEMBER(copro_atan_w);
 	DECLARE_READ32_MEMBER(copro_atan_r);
 
-	void machine_reset_model2_tgp();
+	DECLARE_MACHINE_RESET(model2_tgp);
 
 	void model2_tgp_mem(address_map &map);
 
@@ -373,7 +373,7 @@ public:
 		: model2_tgp_state(mconfig, type, tag)
 	{}
 
-	void machine_reset_model2o();
+	DECLARE_MACHINE_RESET(model2o);
 
 	void model2o(machine_config &config);
 	void daytona(machine_config &config);
@@ -444,7 +444,7 @@ public:
 		: model2_tgp_state(mconfig, type, tag)
 	{}
 
-	void machine_reset_model2a();
+	DECLARE_MACHINE_RESET(model2a);
 
 	void manxtt(machine_config &config);
 	void manxttdx(machine_config &config);
@@ -475,8 +475,8 @@ public:
 		  m_copro_adsp(*this, "copro_adsp")
 	{}
 
-	void machine_reset_model2b();
-	void machine_start_model2b() ATTR_COLD;
+	DECLARE_MACHINE_RESET(model2b);
+	DECLARE_MACHINE_START(model2b);
 
 	void model2b(machine_config &config);
 	void model2b_0229(machine_config &config);
@@ -524,8 +524,8 @@ public:
 		  m_copro_tgpx4_program(*this, "copro_tgpx4_program")
 	{}
 
-	void machine_reset_model2c();
-	void machine_start_model2c() ATTR_COLD;
+	DECLARE_MACHINE_RESET(model2c);
+	DECLARE_MACHINE_START(model2c);
 
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);

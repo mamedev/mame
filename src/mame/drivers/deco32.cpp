@@ -1929,7 +1929,7 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_captaven, this));
+	MCFG_VIDEO_START_OVERRIDE(captaven_state, captaven)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2011,7 +2011,7 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_fghthist, this));
+	MCFG_VIDEO_START_OVERRIDE(fghthist_state, fghthist)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2137,7 +2137,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dragngun, this));
+	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
@@ -2235,7 +2235,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dragngun, this));
+	MCFG_VIDEO_START_OVERRIDE(dragngun_state, dragngun)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2366,7 +2366,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(*this, nslasher_state, tattass_sound_irq_w))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_nslasher, this));
+	MCFG_VIDEO_START_OVERRIDE(nslasher_state,nslasher)
 
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
@@ -2438,7 +2438,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_nslasher)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_nslasher, this));
+	MCFG_VIDEO_START_OVERRIDE(nslasher_state, nslasher)
 
 	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))

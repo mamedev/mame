@@ -903,8 +903,8 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mcr68, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mcr68, this));
+	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
+	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 2))
@@ -924,7 +924,7 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_FORMAT(xxxxxxxRRRBBBGGG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mcr68, this));
+	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
 
 	/* sound hardware -- determined by specific machine */
 	SPEAKER(config, "speaker").front_center();

@@ -287,7 +287,7 @@ public:
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_PALETTE_INIT(spc);
-	void video_start_spc() ATTR_COLD;
+	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
@@ -514,7 +514,7 @@ PALETTE_INIT_MEMBER(spc1500_state,spc)
 	palette.set_pen_color(7,rgb_t(0xff,0xff,0xff));
 }
 
-void spc1500_state::video_start_spc()
+VIDEO_START_MEMBER(spc1500_state, spc)
 {
 }
 
@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
 	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spc, this));
+	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))

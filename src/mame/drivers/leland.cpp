@@ -1014,8 +1014,8 @@ MACHINE_CONFIG_START(leland_state::leland)
 	MCFG_DEVICE_PROGRAM_MAP(slave_small_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_leland, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_leland, this));
+	MCFG_MACHINE_START_OVERRIDE(leland_state,leland)
+	MCFG_MACHINE_RESET_OVERRIDE(leland_state,leland)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_0FILL("battery")
@@ -1104,8 +1104,8 @@ MACHINE_CONFIG_START(leland_state::ataxx)
 	MCFG_80186_CHIP_SELECT_CB(WRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ataxx, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ataxx, this));
+	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
+	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()

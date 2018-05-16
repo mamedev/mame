@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_jrpacman, this));
+	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

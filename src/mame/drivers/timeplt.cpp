@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(timeplt_state::psurge)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_psurge, this));
+	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(timeplt_state::bikkuric)
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(timeplt_state::bikkuric)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(chkun_main_map)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_chkun, this));
+	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(timeplt_state::chkun)

@@ -127,7 +127,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_state::scanline_update)
  *
  *************************************/
 
-void jpmimpct_state::video_start_jpmimpct()
+VIDEO_START_MEMBER(jpmimpct_state,jpmimpct)
 {
 	memset(&m_bt477, 0, sizeof(m_bt477));
 

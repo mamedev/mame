@@ -1003,7 +1003,7 @@ void playmark_state::configure_oki_banks()
 	}
 }
 
-void playmark_state::machine_start_playmark()
+MACHINE_START_MEMBER(playmark_state,playmark)
 {
 	save_item(NAME(m_bgscrollx));
 	save_item(NAME(m_bgscrolly));
@@ -1024,7 +1024,7 @@ void playmark_state::machine_start_playmark()
 
 
 
-void playmark_state::machine_reset_playmark()
+MACHINE_RESET_MEMBER(playmark_state,playmark)
 {
 	m_bgscrollx = 0;
 	m_bgscrolly = 0;
@@ -1055,8 +1055,8 @@ MACHINE_CONFIG_START(playmark_state::bigtwin)
 	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playmark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_playmark, this));
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(playmark_state::bigtwin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bigtwin, this));
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwin)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1095,8 +1095,8 @@ MACHINE_CONFIG_START(playmark_state::bigtwinb)
 	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playmark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_playmark, this));
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1111,7 +1111,7 @@ MACHINE_CONFIG_START(playmark_state::bigtwinb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bigtwinb, this));
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwinb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1139,8 +1139,8 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playmark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_playmark, this));
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1155,7 +1155,7 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wbeachvl, this));
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,wbeachvl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1179,8 +1179,8 @@ MACHINE_CONFIG_START(playmark_state::excelsr)
 	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playmark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_playmark, this));
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1195,7 +1195,7 @@ MACHINE_CONFIG_START(playmark_state::excelsr)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_excelsr, this));
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,excelsr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1220,8 +1220,8 @@ MACHINE_CONFIG_START(playmark_state::hrdtimes)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playmark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_playmark, this));
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1236,7 +1236,7 @@ MACHINE_CONFIG_START(playmark_state::hrdtimes)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hrdtimes, this));
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,hrdtimes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1263,8 +1263,8 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playmark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_playmark, this));
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1279,7 +1279,7 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hotmind, this));
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 	MCFG_TICKET_DISPENSER_ADD("token",  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
@@ -1308,8 +1308,8 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_playmark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_playmark, this));
+	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
+	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1324,7 +1324,7 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_luckboomh, this));
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,luckboomh)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 	MCFG_TICKET_DISPENSER_ADD("token",  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )

@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER(cclimber_state::toprollr_rombank_w)
 }
 
 #ifdef UNUSED_FUNCTION
-void cclimber_state::machine_reset_cclimber()
+MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 {
 	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
 	m_nmi_mask = 0;
@@ -1135,7 +1135,7 @@ MACHINE_CONFIG_START(cclimber_state::root)
 	MCFG_PALETTE_ADD("palette", 16*4+8*4)
 
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,cclimber)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cclimber, this));
+	MCFG_VIDEO_START_OVERRIDE(cclimber_state,cclimber)
 MACHINE_CONFIG_END
 
 
@@ -1244,7 +1244,7 @@ MACHINE_CONFIG_START(cclimber_state::toprollr)
 	MCFG_PALETTE_ENTRIES(32*5)
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,toprollr)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toprollr, this));
+	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_toprollr)
 MACHINE_CONFIG_END
@@ -1282,7 +1282,7 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
 
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,swimmer)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_swimmer, this));
+	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

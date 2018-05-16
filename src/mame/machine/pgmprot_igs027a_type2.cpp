@@ -124,9 +124,9 @@ void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 	map(0x50000000, 0x500003ff).ram();
 }
 
-void pgm_arm_type2_state::machine_start_pgm_arm_type2()
+MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
 {
-	machine_start_pgm();
+	MACHINE_START_CALL_MEMBER(pgm);
 	/* register type specific Save State stuff here */
 }
 
@@ -135,7 +135,7 @@ void pgm_arm_type2_state::machine_start_pgm_arm_type2()
 MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
 	pgmbase(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pgm_arm_type2, this));
+	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(kov2_mem)

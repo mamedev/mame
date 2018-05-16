@@ -234,7 +234,7 @@ void z80netf_state::reset_lx390_banking()
 	 */
 }
 
-void z80ne_state::machine_reset_z80ne_base()
+MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 {
 	int i;
 
@@ -286,32 +286,32 @@ void z80ne_state::machine_reset_z80ne_base()
 
 }
 
-void z80ne_state::machine_reset_z80ne()
+MACHINE_RESET_MEMBER(z80ne_state,z80ne)
 {
 	LOG("In machine_reset z80ne\n");
 	reset_lx382_banking();
-	machine_reset_z80ne_base();
+	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 }
 
-void z80ne_state::machine_reset_z80net()
+MACHINE_RESET_MEMBER(z80ne_state,z80net)
 {
 	LOG("In machine_reset z80net\n");
-	machine_reset_z80ne();
+	MACHINE_RESET_CALL_MEMBER( z80ne );
 	reset_lx387();
 }
 
-void z80ne_state::machine_reset_z80netb()
+MACHINE_RESET_MEMBER(z80ne_state,z80netb)
 {
 	LOG("In machine_reset z80netb\n");
-	machine_reset_z80ne_base();
+	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 	reset_lx387();
 }
 
-void z80netf_state::machine_reset_z80netf()
+MACHINE_RESET_MEMBER(z80netf_state,z80netf)
 {
 	LOG("In machine_reset z80netf\n");
 	reset_lx390_banking();
-	machine_reset_z80ne_base();
+	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 	reset_lx387();
 }
 
@@ -337,7 +337,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 	}
 }
 
-void z80ne_state::machine_start_z80ne()
+MACHINE_START_MEMBER(z80ne_state,z80ne)
 {
 	LOG("In MACHINE_START z80ne\n");
 
@@ -355,21 +355,21 @@ void z80ne_state::machine_start_z80ne()
 	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 }
 
-void z80ne_state::machine_start_z80net()
+MACHINE_START_MEMBER(z80ne_state,z80net)
 {
-	machine_start_z80ne();
+	MACHINE_START_CALL_MEMBER( z80ne );
 	LOG("In MACHINE_START z80net\n");
 }
 
-void z80ne_state::machine_start_z80netb()
+MACHINE_START_MEMBER(z80ne_state,z80netb)
 {
-	machine_start_z80net();
+	MACHINE_START_CALL_MEMBER( z80net );
 	LOG("In MACHINE_START z80netb\n");
 }
 
-void z80netf_state::machine_start_z80netf()
+MACHINE_START_MEMBER(z80netf_state,z80netf)
 {
-	machine_start_z80net();
+	MACHINE_START_CALL_MEMBER( z80net );
 	LOG("In MACHINE_START z80netf\n");
 
 	m_drv_led.resolve();

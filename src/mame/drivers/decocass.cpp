@@ -1003,35 +1003,35 @@ MACHINE_CONFIG_START(decocass_type1_state::ctsttape)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ctsttape, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctsttape)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type1_state::cprogolfj)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cprogolfj, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolfj)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type1_state::cdsteljn)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cdsteljn, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cdsteljn)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type1_state::cmanhat)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cmanhat, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cmanhat)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type3_state::cfishing)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cfishing, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfishing)
 MACHINE_CONFIG_END
 
 
@@ -1039,7 +1039,7 @@ MACHINE_CONFIG_START(decocass_type1_state::chwy)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_chwy, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,chwy)
 MACHINE_CONFIG_END
 
 
@@ -1047,7 +1047,7 @@ MACHINE_CONFIG_START(decocass_type1_state::cterrani)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cterrani, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cterrani)
 MACHINE_CONFIG_END
 
 
@@ -1055,7 +1055,7 @@ MACHINE_CONFIG_START(decocass_type1_state::castfant)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_castfant, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,castfant)
 MACHINE_CONFIG_END
 
 
@@ -1063,7 +1063,7 @@ MACHINE_CONFIG_START(decocass_type1_state::csuperas)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_csuperas, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,csuperas)
 MACHINE_CONFIG_END
 
 
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(decocass_type1_state::cocean1a) /* 10 */
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cocean1a, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cocean1a)
 MACHINE_CONFIG_END
 
 
@@ -1079,21 +1079,21 @@ MACHINE_CONFIG_START(decocass_type1_state::clocknch)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_clocknch, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknch)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type1_state::clocknchj)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_clocknchj, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknchj)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type1_state::cfboy0a1) /* 12 */
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cfboy0a1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cfboy0a1)
 MACHINE_CONFIG_END
 
 
@@ -1101,7 +1101,7 @@ MACHINE_CONFIG_START(decocass_type1_state::cprogolf)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cprogolf, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolf)
 MACHINE_CONFIG_END
 
 
@@ -1109,7 +1109,7 @@ MACHINE_CONFIG_START(decocass_type1_state::cluckypo)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cluckypo, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cluckypo)
 MACHINE_CONFIG_END
 
 
@@ -1117,21 +1117,21 @@ MACHINE_CONFIG_START(decocass_type1_state::ctisland)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ctisland, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type1_state::ctisland3)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ctisland3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland3)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(decocass_type1_state::cexplore)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cexplore, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cexplore)
 MACHINE_CONFIG_END
 
 
@@ -1141,7 +1141,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cbtime)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cbtime, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cbtime)
 MACHINE_CONFIG_END
 
 
@@ -1149,7 +1149,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cburnrub)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cburnrub, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cburnrub)
 MACHINE_CONFIG_END
 
 
@@ -1157,7 +1157,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cgraplop)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cgraplop, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop)
 MACHINE_CONFIG_END
 
 
@@ -1165,7 +1165,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cgraplop2)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cgraplop2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop2)
 MACHINE_CONFIG_END
 
 
@@ -1173,7 +1173,7 @@ MACHINE_CONFIG_START(decocass_type3_state::clapapa)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_clapapa, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,clapapa)
 MACHINE_CONFIG_END
 
 
@@ -1181,7 +1181,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cskater)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cskater, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cskater)
 MACHINE_CONFIG_END
 
 
@@ -1189,7 +1189,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cprobowl)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cprobowl, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cprobowl)
 MACHINE_CONFIG_END
 
 
@@ -1197,7 +1197,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cnightst)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cnightst, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cnightst)
 MACHINE_CONFIG_END
 
 
@@ -1205,7 +1205,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cpsoccer)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cpsoccer, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cpsoccer)
 MACHINE_CONFIG_END
 
 
@@ -1213,7 +1213,7 @@ MACHINE_CONFIG_START(decocass_type3_state::csdtenis)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_csdtenis, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,csdtenis)
 MACHINE_CONFIG_END
 
 
@@ -1221,7 +1221,7 @@ MACHINE_CONFIG_START(decocass_type3_state::czeroize)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_czeroize, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,czeroize)
 MACHINE_CONFIG_END
 
 
@@ -1229,7 +1229,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cppicf)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cppicf, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cppicf)
 MACHINE_CONFIG_END
 
 
@@ -1237,7 +1237,7 @@ MACHINE_CONFIG_START(decocass_type3_state::cfghtice)
 	decocass(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cfghtice, this));
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfghtice)
 MACHINE_CONFIG_END
 
 

@@ -52,7 +52,7 @@ public:
 		m_fg_tilemap(nullptr)
 	{ }
 
-	void video_start_zwackery() ATTR_COLD;
+	DECLARE_VIDEO_START(zwackery);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(spriteram_r);
@@ -183,7 +183,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-void zwackery_state::video_start_zwackery()
+VIDEO_START_MEMBER( zwackery_state, zwackery )
 {
 	const uint8_t *colordatabase = (const uint8_t *)memregion("bg_color")->base();
 	gfx_element *gfx0 = m_gfxdecode->gfx(0);
@@ -533,7 +533,7 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_zwackery, this));
+	MCFG_VIDEO_START_OVERRIDE(zwackery_state, zwackery)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

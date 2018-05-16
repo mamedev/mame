@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(primo_state::primob32)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(primob_port)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_primob, this));
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primob48)
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(primo_state::primob48)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(primob_port)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_primob, this));
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primob64)
@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(primo_state::primob64)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(primob_port)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_primob, this));
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primoc64)
@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(primo_state::primoc64)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(primob_port)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_primob, this));
+	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
 ROM_START( primoa32 )

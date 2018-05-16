@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_farwest)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_farwest, this));
+	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
 

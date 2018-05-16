@@ -1378,7 +1378,7 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga, this));
+	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga)
 
 	// cia
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
@@ -1788,7 +1788,7 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 
 	MCFG_DEVICE_REMOVE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga_aga, this));
+	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a1200_state::GAYLE_ID)
 	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a1200_state, gayle_int2_w))
@@ -1853,7 +1853,7 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 
 	MCFG_DEVICE_REMOVE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga_aga, this));
+	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	// real-time clock
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
@@ -1944,7 +1944,7 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 
 	MCFG_DEVICE_REMOVE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga_aga, this));
+	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	MCFG_DEVICE_ADD("cdda", CDDA)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

@@ -124,23 +124,23 @@ public:
 	void init_jdredd();
 	void init_coh1000w();
 	void init_primrag2();
-	void machine_start_coh1000c();
-	void machine_start_coh1000ta();
-	void machine_start_coh1002e();
-	void machine_start_bam2();
-	void machine_start_nbajamex();
-	void machine_start_coh1001l();
-	void machine_start_coh1002v();
-	void machine_start_coh1002m();
-	void machine_reset_coh1000c();
-	void machine_reset_glpracr();
-	void machine_reset_coh1000ta();
-	void machine_reset_coh1002e();
-	void machine_reset_bam2();
-	void machine_reset_nbajamex();
-	void machine_reset_coh1001l();
-	void machine_reset_coh1002v();
-	void machine_reset_coh1002m();
+	DECLARE_MACHINE_START(coh1000c);
+	DECLARE_MACHINE_START(coh1000ta);
+	DECLARE_MACHINE_START(coh1002e);
+	DECLARE_MACHINE_START(bam2);
+	DECLARE_MACHINE_START(nbajamex);
+	DECLARE_MACHINE_START(coh1001l);
+	DECLARE_MACHINE_START(coh1002v);
+	DECLARE_MACHINE_START(coh1002m);
+	DECLARE_MACHINE_RESET(coh1000c);
+	DECLARE_MACHINE_RESET(glpracr);
+	DECLARE_MACHINE_RESET(coh1000ta);
+	DECLARE_MACHINE_RESET(coh1002e);
+	DECLARE_MACHINE_RESET(bam2);
+	DECLARE_MACHINE_RESET(nbajamex);
+	DECLARE_MACHINE_RESET(coh1001l);
+	DECLARE_MACHINE_RESET(coh1002v);
+	DECLARE_MACHINE_RESET(coh1002m);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 	void atpsx_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -613,22 +613,22 @@ void zn_state::coh1000c_map(address_map &map)
 	map(0x1fb60000, 0x1fb60000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
-void zn_state::machine_start_coh1000c()
+MACHINE_START_MEMBER(zn_state,coh1000c)
 {
 	m_rombank[0]->configure_entries( 0, 16, m_bankedroms->base() + 0x400000, 0x400000 ); /* banked game rom */
 	m_soundbank->configure_entries( 0, 16, memregion("audiocpu")->base() + 0x8000, 0x4000 ); /* banked audio rom */
 }
 
-void zn_state::machine_reset_coh1000c()
+MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
 	m_rombank[0]->set_entry( 0 );
 	m_soundbank->set_entry( 0 );
 }
 
-void zn_state::machine_reset_glpracr()
+MACHINE_RESET_MEMBER(zn_state,glpracr)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // glpracr qsound rom sockets are empty
-	machine_reset_coh1000c();
+	MACHINE_RESET_CALL_MEMBER(coh1000c);
 }
 
 void zn_state::qsound_map(address_map &map)
@@ -657,8 +657,8 @@ MACHINE_CONFIG_START(zn_state::coh1000c)
 	MCFG_DEVICE_IO_MAP(qsound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1000c, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1000c, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
@@ -670,7 +670,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::glpracr)
 	coh1000c(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_glpracr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, glpracr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002c)
@@ -683,8 +683,8 @@ MACHINE_CONFIG_START(zn_state::coh1002c)
 	MCFG_DEVICE_IO_MAP(qsound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1000c, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1000c, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
@@ -845,8 +845,8 @@ MACHINE_CONFIG_START(zn_state::coh3002c)
 	MCFG_DEVICE_IO_MAP(qsound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1000c, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1000c, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
@@ -1100,7 +1100,7 @@ void zn_state::coh1000ta_map(address_map &map)
 	map(0x1fb80002, 0x1fb80002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
-void zn_state::machine_start_coh1000ta()
+MACHINE_START_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 	if (m_soundbank.found())
@@ -1110,7 +1110,7 @@ void zn_state::machine_start_coh1000ta()
 	}
 }
 
-void zn_state::machine_reset_coh1000ta()
+MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->set_entry( 0 );
 	if (m_soundbank.found())
@@ -1140,8 +1140,8 @@ MACHINE_CONFIG_START(zn_state::coh1000ta)
 	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(16'000'000) / 4)    /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fx1a_sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1000ta, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1000ta, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE(m_audiocpu, 0))
@@ -1195,8 +1195,8 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(coh1000tb_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1000ta, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1000ta, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 	MCFG_NVRAM_ADD_1FILL("fm1208s")
 
 	MCFG_MB3773_ADD("mb3773")
@@ -1217,8 +1217,8 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(coh1000tb_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1000ta, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1000ta, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 	MCFG_NVRAM_ADD_1FILL("fm1208s")
 
 	MCFG_MB3773_ADD("mb3773")
@@ -1642,14 +1642,14 @@ void zn_state::coh1002e_map(address_map &map)
 	map(0x1fb00004, 0x1fb00004).w(this, FUNC(zn_state::coh1002e_sound_irq_w));
 }
 
-void zn_state::machine_start_coh1002e()
+MACHINE_START_MEMBER(zn_state,coh1002e)
 {
 	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 	if (m_okibank.found())
 		m_okibank->configure_entries( 0, memregion( "oki" )->bytes()/0x10000, memregion( "oki" )->base(), 0x10000 ); /* not verified */
 }
 
-void zn_state::machine_reset_coh1002e()
+MACHINE_RESET_MEMBER(zn_state,coh1002e)
 {
 	m_rombank[0]->set_entry( 0 );
 	if (m_okibank.found())
@@ -1685,8 +1685,8 @@ MACHINE_CONFIG_START(zn_state::coh1002e)
 	MCFG_DEVICE_ADD(m_audiocpu, M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(psarc_snd_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1002e, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1002e, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002e)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e)
 
 	MCFG_DEVICE_ADD("ymf", YMF271, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1701,8 +1701,8 @@ MACHINE_CONFIG_START(zn_state::beastrzrb)
 	MCFG_DEVICE_ADD(m_audiocpu, AT89C4051, XTAL(12'000'000)) // clock unverified
 	MCFG_DEVICE_PROGRAM_MAP(beastrzrb_snd_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1002e, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1002e, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002e)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1823,12 +1823,12 @@ void zn_state::init_bam2()
 	save_item(NAME(m_bam2_mcu_command));
 }
 
-void zn_state::machine_start_bam2()
+MACHINE_START_MEMBER(zn_state,bam2)
 {
 	m_rombank[0]->configure_entries( 0, 16, m_bankedroms->base(), 0x400000 ); /* banked game rom */
 }
 
-void zn_state::machine_reset_bam2()
+MACHINE_RESET_MEMBER(zn_state,bam2)
 {
 	m_rombank[0]->set_entry( 1 );
 }
@@ -1838,8 +1838,8 @@ MACHINE_CONFIG_START(zn_state::bam2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bam2_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bam2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bam2, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, bam2)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, bam2)
 MACHINE_CONFIG_END
 
 /*
@@ -2154,7 +2154,7 @@ void zn_state::init_nbajamex()
 	save_item(NAME(m_nbajamex_rombank));
 }
 
-void zn_state::machine_start_nbajamex()
+MACHINE_START_MEMBER(zn_state,nbajamex)
 {
 	for (int bank = 0; bank < 2; bank++)
 		m_rombank[bank]->configure_entries( 0, 16, m_bankedroms->base(), 0x200000 );
@@ -2162,7 +2162,7 @@ void zn_state::machine_start_nbajamex()
 	membank( "sram" )->set_base( m_nbajamex_sram.get() );
 }
 
-void zn_state::machine_reset_nbajamex()
+MACHINE_RESET_MEMBER(zn_state,nbajamex)
 {
 	m_nbajamex_bankmap->set_bank( 0 );
 	m_rombank[0]->set_entry( 0 );
@@ -2196,8 +2196,8 @@ MACHINE_CONFIG_START(zn_state::nbajamex)
 
 	MCFG_NVRAM_ADD_1FILL("71256")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_nbajamex, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_nbajamex, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, nbajamex)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)
 
 	MCFG_DEVICE_ADD("nbajamex_bankmap", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(nbajamex_bank_map)
@@ -2358,12 +2358,12 @@ void zn_state::coh1001l_map(address_map &map)
 	map(0x1fb00002, 0x1fb00002).w(this, FUNC(zn_state::coh1001l_bank_w));
 }
 
-void zn_state::machine_start_coh1001l()
+MACHINE_START_MEMBER(zn_state,coh1001l)
 {
 	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 }
 
-void zn_state::machine_reset_coh1001l()
+MACHINE_RESET_MEMBER(zn_state,coh1001l)
 {
 	m_rombank[0]->set_entry( 0 );
 }
@@ -2385,8 +2385,8 @@ MACHINE_CONFIG_START(zn_state::coh1001l)
 	MCFG_DEVICE_ADD(m_audiocpu, M68000, XTAL(10'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(atlus_snd_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1001l, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1001l, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1001l)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch16")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 3))
@@ -2423,12 +2423,12 @@ void zn_state::coh1002v_map(address_map &map)
 	map(0x1fb00000, 0x1fb00000).w(this, FUNC(zn_state::coh1002v_bank_w));
 }
 
-void zn_state::machine_start_coh1002v()
+MACHINE_START_MEMBER(zn_state,coh1002v)
 {
 	m_rombank[0]->configure_entries( 0, 24, m_bankedroms->base(), 0x100000 ); /* banked game rom */
 }
 
-void zn_state::machine_reset_coh1002v()
+MACHINE_RESET_MEMBER(zn_state,coh1002v)
 {
 	m_rombank[0]->set_entry( 0 );
 }
@@ -2438,8 +2438,8 @@ MACHINE_CONFIG_START(zn_state::coh1002v)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(coh1002v_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1002v, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1002v, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002v)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002v)
 MACHINE_CONFIG_END
 
 /*
@@ -2613,12 +2613,12 @@ void zn_state::coh1002m_map(address_map &map)
 	map(0x1fb00006, 0x1fb00006).w(this, FUNC(zn_state::coh1002m_bank_w));
 }
 
-void zn_state::machine_start_coh1002m()
+MACHINE_START_MEMBER(zn_state,coh1002m)
 {
 	m_rombank[0]->configure_entries( 0, 8, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 }
 
-void zn_state::machine_reset_coh1002m()
+MACHINE_RESET_MEMBER(zn_state,coh1002m)
 {
 	m_rombank[0]->set_entry( 0 );
 }
@@ -2628,8 +2628,8 @@ MACHINE_CONFIG_START(zn_state::coh1002m)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(coh1002m_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_coh1002m, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coh1002m, this));
+	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002m)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m)
 MACHINE_CONFIG_END
 
 READ8_MEMBER(zn_state::cbaj_sound_main_status_r)

@@ -395,7 +395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 }
 
 
-void polepos_state::machine_reset_polepos()
+MACHINE_RESET_MEMBER(polepos_state,polepos)
 {
 	/* set the interrupt vectors (this shouldn't be needed) */
 	m_subcpu->set_input_line_vector(0, Z8000_NVI);
@@ -892,7 +892,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_polepos, this));
+	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
@@ -920,7 +920,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_DEFAULT_LAYOUT(layout_polepos)
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_polepos, this));
+	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1005,7 +1005,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_polepos, this));
+	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
@@ -1033,7 +1033,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_DEFAULT_LAYOUT(layout_topracer)
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_polepos, this));
+	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

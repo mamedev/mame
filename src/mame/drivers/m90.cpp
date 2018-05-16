@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(m90_state::bomblord)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_bomblord)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, m90_state, bomblord_vblank_int_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bomblord, this));
+	MCFG_VIDEO_START_OVERRIDE(m90_state,bomblord)
 MACHINE_CONFIG_END
 
 
@@ -872,7 +872,7 @@ MACHINE_CONFIG_START(m90_state::dynablsb)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_dynablsb)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, m90_state, dynablsb_vblank_int_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dynablsb, this));
+	MCFG_VIDEO_START_OVERRIDE(m90_state,dynablsb)
 
 	MCFG_DEVICE_REMOVE("m72")
 	MCFG_DEVICE_REMOVE("soundirq")

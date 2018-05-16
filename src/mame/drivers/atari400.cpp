@@ -261,13 +261,13 @@ public:
 		m_cart(*this, "cartleft"),
 		m_cart2(*this, "cartright") { }
 
-	void machine_start_a400() ATTR_COLD;
-	void machine_start_a800() ATTR_COLD;
-	void machine_start_a800xl() ATTR_COLD;
-	void machine_start_a5200() ATTR_COLD;
+	DECLARE_MACHINE_START(a400);
+	DECLARE_MACHINE_START(a800);
+	DECLARE_MACHINE_START(a800xl);
+	DECLARE_MACHINE_START(a5200);
 	DECLARE_PALETTE_INIT(a400);
 
-	void machine_reset_a400();
+	DECLARE_MACHINE_RESET(a400);
 
 	DECLARE_WRITE8_MEMBER(gtia_cb);
 
@@ -2010,14 +2010,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-void a400_state::machine_reset_a400()
+MACHINE_RESET_MEMBER( a400_state, a400 )
 {
 	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	pokey->write(15,0);
 }
 
 
-void a400_state::machine_start_a400()
+MACHINE_START_MEMBER( a400_state, a400 )
 {
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
@@ -2030,7 +2030,7 @@ void a400_state::machine_start_a400()
 }
 
 
-void a400_state::machine_start_a800()
+MACHINE_START_MEMBER( a400_state, a800 )
 {
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
@@ -2043,7 +2043,7 @@ void a400_state::machine_start_a800()
 	save_item(NAME(m_last_offs));
 }
 
-void a400_state::machine_start_a800xl()
+MACHINE_START_MEMBER( a400_state, a800xl )
 {
 	m_mmu = 0xfd;
 	m_ext_bank = 0x03;  // only used by a130xe
@@ -2057,7 +2057,7 @@ void a400_state::machine_start_a800xl()
 }
 
 
-void a400_state::machine_start_a5200()
+MACHINE_START_MEMBER( a400_state, a5200 )
 {
 	setup_cart(m_cart);
 
@@ -2109,7 +2109,7 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_a400, this));
+	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2187,7 +2187,7 @@ MACHINE_CONFIG_START(a400_state::a400)
 	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_a400, this));
+	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
@@ -2206,7 +2206,7 @@ MACHINE_CONFIG_START(a400_state::a400pal)
 	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_a400, this));
+	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
@@ -2225,7 +2225,7 @@ MACHINE_CONFIG_START(a400_state::a800)
 	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_a800, this));
+	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
@@ -2246,7 +2246,7 @@ MACHINE_CONFIG_START(a400_state::a800pal)
 	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_a800, this));
+	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
@@ -2270,7 +2270,7 @@ MACHINE_CONFIG_START(a400_state::a600xl)
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a600xl_pia_pb_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_a800xl, this));
+	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
@@ -2295,7 +2295,7 @@ MACHINE_CONFIG_START(a400_state::a800xl)
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a800xl_pia_pb_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_a800xl, this));
+	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -2394,7 +2394,7 @@ MACHINE_CONFIG_START(a400_state::a5200)
 	MCFG_PIA_READPB_HANDLER(NOOP) // FIXME: is there anything connected here
 	MCFG_PIA_CB2_HANDLER(NOOP) // FIXME: is there anything connected here
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_a5200, this));
+	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()

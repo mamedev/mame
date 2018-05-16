@@ -74,8 +74,8 @@ public:
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
 	void init_magerror();
 	void init_hyprduel();
-	void machine_start_hyprduel() ATTR_COLD;
-	void machine_start_magerror() ATTR_COLD;
+	DECLARE_MACHINE_START(hyprduel);
+	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
 	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -463,7 +463,7 @@ void hyprduel_state::machine_reset()
 	*m_irq_enable = 0xff;
 }
 
-void hyprduel_state::machine_start_hyprduel()
+MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 {
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_requested_int));
@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map2)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hyprduel, this));
+	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
 	/* video hardware */
 	i4220_config(config);
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(hyprduel_state::magerror)
 	MCFG_DEVICE_PROGRAM_MAP(magerror_map2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hyprduel_state, irq1_line_hold, 968)        /* tempo? */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hyprduel, this));
+	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
 	/* video hardware */
 	i4220_config(config);

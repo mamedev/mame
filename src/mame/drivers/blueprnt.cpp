@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blueprnt, this));
+	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 	MCFG_SCREEN_PALETTE("palette")
 

@@ -102,9 +102,9 @@ static INPUT_PORTS_START( megadriv_radica_6button )
 INPUT_PORTS_END
 
 
-void megadriv_radica_state::machine_start_megadriv_radica_6button()
+MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_6button)
 {
-	machine_start_megadriv();
+	MACHINE_START_CALL_MEMBER(megadriv);
 	m_vdp->stop_timers();
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
@@ -119,17 +119,17 @@ void megadriv_radica_state::machine_start_megadriv_radica_6button()
 	save_item(NAME(m_bank));
 }
 
-void megadriv_radica_state::machine_start_megadriv_radica_3button()
+MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_3button)
 {
-	machine_start_megadriv();
+	MACHINE_START_CALL_MEMBER(megadriv);
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
 }
 
-void megadriv_radica_state::machine_reset_megadriv_radica()
+MACHINE_RESET_MEMBER(megadriv_radica_state, megadriv_radica)
 {
 	m_bank = 0;
-	machine_reset_megadriv();
+	MACHINE_RESET_CALL_MEMBER(megadriv);
 	m_maincpu->reset();
 }
 
@@ -137,24 +137,24 @@ MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_ntsc)
 	md_ntsc(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_megadriv_radica_3button, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megadriv_radica, this));
+	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
+	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_pal)
 	md_pal(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_megadriv_radica_3button, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megadriv_radica, this));
+	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
+	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_6button_pal)
 	md_pal(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_megadriv_radica_6button, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megadriv_radica, this));
+	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_6button)
+	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 MACHINE_CONFIG_END
 
 

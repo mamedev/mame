@@ -916,8 +916,8 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_amstrad, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_amstrad, this));
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state, amstrad )
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
@@ -944,7 +944,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_vsync_changed))
 	MCFG_MC6845_OUT_CUR_CB(WRITELINE("exp", cpc_expansion_slot_device, cursor_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amstrad, this));
+	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1027,8 +1027,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::kccomp)
 	cpc6128(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kccomp, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_kccomp, this));
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state,kccomp)
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,kccomp)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,kccomp)
@@ -1044,8 +1044,8 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_plus, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_plus, this));
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_vsync_changed))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amstrad, this));
+	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1122,8 +1122,8 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gx4000, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gx4000, this));
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
@@ -1149,7 +1149,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_vsync_changed))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amstrad, this));
+	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1167,8 +1167,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::aleste)
 	cpc6128(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aleste, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aleste, this));
+	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 
 	MCFG_DEVICE_REPLACE("ay", AY8912, XTAL(16'000'000) / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */

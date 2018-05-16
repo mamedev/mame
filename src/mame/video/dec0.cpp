@@ -373,14 +373,14 @@ WRITE16_MEMBER(dec0_state::dec0_priority_w)
 	COMBINE_DATA(&m_pri);
 }
 
-void dec0_state::video_start_dec0_nodma()
+VIDEO_START_MEMBER(dec0_state,dec0_nodma)
 {
 	save_item(NAME(m_pri));
 	m_buffered_spriteram = m_spriteram;
 	save_pointer(NAME(m_buffered_spriteram), 0x800/2);
 }
 
-void dec0_state::video_start_dec0()
+VIDEO_START_MEMBER(dec0_state,dec0)
 {
 	save_item(NAME(m_pri));
 	m_buffered_spriteram = auto_alloc_array(machine(), uint16_t, 0x800/2);

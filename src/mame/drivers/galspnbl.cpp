@@ -235,7 +235,7 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_SCREEN_UPDATE_DRIVER(galspnbl_state, screen_update_galspnbl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_galspnbl, this));
+	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galspnbl)
 

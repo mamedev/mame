@@ -974,7 +974,7 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
 //  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
-//  set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bml3, this));
+//  MCFG_MACHINE_RESET_OVERRIDE(bml3_state,bml3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

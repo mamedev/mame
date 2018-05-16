@@ -65,10 +65,10 @@ private:
 	DECLARE_READ16_MEMBER(gp2_ide_std_r);
 	DECLARE_READ16_MEMBER(inputs_r);
 
-	void machine_start_qdrmfgp()  ATTR_COLD;
-	void video_start_qdrmfgp()    ATTR_COLD;
-	void machine_start_qdrmfgp2() ATTR_COLD;
-	void video_start_qdrmfgp2()   ATTR_COLD;
+	DECLARE_MACHINE_START(qdrmfgp);
+	DECLARE_VIDEO_START(qdrmfgp);
+	DECLARE_MACHINE_START(qdrmfgp2);
+	DECLARE_VIDEO_START(qdrmfgp2);
 
 	uint32_t screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(qdrmfgp2_interrupt);

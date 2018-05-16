@@ -63,7 +63,7 @@ public:
 		, m_pio2(*this, "pio2")
 	{ }
 
-	void machine_reset_c8002();
+	DECLARE_MACHINE_RESET(c8002);
 
 	void c8002(machine_config &config);
 	void c5000(machine_config &config);
@@ -86,7 +86,7 @@ static INPUT_PORTS_START( c8002 )
 INPUT_PORTS_END
 
 
-void onyx_state::machine_reset_c8002()
+MACHINE_RESET_MEMBER(onyx_state, c8002)
 {
 }
 
@@ -143,7 +143,7 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
 	MCFG_DEVICE_PROGRAM_MAP(submem)
 	MCFG_DEVICE_IO_MAP(subio)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_c8002, this));
+	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 307200)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio1", z80sio_device, rxca_w))
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(onyx_state::c5000)
 	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
 	MCFG_DEVICE_PROGRAM_MAP(c5000_mem)
 	MCFG_DEVICE_IO_MAP(c5000_io)
-	//set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_c8002, this));
+	//MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 614400)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio1", z80sio_device, rxtxcb_w))

@@ -1875,9 +1875,9 @@ static GFXDECODE_START( gfx_namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
-void namcos21_state::machine_start_namcos21()
+MACHINE_START_MEMBER(namcos21_state,namcos21)
 {
-	machine_start_namcos2();
+	MACHINE_START_CALL_MEMBER( namcos2 );
 	namcos2_kickstart = namcos21_kickstart;
 }
 
@@ -1947,8 +1947,8 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos21, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
@@ -1964,7 +1964,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_namcos21, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2008,8 +2008,8 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos21, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
@@ -2026,7 +2026,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_namcos21, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2076,8 +2076,8 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos21, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2090,7 +2090,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_namcos21, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

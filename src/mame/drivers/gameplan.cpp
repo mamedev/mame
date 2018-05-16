@@ -936,7 +936,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void gameplan_state::machine_start_gameplan()
+MACHINE_START_MEMBER(gameplan_state,gameplan)
 {
 	/* register for save states */
 	save_item(NAME(m_current_port));
@@ -949,7 +949,8 @@ void gameplan_state::machine_start_gameplan()
 	m_via_0->write_pb5(1);
 }
 
-void gameplan_state::machine_reset_gameplan()
+
+MACHINE_RESET_MEMBER(gameplan_state,gameplan)
 {
 	m_current_port = 0;
 	m_video_x = 0;
@@ -971,8 +972,8 @@ MACHINE_CONFIG_START(gameplan_state::gameplan)
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gameplan_state, r6532_soundlatch_w))
 	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, gameplan_state, r6532_irq))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gameplan, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gameplan, this));
+	MCFG_MACHINE_START_OVERRIDE(gameplan_state,gameplan)
+	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,gameplan)
 
 	/* video hardware */
 	gameplan_video(config);

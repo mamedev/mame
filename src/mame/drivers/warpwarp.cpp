@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_PALETTE_ADD("palette", 4*2)
 
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,geebee)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_geebee, this));
+	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,geebee)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -765,7 +765,7 @@ MACHINE_CONFIG_START(warpwarp_state::navarone)
 	MCFG_PALETTE_ENTRIES(2*2)
 
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,navarone)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_navarone, this));
+	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(warpwarp_state::kaitei)
@@ -776,7 +776,7 @@ MACHINE_CONFIG_START(warpwarp_state::kaitei)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4*2+1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_kaitei, this));
+	MCFG_MACHINE_RESET_OVERRIDE(warpwarp_state,kaitei)
 MACHINE_CONFIG_END
 
 
@@ -809,7 +809,7 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 
 	MCFG_PALETTE_ADD("palette", 2*256+1)
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_warpwarp, this));
+	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

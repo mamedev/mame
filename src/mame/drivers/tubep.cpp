@@ -345,7 +345,7 @@ void tubep_state::tubep_setup_save_state()
 
 
 
-void tubep_state::machine_start_tubep()
+MACHINE_START_MEMBER(tubep_state,tubep)
 {
 	/* Create interrupt timer */
 	m_interrupt_timer = timer_alloc(TIMER_TUBEP_SCANLINE);
@@ -354,7 +354,7 @@ void tubep_state::machine_start_tubep()
 }
 
 
-void tubep_state::machine_reset_tubep()
+MACHINE_RESET_MEMBER(tubep_state,tubep)
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 }
@@ -489,7 +489,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 }
 
 
-void tubep_state::machine_start_rjammer()
+MACHINE_START_MEMBER(tubep_state,rjammer)
 {
 	/* Create interrupt timer */
 	m_interrupt_timer = timer_alloc(TIMER_RJAMMER_SCANLINE);
@@ -497,7 +497,7 @@ void tubep_state::machine_start_rjammer()
 	tubep_setup_save_state();
 }
 
-void tubep_state::machine_reset_rjammer()
+MACHINE_RESET_MEMBER(tubep_state,rjammer)
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 }
@@ -848,8 +848,8 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tubep_state, background_romselect_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tubep_state, colorproms_A4_line_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tubep, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tubep, this));
+	MCFG_MACHINE_START_OVERRIDE(tubep_state,tubep)
+	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -920,8 +920,8 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tubep_state, coin2_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tubep_state, screen_flip_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_rjammer, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_rjammer, this));
+	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
+	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,rjammer)
 
 
 	/* video hardware */

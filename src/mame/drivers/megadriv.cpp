@@ -247,7 +247,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void md_cons_state::machine_start_md_common()
+MACHINE_START_MEMBER(md_cons_state, md_common)
 {
 	static const char *const pad6names[2][4] = {
 		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
@@ -314,9 +314,9 @@ void md_cons_state::install_tmss()
 
 }
 
-void md_cons_state::machine_start_ms_megadriv()
+MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 {
-	machine_start_md_common();
+	MACHINE_START_CALL_MEMBER( md_common );
 
 	// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
 	if (m_cart->get_type() == SEGA_SVP)
@@ -334,19 +334,19 @@ void md_cons_state::machine_start_ms_megadriv()
 
 }
 
-void md_cons_state::machine_start_ms_megacd()
+MACHINE_START_MEMBER(md_cons_state, ms_megacd)
 {
-	machine_start_md_common();
+	MACHINE_START_CALL_MEMBER( md_common );
 
 	// the segaCD introduces some kind of DMA 'lag', which we have to compensate for,
 	// at least when reading wordram? we might need to check what mode we're in the DMA...
 	m_vdp->set_dma_delay(2);
 }
 
-void md_cons_state::machine_reset_ms_megadriv()
+MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 {
 	m_maincpu->reset();
-	machine_reset_megadriv();
+	MACHINE_RESET_CALL_MEMBER( megadriv );
 
 	// if the system has a 32x, pause the extra CPUs until they are actually turned on
 	if (m_32x)
@@ -380,8 +380,8 @@ WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 MACHINE_CONFIG_START(md_cons_state::ms_megadriv)
 	md_ntsc(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megadriv, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
@@ -393,8 +393,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
 	md_pal(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megadriv, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
@@ -411,8 +411,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv)
 	dcat16_megadriv_base(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_md_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
@@ -601,8 +601,8 @@ void md_cons_state::_32x_scanline_helper_callback(int scanline)
 MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	md_ntsc(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_md_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
@@ -642,8 +642,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	md_ntsc(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_md_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
@@ -683,8 +683,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::md_32x)
 	md_pal(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_md_common, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
@@ -756,8 +756,8 @@ ROM_END
 MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 	md_ntsc(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megacd, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
@@ -774,8 +774,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::md_scd)
 	md_pal(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megacd, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
@@ -792,8 +792,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 	md_ntsc(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megacd, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ms_megadriv, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megacd, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megacd, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
@@ -858,7 +858,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ms_megacd, this));
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")

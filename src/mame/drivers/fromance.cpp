@@ -864,7 +864,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void fromance_state::machine_start_fromance()
+MACHINE_START_MEMBER(fromance_state,fromance)
 {
 	uint8_t *ROM = memregion("sub")->base();
 
@@ -879,7 +879,7 @@ void fromance_state::machine_start_fromance()
 	/* video-related elements are saved in video_start */
 }
 
-void fromance_state::machine_reset_fromance()
+MACHINE_RESET_MEMBER(fromance_state,fromance)
 {
 	m_portselect = 0;
 
@@ -914,8 +914,8 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fromance, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fromance, this));
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 14318180 / 2) // clock not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_nekkyoku, this));
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -960,8 +960,8 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fromance, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fromance, this));
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -977,7 +977,7 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_fromance, this));
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1006,8 +1006,8 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fromance, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fromance, this));
+	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
+	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_fromance, this));
+	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

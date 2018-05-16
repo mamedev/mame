@@ -186,7 +186,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	void init_cshootere();
 	void init_cshooter();
-	void machine_reset_cshooter();
+	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 	void airraid(machine_config &config);
 	void airraid_crypt(machine_config &config);
@@ -212,7 +212,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::cshooter_scanline)
 }
 
 
-void airraid_state::machine_reset_cshooter()
+MACHINE_RESET_MEMBER(airraid_state,cshooter)
 {
 }
 

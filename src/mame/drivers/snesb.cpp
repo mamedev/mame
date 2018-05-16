@@ -184,7 +184,7 @@ public:
 	void init_endless();
 	void init_mk3snes();
 	void init_legendsb();
-	void machine_reset_ffight2b();
+	DECLARE_MACHINE_RESET(ffight2b);
 	void mk3snes(machine_config &config);
 	void ffight2b(machine_config &config);
 	void kinstb(machine_config &config);
@@ -737,7 +737,7 @@ MACHINE_CONFIG_START(snesb_state::mk3snes)
 MACHINE_CONFIG_END
 
 
-void snesb_state::machine_reset_ffight2b()
+MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	snes_state::machine_reset();
@@ -748,7 +748,7 @@ void snesb_state::machine_reset_ffight2b()
 
 MACHINE_CONFIG_START(snesb_state::ffight2b)
 	kinstb(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ffight2b, this));
+	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 
 void snesb_state::init_kinstb()

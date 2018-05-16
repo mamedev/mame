@@ -561,7 +561,7 @@ void apple2_state::apple2_video_start(const uint8_t *vram, const uint8_t *aux_vr
 
 
 
-void apple2_state::video_start_apple2()
+VIDEO_START_MEMBER(apple2_state,apple2)
 {
 	apple2_video_start(m_ram->pointer(), m_ram->pointer()+0x10000, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
@@ -573,7 +573,7 @@ void apple2_state::video_start_apple2()
 }
 
 
-void apple2_state::video_start_apple2p()
+VIDEO_START_MEMBER(apple2_state,apple2p)
 {
 	apple2_video_start(m_ram->pointer(), m_ram->pointer(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
@@ -585,7 +585,7 @@ void apple2_state::video_start_apple2p()
 }
 
 
-void apple2_state::video_start_apple2e()
+VIDEO_START_MEMBER(apple2_state,apple2e)
 {
 	device_a2eauxslot_card_interface *auxslotdevice = m_a2eauxslot->get_a2eauxslot_card();
 	if (auxslotdevice)
@@ -599,7 +599,7 @@ void apple2_state::video_start_apple2e()
 }
 
 
-void apple2_state::video_start_apple2c()
+VIDEO_START_MEMBER(apple2_state,apple2c)
 {
 	apple2_video_start(m_ram->pointer(), m_ram->pointer()+0x10000, 0, 8);
 }

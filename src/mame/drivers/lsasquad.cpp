@@ -543,11 +543,15 @@ WRITE8_MEMBER(lsasquad_state::unk)
 {
 }
 
-void lsasquad_state::machine_start_lsasquad()
+MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
+}
+
+MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
+{
 }
 
 /* Note: lsasquad clock values are not verified */
@@ -568,7 +572,8 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lsasquad, this));
+	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
+	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
@@ -635,7 +640,8 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lsasquad, this));
+	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
+	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))

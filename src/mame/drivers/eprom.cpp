@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, eprom_state, video_int_write_line))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_eprom, this));
+	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -463,7 +463,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, eprom_state, video_int_write_line))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_eprom, this));
+	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, eprom_state, video_int_write_line))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_guts, this));
+	MCFG_VIDEO_START_OVERRIDE(eprom_state,guts)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

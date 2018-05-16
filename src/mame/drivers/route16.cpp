@@ -596,12 +596,12 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
-void route16_state::machine_start_speakres()
+MACHINE_START_MEMBER(route16_state, speakres)
 {
 	save_item(NAME(m_speakres_vrx));
 }
 
-void route16_state::machine_start_ttmahjng()
+MACHINE_START_MEMBER(route16_state, ttmahjng)
 {
 	save_item(NAME(m_ttmahjng_port_select));
 }
@@ -696,7 +696,7 @@ MACHINE_CONFIG_START(route16_state::speakres)
 	MCFG_DEVICE_MODIFY("cpu1")
 	MCFG_DEVICE_PROGRAM_MAP(speakres_cpu1_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_speakres, this));
+	MCFG_MACHINE_START_OVERRIDE(route16_state, speakres)
 MACHINE_CONFIG_END
 
 
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(route16_state::ttmahjng)
 	MCFG_DEVICE_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ttmahjng, this));
+	MCFG_MACHINE_START_OVERRIDE(route16_state, ttmahjng)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

@@ -451,7 +451,7 @@ void taito_f3_state::machine_start()
 	save_item(NAME(m_coin_word));
 }
 
-void taito_f3_state::machine_reset_f3()
+MACHINE_RESET_MEMBER(taito_f3_state,f3)
 {
 	/* start with sound m68k off, qtheater relies on it (otherwise main CPU tries to reset it while 68k is working with irq table vectors). */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(taito_f3_state::f3)
 	MCFG_DEVICE_PROGRAM_MAP(f3_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_f3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(taito_f3_state,f3)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(taito_f3_state::f3)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_f3)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_f3, this));
+	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bubsympb)
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_f3, this));
+	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

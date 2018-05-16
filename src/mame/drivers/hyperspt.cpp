@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(hyperspt_state::roadf)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(roadf_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_roadf)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_roadf, this));
+	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(roadf_sound_map)

@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(docastle_state::dorunrun)
 	MCFG_DEVICE_PROGRAM_MAP(dorunrun_map2)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dorunrun, this));
+	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(docastle_state::idsoccer)
@@ -693,7 +693,7 @@ MACHINE_CONFIG_START(docastle_state::idsoccer)
 	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dorunrun, this));
+	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */

@@ -156,7 +156,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timerrun[tnum] = 0;
 }
 
-void model2_state::machine_start_model2()
+MACHINE_START_MEMBER( model2_state, model2 )
 {
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
@@ -181,9 +181,9 @@ void model2_state::machine_start_model2()
 	save_item(NAME(m_geo_read_start_address));
 }
 
-void model2_tgp_state::machine_start_model2_tgp()
+MACHINE_START_MEMBER(model2_tgp_state,model2_tgp)
 {
-	machine_start_model2();
+	MACHINE_START_CALL_MEMBER(model2);
 
 	m_copro_fifo_in->setup(16,
 						   [this]() { m_copro_tgp->stall(); },
@@ -204,9 +204,9 @@ void model2_tgp_state::machine_start_model2_tgp()
 							[    ]() { });
 }
 
-void model2b_state::machine_start_model2b()
+MACHINE_START_MEMBER(model2b_state,model2b)
 {
-	machine_start_model2();
+	MACHINE_START_CALL_MEMBER(model2);
 
 	m_copro_fifo_in->setup(16,
 						   [    ]() { },
@@ -226,9 +226,9 @@ void model2b_state::machine_start_model2b()
 							[this]() { m_copro_adsp->set_flag_input(1, m_copro_fifo_in->is_full()); });
 }
 
-void model2c_state::machine_start_model2c()
+MACHINE_START_MEMBER(model2c_state,model2c)
 {
-	machine_start_model2();
+	MACHINE_START_CALL_MEMBER(model2);
 
 	m_copro_fifo_in->setup(16,
 						   [    ]() { },
@@ -248,7 +248,7 @@ void model2c_state::machine_start_model2c()
 							[    ]() { });
 }
 
-void model2_state::machine_reset_model2_common()
+MACHINE_RESET_MEMBER( model2_state, model2_common )
 {
 	int i;
 
@@ -287,7 +287,7 @@ void model2_state::machine_reset_model2_common()
 	m_geo_read_start_address = 0;
 }
 
-void model2_state::machine_reset_model2_scsp()
+MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 {
 	membank("bank4")->set_base(memregion("scsp")->base() + 0x200000);
 	membank("bank5")->set_base(memregion("scsp")->base() + 0x600000);
@@ -298,29 +298,29 @@ void model2_state::machine_reset_model2_scsp()
 	m_scsp->set_ram_base(m_soundram);
 }
 
-void model2_tgp_state::machine_reset_model2_tgp()
+MACHINE_RESET_MEMBER(model2_tgp_state,model2_tgp)
 {
-	machine_reset_model2_common();
+	MACHINE_RESET_CALL_MEMBER(model2_common);
 
 	// hold TGP in halt until we have code
 	m_copro_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-void model2o_state::machine_reset_model2o()
+MACHINE_RESET_MEMBER(model2o_state,model2o)
 {
-	machine_reset_model2_tgp();
+	MACHINE_RESET_CALL_MEMBER(model2_tgp);
 }
 
-void model2a_state::machine_reset_model2a()
+MACHINE_RESET_MEMBER(model2a_state,model2a)
 {
-	machine_reset_model2_tgp();
-	machine_reset_model2_scsp();
+	MACHINE_RESET_CALL_MEMBER(model2_tgp);
+	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 }
 
-void model2b_state::machine_reset_model2b()
+MACHINE_RESET_MEMBER(model2b_state,model2b)
 {
-	machine_reset_model2_common();
-	machine_reset_model2_scsp();
+	MACHINE_RESET_CALL_MEMBER(model2_common);
+	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
 	m_copro_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -330,10 +330,10 @@ void model2b_state::machine_reset_model2b()
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 }
 
-void model2c_state::machine_reset_model2c()
+MACHINE_RESET_MEMBER(model2c_state,model2c)
 {
-	machine_reset_model2_common();
-	machine_reset_model2_scsp();
+	MACHINE_RESET_CALL_MEMBER(model2_common);
+	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
 	m_copro_tgpx4->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
@@ -2439,8 +2439,8 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model2_tgp, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model2o, this));
+	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
+	MCFG_MACHINE_RESET_OVERRIDE(model2o_state,model2o)
 
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
@@ -2583,8 +2583,8 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model2_tgp, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model2a, this));
+	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
+	MCFG_MACHINE_RESET_OVERRIDE(model2a_state,model2a)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
@@ -2696,8 +2696,8 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model2b, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model2b, this));
+	MCFG_MACHINE_START_OVERRIDE(model2b_state,model2b)
+	MCFG_MACHINE_RESET_OVERRIDE(model2b_state,model2b)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
@@ -2811,8 +2811,8 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model2c, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model2c, this));
+	MCFG_MACHINE_START_OVERRIDE(model2c_state,model2c)
+	MCFG_MACHINE_RESET_OVERRIDE(model2c_state,model2c)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")

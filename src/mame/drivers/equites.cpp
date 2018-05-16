@@ -1185,7 +1185,7 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(equites_state,equites)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_equites, this));
+	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gekisou_state::gekisou)
@@ -1235,7 +1235,7 @@ MACHINE_CONFIG_START(splndrbt_state::splndrbt)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(splndrbt_state,splndrbt)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_splndrbt, this));
+	MCFG_VIDEO_START_OVERRIDE(splndrbt_state,splndrbt)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(splndrbt_state::hvoltage)

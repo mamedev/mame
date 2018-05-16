@@ -157,7 +157,7 @@ void gottlieb_state::video_start()
 	save_item(NAME(m_transparent0));
 }
 
-void gottlieb_state::video_start_screwloo()
+VIDEO_START_MEMBER(gottlieb_state,screwloo)
 {
 	static const int resistances[4] = { 2000, 1000, 470, 240 };
 

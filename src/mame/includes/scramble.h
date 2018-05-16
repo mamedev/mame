@@ -78,8 +78,8 @@ public:
 	void init_hustler();
 	void init_hustlerd();
 	void init_billiard();
-	void machine_reset_scramble();
-	void machine_reset_explorer();
+	DECLARE_MACHINE_RESET(scramble);
+	DECLARE_MACHINE_RESET(explorer);
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
 	DECLARE_READ8_MEMBER( mariner_protection_1_r );
 	DECLARE_READ8_MEMBER( mariner_protection_2_r );

@@ -180,7 +180,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
 	virtual void machine_start() override;
-	void machine_reset_ti99_4p();
+	DECLARE_MACHINE_RESET(ti99_4p);
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
@@ -981,7 +981,7 @@ WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 /*
     Reset the machine.
 */
-void ti99_4p_state::machine_reset_ti99_4p()
+MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
 {
 	set_9901_int(12, CLEAR_LINE);
 

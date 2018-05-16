@@ -176,8 +176,8 @@ public:
 	void init_megadblj();
 	void init_hermit();
 	void init_dualgame();
-	void video_start_blitz68k() ATTR_COLD;
-	void video_start_blitz68k_addr_factor1() ATTR_COLD;
+	DECLARE_VIDEO_START(blitz68k);
+	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
@@ -224,15 +224,15 @@ struct blit_t
 	int addr_factor;
 } blit;
 
-void blitz68k_state::video_start_blitz68k()
+VIDEO_START_MEMBER(blitz68k_state,blitz68k)
 {
 	m_blit_buffer = std::make_unique<uint8_t[]>(512*256);
 	blit.addr_factor = 2;
 }
 
-void blitz68k_state::video_start_blitz68k_addr_factor1()
+VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 {
-	video_start_blitz68k();
+	VIDEO_START_CALL_MEMBER(blitz68k);
 	blit.addr_factor = 1;
 }
 
@@ -1719,7 +1719,7 @@ MACHINE_CONFIG_START(blitz68k_state::ilpag)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blitz68k, this));
+	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
@@ -1794,7 +1794,7 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blitz68k, this));
+	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
@@ -1826,7 +1826,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blitz68k, this));
+	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
@@ -1856,7 +1856,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blitz68k_addr_factor1, this));
+	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
@@ -1885,7 +1885,7 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blitz68k, this));
+	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
@@ -1916,7 +1916,7 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blitz68k, this));
+	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
@@ -1945,7 +1945,7 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blitz68k, this));
+	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 

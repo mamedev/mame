@@ -182,7 +182,7 @@ void mc1502_state::init_mc1502()
 	membank("bank10")->set_base(m_ram->pointer());
 }
 
-void mc1502_state::machine_start_mc1502()
+MACHINE_START_MEMBER(mc1502_state, mc1502)
 {
 	/*
 	       Keyboard polling circuit holds IRQ1 high until a key is
@@ -197,7 +197,7 @@ void mc1502_state::machine_start_mc1502()
 	m_kbd.keyb_signal_timer->adjust(attotime::from_msec(20), 0, attotime::from_msec(20));
 }
 
-void mc1502_state::machine_reset_mc1502()
+MACHINE_RESET_MEMBER(mc1502_state, mc1502)
 {
 	m_spkrdata = 0;
 	m_pit_out2 = 1;
@@ -236,8 +236,8 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_DEVICE_IO_MAP(mc1502_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mc1502, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mc1502, this));
+	MCFG_MACHINE_START_OVERRIDE( mc1502_state, mc1502 )
+	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/12) /* heartbeat IRQ */

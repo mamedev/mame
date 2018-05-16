@@ -3148,7 +3148,7 @@ Contcirc road glitchiness in attract?
                    SAVE STATES
 ***********************************************************/
 
-void taitoz_state::machine_start_bshark()
+MACHINE_START_MEMBER(taitoz_state,bshark)
 {
 	save_item(NAME(m_cpua_ctrl));
 
@@ -3157,16 +3157,16 @@ void taitoz_state::machine_start_bshark()
 	save_item(NAME(m_ioc220_port));
 }
 
-void taitoz_state::machine_start_taitoz()
+MACHINE_START_MEMBER(taitoz_state,taitoz)
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 
-	machine_start_bshark();
+	MACHINE_START_CALL_MEMBER(bshark);
 }
 
-void taitoz_state::machine_reset_taitoz()
+MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 {
 	m_cpua_ctrl = 0xff;
 	m_sci_int6 = 0;
@@ -3189,8 +3189,8 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_DEVICE_PROGRAM_MAP(contcirc_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
 	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
@@ -3213,7 +3213,7 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3264,8 +3264,8 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_DEVICE_PROGRAM_MAP(chq_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
 	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
@@ -3288,7 +3288,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3339,8 +3339,8 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_DEVICE_PROGRAM_MAP(enforce_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -3365,7 +3365,7 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3413,8 +3413,8 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_DEVICE_PROGRAM_MAP(bshark_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bshark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3446,7 +3446,7 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3501,8 +3501,8 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_DEVICE_PROGRAM_MAP(sci_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
@@ -3527,7 +3527,7 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3575,8 +3575,8 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_DEVICE_PROGRAM_MAP(nightstr_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3608,7 +3608,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3659,8 +3659,8 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_DEVICE_PROGRAM_MAP(aquajack_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
@@ -3685,7 +3685,7 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3733,8 +3733,8 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_DEVICE_PROGRAM_MAP(spacegun_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bshark, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(spacegun_default_eeprom, 128)
@@ -3812,8 +3812,8 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_DEVICE_PROGRAM_MAP(dblaxle_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
 	MCFG_QUANTUM_TIME(attotime::from_hz(XTAL(32'000'000)/1024))
@@ -3839,7 +3839,7 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
@@ -3887,8 +3887,8 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_DEVICE_PROGRAM_MAP(racingb_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitoz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_taitoz, this));
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -3912,7 +3912,7 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_taitoz, this));
+	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)

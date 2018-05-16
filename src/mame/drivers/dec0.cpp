@@ -1651,7 +1651,7 @@ MACHINE_CONFIG_START(dec0_state::dec0)
 	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dec0, this));
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(XBGR)
@@ -1680,7 +1680,7 @@ MACHINE_CONFIG_START(dec0_state::dec1)
 	/* maincpu and audiocpu clocks and address maps differ per game */
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dec0_nodma, this));
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -1742,7 +1742,7 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	MCFG_DEVICE_PROGRAM_MAP(automat_s_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dec0_nodma, this));
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
@@ -1817,7 +1817,7 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	MCFG_DEVICE_PROGRAM_MAP(secretab_s_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dec0_nodma, this));
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
@@ -1971,7 +1971,7 @@ MACHINE_CONFIG_START(dec0_state::ffantasybl)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
 MACHINE_CONFIG_END
 
-void dec0_state::machine_reset_slyspy()
+MACHINE_RESET_MEMBER(dec0_state,slyspy)
 {
 	// set initial memory map
 	m_slyspy_state = 0;
@@ -2011,7 +2011,7 @@ MACHINE_CONFIG_START(dec0_state::slyspy)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_slyspy)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_slyspy, this));
+	MCFG_MACHINE_RESET_OVERRIDE(dec0_state,slyspy)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dec0_state::midres)

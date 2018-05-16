@@ -98,12 +98,12 @@ public:
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
 	virtual void video_start() override;
-	void sound_reset_demon();
-	void sound_reset_qb3();
-	void video_start_cinemat_16level()  ATTR_COLD;
-	void video_start_cinemat_64level()  ATTR_COLD;
-	void video_start_cinemat_color()    ATTR_COLD;
-	void video_start_cinemat_qb3color() ATTR_COLD;
+	DECLARE_SOUND_RESET(demon);
+	DECLARE_SOUND_RESET(qb3);
+	DECLARE_VIDEO_START(cinemat_16level);
+	DECLARE_VIDEO_START(cinemat_64level);
+	DECLARE_VIDEO_START(cinemat_color);
+	DECLARE_VIDEO_START(cinemat_qb3color);
 	uint32_t screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(sound_porta_r);

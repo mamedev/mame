@@ -45,8 +45,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1_dual);
-	void video_start_gaelco2()      ATTR_COLD;
-	void video_start_gaelco2_dual() ATTR_COLD;
+	DECLARE_VIDEO_START(gaelco2);
+	DECLARE_VIDEO_START(gaelco2_dual);
 	uint32_t screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

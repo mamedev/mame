@@ -1030,12 +1030,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-void wecleman_state::machine_reset_wecleman()
+MACHINE_RESET_MEMBER(wecleman_state, wecleman)
 {
 	m_k007232[0]->set_bank( 0, 1 );
 }
 
-void wecleman_state::machine_start_wecleman()
+MACHINE_START_MEMBER(wecleman_state, wecleman)
 {
 	m_led.resolve();
 }
@@ -1056,8 +1056,8 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_wecleman, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_wecleman, this));
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wecleman, this));
+	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1099,16 +1099,18 @@ INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-void wecleman_state::machine_start_hotchase()
+MACHINE_START_MEMBER(wecleman_state, hotchase)
 {
 	m_led.resolve();
 }
 
-void wecleman_state::machine_reset_hotchase()
+MACHINE_RESET_MEMBER(wecleman_state, hotchase)
 {
+	int i;
+
 	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
 	         For now let's fill everything with white colors until we have better info about it */
-	for (int i = 0; i < 0x2000 / 2; i++)
+	for(i=0;i<0x2000/2;i++)
 	{
 		m_generic_paletteram_16[i] = 0xffff;
 		m_palette->set_pen_color(i,0xff,0xff,0xff);
@@ -1132,8 +1134,8 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hotchase, this));
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hotchase, this));
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1147,7 +1149,7 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotchase)
 	MCFG_PALETTE_ADD("palette", 2048*2)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hotchase, this));
+	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")

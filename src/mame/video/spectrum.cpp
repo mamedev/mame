@@ -22,7 +22,7 @@
 /***************************************************************************
   Start the video hardware emulation.
 ***************************************************************************/
-void spectrum_state::video_start_spectrum()
+VIDEO_START_MEMBER(spectrum_state,spectrum)
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;
@@ -43,7 +43,7 @@ void spectrum_state::video_start_spectrum()
 
 }
 
-void spectrum_state::video_start_spectrum_128()
+VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;

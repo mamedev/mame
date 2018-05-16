@@ -159,12 +159,12 @@ TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
  *
  *************************************/
 
-void champbas_state::video_start_champbas()
+VIDEO_START_MEMBER(champbas_state,champbas)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-void champbas_state::video_start_exctsccr()
+VIDEO_START_MEMBER(champbas_state,exctsccr)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::exctsccr_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }

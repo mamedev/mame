@@ -838,7 +838,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	}
 }
 
-void model1_state::machine_reset_model1()
+MACHINE_RESET_MEMBER(model1_state,model1)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
@@ -1719,8 +1719,8 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_rf_map)
 #endif
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model1, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model1, this));
+	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
+	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
 	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
@@ -1742,7 +1742,7 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_model1, this));
+	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("m1uart", i8251_device, write_rxd))

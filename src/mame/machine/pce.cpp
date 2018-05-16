@@ -94,7 +94,7 @@ void pce_state::init_sgx()
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-void pce_state::machine_start_pce()
+MACHINE_START_MEMBER(pce_state,pce)
 {
 	if (m_cd)
 		m_cd->late_setup();
@@ -108,7 +108,7 @@ void pce_state::machine_start_pce()
 	save_item(NAME(m_joy_6b_packet));
 }
 
-void pce_state::machine_reset_mess_pce()
+MACHINE_RESET_MEMBER(pce_state,mess_pce)
 {
 	for (auto & elem : m_joy_6b_packet)
 		elem = 0;

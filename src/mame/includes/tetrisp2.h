@@ -125,10 +125,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_rot);
 	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
-	void video_start_tetrisp2()   ATTR_COLD;
-	void video_start_nndmseal()   ATTR_COLD;
-	void video_start_rockntread() ATTR_COLD;
-	void video_start_rocknms()    ATTR_COLD;
+	DECLARE_VIDEO_START(tetrisp2);
+	DECLARE_VIDEO_START(nndmseal);
+	DECLARE_VIDEO_START(rockntread);
+	DECLARE_VIDEO_START(rocknms);
 	uint32_t screen_update_tetrisp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -185,7 +185,7 @@ public:
 	DECLARE_WRITE16_MEMBER(stepstag_button_leds_w);
 	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
 	void init_stepstag();
-	void video_start_stepstag() ATTR_COLD;
+	DECLARE_VIDEO_START(stepstag);
 	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

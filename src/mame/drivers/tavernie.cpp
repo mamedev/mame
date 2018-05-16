@@ -93,8 +93,8 @@ public:
 	DECLARE_READ8_MEMBER(pb_ivg_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(ds_w);
-	void machine_reset_cpu09();
-	void machine_reset_ivg09();
+	DECLARE_MACHINE_RESET(cpu09);
+	DECLARE_MACHINE_RESET(ivg09);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void ivg09(machine_config &config);
@@ -175,12 +175,12 @@ static INPUT_PORTS_START( ivg09 )
 	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
 INPUT_PORTS_END
 
-void tavernie_state::machine_reset_cpu09()
+MACHINE_RESET_MEMBER( tavernie_state, cpu09)
 {
 	m_term_data = 0;
 }
 
-void tavernie_state::machine_reset_ivg09()
+MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 {
 	m_beep->set_state(1);
 	m_term_data = 0;
@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(cpu09_mem)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cpu09, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ivg09_mem)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ivg09, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, ivg09)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

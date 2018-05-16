@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_karnov, this));
+	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -916,7 +916,7 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wndrplnt, this));
+	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

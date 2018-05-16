@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 			0);
 }
 
-void flstory_state::video_start_flstory()
+VIDEO_START_MEMBER(flstory_state,flstory)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
@@ -70,7 +70,7 @@ void flstory_state::video_start_flstory()
 	save_item(NAME(m_paletteram_ext));
 }
 
-void flstory_state::video_start_rumba()
+VIDEO_START_MEMBER(flstory_state,rumba)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
@@ -87,7 +87,7 @@ void flstory_state::video_start_rumba()
 	save_item(NAME(m_paletteram_ext));
 }
 
-void flstory_state::video_start_victnine()
+VIDEO_START_MEMBER(flstory_state,victnine)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);

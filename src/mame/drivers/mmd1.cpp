@@ -172,8 +172,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
 	void init_mmd2();
-	void machine_reset_mmd1();
-	void machine_reset_mmd2();
+	DECLARE_MACHINE_RESET(mmd1);
+	DECLARE_MACHINE_RESET(mmd2);
 	void mmd1(machine_config &config);
 	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
@@ -441,12 +441,12 @@ WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
 	output().set_value("led_inte", state);
 }
 
-void mmd1_state::machine_reset_mmd1()
+MACHINE_RESET_MEMBER(mmd1_state,mmd1)
 {
 	m_return_code = 0xff;
 }
 
-void mmd1_state::machine_reset_mmd2()
+MACHINE_RESET_MEMBER(mmd1_state,mmd2)
 {
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(mmd1_state::mmd1)
 	MCFG_DEVICE_PROGRAM_MAP(mmd1_mem)
 	MCFG_DEVICE_IO_MAP(mmd1_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mmd1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mmd1)
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(mmd1_state::mmd2)
 	MCFG_I8085A_STATUS(WRITE8(*this, mmd1_state, mmd2_status_callback))
 	MCFG_I8085A_INTE(WRITELINE(*this, mmd1_state, mmd2_inte_callback))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mmd2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mmd2)

@@ -1558,8 +1558,8 @@ public:
 	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
 	void init_s23();
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
-	void video_start_s23() ATTR_COLD;
-	void machine_reset_gmen();
+	DECLARE_VIDEO_START(s23);
+	DECLARE_MACHINE_RESET(gmen);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -2398,7 +2398,7 @@ WRITE32_MEMBER(namcos23_state::textchar_w)
 
 // Video start/update callbacks
 
-void namcos23_state::video_start_s23()
+VIDEO_START_MEMBER(namcos23_state,s23)
 {
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_charram.target()));
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -3481,7 +3481,7 @@ void namcos23_state::machine_reset()
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void namcos23_state::machine_reset_gmen()
+MACHINE_RESET_MEMBER(namcos23_state,gmen)
 {
 	machine_reset();
 
@@ -3614,7 +3614,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s23, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3681,7 +3681,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s23, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3713,7 +3713,7 @@ MACHINE_CONFIG_START(namcos23_state::gmen)
 	MCFG_DEVICE_ADD("gmen_sh2", SH2, XTAL(28'700'000))
 	MCFG_DEVICE_PROGRAM_MAP(gmen_sh2_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gmen, this));
+	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
 MACHINE_CONFIG_END
 
 
@@ -3761,7 +3761,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_s23, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

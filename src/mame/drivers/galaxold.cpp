@@ -2248,7 +2248,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2) /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(galaxold_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaxold, this));
+	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
 	MCFG_7474_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_1_callback))
@@ -2270,7 +2270,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_galaxold, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2295,7 +2295,7 @@ MACHINE_CONFIG_START(galaxold_state::mooncrst)
 	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mooncrst, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 
 	/* sound hardware */
 	mooncrst_audio(config);
@@ -2315,7 +2315,7 @@ MACHINE_CONFIG_START(galaxold_state::videotron)
 	MCFG_DEVICE_PROGRAM_MAP(hustlerb3_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mooncrst, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 MACHINE_CONFIG_END
 
 
@@ -2323,7 +2323,7 @@ MACHINE_CONFIG_START(galaxold_state::porter)
 	mooncrst(config);
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pisces, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state, pisces)
 MACHINE_CONFIG_END
 
 
@@ -2339,7 +2339,7 @@ MACHINE_CONFIG_START(galaxold_state::scramblb)
 	MCFG_PALETTE_ENTRIES(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
 
@@ -2355,7 +2355,7 @@ MACHINE_CONFIG_START(galaxold_state::scramb2)
 	MCFG_PALETTE_ENTRIES(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
 
@@ -2371,7 +2371,7 @@ MACHINE_CONFIG_START(galaxold_state::scrambler)
 	MCFG_PALETTE_ENTRIES(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
 
@@ -2388,7 +2388,7 @@ MACHINE_CONFIG_START(galaxold_state::guttang)
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 //  MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mooncrst, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 MACHINE_CONFIG_END
 
 
@@ -2402,7 +2402,7 @@ MACHINE_CONFIG_START(galaxold_state::_4in1)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_4in1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pisces, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,pisces)
 MACHINE_CONFIG_END
 
 
@@ -2413,10 +2413,10 @@ MACHINE_CONFIG_START(galaxold_state::bagmanmc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bagmanmc_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_devilfsg, this));
+	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state, devilfsg )
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bagmanmc, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state, bagmanmc)
 MACHINE_CONFIG_END
 
 
@@ -2428,7 +2428,7 @@ MACHINE_CONFIG_START(galaxold_state::dkongjrm)
 	MCFG_DEVICE_PROGRAM_MAP(dkongjrm_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dkongjrm, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrm)
 MACHINE_CONFIG_END
 
 
@@ -2437,7 +2437,7 @@ MACHINE_CONFIG_START(galaxold_state::dkongjrmc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(dkongjrmc_map)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dkongjrmc, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrmc)
 MACHINE_CONFIG_END
 
 
@@ -2450,7 +2450,7 @@ MACHINE_CONFIG_START(galaxold_state::rockclim)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_rockclim)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rockclim, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64+2)    /* 64 colors only, but still uses bullets so we need to keep the palette big */
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
@@ -2469,14 +2469,14 @@ MACHINE_CONFIG_START(galaxold_state::ozon1)
 	MCFG_DEVICE_IO_MAP(ozon1_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
 
-	remove_machine_reset_cb(config);
+	MCFG_MACHINE_RESET_REMOVE()
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ozon1, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
 	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -2505,7 +2505,7 @@ MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gmgalax)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_drivfrcg, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2523,7 +2523,7 @@ MACHINE_CONFIG_START(galaxold_state::bongo)
 	MCFG_DEVICE_IO_MAP(bongo_io)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bongo, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,bongo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
@@ -2548,7 +2548,7 @@ MACHINE_CONFIG_START(galaxold_state::hunchbkg)
 	/* the nmi line seems to be inverted on the cpu plugin board */
 	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", S2650_SENSE_LINE))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hunchbkg, this));
+	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
 
 	galaxian_audio(config);
 MACHINE_CONFIG_END
@@ -2591,7 +2591,7 @@ MACHINE_CONFIG_START(galaxold_state::racknrol)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_racknrol, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2619,7 +2619,7 @@ MACHINE_CONFIG_START(galaxold_state::hexpoola)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_racknrol, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2637,7 +2637,7 @@ MACHINE_CONFIG_START(galaxold_state::ckongg)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ckongs, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END
 
 
@@ -2650,7 +2650,7 @@ MACHINE_CONFIG_START(galaxold_state::ckongmc)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ckongs, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END
 
 

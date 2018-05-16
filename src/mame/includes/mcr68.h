@@ -69,9 +69,9 @@ public:
 	void init_archrivlb();
 	DECLARE_READ16_MEMBER(archrivlb_port_1_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void machine_start_mcr68() ATTR_COLD;
-	void machine_reset_mcr68();
-	void video_start_mcr68()   ATTR_COLD;
+	DECLARE_MACHINE_START(mcr68);
+	DECLARE_MACHINE_RESET(mcr68);
+	DECLARE_VIDEO_START(mcr68);
 	uint32_t screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	TIMER_CALLBACK_MEMBER(mcr68_493_off_callback);

@@ -91,7 +91,7 @@ private:
  *
  *************************************/
 
-void midzeus_state::machine_start_midzeus()
+MACHINE_START_MEMBER(midzeus_state,midzeus)
 {
 	m_digits.resolve();
 
@@ -112,7 +112,7 @@ void midzeus_state::machine_start_midzeus()
 }
 
 
-void midzeus_state::machine_reset_midzeus()
+MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 {
 	memcpy(m_ram_base, memregion("user1")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
@@ -1270,8 +1270,8 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 	MCFG_DEVICE_PROGRAM_MAP(zeus_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_midzeus, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midzeus, this));
+	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
+	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -1282,7 +1282,7 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 	MCFG_SCREEN_UPDATE_DRIVER(midzeus_state, screen_update_midzeus)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midzeus, this));
+	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
@@ -1314,8 +1314,8 @@ MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 	MCFG_DEVICE_PROGRAM_MAP(zeus2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_midzeus, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midzeus, this));
+	MCFG_MACHINE_START_OVERRIDE(midzeus2_state,midzeus)
+	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */

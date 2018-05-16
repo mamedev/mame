@@ -56,13 +56,13 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "speaker.h"
 
 
-void cabal_state::machine_start_cabalbl()
+MACHINE_START_MEMBER(cabal_state,cabalbl)
 {
 	save_item(NAME(m_sound_command1));
 	save_item(NAME(m_sound_command2));
 }
 
-void cabal_state::machine_reset_cabalbl()
+MACHINE_RESET_MEMBER(cabal_state,cabalbl)
 {
 	m_sound_command1 = m_sound_command2 = 0xff;
 }
@@ -595,8 +595,8 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cabalbl, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cabalbl, this));
+	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabalbl)
+	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

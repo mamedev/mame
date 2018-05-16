@@ -1118,7 +1118,7 @@ static const uint16_t mo5_pal_init[16] =
 };
 
 
-void thomson_state::video_start_thom()
+VIDEO_START_MEMBER( thomson_state, thom )
 {
 	LOG (( "thom: video start called\n" ));
 

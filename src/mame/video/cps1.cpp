@@ -1683,7 +1683,7 @@ CPS1 VIDEO RENDERER
 #define CPS2_OBJ_YOFFS  0x0a    /* Y offset (always 0x0010) */
 
 
-void cps_state::machine_reset_cps()
+MACHINE_RESET_MEMBER(cps_state,cps)
 {
 	const char *gamename = machine().system().name;
 	const struct CPS1config *pCFG = &cps1_config_table[0];
@@ -2243,11 +2243,11 @@ void cps_state::cps1_update_transmasks()
 	}
 }
 
-void cps_state::video_start_cps()
+VIDEO_START_MEMBER(cps_state,cps)
 {
 	int i;
 
-	machine_reset_cps();
+	MACHINE_RESET_CALL_MEMBER(cps);
 
 	/* Put in some const */
 	m_scroll_size    = 0x4000;  /* scroll1, scroll2, scroll3 */
@@ -2340,16 +2340,16 @@ void cps_state::video_start_cps()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
 
-void cps_state::video_start_cps1()
+VIDEO_START_MEMBER(cps_state,cps1)
 {
 	m_cps_version = 1;
-	video_start_cps();
+	VIDEO_START_CALL_MEMBER(cps);
 }
 
-void cps_state::video_start_cps2()
+VIDEO_START_MEMBER(cps_state,cps2)
 {
 	m_cps_version = 2;
-	video_start_cps();
+	VIDEO_START_CALL_MEMBER(cps);
 }
 
 /***************************************************************************

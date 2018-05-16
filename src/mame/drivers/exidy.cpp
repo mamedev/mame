@@ -810,7 +810,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void exidy_state::machine_start_teetert()
+MACHINE_START_MEMBER(exidy_state,teetert)
 {
 	save_item(NAME(m_last_dial));
 }
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(exidy_state::teetert)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_teetert, this));
+	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
 
 MACHINE_CONFIG_END
 

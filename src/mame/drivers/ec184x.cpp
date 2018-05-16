@@ -43,7 +43,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	void machine_reset_ec1841();
+	DECLARE_MACHINE_RESET(ec1841);
 	void init_ec1841();
 
 	struct
@@ -175,7 +175,7 @@ void ec184x_state::init_ec1841()
 	}
 }
 
-void ec184x_state::machine_reset_ec1841()
+MACHINE_RESET_MEMBER(ec184x_state, ec1841)
 {
 	memset(m_memory.enable, 0, sizeof(m_memory.enable));
 	// mark 1st board enabled
@@ -253,7 +253,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1841)
 	MCFG_DEVICE_IO_MAP(ec1841_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ec1841, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
 	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")
 

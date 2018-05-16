@@ -484,7 +484,7 @@ public:
 	void init_mrdrilrg();
 	void init_chocovdr();
 	void init_konotako();
-	void machine_reset_namcos10();
+	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
 	required_device<cpu_device> m_maincpu;
 };
@@ -906,7 +906,7 @@ void namcos10_state::init_konotako()
 }
 
 
-void namcos10_state::machine_reset_namcos10()
+MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 {
 	i2c_dev_clock = i2c_dev_data = 1;
 	i2c_host_clock = i2c_host_data = 1;
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("16M")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos10, this));
+	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("16M")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos10, this));
+	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )

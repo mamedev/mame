@@ -66,7 +66,7 @@ void snk68_state::video_start()
 	save_item(NAME(m_fg_tile_offset));
 }
 
-void snk68_state::video_start_searchar()
+VIDEO_START_MEMBER(snk68_state,searchar)
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk68_state::get_searchar_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 

@@ -56,8 +56,8 @@ public:
 	void init_umk3r11();
 	void init_mk3r20();
 
-	void machine_reset_midwunit();
-	void video_start_midwunit() ATTR_COLD;
+	DECLARE_MACHINE_RESET(midwunit);
+	DECLARE_VIDEO_START(midwunit);
 
 	void register_state_saving();
 	void init_wunit_generic();

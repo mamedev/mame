@@ -8118,7 +8118,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8155,7 +8155,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8203,7 +8203,7 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sangho, this));
+	MCFG_VIDEO_START_OVERRIDE(sanghopm_state, sangho)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8242,7 +8242,7 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8351,7 +8351,7 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8425,7 +8425,7 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8472,7 +8472,7 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cherrym, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8520,7 +8520,7 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cherrym, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8577,7 +8577,7 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8631,7 +8631,7 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bingowng, this));
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8758,7 +8758,7 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_PALETTE_INIT_OWNER(wingco_state, magodds)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_magical, this));
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8808,7 +8808,7 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8849,7 +8849,7 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8900,7 +8900,7 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8951,7 +8951,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cherrym, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9008,7 +9008,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cherrym, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9058,7 +9058,7 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_unkch, this));
+	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9096,7 +9096,7 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cherrym, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9133,7 +9133,7 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9180,7 +9180,7 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_goldstar, this));
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

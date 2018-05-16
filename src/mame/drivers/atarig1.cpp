@@ -40,13 +40,13 @@ void atarig1_state::update_interrupts()
 }
 
 
-void atarig1_state::machine_start_atarig1()
+MACHINE_START_MEMBER(atarig1_state,atarig1)
 {
 	atarigen_state::machine_start();
 }
 
 
-void atarig1_state::machine_reset_atarig1()
+MACHINE_RESET_MEMBER(atarig1_state,atarig1)
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -401,8 +401,8 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_atarig1, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atarig1, this));
+	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
+	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
 	MCFG_ADC0808_IN0_CB(IOPORT("ADC0"))
@@ -431,7 +431,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig1_state, video_int_write_line))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_atarig1, this));
+	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

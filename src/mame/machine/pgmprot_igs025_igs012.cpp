@@ -106,9 +106,11 @@ static const uint8_t drgw2_source_data[0x08][0xec] =
 	{ 0, }  // Region 7, not used
 };
 
-void pgm_012_025_state::machine_reset_drgw2()
+MACHINE_RESET_MEMBER(pgm_012_025_state,drgw2)
 {
-	machine_reset_pgm();
+	MACHINE_RESET_CALL_MEMBER(pgm);
+
+
 }
 
 void pgm_012_025_state::drgw2_common_init()
@@ -140,7 +142,7 @@ MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
 	//MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs012_callback )
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_drgw2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_012_025_state,drgw2)
 MACHINE_CONFIG_END
 
 

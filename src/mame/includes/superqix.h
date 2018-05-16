@@ -56,7 +56,7 @@ public:
 	void init_pbillian();
 	void init_hotsmash();
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
-	void video_start_superqix() ATTR_COLD;
+	DECLARE_VIDEO_START(superqix);
 	DECLARE_PALETTE_DECODER(BBGGRRII);
 	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -99,8 +99,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(frommcu_semaphore_input_r);
 	DECLARE_READ8_MEMBER(bootleg_in0_r);
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
-	void machine_start_superqix() ATTR_COLD;
-	void machine_reset_superqix();
+	DECLARE_MACHINE_START(superqix);
+	DECLARE_MACHINE_RESET(superqix);
 
 	void sqix(machine_config &config);
 	void sqix_8031(machine_config &config);
@@ -154,8 +154,8 @@ public:
 
 	TILE_GET_INFO_MEMBER(pb_get_bg_tile_info);
 
-	void machine_start_pbillian() ATTR_COLD;
-	void video_start_pbillian()   ATTR_COLD;
+	DECLARE_MACHINE_START(pbillian);
+	DECLARE_VIDEO_START(pbillian);
 
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

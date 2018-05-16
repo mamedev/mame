@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	void machine_reset_s6a();
+	DECLARE_MACHINE_RESET(s6a);
 	void init_s6a();
 	void s6a(machine_config &config);
 	void s6a_audio_map(address_map &map);
@@ -377,7 +377,7 @@ void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-void s6a_state::machine_reset_s6a()
+MACHINE_RESET_MEMBER( s6a_state, s6a )
 {
 }
 
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(s6a_state::s6a)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6808, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s6a_main_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s6a, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s6a_state, s6a)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s6a)

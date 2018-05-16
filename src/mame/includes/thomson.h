@@ -176,8 +176,8 @@ public:
 	TIMER_CALLBACK_MEMBER( to7_game_update_cb );
 	DECLARE_READ8_MEMBER( to7_midi_r );
 	DECLARE_WRITE8_MEMBER( to7_midi_w );
-	void machine_reset_to7();
-	void machine_start_to7() ATTR_COLD;
+	DECLARE_MACHINE_RESET( to7 );
+	DECLARE_MACHINE_START( to7 );
 	DECLARE_WRITE_LINE_MEMBER( to770_sys_cb2_out );
 	DECLARE_READ8_MEMBER( to770_sys_porta_in );
 	void to7_update_cart_bank_postload();
@@ -186,8 +186,8 @@ public:
 	DECLARE_WRITE8_MEMBER( to770_timer_port_out );
 	DECLARE_READ8_MEMBER( to770_gatearray_r );
 	DECLARE_WRITE8_MEMBER( to770_gatearray_w );
-	void machine_reset_to770();
-	void machine_start_to770() ATTR_COLD;
+	DECLARE_MACHINE_RESET( to770 );
+	DECLARE_MACHINE_START( to770 );
 	void to7_lightpen_cb( int step );
 	void mo5_lightpen_cb( int step );
 	TIMER_CALLBACK_MEMBER( mo5_periodic_cb );
@@ -200,8 +200,8 @@ public:
 	DECLARE_WRITE8_MEMBER( mo5_cartridge_w );
 	DECLARE_READ8_MEMBER( mo5_cartridge_r );
 	DECLARE_WRITE8_MEMBER( mo5_ext_w );
-	void machine_reset_mo5();
-	void machine_start_mo5() ATTR_COLD;
+	DECLARE_MACHINE_RESET( mo5 );
+	DECLARE_MACHINE_START( mo5 );
 	DECLARE_WRITE8_MEMBER( to9_ieee_w );
 	DECLARE_READ8_MEMBER( to9_ieee_r );
 	DECLARE_READ8_MEMBER( to9_gatearray_r );
@@ -219,8 +219,8 @@ public:
 	DECLARE_WRITE8_MEMBER( to9_sys_porta_out );
 	DECLARE_WRITE8_MEMBER( to9_sys_portb_out );
 	DECLARE_WRITE8_MEMBER( to9_timer_port_out );
-	void machine_reset_to9();
-	void machine_start_to9() ATTR_COLD;
+	DECLARE_MACHINE_RESET( to9 );
+	DECLARE_MACHINE_START( to9 );
 	TIMER_CALLBACK_MEMBER( to8_kbd_timer_cb );
 	void to8_update_floppy_bank_postload();
 	void to8_update_ram_bank_postload();
@@ -239,12 +239,12 @@ public:
 	DECLARE_WRITE8_MEMBER( to8_timer_port_out );
 	DECLARE_WRITE_LINE_MEMBER( to8_timer_cp2_out );
 	void to8_lightpen_cb( int step );
-	void machine_reset_to8();
-	void machine_start_to8() ATTR_COLD;
+	DECLARE_MACHINE_RESET( to8 );
+	DECLARE_MACHINE_START( to8 );
 	DECLARE_READ8_MEMBER( to9p_timer_port_in );
 	DECLARE_WRITE8_MEMBER( to9p_timer_port_out );
-	void machine_reset_to9p();
-	void machine_start_to9p() ATTR_COLD;
+	DECLARE_MACHINE_RESET( to9p );
+	DECLARE_MACHINE_START( to9p );
 	void mo6_update_ram_bank_postload();
 	void mo6_update_cart_bank_postload();
 	DECLARE_WRITE8_MEMBER( mo6_cartridge_w );
@@ -262,16 +262,16 @@ public:
 	DECLARE_WRITE8_MEMBER( mo6_gatearray_w );
 	DECLARE_READ8_MEMBER( mo6_vreg_r );
 	DECLARE_WRITE8_MEMBER( mo6_vreg_w );
-	void machine_reset_mo6();
-	void machine_start_mo6() ATTR_COLD;
+	DECLARE_MACHINE_RESET( mo6 );
+	DECLARE_MACHINE_START( mo6 );
 	DECLARE_READ8_MEMBER( mo5nr_net_r );
 	DECLARE_WRITE8_MEMBER( mo5nr_net_w );
 	DECLARE_READ8_MEMBER( mo5nr_prn_r );
 	DECLARE_WRITE8_MEMBER( mo5nr_prn_w );
 	DECLARE_READ8_MEMBER( mo5nr_sys_portb_in );
 	DECLARE_WRITE8_MEMBER( mo5nr_sys_porta_out );
-	void machine_reset_mo5nr();
-	void machine_start_mo5nr() ATTR_COLD;
+	DECLARE_MACHINE_RESET( mo5nr );
+	DECLARE_MACHINE_START( mo5nr );
 
 	TIMER_CALLBACK_MEMBER( thom_lightpen_step );
 	TIMER_CALLBACK_MEMBER( thom_scanline_start );
@@ -317,7 +317,7 @@ public:
 	void overlayhalf_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
-	void video_start_thom() ATTR_COLD;
+	DECLARE_VIDEO_START( thom );
 
 	DECLARE_READ8_MEMBER( to7_5p14_r );
 	DECLARE_WRITE8_MEMBER( to7_5p14_w );

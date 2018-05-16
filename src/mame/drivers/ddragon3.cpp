@@ -938,7 +938,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wwfwfest_state::wwfwfstb)
 	wwfwfest(config);
-	set_video_start_cb(config, driver_callback_delegate(&video_start_wwfwfstb, this));
+	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
 MACHINE_CONFIG_END
 
 

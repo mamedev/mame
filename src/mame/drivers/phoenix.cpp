@@ -435,7 +435,7 @@ static GFXDECODE_START( gfx_pleiads )
 GFXDECODE_END
 
 
-void phoenix_state::machine_reset_phoenix()
+MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_phoenix, this));
+	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,phoenix)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_phoenix, this));
+	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_I8085A_SID(READLINE(*this, phoenix_state, survival_sid_callback))
 	MCFG_DEVICE_PROGRAM_MAP(survival_memory_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_phoenix, this));
+	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
 	/* video hardware */
 
@@ -533,7 +533,7 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,survival)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_phoenix, this));
+	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

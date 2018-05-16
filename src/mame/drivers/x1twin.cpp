@@ -441,8 +441,8 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_x1, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_x1, this));
+	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
+	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
 	MCFG_DEVICE_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
@@ -475,7 +475,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_x1, this));
+	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor

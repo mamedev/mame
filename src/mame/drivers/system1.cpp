@@ -400,7 +400,7 @@ void system1_state::machine_start()
 }
 
 
-void system1_state::machine_start_system2()
+MACHINE_START_MEMBER(system1_state,system2)
 {
 	system1_state::machine_start();
 	m_mute_xor = 0x01;
@@ -2486,10 +2486,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(system1_state::sys2)
 	sys1ppi(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_system2, this));
+	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_system2, this));
+	MCFG_VIDEO_START_OVERRIDE(system1_state,system2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2)
 MACHINE_CONFIG_END

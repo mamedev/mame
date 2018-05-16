@@ -83,7 +83,7 @@ void n8080_state::helifire_next_line(  )
 }
 
 
-void n8080_state::video_start_spacefev()
+VIDEO_START_MEMBER(n8080_state,spacefev)
 {
 	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::spacefev_stop_red_cannon),this));
 
@@ -94,7 +94,7 @@ void n8080_state::video_start_spacefev()
 }
 
 
-void n8080_state::video_start_sheriff()
+VIDEO_START_MEMBER(n8080_state,sheriff)
 {
 	flip_screen_set(0);
 
@@ -103,15 +103,17 @@ void n8080_state::video_start_sheriff()
 }
 
 
-void n8080_state::video_start_helifire()
+VIDEO_START_MEMBER(n8080_state,helifire)
 {
+	uint8_t data = 0;
+	int i;
+
 	save_item(NAME(m_helifire_mv));
 	save_item(NAME(m_helifire_sc));
 	save_item(NAME(m_helifire_flash));
 	save_item(NAME(m_helifire_LSFR));
 
-	uint8_t data = 0;
-	for (int i = 0; i < 63; i++)
+	for (i = 0; i < 63; i++)
 	{
 		int bit =
 			(data >> 6) ^

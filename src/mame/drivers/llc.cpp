@@ -206,8 +206,8 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_DEVICE_PROGRAM_MAP(llc1_mem)
 	MCFG_DEVICE_IO_MAP(llc1_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_llc1, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_llc1, this));
+	MCFG_MACHINE_START_OVERRIDE(llc_state, llc1 )
+	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc1 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_DEVICE_PROGRAM_MAP(llc2_mem)
 	MCFG_DEVICE_IO_MAP(llc2_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_llc2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc2 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

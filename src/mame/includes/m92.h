@@ -85,9 +85,9 @@ public:
 	void init_m92();
 	void init_m92_bank();
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
-	void machine_reset_m92();
-	void video_start_m92()  ATTR_COLD;
-	void video_start_ppan() ATTR_COLD;
+	DECLARE_MACHINE_RESET(m92);
+	DECLARE_VIDEO_START(m92);
+	DECLARE_VIDEO_START(ppan);
 	uint32_t screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(m92_scanline_interrupt);

@@ -181,7 +181,7 @@ public:
 	DECLARE_READ8_MEMBER(csport_r);
 	DECLARE_WRITE8_MEMBER(csport_w);
 
-	void machine_reset_kageki();
+	DECLARE_MACHINE_RESET(kageki);
 	void init_kageki();
 
 	SAMPLES_START_CB_MEMBER(init_samples);

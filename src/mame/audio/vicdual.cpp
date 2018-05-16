@@ -128,7 +128,7 @@ TIMER_CALLBACK_MEMBER( vicdual_state::frogs_croak_callback )
 }
 
 
-void vicdual_state::machine_start_frogs_audio()
+MACHINE_START_MEMBER(vicdual_state,frogs_audio)
 {
 	m_frogs_croak_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vicdual_state::frogs_croak_callback), this));
 

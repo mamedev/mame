@@ -69,7 +69,7 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-void blstroid_state::video_start_blstroid()
+VIDEO_START_MEMBER(blstroid_state,blstroid)
 {
 	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 	m_irq_on_timer = timer_alloc(TIMER_IRQ_ON);

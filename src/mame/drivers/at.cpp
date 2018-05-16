@@ -117,7 +117,7 @@ public:
 	DECLARE_READ16_MEMBER(ps1_unk_r);
 	DECLARE_WRITE16_MEMBER(ps1_unk_w);
 	DECLARE_READ8_MEMBER(ps1_portb_r);
-	void machine_start_vrom_fix() ATTR_COLD;
+	DECLARE_MACHINE_START(vrom_fix);
 
 	void init_at_common(int xmsbase);
 	uint16_t m_ps1_reg[2];
@@ -397,7 +397,7 @@ void at_state::init_atpci()
 	init_at_common(0x100000);
 }
 
-void at_state::machine_start_vrom_fix()
+MACHINE_START_MEMBER(at_state,vrom_fix)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_bank(0xc0000, 0xcffff, "vrom_bank");
@@ -482,7 +482,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ibmps1)
 	ibm5170(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_vrom_fix, this));
+	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(10'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(at16l_map)
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(at_state::megapcpla)
 	MCFG_DEVICE_PROGRAM_MAP(at32l_map)
 	MCFG_DEVICE_IO_MAP(at32_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_vrom_fix, this));
+	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))

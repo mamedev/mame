@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	void machine_reset_s8a();
+	DECLARE_MACHINE_RESET(s8a);
 	void init_s8a();
 	void s8a(machine_config &config);
 	void s8a_audio_map(address_map &map);
@@ -274,7 +274,7 @@ void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-void s8a_state::machine_reset_s8a()
+MACHINE_RESET_MEMBER( s8a_state, s8a )
 {
 }
 
@@ -288,7 +288,7 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s8a_main_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s8a, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s8a)

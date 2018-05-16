@@ -923,7 +923,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_perfrman, this));
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -975,7 +975,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_slapfight, this));
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1048,7 +1048,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_slapfight, this));
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

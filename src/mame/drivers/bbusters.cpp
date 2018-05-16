@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bbuster, this));
+	MCFG_VIDEO_START_OVERRIDE(bbusters_state,bbuster)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(bbusters_state::mechatt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mechatt, this));
+	MCFG_VIDEO_START_OVERRIDE(bbusters_state,mechatt)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 

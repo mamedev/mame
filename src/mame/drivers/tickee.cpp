@@ -79,9 +79,9 @@ public:
 	DECLARE_WRITE16_MEMBER(ff7f_w);
 	DECLARE_WRITE16_MEMBER(rapidfir_control_w);
 	DECLARE_WRITE16_MEMBER(sound_bank_w);
-	void machine_reset_tickee();
-	void video_start_tickee() ATTR_COLD;
-	void machine_reset_rapidfir();
+	DECLARE_MACHINE_RESET(tickee);
+	DECLARE_VIDEO_START(tickee);
+	DECLARE_MACHINE_RESET(rapidfir);
 	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
@@ -201,7 +201,7 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
  *
  *************************************/
 
-void tickee_state::video_start_tickee()
+VIDEO_START_MEMBER(tickee_state,tickee)
 {
 	/* start a timer going on the first scanline of every frame */
 	m_setup_gun_timer = timer_alloc(TIMER_SETUP_GUN_INTERRUPTS);
@@ -277,13 +277,13 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
  *
  *************************************/
 
-void tickee_state::machine_reset_tickee()
+MACHINE_RESET_MEMBER(tickee_state,tickee)
 {
 	m_beamxadd = 50;
 	m_beamyadd = 0;
 }
 
-void tickee_state::machine_reset_rapidfir()
+MACHINE_RESET_MEMBER(tickee_state,rapidfir)
 {
 	m_beamxadd = 0;
 	m_beamyadd = -5;
@@ -766,7 +766,7 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tickee, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("ticket1", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
@@ -775,7 +775,7 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_tickee, this));
+	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
@@ -817,7 +817,7 @@ MACHINE_CONFIG_START(tickee_state::rapidfir)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(tickee_state, rapidfir_to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(tickee_state, rapidfir_from_shiftreg)          /* read from shiftreg function */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_rapidfir, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,rapidfir)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -825,7 +825,7 @@ MACHINE_CONFIG_START(tickee_state::rapidfir)
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_tickee, this));
+	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
@@ -849,7 +849,7 @@ MACHINE_CONFIG_START(tickee_state::mouseatk)
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tickee, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("ticket1", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)

@@ -40,7 +40,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
 	m_fix_tilemap->mark_tile_dirty(offset / 2);
 }
 
-void alpha68k_state::video_start_alpha68k()
+VIDEO_START_MEMBER(alpha68k_state,alpha68k)
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(alpha68k_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(0);

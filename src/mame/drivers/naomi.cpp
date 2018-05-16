@@ -2662,7 +2662,7 @@ static INPUT_PORTS_START( aw1w )
 	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
-void naomi_state::machine_reset_naomi()
+MACHINE_RESET_MEMBER(naomi_state,naomi)
 {
 	naomi_state::machine_reset();
 	m_aica->set_ram_base(dc_sound_ram, 8*1024*1024);
@@ -2736,7 +2736,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 
 	MCFG_X76F100_ADD("naomibd_eeprom")
 	MCFG_M3COMM_ADD("comm_board")
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_naomi, this));
+	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	MCFG_NVRAM_ADD_0FILL("sram")
 MACHINE_CONFIG_END
 
@@ -2851,7 +2851,7 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
 	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dc_console, this));
+	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	MCFG_NVRAM_ADD_0FILL("sram")
 MACHINE_CONFIG_END
 

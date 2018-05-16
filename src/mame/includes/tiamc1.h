@@ -53,7 +53,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_kot() ATTR_COLD;
+	DECLARE_VIDEO_START(kot);
 	DECLARE_PALETTE_INIT(tiamc1);
 	uint32_t screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

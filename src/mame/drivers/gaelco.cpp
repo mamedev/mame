@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bigkarnk, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,bigkarnk)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(gaelco_state::maniacsq)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_maniacsq, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -729,7 +729,7 @@ MACHINE_CONFIG_START(gaelco_state::squash)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_maniacsq, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -768,7 +768,7 @@ MACHINE_CONFIG_START(gaelco_state::thoop)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_maniacsq, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

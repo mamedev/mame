@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 #endif
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spbactn, this));
+	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactn)
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spbactnp, this));
+	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactnp)

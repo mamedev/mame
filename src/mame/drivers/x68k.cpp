@@ -1689,7 +1689,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_PALETTE_ADD("pcgpalette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(2, x68k_state, GGGGGRRRRRBBBBBI)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_x68000, this));
+	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 
 	MCFG_DEFAULT_LAYOUT( layout_x68000 )
 

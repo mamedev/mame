@@ -1283,28 +1283,28 @@ TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
 	m_dma_busy = 0;
 }
 
-void model3_state::machine_start_model3_10()
+MACHINE_START_MEMBER(model3_state,model3_10)
 {
 	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
-void model3_state::machine_start_model3_15()
+MACHINE_START_MEMBER(model3_state,model3_15)
 {
 	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
-void model3_state::machine_start_model3_20()
+MACHINE_START_MEMBER(model3_state,model3_20)
 {
 	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
-void model3_state::machine_start_model3_21()
+MACHINE_START_MEMBER(model3_state,model3_21)
 {
 	configure_fast_ram();
 
@@ -1365,10 +1365,10 @@ void model3_state::model3_init(int step)
 	}
 }
 
-void model3_state::machine_reset_model3_10(){ model3_init(0x10); }
-void model3_state::machine_reset_model3_15(){ model3_init(0x15); }
-void model3_state::machine_reset_model3_20(){ model3_init(0x20); }
-void model3_state::machine_reset_model3_21(){ model3_init(0x21); }
+MACHINE_RESET_MEMBER(model3_state,model3_10){ model3_init(0x10); }
+MACHINE_RESET_MEMBER(model3_state,model3_15){ model3_init(0x15); }
+MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(0x20); }
+MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(0x21); }
 
 
 READ64_MEMBER(model3_state::model3_ctrl_r)
@@ -5756,8 +5756,8 @@ MACHINE_CONFIG_START(model3_state::model3_10)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model3_10, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model3_10, this));
+	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
@@ -5803,8 +5803,8 @@ MACHINE_CONFIG_START(model3_state::model3_15)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model3_15, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model3_15, this));
+	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
@@ -5866,8 +5866,8 @@ MACHINE_CONFIG_START(model3_state::model3_20)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model3_20, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model3_20, this));
+	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_20)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
@@ -5931,8 +5931,8 @@ MACHINE_CONFIG_START(model3_state::model3_21)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_model3_21, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_model3_21, this));
+	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_21)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_21)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")

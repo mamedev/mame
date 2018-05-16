@@ -110,7 +110,7 @@ void punchout_state::video_start()
 }
 
 
-void punchout_state::video_start_armwrest()
+VIDEO_START_MEMBER(punchout_state,armwrest)
 {
 	m_bg_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_top_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 	m_bg_bot_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_bot_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);

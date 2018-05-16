@@ -35,7 +35,7 @@ public:
 	void astrocde(machine_config &config);
 private:
 	DECLARE_READ8_MEMBER(inputs_r);
-	void machine_start_astrocde() ATTR_COLD;
+	DECLARE_MACHINE_START(astrocde);
 
 	void astrocade_io(address_map &map);
 	void astrocade_mem(address_map &map);
@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 	MCFG_DEVICE_PROGRAM_MAP(astrocade_mem)
 	MCFG_DEVICE_IO_MAP(astrocade_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_astrocde, this));
+	MCFG_MACHINE_START_OVERRIDE(astrocde_mess_state, astrocde)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -284,7 +284,7 @@ void astrocde_state::init_astrocde()
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }
 
-void astrocde_mess_state::machine_start_astrocde()
+MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(astrocade_cart_slot_device::read_rom),(astrocade_cart_slot_device*)m_cart));

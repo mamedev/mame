@@ -48,8 +48,8 @@ public:
 
 	DECLARE_READ8_MEMBER(tms5501_status_r);
 
-	void machine_reset_mcb216();
-	void machine_reset_cb308();
+	DECLARE_MACHINE_RESET(mcb216);
+	DECLARE_MACHINE_RESET(cb308);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -108,11 +108,11 @@ IRQ_CALLBACK_MEMBER(mcb216_state::irq_callback)
 	return m_tms5501->get_vector();
 }
 
-void mcb216_state::machine_reset_mcb216()
+MACHINE_RESET_MEMBER( mcb216_state, mcb216 )
 {
 }
 
-void mcb216_state::machine_reset_cb308()
+MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 {
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(mcb216_state::mcb216)
 	MCFG_DEVICE_IO_MAP(mcb216_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mcb216, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
 	MCFG_TMS5501_XMT_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(mcb216_state::cb308)
 	MCFG_DEVICE_IO_MAP(mcb216_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cb308, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
 	MCFG_TMS5501_XMT_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))

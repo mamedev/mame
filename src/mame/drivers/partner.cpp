@@ -174,7 +174,7 @@ MACHINE_CONFIG_START(partner_state::partner)
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(partner_mem)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_partner, this));
+	MCFG_MACHINE_RESET_OVERRIDE(partner_state, partner )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))

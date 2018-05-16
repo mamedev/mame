@@ -279,9 +279,9 @@ INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 // Quasar S2650 Main CPU, I8035 sound board
 // ****************************************
 
-void quasar_state::machine_start_quasar()
+MACHINE_START_MEMBER(quasar_state,quasar)
 {
-	machine_start_cvs();
+	MACHINE_START_CALL_MEMBER(cvs);
 
 	/* register state save */
 	save_item(NAME(m_effectcontrol));
@@ -289,9 +289,9 @@ void quasar_state::machine_start_quasar()
 	save_item(NAME(m_io_page));
 }
 
-void quasar_state::machine_reset_quasar()
+MACHINE_RESET_MEMBER(quasar_state,quasar)
 {
-	machine_reset_cvs();
+	MACHINE_RESET_CALL_MEMBER(cvs);
 
 	m_effectcontrol = 0;
 	m_page = 0;
@@ -314,8 +314,8 @@ MACHINE_CONFIG_START(quasar_state::quasar)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, quasar_state, audio_t1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_quasar, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_quasar, this));
+	MCFG_MACHINE_START_OVERRIDE(quasar_state,quasar)
+	MCFG_MACHINE_RESET_OVERRIDE(quasar_state,quasar)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(quasar_state::quasar)
 	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
 	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_quasar, this));
+	MCFG_VIDEO_START_OVERRIDE(quasar_state,quasar)
 
 	/* sound hardware */
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")

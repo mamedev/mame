@@ -265,7 +265,7 @@ void midxunit_state::init_revx()
  *
  *************************************/
 
-void midxunit_state::machine_reset_midxunit()
+MACHINE_RESET_MEMBER(midxunit_state,midxunit)
 {
 	int i;
 

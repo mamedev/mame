@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(dambustr_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaxold, this));
+	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
 	MCFG_7474_OUTPUT_CB(WRITELINE(*this, dambustr_state,galaxold_7474_9m_1_callback))
@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	MCFG_PALETTE_ADD("palette", 32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
 	MCFG_PALETTE_INIT_OWNER(dambustr_state,dambustr)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_dambustr, this));
+	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

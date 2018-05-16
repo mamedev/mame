@@ -810,7 +810,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-void galaga_state::machine_start_galaga()
+MACHINE_START_MEMBER(galaga_state,galaga)
 {
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
@@ -819,14 +819,14 @@ void galaga_state::machine_start_galaga()
 	save_item(NAME(m_sub2_nmi_mask));
 }
 
-void galaga_state::machine_reset_galaga()
+MACHINE_RESET_MEMBER(galaga_state,galaga)
 {
 	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
-void xevious_state::machine_reset_battles()
+MACHINE_RESET_MEMBER(xevious_state,battles)
 {
-	machine_reset_galaga();
+	MACHINE_RESET_CALL_MEMBER(galaga);
 	battles_customio_init();
 }
 
@@ -1631,8 +1631,8 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_galaga, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaga, this));
+	MCFG_MACHINE_START_OVERRIDE(bosco_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(bosco_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1646,7 +1646,7 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+4+64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
 	MCFG_PALETTE_INIT_OWNER(bosco_state,bosco)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bosco, this));
+	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1706,8 +1706,8 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_galaga, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaga, this));
+	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1721,7 +1721,7 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
 	MCFG_PALETTE_INIT_OWNER(galaga_state,galaga)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_galaga, this));
+	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1812,8 +1812,8 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_galaga, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaga, this));
+	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1826,7 +1826,7 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_PALETTE_ADD("palette", 128*4+64*8+64*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+1)
 	MCFG_PALETTE_INIT_OWNER(xevious_state,xevious)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_xevious, this));
+	MCFG_VIDEO_START_OVERRIDE(xevious_state,xevious)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1864,7 +1864,7 @@ MACHINE_CONFIG_START(xevious_state::battles)
 
 	MCFG_TIMER_DRIVER_ADD("battles_nmi", xevious_state, battles_nmi_generate)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_battles, this));
+	MCFG_MACHINE_RESET_OVERRIDE(xevious_state,battles)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("discrete")
@@ -1929,8 +1929,8 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_galaga, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaga, this));
+	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
+	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -1947,7 +1947,7 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_PALETTE_ADD("palette", 16*2+64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(digdug_state,digdug)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_digdug, this));
+	MCFG_VIDEO_START_OVERRIDE(digdug_state,digdug)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(pc1251_lcd_read);
 	DECLARE_WRITE8_MEMBER(pc1251_lcd_write);
 	virtual void machine_start() override;
-	void machine_start_pc1260() ATTR_COLD;
+	DECLARE_MACHINE_START(pc1260);
 	required_device<sc61860_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

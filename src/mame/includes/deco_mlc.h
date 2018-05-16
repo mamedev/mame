@@ -76,8 +76,8 @@ public:
 
 	void init_mlc();
 	void init_avengrgs();
-	void machine_reset_mlc();
-	void video_start_mlc() ATTR_COLD;
+	DECLARE_MACHINE_RESET(mlc);
+	DECLARE_VIDEO_START(mlc);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);

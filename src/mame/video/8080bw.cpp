@@ -13,7 +13,7 @@
 #include "includes/8080bw.h"
 
 
-void _8080bw_state::machine_start_extra_8080bw_vh()
+MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_vh)
 {
 	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_color_map));

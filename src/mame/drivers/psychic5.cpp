@@ -339,14 +339,14 @@ Notes (23-Jan-2016 AS):
 #include "speaker.h"
 
 
-void psychic5_state::machine_start_psychic5()
+MACHINE_START_MEMBER(psychic5_state, psychic5)
 {
 	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_bank_latch));
 }
 
-void psychic5_state::machine_start_bombsa()
+MACHINE_START_MEMBER(psychic5_state, bombsa)
 {
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_psychic5, this));
+	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -752,8 +752,8 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_psychic5, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_psychic5, this));
+	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
+	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bombsa, this));
+	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -804,8 +804,8 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombsa)
 	MCFG_PALETTE_ADD("palette", 768)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bombsa, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_psychic5, this));
+	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
+	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

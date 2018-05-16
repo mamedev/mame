@@ -292,16 +292,16 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
 	}
 
-	if (!(m_layer_disable&0x0001))
+	if (!(m_layer_disable&0x0001)) 
 		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 1);
-
-	if (!(m_layer_disable&0x0002))
+	
+	if (!(m_layer_disable&0x0002)) 
 		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 2);
-
-	if (!(m_layer_disable&0x0004))
+	
+	if (!(m_layer_disable&0x0004)) 
 		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 4);
-
-	if (!(m_layer_disable&0x0008))
+	
+	if (!(m_layer_disable&0x0008)) 
 		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 8);
 
 	if (!(m_layer_disable&0x0010))
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-//  set_video_start_cb(config, driver_callback_delegate(&video_start_cupsoc, this));
+//  MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

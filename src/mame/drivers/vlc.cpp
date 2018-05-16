@@ -202,7 +202,7 @@ public:
 	DECLARE_WRITE16_MEMBER( nevada_sec_w );
 	DECLARE_WRITE16_MEMBER( vram_w );
 
-	void machine_start_nevada() ATTR_COLD;
+	DECLARE_MACHINE_START(nevada);
 	void init_nevada();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -570,7 +570,7 @@ INPUT_PORTS_END
 *     Machine start      *
 *************************/
 
-void nevada_state::machine_start_nevada()
+MACHINE_START_MEMBER(nevada_state, nevada)
 {
 	m_nvram->set_base(m_ram62256, 0x1000);
 }
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_nevada, this));
+	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", nevada_state, nvram_init)
 

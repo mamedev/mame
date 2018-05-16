@@ -25,7 +25,7 @@ public:
 	void init_ddp2();
 	void init_dw2001();
 	void init_dwpc();
-	void machine_start_pgm_arm_type2() ATTR_COLD;
+	DECLARE_MACHINE_START(pgm_arm_type2);
 	DECLARE_READ32_MEMBER( arm7_latch_arm_r );
 	DECLARE_WRITE32_MEMBER( arm7_latch_arm_w );
 	DECLARE_READ32_MEMBER( arm7_shareram_r );

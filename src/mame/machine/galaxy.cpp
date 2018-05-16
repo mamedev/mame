@@ -171,7 +171,7 @@ void galaxy_state::init_galaxy()
   Machine Initialization
 ***************************************************************************/
 
-void galaxy_state::machine_reset_galaxy()
+MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -194,7 +194,7 @@ void galaxy_state::init_galaxyp()
 	init_galaxy();
 }
 
-void galaxy_state::machine_reset_galaxyp()
+MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);

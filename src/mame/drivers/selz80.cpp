@@ -53,8 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	void machine_reset_dagz80();
-	void machine_reset_selz80();
+	DECLARE_MACHINE_RESET(dagz80);
+	DECLARE_MACHINE_RESET(selz80);
 
 	void selz80(machine_config &config);
 	void dagz80(machine_config &config);
@@ -175,12 +175,12 @@ void selz80_state::setup_baud()
 	}
 }
 
-void selz80_state::machine_reset_selz80()
+MACHINE_RESET_MEMBER(selz80_state, selz80)
 {
 	setup_baud();
 }
 
-void selz80_state::machine_reset_dagz80()
+MACHINE_RESET_MEMBER(selz80_state, dagz80)
 {
 	setup_baud();
 	uint8_t* rom = memregion("user1")->base();
@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
 	MCFG_DEVICE_PROGRAM_MAP(selz80_mem)
 	MCFG_DEVICE_IO_MAP(selz80_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_selz80, this));
+	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_selz80)
@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(selz80_state::dagz80)
 	selz80(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(dagz80_mem)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dagz80, this));
+	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
 MACHINE_CONFIG_END
 
 

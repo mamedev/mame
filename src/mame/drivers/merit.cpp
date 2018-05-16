@@ -128,7 +128,7 @@ public:
 	void init_key_2();
 	void init_dtrvwz5();
 	virtual void machine_start() override;
-	void machine_start_casino5() ATTR_COLD;
+	DECLARE_MACHINE_START(casino5);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
@@ -1387,7 +1387,7 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 	reinterpret_cast<uint8_t *>(base)[0x1040] = 0xc9; /* ret */
 }
 
-void merit_state::machine_start_casino5()
+MACHINE_START_MEMBER(merit_state,casino5)
 {
 	merit_state::machine_start();
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x2000);
@@ -1440,7 +1440,7 @@ MACHINE_CONFIG_START(merit_state::casino5)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_casino5, this));
+	MCFG_MACHINE_START_OVERRIDE(merit_state,casino5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::bigappg)

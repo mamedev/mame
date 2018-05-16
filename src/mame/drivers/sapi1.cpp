@@ -77,8 +77,8 @@ public:
 	void init_sapizps3();
 	void init_sapizps3a();
 	void init_sapizps3b();
-	void machine_reset_sapi1();
-	void machine_reset_sapizps3();
+	DECLARE_MACHINE_RESET(sapi1);
+	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -583,13 +583,13 @@ WRITE8_MEMBER( sapi1_state::sapi3_25_w )
 	m_zps3_25 = data & 0xfc; //??
 }
 
-void sapi1_state::machine_reset_sapi1()
+MACHINE_RESET_MEMBER( sapi1_state, sapi1 )
 {
 	m_keyboard_mask = 0;
 	m_refresh_counter = 0x20;
 }
 
-void sapi1_state::machine_reset_sapizps3()
+MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
 {
 	m_keyboard_mask = 0;
 	m_bank1->set_entry(1);
@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_DEVICE_PROGRAM_MAP(sapi1_mem)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sapi1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi3)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sapi3_mem)
 	MCFG_DEVICE_IO_MAP(sapi3_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sapizps3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(40*6, 20*9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 20*9-1)
@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_DEVICE_PROGRAM_MAP(sapi3a_mem)
 	MCFG_DEVICE_IO_MAP(sapi3a_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sapizps3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // Tesla MHB1012

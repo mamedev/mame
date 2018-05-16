@@ -72,7 +72,7 @@ public:
 		, m_bram(*this, "bram")
 		{ }
 
-	void machine_reset_tosh1000();
+	DECLARE_MACHINE_RESET(tosh1000);
 	void init_tosh1000();
 
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
@@ -106,7 +106,7 @@ void tosh1000_state::init_tosh1000()
 {
 }
 
-void tosh1000_state::machine_reset_tosh1000()
+MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
 {
 	m_bram_latch = false;
 	m_bram_offset = 0;
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tosh1000, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 

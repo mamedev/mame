@@ -202,7 +202,7 @@ TODO:
 #include "speaker.h"
 
 
-void gladiatr_state::machine_reset_gladiator()
+MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 {
 	// 6809 bank memory set
 	membank("bank2")->set_entry(0);
@@ -607,7 +607,7 @@ WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
 	// ...
 }
 
-void ppking_state::machine_reset_ppking()
+MACHINE_RESET_MEMBER(ppking_state, ppking)
 {
 	// yes, it expects to read DSW1 without sending commands first ...
 	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ppking, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
@@ -981,7 +981,7 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppking)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ppking, this));
+	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1018,7 +1018,7 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu3_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gladiator, this));
+	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
 	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gladiatr)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gladiatr, this));
+	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

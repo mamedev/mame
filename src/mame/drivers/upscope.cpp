@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(upscope_state,amiga)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga, this));
+	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

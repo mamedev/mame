@@ -202,9 +202,9 @@ public:
 	void init_fghtbskt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void machine_start_m63() ATTR_COLD;
-	void machine_reset_m63();
-	void video_start_m63() ATTR_COLD;
+	DECLARE_MACHINE_START(m63);
+	DECLARE_MACHINE_RESET(m63);
+	DECLARE_VIDEO_START(m63);
 	DECLARE_PALETTE_INIT(m63);
 	uint32_t screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
@@ -329,7 +329,7 @@ TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0, m_fg_flag);
 }
 
-void m63_state::video_start_m63()
+VIDEO_START_MEMBER(m63_state,m63)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -722,7 +722,7 @@ INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 	m_sound_irq = 1;
 }
 
-void m63_state::machine_start_m63()
+MACHINE_START_MEMBER(m63_state,m63)
 {
 	save_item(NAME(m_pal_bank));
 	save_item(NAME(m_fg_flag));
@@ -735,7 +735,7 @@ void m63_state::machine_start_m63()
 	save_item(NAME(m_p2));
 }
 
-void m63_state::machine_reset_m63()
+MACHINE_RESET_MEMBER(m63_state,m63)
 {
 	m_pal_bank = 0;
 	m_fg_flag = 0;
@@ -774,8 +774,8 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, m63_state, irq_r))
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_m63, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_m63, this));
+	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
+	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_PALETTE_ADD("palette", 256+4)
 
 	MCFG_PALETTE_INIT_OWNER(m63_state,m63)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_m63, this));
+	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); /* ????? */
@@ -827,8 +827,8 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	MCFG_DEVICE_IO_MAP(i8039_port_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_m63, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_m63, this));
+	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
+	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghtbskt)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_m63, this));
+	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -215,11 +215,11 @@
 /*                                                     */
 /*******************************************************/
 
-void _8080bw_state::machine_start_extra_8080bw()
+MACHINE_START_MEMBER(_8080bw_state,extra_8080bw)
 {
-	machine_start_extra_8080bw_sh();
-	machine_start_extra_8080bw_vh();
-	machine_start_mw8080bw();
+	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
+	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
+	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 /*******************************************************/
@@ -412,7 +412,7 @@ MACHINE_CONFIG_START(_8080bw_state::invadpt2)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(invadpt2_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* 60 Hz signal clocks two LS161. Ripple carry will */
 	/* reset circuit, if LS161 not cleared before.      */
@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(_8080bw_state::spcewars)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(spcewars_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(_8080bw_state::cosmo)
 	MCFG_DEVICE_PROGRAM_MAP(cosmo_map)
 	MCFG_DEVICE_IO_MAP(cosmo_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -828,8 +828,8 @@ MACHINE_CONFIG_START(_8080bw_state::spacecom)
 	MCFG_DEVICE_PROGRAM_MAP(spacecom_map)
 	MCFG_DEVICE_IO_MAP(spacecom_io_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mw8080bw, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mw8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state, mw8080bw)
+	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1122,7 +1122,7 @@ MACHINE_CONFIG_START(_8080bw_state::lrescue)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(lrescue_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1153,8 +1153,8 @@ MACHINE_CONFIG_START(_8080bw_state::escmars)
 	MCFG_DEVICE_PROGRAM_MAP(escmars_map)
 	MCFG_DEVICE_IO_MAP(lrescue_io_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mw8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1253,7 +1253,7 @@ MACHINE_CONFIG_START(_8080bw_state::cosmicmo)
 	MCFG_DEVICE_IO_MAP(cosmicmo_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
@@ -1388,14 +1388,14 @@ static INPUT_PORTS_START( rollingc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 INPUT_PORTS_END
 
-void _8080bw_state::machine_start_rollingc()
+MACHINE_START_MEMBER(_8080bw_state,rollingc)
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x400);
 	m_scattered_colorram2 = std::make_unique<uint8_t []>(0x400);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x400);
 	save_pointer(&m_scattered_colorram2[0], "m_scattered_colorram2", 0x400);
 
-	machine_start_mw8080bw();
+	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 MACHINE_CONFIG_START(_8080bw_state::rollingc)
@@ -1419,7 +1419,7 @@ MACHINE_CONFIG_START(_8080bw_state::rollingc)
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_rollingc, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,rollingc)
 MACHINE_CONFIG_END
 
 
@@ -1526,19 +1526,19 @@ static INPUT_PORTS_START( schaserm )
 	PORT_DIPSETTING(    0x03, "4" )
 INPUT_PORTS_END
 
-void _8080bw_state::machine_start_schaser()
+MACHINE_START_MEMBER(_8080bw_state,schaser)
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
-	machine_start_schaser_sh();
-	machine_start_extra_8080bw_vh();
-	machine_start_mw8080bw();
+	MACHINE_START_CALL_MEMBER(schaser_sh);
+	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
+	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-void _8080bw_state::machine_reset_schaser()
+MACHINE_RESET_MEMBER(_8080bw_state,schaser)
 {
-	machine_reset_schaser_sh();
-	machine_reset_mw8080bw();
+	MACHINE_RESET_CALL_MEMBER(schaser_sh);
+	MACHINE_RESET_CALL_MEMBER(mw8080bw);
 }
 
 MACHINE_CONFIG_START(_8080bw_state::schaser)
@@ -1551,8 +1551,8 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_schaser, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_schaser, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,schaser)
 
 	MCFG_TIMER_DRIVER_ADD("schaser_sh_555", _8080bw_state, schaser_effect_555_cb)
 
@@ -1667,14 +1667,14 @@ static INPUT_PORTS_START( schasercv )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-void _8080bw_state::machine_start_schasercv()
+MACHINE_START_MEMBER(_8080bw_state,schasercv)
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 
-	machine_start_extra_8080bw_sh();
-	machine_start_extra_8080bw_vh();
-	machine_start_mw8080bw();
+	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
+	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
+	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 MACHINE_CONFIG_START(_8080bw_state::schasercv)
@@ -1684,7 +1684,7 @@ MACHINE_CONFIG_START(_8080bw_state::schasercv)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
 	MCFG_DEVICE_IO_MAP(schasercv_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_schasercv, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schasercv)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1768,12 +1768,12 @@ static INPUT_PORTS_START( sflush )
 INPUT_PORTS_END
 
 
-void _8080bw_state::machine_start_sflush()
+MACHINE_START_MEMBER(_8080bw_state,sflush)
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 
-	machine_start_mw8080bw();
+	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 MACHINE_CONFIG_START(_8080bw_state::sflush)
@@ -1783,7 +1783,7 @@ MACHINE_CONFIG_START(_8080bw_state::sflush)
 	MCFG_DEVICE_REPLACE("maincpu",M6800,1500000) // ?
 	MCFG_DEVICE_PROGRAM_MAP(sflush_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state, irq0_line_hold)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sflush, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1888,7 +1888,7 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(lupin3_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1931,7 +1931,7 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3a)
 	lupin3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sflush, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_lupin3)
@@ -1958,14 +1958,14 @@ INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
 	}
 }
 
-void _8080bw_state::machine_start_polaris()
+MACHINE_START_MEMBER(_8080bw_state,polaris)
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
 
-	machine_start_mw8080bw();
+	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 READ8_MEMBER(_8080bw_state::polaris_port00_r)
@@ -2059,7 +2059,7 @@ MACHINE_CONFIG_START(_8080bw_state::polaris)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_polaris, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,polaris)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2186,7 +2186,7 @@ MACHINE_CONFIG_START(_8080bw_state::ballbomb)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(ballbomb_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2269,7 +2269,7 @@ MACHINE_CONFIG_START(_8080bw_state::yosakdon)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(yosakdon_map)
 	MCFG_DEVICE_IO_MAP(yosakdon_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -2435,7 +2435,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbt)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(indianbt_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2461,7 +2461,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbtbr)
 	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
 	MCFG_DEVICE_IO_MAP(indianbtbr_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2536,7 +2536,7 @@ MACHINE_CONFIG_START(_8080bw_state::steelwkr)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(steelwkr_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2758,8 +2758,8 @@ MACHINE_CONFIG_START(_8080bw_state::shuttlei)
 	MCFG_DEVICE_PROGRAM_MAP(shuttlei_map)
 	MCFG_DEVICE_IO_MAP(shuttlei_io_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mw8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2800,14 +2800,14 @@ Another (same checksums) dump came from board labeled SI-7811M-2
 
 */
 
-void _8080bw_state::machine_start_darthvdr()
+MACHINE_START_MEMBER(_8080bw_state,darthvdr)
 {
 	/* do nothing for now - different interrupt system */
 	m_fleet_step = 3;
 }
 
 
-void _8080bw_state::machine_reset_darthvdr()
+MACHINE_RESET_MEMBER(_8080bw_state,darthvdr)
 {
 	/* do nothing for now - different interrupt system */
 }
@@ -2885,8 +2885,8 @@ MACHINE_CONFIG_START(_8080bw_state::darthvdr)
 	MCFG_DEVICE_IO_MAP(darthvdr_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_darthvdr, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_darthvdr, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,darthvdr)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,darthvdr)
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -2957,7 +2957,7 @@ MACHINE_CONFIG_START(_8080bw_state::vortex)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(vortex_io_map)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_extra_8080bw, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
@@ -3252,12 +3252,12 @@ static INPUT_PORTS_START( gunchamp )
 INPUT_PORTS_END
 
 
-void _8080bw_state::machine_start_claybust()
+MACHINE_START_MEMBER(_8080bw_state, claybust)
 {
 	m_claybust_gun_pos = 0;
 	save_item(NAME(m_claybust_gun_pos));
 
-	machine_start_mw8080bw();
+	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 MACHINE_CONFIG_START(_8080bw_state::claybust)
@@ -3269,7 +3269,7 @@ MACHINE_CONFIG_START(_8080bw_state::claybust)
 
 	MCFG_TIMER_DRIVER_ADD("claybust_gun", _8080bw_state, claybust_gun_callback)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_claybust, this));
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, claybust)
 
 	/* sound hardware */
 	// TODO: discrete sound
@@ -3526,7 +3526,7 @@ MACHINE_CONFIG_START(_8080bw_state::invmulti)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mw8080bw, this));
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 MACHINE_CONFIG_END
 
 void _8080bw_state::init_invmulti()

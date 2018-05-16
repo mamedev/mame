@@ -86,9 +86,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigt_playfield_scan);
-	void machine_start_atarigt() ATTR_COLD;
-	void machine_reset_atarigt();
-	void video_start_atarigt() ATTR_COLD;
+	DECLARE_MACHINE_START(atarigt);
+	DECLARE_MACHINE_RESET(atarigt);
+	DECLARE_VIDEO_START(atarigt);
 	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void atarigt(machine_config &config);
 	void tmek(machine_config &config);

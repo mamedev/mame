@@ -1354,7 +1354,7 @@ WRITE8_MEMBER(cinemat_state::sound_output_w)
 	logerror("sound_output = %02X\n", data);
 }
 
-void cinemat_state::sound_reset_demon()
+SOUND_RESET_MEMBER( cinemat_state, demon )
 {
 	/* generic init */
 	sound_reset();
@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_START(cinemat_state::demon_sound)
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 3579545 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
-	set_sound_reset_cb(config, driver_callback_delegate(&sound_reset_demon, this));
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, demon)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, demon_sound4_w))
@@ -1447,9 +1447,9 @@ WRITE8_MEMBER(cinemat_state::qb3_sound_fifo_w)
 }
 
 
-void cinemat_state::sound_reset_qb3()
+SOUND_RESET_MEMBER( cinemat_state, qb3 )
 {
-	sound_reset_demon();
+	SOUND_RESET_CALL_MEMBER(demon);
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */
@@ -1459,7 +1459,7 @@ void cinemat_state::sound_reset_qb3()
 
 MACHINE_CONFIG_START(cinemat_state::qb3_sound)
 	demon_sound(config);
-	set_sound_reset_cb(config, driver_callback_delegate(&sound_reset_qb3, this));
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, qb3)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // not mapped through LS259

@@ -123,9 +123,9 @@ public:
 
 	void megadriv_stop_scanline_timer();
 
-	void machine_start_megadriv() ATTR_COLD;
-	void machine_reset_megadriv();
-	void video_start_megadriv()   ATTR_COLD;
+	DECLARE_MACHINE_START( megadriv );
+	DECLARE_MACHINE_RESET( megadriv );
+	DECLARE_VIDEO_START( megadriv );
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
@@ -170,10 +170,10 @@ public:
 	READ8_MEMBER(mess_md_io_read_data_port);
 	WRITE16_MEMBER(mess_md_io_write_data_port);
 
-	void machine_start_md_common()   ATTR_COLD; // setup ioport_port
-	void machine_start_ms_megadriv() ATTR_COLD; // setup ioport_port + install cartslot handlers
-	void machine_start_ms_megacd()   ATTR_COLD; // setup ioport_port + dma delay for cd
-	void machine_reset_ms_megadriv();
+	DECLARE_MACHINE_START( md_common );     // setup ioport_port
+	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
+	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
+	DECLARE_MACHINE_RESET( ms_megadriv );
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 

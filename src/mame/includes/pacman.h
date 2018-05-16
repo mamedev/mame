@@ -170,15 +170,15 @@ public:
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(jrpacman_scan_rows);
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
-	void video_start_pacman()     ATTR_COLD;
+	DECLARE_VIDEO_START(pacman);
 	DECLARE_PALETTE_INIT(pacman);
-	void video_start_birdiy()     ATTR_COLD;
-	void video_start_s2650games() ATTR_COLD;
-	void machine_reset_mschamp();
-	void machine_reset_superabc();
-	void machine_reset_maketrax();
-	void video_start_pengo()      ATTR_COLD;
-	void video_start_jrpacman()   ATTR_COLD;
+	DECLARE_VIDEO_START(birdiy);
+	DECLARE_VIDEO_START(s2650games);
+	DECLARE_MACHINE_RESET(mschamp);
+	DECLARE_MACHINE_RESET(superabc);
+	DECLARE_MACHINE_RESET(maketrax);
+	DECLARE_VIDEO_START(pengo);
+	DECLARE_VIDEO_START(jrpacman);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -196,12 +196,12 @@ private:
 public:
 	// epos.c
 	DECLARE_READ8_MEMBER(epos_decryption_w);
-	void machine_start_theglobp() ATTR_COLD;
-	void machine_reset_theglobp();
-	void machine_start_eeekk()    ATTR_COLD;
-	void machine_reset_eeekk();
-	void machine_start_acitya()   ATTR_COLD;
-	void machine_reset_acitya();
+	DECLARE_MACHINE_START(theglobp);
+	DECLARE_MACHINE_RESET(theglobp);
+	DECLARE_MACHINE_START(eeekk);
+	DECLARE_MACHINE_RESET(eeekk);
+	DECLARE_MACHINE_START(acitya);
+	DECLARE_MACHINE_RESET(acitya);
 
 	void birdiy(machine_config &config);
 	void rocktrv2(machine_config &config);

@@ -546,7 +546,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
-	void machine_start_vcc() ATTR_COLD;
+	DECLARE_MACHINE_START(vcc);
 	void cc10_map(address_map &map);
 	void vcc_io(address_map &map);
 	void vcc_map(address_map &map);
@@ -801,7 +801,7 @@ READ8_MEMBER(fidelz80_state::vcc_speech_r)
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
-void fidelz80_state::machine_start_vcc()
+MACHINE_START_MEMBER(fidelz80_state,vcc)
 {
 	machine_start();
 
@@ -1731,7 +1731,7 @@ MACHINE_CONFIG_START(fidelz80_state::vcc)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_vcc, this));
+	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

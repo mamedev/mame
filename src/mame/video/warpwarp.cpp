@@ -40,7 +40,7 @@ PALETTE_INIT_MEMBER(warpwarp_state,navarone)
 	palette.set_pen_color(3, geebee_palette[0]);
 }
 
-void warpwarp_state::machine_reset_kaitei()
+MACHINE_RESET_MEMBER(warpwarp_state,kaitei)
 {
 	// Some PCB videos/images shows a b&w arrangement, others a full colorized one.
 	// This is due of the monitor type used, cfr. http://news.livedoor.com/article/detail/5604337/
@@ -193,17 +193,17 @@ TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 
 ***************************************************************************/
 
-void warpwarp_state::video_start_geebee()
+VIDEO_START_MEMBER(warpwarp_state,geebee)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
-void warpwarp_state::video_start_navarone()
+VIDEO_START_MEMBER(warpwarp_state,navarone)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
-void warpwarp_state::video_start_warpwarp()
+VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }

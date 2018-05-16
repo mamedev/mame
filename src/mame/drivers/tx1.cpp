@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_DEVICE_IO_MAP(tx1_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, irq0_line_hold,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tx1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_tx1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_tx1, this));
+	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
@@ -696,7 +696,7 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
 	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_buggyboy, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -725,7 +725,7 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_buggyboy, this));
+	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_buggyboy, this));
+	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -773,7 +773,7 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_buggybjr, this));
+	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);

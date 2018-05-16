@@ -137,7 +137,7 @@ READ8_MEMBER(vsnes_state::vsnes_in1_1_r)
  *
  *************************************/
 
-void vsnes_state::machine_reset_vsnes()
+MACHINE_RESET_MEMBER(vsnes_state,vsnes)
 {
 	m_last_bank = 0xff;
 	m_sound_fix = 0;
@@ -152,7 +152,7 @@ void vsnes_state::machine_reset_vsnes()
  *
  *************************************/
 
-void vsnes_state::machine_reset_vsdual()
+MACHINE_RESET_MEMBER(vsnes_state,vsdual)
 {
 	m_input_latch[0] = m_input_latch[1] = 0;
 	m_input_latch[2] = m_input_latch[3] = 0;
@@ -182,7 +182,7 @@ void vsnes_state::v_set_videorom_bank(  int start, int count, int vrom_start_ban
 	}
 }
 
-void vsnes_state::machine_start_vsnes()
+MACHINE_START_MEMBER(vsnes_state,vsnes)
 {
 	address_space &ppu1_space = machine().device("ppu1")->memory().space(AS_PROGRAM);
 	int i;
@@ -228,7 +228,7 @@ void vsnes_state::machine_start_vsnes()
 	}
 }
 
-void vsnes_state::machine_start_vsdual()
+MACHINE_START_MEMBER(vsnes_state,vsdual)
 {
 	m_vrom[0] = memregion("gfx1")->base();
 	m_vrom[1] = memregion("gfx2")->base();

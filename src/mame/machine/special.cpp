@@ -145,7 +145,7 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-void special_state::machine_reset_special()
+MACHINE_RESET_MEMBER(special_state,special)
 {
 	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
@@ -218,12 +218,12 @@ WRITE8_MEMBER( special_state::specimx_select_bank )
 	specimx_set_bank(offset, data);
 }
 
-void special_state::machine_start_specimx()
+MACHINE_START_MEMBER(special_state,specimx)
 {
 	m_drive = 0;
 }
 
-void special_state::machine_reset_specimx()
+MACHINE_RESET_MEMBER(special_state,specimx)
 {
 	specimx_set_bank(2, 0); // Initiali load ROM disk
 	timer_set(attotime::zero, TIMER_PIT8253_GATES);
@@ -350,7 +350,7 @@ void special_state::init_erik()
 	m_erik_background = 0;
 }
 
-void special_state::machine_reset_erik()
+MACHINE_RESET_MEMBER(special_state,erik)
 {
 	m_RR_register = 0x00;
 	m_RC_register = 0x00;

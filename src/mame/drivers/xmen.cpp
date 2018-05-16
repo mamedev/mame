@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xmen_state, screen_vblank_xmen6p))
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_xmen6p, this));
+	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
 
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")

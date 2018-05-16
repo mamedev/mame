@@ -159,9 +159,9 @@ public:
 	void init_pclubjv4();
 	void init_pclubjv5();
 	void segac2_common_init(segac2_prot_delegate prot_func);
-	void video_start_segac2_new() ATTR_COLD;
-	void machine_start_segac2()   ATTR_COLD;
-	void machine_reset_segac2();
+	DECLARE_VIDEO_START(segac2_new);
+	DECLARE_MACHINE_START(segac2);
+	DECLARE_MACHINE_RESET(segac2);
 
 	uint32_t screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_segac2_bg_pal_lookup[4];
@@ -236,7 +236,7 @@ public:
 
 ******************************************************************************/
 
-void segac2_state::machine_start_segac2()
+MACHINE_START_MEMBER(segac2_state,segac2)
 {
 	save_item(NAME(m_prot_write_buf));
 	save_item(NAME(m_prot_read_buf));
@@ -245,7 +245,7 @@ void segac2_state::machine_start_segac2()
 }
 
 
-void segac2_state::machine_reset_segac2()
+MACHINE_RESET_MEMBER(segac2_state,segac2)
 {
 //  megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
 //  megadriv_scanline_timer->adjust(attotime::zero);
@@ -1446,9 +1446,9 @@ WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
 
 ******************************************************************************/
 
-void segac2_state::video_start_segac2_new()
+VIDEO_START_MEMBER(segac2_state,segac2_new)
 {
-	video_start_megadriv();
+	VIDEO_START_CALL_MEMBER(megadriv);
 }
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
@@ -1544,8 +1544,8 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_segac2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_segac2, this));
+	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
+	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5296, XL2_CLOCK/6) // clock divider guessed
@@ -1578,7 +1578,7 @@ MACHINE_CONFIG_START(segac2_state::segac)
 
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_segac2_new, this));
+	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

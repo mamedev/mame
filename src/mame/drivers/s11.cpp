@@ -167,7 +167,7 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-void s11_state::machine_reset_s11()
+MACHINE_RESET_MEMBER( s11_state, s11 )
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(s11_state::s11)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s11_main_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s11, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s11)

@@ -300,7 +300,7 @@ DRIVER_MEMBER(aim65_state, aim65_printer_on), // out CB2
 
 
 /* From Machine Config
-    set_video_start_cb(config, driver_callback_delegate(&video_start_aim65, this));
+    MCFG_VIDEO_START_OVERRIDE(aim65_state,aim65)
     MCFG_VIDEO_UPDATE(aim65)
 */
 
@@ -371,12 +371,12 @@ WRITE8_MEMBER( aim65_state::aim65_pa_w )
 	}
 }
 
-void aim65_state::video_start_aim65()
+VIDEO_START_MEMBER(aim65_state,aim65)
 {
 	m_print_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aim65_state::aim65_printer_timer),this));
 	m_printerRAM = std::make_unique<uint16_t[]>((600 * 10 * 2) / 2);
 	memset(m_printerRAM, 0, videoram_size);
-	video_start_generic();
+	VIDEO_START_CALL_MEMBER(generic);
 	m_printer_x = 0;
 	m_printer_y = 0;
 	m_printer_dir = 0;

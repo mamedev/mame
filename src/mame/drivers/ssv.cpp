@@ -2624,7 +2624,7 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gdfs)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gdfs, this));
+	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
 MACHINE_CONFIG_END
 
 
@@ -2839,7 +2839,7 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_eaglshot)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_eaglshot)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_eaglshot, this));
+	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)
 MACHINE_CONFIG_END
 
 

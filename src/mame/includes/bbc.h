@@ -145,22 +145,22 @@ public:
 	DECLARE_READ8_MEMBER(bbc_fe_r);
 
 	void init_bbc();
-	void video_start_bbc()       ATTR_COLD;
+	DECLARE_VIDEO_START(bbc);
 
-	void machine_start_bbca()    ATTR_COLD;
-	void machine_reset_bbca();
-	void machine_start_bbcb()    ATTR_COLD;
-	void machine_reset_bbcb();
-	void machine_reset_torch();
-	void machine_start_bbcbp()   ATTR_COLD;
-	void machine_reset_bbcbp();
-	void machine_start_bbcm()    ATTR_COLD;
-	void machine_reset_bbcm();
-	void machine_start_bbcmc()   ATTR_COLD;
-	void machine_reset_bbcmc();
-	void machine_reset_ltmpbp();
-	void machine_reset_ltmpm();
-	void machine_start_cfa3000() ATTR_COLD;
+	DECLARE_MACHINE_START(bbca);
+	DECLARE_MACHINE_RESET(bbca);
+	DECLARE_MACHINE_START(bbcb);
+	DECLARE_MACHINE_RESET(bbcb);
+	DECLARE_MACHINE_RESET(torch);
+	DECLARE_MACHINE_START(bbcbp);
+	DECLARE_MACHINE_RESET(bbcbp);
+	DECLARE_MACHINE_START(bbcm);
+	DECLARE_MACHINE_RESET(bbcm);
+	DECLARE_MACHINE_START(bbcmc);
+	DECLARE_MACHINE_RESET(bbcmc);
+	DECLARE_MACHINE_RESET(ltmpbp);
+	DECLARE_MACHINE_RESET(ltmpm);
+	DECLARE_MACHINE_START(cfa3000);
 
 	DECLARE_PALETTE_INIT(bbc);
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);

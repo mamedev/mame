@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
 
 ***************************************************************************/
 
-void playmark_state::video_start_bigtwin()
+VIDEO_START_MEMBER(playmark_state,bigtwin)
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -106,7 +106,7 @@ void playmark_state::video_start_bigtwin()
 }
 
 
-void playmark_state::video_start_bigtwinb()
+VIDEO_START_MEMBER(playmark_state,bigtwinb)
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwinb_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -126,7 +126,7 @@ void playmark_state::video_start_bigtwinb()
 }
 
 
-void playmark_state::video_start_wbeachvl()
+VIDEO_START_MEMBER(playmark_state,wbeachvl)
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -143,7 +143,7 @@ void playmark_state::video_start_wbeachvl()
 	m_pri_masks[2] = 0;
 }
 
-void playmark_state::video_start_excelsr()
+VIDEO_START_MEMBER(playmark_state,excelsr)
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -158,7 +158,7 @@ void playmark_state::video_start_excelsr()
 	m_pri_masks[2] = 0xfff0;
 }
 
-void playmark_state::video_start_hotmind()
+VIDEO_START_MEMBER(playmark_state,hotmind)
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -179,7 +179,7 @@ void playmark_state::video_start_hotmind()
 	m_pri_masks[2] = 0;
 }
 
-void playmark_state::video_start_luckboomh()
+VIDEO_START_MEMBER(playmark_state,luckboomh)
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -219,7 +219,7 @@ TILEMAP_MAPPER_MEMBER(playmark_state::playmark_tilemap_scan_pages)
 
 // theres enough ram for 64*128 on each tilemap..
 
-void playmark_state::video_start_hrdtimes()
+VIDEO_START_MEMBER(playmark_state,hrdtimes)
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(playmark_state::playmark_tilemap_scan_pages),this), 16, 16, 128, 32);

@@ -103,13 +103,13 @@ public:
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
 
-	void machine_start_wecleman() ATTR_COLD;
-	void machine_reset_wecleman();
-	void video_start_wecleman()   ATTR_COLD;
+	DECLARE_MACHINE_START(wecleman);
+	DECLARE_MACHINE_RESET(wecleman);
+	DECLARE_VIDEO_START(wecleman);
 
-	void machine_start_hotchase() ATTR_COLD;
-	void machine_reset_hotchase();
-	void video_start_hotchase()   ATTR_COLD;
+	DECLARE_MACHINE_START(hotchase);
+	DECLARE_MACHINE_RESET(hotchase);
+	DECLARE_VIDEO_START(hotchase);
 
 	uint32_t screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

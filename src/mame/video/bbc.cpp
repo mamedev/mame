@@ -298,7 +298,7 @@ void bbc_state::setvideoshadow(int vdusel)
  * Initialize the BBC video emulation
  ************************************************************************/
 
-void bbc_state::video_start_bbc()
+VIDEO_START_MEMBER(bbc_state, bbc)
 {
 	m_cursor_size = 1;
 

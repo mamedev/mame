@@ -93,8 +93,8 @@ public:
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void video_start_sngkace() ATTR_COLD;
-	void video_start_psikyo()  ATTR_COLD;
+	DECLARE_VIDEO_START(sngkace);
+	DECLARE_VIDEO_START(psikyo);
 	uint32_t screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_psikyo);

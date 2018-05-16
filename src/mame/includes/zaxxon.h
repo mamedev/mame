@@ -87,8 +87,8 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zaxxon);
-	void video_start_razmataz() ATTR_COLD;
-	void video_start_congo()    ATTR_COLD;
+	DECLARE_VIDEO_START(razmataz);
+	DECLARE_VIDEO_START(congo);
 	uint32_t screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
