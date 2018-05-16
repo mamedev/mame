@@ -26,6 +26,11 @@ nereid_device::nereid_device(const machine_config &mconfig, const char *tag, dev
 
 void nereid_device::device_start()
 {
+	save_item(NAME(m_red));
+	save_item(NAME(m_green));
+	save_item(NAME(m_blue));
+	save_item(NAME(m_index));
+	save_item(NAME(m_palette));
 }
 
 void nereid_device::device_reset()
