@@ -70,7 +70,8 @@ dio16_98544_device::dio16_98544_device(const machine_config &mconfig, const char
 dio16_98544_device::dio16_98544_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
-	m_topcat(*this, "topcat")
+	m_topcat(*this, "topcat"),
+	m_rom(*this, HP98544_ROM_REGION)
 {
 	m_vram.resize(0x100000);
 }
@@ -83,7 +84,6 @@ void dio16_98544_device::device_start()
 {
 	// set_nubus_device makes m_slot valid
 	set_dio_device();
-	m_rom = device().machine().root_device().memregion(this->subtag(HP98544_ROM_REGION).c_str())->base();
 
 	m_dio->install_memory(
 			0x200000, 0x2fffff,
