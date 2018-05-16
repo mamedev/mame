@@ -14,20 +14,20 @@
 		</part>
 	</software>
 
-	<software name="cpm30" supported="no">
-		<description>CP/M Plus v3.0 - MYAB BIOS v0.9</description>
+	<software name="cpm30">
+		<description>CP/M Plus v3.0 (v0.9)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="297216">
-				<rom name="cpm30.td0" size="297216" crc="ccf77a0c" sha1="2563cc8c93c101f616f39620b3d7759a5062f97b" offset="0" />
+				<rom name="cpm30.td0" size="297216" crc="ccf77a0c" sha1="2563cc8c93c101f616f39620b3d7759a5062f97b" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cpmplus3" supported="no">
-		<description>CP/M Plus v3.0</description>
+	<software name="cpm30_12" cloneof="cpm30">
+		<description>CP/M Plus v3.0 (v1.2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 

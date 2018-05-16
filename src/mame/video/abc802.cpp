@@ -171,9 +171,6 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 			m_flshclk_ctr++;
 		}
 	}
-
-	// signal _DEW to DART
-	m_dart->rib_w(!state);
 }
 
 
@@ -187,6 +184,7 @@ MACHINE_CONFIG_START(abc802_state::abc802_video)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
 	MCFG_MC6845_UPDATE_ROW_CB(abc802_state, abc802_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, abc802_state, vs_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, rib_w)) MCFG_DEVCB_XOR(1)
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
