@@ -517,7 +517,7 @@ void astrocde_state::tenpin_sub_map(address_map &map)
 
 void astrocde_state::port_map(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x0000, 0x000f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x0010, 0x001f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
 	map(0x0010, 0x0018).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
 	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
@@ -575,7 +575,7 @@ void astrocde_state::port_map_16col_pattern(address_map &map)
 
 void astrocde_state::port_map_16col_pattern_nosound(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x0000, 0x000f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
 	map(0x0078, 0x007e).mirror(0xff00).w(this, FUNC(astrocde_state::astrocade_pattern_board_w));
 	map(0x00bf, 0x00bf).mirror(0xff00).w(this, FUNC(astrocde_state::profpac_page_select_w));
