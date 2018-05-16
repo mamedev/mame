@@ -2838,13 +2838,8 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_eaglshot)
 
-<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_eaglshot)
-	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)
-=======
-	MCFG_GFXDECODE_MODIFY("gfxdecode", eaglshot)
 	set_video_start_cb(config, driver_callback_delegate(&video_start_eaglshot, this));
->>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 MACHINE_CONFIG_END
 
 

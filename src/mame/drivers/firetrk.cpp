@@ -918,13 +918,8 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_montecar)
 
-<<<<<<< HEAD
-	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
-=======
 	set_video_start_cb(config, driver_callback_delegate(&video_start_montecar, this));
-	MCFG_GFXDECODE_MODIFY("gfxdecode", montecar)
->>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(46)

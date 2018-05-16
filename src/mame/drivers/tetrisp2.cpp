@@ -1994,13 +1994,8 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
-<<<<<<< HEAD
-	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
-=======
 	set_video_start_cb(config, driver_callback_delegate(&video_start_stepstag, this));
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
->>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)

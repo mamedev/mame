@@ -1802,13 +1802,8 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 	//MCFG_SCREEN_RAW_PARAMS(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	//MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
 
-<<<<<<< HEAD
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_racinfrc)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, racinfrc)
-=======
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", racinfrc)
 	set_video_start_cb(config, driver_callback_delegate(&video_start_racinfrc, this));
->>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24-8+16, 0)
@@ -1835,13 +1830,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-<<<<<<< HEAD
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type3)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
-=======
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type3)
 	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_type3, this));
->>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(0, 16)
@@ -1899,13 +1889,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-<<<<<<< HEAD
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type4)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
-=======
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type4)
 	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_type4, this));
->>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(0, 16)

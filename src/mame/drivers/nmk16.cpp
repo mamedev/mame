@@ -5229,13 +5229,8 @@ MACHINE_CONFIG_START(nmk16_state::grdnstrmk) /* Side by side with PCB, the music
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(57) /* Side by side with PCB, MAME is too fast at 56 */
-<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_grdnstrm)
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
-=======
-	MCFG_GFXDECODE_MODIFY("gfxdecode", grdnstrm)
 	set_video_start_cb(config, driver_callback_delegate(&video_start_grdnstrm, this));
->>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::popspops)
