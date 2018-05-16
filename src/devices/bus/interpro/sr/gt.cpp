@@ -1091,7 +1091,7 @@ bool gt_device_base::kuzmin_clip(s16 x1, s16 y1, s16 x2, s16 y2, s16 clip_xmin, 
 
 		return false;
 	}
-	return false;
+
 	// horizontal line case
 	if (y1 == y2)
 	{
