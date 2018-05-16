@@ -394,6 +394,7 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
+#include "machine/input_merger.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
 #include "sound/ymz280b.h"
@@ -699,21 +700,15 @@ WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
 }
 
 template<int Chip>
-WRITE16_MEMBER(toaplan2_state::oki_bankswitch_w)
+WRITE8_MEMBER(toaplan2_state::oki_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki[Chip]->set_rom_bank(data & 1);
-	}
+	m_oki[Chip]->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
+WRITE8_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		data &= 7;
-		if (data <= 4) m_okibank->set_entry(data);
-	}
+	data &= 7;
+	if (data <= 4) m_okibank->set_entry(data);
 }
 
 
@@ -759,12 +754,9 @@ READ16_MEMBER(toaplan2_state::batrider_z80_busack_r)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
+WRITE8_MEMBER(toaplan2_state::batrider_z80_busreq_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_z80_busreq = (data & 0x01);   // see batrider_z80_busack_r above
-	}
+	m_z80_busreq = (data & 0x01);   // see batrider_z80_busack_r above
 }
 
 
@@ -916,7 +908,7 @@ void toaplan2_state::kbash2_68k_mem(address_map &map)
 	map(0x200018, 0x200019).portr("SYS");
 	map(0x200021, 0x200021).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200025, 0x200025).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x200028, 0x200029).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x200029, 0x200029).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x20002c, 0x20002d).r(this, FUNC(toaplan2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -1017,7 +1009,7 @@ void toaplan2_state::fixeightbl_68k_mem(address_map &map)
 	map(0x200008, 0x200009).portr("IN3");
 	map(0x20000c, 0x20000d).portr("DSWB");
 	map(0x200010, 0x200011).portr("SYS");
-	map(0x200014, 0x200015).w(this, FUNC(toaplan2_state::fixeightbl_oki_bankswitch_w));  // Sound banking. Code at $4084c, $5070
+	map(0x200015, 0x200015).w(this, FUNC(toaplan2_state::fixeightbl_oki_bankswitch_w));  // Sound banking. Code at $4084c, $5070
 	map(0x200019, 0x200019).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x20001c, 0x20001d).portr("DSWA");
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
@@ -1077,7 +1069,7 @@ void toaplan2_state::pwrkick_68k_mem(address_map &map)
 	map(0x700014, 0x700015).portr("IN2");
 	map(0x700018, 0x700019).portr("DSWC");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700030, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x700031, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x700035, 0x700035).w(this, FUNC(toaplan2_state::pwrkick_coin_w));
 	map(0x700039, 0x700039).w(this, FUNC(toaplan2_state::pwrkick_coin_lockout_w));
 }
@@ -1099,7 +1091,7 @@ void toaplan2_state::othldrby_68k_mem(address_map &map)
 	map(0x70000c, 0x70000d).portr("IN1");
 	map(0x700010, 0x700011).portr("IN2");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700030, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x700031, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x700034, 0x700035).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
 }
 
@@ -1161,7 +1153,7 @@ void toaplan2_state::snowbro2_68k_mem(address_map &map)
 	map(0x700014, 0x700015).portr("IN3");
 	map(0x700018, 0x700019).portr("IN4");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700030, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0x700031, 0x700031).w(this, FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x700034, 0x700035).w(this, FUNC(toaplan2_state::toaplan2_coin_word_w));
 }
 
@@ -1267,10 +1259,10 @@ void toaplan2_state::batrider_68k_mem(address_map &map)
 	map(0x500023, 0x500023).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 	map(0x500024, 0x500025).w(this, FUNC(toaplan2_state::batrider_unknown_sound_w));
 	map(0x500026, 0x500027).w(this, FUNC(toaplan2_state::batrider_clear_sndirq_w));
-	map(0x500060, 0x500061).w(this, FUNC(toaplan2_state::batrider_z80_busreq_w));
+	map(0x500061, 0x500061).w(this, FUNC(toaplan2_state::batrider_z80_busreq_w));
 	map(0x500080, 0x500081).w(this, FUNC(toaplan2_state::batrider_textdata_dma_w));
 	map(0x500082, 0x500083).w(this, FUNC(toaplan2_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(this, FUNC(toaplan2_state::batrider_objectbank_w));
+	map(0x5000c0, 0x5000cf).w(this, FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 
@@ -1297,7 +1289,7 @@ void toaplan2_state::bbakraid_68k_mem(address_map &map)
 	map(0x50001e, 0x50001f).w(this, FUNC(toaplan2_state::bbakraid_eeprom_w));
 	map(0x500080, 0x500081).w(this, FUNC(toaplan2_state::batrider_textdata_dma_w));
 	map(0x500082, 0x500083).w(this, FUNC(toaplan2_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(this, FUNC(toaplan2_state::batrider_objectbank_w));
+	map(0x5000c0, 0x5000cf).w(this, FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 

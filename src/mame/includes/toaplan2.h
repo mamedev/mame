@@ -8,7 +8,6 @@
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "machine/input_merger.h"
 #include "machine/nmk112.h"
 #include "machine/ticket.h"
 #include "machine/upd4992.h"
@@ -44,7 +43,6 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_hopper(*this, "hopper")
-		, m_batrider_sndirq(*this, "batrider_sndirq")
 		, m_dma_space(*this, "dma_space")
 		, m_z80_rom(*this, "audiocpu")
 		, m_audiobank(*this, "audiobank")
@@ -72,7 +70,6 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<ticket_dispenser_device> m_hopper;
-	optional_device<input_merger_any_high_device> m_batrider_sndirq;
 
 	optional_device<address_map_bank_device> m_dma_space;
 
@@ -105,7 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
 	DECLARE_READ8_MEMBER(bgaregga_E01D_r);
 	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
-	DECLARE_WRITE16_MEMBER(batrider_z80_busreq_w);
+	DECLARE_WRITE8_MEMBER(batrider_z80_busreq_w);
 	DECLARE_READ16_MEMBER(batrider_z80rom_r);
 	DECLARE_WRITE16_MEMBER(batrider_unknown_sound_w);
 	DECLARE_WRITE16_MEMBER(batrider_clear_sndirq_w);
@@ -118,9 +115,9 @@ public:
 	DECLARE_WRITE16_MEMBER(toaplan2_tx_gfxram16_w);
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_pal_text_dma_w);
-	DECLARE_WRITE16_MEMBER(batrider_objectbank_w);
+	DECLARE_WRITE8_MEMBER(batrider_objectbank_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
-	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(enmadaio_oki_bank_w);
 	void init_bbakraid();
 	void init_pipibibsbl();

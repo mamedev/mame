@@ -194,10 +194,9 @@ WRITE16_MEMBER(toaplan2_state::batrider_pal_text_dma_w)
 	}
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
+WRITE8_MEMBER(toaplan2_state::batrider_objectbank_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_vdp[0]->set_gfxrom_bank(offset, data & 0x0f);
+	m_vdp[0]->set_gfxrom_bank(offset, data & 0x0f);
 }
 
 
@@ -254,18 +253,15 @@ uint32_t toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_in
 
 	if (m_vdp[0] && m_vdp[1])
 	{
-		int width = screen.width();
-		int height = screen.height();
-		int y,x;
 		uint16_t* src_vdp0; // output buffer of vdp0
 		uint16_t* src_vdp1; // output buffer of vdp1
 
-		for (y=0;y<height;y++)
+		for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 		{
 			src_vdp0 = &bitmap.pix16(y);
 			src_vdp1 = &m_secondary_render_bitmap.pix16(y);
 
-			for (x=0;x<width;x++)
+			for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
 			{
 				uint16_t GPU0_LUTaddr = src_vdp0[x];
 				uint16_t GPU1_LUTaddr = src_vdp1[x];
