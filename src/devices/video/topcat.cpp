@@ -23,6 +23,31 @@ void topcat_device::device_start()
 {
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(topcat_device::cursor_callback),this));
 	m_cursor_timer->adjust(attotime::from_hz(3));
+
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_wmove_active));
+	save_item(NAME(m_vert_retrace_intrq));
+	save_item(NAME(m_wmove_intrq));
+	save_item(NAME(m_display_enable_planes));
+	save_item(NAME(m_write_enable_plane));
+	save_item(NAME(m_read_enable_plane));
+	save_item(NAME(m_fb_write_enable));
+	save_item(NAME(m_enable_blink_planes));
+	save_item(NAME(m_enable_alt_frame));
+	save_item(NAME(m_cursor_ctrl));
+	save_item(NAME(m_move_replacement_rule));
+	save_item(NAME(m_pixel_replacement_rule));
+	save_item(NAME(m_source_x_pixel));
+	save_item(NAME(m_source_y_pixel));
+	save_item(NAME(m_dst_x_pixel));
+	save_item(NAME(m_dst_y_pixel));
+	save_item(NAME(m_block_mover_pixel_width));
+	save_item(NAME(m_block_mover_pixel_height));
+	save_item(NAME(m_fb_width));
+	save_item(NAME(m_fb_height));
+	save_item(NAME(m_read_enable));
+	save_item(NAME(m_write_enable));
+	save_item(NAME(m_fb_enable));       
 }
 
 void topcat_device::device_reset()
