@@ -108,6 +108,31 @@ ioport_constructor model1io2_device::device_input_ports() const
 }
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+ROM_START( model1io2 )
+	ROM_REGION(0x10000, "iocpu", 0)
+
+	// Wing War (taken from R360 version, is it the same for the regular version?)
+	ROM_SYSTEM_BIOS(0, "epr16891", "EPR-16891")
+	ROMX_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0), ROM_BIOS(1))
+
+	// NetMerc
+	ROM_SYSTEM_BIOS(1, "epr18021", "EPR-18021")
+	ROMX_LOAD("epr-18021.6", 0x00000, 0x10000, CRC(5551837e) SHA1(bf5b9aad99c0f8f5e262e0855796f39119d11a97), ROM_BIOS(2))
+
+	// Virtua Cop
+	ROM_SYSTEM_BIOS(2, "epr17181", "EPR-17181")
+	ROMX_LOAD("epr-17181.6", 0x00000, 0x10000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede), ROM_BIOS(3))
+ROM_END
+
+const tiny_rom_entry *model1io2_device::device_rom_region() const
+{
+	return ROM_NAME(model1io2);
+}
+
+//-------------------------------------------------
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 

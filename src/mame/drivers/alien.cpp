@@ -2,19 +2,37 @@
 // copyright-holders:Angelo Salese
 /**********************************************************************************
 
-    Alien: The Arcade Medal Edition (c) 2005 Capcom
+    Capcom Medal hardware (c) 2005 Capcom
 
     skeleton driver
 
    Main board:
+   Capcom AMT-04054
     - Hitachi SH-4 HD6417750S at 200MHz
-    - 2 x Fujitsu MB86292 Graphics Controller
-    - Altera ACEX 1K PLD
+	- Elpida DS1232AA-75 1M x 32-bit x 4-banks (128Mbit) SDRAM
+    - Altera ACEX EP1K50TC144-3 FPGA
+    - 2 x Xilinx XC9572XL CPLD (TQFP-100) stamped AMTPS005 and AMTPS011
     - M48T35Y timekeeper device
-    - YMZ770B-F
-   Upper board (game specific):
-    - CF interface
-    - 2 x Panasonic MN677511DE MPEG2 decoders (optional)
+  * - 2 x Fujitsu MB86292 'Orchid' Graphics Controller
+  * - 8 x Fujitsu MB81E161622-10FH 512K x 16-bit x 2-banks (16Mbit) FCRAM
+  * - 2 x ADV7120 Video DAC
+  * - Yamaha YMZ770B-F 'AMMSL' SPU
+   components marked * might be not populated
+
+   Upper boards (game specific):
+
+   Capcom AMT-04041 (Alien: The Arcade)
+    - 2 x Panasonic MN677511DE MPEG2 decoder
+    - 2 x Hynix HY57V161610DTC-7 512K x 16-bit x 2-banks (16Mbit) SDRAM (TSOPII-50)
+    - Hynix HY57V643220DTP-7 512K x 32-bit x 4-banks (64Mbit) SDRAM (TSOPII-86)
+    - Altera ACEX EP1K100FC484-2 FPGA
+    - S29JL064H 64Mbit FlashROM (TSOP-48)
+    - Compact Flash connector
+
+   Capcom AMT-05057 (Pingu's Ice Block and Donkey Kong Banana Kingdom)
+    - Altera MAX EPM3064ATC100-10 CPLD (QFP-100) stamped PS015
+	- S29JL064H 64Mbit FlashROM (TSOP-48)
+	- Compact Flash connector
 
    Known undumped games:
     - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco

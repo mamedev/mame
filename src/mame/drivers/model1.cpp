@@ -1477,9 +1477,6 @@ ROM_START( wingwar )
 	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
 	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
-
-	ROM_REGION( 0x10000, "ioboard:iocpu", 0 ) // taken from r360 version, is it the same?
-	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
 ROM_END
 
 ROM_START( wingwaru )
@@ -1532,9 +1529,6 @@ ROM_START( wingwaru )
 	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
 	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
-
-	ROM_REGION( 0x10000, "ioboard:iocpu", 0 ) // taken from r360 version, is it the same?
-	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
 ROM_END
 
 ROM_START( wingwarj )
@@ -1587,9 +1581,6 @@ ROM_START( wingwarj )
 	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
 	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
-
-	ROM_REGION( 0x10000, "ioboard:iocpu", 0 ) // taken from r360 version, is it the same?
-	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
 ROM_END
 
 // Dumper's note: As per other R360 games wingwar is just a slightly modified version with 4 roms different on the rom board.
@@ -1645,9 +1636,6 @@ ROM_START( wingwar360 )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
 	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
 
-	ROM_REGION( 0x10000, "ioboard:iocpu", 0 )
-	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
-
 	// Dumper's note: Video & Drive is the control board in the attendants' tower, same hardware as G-Loc R360 with the two program roms being the only difference.
 	ROM_REGION( 0x400000, "controlboard", 0 )
 	ROM_LOAD("ic22_18851.bin", 0x00000, 0x20000, CRC(85f75bd7) SHA1(43cc8f8c81631d71b661e55e15f3fe8803a8a7e9) )
@@ -1691,9 +1679,6 @@ ROM_START( netmerc )
 	ROM_LOAD32_WORD( "mpr-18133.ic31", 0x800002, 0x200000, CRC(f56354dd) SHA1(2ef1fe8b4995a67b70b565adf8f0ea0ad6e10094) )
 
 	ROM_REGION32_LE( 0x200000, "tgp_data", ROMREGION_ERASE00 ) // IC39-IC42 unpopulated
-
-	ROM_REGION( 0x10000, "ioboard:iocpu", 0 )
-	ROM_LOAD( "epr-18021.ic6", 0x00000, 0x10000, CRC(5551837e) SHA1(bf5b9aad99c0f8f5e262e0855796f39119d11a97) )
 
 	ROM_REGION( 0x8000, "polhemus", 0 ) /* POLHEMUS board */
 	ROM_LOAD16_BYTE( "u1", 0x0000, 0x4000, CRC(7073a312) SHA1(d2582f9520b8c8c051708dd372633112af59206e) )
@@ -1827,6 +1812,7 @@ MACHINE_CONFIG_START(model1_state::wingwar)
 	MCFG_DEVICE_REMOVE("ioboard")
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
+	MCFG_DEVICE_BIOS("epr16891");
 	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
 	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN.0"))
@@ -1869,6 +1855,7 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 	MCFG_DEVICE_REMOVE("ioboard")
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
+	MCFG_DEVICE_BIOS("epr18021");
 	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
 	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN.0"))
