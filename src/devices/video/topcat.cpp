@@ -10,7 +10,8 @@
 DEFINE_DEVICE_TYPE(TOPCAT, topcat_device, "topcat", "HP Topcat ASIC")
 
 topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+: device_t(mconfig, type, tag, owner, clock),
+	m_vram(*this, "^vram")
 {
 }
 
@@ -47,8 +48,13 @@ void topcat_device::device_start()
 	save_item(NAME(m_fb_height));
 	save_item(NAME(m_read_enable));
 	save_item(NAME(m_write_enable));
-	save_item(NAME(m_fb_enable));       
+	save_item(NAME(m_fb_enable));
 }
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
 
 void topcat_device::device_reset()
 {
@@ -60,10 +66,10 @@ READ16_MEMBER(topcat_device::vram_r)
 	uint16_t ret = 0;
 
 	if (mem_mask & m_plane_mask)
-		ret |= (*m_vram)[offset*2+1] ? m_plane_mask : 0;
+		ret |= m_vram[offset*2+1] ? m_plane_mask : 0;
 
 	if (mem_mask & m_plane_mask << 8)
-		ret |= (*m_vram)[offset*2] ? m_plane_mask << 8 : 0;
+		ret |= m_vram[offset*2] ? m_plane_mask << 8 : 0;
 
 	return ret;
 }

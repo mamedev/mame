@@ -42,7 +42,7 @@ MACHINE_CONFIG_START(dio16_98544_device::device_add_mconfig)
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(768)
 	MCFG_TOPCAT_PLANEMASK(1)
-	MCFG_TOPCAT_VRAM(&m_vram)
+
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -70,10 +70,24 @@ dio16_98544_device::dio16_98544_device(const machine_config &mconfig, const char
 dio16_98544_device::dio16_98544_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
 	m_topcat(*this, "topcat"),
-	m_rom(*this, HP98544_ROM_REGION)
+	m_space_config("vram", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(dio16_98544_device::map), this)),
+	m_rom(*this, HP98544_ROM_REGION),
+	m_vram(*this, "vram")
 {
-	m_vram.resize(0x100000);
+}
+
+void dio16_98544_device::map(address_map& map)
+{
+	map(0, 0xfffff).ram().share("vram");
+}
+
+device_memory_interface::space_config_vector dio16_98544_device::memory_space_config() const
+{
+        return space_config_vector {
+                std::make_pair(0, &m_space_config)
+        };
 }
 
 //-------------------------------------------------

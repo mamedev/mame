@@ -14,9 +14,6 @@
 #define MCFG_TOPCAT_PLANEMASK(_mask) \
 	downcast<topcat_device &>(*device).set_planemask(_mask);
 
-#define MCFG_TOPCAT_VRAM(_vram) \
-	downcast<topcat_device &>(*device).set_vram(_vram);
-
 class topcat_device : public device_t
 {
 public:
@@ -25,7 +22,6 @@ public:
 	void set_fb_width(int _pixels) { m_fb_width = _pixels; }
 	void set_fb_height(int _pixels) { m_fb_height = _pixels; }
 	void set_planemask(int _mask) { m_plane_mask = _mask; }
-	void set_vram(std::vector<uint8_t> *vram) { m_vram = vram; }
 
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 
@@ -34,6 +30,7 @@ public:
 	DECLARE_READ16_MEMBER(ctrl_r);
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 
+	void topcat_mem(address_map &map);
 protected:
 	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -94,23 +91,21 @@ private:
 
 	void modify_vram(int x, int y, bool state) {
 		if (state)
-			(*m_vram)[y * m_fb_width + x] |= m_plane_mask;
+			m_vram[y * m_fb_width + x] |= m_plane_mask;
 		else
-			(*m_vram)[y * m_fb_width + x] &= ~m_plane_mask;
+			m_vram[y * m_fb_width + x] &= ~m_plane_mask;
 	}
 
 	void modify_vram_offset(int offset, bool state) {
 		if (state)
-			(*m_vram)[offset] |= m_plane_mask;
+			m_vram[offset] |= m_plane_mask;
 		else
-			(*m_vram)[offset] &= ~m_plane_mask;
+			m_vram[offset] &= ~m_plane_mask;
 	}
 
 	bool get_vram_pixel(int x, int y) {
-		return (*m_vram)[y * m_fb_width + x] & m_plane_mask;
+		return m_vram[y * m_fb_width + x] & m_plane_mask;
 	}
-
-	std::vector<uint8_t> *m_vram;
 
 	uint8_t m_vblank;
 	uint8_t m_wmove_active;
@@ -145,6 +140,8 @@ private:
 	bool m_read_enable;
 	bool m_write_enable;
 	bool m_fb_enable;
+
+	required_shared_ptr<uint8_t> m_vram;
 };
 
 DECLARE_DEVICE_TYPE(TOPCAT, topcat_device)

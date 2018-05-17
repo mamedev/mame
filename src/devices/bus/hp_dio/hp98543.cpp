@@ -1,5 +1,4 @@
-// license:BSD-3-Clause
-// copyright-holders:Sven Schnelle
+
 /***************************************************************************
 
   HP98543 medium-resolution color board
@@ -11,6 +10,7 @@
 #include "screen.h"
 #include "video/topcat.h"
 #include "video/nereid.h"
+#include "machine/ram.h"
 
 #define HP98543_SCREEN_NAME   "98543_screen"
 #define HP98543_ROM_REGION    "98543_rom"
@@ -33,25 +33,21 @@ MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(1)
-	MCFG_TOPCAT_VRAM(&m_vram)
 
 	MCFG_DEVICE_ADD("topcat1", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(2)
-	MCFG_TOPCAT_VRAM(&m_vram)
 
 	MCFG_DEVICE_ADD("topcat2", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(4)
-	MCFG_TOPCAT_VRAM(&m_vram)
 
 	MCFG_DEVICE_ADD("topcat3", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(8)
-	MCFG_TOPCAT_VRAM(&m_vram)
 
 	MCFG_DEVICE_ADD("nereid", NEREID, 0)
 MACHINE_CONFIG_END
@@ -59,6 +55,18 @@ MACHINE_CONFIG_END
 const tiny_rom_entry *dio16_98543_device::device_rom_region() const
 {
 	return ROM_NAME(hp98543);
+}
+
+void dio16_98543_device::map(address_map& map)
+{
+	map(0, 0x7ffff).ram().share("vram");
+}
+
+device_memory_interface::space_config_vector dio16_98543_device::memory_space_config() const
+{
+        return space_config_vector {
+                std::make_pair(0, &m_space_config)
+        };
 }
 
 dio16_98543_device::dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -69,11 +77,14 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, const char
 dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
 	m_topcat(*this, "topcat%u", 0),
 	m_nereid(*this, "nereid"),
-	m_rom(*this, HP98543_ROM_REGION)
+	m_space_config("vram", ENDIANNESS_BIG, 8, 19, 0, address_map_constructor(FUNC(dio16_98543_device::map), this)),
+	m_rom(*this, HP98543_ROM_REGION),
+	m_vram(*this, "vram")
+
 {
-	m_vram.resize(0x80000);
 }
 
 void dio16_98543_device::device_start()
@@ -81,7 +92,7 @@ void dio16_98543_device::device_start()
 	set_dio_device();
 
 	m_dio->install_memory(
-			0x200000, 0x2fffff,
+			0x200000, 0x27ffff,
 			read16_delegate(FUNC(dio16_98543_device::vram_r), this),
 			write16_delegate(FUNC(dio16_98543_device::vram_w), this));
 	m_dio->install_memory(
@@ -116,7 +127,7 @@ READ16_MEMBER(dio16_98543_device::ctrl_r)
 {
 	uint16_t ret = 0;
 
-	for(auto tc: m_topcat)
+	for(auto& tc: m_topcat)
 		ret |= tc->ctrl_r(space, offset, mem_mask);
 
 	return ret;
@@ -124,21 +135,21 @@ READ16_MEMBER(dio16_98543_device::ctrl_r)
 
 WRITE16_MEMBER(dio16_98543_device::ctrl_w)
 {
-	for(auto tc: m_topcat)
+	for(auto& tc: m_topcat)
 		tc->ctrl_w(space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(dio16_98543_device::vram_r)
 {
 	uint16_t ret = 0;
-	for(auto tc: m_topcat)
+	for(auto& tc: m_topcat)
 		ret |= tc->vram_r(space, offset, mem_mask);
 	return ret;
 }
 
 WRITE16_MEMBER(dio16_98543_device::vram_w)
 {
-	for(auto tc: m_topcat)
+	for(auto& tc: m_topcat)
 		tc->vram_w(space, offset, data, mem_mask);
 }
 

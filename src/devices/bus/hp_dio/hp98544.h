@@ -15,8 +15,9 @@
 // ======================> dio16_98544_device
 
 class dio16_98544_device :
-		public device_t,
-		public device_dio16_card_interface
+	public device_t,
+	public device_dio16_card_interface,
+	public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -37,9 +38,13 @@ public:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual space_config_vector memory_space_config() const override;
 private:
+	const address_space_config m_space_config;
+	void map(address_map &map);
+
 	required_region_ptr<uint8_t> m_rom;
-	std::vector<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 };
 
 // device type definition
