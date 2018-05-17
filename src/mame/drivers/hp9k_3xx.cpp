@@ -45,7 +45,7 @@
     RTC_DATA: 0x420001
     RTC_CMD:  0x420003
     HIL:      0x428000
-    HPIB:     0x478000
+    HPIB:     0x470000
     KBDNMIST: 0x478005
     DMA:      0x500000
     FRAMEBUF: 0x560000
@@ -201,12 +201,11 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(this, FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
 	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
-	map(0x00478000, 0x0047ffff).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x00470000, 0x0047ffff).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
 	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
-	map(0x00474000, 0x00474fff).ram(); // unknown
 
 }
 
@@ -216,7 +215,7 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
 	map(0x428000, 0x428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
-	map(0x478000, 0x47800f).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x470000, 0x47800f).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x510000, 0x510003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
 	map(0x538000, 0x538003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
@@ -319,6 +318,8 @@ WRITE_LINE_MEMBER(hp9k3xx_state::gpib_irq)
 
 WRITE8_MEMBER(hp9k3xx_state::gpib_w)
 {
+	offset &= 0xf;
+
 	if (offset >= 0x08) {
 		m_tms9914->reg8_w(space, offset & 0x07, data);
 		return;
@@ -329,6 +330,8 @@ WRITE8_MEMBER(hp9k3xx_state::gpib_w)
 READ8_MEMBER(hp9k3xx_state::gpib_r)
 {
 	uint8_t data = 0xff;
+
+	offset &= 0xf;
 
 	if (offset >= 0x8) {
 		data = m_tms9914->reg8_r(space, offset & 0x07);
