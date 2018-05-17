@@ -55,6 +55,42 @@ private:
 	ioport_port *port[8];
 };
 
+#define MCFG_DC_KEYBOARD_ADD(_tag, _host_tag, _host_port, d0, d1, a0, a1, a2, a3, a4, a5) \
+	MCFG_MAPLE_DEVICE_ADD(_tag, DC_KEYBOARD, 0, _host_tag, _host_port) \
+	downcast<dc_controller_device &>(*device).set_port_tag(0, d0); \
+	downcast<dc_controller_device &>(*device).set_port_tag(1, d1); \
+	downcast<dc_controller_device &>(*device).set_port_tag(2, a0); \
+	downcast<dc_controller_device &>(*device).set_port_tag(3, a1); \
+	downcast<dc_controller_device &>(*device).set_port_tag(4, a2); \
+	downcast<dc_controller_device &>(*device).set_port_tag(5, a3); \
+	downcast<dc_controller_device &>(*device).set_port_tag(6, a4); \
+	downcast<dc_controller_device &>(*device).set_port_tag(7, a5);
+
+
+class dc_keyboard_device : public maple_device
+{
+public:
+	// construction/destruction
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	
+	void maple_w(const uint32_t *data, uint32_t in_size) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;	
+
+private:
+	void fixed_status(uint32_t *dest);
+	void free_status(uint32_t *dest);
+	void read(uint32_t *dest);
+
+	const char *port_tag[8];
+	const char *id, *license, *versions;
+
+	ioport_port *port[8];
+};
+
 DECLARE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device)
+DECLARE_DEVICE_TYPE(DC_KEYBOARD, dc_keyboard_device)
 
 #endif // MAME_MACHINE_DC_CTRL_H
