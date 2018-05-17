@@ -1,3 +1,57 @@
+// license:BSD-3-Clause
+// copyright-holders:Tomasz Slanina, Roberto Fresca
+/***************************************************************************
+
+  Procyon 68000 homebrew single-board computer.
+ 
+  Driver by Katherine Rohl.
+  
+  Homebrew 68000-based computer that I designed.
+  
+  This driver is to document its build and to act as an emulator platform for
+  BIOS and software development for the system.
+
+***************************************************************************
+
+  CPU:
+  8MHz MC68000
+
+  RAM:
+  2x AS6C1008-55
+
+  Flash ROM:
+  2x SST39SF040
+  
+  Support:
+  1x MC68901 MFP
+  1x HD63450 4-channel DMA controller
+  
+  Slot devices:
+  1x 16-bit ISA slot
+
+  Memory Map:
+  0x000000-0x0fffff - ROM
+  0x100000-0x1fffff - RAM
+  0x600000-0x60003f - MFP registers
+  0x800000-0x9fffff - ISA memory address space
+  0xf00000-0xf01fff - DMA controller
+  0xfa0000-0xfbffff - ISA I/O address space
+    
+  I/O:
+  RS-232 terminal, 9600 bps, 8/N/1
+  
+  Video:
+  Tseng ET4000-compatible device on the ISA bus.
+
+  Sound:
+  None (yet)
+  
+  Usage:
+  Doesn't do very much yet. 
+  Type X in the monitor to run an ELF program built into the BIOS.
+
+***************************************************************************/
+
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
