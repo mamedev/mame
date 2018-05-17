@@ -42,6 +42,7 @@ public:
 		, m_ay8910(*this, "ay8910")
 		, m_ay8912(*this, "ay8912")
 		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_master_base(*this, "master")
 		, m_slave_base(*this, "slave")
@@ -62,14 +63,15 @@ public:
 	optional_device<ay8910_device> m_ay8910;
 	optional_device<ay8912_device> m_ay8912;
 	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_region_ptr<uint8_t> m_master_base;
 	required_region_ptr<uint8_t> m_slave_base;
 	required_region_ptr<uint8_t> m_bg_gfxrom;
 	optional_region_ptr<uint8_t> m_bg_prom;
 	optional_region_ptr<uint8_t> m_xrom_base;
-	
+
 	required_memory_bank_array<2> m_master_bankslot;
 	required_memory_bank m_slave_bankslot;
 
@@ -191,8 +193,13 @@ public:
 	DECLARE_VIDEO_START(leland2);
 	DECLARE_VIDEO_START(ataxx);
 
-	uint32_t screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	tilemap_t      *m_tilemap;
+
+	TILEMAP_MAPPER_MEMBER(leland_scan);
+	TILE_GET_INFO_MEMBER(leland_get_tile_info);
+	TILEMAP_MAPPER_MEMBER(ataxx_scan);
+	TILE_GET_INFO_MEMBER(ataxx_get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
 	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);

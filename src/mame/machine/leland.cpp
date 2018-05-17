@@ -865,7 +865,10 @@ WRITE8_MEMBER(leland_state::ataxx_battery_ram_w)
 		m_battery_ram[offset] = data;
 	}
 	else if ((m_master_bank & 0x30) == 0x20)
+	{
 		m_ataxx_qram[((m_master_bank & 0xc0) << 8) | offset] = data;
+		m_tilemap->mark_tile_dirty(((m_master_bank & 0x80) << 8) | offset);
+	}
 	else
 		logerror("%04X:BatteryW@%04X (invalid!)\n", m_master->pc(), offset);
 }
