@@ -244,10 +244,6 @@ public:
 	void slave_map_io_2(address_map &map);
 	void slave_map_program(address_map &map);
 	void slave_small_map_program(address_map &map);
-	void ataxx_80186_map_io(address_map &map);
-	void leland_80186_map_io(address_map &map);
-	void leland_80186_map_program(address_map &map);
-	void redline_80186_map_io(address_map &map);
 };
 
 

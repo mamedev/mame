@@ -61,12 +61,15 @@ protected:
 	optional_device<dac_word_interface> m_dac9;
 	optional_device_array<dac_byte_interface, 8> m_dacvol;
 
+	void ataxx_80186_map_io(address_map &map);
+	void leland_80186_map_io(address_map &map);
+	void leland_80186_map_program(address_map &map);
+
 private:
 	void delayed_response_r(void *ptr, int param);
 	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
 
 	// internal state
-	i80186_cpu_device *m_audiocpu;
 	uint16_t m_peripheral;
 	uint8_t m_last_control;
 	uint8_t m_clock_active;
@@ -80,6 +83,8 @@ private:
 
 	optional_device_array<pit8254_device, 3> m_pit;
 	optional_device<ym2151_device> m_ymsnd;
+	optional_device<i80186_cpu_device> m_audiocpu;
+	required_device<cpu_device> m_master;
 };
 
 
@@ -91,6 +96,8 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+private:
+	void redline_80186_map_io(address_map &map);
 };
 
 

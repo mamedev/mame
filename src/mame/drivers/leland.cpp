@@ -72,8 +72,6 @@
 #define MASTER_CLOCK2       XTAL_28_63636MHZ
 #define MASTER_CLOCK        XTAL(12'000'000)
 #define VIDEO_CLOCK         XTAL(14'318'181)
-#define MCU_CLOCK           XTAL(16'000'000)
-
 
 
 /*************************************
@@ -192,28 +190,6 @@ void leland_state::slave_map_io_2(address_map &map)
  *  Sound CPU memory handlers
  *
  *************************************/
-
-void leland_state::leland_80186_map_program(address_map &map)
-{
-	map(0x00000, 0x03fff).mirror(0x1c000).ram();
-	map(0x20000, 0xfffff).rom();
-}
-
-void leland_state::ataxx_80186_map_io(address_map &map)
-{
-}
-
-void leland_state::redline_80186_map_io(address_map &map)
-{
-	map(0x0000, 0xffff).w("custom", FUNC(redline_80186_sound_device::redline_dac_w));
-}
-
-
-void leland_state::leland_80186_map_io(address_map &map)
-{
-	map(0x0000, 0xffff).w(m_sound, FUNC(leland_80186_sound_device::dac_w));
-}
-
 
 /************************************************************************
 
@@ -1055,11 +1031,6 @@ MACHINE_CONFIG_START(leland_state::redline)
 	MCFG_DEVICE_MODIFY("master")
 	MCFG_DEVICE_IO_MAP(master_redline_map_io)
 
-	MCFG_DEVICE_ADD("audiocpu", I80186, MCU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(leland_80186_map_program)
-	MCFG_DEVICE_IO_MAP(redline_80186_map_io)
-	MCFG_80186_CHIP_SELECT_CB(WRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
-
 	/* sound hardware */
 	MCFG_DEVICE_ADD("custom", REDLINE_80186, 0)
 MACHINE_CONFIG_END
@@ -1067,11 +1038,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(leland_state::quarterb)
 	redline(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_IO_MAP(leland_80186_map_io)
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("custom", LELAND_80186, 0)
@@ -1098,12 +1064,6 @@ MACHINE_CONFIG_START(leland_state::ataxx)
 	MCFG_DEVICE_PROGRAM_MAP(slave_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io_2)
 
-	MCFG_DEVICE_ADD("audiocpu", I80186, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(leland_80186_map_program)
-	MCFG_DEVICE_IO_MAP(ataxx_80186_map_io)
-	MCFG_80186_CHIP_SELECT_CB(WRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
-
 	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
 	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
 
@@ -1122,8 +1082,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(leland_state::wsf)
 	ataxx(config);
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
 
 	MCFG_DEVICE_REMOVE("custom")
 	MCFG_DEVICE_ADD("custom", WSF_80186, 0)
