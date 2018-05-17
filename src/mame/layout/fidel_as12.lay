@@ -351,7 +351,7 @@
 		<bezel element="text_r3"><bounds x="93.25" y="35.0" width="4" height="2" /></bezel>
 		<bezel element="text_r4"><bounds x="93.25" y="41.5" width="4" height="2" /></bezel>
 		<bezel element="text_r5"><bounds x="93.25" y="48.0" width="4" height="2" /></bezel>
-		<bezel element="text_r6"><bounds x="93.25" y="55.5" width="4" height="2" /></bezel>
+		<bezel element="text_r6"><bounds x="93.25" y="54.5" width="4" height="2" /></bezel>
 		<bezel element="text_r7"><bounds x="93.25" y="61.0" width="4" height="2" /></bezel>
 		<bezel element="text_r8"><bounds x="93.25" y="67.5" width="4" height="2" /></bezel>
 
@@ -360,14 +360,14 @@
 		<bezel element="but" inputtag="IN.8" inputmask="0x20"><bounds x="91.5" y="35.0" width="2" height="2" /></bezel>
 		<bezel element="but" inputtag="IN.8" inputmask="0x10"><bounds x="91.5" y="41.5" width="2" height="2" /></bezel>
 		<bezel element="but" inputtag="IN.8" inputmask="0x08"><bounds x="91.5" y="48.0" width="2" height="2" /></bezel>
-		<bezel element="but" inputtag="IN.8" inputmask="0x04"><bounds x="91.5" y="55.5" width="2" height="2" /></bezel>
+		<bezel element="but" inputtag="IN.8" inputmask="0x04"><bounds x="91.5" y="54.5" width="2" height="2" /></bezel>
 		<bezel element="but" inputtag="IN.8" inputmask="0x02"><bounds x="91.5" y="61.0" width="2" height="2" /></bezel>
 		<bezel element="but" inputtag="IN.8" inputmask="0x01"><bounds x="91.5" y="67.5" width="2" height="2" /></bezel>
 
 		<bezel name="8.7" element="led2"><bounds x="89" y="35.25" width="1.5" height="1.5" /></bezel>
 		<bezel name="8.6" element="led2"><bounds x="89" y="41.75" width="1.5" height="1.5" /></bezel>
 		<bezel name="8.5" element="led2"><bounds x="89" y="48.25" width="1.5" height="1.5" /></bezel>
-		<bezel name="8.4" element="led2"><bounds x="89" y="55.75" width="1.5" height="1.5" /></bezel>
+		<bezel name="8.4" element="led2"><bounds x="89" y="54.75" width="1.5" height="1.5" /></bezel>
 		<bezel name="8.3" element="led2"><bounds x="89" y="61.25" width="1.5" height="1.5" /></bezel>
 		<bezel name="8.2" element="led2"><bounds x="89" y="67.75" width="1.5" height="1.5" /></bezel>
 		<bezel name="8.1" element="led2"><bounds x="89" y="75" width="1.5" height="1.5" /></bezel>
