@@ -517,7 +517,7 @@ void astrocde_state::tenpin_sub_map(address_map &map)
 
 void astrocde_state::port_map(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x0000, 0x000f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x0010, 0x001f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
 	map(0x0010, 0x0018).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
 	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
@@ -528,10 +528,10 @@ void astrocde_state::port_map_discrete(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
-	map(0x10, 0x10).portr("HANDLE0");
-	map(0x11, 0x11).portr("HANDLE1");
-	map(0x12, 0x12).portr("HANDLE2");
-	map(0x13, 0x13).portr("HANDLE3");
+	map(0x10, 0x10).portr("P1HANDLE");
+	map(0x11, 0x11).portr("P2HANDLE");
+	map(0x12, 0x12).portr("P3HANDLE");
+	map(0x13, 0x13).portr("P4HANDLE");
 	map(0x19, 0x19).w(this, FUNC(astrocde_state::expand_register_w));
 	map(0x40, 0x40).mirror(0x18).w(this, FUNC(astrocde_state::seawolf2_sound_1_w));
 	map(0x41, 0x41).mirror(0x18).w(this, FUNC(astrocde_state::seawolf2_sound_2_w));
@@ -575,7 +575,7 @@ void astrocde_state::port_map_16col_pattern(address_map &map)
 
 void astrocde_state::port_map_16col_pattern_nosound(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x0000, 0x000f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
 	map(0x0078, 0x007e).mirror(0xff00).w(this, FUNC(astrocde_state::astrocade_pattern_board_w));
 	map(0x00bf, 0x00bf).mirror(0xff00).w(this, FUNC(astrocde_state::profpac_page_select_w));

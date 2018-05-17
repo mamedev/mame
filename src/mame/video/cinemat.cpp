@@ -22,8 +22,7 @@ enum
 	COLOR_BILEVEL,
 	COLOR_16LEVEL,
 	COLOR_64LEVEL,
-	COLOR_RGB,
-	COLOR_QB3
+	COLOR_RGB
 };
 
 
@@ -71,6 +70,7 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
 
 WRITE_LINE_MEMBER(cinemat_state::vector_control_w)
 {
+	// TODO: turn this into a virtual method and just override for each type
 	int r, g, b, i;
 	cpu_device *cpu = m_maincpu;
 
@@ -119,38 +119,38 @@ WRITE_LINE_MEMBER(cinemat_state::vector_control_w)
 				m_vector_color = rgb_t(r,g,b);
 			}
 			break;
+	}
+}
 
-		case COLOR_QB3:
-			{
-				/* on the falling edge of the data value, remember the original X,Y values */
-				/* they will be restored on the rising edge; this is to simulate the fact */
-				/* that the Rockola color hardware did not overwrite the beam X,Y position */
-				/* on an IV instruction if data == 0 here */
-				if (!state)
-				{
-					m_qb3_lastx = cpu->state_int(ccpu_cpu_device::CCPU_X);
-					m_qb3_lasty = cpu->state_int(ccpu_cpu_device::CCPU_Y);
-				}
 
-				/* on the rising edge of the data value, latch the Y register */
-				/* as 2-3-3 BGR values */
-				if (state)
-				{
-					int yval = cpu->state_int(ccpu_cpu_device::CCPU_Y);
-					r = (~yval >> 0) & 0x07;
-					r = r * 255 / 7;
-					g = (~yval >> 3) & 0x07;
-					g = g * 255 / 7;
-					b = (~yval >> 6) & 0x03;
-					b = b * 255 / 3;
-					m_vector_color = rgb_t(r,g,b);
+WRITE_LINE_MEMBER(qb3_state::vector_control_w)
+{
+	/* on the falling edge of the data value, remember the original X,Y values */
+	/* they will be restored on the rising edge; this is to simulate the fact */
+	/* that the Rockola color hardware did not overwrite the beam X,Y position */
+	/* on an IV instruction if data == 0 here */
+	if (!state)
+	{
+		m_qb3_lastx = m_maincpu->state_int(ccpu_cpu_device::CCPU_X);
+		m_qb3_lasty = m_maincpu->state_int(ccpu_cpu_device::CCPU_Y);
+	}
 
-					/* restore the original X,Y values */
-					cpu->set_state_int(ccpu_cpu_device::CCPU_X, m_qb3_lastx);
-					cpu->set_state_int(ccpu_cpu_device::CCPU_Y, m_qb3_lasty);
-				}
-			}
-			break;
+	/* on the rising edge of the data value, latch the Y register */
+	/* as 2-3-3 BGR values */
+	if (state)
+	{
+		int yval = m_maincpu->state_int(ccpu_cpu_device::CCPU_Y);
+		int r = (~yval >> 0) & 0x07;
+		r = r * 255 / 7;
+		int g = (~yval >> 3) & 0x07;
+		g = g * 255 / 7;
+		int b = (~yval >> 6) & 0x03;
+		b = b * 255 / 3;
+		m_vector_color = rgb_t(r,g,b);
+
+		/* restore the original X,Y values */
+		m_maincpu->set_state_int(ccpu_cpu_device::CCPU_X, m_qb3_lastx);
+		m_maincpu->set_state_int(ccpu_cpu_device::CCPU_Y, m_qb3_lasty);
 	}
 }
 
@@ -183,12 +183,6 @@ VIDEO_START_MEMBER(cinemat_state,cinemat_64level)
 VIDEO_START_MEMBER(cinemat_state,cinemat_color)
 {
 	m_color_mode = COLOR_RGB;
-}
-
-
-VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
-{
-	m_color_mode = COLOR_QB3;
 }
 
 

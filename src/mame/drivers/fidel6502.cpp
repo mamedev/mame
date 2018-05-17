@@ -14,7 +14,7 @@
     - Source organization is a big mess. Each machine family could be in its own
       sub driverclass, and separate files.
     - verify cpu speed and rom labels where unknown
-    - improve SC12 CPU divider? it seems a little bit slower than the real machine.
+    - improve SC12/AS12 CPU divider? it seems a little bit slower than the real machine.
       Currently, a dummy timer workaround is needed, or it's much worse.
       Is the problem here is due to timing of CPU addressbus changes? We can only 'sense'
       the addressbus at read or write accesses.
@@ -451,6 +451,7 @@ I/O is via TTL, very similar to Designer Display
 #include "speaker.h"
 
 // internal artwork
+#include "fidel_as12.lh" // clickable
 #include "fidel_chesster.lh" // clickable
 #include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
 #include "fidel_des.lh" // clickable
@@ -549,6 +550,14 @@ public:
 	void sc12_trampoline(address_map &map);
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
+
+	// AS12
+	void as12_prepare_display();
+	DECLARE_WRITE8_MEMBER(as12_control_w);
+	DECLARE_WRITE8_MEMBER(as12_led_w);
+	DECLARE_READ8_MEMBER(as12_input_r);
+	void as12_map(address_map &map);
+	void as12(machine_config &config);
 
 	// Excellence
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
@@ -936,6 +945,49 @@ READ8_MEMBER(fidel6502_state::sc12_input_r)
 
 
 /******************************************************************************
+    AS12
+******************************************************************************/
+
+// TTL/generic
+
+void fidel6502_state::as12_prepare_display()
+{
+	// 8*8(+1) chessboard leds
+	display_matrix(8, 9, m_led_data, m_inp_mux);
+}
+
+WRITE8_MEMBER(fidel6502_state::as12_control_w)
+{
+	// d0-d3: 74245 P0-P3
+	// 74245 Q0-Q8: input mux, led select
+	u16 sel = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux = bitswap<9>(sel,5,8,7,6,4,3,1,0,2);
+	as12_prepare_display();
+
+	// 74245 Q9: speaker out
+	m_dac->write(BIT(sel, 9));
+
+	// d4,d5: printer?
+	// d6,d7: N/C?
+}
+
+WRITE8_MEMBER(fidel6502_state::as12_led_w)
+{
+	// a0-a2,d0: led data via NE591N
+	m_led_data = (data & 1) << offset;
+	as12_prepare_display();
+}
+
+READ8_MEMBER(fidel6502_state::as12_input_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	u8 inp = bitswap<8>(read_inputs(9),4,3,2,1,0,5,6,7);
+	return (inp >> offset & 1) ? 0 : 0x80;
+}
+
+
+
+/******************************************************************************
     Excellence
 ******************************************************************************/
 
@@ -1253,7 +1305,7 @@ void fidel6502_state::sc9d_map(address_map &map)
 }
 
 
-// SC12
+// SC12, AS12
 
 void fidel6502_state::sc12_trampoline(address_map &map)
 {
@@ -1270,6 +1322,18 @@ void fidel6502_state::sc12_map(address_map &map)
 	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc12_input_r));
 	map(0xc000, 0xcfff).mirror(0x1000).rom();
 	map(0xe000, 0xffff).rom();
+}
+
+void fidel6502_state::as12_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();
+	map(0x1800, 0x1807).w(this, FUNC(fidel6502_state::as12_led_w)).nopr();
+	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::as12_control_w));
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::as12_input_r));
+	map(0xc000, 0xffff).rom();
 }
 
 
@@ -1576,6 +1640,17 @@ static INPUT_PORTS_START( sc12b )
 	PORT_INCLUDE( sc12 )
 
 	PORT_MODIFY("IN.9") // hardwired, modify default to /4
+	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "Disabled" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( as12 )
+	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( sc12_sidepanel )
+
+	PORT_START("IN.9") // hardwired, default to /4
 	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
 	PORT_CONFSETTING(    0x00, "Disabled" )
 	PORT_CONFSETTING(    0x02, "2" )
@@ -1935,6 +2010,23 @@ MACHINE_CONFIG_START(fidel6502_state::sc12b)
 
 	MCFG_DEVICE_REMOVE("dummy_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(fidel6502_state::as12)
+	sc12b(config);
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("sc12_map")
+	MCFG_DEVICE_PROGRAM_MAP(as12_map)
+
+	// change irq timer frequency
+	MCFG_DEVICE_REMOVE("irq_on")
+	MCFG_DEVICE_REMOVE("irq_off")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(585)) // from 556 timer (22nF, 110K, 1K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(585) - attotime::from_nsec(15250)) // active for 15.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(585))
+
+	MCFG_DEFAULT_LAYOUT(layout_fidel_as12)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcel)
@@ -2524,6 +2616,14 @@ ROM_START( fscc12b ) // model 6086, PCB label 510-1084B01
 ROM_END
 
 
+ROM_START( feleg ) // model AS12(or 6085), PCB label 510-1084B01
+	ROM_REGION( 0x10000, "sc12_map", 0 )
+	ROM_LOAD("feleg.1", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
+	ROM_LOAD("feleg.2", 0xc000, 0x2000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "
+	ROM_LOAD("feleg.3", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
+ROM_END
+
+
 ROM_START( fexcel ) // model 6080(B), PCB label 510.1117A02
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
@@ -2682,6 +2782,8 @@ CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, empt
 
 CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12b,     fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+
+CONS( 1985, feleg,      0,        0, as12,      as12,      fidel6502_state, empty_init,    "Fidelity Electronics", "Elegance Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 
 CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, empty_init,    "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

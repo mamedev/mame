@@ -1302,14 +1302,16 @@ GFXDECODE_END
 
 WRITE8_MEMBER(mappy_state::out_lamps)
 {
-	output().set_led_value(0, data & 1);
-	output().set_led_value(1, data & 2);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
 	machine().bookkeeping().coin_lockout_global_w(data & 4);
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
 void mappy_state::machine_start()
 {
+	m_leds.resolve();
+	
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));

@@ -44,6 +44,7 @@ void hh_sm510_state::machine_start()
 	m_inp_mux = 0;
 	/* m_inp_lines = 0; */ // not here
 	/* m_inp_fixed = -1; */ // not here
+	m_speaker_data = 0;
 	m_s = 0;
 	m_r = 0;
 	m_display_x_len = 0;
@@ -56,6 +57,7 @@ void hh_sm510_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_lines));
 	save_item(NAME(m_inp_fixed));
+	save_item(NAME(m_speaker_data));
 	save_item(NAME(m_s));
 	save_item(NAME(m_r));
 	save_item(NAME(m_display_x_len));
@@ -200,6 +202,23 @@ WRITE8_MEMBER(hh_sm510_state::piezo_input_w)
 {
 	// R1 to piezo, other to input mux
 	piezo_r1_w(space, 0, data & 1);
+	input_w(space, 0, data >> 1);
+}
+
+static const s16 piezo2bit_r1_120k_s1_39k[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff }; // R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
+
+WRITE8_MEMBER(hh_sm510_state::piezo2bit_r1_w)
+{
+	// R1(+S1) to piezo
+	m_speaker_data = (m_speaker_data & ~1) | (data & 1);
+	m_speaker->level_w(m_speaker_data);
+}
+
+WRITE8_MEMBER(hh_sm510_state::piezo2bit_input_w)
+{
+	// S1(+R1) to piezo, other to input mux
+	m_speaker_data = (m_speaker_data & ~2) | (data << 1 & 2);
+	m_speaker->level_w(m_speaker_data);
 	input_w(space, 0, data >> 1);
 }
 
@@ -4186,35 +4205,8 @@ public:
 		m_inp_fixed = 5;
 	}
 
-	void update_speaker();
-	DECLARE_WRITE8_MEMBER(write_r);
-	DECLARE_WRITE8_MEMBER(write_s);
 	void tsonic(machine_config &config);
 };
-
-// handlers
-
-void tsonic_state::update_speaker()
-{
-	m_speaker->level_w((m_s << 1 & 2) | (m_r & 1));
-}
-
-WRITE8_MEMBER(tsonic_state::write_r)
-{
-	// R: to speaker, via 120K resistor
-	m_r = data;
-	update_speaker();
-}
-
-WRITE8_MEMBER(tsonic_state::write_s)
-{
-	// S1: to speaker, via 39K resistor
-	m_s = data;
-	update_speaker();
-
-	// other: input mux
-	hh_sm510_state::input_w(space, 0, data >> 1);
-}
 
 // config
 
@@ -4254,16 +4246,14 @@ static INPUT_PORTS_START( tsonic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static const s16 tsonic_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
-
 MACHINE_CONFIG_START(tsonic_state::tsonic)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, tsonic_state, write_s))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, tsonic_state, write_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, piezo2bit_input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo2bit_r1_w))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -4278,7 +4268,7 @@ MACHINE_CONFIG_START(tsonic_state::tsonic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, tsonic_speaker_levels)
+	MCFG_SPEAKER_LEVELS(4, piezo2bit_r1_120k_s1_39k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4771,35 +4761,8 @@ public:
 		m_inp_fixed = 5;
 	}
 
-	void update_speaker();
-	DECLARE_WRITE8_MEMBER(write_r);
-	DECLARE_WRITE8_MEMBER(write_s);
 	void tsonic2(machine_config &config);
 };
-
-// handlers
-
-void tsonic2_state::update_speaker()
-{
-	m_speaker->level_w((m_s << 1 & 2) | (m_r & 1));
-}
-
-WRITE8_MEMBER(tsonic2_state::write_r)
-{
-	// R: to speaker, via 120K resistor
-	m_r = data;
-	update_speaker();
-}
-
-WRITE8_MEMBER(tsonic2_state::write_s)
-{
-	// S1: to speaker, via 39K resistor
-	m_s = data;
-	update_speaker();
-
-	// other: input mux
-	hh_sm510_state::input_w(space, 0, data >> 1);
-}
 
 // config
 
@@ -4839,16 +4802,14 @@ static INPUT_PORTS_START( tsonic2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static const s16 tsonic2_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
-
 MACHINE_CONFIG_START(tsonic2_state::tsonic2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, tsonic2_state, write_s))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, tsonic2_state, write_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, piezo2bit_input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo2bit_r1_w))
 	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
@@ -4863,7 +4824,7 @@ MACHINE_CONFIG_START(tsonic2_state::tsonic2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, tsonic2_speaker_levels)
+	MCFG_SPEAKER_LEVELS(4, piezo2bit_r1_120k_s1_39k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -6206,6 +6167,96 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tiger Batman: The Animated Series (model 72-505)
+  * Sharp SM511 under epoxy (die label N81)
+  * lcd screen with custom segments, 2-bit sound
+
+***************************************************************************/
+
+class tbatmana_state : public hh_sm510_state
+{
+public:
+	tbatmana_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 6;
+		m_inp_fixed = 6;
+	}
+
+	void tbatmana(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tbatmana )
+	PORT_START("IN.0") // S2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Jump")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Fast")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S5
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)  PORT_NAME("Throw/Attack")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S6
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Max Score")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(tbatmana_state::tbatmana)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", SM511)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, piezo2bit_input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo2bit_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1478, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1478-1, 0, 1080-1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, piezo2bit_r1_120k_s1_39k)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tronica Thief in Garden (model TG-18)
   * Sharp SM510 label 0019 238E TRONICA (no decap)
   * lcd screen with custom segments, 1-bit sound
@@ -7089,6 +7140,18 @@ ROM_START( tsjam )
 ROM_END
 
 
+ROM_START( tbatmana )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "n81.program", 0x0000, 0x1000, CRC(efb3f122) SHA1(d55c2fb92fb9bd41d6001f42143691b84f3f389a) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "n81.melody", 0x000, 0x100, CRC(56ba8fe5) SHA1(5c286ae1bfc943bbe8c8f4cdc9c8b73d9b3c186e) )
+
+	ROM_REGION( 618831, "svg", 0)
+	ROM_LOAD( "tbatmana.svg", 0, 618831, CRC(fc38cb9d) SHA1(1b6c10dcd33bfcfef43d61f97fa8e530011c1e61) )
+ROM_END
+
+
 ROM_START( tigarden )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "0019_238e", 0x0000, 0x1000, CRC(8bd0eadd) SHA1(7bb5eb30d569901dce52d777bc01c0979e4afa06) )
@@ -7124,21 +7187,26 @@ CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state, 
 CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
+// wide screen
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
 
+// multi screen
 CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
 
+// new wide screen
 CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
+// micro vs.
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
 
+// 7-xxx/78-xxx models
 CONS( 1989, tgaunt,      0,          0, tgaunt,      tgaunt,      tgaunt_state,      empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, trobhood,    tgaunt,     0, trobhood,    trobhood,    tgaunt_state,      empty_init, "Tiger Electronics", "Robin Hood (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tddragon,    0,          0, tddragon,    tddragon,    tddragon_state,    empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
@@ -7187,6 +7255,9 @@ CONS( 1995, tapollo13,   0,          0, tapollo13,   tapollo13,   tapollo13_stat
 CONS( 1995, tgoldeye,    0,          0, tgoldeye,    tgoldeye,    tgoldeye_state,    empty_init, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tsjam,       0,          0, tsjam,       tsjam,       tsjam_state,       empty_init, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
+
+// 72-xxx models
+CONS( 1992, tbatmana,    0,          0, tbatmana,    tbatmana,    tbatmana_state,    empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1983, tigarden,    0,          0, tigarden,    tigarden,    tigarden_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
 

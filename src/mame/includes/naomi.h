@@ -66,6 +66,7 @@ class naomi_state : public dc_state
 
 	uint8_t m_mp_mux;
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
 	uint8_t asciihex_to_dec(uint8_t in);
@@ -81,9 +82,11 @@ class naomi_state : public dc_state
 	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
 	void naomi_base(machine_config &config);
 	void naomim2(machine_config &config);
+	void naomim2_kb(machine_config &config);
 	void naomi(machine_config &config);
 	void naomim1(machine_config &config);
 	void naomigd(machine_config &config);
+	void naomigd_kb(machine_config &config);
 	void naomim4(machine_config &config);
 	void naomi_map(address_map &map);
 	void naomi_port(address_map &map);

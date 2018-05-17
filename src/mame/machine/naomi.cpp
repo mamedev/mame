@@ -229,6 +229,7 @@ INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
 {
 	m_mp_mux = newval;
 }
+
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 {
 	const char *tagptr = (const char *)param;
@@ -244,6 +245,39 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 		}
 		tagptr += strlen(tagptr) + 1;
 	}
+	return retval;
+}
+
+CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
+{
+	// TODO: player 2 input reading
+//	const int *tagptr = (const int *)param;
+	uint8_t retval = 0;
+	static const char *const keynames[] =
+	{
+		"P1.ROW0", "P1.ROW1", "P1.ROW2", "P1.ROW3", "P1.ROW4"
+	};
+
+	for(int i=0;i<5;i++)
+	{
+		uint32_t row;
+		
+		// read the current row
+		row = ioport(keynames[i])->read();
+		
+		// if anything is pressed, convert the 32-bit raw value to keycode
+		if(row != 0)
+		{
+			// base value x20
+			retval = i * 0x20;
+			for(int j=0;j<32;j++)
+			{
+				if(row & 1 << j)
+					return retval + j;
+			}
+		}
+	}
+
 	return retval;
 }
 

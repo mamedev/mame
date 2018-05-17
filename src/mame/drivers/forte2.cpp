@@ -160,12 +160,7 @@ void forte2_state::init_pesadelo()
 	}
 
 	// address line swap
-	std::vector<uint8_t> buf(memsize);
-
-	for (int i = 0; i < memsize; i++)
-	{
-		buf.push_back((uint8_t)i);
-	}
+	std::vector<uint8_t> buf(&mem[0], &mem[memsize]);
 
 	for (int i = 0; i < memsize; i++)
 	{

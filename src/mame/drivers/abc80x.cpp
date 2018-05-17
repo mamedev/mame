@@ -150,6 +150,8 @@ Notes:
 #include "emu.h"
 #include "includes/abc80x.h"
 
+#define LOG 0
+
 
 //**************************************************************************
 //  SOUND
@@ -204,11 +206,6 @@ void abc800_state::bankswitch()
 	}
 }
 
-
-//-------------------------------------------------
-//  bankswitch
-//-------------------------------------------------
-
 void abc802_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -226,138 +223,143 @@ void abc802_state::bankswitch()
 	}
 }
 
-
-//-------------------------------------------------
-//  bankswitch
-//-------------------------------------------------
-
-void abc806_state::bankswitch()
+void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, bool &romd, bool &ramd, bool &hre, bool &vr)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	uint32_t videoram_mask = m_ram->size() - 0x8000 - 1;
-	int bank;
-	char bank_name[10];
+	uint8_t map = m_map[offset >> 12] ^ 0xff;
+	bool enl = BIT(map, 7);
 
-	if (!m_keydtr)
+	/*
+	uint16_t input = 1 << 14 | m_keydtr << 12 | xml << 9 | enl << 8 | m_eme << 7 | m1l << 6 | BIT(offset, 11) << 5 | BIT(offset, 12) << 4 | BIT(offset, 13) << 3 | BIT(offset, 14) << 2 | BIT(offset, 15) << 1 | 1;
+	int palout = m_pal->read(input);
+
+	romd = BIT(palout, 0);
+	ramd = BIT(palout, 7);
+	hre = BIT(palout, 4);
+	bool mux = BIT(palout, 6);
+	*/
+
+	romd = offset >= 0x8000;
+	ramd = offset < 0x8000;
+	hre = 0;
+	vr = (offset & 0xf800) != 0x7800;
+	bool mux = 0;
+
+	if (!m_keydtr && offset < 0x8000)
 	{
-		// 32K block mapping
-
-		uint32_t videoram_start = (m_hrs & 0xf0) << 11;
-
-		for (bank = 1; bank <= 8; bank++)
-		{
-			// 0x0000-0x7FFF is video RAM
-
-			uint16_t start_addr = 0x1000 * (bank - 1);
-			uint16_t end_addr = start_addr + 0xfff;
-			uint32_t videoram_offset = (videoram_start + start_addr) & videoram_mask;
-			sprintf(bank_name,"bank%d",bank);
-			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
-
-			program.install_readwrite_bank(start_addr, end_addr, bank_name);
-			membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
-			membank(bank_name)->set_entry(1);
-		}
-
-		for (bank = 9; bank <= 16; bank++)
-		{
-			// 0x8000-0xFFFF is main RAM
-
-			uint16_t start_addr = 0x1000 * (bank - 1);
-			uint16_t end_addr = start_addr + 0xfff;
-			sprintf(bank_name,"bank%d",bank);
-			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
-
-			program.install_readwrite_bank(start_addr, end_addr, bank_name);
-			membank(bank_name)->set_entry(0);
-		}
-	}
-	else
-	{
-		// 4K block mapping
-
-		for (bank = 1; bank <= 16; bank++)
-		{
-			uint16_t start_addr = 0x1000 * (bank - 1);
-			uint16_t end_addr = start_addr + 0xfff;
-			uint8_t map = m_map[bank - 1];
-			uint32_t videoram_offset = ((map & 0x7f) << 12) & videoram_mask;
-			sprintf(bank_name,"bank%d",bank);
-			if (BIT(map, 7) && m_eme)
-			{
-				// map to video RAM
-				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
-
-				program.install_readwrite_bank(start_addr, end_addr, bank_name);
-				membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
-				membank(bank_name)->set_entry(1);
-			}
-			else
-			{
-				// map to ROM/RAM
-
-				switch (bank)
-				{
-				case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-					// ROM
-					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
-
-					program.install_read_bank(start_addr, end_addr, bank_name);
-					program.unmap_write(start_addr, end_addr);
-					membank(bank_name)->set_entry(0);
-					break;
-
-				case 8:
-					// ROM/char RAM
-					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
-
-					program.install_read_bank(0x7000, 0x77ff, bank_name);
-					program.unmap_write(0x7000, 0x77ff);
-					program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
-					membank(bank_name)->set_entry(0);
-					break;
-
-				default:
-					// work RAM
-					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
-
-					program.install_readwrite_bank(start_addr, end_addr, bank_name);
-					membank(bank_name)->set_entry(0);
-					break;
-				}
-			}
-		}
+		romd = 1;
+		hre = 1;
+		vr = 1;
+		mux = 0;
 	}
 
-	if (m_fetch_charram)
+	if (m_eme && !enl)
 	{
-		// 30K block mapping
+		romd = 1;
+		ramd = 1;
+		hre = 1;
+		vr = 1;
+		mux = 1;
+	}
 
-		uint32_t videoram_start = (m_hrs & 0xf0) << 11;
+	if (!m1l)
+	{
+		vr = 1;
+	}
+/*
+	if (!m1l && (offset < 0x7800)
+	{
+		TODO 0..30k read from videoram if fetch opcode from 7800-7fff
+		romd = 1;
+		hre = 1;
+		mux = 0;
+	}
+*/
+	size_t videoram_mask = m_ram->size() - 0x8001;
 
-		for (bank = 1; bank <= 8; bank++)
-		{
-			// 0x0000-0x77FF is video RAM
+	m = (mux ? ((map & 0x7f) << 12 | (offset & 0xfff)) : ((m_hrs & 0xf0) << 11 | (offset & 0x7fff))) & videoram_mask;
+}
 
-			uint16_t start_addr = 0x1000 * (bank - 1);
-			uint16_t end_addr = start_addr + 0xfff;
-			uint32_t videoram_offset = (videoram_start + start_addr) & videoram_mask;
-			sprintf(bank_name,"bank%d",bank);
-			//logerror("%04x-%04x: Video RAM %04x (30K)\n", start_addr, end_addr, videoram_offset);
+READ8_MEMBER( abc806_state::read )
+{
+	uint8_t data = 0xff;
 
-			if (start_addr == 0x7000)
-			{
-				program.install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
-			}
-			else
-			{
-				program.install_readwrite_bank(start_addr, end_addr, bank_name);
-			}
+	offs_t m = 0;
+	bool m1l = 1, xml = 1, romd = 0, ramd = 0, hre = 0, vr = 1;
+	read_pal_p4(offset, m1l, xml, m, romd, ramd, hre, vr);
 
-			membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
-			membank(bank_name)->set_entry(1);
-		}
+	if (!romd)
+	{
+		data = m_rom->base()[offset & 0x7fff];
+	}
+
+	if (!ramd)
+	{
+		data = m_ram->pointer()[offset & 0x7fff];
+	}
+
+	if (hre)
+	{
+		data = m_video_ram[m];
+	}
+
+	if (!vr)
+	{
+		data = charram_r(space, offset & 0x7ff);
+	}
+
+	return data;
+}
+
+READ8_MEMBER( abc806_state::m1_r )
+{
+	uint8_t data = 0xff;
+
+	offs_t m = 0;
+	bool m1l = 0, xml = 1, romd = 0, ramd = 0, hre = 0, vr = 1;
+	read_pal_p4(offset, m1l, xml, m, romd, ramd, hre, vr);
+
+	if (!romd)
+	{
+		data = m_rom->base()[offset & 0x7fff];
+	}
+
+	if (!ramd)
+	{
+		data = m_ram->pointer()[offset & 0x7fff];
+	}
+
+	if (hre)
+	{
+		data = m_video_ram[m];
+	}
+
+	if (!vr)
+	{
+		data = charram_r(space, offset & 0x7ff);
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( abc806_state::write )
+{
+	offs_t m = 0;
+	bool m1l = 1, xml = 1, romd = 0, ramd = 0, hre = 0, vr = 1;
+	read_pal_p4(offset, m1l, xml, m, romd, ramd, hre, vr);
+
+	if (!ramd)
+	{
+		m_ram->pointer()[offset & 0x7fff] = data;
+	}
+
+	if (hre)
+	{
+		m_video_ram[m] = data;
+	}
+
+	if (!vr)
+	{
+		charram_w(space, offset & 0x7ff, data);
 	}
 }
 
@@ -376,7 +378,7 @@ READ8_MEMBER( abc800_state::m1_r )
 			bankswitch();
 		}
 
-		return m_rom->base()[0x7800 | (offset & 0x7ff)];
+		return m_rom->base()[offset];
 	}
 
 	if (m_fetch_charram)
@@ -398,7 +400,7 @@ READ8_MEMBER( abc800c_state::m1_r )
 			bankswitch();
 		}
 
-		return m_rom->base()[0x7c00 | (offset & 0x3ff)];
+		return m_rom->base()[offset];
 	}
 
 	if (m_fetch_charram)
@@ -416,7 +418,7 @@ READ8_MEMBER( abc802_state::m1_r )
 	{
 		if (offset >= 0x7800 && offset < 0x8000)
 		{
-			return m_rom->base()[0x7800 | (offset & 0x7ff)];
+			return m_rom->base()[offset];
 		}
 	}
 
@@ -459,9 +461,9 @@ WRITE8_MEMBER( abc806_state::mao_w )
 
 	int bank = offset >> 12;
 
-	m_map[bank] = data;
+	if (LOG) logerror("MAO %04x %02x %02x\n",offset,bank,data);
 
-	bankswitch();
+	m_map[bank] = data;
 }
 
 
@@ -588,23 +590,7 @@ void abc802_state::abc802_io(address_map &map)
 
 void abc806_state::abc806_mem(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankrw("bank1");
-	map(0x1000, 0x1fff).bankrw("bank2");
-	map(0x2000, 0x2fff).bankrw("bank3");
-	map(0x3000, 0x3fff).bankrw("bank4");
-	map(0x4000, 0x4fff).bankrw("bank5");
-	map(0x5000, 0x5fff).bankrw("bank6");
-	map(0x6000, 0x6fff).bankrw("bank7");
-	map(0x7000, 0x7fff).bankrw("bank8");
-	map(0x8000, 0x8fff).bankrw("bank9");
-	map(0x9000, 0x9fff).bankrw("bank10");
-	map(0xa000, 0xafff).bankrw("bank11");
-	map(0xb000, 0xbfff).bankrw("bank12");
-	map(0xc000, 0xcfff).bankrw("bank13");
-	map(0xd000, 0xdfff).bankrw("bank14");
-	map(0xe000, 0xefff).bankrw("bank15");
-	map(0xf000, 0xffff).bankrw("bank16");
+	map(0x0000, 0xffff).rw(this, FUNC(abc806_state::read), FUNC(abc806_state::write));
 }
 
 
@@ -844,9 +830,9 @@ WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
 
 WRITE_LINE_MEMBER( abc806_state::keydtr_w )
 {
-	m_keydtr = state;
+	if (LOG) logerror("%s KEYDTR %u\n",machine().describe_context(),state);
 
-	bankswitch();
+	m_keydtr = state;
 }
 
 
@@ -960,15 +946,6 @@ void abc806_state::machine_start()
 	uint32_t videoram_size = m_ram->size() - 0x8000;
 	m_video_ram.allocate(videoram_size);
 
-	// setup memory banks
-	for (int bank = 1; bank <= 16; bank++) {
-		char bank_name[10];
-		sprintf(bank_name,"bank%d",bank);
-
-		membank(bank_name)->configure_entry(0, m_rom->base() + (0x1000 * (bank - 1)));
-		membank(bank_name)->configure_entry(1, m_video_ram);
-	}
-
 	// register for state saving
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_sb));
@@ -999,14 +976,16 @@ void abc806_state::machine_start()
 
 void abc806_state::machine_reset()
 {
-	// reset memory banks
-	for (int bank = 1; bank <= 16; bank++) {
-		char bank_name[10];
-		sprintf(bank_name,"bank%d",bank);
-		membank(bank_name)->set_entry(0);
-	}
+	m_sb = m_io_sb->read();
 
-	abc800_state::machine_reset();
+	m_dart->ria_w(1);
+
+	// 50/60 Hz
+	m_dart->ctsb_w(0); // 0 = 50Hz, 1 = 60Hz
+
+	m_dfd_in = 0;
+
+	m_hrs = 0;
 
 	// clear STO lines
 	for (int i = 0; i < 8; i++) {
@@ -1270,8 +1249,8 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("512K")
+	MCFG_RAM_DEFAULT_SIZE("160K")
+	MCFG_RAM_EXTRA_OPTIONS("544K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")
@@ -1523,10 +1502,10 @@ ROM_START( abc806 )
 	    1   I3
 	    2   A15
 	    3   A14
-	    4   A13
-	    5   A12
-	    6   A11
-	    7   MIL
+	    4   B13
+	    5   B12
+	    6   B11
+	    7   M1L
 	    8   EME
 	    9   ENL
 	    10  GND
@@ -1537,7 +1516,7 @@ ROM_START( abc806 )
 	    15  KDL
 	    16  >HRE
 	    17  RKDL
-	    18  MUX
+	    18  >MUX
 	    19  >RAMD
 	    20  Vcc
 	*/

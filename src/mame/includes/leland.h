@@ -31,30 +31,49 @@ class leland_state : public driver_device
 {
 public:
 	leland_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_master(*this, "master"),
-		m_slave(*this, "slave"),
-		m_mainram(*this, "mainram"),
-		m_eeprom(*this, "eeprom"),
-		m_sound(*this, "custom"),
-		m_dac0(*this, "dac0"),
-		m_dac1(*this, "dac1"),
-		m_ay8910(*this, "ay8910"),
-		m_ay8912(*this, "ay8912"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_master(*this, "master")
+		, m_slave(*this, "slave")
+		, m_mainram(*this, "mainram")
+		, m_battery_ram(*this, "battery")
+		, m_eeprom(*this, "eeprom")
+		, m_sound(*this, "custom")
+		, m_dac(*this, "dac%u", 0U)
+		, m_ay8910(*this, "ay8910")
+		, m_ay8912(*this, "ay8912")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_master_base(*this, "master")
+		, m_slave_base(*this, "slave")
+		, m_bg_gfxrom(*this, "bg_gfx")
+		, m_bg_prom(*this, "bg_prom")
+		, m_xrom_base(*this, "xrom")
+		, m_master_bankslot(*this, "masterbank_%u", 0U)
+		, m_slave_bankslot(*this, "slavebank")
+	{ }
 
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
 	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_battery_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<leland_80186_sound_device> m_sound;
-	optional_device<dac_byte_interface> m_dac0;
-	optional_device<dac_byte_interface> m_dac1;
+	optional_device_array<dac_byte_interface, 2> m_dac;
 	optional_device<ay8910_device> m_ay8910;
 	optional_device<ay8912_device> m_ay8912;
 	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	required_region_ptr<uint8_t> m_master_base;
+	required_region_ptr<uint8_t> m_slave_base;
+	required_region_ptr<uint8_t> m_bg_gfxrom;
+	optional_region_ptr<uint8_t> m_bg_prom;
+	optional_region_ptr<uint8_t> m_xrom_base;
+
+	required_memory_bank_array<2> m_master_bankslot;
+	required_memory_bank m_slave_bankslot;
 
 	uint8_t m_dac_control;
 	uint8_t *m_alleymas_kludge_mem;
@@ -62,11 +81,6 @@ public:
 	uint8_t m_gfx_control;
 	uint8_t m_wcol_enable;
 	emu_timer *m_master_int_timer;
-	uint8_t *m_master_base;
-	uint8_t *m_slave_base;
-	uint8_t *m_xrom_base;
-	uint32_t m_master_length;
-	uint32_t m_slave_length;
 	int m_dangerz_x;
 	int m_dangerz_y;
 	uint8_t m_analog_result;
@@ -85,7 +99,6 @@ public:
 	uint32_t m_xrom1_addr;
 	uint32_t m_xrom2_addr;
 	uint8_t m_battery_ram_enable;
-	uint8_t *m_battery_ram;
 	std::unique_ptr<uint8_t[]> m_extra_tram;
 	std::unique_ptr<uint8_t[]> m_video_ram;
 	struct vram_state_data m_vram_state[2];
@@ -180,8 +193,13 @@ public:
 	DECLARE_VIDEO_START(leland2);
 	DECLARE_VIDEO_START(ataxx);
 
-	uint32_t screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	tilemap_t      *m_tilemap;
+
+	TILEMAP_MAPPER_MEMBER(leland_scan);
+	TILE_GET_INFO_MEMBER(leland_get_tile_info);
+	TILEMAP_MAPPER_MEMBER(ataxx_scan);
+	TILE_GET_INFO_MEMBER(ataxx_get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
 	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);
@@ -226,10 +244,6 @@ public:
 	void slave_map_io_2(address_map &map);
 	void slave_map_program(address_map &map);
 	void slave_small_map_program(address_map &map);
-	void ataxx_80186_map_io(address_map &map);
-	void leland_80186_map_io(address_map &map);
-	void leland_80186_map_program(address_map &map);
-	void redline_80186_map_io(address_map &map);
 };
 
 

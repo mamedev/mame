@@ -91,23 +91,23 @@ public:
 	DECLARE_WRITE16_MEMBER(bsga_tmp_w) { COMBINE_DATA(&m_bsga_tmp); }
 
 	DECLARE_READ16_MEMBER(bsga_xmin_r) { return m_bsga_xmin; }
-	DECLARE_WRITE16_MEMBER(bsga_xmin_w) { COMBINE_DATA(&m_bsga_xmin); }
+	DECLARE_WRITE16_MEMBER(bsga_xmin_w) { COMBINE_DATA(&m_bsga_xmin); logerror("xmin = %04x\n", m_bsga_xmin); }
 	DECLARE_READ16_MEMBER(bsga_ymin_r) { return m_bsga_ymin; }
-	DECLARE_WRITE16_MEMBER(bsga_ymin_w) { COMBINE_DATA(&m_bsga_ymin); }
+	DECLARE_WRITE16_MEMBER(bsga_ymin_w) { COMBINE_DATA(&m_bsga_ymin); logerror("ymin = %04x\n", m_bsga_ymin); }
 
 	DECLARE_READ16_MEMBER(bsga_acc0_r) { return (m_bsga_width - m_bsga_xin1); }
 	DECLARE_READ16_MEMBER(bsga_acc1_r) { return -(m_bsga_width - m_bsga_xin1); }
 
 	DECLARE_READ16_MEMBER(bsga_xmax_r) { return m_bsga_xmax; }
-	DECLARE_WRITE16_MEMBER(bsga_xmax_w) { COMBINE_DATA(&m_bsga_xmax); }
+	DECLARE_WRITE16_MEMBER(bsga_xmax_w) { COMBINE_DATA(&m_bsga_xmax); logerror("xmax = %04x\n", m_bsga_xmax); }
 	DECLARE_READ16_MEMBER(bsga_ymax_r) { return m_bsga_ymax; }
-	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); }
+	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); logerror("ymax = %04x\n", m_bsga_ymax); bsga_clip_status(m_bsga_xin1, m_bsga_yin1); }
 
 	DECLARE_READ16_MEMBER(bsga_src0_r) { return m_bsga_xin1; }
 	DECLARE_READ16_MEMBER(bsga_src1_r) { return m_bsga_xin1; }
 
-	DECLARE_WRITE16_MEMBER(bsga_xin1_w) { COMBINE_DATA(&m_bsga_xin1); m_bsga_xin = m_bsga_xin1; m_bsga_tmp = m_bsga_xin1; }
-	DECLARE_WRITE16_MEMBER(bsga_yin1_w) { COMBINE_DATA(&m_bsga_yin1); m_bsga_yin = m_bsga_yin1; }
+	DECLARE_WRITE16_MEMBER(bsga_xin1_w) { COMBINE_DATA(&m_bsga_xin1); m_bsga_xin = m_bsga_xin1; m_bsga_tmp = m_bsga_xin1; logerror("xin = %04x\n", m_bsga_xin1); }
+	DECLARE_WRITE16_MEMBER(bsga_yin1_w) { COMBINE_DATA(&m_bsga_yin1); m_bsga_yin = m_bsga_yin1; logerror("yin = %04x\n", m_bsga_yin1); }
 	DECLARE_WRITE32_MEMBER(bsga_xin1yin1_w);
 
 	enum bsga_status_mask

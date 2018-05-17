@@ -116,6 +116,7 @@ How the architecture works:
     set the segment map validly in order to write to the page map.  This is how they get away
     with having 16 MB of segment entries and only 8 MB of PMEGs.
 
+    See http://sunstuff.org/Sun-Hardware-Ref/s2hr/part2
 ****************************************************************************/
 
 #include "emu.h"
@@ -311,14 +312,14 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 				{
 					if ((tmp >= (0x7f0000>>1)) && (tmp <= (0x7f07ff>>1)))
 					{
-						return m_rom_ptr[offset & 0x3fff];
+						return m_rom_ptr[offset & 0x3fff]; // the mask here is probably &0x7fff, change it if any 8KW (1.x?) romset shows up for a VME machine
 					}
 				}
 				else    // Multibus has EPROM at 0x000000
 				{
 					if (tmp <= (0x7ff>>1))
 					{
-						return m_rom_ptr[offset & 0x3fff];
+						return m_rom_ptr[offset & 0x7fff];
 					}
 				}
 
@@ -755,18 +756,23 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( sun2_120 ) // ROMs are located on the '501-1007' PCB at locations B11 and B10
+ROM_START( sun2_120 ) // ROMs are located on the '501-1007' CPU PCB at locations B11 and B10; J400 is set to 1-2 for 27128 EPROMs and 3-4 for 27256 EPROMs
 	ROM_REGION16_BE( 0x10000, "bootprom", ROMREGION_ERASEFF )
-	ROM_DEFAULT_BIOS("revr")
+	// There is an undumped revision 1.1.2, which uses 27256 EPROMs
 	ROM_SYSTEM_BIOS( 0, "rev10f", "Bootrom Rev 1.0F")
 	ROMX_LOAD( "1.0f.b11", 0x0000, 0x8000, CRC(8fb0050a) SHA1(399cdb894b2a66d847d76d8a5d266906fb1d3430), ROM_SKIP(1) | ROM_BIOS(1)) // actual rom stickers had fallen off
 	ROMX_LOAD( "1.0f.b10", 0x0001, 0x8000, CRC(70de816d) SHA1(67e980497f463dbc529f64ec5f3e0046b3901b7e), ROM_SKIP(1) | ROM_BIOS(1)) // "
 	ROM_SYSTEM_BIOS( 1, "revr", "Bootrom Rev R")
-	ROMX_LOAD( "sun2-multi-rev-r.bin", 0x0000, 0x8000, CRC(4df0df77) SHA1(4d6bcf09ddc9cc8f5823847b8ea88f98fe4a642e), ROM_BIOS(2)) // todo: this should be 2 separate chips, one at b11 and one at b9
-	ROM_SYSTEM_BIOS( 2, "revn", "Bootrom Rev N")
+	ROMX_LOAD( "520-1102-03.b11", 0x0000, 0x4000, CRC(020bb0a8) SHA1(a7b60e89a40757975a5d345d57ea02781dea4f89), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "520-1101-03.b10", 0x0001, 0x4000, CRC(b97c61f7) SHA1(9f08fe232cfc3da48539fa66673fc1f89a362b1e), ROM_SKIP(1) | ROM_BIOS(2))
+	// There is an undumped revision Q, with roms:
+	//ROM_SYSTEM_BIOS( 8, "revq", "Bootrom Rev Q")
+	// ROMX_LOAD( "520-1104-02.b11", 0x0000, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(9))
+	// ROMX_LOAD( "520-1103-02.b10", 0x0001, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(9))
+	ROM_SYSTEM_BIOS( 2, "revn", "Bootrom Rev N") // SunOS 2.0 requires this bootrom version at a minimum
 	ROMX_LOAD( "revn.b11", 0x0000, 0x4000, CRC(b1e70965) SHA1(726b3ed9323750a1ae238cf6dccaed6ff5981ad1), ROM_SKIP(1) | ROM_BIOS(3)) // actual rom stickers had fallen off
 	ROMX_LOAD( "revn.b10", 0x0001, 0x4000, CRC(95fd9242) SHA1(1eee2d291f4b18f6aafdde1a9521d88e454843b9), ROM_SKIP(1) | ROM_BIOS(3)) // "
-	ROM_SYSTEM_BIOS( 3, "revm", "Bootrom Rev M")
+	ROM_SYSTEM_BIOS( 3, "revm", "Bootrom Rev M") // SunOS 1.0 apparently requires this bootrom revision?
 	ROMX_LOAD( "sun2-revm-8.b11", 0x0000, 0x4000, CRC(98b8ae55) SHA1(55485f4d8fd1ebc218aa8527c8bb62752c34abf7), ROM_SKIP(1) | ROM_BIOS(4)) // handwritten label: "SUN2-RevM-8"
 	ROMX_LOAD( "sun2-revm-0.b10", 0x0001, 0x4000, CRC(5117f431) SHA1(fce85c11ada1614152dde35bb329350f6fb2ecd9), ROM_SKIP(1) | ROM_BIOS(4)) // handwritten label: "SUN2-RevM-0"
 
@@ -776,6 +782,7 @@ ROM_END
 
 ROM_START( sun2_50 )
 	ROM_REGION16_BE( 0x8000, "bootprom", ROMREGION_ERASEFF )
+	// There is at least one undumped revision (Rev 1.1.2) which uses 27256 EPROMs; the sun2/50 board handles up to 27512 EPROMs
 	// bootrom rev Q
 	ROM_LOAD16_BYTE( "250_q_8.rom", 0x0000, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
 	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0001, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))

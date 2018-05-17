@@ -70,7 +70,7 @@ void astrocde_mess_state::astrocade_mem(address_map &map)
 
 void astrocde_mess_state::astrocade_io(address_map &map)
 {
-	map(0x00, 0x0f).mirror(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x00, 0x0f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x10, 0x1f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
 	map(0x10, 0x18).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
 	map(0x19, 0x19).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));

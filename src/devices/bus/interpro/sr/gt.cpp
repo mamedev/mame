@@ -57,7 +57,7 @@
 #define LOG_LINE    (1U << 1)
 #define LOG_BLIT    (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_LINE | LOG_BLIT)
+#define VERBOSE (LOG_GENERAL | LOG_LINE | LOG_BLIT)
 //#define VERBOSE (LOG_GENERAL | LOG_LINE)
 
 #include "logmacro.h"
@@ -130,7 +130,7 @@ void gt_device_base::map(address_map &map)
 	//AM_RANGE(0x178, 0x17b) AM_READWRITE(ri_xfer_r, ri_xfer_w)
 	map(0x17c, 0x17f).rw(this, FUNC(gt_device_base::ri_xfer_r), FUNC(gt_device_base::ri_xfer_w));
 
-	map(0x1a4, 0x1a7).w(this, FUNC(gt_device_base::bsga_float_w));
+	map(0x1a4, 0x1ab).w(this, FUNC(gt_device_base::bsga_float_w));
 
 	//AM_RANGE(0x1c0, 0x1c3)
 	//AM_RANGE(0x1c4, 0x1c7)
@@ -421,7 +421,7 @@ void gt_device_base::device_start()
 
 WRITE32_MEMBER(gt_device_base::control_w)
 {
-	LOG("control_w 0x%08x\n", data);
+	//	LOG("control_w 0x%08x\n", data);
 	if (data & GFX_BSGA_RST)
 	{
 		// set graphics busy and schedule a reset
@@ -466,6 +466,13 @@ WRITE32_MEMBER(dual_gt_device_base::blit_control_w)
 		((data & BLIT1_CONTROL_RM) >> 24) << 0);
 }
 
+// bsga test = 121780
+//  12184c = preparation
+//  1218ea = execution
+//  122922 = simulate clip
+// bp 122922,1,{ logerror "simulate xy=%08x, min=%08x, max=%08x status=%04x", r0, r1, pd@(r15+4), pd@(r15+8); g }
+// bp 1229ee,1,{ logerror " -> %04x\n", r0; g }
+
 void gt_device_base::bsga_clip_status(s16 x, s16 y)
 {
 	// compute Cohen-Sutherland clipping outcode
@@ -474,27 +481,22 @@ void gt_device_base::bsga_clip_status(s16 x, s16 y)
 	m_bsga_status <<= 4;
 
 	LOG("bsga_clip_status shifted 0x%04x\n", m_bsga_status);
-	LOG("bsga_clip_status (%d,%d) (%d,%d,%d,%d)\n", x, y, (s16)m_bsga_xmin, (s16)m_bsga_xmax, (s16)m_bsga_ymin, (s16)m_bsga_ymax);
+	LOG("bsga_clip_status (%04x,%04x) (%04x,%04x,%04x,%04x)\n", u16(x), u16(y), m_bsga_xmin, m_bsga_xmax, m_bsga_ymin, m_bsga_ymax);
 
-	if ((s16)m_bsga_xmin < (s16)m_bsga_xmax && (s16)m_bsga_ymin < (s16)m_bsga_ymax)
-	{
-		// clip x coordinate
-		if (x < (s16)m_bsga_xmin)
-			m_bsga_status |= STATUS_CLIP1_XMIN;
-		if (x > (s16)m_bsga_xmax)
-			m_bsga_status |= STATUS_CLIP1_XMAX;
+	// clip x coordinate
+	if (x < (s16)m_bsga_xmin)
+		m_bsga_status |= STATUS_CLIP1_XMIN;
+	if (x > (s16)m_bsga_xmax)
+		m_bsga_status |= STATUS_CLIP1_XMAX;
 
-		// clip y coordinate
-		if (y < (s16)m_bsga_ymin)
-			m_bsga_status |= STATUS_CLIP1_YMIN;
-		if (y > (s16)m_bsga_ymax)
-			m_bsga_status |= STATUS_CLIP1_YMAX;
+	// clip y coordinate
+	if (y < (s16)m_bsga_ymin)
+		m_bsga_status |= STATUS_CLIP1_YMIN;
+	if (y > (s16)m_bsga_ymax)
+		m_bsga_status |= STATUS_CLIP1_YMAX;
 
-		if (m_bsga_status & (STATUS_CLIP1_MASK | STATUS_CLIP0_MASK))
-			m_bsga_status |= STATUS_CLIP_ANY;
-	}
-	else
-		m_bsga_status |= STATUS_CLIP1_MASK;
+	if (m_bsga_status & (STATUS_CLIP0_MASK | STATUS_CLIP1_MASK))
+		m_bsga_status |= STATUS_CLIP_ANY;
 
 	if (((m_bsga_status & STATUS_CLIP0_MASK) >> 4) & (m_bsga_status & STATUS_CLIP1_MASK))
 		m_bsga_status |= STATUS_CLIP_BOTH;
@@ -536,7 +538,11 @@ WRITE32_MEMBER(gt_device_base::bsga_xin1yin1_w)
 	m_bsga_xin1 = (m_bsga_xin1 & ~(mem_mask >> 0)) | ((data & mem_mask) >> 0);
 	m_bsga_yin1 = (m_bsga_yin1 & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
 
+	logerror("xin = %04x\n", m_bsga_xin1);
+	logerror("yin = %04x\n", m_bsga_yin1);
+
 	LOG("bsga_xin1yin1_w data 0x%08x mem_mask 0x%08x xin1 0x%04x yin1 0x%04x\n", data, mem_mask, m_bsga_xin1, m_bsga_yin1);
+
 	bsga_clip_status(m_bsga_xin1, m_bsga_yin1);
 
 	m_bsga_xin = m_bsga_xin1;
@@ -600,9 +606,10 @@ WRITE32_MEMBER(gt_device_base::bsga_float_w)
 	const u32 mantissa = (data & 0x7fffff) | 0x800000;
 	const bool sign = data & 0x80000000;
 
-	LOG("bsga_float_w data 0x%08x value %f exponent 0x%02x shift %d mantissa 0x%08x mantissa sign %d\n", data, u2f(data), exponent, shift, mantissa, sign);
+	LOG("bsga_float_w %d data 0x%08x value %f exponent 0x%02x shift %d mantissa 0x%08x mantissa sign %d\n", offset, data, u2f(data), exponent, shift, mantissa, sign);
 
 	m_bsga_status &= ~STATUS_FLOAT_OFLOW;
+	bool overflow = false;
 
 	if (shift > 0)
 	{
@@ -616,13 +623,23 @@ WRITE32_MEMBER(gt_device_base::bsga_float_w)
 
 		// TODO: conditional on something?
 		if (shift <= 8)
-			m_bsga_status |= STATUS_FLOAT_OFLOW;
+			overflow = true;
 	}
 	else
 	{
 		m_bsga_xin = 0;
-		m_bsga_status |= STATUS_FLOAT_OFLOW;
+		overflow = true;
 	}
+
+	if(offset)
+		m_bsga_yin1 = m_bsga_xin;
+	else
+		m_bsga_xin1 = m_bsga_xin;
+
+	bsga_clip_status(m_bsga_xin1, m_bsga_yin1);
+
+	if(overflow)
+		m_bsga_status = (m_bsga_status | STATUS_FLOAT_OFLOW | STATUS_CLIP_ANY) & ~STATUS_CLIP_BOTH;
 
 	LOG("bsga_float_w result 0x%04x overflow %s\n", m_bsga_xin, m_bsga_status & STATUS_FLOAT_OFLOW ? "set" : "clear");
 }
@@ -740,7 +757,7 @@ TIMER_CALLBACK_MEMBER(gt_device_base::blit)
 		{
 			const u8 *dst_data = (m_control & GFX_MASK_SEL) ? &gt.mask[dst_address] : &gt.buffer[dst_address];
 
-			LOGMASKED(LOG_BLIT, "blit dst data %3d address 0x%08x %02x %02x %02x %02x\n",
+			LOGMASKED(LOG_BLIT, "blit dst data hi %3d address 0x%08x %02x %02x %02x %02x\n",
 				word, dst_address, dst_data[0], dst_data[1], dst_data[2], dst_data[3]);
 
 			gt.bpu->destination_w(HI(dst_data[0], dst_data[1], dst_data[2], dst_data[3]));
@@ -748,6 +765,7 @@ TIMER_CALLBACK_MEMBER(gt_device_base::blit)
 
 		// fetch bpu output
 		const u16 output = gt.bpu->output_r();
+		LOGMASKED(LOG_BLIT, "blit shift out hi %04x plane=%02x\n", output, m_plane_enable);
 
 		if (!(m_control & GFX_MASK_SEL))
 		{
@@ -756,13 +774,13 @@ TIMER_CALLBACK_MEMBER(gt_device_base::blit)
 			const u8 *out_mask = &gt.mask[dst_address];
 
 			if (!(m_control & GFX_MASK_ENA) || out_mask[0] == 0)
-				out_data[0] = (out_data[0] & ~(0xf0 | m_plane_enable)) | (((output & 0xf000) >> 8) & m_plane_enable);
+				out_data[0] = (out_data[0] & (0x0f | ~m_plane_enable)) | (((output & 0xf000) >> 8) & m_plane_enable);
 			if (!(m_control & GFX_MASK_ENA) || out_mask[1] == 0)
-				out_data[1] = (out_data[1] & ~(0xf0 | m_plane_enable)) | (((output & 0x0f00) >> 4) & m_plane_enable);
+				out_data[1] = (out_data[1] & (0x0f | ~m_plane_enable)) | (((output & 0x0f00) >> 4) & m_plane_enable);
 			if (!(m_control & GFX_MASK_ENA) || out_mask[2] == 0)
-				out_data[2] = (out_data[2] & ~(0xf0 | m_plane_enable)) | (((output & 0x00f0) >> 0) & m_plane_enable);
+				out_data[2] = (out_data[2] & (0x0f | ~m_plane_enable)) | (((output & 0x00f0) >> 0) & m_plane_enable);
 			if (!(m_control & GFX_MASK_ENA) || out_mask[3] == 0)
-				out_data[3] = (out_data[3] & ~(0xf0 | m_plane_enable)) | (((output & 0x000f) << 4) & m_plane_enable);
+				out_data[3] = (out_data[3] & (0x0f | ~m_plane_enable)) | (((output & 0x000f) << 4) & m_plane_enable);
 		}
 		else
 		{
@@ -841,11 +859,15 @@ TIMER_CALLBACK_MEMBER(gt_device_base::blit)
 		{
 			const u8 *dst_data = (m_control & GFX_MASK_SEL) ? &gt.mask[dst_address] : &gt.buffer[dst_address];
 
+			LOGMASKED(LOG_BLIT, "blit dst data lo %3d address 0x%08x %02x %02x %02x %02x\n",
+				word, dst_address, dst_data[0], dst_data[1], dst_data[2], dst_data[3]);
+
 			gt.bpu->destination_w(LO(dst_data[0], dst_data[1], dst_data[2], dst_data[3]));
 		}
 
 		// fetch bpu output
 		const u16 output = gt.bpu->output_r();
+		LOGMASKED(LOG_BLIT, "blit shift out lo %04x plane=%02x\n", output, m_plane_enable);
 
 		if (!(m_control & GFX_MASK_SEL))
 		{
@@ -854,18 +876,18 @@ TIMER_CALLBACK_MEMBER(gt_device_base::blit)
 			const u8 *out_mask = &gt.mask[dst_address];
 
 			if (!(m_control & GFX_MASK_ENA) || out_mask[0] == 0)
-				out_data[0] = (out_data[0] & ~(0x0f | m_plane_enable)) | (((output & 0xf000) >> 12) & m_plane_enable);
+				out_data[0] = (out_data[0] & (0xf0 | ~m_plane_enable)) | (((output & 0xf000) >> 12) & m_plane_enable);
 			if (!(m_control & GFX_MASK_ENA) || out_mask[1] == 0)
-				out_data[1] = (out_data[1] & ~(0x0f | m_plane_enable)) | (((output & 0x0f00) >> 8) & m_plane_enable);
+				out_data[1] = (out_data[1] & (0xf0 | ~m_plane_enable)) | (((output & 0x0f00) >> 8) & m_plane_enable);
 			if (!(m_control & GFX_MASK_ENA) || out_mask[2] == 0)
-				out_data[2] = (out_data[2] & ~(0x0f | m_plane_enable)) | (((output & 0x00f0) >> 4) & m_plane_enable);
+				out_data[2] = (out_data[2] & (0xf0 | ~m_plane_enable)) | (((output & 0x00f0) >> 4) & m_plane_enable);
 			if (!(m_control & GFX_MASK_ENA) || out_mask[3] == 0)
-				out_data[3] = (out_data[3] & ~(0x0f | m_plane_enable)) | (((output & 0x000f) >> 0) & m_plane_enable);
+				out_data[3] = (out_data[3] & (0xf0 | ~m_plane_enable)) | (((output & 0x000f) >> 0) & m_plane_enable);
 
 			LOGMASKED(LOG_BLIT, "blit dst mask %3d address 0x%08x %02x %02x %02x %02x\n",
 				word, dst_address, out_mask[0], out_mask[1], out_mask[2], out_mask[3]);
 			LOGMASKED(LOG_BLIT, "blit out data %3d address 0x%08x %02x %02x %02x %02x\n",
-				word, dst_address, out_data[0], out_data[1], out_data[2], out_data[3]);
+					  word, dst_address, out_data[0], out_data[1], out_data[2], out_data[3]);
 		}
 
 		dst_address += delta;
@@ -1407,6 +1429,7 @@ void gt_device_base::write_vram(const gt_t &gt, const offs_t offset, const u8 da
 
 		buffer_write(gt, offset >> 2, data << shift_amount, 0xff << shift_amount);
 	}
-	else
-		gt.buffer[offset] = data;
+	else {
+		gt.buffer[offset & GT_BUFFER_MASK] = data;
+	}
 }

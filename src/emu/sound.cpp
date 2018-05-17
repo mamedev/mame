@@ -268,9 +268,6 @@ void sound_stream::update()
 	attotime time = m_device.machine().time();
 	s32 update_sampindex = s32(time.attoseconds() / m_attoseconds_per_sample);
 
-	if (update_sampindex <= m_output_sampindex)
-		return;
-
 	// if we're ahead of the last update, then adjust upwards
 	attotime last_update = m_device.machine().sound().last_update();
 	if (time.seconds() > last_update.seconds())
@@ -285,6 +282,9 @@ void sound_stream::update()
 		assert(time.seconds() == last_update.seconds() - 1);
 		update_sampindex -= m_sample_rate;
 	}
+
+	if (update_sampindex <= m_output_sampindex)
+		return;
 
 	// generate samples to get us up to the appropriate time
 	g_profiler.start(PROFILER_SOUND);
@@ -604,11 +604,9 @@ void sound_stream::generate_samples(int samples)
 {
 	stream_sample_t **inputs = nullptr;
 	stream_sample_t **outputs = nullptr;
-	// if we're already there, skip it
-	if (samples <= 0)
-		return;
 
 	VPRINTF(("generate_samples(%p, %d)\n", (void *) this, samples));
+	assert(samples > 0);
 
 	// ensure all inputs are up to date and generate resampled data
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)

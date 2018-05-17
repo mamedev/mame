@@ -539,3 +539,4 @@ ROM_END
 
 CONS(1996, n64,   0,   0, n64,   n64, n64_mess_state, empty_init, "Nintendo", "Nintendo 64",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS(1996, n64dd, n64, 0, n64dd, n64, n64_mess_state, empty_init, "Nintendo", "Nintendo 64DD", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+

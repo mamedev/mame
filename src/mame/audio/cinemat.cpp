@@ -57,10 +57,6 @@ void cinemat_state::sound_start()
 	save_item(NAME(m_last_shift2));
 	save_item(NAME(m_current_pitch));
 	save_item(NAME(m_last_frame));
-	save_item(NAME(m_sound_fifo));
-	save_item(NAME(m_sound_fifo_in));
-	save_item(NAME(m_sound_fifo_out));
-	save_item(NAME(m_last_portb_write));
 }
 
 
@@ -1303,35 +1299,35 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( cinemat_state::synced_sound_w )
+TIMER_CALLBACK_MEMBER( demon_state::synced_sound_w )
 {
 	m_sound_fifo[m_sound_fifo_in] = param;
 	m_sound_fifo_in = (m_sound_fifo_in + 1) % 16;
 }
 
 
-WRITE_LINE_MEMBER(cinemat_state::demon_sound4_w)
+WRITE_LINE_MEMBER(demon_state::demon_sound4_w)
 {
 	/* watch for a 0->1 edge on bit 4 ("shift in") to clock in the new data */
 	if (state)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(cinemat_state::synced_sound_w), this), ~m_outlatch->output_state() & 0x0f);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(demon_state::synced_sound_w), this), ~m_outlatch->output_state() & 0x0f);
 }
 
 
-READ8_MEMBER(cinemat_state::sound_porta_r)
+READ8_MEMBER(demon_state::sound_porta_r)
 {
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
 	return m_sound_fifo[m_sound_fifo_out] | ((m_sound_fifo_in != m_sound_fifo_out) << 4);
 }
 
 
-READ8_MEMBER(cinemat_state::sound_portb_r)
+READ8_MEMBER(demon_state::sound_portb_r)
 {
 	return m_last_portb_write;
 }
 
 
-WRITE8_MEMBER(cinemat_state::sound_portb_w)
+WRITE8_MEMBER(demon_state::sound_portb_w)
 {
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
 	if ((data & 1) != (m_last_portb_write & 1) && (data & 1) != 0)
@@ -1349,15 +1345,27 @@ WRITE8_MEMBER(cinemat_state::sound_portb_w)
 	m_last_portb_write = data;
 }
 
-WRITE8_MEMBER(cinemat_state::sound_output_w)
+WRITE8_MEMBER(demon_state::sound_output_w)
 {
 	logerror("sound_output = %02X\n", data);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, demon )
+
+void demon_state::sound_start()
+{
+	cinemat_state::sound_start();
+
+	/* register for save states */
+	save_item(NAME(m_sound_fifo));
+	save_item(NAME(m_sound_fifo_in));
+	save_item(NAME(m_sound_fifo_out));
+	save_item(NAME(m_last_portb_write));
+}
+
+void demon_state::sound_reset()
 {
 	/* generic init */
-	sound_reset();
+	cinemat_state::sound_reset();
 
 	/* reset the FIFO */
 	m_sound_fifo_in = m_sound_fifo_out = 0;
@@ -1368,7 +1376,7 @@ SOUND_RESET_MEMBER( cinemat_state, demon )
 }
 
 
-void cinemat_state::demon_sound_map(address_map &map)
+void demon_state::demon_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x3000, 0x33ff).ram();
@@ -1382,7 +1390,7 @@ void cinemat_state::demon_sound_map(address_map &map)
 }
 
 
-void cinemat_state::demon_sound_ports(address_map &map)
+void demon_state::demon_sound_ports(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).w("ctc", FUNC(z80ctc_device::write));
@@ -1397,7 +1405,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(cinemat_state::demon_sound)
+MACHINE_CONFIG_START(demon_state::demon_sound)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
@@ -1408,18 +1416,16 @@ MACHINE_CONFIG_START(cinemat_state::demon_sound)
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 3579545 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
-	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, demon)
-
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, demon_sound4_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, demon_state, demon_sound4_w))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 3579545)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, cinemat_state, sound_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, cinemat_state, sound_portb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, cinemat_state, sound_portb_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, demon_state, sound_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, demon_state, sound_portb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("ay2", AY8910, 3579545)
@@ -1428,7 +1434,7 @@ MACHINE_CONFIG_START(cinemat_state::demon_sound)
 	MCFG_DEVICE_ADD("ay3", AY8910, 3579545)
 
 
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, cinemat_state, sound_output_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1440,16 +1446,16 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::qb3_sound_fifo_w)
+WRITE8_MEMBER(qb3_state::qb3_sound_fifo_w)
 {
 	uint16_t rega = m_maincpu->state_int(ccpu_cpu_device::CCPU_A);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cinemat_state::synced_sound_w), this), rega & 0x0f);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qb3_state::synced_sound_w), this), rega & 0x0f);
 }
 
 
-SOUND_RESET_MEMBER( cinemat_state, qb3 )
+void qb3_state::sound_reset()
 {
-	SOUND_RESET_CALL_MEMBER(demon);
+	demon_state::sound_reset();
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */
@@ -1457,9 +1463,8 @@ SOUND_RESET_MEMBER( cinemat_state, qb3 )
 }
 
 
-MACHINE_CONFIG_START(cinemat_state::qb3_sound)
+MACHINE_CONFIG_START(qb3_state::qb3_sound)
 	demon_sound(config);
-	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, qb3)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // not mapped through LS259

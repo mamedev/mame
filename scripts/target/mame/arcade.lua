@@ -3382,6 +3382,8 @@ files {
 	MAME_DIR .. "src/mame/machine/315_5649.h",
 	MAME_DIR .. "src/mame/machine/model1io.cpp",
 	MAME_DIR .. "src/mame/machine/model1io.h",
+	MAME_DIR .. "src/mame/machine/model1io2.cpp",
+	MAME_DIR .. "src/mame/machine/model1io2.h",
 	MAME_DIR .. "src/mame/machine/fd1089.cpp",
 	MAME_DIR .. "src/mame/machine/fd1089.h",
 	MAME_DIR .. "src/mame/machine/fd1094.cpp",
