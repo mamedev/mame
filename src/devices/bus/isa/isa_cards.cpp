@@ -152,6 +152,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("aha1542", AHA1542);
 	device.option_add("gus",ISA16_GUS);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
+	device.option_add("svga_et4k_16", ISA16_SVGA_ET4K);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
 	device.option_add("s3virge", ISA16_S3VIRGE);
 	device.option_add("s3virgedx", ISA16_S3VIRGEDX);

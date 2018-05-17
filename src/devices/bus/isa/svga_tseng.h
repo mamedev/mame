@@ -45,4 +45,35 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device)
 
+class isa16_svga_et4k_device :
+		public device_t,
+		public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ16_MEMBER(input_port_0_r);
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	tseng_vga_device *m_vga;
+	void map_io();
+	void map_ram();
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(ISA16_SVGA_ET4K, isa16_svga_et4k_device)
+
 #endif // MAME_BUS_ISA_SVGA_TSENG_H
+

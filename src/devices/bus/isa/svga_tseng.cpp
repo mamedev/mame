@@ -22,14 +22,23 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng ET4000 Graphics Card")
-
+DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng ET4000 Graphics Card (8-bit)")
+DEFINE_DEVICE_TYPE(ISA16_SVGA_ET4K, isa16_svga_et4k_device, "et4000", "SVGA Tseng ET4000 Graphics Card (16-bit)")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_svga_et4k_device::device_add_mconfig)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", tseng_vga_device, screen_update)
+
+	MCFG_DEVICE_ADD("vga", TSENG_VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(isa16_svga_et4k_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", tseng_vga_device, screen_update)
@@ -47,6 +56,11 @@ const tiny_rom_entry *isa8_svga_et4k_device::device_rom_region() const
 	return ROM_NAME( et4000 );
 }
 
+const tiny_rom_entry *isa16_svga_et4k_device::device_rom_region() const
+{
+	return ROM_NAME( et4000 );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -58,6 +72,13 @@ const tiny_rom_entry *isa8_svga_et4k_device::device_rom_region() const
 isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA8_SVGA_ET4K, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
+	m_vga(nullptr)
+{
+}
+
+isa16_svga_et4k_device::isa16_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA16_SVGA_ET4K, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
 	m_vga(nullptr)
 {
 }
@@ -78,11 +99,33 @@ void isa8_svga_et4k_device::device_start()
 	map_ram();
 }
 
+READ16_MEMBER(isa16_svga_et4k_device::input_port_0_r ) { return 0xffff; } //return machine().root_device().ioport("IN0")->read(); }
+
+void isa16_svga_et4k_device::device_start()
+{
+	set_isa_device();
+
+	m_vga = subdevice<tseng_vga_device>("vga");
+
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000", "et4000");
+
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(tseng_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(tseng_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(tseng_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03d0_w),m_vga));
+
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(tseng_vga_device::mem_r),m_vga), write8_delegate(FUNC(tseng_vga_device::mem_w),m_vga));
+	m_isa->install_memory(0x100000, 0x1fffff, read8_delegate(FUNC(tseng_vga_device::isa_aperture_r),m_vga), write8_delegate(FUNC(tseng_vga_device::isa_aperture_w),m_vga));
+}
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
 void isa8_svga_et4k_device::device_reset()
+{
+}
+
+void isa16_svga_et4k_device::device_reset()
 {
 }
 
@@ -107,4 +150,23 @@ void isa8_svga_et4k_device::map_io()
 void isa8_svga_et4k_device::map_ram()
 {
 	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(tseng_vga_device::mem_r), m_vga), write8_delegate(FUNC(tseng_vga_device::mem_w), m_vga));
+}
+
+void isa16_svga_et4k_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+		map_ram();
+}
+
+void isa16_svga_et4k_device::map_io()
+{
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(tseng_vga_device::port_03b0_r), m_vga), write8_delegate(FUNC(tseng_vga_device::port_03b0_w), m_vga));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(tseng_vga_device::port_03c0_r), m_vga), write8_delegate(FUNC(tseng_vga_device::port_03c0_w), m_vga));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(tseng_vga_device::port_03d0_r), m_vga), write8_delegate(FUNC(tseng_vga_device::port_03d0_w), m_vga));
+}
+
+void isa16_svga_et4k_device::map_ram()
+{
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(tseng_vga_device::mem_r), m_vga), write8_delegate(FUNC(tseng_vga_device::mem_w), m_vga));
+	m_isa->install_memory(0x100000, 0x1fffff, read8_delegate(FUNC(tseng_vga_device::isa_aperture_r), m_vga), write8_delegate(FUNC(tseng_vga_device::isa_aperture_w), m_vga));
 }

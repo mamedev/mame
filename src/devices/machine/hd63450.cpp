@@ -317,6 +317,7 @@ void hd63450_device::dma_transfer_continue(int channel)
 
 void hd63450_device::single_transfer(int x)
 {
+	logerror("Single transfer\n");
 	address_space &space = m_cpu->space(AS_PROGRAM);
 	int data;
 	int datasize = 1;
@@ -325,8 +326,10 @@ void hd63450_device::single_transfer(int x)
 		{
 			if(m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory
 			{
+				logerror("Device -> Memory\n");
 				if((x == 0) && !m_dma_read_0.isnull())
 				{
+					
 					data = m_dma_read_0(m_reg[x].mar);
 					if(data == -1)
 						return;  // not ready to receive data
@@ -358,7 +361,7 @@ void hd63450_device::single_transfer(int x)
 					datasize = 1;
 				}
 				else
-				{
+				{					
 					switch(m_reg[x].ocr & 0x30)  // operation size
 					{
 					case 0x00:  // 8 bit
@@ -385,32 +388,33 @@ void hd63450_device::single_transfer(int x)
 						break;
 					}
 				}
-//              logerror("DMA#%i: byte transfer %08lx -> %08lx  (byte = %02x)\n",x,dmac.reg[x].dar,dmac.reg[x].mar,data);
+              logerror("DMA#%i: byte transfer %08lx -> %08lx  (byte = %02x)\n",x,m_reg[x].dar,m_reg[x].mar,data);
 			}
 			else  // memory -> device
 			{
+				
 				if((x == 0) && !m_dma_write_0.isnull())
 				{
 					data = space.read_byte(m_reg[x].mar);
-					m_dma_write_0((offs_t)m_reg[x].mar,data);
+					m_dma_write_0((offs_t)m_reg[x].dar,data);
 					datasize = 1;
 				}
 				else if((x == 1) && !m_dma_write_1.isnull())
 				{
 					data = space.read_byte(m_reg[x].mar);
-					m_dma_write_1((offs_t)m_reg[x].mar,data);
+					m_dma_write_1((offs_t)m_reg[x].dar,data);
 					datasize = 1;
 				}
 				else if((x == 2) && !m_dma_write_2.isnull())
 				{
 					data = space.read_byte(m_reg[x].mar);
-					m_dma_write_2((offs_t)m_reg[x].mar,data);
+					m_dma_write_2((offs_t)m_reg[x].dar,data);
 					datasize = 1;
 				}
 				else if((x == 3) && !m_dma_write_3.isnull())
 				{
 					data = space.read_byte(m_reg[x].mar);
-					m_dma_write_3((offs_t)m_reg[x].mar,data);
+					m_dma_write_3((offs_t)m_reg[x].dar,data);
 					datasize = 1;
 				}
 				else
@@ -424,6 +428,7 @@ void hd63450_device::single_transfer(int x)
 						break;
 					case 0x10:  // 16 bit
 						data = space.read_word(m_reg[x].mar);  // read from memory address
+						printf("Transferring %x from %lx to %lx\n", data, m_reg[x].mar, m_reg[x].dar);
 						space.write_word(m_reg[x].dar, data);  // write to device address
 						datasize = 2;
 						break;
@@ -441,7 +446,7 @@ void hd63450_device::single_transfer(int x)
 						break;
 					}
 				}
-//              logerror("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
+				logerror("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
 			}
 
 

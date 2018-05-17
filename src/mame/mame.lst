@@ -18118,6 +18118,9 @@ luckybala                       // (c) 1996 Sielcon Games
 luckybalb                       // (c) 1996 Sielcon Games
 luckybalc                       // (c) 1996 Sielcon Games
 
+@source:luigisbc.cpp
+luigisbc						// (c) 2018
+
 @source:lvcards.cpp
 lvcards                         // (c) 1985 Tehkan
 lvpoker                         // ???? - (c) 1985 Tehkan

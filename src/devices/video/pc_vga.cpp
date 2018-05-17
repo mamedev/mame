@@ -404,6 +404,7 @@ void tseng_vga_device::device_start()
 	save_item(NAME(et4k.dac_state));
 	save_item(NAME(et4k.horz_overflow));
 	save_item(NAME(et4k.aux_ctrl));
+	save_item(NAME(et4k.vsconf1));
 	save_item(NAME(et4k.ext_reg_ena));
 	save_item(NAME(et4k.misc1));
 	save_item(NAME(et4k.misc2));
@@ -488,7 +489,9 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						pen = vga.pens[back_col];
 
 					if(!screen().visible_area().contains(column*width+w, line+h))
+					{
 						continue;
+					}
 					bitmapline[column*width+w] = pen;
 
 				}
@@ -501,7 +504,9 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						pen = vga.pens[back_col];
 
 					if(!screen().visible_area().contains(column*width+w, line+h))
+					{
 						continue;
+					}
 					bitmapline[column*width+w] = pen;
 				}
 			}
@@ -512,7 +517,9 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						h++)
 				{
 					if(!screen().visible_area().contains(column*width, line+h))
+					{
 						continue;
+					}
 					bitmap.plot_box(column*width, line+h, width, 1, vga.pens[attr&0xf]);
 				}
 			}
@@ -1251,7 +1258,9 @@ inline uint8_t vga_device::vga_latch_write(int offs, uint8_t data)
 	case 0:
 		data = rotate_right(data);
 		if(vga.gc.enable_set_reset & 1<<offs)
+		{
 			res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? vga.gc.bit_mask : 0, offs,vga.gc.bit_mask);
+		}
 		else
 			res = vga_logical_op(data, offs, vga.gc.bit_mask);
 		break;
@@ -2166,37 +2175,46 @@ READ8_MEMBER(vga_device::mem_r)
 
 WRITE8_MEMBER(vga_device::mem_w)
 {
-	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask the offset.
+	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask the offset.	
 	switch(vga.gc.memory_map_sel & 0x03)
 	{
 		case 0: break;
 		case 1:
 			if(offset & 0x10000)
+			{
 				return;
+			}
 
 			offset &= 0x0ffff;
 			break;
 		case 2:
 			if((offset & 0x18000) != 0x10000)
+			{
 				return;
+			}
+				
 
 			offset &= 0x07fff;
 			break;
 		case 3:
 			if((offset & 0x18000) != 0x18000)
-				return;
+			{
+				return;	
+			}
 
 			offset &= 0x07fff;
 			break;
 	}
-
+	
 	{
 		uint8_t i;
 
 		for(i=0;i<4;i++)
 		{
 			if(vga.sequencer.map_mask & 1 << i)
+			{	
 				vga.memory[offset+i*0x10000] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+			}
 		}
 		return;
 	}
@@ -2300,6 +2318,9 @@ uint8_t tseng_vga_device::tseng_crtc_reg_read(uint8_t index)
 	{
 		switch(index)
 		{
+			case 0x24:
+				res = et4k.vsconf1;
+				break;
 			case 0x34:
 				res = et4k.aux_ctrl;
 				break;
@@ -2324,6 +2345,9 @@ void tseng_vga_device::tseng_crtc_reg_write(uint8_t index, uint8_t data)
 	{
 		switch(index)
 		{
+			case 0x24:
+				et4k.vsconf1 = data;
+				break;
 			case 0x34:
 				et4k.aux_ctrl = data;
 				break;
@@ -2608,8 +2632,44 @@ WRITE8_MEMBER(tseng_vga_device::mem_w)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
+		if(et4k.vsconf1 & 0x10)
+		{
+			vga.memory[offset] = data;
+		}
+		else
+		{
+			offset &= 0xffff;
+			vga.memory[(offset+svga.bank_w*0x10000)] = data;			
+		}
+	}
+	else
+		vga_device::mem_w(space,offset,data,mem_mask);
+}
+
+READ8_MEMBER(tseng_vga_device::isa_aperture_r)
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
 		offset &= 0xffff;
-		vga.memory[(offset+svga.bank_w*0x10000)] = data;
+		return vga.memory[(offset+svga.bank_r*0x10000)];
+	}
+
+	return vga_device::mem_r(space,offset,mem_mask);
+}
+
+WRITE8_MEMBER(tseng_vga_device::isa_aperture_w)
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		if(et4k.vsconf1 & 0x10)
+		{
+			vga.memory[offset] = data;
+		}
+		else
+		{
+			offset &= 0xffff;
+			vga.memory[(offset+svga.bank_w*0x10000)] = data;			
+		}
 	}
 	else
 		vga_device::mem_w(space,offset,data,mem_mask);
