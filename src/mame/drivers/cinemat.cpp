@@ -261,7 +261,7 @@ READ8_MEMBER(cinemat_state::boxingb_dial_r)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::qb3_frame_r)
+READ8_MEMBER(qb3_state::qb3_frame_r)
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
@@ -272,7 +272,7 @@ READ8_MEMBER(cinemat_state::qb3_frame_r)
 }
 
 
-WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
+WRITE8_MEMBER(qb3_state::qb3_ram_bank_w)
 {
 	membank("bank1")->set_entry(m_maincpu->state_int(ccpu_cpu_device::CCPU_P) & 3);
 }
@@ -316,7 +316,7 @@ void cinemat_state::data_map(address_map &map)
 	map(0x0000, 0x00ff).ram();
 }
 
-void cinemat_state::data_map_qb3(address_map &map)
+void qb3_state::data_map_qb3(address_map &map)
 {
 	map(0x0000, 0x03ff).bankrw("bank1").share("rambase");
 }
@@ -331,13 +331,13 @@ void cinemat_state::io_map(address_map &map)
 	map(0x00, 0x07).w(m_outlatch, FUNC(ls259_device::write_d0));
 }
 
-void cinemat_state::io_map_qb3(address_map &map)
+void qb3_state::io_map_qb3(address_map &map)
 {
 	io_map(map);
 	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
-	map(0x00, 0x00).w(this, FUNC(cinemat_state::qb3_ram_bank_w));
-	map(0x04, 0x04).w(this, FUNC(cinemat_state::qb3_sound_fifo_w));
-	map(0x0f, 0x0f).r(this, FUNC(cinemat_state::qb3_frame_r));
+	map(0x00, 0x00).w(this, FUNC(qb3_state::qb3_ram_bank_w));
+	map(0x04, 0x04).w(this, FUNC(qb3_state::qb3_sound_fifo_w));
+	map(0x0f, 0x0f).r(this, FUNC(qb3_state::qb3_frame_r));
 }
 
 
@@ -1141,7 +1141,7 @@ MACHINE_CONFIG_START(cinemat_state::wotwc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(cinemat_state::demon)
+MACHINE_CONFIG_START(demon_state::demon)
 	cinemat_jmi_16k(config);
 	demon_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
@@ -1149,7 +1149,7 @@ MACHINE_CONFIG_START(cinemat_state::demon)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(cinemat_state::qb3)
+MACHINE_CONFIG_START(qb3_state::qb3)
 	cinemat_jmi_32k(config);
 	qb3_sound(config);
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1157,7 +1157,6 @@ MACHINE_CONFIG_START(cinemat_state::qb3)
 	MCFG_DEVICE_IO_MAP(io_map_qb3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
-	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_qb3color)
 MACHINE_CONFIG_END
 
 
@@ -1486,7 +1485,7 @@ void cinemat_state::init_boxingb()
 }
 
 
-void cinemat_state::init_qb3()
+void qb3_state::init_qb3()
 {
 	membank("bank1")->configure_entries(0, 4, m_rambase, 0x100*2);
 }
@@ -1521,5 +1520,5 @@ GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_state, empty_init, 
 GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_state, init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state, empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wotw )
 GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_state, empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1982, demon,    0,        demon,    demon,    cinemat_state, empty_init,    ORIENTATION_FLIP_Y,   "Rock-Ola", "Demon", MACHINE_SUPPORTS_SAVE, layout_demon )
-GAME(  1982, qb3,      0,        qb3,      qb3,      cinemat_state, init_qb3,      ORIENTATION_FLIP_Y,   "Rock-Ola", "QB-3 (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1982, demon,    0,        demon,    demon,    demon_state,   empty_init,    ORIENTATION_FLIP_Y,   "Rock-Ola", "Demon", MACHINE_SUPPORTS_SAVE, layout_demon )
+GAME(  1982, qb3,      0,        qb3,      qb3,      qb3_state,     init_qb3,      ORIENTATION_FLIP_Y,   "Rock-Ola", "QB-3 (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

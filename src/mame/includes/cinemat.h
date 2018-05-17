@@ -5,6 +5,10 @@
     Cinematronics vector hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CINEMAT_H
+#define MAME_INCLUDES_CINEMAT_H
+
+#pragma once
 
 #include "cpu/ccpu/ccpu.h"
 #include "machine/74259.h"
@@ -58,10 +62,6 @@ public:
 	uint32_t m_last_shift2;
 	uint32_t m_current_pitch;
 	uint32_t m_last_frame;
-	uint8_t m_sound_fifo[16];
-	uint8_t m_sound_fifo_in;
-	uint8_t m_sound_fifo_out;
-	uint8_t m_last_portb_write;
 	float m_target_volume;
 	float m_current_volume;
 	uint8_t m_coin_detected;
@@ -73,8 +73,6 @@ public:
 	int16_t m_lastx;
 	int16_t m_lasty;
 	uint8_t m_last_control;
-	int m_qb3_lastx;
-	int m_qb3_lasty;
 	DECLARE_READ8_MEMBER(inputs_r);
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_READ8_MEMBER(coin_input_r);
@@ -84,33 +82,22 @@ public:
 	DECLARE_READ8_MEMBER(speedfrk_gear_r);
 	DECLARE_READ8_MEMBER(sundance_inputs_r);
 	DECLARE_READ8_MEMBER(boxingb_dial_r);
-	DECLARE_READ8_MEMBER(qb3_frame_r);
-	DECLARE_WRITE8_MEMBER(qb3_ram_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(vector_control_w);
+	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w);
 	DECLARE_READ8_MEMBER(joystick_read);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_speedfrk();
 	void init_boxingb();
 	void init_sundance();
-	void init_qb3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
 	virtual void video_start() override;
-	DECLARE_SOUND_RESET(demon);
-	DECLARE_SOUND_RESET(qb3);
 	DECLARE_VIDEO_START(cinemat_16level);
 	DECLARE_VIDEO_START(cinemat_64level);
 	DECLARE_VIDEO_START(cinemat_color);
-	DECLARE_VIDEO_START(cinemat_qb3color);
 	uint32_t screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(sound_porta_r);
-	DECLARE_READ8_MEMBER(sound_portb_r);
-	DECLARE_WRITE8_MEMBER(sound_portb_w);
-	DECLARE_WRITE8_MEMBER(sound_output_w);
-	TIMER_CALLBACK_MEMBER(synced_sound_w);
 	void cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift);
 	DECLARE_WRITE_LINE_MEMBER(spacewar_sound0_w);
 	DECLARE_WRITE_LINE_MEMBER(spacewar_sound1_w);
@@ -169,17 +156,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound2_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound3_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
-	DECLARE_WRITE8_MEMBER(qb3_sound_fifo_w);
 	void cinemat_nojmi_4k(machine_config &config);
 	void cinemat_jmi_4k(machine_config &config);
 	void cinemat_nojmi_8k(machine_config &config);
 	void cinemat_jmi_8k(machine_config &config);
 	void cinemat_jmi_16k(machine_config &config);
 	void cinemat_jmi_32k(machine_config &config);
-	void qb3(machine_config &config);
 	void ripoff(machine_config &config);
-	void demon(machine_config &config);
 	void wotwc(machine_config &config);
 	void wotw(machine_config &config);
 	void boxingb(machine_config &config);
@@ -206,16 +189,71 @@ public:
 	void solarq_sound(machine_config &config);
 	void boxingb_sound(machine_config &config);
 	void wotw_sound(machine_config &config);
-	void demon_sound(machine_config &config);
-	void qb3_sound(machine_config &config);
 	void data_map(address_map &map);
-	void data_map_qb3(address_map &map);
-	void demon_sound_map(address_map &map);
-	void demon_sound_ports(address_map &map);
 	void io_map(address_map &map);
-	void io_map_qb3(address_map &map);
 	void program_map_16k(address_map &map);
 	void program_map_32k(address_map &map);
 	void program_map_4k(address_map &map);
 	void program_map_8k(address_map &map);
 };
+
+
+class demon_state : public cinemat_state
+{
+public:
+	using cinemat_state::cinemat_state;
+
+	void demon(machine_config &config);
+
+protected:
+	TIMER_CALLBACK_MEMBER(synced_sound_w);
+	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
+	DECLARE_READ8_MEMBER(sound_porta_r);
+	DECLARE_READ8_MEMBER(sound_portb_r);
+	DECLARE_WRITE8_MEMBER(sound_portb_w);
+	DECLARE_WRITE8_MEMBER(sound_output_w);
+
+	virtual void sound_start() override;
+	virtual void sound_reset() override;
+
+	void demon_sound(machine_config &config);
+
+	void demon_sound_map(address_map &map);
+	void demon_sound_ports(address_map &map);
+
+private:
+	uint8_t m_sound_fifo[16];
+	uint8_t m_sound_fifo_in;
+	uint8_t m_sound_fifo_out;
+	uint8_t m_last_portb_write;
+};
+
+
+class qb3_state : public demon_state
+{
+public:
+	using demon_state::demon_state;
+
+	void init_qb3();
+
+	void qb3(machine_config &config);
+
+protected:
+	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	DECLARE_READ8_MEMBER(qb3_frame_r);
+	DECLARE_WRITE8_MEMBER(qb3_ram_bank_w);
+	DECLARE_WRITE8_MEMBER(qb3_sound_fifo_w);
+
+	virtual void sound_reset() override;
+
+	void qb3_sound(machine_config &config);
+
+	void data_map_qb3(address_map &map);
+	void io_map_qb3(address_map &map);
+
+private:
+	int m_qb3_lastx;
+	int m_qb3_lasty;
+};
+
+#endif // MAME_INCLUDES_CINEMAT_H
