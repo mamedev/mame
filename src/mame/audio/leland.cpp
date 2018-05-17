@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 	{
 		if (m_ext_active && (m_ext_start < m_ext_stop))
 		{
-			m_dac4->write(m_ext_base[m_ext_start]);
+			m_dac[3]->write(m_ext_base[m_ext_start]);
 			m_ext_start++;
 		}
 	}
@@ -172,6 +172,8 @@ MACHINE_CONFIG_START(leland_80186_sound_device::device_add_mconfig)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_1_w))
 	MCFG_PIT8253_CLK2(4000000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_2_w))
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
@@ -222,6 +224,8 @@ MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_2_w))
 	MCFG_PIT8253_CLK1(7000000)
 	MCFG_PIT8253_CLK2(7000000)
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
@@ -249,6 +253,8 @@ MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
 	MCFG_PIT8253_CLK2(4000000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit0_2_w))
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
@@ -281,6 +287,8 @@ MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
 	MCFG_PIT8253_CLK2(4000000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit0_2_w))
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 
@@ -341,28 +349,13 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 }
 
 leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
-		m_dac3(*this, "dac3"),
-		m_dac4(*this, "dac4"),
-		m_dac5(*this, "dac5"),
-		m_dac6(*this, "dac6"),
-		m_dac7(*this, "dac7"),
-		m_dac8(*this, "dac8"),
-		m_dac9(*this, "dac9"),
-		m_dac1vol(*this, "dac1vol"),
-		m_dac2vol(*this, "dac2vol"),
-		m_dac3vol(*this, "dac3vol"),
-		m_dac4vol(*this, "dac4vol"),
-		m_dac5vol(*this, "dac5vol"),
-		m_dac6vol(*this, "dac6vol"),
-		m_dac7vol(*this, "dac7vol"),
-		m_dac8vol(*this, "dac8vol"),
-		m_pit0(*this, "pit0"),
-		m_pit1(*this, "pit1"),
-		m_pit2(*this, "pit2"),
-		m_ymsnd(*this, "ymsnd")
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_soundlatch(*this, "soundlatch")
+	, m_dac(*this, "dac%u", 1U)
+	, m_dac9(*this, "dac9")
+	, m_dacvol(*this, "dac%uvol", 1U)
+	, m_pit(*this, "pit%u", 0U)
+	, m_ymsnd(*this, "ymsnd")
 {
 }
 
@@ -471,16 +464,11 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
  *
  *************************************/
 
-void leland_80186_sound_device::command_lo_sync(void *ptr, int param)
-{
-	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", machine().describe_context(), param);
-	m_sound_command = (m_sound_command & 0xff00) | param;
-}
-
-
 WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_lo_w )
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_80186_sound_device::command_lo_sync), this), data);
+	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", machine().describe_context(), data);
+	m_sound_command = (m_sound_command & 0xff00) | data;
+	m_soundlatch->write(space, offset, m_sound_command);
 }
 
 
@@ -488,6 +476,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_hi_w )
 {
 	if (LOG_COMM) logerror("%s:Write sound command latch hi = %02X\n", machine().describe_context(), data);
 	m_sound_command = (m_sound_command & 0x00ff) | (data << 8);
+	m_soundlatch->write(space, offset, m_sound_command);
 }
 
 
@@ -551,33 +540,7 @@ WRITE16_MEMBER( leland_80186_sound_device::dac_w )
 	/* handle value changes */
 	if (ACCESSING_BITS_0_7)
 	{
-		switch (dac)
-		{
-		case 0:
-			m_dac1->write(data & 0xff);
-			break;
-		case 1:
-			m_dac2->write(data & 0xff);
-			break;
-		case 2:
-			m_dac3->write(data & 0xff);
-			break;
-		case 3:
-			m_dac4->write(data & 0xff);
-			break;
-		case 4:
-			m_dac5->write(data & 0xff);
-			break;
-		case 5:
-			m_dac6->write(data & 0xff);
-			break;
-		case 6:
-			m_dac7->write(data & 0xff);
-			break;
-		case 7:
-			m_dac8->write(data & 0xff);
-			break;
-		}
+		m_dac[dac]->write(data & 0xff);
 
 		set_clock_line(dac, 0);
 	}
@@ -585,33 +548,7 @@ WRITE16_MEMBER( leland_80186_sound_device::dac_w )
 	/* handle volume changes */
 	if (ACCESSING_BITS_8_15)
 	{
-		switch(dac)
-		{
-		case 0:
-			m_dac1vol->write(data >> 8);
-			break;
-		case 1:
-			m_dac2vol->write(data >> 8);
-			break;
-		case 2:
-			m_dac3vol->write(data >> 8);
-			break;
-		case 3:
-			m_dac4vol->write(data >> 8);
-			break;
-		case 4:
-			m_dac5vol->write(data >> 8);
-			break;
-		case 5:
-			m_dac6vol->write(data >> 8);
-			break;
-		case 6:
-			m_dac7vol->write(data >> 8);
-			break;
-		case 7:
-			m_dac8vol->write(data >> 8);
-			break;
-		}
+		m_dacvol[dac]->write(data >> 8);
 	}
 }
 
@@ -634,9 +571,9 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			dac_w(space, offset, data, 0x00ff);
 			return;
 		case 0x03:
-			m_dac1vol->write((data & 7) << 5);
-			m_dac2vol->write(((data >> 3) & 7) << 5);
-			m_dac3vol->write(((data >> 6) & 3) << 6);
+			m_dacvol[0]->write((data & 7) << 5);
+			m_dacvol[1]->write(((data >> 3) & 7) << 5);
+			m_dacvol[2]->write(((data >> 6) & 3) << 6);
 			return;
 		case 0x21:
 			dac_w(space, 3, data, mem_mask);
@@ -705,19 +642,19 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 				return ((m_clock_active << 1) & 0x7e);
 
 		case 1:
-			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), m_sound_command);
-			return m_sound_command;
+			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), m_soundlatch->read(space, offset));
+			return m_soundlatch->read(space, offset);
 
 		case 2:
 			if (ACCESSING_BITS_0_7)
-				return m_pit0->read(space, offset & 3);
+				return m_pit[0]->read(space, offset & 3);
 			break;
 
 		case 3:
 			if (m_type <= TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					return m_pit1->read(space, offset & 3);
+					return m_pit[1]->read(space, offset & 3);
 			}
 			else if (m_type == TYPE_WSF)
 				return m_ymsnd->read(space, offset);
@@ -727,7 +664,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 			if (m_type == TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					return m_pit2->read(space, offset & 3);
+					return m_pit[2]->read(space, offset & 3);
 			}
 			else
 				logerror("%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
@@ -755,14 +692,14 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 
 		case 2:
 			if (ACCESSING_BITS_0_7)
-				m_pit0->write(space, offset & 3, data);
+				m_pit[0]->write(space, offset & 3, data);
 			break;
 
 		case 3:
 			if (m_type <= TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					m_pit1->write(space, offset & 3, data);
+					m_pit[1]->write(space, offset & 3, data);
 			}
 			else if(m_type == TYPE_WSF)
 				m_ymsnd->write(space, offset, data);
@@ -772,7 +709,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 			if (m_type == TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					m_pit2->write(space, offset & 3, data);
+					m_pit[2]->write(space, offset & 3, data);
 			}
 			else if (mem_mask == 0xffff)
 			{
