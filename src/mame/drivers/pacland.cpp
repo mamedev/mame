@@ -200,6 +200,8 @@ Notes:
 
 void pacland_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_mcu_irq_mask));
 }
@@ -237,8 +239,8 @@ WRITE8_MEMBER(pacland_state::coin_w)
 
 WRITE8_MEMBER(pacland_state::led_w)
 {
-	output().set_led_value(0, data & 0x08);
-	output().set_led_value(1, data & 0x10);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
