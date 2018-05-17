@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina, Roberto Fresca
+// copyright-holders:Katherine Rohl
 /***************************************************************************
 
   Procyon 68000 homebrew single-board computer.
