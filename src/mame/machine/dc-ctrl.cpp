@@ -69,22 +69,21 @@ dc_controller_device::dc_controller_device(const machine_config &mconfig, const 
 {
 	id = "Dreamcast Controller";
 	license = "Produced By or Under License From SEGA ENTERPRISES,LTD.";
-	versions = "Version 1.010,1998/09/28,315-6211-AB   ,Analog Module : The 4th Edition.5/8  +DF";
+	versions = "Version 1.000,1998/05/11,315-6215-AB   ,Analog Module: The 4th Edition. 05/08";
 }
 
 void dc_controller_device::fixed_status(uint32_t *dest)
 {
-	// TODO: is this right? should be 0x01000000
-	dest[0] = 0x20000000; // Controller
+	dest[0] = 0x01000000; // Controller
 	dest[1] =
-		((port[2] != nullptr) ? 0x010000 : 0) |
-		((port[3] != nullptr) ? 0x020000 : 0) |
-		((port[4] != nullptr) ? 0x040000 : 0) |
-		((port[5] != nullptr) ? 0x080000 : 0) |
-		((port[6] != nullptr) ? 0x100000 : 0) |
-		((port[7] != nullptr) ? 0x200000 : 0) |
-		((port[0] ? port[0]->active() : 0) << 8) |
-		(port[1] ? port[1]->active() : 0); // 1st function - controller
+		((port[2] != nullptr) ? 0x0100 : 0) |
+		((port[3] != nullptr) ? 0x0200 : 0) |
+		((port[4] != nullptr) ? 0x0400 : 0) |
+		((port[5] != nullptr) ? 0x0800 : 0) |
+		((port[6] != nullptr) ? 0x1000 : 0) |
+		((port[7] != nullptr) ? 0x2000 : 0) |
+		((port[0] ? port[0]->active() : 0) << 24) |
+		((port[1] ? port[1]->active() : 0) << 16); // 1st function - controller
 	dest[2] = 0; // No 2nd function
 	dest[3] = 0; // No 3rd function
 	dest[4] = 0x00ff; // Every region, no expansion
@@ -100,8 +99,7 @@ void dc_controller_device::free_status(uint32_t *dest)
 
 void dc_controller_device::read(uint32_t *dest)
 {
-	// TODO: is this right? should be 0x01000000
-	dest[0] = 0x21000000; // Controller
+	dest[0] = 0x01000000; // Controller
 	dest[1] =
 		(port[0] ? port[0]->read() : 0xff) |
 		((port[1] ? port[1]->read() : 0xff) << 8) |
@@ -134,7 +132,7 @@ void dc_keyboard_device::fixed_status(uint32_t *dest)
 {
 	dest[0] = 0x40000000; // Keyboard
 	dest[1] = 0x00201000; // 1st function
-	dest[2] = 0x00000008; // No 2nd function
+	dest[2] = 0x00000008; // No 2nd function (doc returns 8 here tho?)
 	dest[3] = 0x00000000; // No 3rd function
 	dest[4] = 0x00000002; // Japan region, no expansion
 	copy_with_spaces(((uint8_t *)dest) + 18, id, 30);
