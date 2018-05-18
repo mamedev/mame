@@ -106,6 +106,7 @@ public:
 	// registration control
 	void allow_registration(bool allowed = true);
 	const char *indexed_item(int index, void *&base, u32 &valsize, u32 &valcount) const;
+	void named_item(std::string name, void *&base, u32 &valsize, u32 &valcount) const;
 
 	// function registration
 	void register_presave(save_prepost_delegate func);
