@@ -1634,10 +1634,8 @@ WRITE_LINE_MEMBER(seta_state::screen_vblank_seta_buffer_sprites)
 template<int Layer>
 WRITE16_MEMBER(seta_state::vram_w)
 {
-	int bank = m_vctrl[Layer][ 4/2 ];
-	bank     = (bank & 0x0008) ? 1 : 0; /*&& (bank & 0x0001)*/
 	COMBINE_DATA(&m_vram[Layer][offset]);
-	if (bank == ((offset >> 12) & 1))
+	if (m_rambank[Layer] == ((offset >> 12) & 1))
 		m_tilemap[Layer]->mark_tile_dirty(offset & 0x7ff);
 }
 

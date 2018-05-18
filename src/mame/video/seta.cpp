@@ -373,7 +373,7 @@ Offset + 0x4:
 
 TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info)
 {
-	uint16_t *vram = (uint16_t *)tilemap.user_data();
+	uint16_t *vram = &m_vram[0][m_rambank[0] ? 0x1000 : 0];
 	uint16_t code =   vram[ tile_index ];
 	uint16_t attr =   vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
@@ -385,7 +385,7 @@ template<int Layer>
 TILE_GET_INFO_MEMBER(seta_state::get_tile_info)
 {
 	int gfx = 1 + Layer;
-	uint16_t *vram = (uint16_t *)tilemap.user_data();
+	uint16_t *vram = &m_vram[Layer][m_rambank[Layer] ? 0x1000 : 0];
 	uint16_t *vctrl = m_vctrl[Layer];
 	uint16_t code =   vram[ tile_index ];
 	uint16_t attr =   vram[ tile_index + 0x800 ];
@@ -442,7 +442,6 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	for (int layer = 0; layer < 2; layer++)
 	{
 		m_tilemap[layer]->set_transparent_pen(0);
-		m_tilemap[layer]->set_user_data(&m_vram[layer][0]);
 	}
 }
 
@@ -472,7 +471,6 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 	m_color_mode_shift = 4;
 
 	m_tilemap[0]->set_transparent_pen(0);
-	m_tilemap[0]->set_user_data(&m_vram[0][0]);
 }
 
 VIDEO_START_MEMBER(setaroul_state,setaroul_1_layer)
@@ -505,7 +503,6 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 			16,16, 64,32 );
 
 	m_tilemap[0]->set_transparent_pen(0);
-	m_tilemap[0]->set_user_data(&m_vram[0][0]);
 }
 
 SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
@@ -533,6 +530,7 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	m_seta001->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
+	save_item(NAME(m_rambank));
 }
 
 VIDEO_START_MEMBER(seta_state,kyustrkr_no_layers)
@@ -841,11 +839,10 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 			bank[layer]  =   (bank[layer] & 0x0008) ? 1 : 0; /*&& (bank[layer] & 0x0001)*/
 
 			/* Select tilemap bank, Only one tilemap bank per layer is enabled */
-			if (m_old_bank[layer] != bank[layer])
+			if (m_rambank[layer] != bank[layer])
 			{
-				m_tilemap[layer]->set_user_data(&m_vram[Layer][bank[layer] ? 0x1000 : 0]);
+				m_rambank[layer] = bank[layer];
 				m_tilemap[layer]->mark_all_dirty();
-				m_old_bank[layer] = bank[layer];
 			}
 
 			/* the hardware wants different scroll values when flipped */

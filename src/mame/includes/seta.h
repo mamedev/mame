@@ -100,11 +100,11 @@ public:
 
 	int m_tiles_offset;
 	tilemap_t *m_tilemap[2]; // Max 2 Layers
+	int m_rambank[2]; // 2 Tilemap banks for each layers
 	int m_tilemaps_flip;
 	int m_samples_bank;
 	int m_color_mode_shift;
 	int m_current_tilemap_mode[2];
-	int m_old_bank[2]; // 2 Tilemap banks for each layers
 
 	uPD71054_state m_uPD71054;
 	const game_offset *m_global_offsets;
