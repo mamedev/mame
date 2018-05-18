@@ -108,28 +108,6 @@ const char *save_manager::indexed_item(int index, void *&base, u32 &valsize, u32
 
 
 //-------------------------------------------------
-//  named_item - return an item with the given
-//  name
-//-------------------------------------------------
-
-void save_manager::named_item(std::string name, void *&base, u32 &valsize, u32 &valcount) const
-{
-	for (auto it = m_entry_list.begin(); it != m_entry_list.end(); ++it)
-	{
-		if (it->get()->m_name.compare(name) == 0)
-		{
-			state_entry *entry = it->get();
-
-			base = entry->m_data;
-			valsize = entry->m_typesize;
-			valcount = entry->m_typecount;
-			break;
-		}
-	}
-}
-
-
-//-------------------------------------------------
 //  register_presave - register a pre-save
 //  function callback
 //-------------------------------------------------
