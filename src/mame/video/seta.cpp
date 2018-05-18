@@ -819,8 +819,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 			if (m_current_tilemap_mode[layer] != (m_vctrl[layer][ 4/2 ] & 0x10))
 			{
 				m_current_tilemap_mode[layer] = m_vctrl[layer][ 4/2 ] & 0x10;
-				for (int bank = 0; bank < 2; bank++)
-					m_tilemap[layer][bank]->mark_all_dirty();
+				m_tilemap[layer]->mark_all_dirty();
 			}
 		}
 	}

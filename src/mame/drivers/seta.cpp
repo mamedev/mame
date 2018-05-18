@@ -1974,8 +1974,8 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 
 	/* Gun Recoils */
 	/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
-	output().set_value("Player1_Gun_Recoil", BIT(data, 4));
-	output().set_value("Player2_Gun_Recoil", BIT(data, 3));
+	m_gun_recoil[0] = BIT(data, 4);
+	m_gun_recoil[1] = BIT(data, 3);
 }
 
 READ16_MEMBER(seta_state::extra_r)
@@ -2372,6 +2372,11 @@ void seta_state::drgnunit_map(address_map &map)
                                 The Roulette
 ***************************************************************************/
 
+MACHINE_START_MEMBER(setaroul_state, setaroul)
+{
+	m_leds.resolve();
+}
+
 // Coin drop
 MACHINE_RESET_MEMBER(setaroul_state, setaroul)
 {
@@ -2490,8 +2495,8 @@ WRITE8_MEMBER(setaroul_state::led_w)
 {
 	m_led = data;
 
-	output().set_led_value(0,   data  & 0x01);  // pay out        (hop.c in input test, touch '1')
-	output().set_led_value(1,   data  & 0x02);  // call attendant (cal.o in input test, touch '9')
+	m_leds[0] = BIT(data, 0);  // pay out        (hop.c in input test, touch '1')
+	m_leds[1] = BIT(data, 1);  // call attendant (cal.o in input test, touch '9')
 	//
 	//                          data  & 0x10    // hopper divider (divider in input test, touch '10')
 	//                          data  & 0x80    // video enable?
@@ -2642,7 +2647,7 @@ WRITE16_MEMBER(seta_state::magspeed_lights_w)
 	COMBINE_DATA( &m_magspeed_lights[offset] );
 
 	for (int i = 0; i < 16; i++)
-		output().set_led_value(offset * 16 + i, BIT(m_magspeed_lights[offset], i));
+		m_leds[offset * 16 + i] = BIT(m_magspeed_lights[offset], i);
 
 //  popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
 }
@@ -3149,9 +3154,9 @@ WRITE16_MEMBER(jockeyc_state::jockeyc_mux_w)
 	// 0x0002 hopper 2 motor / switch hopper output to p1 (single hopper mode)
 	// 0x0001 hopper 1 motor
 
-	output().set_value("cancel1", (data & 0x8000) ? 1 : 0);
-	output().set_value("payout2", (data & 0x4000) ? 1 : 0);
-	output().set_value("payout1", (data & 0x2000) ? 1 : 0);
+	m_out_cancel[0] = BIT(data, 15);
+	m_out_payout[1] = BIT(data, 14);
+	m_out_payout[0] = BIT(data, 13);
 
 	update_hoppers();
 	show_outputs();
@@ -3178,9 +3183,9 @@ WRITE16_MEMBER(jockeyc_state::jockeyc_out_w)
 	// 0x0002
 	// 0x0001
 
-	output().set_value("start2",  (data & 0x8000) ? 1 : 0);
-	output().set_value("start1",  (data & 0x4000) ? 1 : 0);
-	output().set_value("cancel2", (data & 0x0020) ? 1 : 0);
+	m_out_start[1] = BIT(data, 15);
+	m_out_start[0] = BIT(data, 14);
+	m_out_cancel[1] = BIT(data, 5);
 
 	machine().bookkeeping().coin_counter_w(6, data  & 0x2000); // coin 2/4
 	machine().bookkeeping().coin_counter_w(5, data  & 0x1000); // p1 hopper coin out
@@ -3299,8 +3304,8 @@ WRITE16_MEMBER(jockeyc_state::inttoote_mux_w)
 	// 0x1000 lamp (help button)
 	// 0x0800 lamp (start button)
 
-	output().set_value("help",  (data & 0x1000) ? 1 : 0);
-	output().set_value("start", (data & 0x0800) ? 1 : 0);
+	m_out_help = BIT(data, 12);
+	m_out_itstart = BIT(data, 11);
 
 	update_hoppers();
 	show_outputs();
@@ -8521,6 +8526,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
+	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8718,12 +8724,16 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
+MACHINE_START_MEMBER(seta_state,zombraid){ m_gun_recoil.resolve(); }
+
 MACHINE_CONFIG_START(seta_state::zombraid)
 	gundhara(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zombraid_map)
+
+	MCFG_MACHINE_START_OVERRIDE(seta_state, zombraid)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -9034,6 +9044,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
                                 Magical Speed
 ***************************************************************************/
+
+MACHINE_START_MEMBER(seta_state,magspeed){ m_leds.resolve(); }
 
 /*  magspeed: lev 2 by vblank, lev 4 by timer */
 MACHINE_CONFIG_START(seta_state::magspeed)
@@ -9755,6 +9767,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
+MACHINE_START_MEMBER(jockeyc_state, jockeyc)
+{
+	m_out_cancel.resolve();
+	m_out_payout.resolve();
+	m_out_start.resolve();
+}
+
+
 MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	/* basic machine hardware */
@@ -9770,6 +9790,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
+	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
@@ -9809,12 +9830,19 @@ MACHINE_CONFIG_END
                              International Toote
 ***************************************************************************/
 
+MACHINE_START_MEMBER(jockeyc_state, inttoote)
+{
+	m_out_help.resolve();
+	m_out_itstart.resolve();
+}
+
 MACHINE_CONFIG_START(jockeyc_state::inttoote)
 	jockeyc(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
 	MCFG_DEVICE_PROGRAM_MAP(inttoote_map)
 
+	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, inttoote)
 	// I/O board (not hooked up yet)
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
