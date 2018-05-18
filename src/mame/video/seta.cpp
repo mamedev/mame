@@ -371,10 +371,9 @@ Offset + 0x4:
 
 ***************************************************************************/
 
-template<int Offset>
 TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info)
 {
-	uint16_t *vram = m_vram[0] + Offset;
+	uint16_t *vram = (uint16_t *)tilemap.user_data();
 	uint16_t code =   vram[ tile_index ];
 	uint16_t attr =   vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
@@ -382,11 +381,11 @@ TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info)
 	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-template<int Layer, int Offset>
+template<int Layer>
 TILE_GET_INFO_MEMBER(seta_state::get_tile_info)
 {
 	int gfx = 1 + Layer;
-	uint16_t *vram = m_vram[Layer] + Offset;
+	uint16_t *vram = (uint16_t *)tilemap.user_data();
 	uint16_t *vctrl = m_vctrl[Layer];
 	uint16_t code =   vram[ tile_index ];
 	uint16_t attr =   vram[ tile_index + 0x800 ];
@@ -428,30 +427,23 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	   at any given time */
 
 	/* layer 0 */
-	m_tilemap[0][0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x0000>, "layer1_bank0", this), TILEMAP_SCAN_ROWS,
+	m_tilemap[0] = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<0>), this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
-
-	m_tilemap[0][1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x1000>, "layer1_bank1", this), TILEMAP_SCAN_ROWS,
-			16,16, 64,32 );
-
-
+	
 	/* layer 1 */
-	m_tilemap[1][0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<1, 0x0000>, "layer2_bank0", this), TILEMAP_SCAN_ROWS,
-			16,16, 64,32 );
-
-	m_tilemap[1][1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<1, 0x1000>, "layer2_bank1", this), TILEMAP_SCAN_ROWS,
+	m_tilemap[1] = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<1>), this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 	m_tilemaps_flip = 0;
 	m_color_mode_shift = 3;
 
 	for (int layer = 0; layer < 2; layer++)
-		for (int bank = 0; bank < 2; bank++)
-			m_tilemap[layer][bank]->set_transparent_pen(0);
+	{
+		m_tilemap[layer]->set_transparent_pen(0);
+		m_tilemap[layer]->set_user_data(&m_vram[layer][0]);
+	}
 }
 
 VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
@@ -473,18 +465,14 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 	   at any given time */
 
 	/* layer 0 */
-	m_tilemap[0][0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x0000>, "layer1_bank0", this), TILEMAP_SCAN_ROWS,
-			16,16, 64,32 );
-
-	m_tilemap[0][1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(&seta_state::get_tile_info<0, 0x1000>, "layer1_bank1", this), TILEMAP_SCAN_ROWS,
+	m_tilemap[0] = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
 	m_color_mode_shift = 4;
 
-	for (int bank = 0; bank < 2; bank++)
-		m_tilemap[0][bank]->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[0]->set_user_data(&m_vram[0][0]);
 }
 
 VIDEO_START_MEMBER(setaroul_state,setaroul_1_layer)
@@ -512,16 +500,12 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 	   at any given time */
 
 	/* layer 0 */
-	m_tilemap[0][0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info<0x0000>),this), TILEMAP_SCAN_ROWS,
+	m_tilemap[0] = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info),this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
 
-	m_tilemap[0][1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info<0x1000>),this), TILEMAP_SCAN_ROWS,
-			16,16, 64,32 );
-
-	for (int bank = 0; bank < 2; bank++)
-		m_tilemap[0][bank]->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[0]->set_user_data(&m_vram[0][0]);
 }
 
 SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
@@ -535,10 +519,8 @@ SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 /* NO layers, only sprites */
 VIDEO_START_MEMBER(seta_state,seta_no_layers)
 {
-	m_tilemap[0][0] = nullptr;
-	m_tilemap[0][1] = nullptr;
-	m_tilemap[1][0] = nullptr;
-	m_tilemap[1][1] = nullptr;
+	m_tilemap[0] = nullptr;
+	m_tilemap[1] = nullptr;
 
 	m_tilemaps_flip = 0;
 
@@ -834,7 +816,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (int layer = 0; layer < 2; layer++)
 	{
-		if (m_tilemap[layer][0])
+		if (m_tilemap[layer])
 		{
 			if (m_current_tilemap_mode[layer] != (m_vctrl[layer][ 4/2 ] & 0x10))
 			{
@@ -851,7 +833,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 	int bank[2]{ 0, 0 }, x[2]{ 0, 0 }, y[2]{ 0, 0 };
 	for (int layer = 0; layer < 2; layer++)
 	{
-		if (m_tilemap[layer][0])
+		if (m_tilemap[layer])
 		{
 			x[layer]     =   m_vctrl[layer][ 0/2 ];
 			y[layer]     =   m_vctrl[layer][ 2/2 ];
@@ -859,8 +841,12 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 			bank[layer]  =   (bank[layer] & 0x0008) ? 1 : 0; /*&& (bank[layer] & 0x0001)*/
 
 			/* Select tilemap bank, Only one tilemap bank per layer is enabled */
-			m_tilemap[layer][0]->enable((!bank[layer]));
-			m_tilemap[layer][1]->enable(( bank[layer]));
+			if (m_old_bank[layer] != bank[layer])
+			{
+				m_tilemap[layer]->set_user_data(&m_vram[Layer][bank[layer] ? 0x1000 : 0]);
+				m_tilemap[layer]->mark_all_dirty();
+				m_old_bank[layer] = bank[layer];
+			}
 
 			/* the hardware wants different scroll values when flipped */
 
@@ -878,10 +864,8 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 				y[layer] = y[layer] - vis_dimy;
 			}
 
-			m_tilemap[layer][0]->set_scrollx(0, x[layer]);
-			m_tilemap[layer][1]->set_scrollx(0, x[layer]);
-			m_tilemap[layer][0]->set_scrolly(0, y[layer]);
-			m_tilemap[layer][1]->set_scrolly(0, y[layer]);
+			m_tilemap[layer]->set_scrollx(0, x[layer]);
+			m_tilemap[layer]->set_scrolly(0, y[layer]);
 		}
 		else
 		{
@@ -899,21 +883,21 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 		if (screen.machine().input().code_pressed(KEYCODE_A))   msk |= 8;
 		if (msk != 0) layers_ctrl &= msk;
 
-		if (m_tilemap[1][0])
+		if (m_tilemap[1])
 			popmessage("VR:%04X-%04X-%04X L0:%04X L1:%04X",
 				m_vregs[0], m_vregs[1], m_vregs[2], m_vctrl[0][4/2], m_vctrl[1][4/2]);
-		else if (m_tilemap[0][0])    popmessage("L0:%04X", m_vctrl[0][4/2]);
+		else if (m_tilemap[0])    popmessage("L0:%04X", m_vctrl[0][4/2]);
 	}
 #endif
 
 	bitmap.fill(0, cliprect);
 
-	int const order = m_tilemap[1][0] ? m_vregs[ 2/2 ] : 0;
+	int const order = m_tilemap[1] ? m_vregs[ 2/2 ] : 0;
 	if (order & 1)  // swap the layers?
 	{
-		if (m_tilemap[1][bank[1]])
+		if (m_tilemap[1])
 		{
-			if (layers_ctrl & 2)    m_tilemap[1][bank[1]]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		}
 
 		if (order & 2)  // layer-sprite priority?
@@ -925,7 +909,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)    m_tilemap[0][bank[0]]->draw(screen, bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 		}
 		else
 		{
@@ -934,14 +918,14 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)    m_tilemap[0][bank[0]]->draw(screen, bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
 			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 	else
 	{
-		if (layers_ctrl & 1)    m_tilemap[0][bank[0]]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 		if (order & 2)  // layer-sprite priority?
 		{
@@ -949,7 +933,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			if ((order & 4) && m_paletteram[1] != nullptr)
 			{
-				draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap[1][bank[1]], x[1], y[1], 2 + ((m_vctrl[1][ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
+				draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap[1], x[1], y[1], 2 + ((m_vctrl[1][ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
 			}
 			else
 			{
@@ -958,9 +942,9 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 					popmessage("Missing palette effect. Contact MAMETesters.");
 				}
 
-				if (m_tilemap[1][bank[1]])
+				if (m_tilemap[1])
 				{
-					if (layers_ctrl & 2)    m_tilemap[1][bank[1]]->draw(screen, bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 				}
 			}
 		}
@@ -968,7 +952,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			if ((order & 4) && m_paletteram[1] != nullptr)
 			{
-				draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap[1][bank[1]], x[1], y[1], 2 + ((m_vctrl[1][ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
+				draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap[1], x[1], y[1], 2 + ((m_vctrl[1][ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
 			}
 			else
 			{
@@ -977,9 +961,9 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 					popmessage("Missing palette effect. Contact MAMETesters.");
 				}
 
-				if (m_tilemap[1][bank[1]])
+				if (m_tilemap[1])
 				{
-					if (layers_ctrl & 2)    m_tilemap[1][bank[1]]->draw(screen, bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 				}
 			}
 

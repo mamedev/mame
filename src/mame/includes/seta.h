@@ -99,11 +99,12 @@ public:
 	required_device<palette_device> m_palette;
 
 	int m_tiles_offset;
-	tilemap_t *m_tilemap[2][2]; // Max 2 Layers, 2 Tilemap banks for each layers
+	tilemap_t *m_tilemap[2]; // Max 2 Layers
 	int m_tilemaps_flip;
 	int m_samples_bank;
 	int m_color_mode_shift;
 	int m_current_tilemap_mode[2];
+	int m_old_bank[2]; // 2 Tilemap banks for each layers
 
 	uPD71054_state m_uPD71054;
 	const game_offset *m_global_offsets;
@@ -185,8 +186,8 @@ public:
 	void init_kiwame();
 	void init_eightfrc();
 	void init_pairlove();
-	template<int Offset> TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
-	template<int Layer, int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(seta_no_layers);
 	DECLARE_VIDEO_START(kyustrkr_no_layers);
 	DECLARE_VIDEO_START(twineagl_1_layer);
