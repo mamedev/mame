@@ -377,56 +377,56 @@ static const char *const sundance_sample_names[] =
 	nullptr
 };
 
-WRITE_LINE_MEMBER(cinemat_state::sundance_sound0_w)
+WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound0_w)
 {
 	/* bong - falling edge */
 	if (!state)
 		m_samples->start(0, 0);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::sundance_sound1_w)
+WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound1_w)
 {
 	/* whoosh - falling edge */
 	if (!state)
 		m_samples->start(1, 1);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::sundance_sound2_w)
+WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound2_w)
 {
 	/* explosion - falling edge */
 	if (!state)
 		m_samples->start(2, 2);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::sundance_sound3_w)
+WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound3_w)
 {
 	/* ping - falling edge */
 	if (!state)
 		m_samples->start(3, 3);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::sundance_sound4_w)
+WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound4_w)
 {
 	/* ping - falling edge */
 	if (!state)
 		m_samples->start(4, 4);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::sundance_sound7_w)
+WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound7_w)
 {
 	/* hatch - falling edge */
 	if (!state)
 		m_samples->start(5, 5);
 }
 
-MACHINE_CONFIG_START(cinemat_state::sundance_sound)
+MACHINE_CONFIG_START(cinemat_16level_state::sundance_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound4_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound7_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound4_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound7_w))
 
 	SPEAKER(config, "mono").front_center();
 
@@ -924,14 +924,14 @@ static const char *const solarq_sample_names[] =
 	nullptr
 };
 
-WRITE_LINE_MEMBER(cinemat_state::solarq_sound4_w)
+WRITE_LINE_MEMBER(cinemat_64level_state::solarq_sound4_w)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (state)
 		m_current_shift = ((m_current_shift >> 1) & 0x7fff) | (m_outlatch->q7_r() << 15);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::solarq_sound1_w)
+WRITE_LINE_MEMBER(cinemat_64level_state::solarq_sound1_w)
 {
 	/* execute on the rising edge of bit 0x02 */
 	if (state)
@@ -994,7 +994,7 @@ WRITE_LINE_MEMBER(cinemat_state::solarq_sound1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(cinemat_state::solarq_sound0_w)
+WRITE_LINE_MEMBER(cinemat_64level_state::solarq_sound0_w)
 {
 	/* clock music data on the rising edge of bit 0x01 */
 	if (state)
@@ -1020,11 +1020,11 @@ WRITE_LINE_MEMBER(cinemat_state::solarq_sound0_w)
 	}
 }
 
-MACHINE_CONFIG_START(cinemat_state::solarq_sound)
+MACHINE_CONFIG_START(cinemat_64level_state::solarq_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, solarq_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, solarq_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, solarq_sound4_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_64level_state, solarq_sound0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_64level_state, solarq_sound1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_64level_state, solarq_sound4_w))
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1060,14 +1060,14 @@ static const char *const boxingb_sample_names[] =
 	nullptr
 };
 
-WRITE_LINE_MEMBER(cinemat_state::boxingb_sound4_w)
+WRITE_LINE_MEMBER(cinemat_color_state::boxingb_sound4_w)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (state)
 		m_current_shift = ((m_current_shift >> 1) & 0x7fff) | (m_outlatch->q7_r() << 15);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::boxingb_sound1_w)
+WRITE_LINE_MEMBER(cinemat_color_state::boxingb_sound1_w)
 {
 	/* execute on the rising edge of bit 0x02 */
 	if (state)
@@ -1114,7 +1114,7 @@ WRITE_LINE_MEMBER(cinemat_state::boxingb_sound1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(cinemat_state::boxingb_sound0_w)
+WRITE_LINE_MEMBER(cinemat_color_state::boxingb_sound0_w)
 {
 	/* clock music data on the rising edge of bit 0x01 */
 	if (state)
@@ -1144,27 +1144,27 @@ WRITE_LINE_MEMBER(cinemat_state::boxingb_sound0_w)
 	}
 }
 
-WRITE_LINE_MEMBER(cinemat_state::boxingb_sound2_w)
+WRITE_LINE_MEMBER(cinemat_color_state::boxingb_sound2_w)
 {
 	/* bounce - rising edge */
 	if (state)
 		m_samples->start(10, 10);
 }
 
-WRITE_LINE_MEMBER(cinemat_state::boxingb_sound3_w)
+WRITE_LINE_MEMBER(cinemat_color_state::boxingb_sound3_w)
 {
 	/* bell - falling edge */
 	if (state)
 		m_samples->start(11, 11);
 }
 
-MACHINE_CONFIG_START(cinemat_state::boxingb_sound)
+MACHINE_CONFIG_START(cinemat_color_state::boxingb_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, boxingb_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, boxingb_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, boxingb_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, boxingb_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, boxingb_sound4_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound4_w))
 
 	SPEAKER(config, "mono").front_center();
 
