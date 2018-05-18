@@ -35,6 +35,7 @@ System specs :
              Text   : 256 colors
    Others : Brightness controller  (Emulated)
             Half transparent color (Not emulated)
+   Reference : https://youtu.be/aSgRfAgd7yU
 
  Valtric
  ---------------------------------------------------------------

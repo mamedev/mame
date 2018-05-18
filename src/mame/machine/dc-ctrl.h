@@ -18,8 +18,8 @@
 	downcast<dc_common_device &>(*device).set_port_tag(6, a4); \
 	downcast<dc_common_device &>(*device).set_port_tag(7, a5);
 
-#define MCFG_DC_CONTROLLER_SET_ID(id) \
-	downcast<dc_common_device &>(*device).set_id(id);
+#define MCFG_DC_CONTROLLER_SET_MODEL(name) \
+	downcast<dc_common_device &>(*device).set_model(name);
 
 #define MCFG_DC_CONTROLLER_SET_LICENSE(license) \
 	downcast<dc_common_device &>(*device).set_license(license);
@@ -34,7 +34,8 @@ public:
 	dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_port_tag(int port, const char *tag) { port_tag[port] = tag; }
-	void set_id(const char *new_id) { id = new_id; }
+	// TODO: we probably don't need these setters
+	void set_model(const char *new_id) { model = new_id; }
 	void set_license(const char *new_license) { license = new_license; }
 	void set_versions(const char *new_versions) { versions = new_versions; }
 
@@ -45,8 +46,11 @@ protected:
 	virtual void device_start() override;
 
 	const char *port_tag[8];
-	const char *id, *license, *versions;
-
+	const char *model, *license, *versions;
+	uint32_t id;
+	uint32_t electric_current;
+	uint32_t region;
+	
 	ioport_port *port[8];
 	
 	virtual void fixed_status(uint32_t *dest) = 0;

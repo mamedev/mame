@@ -62,13 +62,10 @@ public:
 	uint32_t m_last_shift2;
 	uint32_t m_current_pitch;
 	uint32_t m_last_frame;
-	float m_target_volume;
-	float m_current_volume;
 	uint8_t m_coin_detected;
 	uint8_t m_coin_last_reset;
 	uint8_t m_mux_select;
 	int m_gear;
-	int m_color_mode;
 	rgb_t m_vector_color;
 	int16_t m_lastx;
 	int16_t m_lasty;
@@ -80,25 +77,30 @@ public:
 	WRITE_LINE_MEMBER(mux_select_w);
 	DECLARE_READ8_MEMBER(speedfrk_wheel_r);
 	DECLARE_READ8_MEMBER(speedfrk_gear_r);
-	DECLARE_READ8_MEMBER(sundance_inputs_r);
-	DECLARE_READ8_MEMBER(boxingb_dial_r);
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w);
 	DECLARE_READ8_MEMBER(joystick_read);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_speedfrk();
-	void init_boxingb();
-	void init_sundance();
+	uint32_t screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift);
+	void ripoff(machine_config &config);
+	void wotw(machine_config &config);
+	void speedfrk(machine_config &config);
+	void starcas(machine_config &config);
+	void spacewar(machine_config &config);
+	void tailg(machine_config &config);
+	void warrior(machine_config &config);
+	void starhawk(machine_config &config);
+	void barrier(machine_config &config);
+	void armora(machine_config &config);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
-	virtual void video_start() override;
-	DECLARE_VIDEO_START(cinemat_16level);
-	DECLARE_VIDEO_START(cinemat_64level);
-	DECLARE_VIDEO_START(cinemat_color);
-	uint32_t screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift);
+
 	DECLARE_WRITE_LINE_MEMBER(spacewar_sound0_w);
 	DECLARE_WRITE_LINE_MEMBER(spacewar_sound1_w);
 	DECLARE_WRITE_LINE_MEMBER(spacewar_sound2_w);
@@ -116,12 +118,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(starhawk_sound3_w);
 	DECLARE_WRITE_LINE_MEMBER(starhawk_sound4_w);
 	DECLARE_WRITE_LINE_MEMBER(starhawk_sound7_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound7_w);
 	DECLARE_WRITE_LINE_MEMBER(tailg_sound_w);
 	DECLARE_WRITE_LINE_MEMBER(warrior_sound0_w);
 	DECLARE_WRITE_LINE_MEMBER(warrior_sound1_w);
@@ -143,58 +139,103 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(starcas_sound2_w);
 	DECLARE_WRITE_LINE_MEMBER(starcas_sound3_w);
 	DECLARE_WRITE_LINE_MEMBER(starcas_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(solarq_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(solarq_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(solarq_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound4_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound0_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound1_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound2_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound3_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound4_w);
+
 	void cinemat_nojmi_4k(machine_config &config);
 	void cinemat_jmi_4k(machine_config &config);
 	void cinemat_nojmi_8k(machine_config &config);
 	void cinemat_jmi_8k(machine_config &config);
 	void cinemat_jmi_16k(machine_config &config);
 	void cinemat_jmi_32k(machine_config &config);
-	void ripoff(machine_config &config);
-	void wotwc(machine_config &config);
-	void wotw(machine_config &config);
-	void boxingb(machine_config &config);
-	void speedfrk(machine_config &config);
-	void sundance(machine_config &config);
-	void starcas(machine_config &config);
-	void spacewar(machine_config &config);
-	void solarq(machine_config &config);
-	void tailg(machine_config &config);
-	void warrior(machine_config &config);
-	void starhawk(machine_config &config);
-	void barrier(machine_config &config);
-	void armora(machine_config &config);
+
 	void spacewar_sound(machine_config &config);
 	void barrier_sound(machine_config &config);
 	void speedfrk_sound(machine_config &config);
 	void starhawk_sound(machine_config &config);
-	void sundance_sound(machine_config &config);
 	void tailg_sound(machine_config &config);
 	void warrior_sound(machine_config &config);
 	void armora_sound(machine_config &config);
 	void ripoff_sound(machine_config &config);
 	void starcas_sound(machine_config &config);
-	void solarq_sound(machine_config &config);
-	void boxingb_sound(machine_config &config);
 	void wotw_sound(machine_config &config);
-	void data_map(address_map &map);
-	void io_map(address_map &map);
-	void program_map_16k(address_map &map);
-	void program_map_32k(address_map &map);
+
 	void program_map_4k(address_map &map);
 	void program_map_8k(address_map &map);
+	void program_map_16k(address_map &map);
+	void program_map_32k(address_map &map);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+};
+
+
+class cinemat_16level_state : public cinemat_state
+{
+public:
+	using cinemat_state::cinemat_state;
+
+	void init_sundance();
+
+	void sundance(machine_config &config);
+
+protected:
+	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	DECLARE_READ8_MEMBER(sundance_inputs_r);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound4_w);
+	DECLARE_WRITE_LINE_MEMBER(sundance_sound7_w);
+
+	void sundance_sound(machine_config &config);
+};
+
+
+class cinemat_64level_state : public cinemat_state
+{
+public:
+	using cinemat_state::cinemat_state;
+
+	void solarq(machine_config &config);
+
+protected:
+	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	DECLARE_WRITE_LINE_MEMBER(solarq_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(solarq_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(solarq_sound4_w);
+
+	void solarq_sound(machine_config &config);
+
+private:
+	float m_target_volume;
+	float m_current_volume;
+};
+
+
+class cinemat_color_state : public cinemat_state
+{
+public:
+	using cinemat_state::cinemat_state;
+
+	void init_boxingb();
+
+	void boxingb(machine_config &config);
+	void wotwc(machine_config &config);
+
+protected:
+	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	DECLARE_READ8_MEMBER(boxingb_dial_r);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound0_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound1_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound2_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound3_w);
+	DECLARE_WRITE_LINE_MEMBER(boxingb_sound4_w);
+
+	void boxingb_sound(machine_config &config);
 };
 
 

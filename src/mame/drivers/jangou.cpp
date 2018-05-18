@@ -56,6 +56,20 @@ public:
 	{
 	}
 
+	void jngolady(machine_config &config);
+	void roylcrdn(machine_config &config);
+	void cntrygrl(machine_config &config);
+	void jangou(machine_config &config);
+
+	void init_jngolady();
+	void init_luckygrl();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* sound-related */
 	// Jangou CVSD Sound
 	emu_timer    *m_cvsd_bit_timer;
@@ -69,6 +83,8 @@ public:
 	uint8_t        m_mux_data;
 	uint8_t        m_nsc_latch;
 	uint8_t        m_z80_latch;
+
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
 	/* devices */
 	required_device<cpu_device> m_cpu_0;
@@ -94,11 +110,7 @@ public:
 	DECLARE_READ8_MEMBER(jngolady_rng_r);
 	DECLARE_READ8_MEMBER(input_mux_r);
 	DECLARE_READ8_MEMBER(input_system_r);
-	void init_jngolady();
-	void init_luckygrl();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+
 	DECLARE_PALETTE_INIT(jangou);
 	DECLARE_MACHINE_START(jngolady);
 	DECLARE_MACHINE_RESET(jngolady);
@@ -108,11 +120,6 @@ public:
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
 
-	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
-	void jngolady(machine_config &config);
-	void roylcrdn(machine_config &config);
-	void cntrygrl(machine_config &config);
-	void jangou(machine_config &config);
 	void cntrygrl_cpu0_io(address_map &map);
 	void cntrygrl_cpu0_map(address_map &map);
 	void cpu0_io(address_map &map);
@@ -1251,28 +1258,27 @@ void jangou_state::init_jngolady()
 
 void jangou_state::init_luckygrl()
 {
-	// this is WRONG
+	// this is WRONG, plaintext in the 0x1800 - 0x1dff range
 	uint8_t *ROM = memregion("cpu0")->base();
-
-	unsigned char patn1[32] = {
-		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,
-		0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28,
-	};
-
-	unsigned char patn2[32] = {
-		0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20,
-		0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88
-	};
 
 	for (int A = 0; A < 0x3000; A++)
 	{
-		uint8_t dat = ROM[A];
-		if (A&0x100) dat = dat ^ patn2[A & 0x1f];
-		else dat = dat ^ patn1[A & 0x1f];
+		uint8_t x = ROM[A];
 
-		ROM[A] = dat;
+		switch(A & 0x111)
+		{
+			case 0x000: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x001: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x010: x = bitswap<8>(x ^ 0x88, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x011: x = bitswap<8>(x ^ 0x28, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x100: x = bitswap<8>(x ^ 0x28, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x101: x = bitswap<8>(x ^ 0x20, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x110: x = bitswap<8>(x ^ 0x28, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x111: x = bitswap<8>(x ^ 0x88, 7, 6, 5, 4, 3, 2, 1, 0); break;
+		}
+
+		ROM[A] = x;
 	}
-
 
 	#if 0
 	{
@@ -1305,7 +1311,7 @@ GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,
 GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
 
 /* The following might not run there... */
-GAME( 1984?, luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /*
 Some other games that might run on this HW:
