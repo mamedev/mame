@@ -47,11 +47,6 @@ public:
 	uint8_t m_flipscreen;
 	uint16_t m_palette_intensity;
 
-	// argus specific
-	std::unique_ptr<uint8_t[]> m_dummy_bg0ram;
-	int m_lowbitscroll;
-	int m_prvscrollx;
-
 	// butasan specific
 	uint8_t *m_butasan_txram;
 	uint8_t *m_butasan_bg0ram;
@@ -127,8 +122,6 @@ public:
 	void bg_setting();
 
 	// argus specific
-	void argus_bg0_scroll_handle();
-	void argus_write_dummy_rams(int dramoffs, int vromoffs);
 	void argus_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
 
 	// butasan specific
