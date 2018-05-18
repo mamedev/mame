@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_last_nmi_state = state;
 }

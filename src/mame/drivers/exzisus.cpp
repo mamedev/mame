@@ -75,7 +75,7 @@ WRITE8_MEMBER(exzisus_state::coincounter_w)
 // is it ok that cpub_reset refers to cpuc?
 WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 {
-	m_cpuc->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_cpuc->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 #if 0

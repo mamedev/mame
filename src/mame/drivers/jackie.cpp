@@ -597,7 +597,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 	if((scanline % 64) == 32 && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if ((scanline % 64) == 0 && m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(jackie_state::jackie)

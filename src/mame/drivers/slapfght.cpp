@@ -438,7 +438,7 @@ void slapfght_state::getstarb2_io_map(address_map &map)
 INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
 {
 	if (m_sound_nmi_enabled)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)

@@ -293,7 +293,7 @@ WRITE8_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 WRITE8_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 //ZT
 /******************************************************************************/
@@ -2102,7 +2102,7 @@ MACHINE_CONFIG_END
 INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)

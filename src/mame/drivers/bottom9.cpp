@@ -137,7 +137,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)
 {
 	if (m_nmienable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(bottom9_state::nmi_enable_w)

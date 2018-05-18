@@ -598,7 +598,7 @@ void model2_tgp_state::copro_halt()
 void model2_tgp_state::copro_boot()
 {
 	m_copro_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	m_copro_tgp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_copro_tgp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 READ32_MEMBER(model2_tgp_state::copro_fifo_r)

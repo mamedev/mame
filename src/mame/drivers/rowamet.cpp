@@ -196,7 +196,7 @@ WRITE8_MEMBER( rowamet_state::io_w )
 		if (cmd != m_sndcmd)
 		{
 			m_sndcmd = cmd;
-			m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }

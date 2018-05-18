@@ -86,7 +86,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
 	if((scanline % 32) == 16)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if ((scanline % 32) == 0)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

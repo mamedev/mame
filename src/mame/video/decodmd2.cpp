@@ -74,7 +74,7 @@ WRITE8_MEMBER( decodmd_type2_device::ctrl_w )
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_rombank1->set_entry(0);
 		logerror("DMD2: Reset\n");
 	}

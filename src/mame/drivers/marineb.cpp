@@ -529,7 +529,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(marineb_state::marineb_vblank_irq)
 {
 	if (state && m_irq_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)

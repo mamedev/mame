@@ -160,7 +160,7 @@ READ8_MEMBER(djboy_state::beast_status_r)
 
 WRITE8_MEMBER(djboy_state::trigger_nmi_on_mastercpu)
 {
-	m_mastercpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_mastercpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(djboy_state::mastercpu_bankswitch_w)

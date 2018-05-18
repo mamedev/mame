@@ -42,7 +42,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 			break;
 		case 6: /* 6502 sound cpu */
 			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+offset);

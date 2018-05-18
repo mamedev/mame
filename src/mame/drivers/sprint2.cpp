@@ -115,7 +115,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 	m_watchdog->watchdog_enable(!service_mode());
 
 	if (!service_mode())
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

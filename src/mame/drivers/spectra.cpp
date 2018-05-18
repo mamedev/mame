@@ -182,7 +182,7 @@ WRITE8_MEMBER( spectra_state::portb_w )
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 {
 	if (m_t_c > 0x10)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_t_c++;
 }

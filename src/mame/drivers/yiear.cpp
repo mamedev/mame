@@ -134,7 +134,7 @@ WRITE_LINE_MEMBER(yiear_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
 {
 	if (m_yiear_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

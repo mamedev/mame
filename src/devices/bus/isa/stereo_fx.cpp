@@ -168,7 +168,7 @@ void stereo_fx_device::dack_w(int line, uint8_t data)
 WRITE8_MEMBER( stereo_fx_device::dsp_reset_w )
 {
 	device_reset();
-	m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 READ8_MEMBER( stereo_fx_device::dsp_wbuf_status_r )

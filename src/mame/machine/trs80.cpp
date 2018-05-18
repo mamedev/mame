@@ -652,7 +652,7 @@ void trs80_state::trs80_fdc_interrupt_internal()
 		if (m_nmi_mask & 0x80)   // Model 4 does a NMI
 		{
 			m_nmi_data = 0x80;
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 	else        // Model 1 does a IRQ

@@ -971,7 +971,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 {
 	if(m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(luckgrln_state::luckgrln)

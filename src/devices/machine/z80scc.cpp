@@ -635,7 +635,7 @@ int z80scc_device::z80daisy_irq_ack()
 	if (ret == -1 && m_cputag != nullptr)
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
-		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
 		LOGINT(" - failed to find an interrupt to ack, returning default IRQ vector: %02x\n", ret );
 		logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
 	}

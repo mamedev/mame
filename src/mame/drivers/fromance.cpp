@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
 
 	/* generate an NMI if we're out of data */
 	if (!m_vclk_left)
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

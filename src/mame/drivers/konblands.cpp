@@ -260,7 +260,7 @@ void konblands_state::machine_reset()
 INTERRUPT_GEN_MEMBER(konblands_state::vblank_irq)
 {
 	if (m_nmi_enable == true)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(konblands_state::timer_irq)

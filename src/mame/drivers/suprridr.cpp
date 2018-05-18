@@ -118,7 +118,7 @@ WRITE8_MEMBER(suprridr_state::nmi_enable_w)
 INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

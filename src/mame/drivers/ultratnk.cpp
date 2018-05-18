@@ -70,7 +70,7 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x40);
 
 	if (ioport("IN0")->read() & 0x40)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_nmi_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }

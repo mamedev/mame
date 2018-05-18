@@ -275,7 +275,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 	if (ACCESSING_BITS_0_7)     m_soundlatch->write(space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)    m_soundlatch2->write(space, 0, (data >> 8) & 0xff);
 
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void lordgun_state::lordgun_map(address_map &map)

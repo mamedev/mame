@@ -27,7 +27,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
 	if(scanline == 240)
 			m_maincpu->set_input_line(0, HOLD_LINE);
 	else if((scanline % 32) == 0)
-		if (m_nmi_enable & 0x02) m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_nmi_enable & 0x02) m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

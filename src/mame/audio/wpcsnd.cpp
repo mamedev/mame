@@ -48,7 +48,7 @@ void wpcsnd_device::wpcsnd_map(address_map &map)
 
 void wpcsnd_device::ctrl_w(uint8_t data)
 {
-	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void wpcsnd_device::data_w(uint8_t data)
@@ -102,7 +102,7 @@ void wpcsnd_device::device_reset()
 	m_fixedbank->set_entry(0);
 
 	// reset the CPU again, so that the CPU is starting with the right vectors (otherwise sound may die on reset)
-	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	m_reply_available = false;
 }

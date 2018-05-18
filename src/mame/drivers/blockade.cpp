@@ -326,7 +326,7 @@ INPUT_CHANGED_MEMBER( blockade_state::coin_inserted )
 	m_coin_inserted = newval;
 
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 CUSTOM_INPUT_MEMBER( blockade_state::coin_r )

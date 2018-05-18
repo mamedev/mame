@@ -849,7 +849,7 @@ INTERRUPT_GEN_MEMBER(agat7_state::agat_vblank)
 {
 	if (m_agat7_interrupts)
 	{
-		m_maincpu->set_input_line(M6502_NMI_LINE, PULSE_LINE);
+		m_maincpu->pulse_input_line(M6502_NMI_LINE, attotime::zero);
 	}
 }
 

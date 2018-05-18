@@ -286,7 +286,7 @@ READ8_MEMBER(microtan_state::microtan_bffx_r)
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
 TIMER_CALLBACK_MEMBER(microtan_state::microtan_pulse_nmi)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(microtan_state::microtan_bffx_w)

@@ -748,7 +748,7 @@ void namcos21_kickstart(running_machine &machine, int internal)
 	state->m_mpDspState->masterFinished = 0;
 	state->m_mpDspState->slaveActive = 0;
 	state->m_dspmaster->set_input_line(0, HOLD_LINE);
-	state->m_dspslave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	state->m_dspslave->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 uint16_t namcos21_state::read_word_from_slave_input()
@@ -1407,7 +1407,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dsp_complete_w)
 	if( data )
 	{
 		winrun_flush_poly();
-		m_dsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_dsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		clear_poly_framebuffer();
 	}
 }

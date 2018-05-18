@@ -105,7 +105,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::read_coin_status)
 /* the main CPU is reset when a coin is inserted */
 void vicdual_state::coin_in()
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	/* simulate the coin switch being closed for a while */
 	m_coinstate_timer->adjust(attotime::from_msec(70));

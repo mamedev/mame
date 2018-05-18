@@ -82,7 +82,7 @@ WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
 WRITE_LINE_MEMBER(tsamurai_state::vblank_irq)
 {
 	if (state && m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(tsamurai_state::tsamurai_unknown_d803_r)
@@ -311,7 +311,8 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_sound_nmi_enable_w)
 
 INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
 {
-	if (m_vsgongf_sound_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_vsgongf_sound_nmi_enabled)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* what are these, protection of some kind? */
@@ -341,7 +342,7 @@ READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
 WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tsamurai_state::vsgongf_map(address_map &map)

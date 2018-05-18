@@ -202,19 +202,19 @@ void by133_state::sound_portmap(address_map &map)
 INPUT_CHANGED_MEMBER( by133_state::video_test )
 {
 	if(newval)
-		m_videocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_videocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by133_state::sound_test )
 {
 	if(newval)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by133_state::activity_test )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by133_state::self_test )

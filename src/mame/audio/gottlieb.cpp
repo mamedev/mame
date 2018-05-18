@@ -101,7 +101,7 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -813,7 +813,7 @@ void igs009_state::machine_reset()
 WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 {
 	if (state && BIT(m_nmi_enable, 7))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(igs009_state::jingbell)

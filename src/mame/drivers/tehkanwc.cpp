@@ -158,7 +158,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -166,7 +166,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_RESET:
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		break;
 	default:
 		assert_always(false, "Unknown id in tehkanwc_state::device_timer");

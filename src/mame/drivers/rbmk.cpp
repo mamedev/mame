@@ -563,7 +563,7 @@ uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 {
-	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_mcu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(rbmk_state::rbmk)

@@ -37,7 +37,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
 	else if (((scanline+16) % 64) == 0)
 	{
 		if (*m_interrupt_enable & 1)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -435,7 +435,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
 	else if ((scanline % 2) == 0)
 	{
 		if (*m_interrupt_enable & 1)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

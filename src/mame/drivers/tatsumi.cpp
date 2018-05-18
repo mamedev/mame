@@ -845,7 +845,7 @@ INTERRUPT_GEN_MEMBER(tatsumi_state::v30_interrupt)
 
 WRITE_LINE_MEMBER(apache3_state::apache3_68000_reset)
 {
-	m_subcpu2->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu2->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(apache3_state,apache3)

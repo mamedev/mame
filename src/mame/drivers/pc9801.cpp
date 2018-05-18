@@ -786,7 +786,7 @@ WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
 		por = machine().device<i8255_device>("ppi8255_sys")->read(space, 2) & ~0x20;
 		machine().device<i8255_device>("ppi8255_sys")->write(space, 2,por);
 		m_maincpu->set_input_line(INPUT_LINE_A20, CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
 	}
 

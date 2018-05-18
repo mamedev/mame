@@ -446,7 +446,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 			io.install_readwrite_handler(addr,addr+0xff,read16_delegate(FUNC(ngen_state::hfd_r),this),write16_delegate(FUNC(ngen_state::hfd_w),this),0xffffffff);
 			break;
 		default:
-			cpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached end of the modules
+			cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
 			break;
 	}
 	if(addr != 0)
@@ -470,9 +470,9 @@ READ16_MEMBER(ngen_state::xbus_r)
 			break;
 		default:
 			if(m_maincpu)
-				m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached the end of the modules
+				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached the end of the modules
 			else
-				m_i386cpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+				m_i386cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			ret = 0x0080;
 			break;
 	}

@@ -1237,7 +1237,7 @@ READ8_MEMBER( segas16b_state::upd7759_status_r )
 WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
 {
 	if (state)
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -400,7 +400,7 @@ READ8_MEMBER(m72_state::mcu_snd_r)
 WRITE8_MEMBER(m72_state::mcu_port1_w)
 {
 	m_mcu_sample_latch = data;
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(m72_state::mcu_port3_w)

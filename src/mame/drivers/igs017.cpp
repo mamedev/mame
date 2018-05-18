@@ -3544,7 +3544,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
 	if(scanline == 0 && m_igs017_igs031->get_nmi_enable())
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(igs017_state,iqblocka)

@@ -147,7 +147,7 @@ number 0 on each voice. That sample is 00000-00000.
 		if ((data & 0xff) != 0x3a)
 		{
 			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }

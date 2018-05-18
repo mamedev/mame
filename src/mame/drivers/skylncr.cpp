@@ -1626,7 +1626,7 @@ INPUT_PORTS_END
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
-	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -56,7 +56,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 5; }
 	virtual uint32_t execute_max_cycles() const override { return 13; }
 	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

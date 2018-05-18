@@ -172,7 +172,7 @@ WRITE8_MEMBER(mcr_nflfoot_state::ipu_laserdisk_w)
 TIMER_CALLBACK_MEMBER(mcr_nflfoot_state::ipu_watchdog_reset)
 {
 	logerror("ipu_watchdog_reset\n");
-	m_ipu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_ipu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	m_ipu_ctc->reset();
 	m_ipu_pio0->reset();
 	m_ipu_pio1->reset();

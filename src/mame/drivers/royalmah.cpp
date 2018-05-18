@@ -920,7 +920,7 @@ READ8_MEMBER(royalmah_state::jansou_6405_r)
 WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void royalmah_state::jansou_map(address_map &map)
@@ -3601,7 +3601,7 @@ MACHINE_CONFIG_END
 INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
 {
 	if ( m_suzume_bank & 0x40 )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(royalmah_state::suzume)

@@ -72,7 +72,6 @@ protected:
 	virtual u32 execute_min_cycles() const override { return 1; }
 	virtual u32 execute_max_cycles() const override { return 3; }
 	virtual u32 execute_input_lines() const override { return 0; }
-	virtual u32 execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides

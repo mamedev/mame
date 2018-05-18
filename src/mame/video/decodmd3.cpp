@@ -42,7 +42,7 @@ WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		logerror("DMD3: Reset\n");
 	}
 	m_ctrl = data;

@@ -353,8 +353,8 @@ void cabaret_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 {
-		if (m_nmi_enable & 0x80)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable & 0x80)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(cabaret_state::cabaret)

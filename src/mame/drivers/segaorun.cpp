@@ -830,7 +830,7 @@ void segaorun_state::update_main_irqs()
 
 WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
 {
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 

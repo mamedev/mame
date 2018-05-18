@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {
 	int scanline = param;
 
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	scanline += 64;
 

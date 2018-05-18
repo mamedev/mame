@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(hvyunit_state::screen_vblank)
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 {
-	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)

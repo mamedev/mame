@@ -155,7 +155,7 @@ static const z80_daisy_config daisy_chain_zrepp[] =
 
 INTERRUPT_GEN_MEMBER(polyplay_state::nmi_handler)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* I/O Port handling */

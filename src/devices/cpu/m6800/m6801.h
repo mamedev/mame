@@ -16,7 +16,6 @@ enum
 									/* Active eddge is selecrable by internal reg.  */
 									/* raise eddge : CLEAR_LINE  -> ASSERT_LINE     */
 									/* fall  eddge : ASSERT_LINE -> CLEAR_LINE      */
-									/* it is usuali to use PULSE_LINE state         */
 	M6801_SC1_LINE
 };
 

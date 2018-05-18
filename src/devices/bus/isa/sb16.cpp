@@ -602,7 +602,7 @@ WRITE8_MEMBER( sb16_lle_device::dsp_reset_w )
 	if(data & 1)
 	{
 		device_reset();
-		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }
 

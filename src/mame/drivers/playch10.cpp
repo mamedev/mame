@@ -638,9 +638,9 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 	{
 		/* LS161A, Sheet 1 - bottom left of Z80 */
 		if (!m_pc10_dog_di && !m_pc10_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		else if (m_pc10_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

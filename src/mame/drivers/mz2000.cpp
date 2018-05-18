@@ -822,7 +822,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	{
 		m_ipl_enable = 0;
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	m_beeper->set_state(data & 0x04);

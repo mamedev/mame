@@ -535,7 +535,7 @@ READ32_MEMBER(ms32_state::ms32_sound_r)
 
 WRITE32_MEMBER(ms32_state::reset_sub_w)
 {
-	if(data) m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
 }
 
 

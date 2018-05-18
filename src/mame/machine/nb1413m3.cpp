@@ -125,7 +125,7 @@ TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 	{
 		if (m_nmi_enable)
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			m_nmi_count++;
 		}
 

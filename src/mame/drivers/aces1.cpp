@@ -252,7 +252,7 @@ TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_irq_timer_callback)
 TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 {
 //  printf("nmi\n");
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	aces1_reset_nmi_timer();
 }
 

@@ -1542,7 +1542,7 @@ WRITE8_MEMBER(rainbow_state::ext_ram_w)
 #ifndef OLD_RAM_BOARD_PRESENT
 	if(m_diagnostic & 0x08)
 		if( (offset + 0x10000) >= (MOTHERBOARD_RAM + 1))
-			m_i8088->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_i8088->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 #endif
 }
 

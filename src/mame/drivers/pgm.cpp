@@ -260,7 +260,7 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 	{
 		m_ics->reset();
 		m_soundcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_soundcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	else
 	{
@@ -283,7 +283,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
 		m_soundlatch->write(space, 0, data);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

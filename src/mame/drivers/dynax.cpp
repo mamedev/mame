@@ -325,7 +325,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 	if (m_toggle)
 	{
 		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -338,7 +338,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 	if (m_toggle_cpu1)
 	{
 		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);  // cpu1
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // cpu1
 	}
 }
 
