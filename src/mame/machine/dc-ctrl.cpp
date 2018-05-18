@@ -67,14 +67,17 @@ DEFINE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device, "dcctrl", "Dreamcast Con
 dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dc_common_device(mconfig, DC_CONTROLLER, tag, owner, clock)
 {
-	id = "Dreamcast Controller";
+	model = "Dreamcast Controller";
 	license = "Produced By or Under License From SEGA ENTERPRISES,LTD.";
 	versions = "Version 1.000,1998/05/11,315-6215-AB   ,Analog Module: The 4th Edition. 05/08";
+	id = 0x01000000; // Controller
+	electric_current = 0x01f401ae; // max 50mA, standby 43mA
+	region = 0x00ff;
 }
 
 void dc_controller_device::fixed_status(uint32_t *dest)
 {
-	dest[0] = 0x01000000; // Controller
+	dest[0] = id;
 	dest[1] =
 		((port[2] != nullptr) ? 0x0100 : 0) |
 		((port[3] != nullptr) ? 0x0200 : 0) |
@@ -86,10 +89,10 @@ void dc_controller_device::fixed_status(uint32_t *dest)
 		((port[1] ? port[1]->active() : 0) << 16); // 1st function - controller
 	dest[2] = 0; // No 2nd function
 	dest[3] = 0; // No 3rd function
-	dest[4] = 0x00ff; // Every region, no expansion
-	copy_with_spaces(((uint8_t *)dest) + 18, id, 30);
+	dest[4] = region; // Every region, no expansion
+	copy_with_spaces(((uint8_t *)dest) + 18, model, 30);
 	copy_with_spaces(((uint8_t *)dest) + 48, license, 60);
-	dest[27] = 0x01f401ae; // standby 43mA, max 50mA
+	dest[27] = electric_current;
 }
 
 void dc_controller_device::free_status(uint32_t *dest)
@@ -99,7 +102,7 @@ void dc_controller_device::free_status(uint32_t *dest)
 
 void dc_controller_device::read(uint32_t *dest)
 {
-	dest[0] = 0x01000000; // Controller
+	dest[0] = id; // Controller
 	dest[1] =
 		(port[0] ? port[0]->read() : 0xff) |
 		((port[1] ? port[1]->read() : 0xff) << 8) |
@@ -123,21 +126,24 @@ DEFINE_DEVICE_TYPE(DC_KEYBOARD, dc_keyboard_device, "dckb", "Dreamcast Keyboard"
 dc_keyboard_device::dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dc_common_device(mconfig, DC_KEYBOARD, tag, owner, clock)
 {
-	id = "92key Keyboard for JPN";
+	model = "92key Keyboard for JPN";
 	license = "Produced By or Under License From SEGA ENTERPRISES,LTD.";
 	versions = "Version 1.000,1998/06/12,315-6215-AD   ,Key Scan Module: The 1st Edition. 05/20";
+	id = 0x40000000; // Keyboard
+	electric_current = 0x0190015e; // max 40mA, standby 35mA
+	region = 0x0002; // Japan region, no expansion
 }
 
 void dc_keyboard_device::fixed_status(uint32_t *dest)
 {
-	dest[0] = 0x40000000; // Keyboard
+	dest[0] = id; // Keyboard
 	dest[1] = 0x00201000; // 1st function
 	dest[2] = 0x00000008; // No 2nd function (doc returns 8 here tho?)
 	dest[3] = 0x00000000; // No 3rd function
-	dest[4] = 0x00000002; // Japan region, no expansion
-	copy_with_spaces(((uint8_t *)dest) + 18, id, 30);
+	dest[4] = region; 
+	copy_with_spaces(((uint8_t *)dest) + 18, model, 30);
 	copy_with_spaces(((uint8_t *)dest) + 48, license, 60);
-	dest[27] = 0x0190015e; // standby 35mA, max 40mA
+	dest[27] = electric_current;
 }
 
 void dc_keyboard_device::free_status(uint32_t *dest)
@@ -147,7 +153,7 @@ void dc_keyboard_device::free_status(uint32_t *dest)
 
 void dc_keyboard_device::read(uint32_t *dest)
 {
-	dest[0] = 0x40000000; // Keyboard
+	dest[0] = id;
 	// key code
 	dest[1] =
 		(port[0] ? port[0]->read() : 0) |
