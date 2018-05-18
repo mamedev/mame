@@ -1,4 +1,5 @@
-
+// license:BSD-3-Clause
+// copyright-holders:Sven Schnelle
 /***************************************************************************
 
   HP98543 medium-resolution color board
@@ -127,7 +128,7 @@ READ16_MEMBER(dio16_98543_device::ctrl_r)
 {
 	uint16_t ret = 0;
 
-	for(auto& tc: m_topcat)
+	for (auto &tc: m_topcat)
 		ret |= tc->ctrl_r(space, offset, mem_mask);
 
 	return ret;
@@ -135,21 +136,21 @@ READ16_MEMBER(dio16_98543_device::ctrl_r)
 
 WRITE16_MEMBER(dio16_98543_device::ctrl_w)
 {
-	for(auto& tc: m_topcat)
+	for (auto &tc: m_topcat)
 		tc->ctrl_w(space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(dio16_98543_device::vram_r)
 {
 	uint16_t ret = 0;
-	for(auto& tc: m_topcat)
+	for (auto &tc: m_topcat)
 		ret |= tc->vram_r(space, offset, mem_mask);
 	return ret;
 }
 
 WRITE16_MEMBER(dio16_98543_device::vram_w)
 {
-	for(auto& tc: m_topcat)
+	for (auto &tc: m_topcat)
 		tc->vram_w(space, offset, data, mem_mask);
 }
 

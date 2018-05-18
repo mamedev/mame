@@ -42,7 +42,7 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 private:
-        const address_space_config m_space_config;
+	const address_space_config m_space_config;
 	void map(address_map &map);
 
 	static constexpr int m_h_pix = 1024;

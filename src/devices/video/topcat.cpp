@@ -9,14 +9,14 @@
 
 DEFINE_DEVICE_TYPE(TOPCAT, topcat_device, "topcat", "HP Topcat ASIC")
 
-topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, type, tag, owner, clock),
+topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_vram(*this, "^vram")
 {
 }
 
-topcat_device::topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: topcat_device(mconfig, TOPCAT, tag, owner, clock)
+topcat_device::topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	topcat_device(mconfig, TOPCAT, tag, owner, clock)
 {
 }
 
@@ -110,55 +110,55 @@ void topcat_device::update_cursor(int x, int y, uint8_t ctrl, uint8_t width)
 	m_cursor_width = width;
 }
 
-void topcat_device::execute_rule(bool src, replacement_rule_t rule, bool *dst)
+void topcat_device::execute_rule(bool src, replacement_rule_t rule, bool &dst)
 {
 	switch(rule & 0x0f) {
 	case TOPCAT_REPLACE_RULE_CLEAR:
-		*dst = false;
+		dst = false;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_AND_DST:
-		*dst &= src;
+		dst &= src;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_AND_NOT_DST:
-		*dst = !(*dst) & src;
+		dst = !dst & src;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC:
-		*dst = src;
+		dst = src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_AND_DST:
-		*dst &= !src;
+		dst &= !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOP:
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_XOR_DST:
-		*dst ^= src;
+		dst ^= src;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_OR_DST:
-		*dst |= src;
+		dst |= src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_AND_NOT_DST:
-		*dst = !(*dst) & !src;
+		dst = !dst & !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_XOR_DST:
-		*dst ^= !src;
+		dst ^= !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_DST:
-		*dst ^= true;
+		dst ^= true;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_OR_NOT_DST:
-		*dst = src | !(*dst);
+		dst = src | !dst;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC:
-		*dst = !src;
+		dst = !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_OR_DST:
-		*dst = !src | *dst;
+		dst |= !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_OR_NOT_DST:
-		*dst = !src | !(*dst);
+		dst = !src | !dst;
 		break;
 	case TOPCAT_REPLACE_RULE_SET:
-		*dst = true;
+		dst = true;
 		break;
 
 	}
@@ -176,7 +176,7 @@ void topcat_device::window_move(void)
 			bool dst = get_vram_pixel(m_dst_x_pixel + column,
 						  m_dst_y_pixel + line);
 //			execute_rule(src, (replacement_rule_t)((m_move_replacement_rule >> 4) & 0x0f), &dst);
-			execute_rule(src, (replacement_rule_t)(m_move_replacement_rule & 0x0f), &dst);
+			execute_rule(src, (replacement_rule_t)(m_move_replacement_rule & 0x0f), dst);
 			modify_vram(m_dst_x_pixel + column, m_dst_y_pixel + line, dst);
 		}
 	}

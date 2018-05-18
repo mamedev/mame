@@ -85,7 +85,7 @@ private:
 	};
 
 	void window_move(void);
-	void execute_rule(bool src, replacement_rule_t rule, bool *dst);
+	void execute_rule(bool src, replacement_rule_t rule, bool &dst);
 
 	void update_cursor(int x, int y, uint8_t ctrl, uint8_t width);
 
