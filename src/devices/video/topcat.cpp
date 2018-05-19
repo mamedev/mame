@@ -166,11 +166,48 @@ void topcat_device::execute_rule(bool src, replacement_rule_t rule, bool &dst)
 
 void topcat_device::window_move(void)
 {
+	int line, endline, lineincr;
+	int startcolumn, endcolumn, columnincr;
+
 	if (!((m_fb_write_enable >> 8) & m_plane_mask))
 		return;
 
-	for(int line = 0; line < m_block_mover_pixel_height; line++) {
-		for(int column = 0; column < m_block_mover_pixel_width; column++) {
+	LOG("WINDOWMOVE: %3ux%3u -> %3ux%3u / %3ux%3u rule %x\n",
+	    m_source_x_pixel,
+	    m_source_y_pixel,
+	    m_dst_x_pixel,
+	    m_dst_y_pixel,
+	    m_block_mover_pixel_width,
+	    m_block_mover_pixel_height,
+	    m_move_replacement_rule);
+
+	if (m_dst_y_pixel > m_source_y_pixel) {
+		/* move down */
+		line = m_block_mover_pixel_height-1;
+		endline = -1;
+		lineincr = -1;
+	} else {
+		/* move up */
+		line = 0;
+		endline = m_block_mover_pixel_height;
+		lineincr = 1;
+	}
+
+	if (m_dst_x_pixel > m_source_x_pixel) {
+		/* move right */
+		startcolumn = m_block_mover_pixel_width-1;
+		endcolumn = -1;
+		columnincr = -1;
+	} else {
+		/* move left */
+		startcolumn = 0;
+		endcolumn = m_block_mover_pixel_width;
+		columnincr = 1;
+
+	}
+
+	for(;line != endline; line += lineincr) {
+		for(int column = startcolumn; column != endcolumn; column += columnincr) {
 			bool src = get_vram_pixel(m_source_x_pixel + column,
 						  m_source_y_pixel + line);
 			bool dst = get_vram_pixel(m_dst_x_pixel + column,
