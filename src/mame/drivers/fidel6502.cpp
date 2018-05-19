@@ -924,7 +924,9 @@ WRITE8_MEMBER(fidel6502_state::sc12_trampoline_w)
 
 READ8_MEMBER(fidel6502_state::sc12_trampoline_r)
 {
-	sc12_set_cpu_freq(offset);
+	if (!machine().side_effects_disabled())
+		sc12_set_cpu_freq(offset);
+
 	return m_sc12_map->read8(space, offset);
 }
 
