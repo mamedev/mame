@@ -215,8 +215,6 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	void init_cocob();
-
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
 
@@ -582,19 +580,11 @@ ROM_START( cocolocoa )
 	ROM_LOAD( "tbp28l22.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // same decode prom from abattle (astrof.cpp)
 ROM_END
 
-/*
-  Petaco's 2-player game.
-
-  C1.bin was redumped from another board with the same set.
-  The original device was bitrotten. Each 0x1b offset (1b, 2b, 3b, etc)
-  has bit7 fixed to zero, in range 0000-026f.
-
-*/
 ROM_START( cocolocob )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",   0xd000, 0x0800, CRC(5ead42c4) SHA1(f2b8bf48f80c99c8c109ec67cdd6e1105f7f9702) )
 	ROM_LOAD( "b-c1.bin", 0xd800, 0x0800, CRC(104db6b3) SHA1(d0a9ce1b920124078f442bdcb226e8da9f96d60a) )
-	ROM_LOAD( "c1.bin",   0xe000, 0x0800, CRC(64a51a8c) SHA1(571ab5b29101ce400381538209f5da7ecbd9a523) )  // redumped.
+	ROM_LOAD( "c1.bin",   0xe000, 0x0800, CRC(64a51a8c) SHA1(571ab5b29101ce400381538209f5da7ecbd9a523) )
 	ROM_LOAD( "d1.bin",   0xe800, 0x0800, CRC(41b22627) SHA1(241659448074e5101ca7da3feb4a0a38580b12e9) )
 	ROM_LOAD( "d-e1.bin", 0xf000, 0x0800, CRC(db93f941) SHA1(b827341e408b5dc50acdfd3586f829f7bb2bb915) )
 	ROM_LOAD( "e1.bin",   0xf800, 0x0800, CRC(4e5705f0) SHA1(271d6c8eff331327dc1a75f7a4b0c64d3e363e3d) )
@@ -604,16 +594,6 @@ ROM_START( cocolocob )
 ROM_END
 
 
-/***********************************
-*           Driver Init            *
-***********************************/
-
-void cocoloco_state::init_cocob()
-{
-//  Just for testing...
-
-}
-
 
 /***********************************
 *           Game Drivers           *
@@ -622,4 +602,4 @@ void cocoloco_state::init_cocob()
 //    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        ROT    COMPANY         FULLNAME             FLAGS
 GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, empty_init, ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, empty_init, ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, init_cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, empty_init, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_SUPPORTS_SAVE )
