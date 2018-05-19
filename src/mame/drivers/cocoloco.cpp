@@ -188,9 +188,9 @@
 #include "netlist/devices/net_lib.h"
 
 
-#define MASTER_CLOCK    XTAL(20'000'000)           /* confirmed */
-#define CPU_CLOCK       MASTER_CLOCK / 16    /* confirmed */
-#define SND_CLOCK       MASTER_CLOCK / 8     /* confirmed */
+#define MASTER_CLOCK    XTAL(20'000'000)     // confirmed
+#define CPU_CLOCK       MASTER_CLOCK / 16    // confirmed
+#define SND_CLOCK       MASTER_CLOCK / 8     // confirmed
 
 
 class cocoloco_state : public driver_device
@@ -224,6 +224,7 @@ public:
 	void cocoloco(machine_config &config);
 	void cocoloco_map(address_map &map);
 };
+
 
 /***********************************
 *          Sound Hardware          *
@@ -437,6 +438,7 @@ void cocoloco_state::cocoloco_map(address_map &map)
 
 */
 
+
 /***********************************
 *           Input Ports            *
 ***********************************/
@@ -514,12 +516,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
+	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(cocoloco_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256) /* TODO: not accurate, ~50 Hz */
+	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256)  // TODO: not accurate, ~50 Hz.
 	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -528,7 +530,7 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK) /* confirmed */
+	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
@@ -600,7 +602,7 @@ ROM_START( cocolocob )
 	ROM_LOAD( "e1.bin",   0xf800, 0x0800, CRC(4e5705f0) SHA1(271d6c8eff331327dc1a75f7a4b0c64d3e363e3d) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp18s22n.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
+	ROM_LOAD( "tbp18s22n.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // verified.
 ROM_END
 
 
@@ -620,6 +622,6 @@ void cocoloco_state::init_cocob()
 ***********************************/
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        ROT    COMPANY         FULLNAME             FLAGS
-GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, empty_init, ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, empty_init, ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, init_cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, empty_init, ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, empty_init, ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, init_cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_SUPPORTS_SAVE )
