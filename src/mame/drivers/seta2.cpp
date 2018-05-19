@@ -4275,7 +4275,7 @@ ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9
 	ROM_LOAD16_BYTE( "trophy_2-26_u6_de45.u07", 0x000001, 0x100000, CRC(9ae364f6) SHA1(9df8352345e59f1e0a5cb66a8b43d5ad7785ca29) ) /* hand written label:  Trophy 2/26 U7  DE45 */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "lh28f016sat.u20", 0x0000000, 0x200000, NO_DUMP ) /* Non of the 28F016 flash ROMs are dumped */
+	ROM_LOAD( "lh28f016sat.u20", 0x0000000, 0x200000, NO_DUMP ) /* None of the 28F016 flash ROMs are dumped */
 	ROM_LOAD( "lh28f016sat.u21", 0x0200000, 0x200000, NO_DUMP ) /* The correct loading order is unknown    */
 	ROM_LOAD( "lh28f016sat.u22", 0x0400000, 0x200000, NO_DUMP )
 	ROM_LOAD( "lh28f016sat.u23", 0x0600000, 0x200000, NO_DUMP )
