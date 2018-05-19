@@ -27,7 +27,6 @@ public:
 		m_mainram(*this, "mainram"),
 		m_gunnail_scrollram(*this, "scrollram"),
 		m_spriteram(*this, "spriteram"),
-		m_nmk_fgvideoram(*this, "nmk_fgvideoram"),
 		m_gunnail_scrollramy(*this, "scrollramy"),
 		m_afega_scroll(*this, "afega_scroll_%u", 0),
 		m_tilemap_rom(*this, "tilerom"),
@@ -45,12 +44,11 @@ public:
 	optional_device<nmk004_device> m_nmk004;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	optional_shared_ptr_array<uint16_t, 4> m_nmk_bgvideoram;
+	optional_shared_ptr_array<uint16_t, 2> m_nmk_bgvideoram;
 	optional_shared_ptr<uint16_t> m_nmk_txvideoram;
 	required_shared_ptr<uint16_t> m_mainram;
 	optional_shared_ptr<uint16_t> m_gunnail_scrollram;
 	optional_shared_ptr<uint8_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_nmk_fgvideoram;
 	optional_shared_ptr<uint16_t> m_gunnail_scrollramy;
 	optional_shared_ptr_array<uint16_t, 2> m_afega_scroll;
 
@@ -58,23 +56,20 @@ public:
 	optional_memory_bank m_audiobank;
 	optional_memory_bank_array<2> m_okibank;
 
+	int m_sprclk;
+	int m_sprlimit;
+	int m_tilerambank;
 	int m_sprdma_base;
 	int mask[4*2];
-	int m_simple_scroll;
-	int m_redraw_bitmap;
 	std::unique_ptr<uint16_t[]> m_spriteram_old;
 	std::unique_ptr<uint16_t[]> m_spriteram_old2;
 	int m_bgbank;
 	int m_videoshift;
 	int m_bioship_background_bank;
-	uint8_t m_bioship_scroll[4];
-	tilemap_t *m_bg_tilemap[4];
+	tilemap_t *m_bg_tilemap[2];
 	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_fg_tilemap;
-	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	int m_mustang_bg_xscroll;
-	uint8_t m_scroll[4];
-	uint8_t m_scroll_2[4];
+	uint8_t m_scroll[2][4];
 	uint16_t m_vscroll[4];
 	int m_prot_count;
 	uint8_t m_input_pressed;
@@ -95,19 +90,16 @@ public:
 	DECLARE_READ16_MEMBER(afega_unknown_r);
 	template<int Scroll> DECLARE_WRITE16_MEMBER(afega_scroll_w);
 	template<int Bank> DECLARE_WRITE16_MEMBER(nmk_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(nmk_fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(nmk_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(mustang_scroll_w);
-	DECLARE_WRITE16_MEMBER(bioshipbg_scroll_w);
-	DECLARE_WRITE16_MEMBER(nmk_scroll_w);
-	DECLARE_WRITE16_MEMBER(nmk_scroll_2_w);
+	DECLARE_WRITE16_MEMBER(raphero_scroll_w);
+	template<int Layer> DECLARE_WRITE8_MEMBER(nmk_scroll_w);
 	DECLARE_WRITE16_MEMBER(vandyke_scroll_w);
 	DECLARE_WRITE16_MEMBER(vandykeb_scroll_w);
 	DECLARE_WRITE16_MEMBER(manybloc_scroll_w);
-	DECLARE_WRITE16_MEMBER(nmk_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(nmk_tilebank_w);
-	DECLARE_WRITE16_MEMBER(bioship_scroll_w);
-	DECLARE_WRITE16_MEMBER(bioship_bank_w);
+	DECLARE_WRITE8_MEMBER(nmk_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(nmk_tilebank_w);
+	DECLARE_WRITE8_MEMBER(bioship_bank_w);
 	DECLARE_WRITE8_MEMBER(spec2k_oki1_banking_w);
 	DECLARE_WRITE8_MEMBER(twinactn_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
@@ -129,9 +121,9 @@ public:
 	void init_bjtwin();
 	void init_atombjt();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
-	template<int Bank> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(strahl_get_fg_tile_info);
+	template<int Bank, int Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(common_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(bioship_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
 	DECLARE_VIDEO_START(macross);
@@ -139,17 +131,13 @@ public:
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(gunnail);
 	DECLARE_VIDEO_START(macross2);
-	DECLARE_VIDEO_START(raphero);
 	DECLARE_VIDEO_START(bjtwin);
 	DECLARE_VIDEO_START(afega);
-	DECLARE_VIDEO_START(firehawk);
 	DECLARE_VIDEO_START(grdnstrm);
 	uint32_t screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bioship(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_gunnail(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tdragon2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -168,14 +156,8 @@ public:
 	void nmk16_draw_sprites_swap_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int *bittbl);
 	void nmk16_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nmk16_draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nmk16_bg_spr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nmk16_bg_fg_spr_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nmk16_bg_spr_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nmk16_bg_sprflip_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nmk16_bg_sprswap_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bittbl[8]);
-	int nmk16_bg_sprswapflip_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bittbl[8]);
-	int nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bittbl[8]);
+	void nmk16_bg_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer = 0);
+	void nmk16_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int dsw_flipscreen,int xoffset, int yoffset,int attr_mask);
 	void redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcu_run(uint8_t dsw_setting);

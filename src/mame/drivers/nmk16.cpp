@@ -70,6 +70,8 @@ TODO:
 - Thunder Dragon 3 (bootleg of Thunder Dragon 2) :
   Sound System isn't hooked up correctly for this set.
 
+- Verify sprite limits for games when resolution is 384x224
+
 NOT BUGS:
 - Hacha Mecha Fighter: (BTANB) the bomb graphics are pretty weird when the game
   is in japanese mode, but it's like this on the original game.
@@ -77,6 +79,9 @@ NOT BUGS:
 - Vandyke: Many enemies make very strange sounds because they seem to have no
   rate limit for making their sound effect. This is normal, it's like this on all
   PCB recordings.
+
+- Sprite number is limited related to screen size and each sprite size.
+  reference : http://upl-gravedigger.boo.jp/pcb_info/pcb_manual_7.jpg
 
 
 ----
@@ -302,19 +307,37 @@ template<int Bank>
 WRITE16_MEMBER(nmk16_state::nmk_bgvideoram_w)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram[Bank][offset]);
-	m_bg_tilemap[Bank]->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(nmk16_state::nmk_fgvideoram_w)
-{
-	COMBINE_DATA(&m_nmk_fgvideoram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
+	if ((offset >> 13) == m_tilerambank)
+		m_bg_tilemap[Bank]->mark_tile_dirty(offset & 0x1fff);
 }
 
 WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
 {
 	COMBINE_DATA(&m_nmk_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+template<int Layer>
+WRITE8_MEMBER(nmk16_state::nmk_scroll_w)
+{
+	m_scroll[Layer][offset] = data;
+
+	if (offset & 2)
+	{
+		m_bg_tilemap[Layer]->set_scrolly(0,((m_scroll[Layer][2] << 8) | m_scroll[Layer][3]));
+	}
+	else
+	{
+		if ((m_nmk_bgvideoram[Layer].bytes() > 0x4000) && (offset == 0))
+		{
+			int newbank = (m_scroll[Layer][0] >> 4) & ((m_nmk_bgvideoram[Layer].bytes() >> 14)-1);
+			if (m_tilerambank != newbank)
+			{
+				m_tilerambank = newbank;
+			}
+		}
+		m_bg_tilemap[Layer]->set_scrollx(0,((m_scroll[Layer][0] << 8) | m_scroll[Layer][1]) - m_videoshift);
+	}
 }
 
 
@@ -329,7 +352,7 @@ void nmk16_state::vandyke_map(address_map &map)
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_x0016_w));
-	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x080019, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::vandyke_scroll_w));
@@ -349,7 +372,7 @@ void nmk16_state::vandykeb_map(address_map &map)
 //  map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
 	map(0x080010, 0x08001d).w(this, FUNC(nmk16_state::vandykeb_scroll_w)); /* 10, 12, 1a, 1c */
 	map(0x080016, 0x080017).nopw();    /* IRQ enable? */
-	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x080019, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 //  map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).nopw();    /* just in case... */
@@ -367,7 +390,7 @@ void nmk16_state::manybloc_map(address_map &map)
 	map(0x080004, 0x080005).portr("DSW1");
 	map(0x080010, 0x080011).nopw();            /* See notes at the top of the driver */
 	map(0x080012, 0x080013).nopw();            /* See notes at the top of the driver */
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x08001c, 0x08001d).nopw();            /* See notes at the top of the driver */
 	map(0x08001f, 0x08001f).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -386,12 +409,12 @@ void nmk16_state::tharrier_map(address_map &map)
 	map(0x08000f, 0x08000f).r("soundlatch2", FUNC(generic_latch_8_device::read));    /* from Z80 */
 	map(0x080010, 0x080011).w(this, FUNC(nmk16_state::tharrier_mcu_control_w));
 	map(0x080012, 0x080013).nopw();
-//  map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
-//  map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+//  map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+//  map(0x080019, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x080202, 0x080203).portr("IN2");
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-//  map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w));
+//  map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x09c000, 0x09c7ff).ram(); /* Unused txvideoram area? */
 	map(0x09d000, 0x09d7ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
@@ -426,7 +449,7 @@ void nmk16_state::mustang_map(address_map &map)
 	map(0x080004, 0x080005).portr("DSW1");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
 	map(0x08000e, 0x08000f).nopw();
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_x0016_w));    // frame number?
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -444,7 +467,7 @@ void nmk16_state::mustangb_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080004, 0x080005).portr("DSW1");
 	map(0x08000e, 0x08000f).noprw();
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).nopw();    // frame number?
 	map(0x08001e, 0x08001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -455,7 +478,6 @@ void nmk16_state::mustangb_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().w(this, FUNC(nmk16_state::nmk16_mainram_strange_w)).share("mainram");
 }
 
-
 void nmk16_state::twinactn_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -463,7 +485,7 @@ void nmk16_state::twinactn_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080004, 0x080005).portr("DSW1");
 	map(0x08000e, 0x08000f).noprw();
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).nopw();    // frame number?
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -474,7 +496,6 @@ void nmk16_state::twinactn_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().w(this, FUNC(nmk16_state::nmk16_mainram_strange_w)).share("mainram");
 }
 
-
 void nmk16_state::acrobatm_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
@@ -484,12 +505,12 @@ void nmk16_state::acrobatm_map(address_map &map)
 	map(0xc0008, 0xc0009).portr("DSW1");
 	map(0xc000a, 0xc000b).portr("DSW2");
 	map(0xc000f, 0xc000f).r(m_nmk004, FUNC(nmk004_device::read));
-	map(0xc0014, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0xc0015, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0xc0016, 0xc0017).w(this, FUNC(nmk16_state::nmk16_x0016_w));
-	map(0xc0018, 0xc0019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0xc0019, 0xc0019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0xc001f, 0xc001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0xc4000, 0xc45ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xc8000, 0xc8007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w));
+	map(0xc8000, 0xc8007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
 	map(0xcc000, 0xcffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0xd4000, 0xd47ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 }
@@ -502,14 +523,14 @@ void nmk16_state::bioship_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-//  map(0xc0014, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+//  map(0xc0015, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_bioship_x0016_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
-	map(0x084000, 0x084001).w(this, FUNC(nmk16_state::bioship_bank_w));
+	map(0x084001, 0x084001).w(this, FUNC(nmk16_state::bioship_bank_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).ram().w(this, FUNC(nmk16_state::bioshipbg_scroll_w));
-	map(0x08c010, 0x08c017).ram().w(this, FUNC(nmk16_state::bioship_scroll_w));
-	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
+	map(0x08c000, 0x08c007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<1>)).umask16(0xff00);
+	map(0x08c010, 0x08c017).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0xff00);
+	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<1>)).share("nmk_bgvideoram1");
 	map(0x09c000, 0x09c7ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }
@@ -682,13 +703,13 @@ void nmk16_state::hachamf_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_x0016_w));
-	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x080019, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	/* Video Region */
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w));
+	map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x09c000, 0x09c7ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	/* Main RAM, inc sprites, shared with MCU */
@@ -916,11 +937,11 @@ void nmk16_state::tdragon_map(address_map &map)
 	map(0x0c0008, 0x0c0009).portr("DSW1");
 	map(0x0c000a, 0x0c000b).portr("DSW2");
 	map(0x0c000f, 0x0c000f).r(m_nmk004, FUNC(nmk004_device::read));
-	map(0x0c0014, 0x0c0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w)); /* Maybe */
+	map(0x0c0015, 0x0c0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w)); /* Maybe */
 	map(0x0c0016, 0x0c0017).w(this, FUNC(nmk16_state::nmk16_x0016_w));
-	map(0x0c0018, 0x0c0019).w(this, FUNC(nmk16_state::nmk_tilebank_w)); /* Tile Bank ? */
+	map(0x0c0019, 0x0c0019).w(this, FUNC(nmk16_state::nmk_tilebank_w)); /* Tile Bank ? */
 	map(0x0c001f, 0x0c001f).w(m_nmk004, FUNC(nmk004_device::write));
-	map(0x0c4000, 0x0c4007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w));
+	map(0x0c4000, 0x0c4007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0cc000, 0x0cffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x0d0000, 0x0d07ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
@@ -941,10 +962,10 @@ void nmk16_state::tdragonb_map(address_map &map)
 	map(0x0c0002, 0x0c0003).portr("IN1");
 	map(0x0c0008, 0x0c0009).portr("DSW1");
 	map(0x0c000a, 0x0c000b).portr("DSW2");
-	map(0x0c0014, 0x0c0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w)); /* Maybe */
-	map(0x0c0018, 0x0c0019).w(this, FUNC(nmk16_state::nmk_tilebank_w)); /* Tile Bank ? */
+	map(0x0c0015, 0x0c0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w)); /* Maybe */
+	map(0x0c0019, 0x0c0019).w(this, FUNC(nmk16_state::nmk_tilebank_w)); /* Tile Bank ? */
 	map(0x0c001e, 0x0c001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
-	map(0x0c4000, 0x0c4007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w));
+	map(0x0c4000, 0x0c4007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0cc000, 0x0cffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x0d0000, 0x0d07ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
@@ -958,10 +979,10 @@ void nmk16_state::ssmissin_map(address_map &map)
 	map(0x0c0004, 0x0c0005).portr("IN1");
 	map(0x0c0006, 0x0c0007).portr("DSW1");
 //  AM_RANGE(0x0c000e, 0x0c000f) AM_READ(??)
-	map(0x0c0014, 0x0c0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w)); /* Maybe */
-	map(0x0c0018, 0x0c0019).w(this, FUNC(nmk16_state::nmk_tilebank_w)); /* Tile Bank ? */
+	map(0x0c0015, 0x0c0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w)); /* Maybe */
+	map(0x0c0019, 0x0c0019).w(this, FUNC(nmk16_state::nmk_tilebank_w)); /* Tile Bank ? */
 	map(0x0c001f, 0x0c001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0c4000, 0x0c4007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w));
+	map(0x0c4000, 0x0c4007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0cc000, 0x0cffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x0d0000, 0x0d07ff).mirror(0x1800).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram"); //mirror for airattck
@@ -996,14 +1017,14 @@ void nmk16_state::strahl_map(address_map &map)
 	map(0x80008, 0x80009).portr("DSW1");
 	map(0x8000a, 0x8000b).portr("DSW2");
 	map(0x8000f, 0x8000f).r(m_nmk004, FUNC(nmk004_device::read));
-	map(0x80014, 0x80015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x80015, 0x80015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x80016, 0x80017).w(this, FUNC(nmk16_state::nmk16_x0016_w));
 	map(0x8001f, 0x8001f).w(m_nmk004, FUNC(nmk004_device::write));
-	map(0x84000, 0x84007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w));
-	map(0x88000, 0x88007).ram().w(this, FUNC(nmk16_state::nmk_scroll_2_w));
+	map(0x84000, 0x84007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
+	map(0x88000, 0x88007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<1>)).umask16(0x00ff);
 	map(0x8c000, 0x8c7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x90000, 0x93fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
-	map(0x94000, 0x97fff).ram().w(this, FUNC(nmk16_state::nmk_fgvideoram_w)).share("nmk_fgvideoram");
+	map(0x94000, 0x97fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<1>)).share("nmk_bgvideoram1");
 	map(0x9c000, 0x9c7ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0xf0000, 0xfffff).ram().share("mainram");
 }
@@ -1016,12 +1037,12 @@ void nmk16_state::macross_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_x0016_w));
-	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x080019, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w));
+	map(0x08c000, 0x08c007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x09c000, 0x09c7ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0x0f0000, 0x0fffff).ram().w(this, FUNC(nmk16_state::nmk16_mainram_strange_w)).share("mainram");
@@ -1035,9 +1056,9 @@ void nmk16_state::gunnail_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_x0016_w));
-	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x080019, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
@@ -1056,21 +1077,13 @@ void nmk16_state::macross2_map(address_map &map)
 	map(0x100008, 0x100009).portr("DSW1");
 	map(0x10000a, 0x10000b).portr("DSW2");
 	map(0x10000f, 0x10000f).r("soundlatch2", FUNC(generic_latch_8_device::read));    /* from Z80 */
-	map(0x100014, 0x100015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x100015, 0x100015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x100016, 0x100017).w(this, FUNC(nmk16_state::macross2_sound_reset_w));   /* Z80 reset */
-	map(0x100018, 0x100019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x100019, 0x100019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write)); /* to Z80 */
 	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-
-	map(0x130000, 0x1301ff).ram().share("scrollram");
-	map(0x130200, 0x1303ff).ram().share("scrollramy");
-	map(0x130400, 0x1307ff).ram();
-
-	map(0x140000, 0x143fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
-	map(0x144000, 0x147fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<1>)).share("nmk_bgvideoram1");
-	map(0x148000, 0x14bfff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<2>)).share("nmk_bgvideoram2");
-	map(0x14c000, 0x14ffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<3>)).share("nmk_bgvideoram3");
-
+	map(0x130000, 0x130007).ram().w(this, FUNC(nmk16_state::nmk_scroll_w<0>)).umask16(0x00ff);
+	map(0x140000, 0x14ffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x170000, 0x170fff).mirror(0x1000).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0x1f0000, 0x1fffff).ram().share("mainram");
 }
@@ -1090,22 +1103,15 @@ void nmk16_state::raphero_map(address_map &map)
 	map(0x100008, 0x100009).portr("DSW1");
 	map(0x10000a, 0x10000b).portr("DSW2");
 	map(0x10000f, 0x10000f).r("soundlatch2", FUNC(generic_latch_8_device::read));    /* from Z80 */
-	map(0x100014, 0x100015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x100015, 0x100015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x100016, 0x100017).nopw();    /* IRQ enable or z80 sound reset like in Macross 2? */
-	map(0x100018, 0x100019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x100019, 0x100019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write)); /* to Z80 */
 	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-
-	map(0x130000, 0x1301ff).ram().share("scrollram");
+	map(0x130000, 0x1301ff).ram().w(this, FUNC(nmk16_state::raphero_scroll_w)).share("scrollram");
 	map(0x130200, 0x1303ff).ram().share("scrollramy");
 	map(0x130400, 0x1307ff).ram();
-
-	map(0x140000, 0x143fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
-	map(0x144000, 0x147fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<1>)).share("nmk_bgvideoram1");
-	map(0x148000, 0x14bfff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<2>)).share("nmk_bgvideoram2");
-	map(0x14c000, 0x14ffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<3>)).share("nmk_bgvideoram3");
-
-
+	map(0x140000, 0x14ffff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x170000, 0x170fff).mirror(0x1000).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0x1f0000, 0x1fffff).ram().share("mainram");
 }
@@ -1149,12 +1155,12 @@ void nmk16_state::bjtwin_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
-	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x084001, 0x084001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x084011, 0x084011).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x084020, 0x08402f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x094000, 0x094001).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x094001, 0x094001).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x094002, 0x094003).nopw();    /* IRQ enable? */
 	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
@@ -3694,7 +3700,6 @@ static INPUT_PORTS_START( dolmen )
 INPUT_PORTS_END
 
 
-
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -3740,8 +3745,6 @@ static GFXDECODE_START( gfx_bjtwin )
 	GFXDECODE_ENTRY( "bgtile",  0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
-
-
 
 
 static GFXDECODE_START( gfx_bioship )
@@ -3840,8 +3843,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	MCFG_SCREEN_PALETTE("palette")
 
 
-
-
 MACHINE_CONFIG_START(nmk16_state::tharrier)
 
 	/* basic machine hardware */
@@ -3856,7 +3857,6 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tharrier)
-
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -3895,7 +3895,6 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -3939,7 +3938,6 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -3975,8 +3973,7 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
-	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bioship)
-
+	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bioship)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4016,7 +4013,6 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4060,7 +4056,6 @@ MACHINE_CONFIG_START(nmk16_state::vandykeb)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -4086,9 +4081,8 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
@@ -4130,7 +4124,6 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -4164,7 +4157,6 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4212,7 +4204,6 @@ MACHINE_CONFIG_START(nmk16_state::ssmissin)
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
-
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4282,7 +4273,6 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -4328,7 +4318,6 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -4368,7 +4357,6 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -4406,7 +4394,7 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
-	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
+	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4449,8 +4437,7 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
-	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
-
+	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4496,7 +4483,6 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
-
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -4555,7 +4541,7 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,raphero)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5216,7 +5202,7 @@ MACHINE_CONFIG_START(nmk16_state::grdnstrm)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_grdnstrm)
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 MACHINE_CONFIG_END
@@ -5262,7 +5248,7 @@ MACHINE_CONFIG_START(nmk16_state::firehawk)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6411,7 +6397,7 @@ ROM_START( tdragon3h )
 
 	// Not from this PCB
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "1.27c1000",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
+	ROM_LOAD( "1.27c1000",    0x00000, 0x20000, BAD_DUMP CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "12.27c1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
@@ -6427,10 +6413,10 @@ ROM_START( tdragon3h )
 
 	// Not from this PCB
 	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 samples */
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  /* all banked */
+	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, BAD_DUMP CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  /* all banked */
 
 	ROM_REGION( 0x240000, "oki2", 0 )   /* OKIM6295 samples */
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  /* all banked */
+	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, BAD_DUMP CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  /* all banked */
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  /* unknown */
