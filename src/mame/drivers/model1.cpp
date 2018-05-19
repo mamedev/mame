@@ -1750,6 +1750,7 @@ MACHINE_CONFIG_START(model1_state::vf)
 	model1_hle(config);
 
 	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_DEVICE_BIOS("epr14869b");
 	MCFG_MODEL1IO_IN2_CB(IOPORT("IN.2"))
 	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vf_outputs_w))
 MACHINE_CONFIG_END
