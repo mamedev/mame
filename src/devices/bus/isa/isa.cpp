@@ -376,7 +376,7 @@ void isa8_device::nmi()
 	{
 		if (m_nmi_enabled)
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 	else

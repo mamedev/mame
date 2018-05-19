@@ -917,7 +917,7 @@ INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 {
 	if ((m_ym2149_portb & 0x10) == 0)   /* ym2149 portB bit 4 trigger the NMI */
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

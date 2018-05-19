@@ -449,7 +449,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::st0016_int)
 		m_maincpu->set_input_line(0,HOLD_LINE);
 	else if((scanline % 64) == 0)
 		if(m_maincpu->state_int(Z80_IFF1)) /* dirty hack ... */
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -111,7 +111,7 @@
 INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
 {
 	if (ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);    /* trigger self test */
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);    /* trigger self test */
 }
 
 

@@ -31,7 +31,7 @@ Quite similar to Appoooh
 INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
 {
 	if (m_nmi_enable)
-			device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(drmicro_state::nmi_enable_w)

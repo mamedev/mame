@@ -2745,7 +2745,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(cave_state,sailormn)

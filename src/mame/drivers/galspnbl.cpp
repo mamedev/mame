@@ -52,7 +52,7 @@ WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space,offset,data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

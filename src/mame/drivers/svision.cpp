@@ -437,7 +437,7 @@ uint32_t svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32
 INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 {
 	if (BANK & 1)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_sound->sound_decrement();
 }

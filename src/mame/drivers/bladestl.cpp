@@ -48,7 +48,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
 		m_maincpu->set_input_line(HD6309_FIRQ_LINE, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in or timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /*************************************

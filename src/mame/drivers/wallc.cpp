@@ -100,6 +100,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info_sidampkr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(wallc);
@@ -233,6 +234,11 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
 	SET_TILE_INFO_MEMBER(0, code, 1, 0);
 }
 
+TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_sidampkr)
+{
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 0, 0);
+}
+
 void wallc_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
@@ -245,7 +251,7 @@ VIDEO_START_MEMBER(wallc_state, unkitpkr)
 
 VIDEO_START_MEMBER(wallc_state, sidampkr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_sidampkr), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -772,5 +778,5 @@ GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, init_wallc,    RO
 GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs correct decoding of the color PROM. Using the unkitpkr one gives correct colors and makes the game playable.
+GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam poker",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified
 GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

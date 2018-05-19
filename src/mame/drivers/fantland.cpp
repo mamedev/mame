@@ -81,7 +81,7 @@ WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
 WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
@@ -840,7 +840,7 @@ MACHINE_RESET_MEMBER(fantland_state,fantland)
 WRITE_LINE_MEMBER(fantland_state::fantland_irq)
 {
 	if (state && BIT(m_nmi_enable, 3))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)

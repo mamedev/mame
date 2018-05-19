@@ -289,7 +289,7 @@ uint32_t ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_in
 INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 {
 	if( ioport("COIN")->read() & 0x01 )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
 }

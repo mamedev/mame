@@ -136,7 +136,7 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 	// pressing both VIEW and MONITOR buttons causes a reset
 	if ((m_extra->read() & 0x03) == 0x03)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		machine_reset();
 	}
 }

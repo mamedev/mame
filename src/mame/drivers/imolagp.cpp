@@ -224,7 +224,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 		const int base = 6500;
 		const int range = 100000;
 		m_steer_pot_timer->adjust(attotime::from_usec(base + range * (1.0 / (double)(steer & 0x7f))));
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		m_steer_pot_timer->adjust(attotime::from_msec(20));
@@ -265,7 +265,8 @@ READ8_MEMBER(imolagp_state::receive_data_r)
 
 READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
 {
-	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!machine().side_effects_disabled())
+		m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	return 0;
 }
 

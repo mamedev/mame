@@ -414,7 +414,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(vastar_state::vastar)

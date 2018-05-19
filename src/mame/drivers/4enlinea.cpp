@@ -485,7 +485,7 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
 {
 	if(m_irq_count == 0)
 	{
-		//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		//device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		device.execute().set_input_line(0, HOLD_LINE);

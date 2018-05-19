@@ -750,7 +750,7 @@ void pcw16_state::trigger_fdc_int()
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
 					it would clear - to be checked */
-					m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+					m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 				}
 			}
 		}

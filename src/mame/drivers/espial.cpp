@@ -80,7 +80,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
 	int scanline = param;
 
 	if(scanline == 240 && m_main_nmi_enabled) // vblank-out irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if(scanline == 16) // timer irq, checks soundlatch port then updates some sound related work RAM buffers
 		m_maincpu->set_input_line(0, HOLD_LINE);

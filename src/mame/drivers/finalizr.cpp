@@ -36,7 +36,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)
 	if (scanline == 240 && m_irq_enable) // vblank irq
 		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	else if (((scanline % 32) == 0) && m_nmi_enable) // timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

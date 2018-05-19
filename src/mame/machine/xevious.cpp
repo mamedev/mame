@@ -38,18 +38,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(xevious_state::battles_nmi_generate)
 	{
 		if( m_battles_customio_command_count == 0 )
 		{
-			m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 		else
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 	else
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	m_battles_customio_command_count++;
 }

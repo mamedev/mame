@@ -135,7 +135,7 @@ WRITE8_MEMBER(sf_state::coin_w)
 WRITE8_MEMBER(sf_state::soundcmd_w)
 {
 	m_soundlatch->write(space, offset, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)

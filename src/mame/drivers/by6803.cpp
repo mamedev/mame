@@ -164,7 +164,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( by6803_state::activity_test )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( by6803_state::self_test )

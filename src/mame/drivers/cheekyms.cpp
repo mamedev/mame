@@ -16,7 +16,7 @@ INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 {
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -655,7 +655,7 @@ WRITE_LINE_MEMBER(cntsteer_state::subcpu_vblank_irq)
 INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
 {
 	if (!m_nmimask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void cntsteer_state::sound_map(address_map &map)

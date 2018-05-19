@@ -53,8 +53,8 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	/*
 	if (~m_cpu_control & 0x08)
 	{
-	    m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	    m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	*/
 
@@ -88,8 +88,8 @@ INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 	/* See note in battlane_cpu_command_w */
 	if (~m_cpu_control & 0x08)
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

@@ -433,13 +433,13 @@ PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
 INTERRUPT_GEN_MEMBER(sprcros2_state::master_vblank_irq)
 {
 	if(m_master_nmi_enable == true)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(sprcros2_state::slave_vblank_irq)
 {
 	if(m_slave_nmi_enable == true)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)

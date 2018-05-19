@@ -122,7 +122,7 @@ uint32_t stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if(machine().input().code_pressed(KEYCODE_W)) {
 		if(!nmi) {
-			maincpu->set_input_line(M65C02_NMI_LINE, PULSE_LINE);
+			maincpu->pulse_input_line(M65C02_NMI_LINE, attotime::zero);
 			nmi = true;
 		}
 	} else

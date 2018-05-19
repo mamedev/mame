@@ -636,7 +636,7 @@ WRITE_LINE_MEMBER(segas24_state::cnt1)
 		if (state)
 		{
 			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			//osd_printf_debug("enable 2nd cpu!\n");
 			//machine().debug_break();
 			if (m_gground_hack_timer)

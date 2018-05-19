@@ -866,7 +866,7 @@ void segaxbd_state::update_main_irqs()
 
 WRITE_LINE_MEMBER(segaxbd_state::m68k_reset_callback)
 {
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

@@ -315,7 +315,7 @@ WRITE8_MEMBER(flower_state::sound_command_w)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	if(m_audio_nmi_enable == true)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(flower_state::audio_nmi_mask_w)

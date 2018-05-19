@@ -86,5 +86,5 @@ WRITE8_MEMBER(docastle_state::docastle_shared1_w)
 
 WRITE8_MEMBER(docastle_state::docastle_nmitrigger_w)
 {
-	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }

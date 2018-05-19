@@ -99,7 +99,7 @@ void namco_c117_device::device_reset()
 	m_subres_cb(ASSERT_LINE);
 
 	// reset the main CPU so it picks up the reset vector from the correct bank
-	m_cpuexec[0]->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_cpuexec[0]->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 

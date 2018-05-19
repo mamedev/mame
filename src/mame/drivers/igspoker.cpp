@@ -171,7 +171,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if((scanline % 64) == 0 && m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

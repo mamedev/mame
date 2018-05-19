@@ -285,7 +285,7 @@ READ16_MEMBER(vcombat_state::main_irqiack_r)
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 

@@ -237,7 +237,7 @@ WRITE8_MEMBER(vsnes_state::bootleg_sound_write)
 {
 	m_bootleg_sound_offset = offset;
 	m_bootleg_sound_data = data;
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)

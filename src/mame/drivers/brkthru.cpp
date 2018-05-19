@@ -370,7 +370,7 @@ void brkthru_state::machine_reset()
 WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 {
 	if (state && m_nmi_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(brkthru_state::brkthru)

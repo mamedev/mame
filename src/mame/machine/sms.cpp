@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 	if (pause_pressed)
 	{
 		if (!m_paused)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 		m_paused = 1;
 	}

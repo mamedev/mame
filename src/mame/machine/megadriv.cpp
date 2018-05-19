@@ -1069,7 +1069,7 @@ void md_base_state::init_megadrie()
 WRITE_LINE_MEMBER(md_base_state::screen_vblank_megadriv)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// rising edge
 	if (state)

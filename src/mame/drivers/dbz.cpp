@@ -102,7 +102,7 @@ WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 
 WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

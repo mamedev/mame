@@ -401,7 +401,7 @@ void mainevt_state::machine_reset()
 INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_sound_timer_irq)
 {
 	if(m_sound_irq_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)

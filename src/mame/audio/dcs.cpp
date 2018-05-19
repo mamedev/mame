@@ -1875,7 +1875,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 			if ((data & 0x0200) && !(m_rev == REV_DSIO || m_rev == REV_DENV))
 			{
 				logerror("%s Rebooting DCS due to SYSCONTROL write = %04X\n", machine().describe_context(), data);
-				m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+				m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				dcs_boot();
 				m_control_regs[SYSCONTROL_REG] = 0;
 			}

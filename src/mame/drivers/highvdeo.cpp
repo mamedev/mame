@@ -1194,7 +1194,7 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq)
 
 INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
 {
-	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void highvdeo_state::ramdac_map(address_map &map)

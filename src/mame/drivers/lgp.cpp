@@ -354,7 +354,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)
 {
 	// NMI
-	//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	//device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	// IRQ
 	device.execute().set_input_line(0, HOLD_LINE);

@@ -2079,8 +2079,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 
 	if(scanline == 240)
 		m_maincpu->set_input_line(0, HOLD_LINE);
-	if(scanline == 112)
-		if (m_nmi_enable)   m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(scanline == 112 && m_nmi_enable)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(suna8_state,hardhea2)

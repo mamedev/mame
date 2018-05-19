@@ -1217,7 +1217,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 			{
 				uint32_t page = (data >> 6) & 7;
 				m_ds3sdsp->load_boot_data(m_ds3sdsp_region->base() + (0x2000 * page), m_ds3sdsp_pgm_memory);
-				m_ds3sdsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+				m_ds3sdsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				data &= ~0x200;
 			}
 

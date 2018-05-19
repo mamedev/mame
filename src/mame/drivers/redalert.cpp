@@ -113,7 +113,7 @@ INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
 {
 	if( ioport("COIN")->read() )
 		/* the service coin as conntected to the CPU's RDY pin as well */
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	device.execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }

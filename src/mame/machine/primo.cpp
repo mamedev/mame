@@ -30,7 +30,7 @@
 WRITE_LINE_MEMBER(primo_state::vblank_irq)
 {
 	if (state && m_nmi)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /*******************************************************************************

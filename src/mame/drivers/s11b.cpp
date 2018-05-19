@@ -151,9 +151,9 @@ MACHINE_RESET_MEMBER( s11b_state, s11b )
 	membank("bank1")->set_entry(0);
 	membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
-	m_audiocpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	if(m_bgcpu)
-		m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_bgcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 WRITE8_MEMBER( s11b_state::bg_speech_clock_w )

@@ -173,7 +173,7 @@ WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(m_last & 0x2000))
-			m_slave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_slave->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 		/* Bits 14-15 = Coin counters */
 		machine().bookkeeping().coin_counter_w(0, data & 0x8000);
@@ -203,7 +203,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (m_sound_control & 0x01)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -229,7 +229,7 @@ WRITE8_MEMBER(exterm_state::sound_nmi_rate_w)
 READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	m_audioslave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audioslave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	return 0xff;
 }
 

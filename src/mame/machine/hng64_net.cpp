@@ -135,7 +135,7 @@ void hng64_state::hng_comm_io_map(address_map &map)
 
 void hng64_state::reset_net()
 {
-//  m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  m_comm->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // reset the CPU and let 'er rip
 //  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	m_mmub[0] = 0;

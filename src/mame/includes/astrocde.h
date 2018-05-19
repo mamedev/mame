@@ -34,7 +34,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_samples(*this, "samples"),
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
 		m_videoram(*this, "videoram"),
@@ -44,14 +43,11 @@ public:
 		m_bank4000(*this, "bank4000"),
 		m_bank8000(*this, "bank8000"),
 		m_handle(*this, "P%uHANDLE", 1U),
-		m_trackball(*this, { { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" } }),
-		m_joystick(*this, { { "MOVEX", "MOVEY" } }),
 		m_interrupt_scanline(0xff)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
-	optional_device<samples_device> m_samples;
 	optional_device<votrax_sc01_device> m_votrax;
 	optional_device<astrocade_io_device> m_astrocade_sound1;
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -61,8 +57,6 @@ public:
 	optional_device<address_map_bank_device> m_bank4000;
 	optional_memory_bank m_bank8000;
 	optional_ioport_array<4> m_handle;
-	optional_ioport_array<4> m_trackball;
-	optional_ioport_array<2> m_joystick;
 
 	uint8_t m_video_config;
 	uint8_t m_sparkle[4];
@@ -70,8 +64,6 @@ public:
 	char *m_totalword_ptr;
 	char m_oldword[256];
 	int m_plural;
-	uint8_t m_port_1_last;
-	uint8_t m_port_2_last;
 	uint8_t m_ram_write_enable;
 	uint8_t m_input_select;
 	std::unique_ptr<uint8_t[]> m_sparklestar;
@@ -114,21 +106,12 @@ public:
 	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
 	DECLARE_READ8_MEMBER(protected_ram_r);
 	DECLARE_WRITE8_MEMBER(protected_ram_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_sound_1_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_sound_2_w);
-	DECLARE_WRITE8_MEMBER(ebases_trackball_select_w);
-	DECLARE_WRITE8_MEMBER(ebases_coin_w);
 	DECLARE_READ8_MEMBER(input_mux_r);
 	template<int Coin> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	template<int Bit> DECLARE_WRITE_LINE_MEMBER(sparkle_w);
 	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
 	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
 	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
-	DECLARE_WRITE_LINE_MEMBER(demndrgn_input_select_w);
-	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_lamp_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_counter_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_lights_w);
 	DECLARE_READ8_MEMBER(video_register_r);
 	DECLARE_WRITE8_MEMBER(video_register_w);
 	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
@@ -139,8 +122,6 @@ public:
 	DECLARE_WRITE8_MEMBER(profpac_screenram_ctrl_w);
 	DECLARE_READ8_MEMBER(profpac_videoram_r);
 	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ebases_trackball_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(demndragn_joystick_r);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
 	void init_profpac();
 	void init_spacezap();
@@ -177,23 +158,14 @@ public:
 	void astrocade_stereo_sound(machine_config &config);
 	void spacezap(machine_config &config);
 	void gorf(machine_config &config);
-	void seawolf2(machine_config &config);
 	void profpac(machine_config &config);
 	void robby(machine_config &config);
-	void ebases(machine_config &config);
 	void wow(machine_config &config);
-	void tenpindx(machine_config &config);
-	void demndrgn(machine_config &config);
 	void bank4000_map(address_map &map);
 	void demndrgn_map(address_map &map);
-	void ebases_map(address_map &map);
 	void port_map(address_map &map);
-	void port_map_discrete(address_map &map);
-	void port_map_ebases(address_map &map);
 	void port_map_16col_pattern(address_map &map);
 	void port_map_16col_pattern_nosound(address_map &map);
-	void port_map_16col_pattern_demndrgn(address_map &map);
-	void port_map_16col_pattern_tenpindx(address_map &map);
 	void port_map_mono_pattern(address_map &map);
 	void port_map_stereo_pattern(address_map &map);
 	void profpac_bank4000_map(address_map &map);
@@ -201,9 +173,91 @@ public:
 	void robby_map(address_map &map);
 	void seawolf2_map(address_map &map);
 	void spacezap_map(address_map &map);
-	void tenpin_sub_io_map(address_map &map);
-	void tenpin_sub_map(address_map &map);
 	void wow_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+};
+
+class seawolf2_state : public astrocde_state
+{
+public:
+	seawolf2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: astrocde_state(mconfig, type, tag)
+		, m_samples(*this, "samples")
+	{ }
+
+	void seawolf2(machine_config &config);
+private:
+	DECLARE_WRITE8_MEMBER(sound_1_w);
+	DECLARE_WRITE8_MEMBER(sound_2_w);
+
+	void port_map_discrete(address_map &map);
+
+	virtual void machine_start() override;
+
+	required_device<samples_device> m_samples;
+	uint8_t m_port_1_last;
+	uint8_t m_port_2_last;
+};
+
+class ebases_state : public astrocde_state
+{
+public:
+	ebases_state(const machine_config &mconfig, device_type type, const char *tag)
+		: astrocde_state(mconfig, type, tag)
+		, m_trackball(*this, {"TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1"})
+	{ }
+
+	void ebases(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+private:
+	DECLARE_WRITE8_MEMBER(trackball_select_w);
+	DECLARE_WRITE8_MEMBER(coin_w);
+
+	void ebases_map(address_map &map);
+	void port_map_ebases(address_map &map);
+
+	required_ioport_array<4> m_trackball;
+};
+
+class demndrgn_state : public astrocde_state
+{
+public:
+	demndrgn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: astrocde_state(mconfig, type, tag)
+		, m_joystick(*this, {"MOVEX", "MOVEY"})
+	{ }
+
+	void demndrgn(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(joystick_r);
+private:
+	DECLARE_WRITE_LINE_MEMBER(input_select_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+
+	void port_map_16col_pattern_demndrgn(address_map &map);
+
+	required_ioport_array<2> m_joystick;
+};
+
+class tenpindx_state : public astrocde_state
+{
+public:
+	tenpindx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: astrocde_state(mconfig, type, tag)
+		, m_lamps(*this, "lamp%0", 0U)
+	{ }
+
+	void tenpindx(machine_config &config);
+private:
+	DECLARE_WRITE8_MEMBER(lamp_w);
+	DECLARE_WRITE8_MEMBER(counter_w);
+	DECLARE_WRITE8_MEMBER(lights_w);
+
+	virtual void machine_start() override;
+
+	void port_map_16col_pattern_tenpindx(address_map &map);
+	void sub_io_map(address_map &map);
+	void sub_map(address_map &map);
+
+	output_finder<19> m_lamps;
 };

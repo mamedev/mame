@@ -1569,7 +1569,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				if ( !(m_sub_ctrl_data & 1) && (data & 1) )
-					m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+					m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				m_sub_ctrl_data = data;
 			}
 			break;
@@ -7790,7 +7790,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
 	int scanline = param;
 
 	if(scanline == 240)
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if(scanline == 112)
 		m_subcpu->set_input_line(0, HOLD_LINE);
@@ -7806,7 +7806,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 	int scanline = param;
 
 	if(scanline == 240)
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if((scanline % 16) == 0)
 		m_subcpu->set_input_line(0, HOLD_LINE);

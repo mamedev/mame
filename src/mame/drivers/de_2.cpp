@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 	if(m_more_data)
 	{
 		if(m_nmi_enable)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // generate NMI when we need more data
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // generate NMI when we need more data
 		m_more_data = false;
 	}
 	else

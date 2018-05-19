@@ -958,7 +958,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
 		mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, 0x00, 0xff);
-		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }
 

@@ -144,7 +144,7 @@ uint8_t a2bus_applicard_device::read_c0nx(uint8_t offset)
 			fatalerror("Applicard: Z80 IRQ not supported yet\n");
 
 		case 7: // NMI on Z80 (direct)
-			m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 	}

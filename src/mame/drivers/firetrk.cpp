@@ -62,7 +62,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
 	// vblank interrupt
 	// NMIs are disabled during service mode
 	if (!m_in_service_mode && scanline == 240)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

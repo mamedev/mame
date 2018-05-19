@@ -83,7 +83,7 @@ WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
 
 	/* generate an NMI if we're out of data */
 	if (!m_vclk_left)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)

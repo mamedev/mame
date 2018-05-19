@@ -1142,7 +1142,7 @@ INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 	m_custom_nmi = 1;
 	m_custom_nmi_vector = 0xffd4;
 
-	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	*/
 }
 
