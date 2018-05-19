@@ -245,7 +245,7 @@ READ8_MEMBER(leland_state::offroad_wheel_3_r)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::ataxx_trackball_r)
+READ8_MEMBER(ataxx_state::ataxx_trackball_r)
 {
 	static const char *const tracknames[] = { "AN0", "AN1", "AN2", "AN3" };
 
@@ -260,7 +260,7 @@ READ8_MEMBER(leland_state::ataxx_trackball_r)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::indyheat_wheel_r)
+READ8_MEMBER(ataxx_state::indyheat_wheel_r)
 {
 	static const char *const tracknames[] = { "AN0", "AN1", "AN2" };
 
@@ -268,7 +268,7 @@ READ8_MEMBER(leland_state::indyheat_wheel_r)
 }
 
 
-READ8_MEMBER(leland_state::indyheat_analog_r)
+READ8_MEMBER(ataxx_state::indyheat_analog_r)
 {
 	switch (offset)
 	{
@@ -289,7 +289,7 @@ READ8_MEMBER(leland_state::indyheat_analog_r)
 }
 
 
-WRITE8_MEMBER(leland_state::indyheat_analog_w)
+WRITE8_MEMBER(ataxx_state::indyheat_analog_w)
 {
 	static const char *const tracknames[] = { "AN3", "AN4", "AN5" };
 
@@ -315,7 +315,7 @@ WRITE8_MEMBER(leland_state::indyheat_analog_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(leland_state,leland)
+void leland_state::machine_start()
 {
 	/* start scanline interrupts going */
 	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::leland_interrupt_callback),this));
@@ -337,7 +337,7 @@ MACHINE_START_MEMBER(leland_state,leland)
 }
 
 
-MACHINE_RESET_MEMBER(leland_state,leland)
+void leland_state::machine_reset()
 {
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
@@ -372,8 +372,9 @@ MACHINE_RESET_MEMBER(leland_state,leland)
 }
 
 
-MACHINE_START_MEMBER(leland_state,ataxx)
+void ataxx_state::machine_start()
 {
+	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	/* set the odd data banks */
 	m_extra_tram = std::make_unique<uint8_t[]>(ATAXX_EXTRA_TRAM_SIZE);
 
@@ -391,8 +392,9 @@ MACHINE_START_MEMBER(leland_state,ataxx)
 }
 
 
-MACHINE_RESET_MEMBER(leland_state,ataxx)
+void ataxx_state::machine_reset()
 {
+	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	memset(m_extra_tram.get(), 0, ATAXX_EXTRA_TRAM_SIZE);
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
@@ -597,7 +599,7 @@ void leland_state::offroad_bankswitch()
 
 
 /* bankswitching for Ataxx, WSF, Indy Heat, and Brute Force */
-void leland_state::ataxx_bankswitch()
+void ataxx_state::ataxx_bankswitch()
 {
 	static const uint32_t bank_list[] =
 	{
@@ -820,7 +822,7 @@ void leland_state::ataxx_init_eeprom(const uint16_t *data)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::ataxx_eeprom_r)
+READ8_MEMBER(ataxx_state::ataxx_eeprom_r)
 {
 	int port = ioport("IN2")->read();
 	if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
@@ -828,7 +830,7 @@ READ8_MEMBER(leland_state::ataxx_eeprom_r)
 }
 
 
-WRITE8_MEMBER(leland_state::ataxx_eeprom_w)
+WRITE8_MEMBER(ataxx_state::ataxx_eeprom_w)
 {
 	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
@@ -857,7 +859,7 @@ WRITE8_MEMBER(leland_state::leland_battery_ram_w)
 }
 
 
-WRITE8_MEMBER(leland_state::ataxx_battery_ram_w)
+WRITE8_MEMBER(ataxx_state::ataxx_battery_ram_w)
 {
 	if (m_battery_ram_enable)
 	{
@@ -1169,7 +1171,7 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 }
 
 
-READ8_MEMBER(leland_state::ataxx_master_input_r)
+READ8_MEMBER(ataxx_state::ataxx_master_input_r)
 {
 	int result = 0xff;
 
@@ -1193,7 +1195,7 @@ READ8_MEMBER(leland_state::ataxx_master_input_r)
 }
 
 
-WRITE8_MEMBER(leland_state::ataxx_master_output_w)
+WRITE8_MEMBER(ataxx_state::ataxx_master_output_w)
 {
 	switch (offset)
 	{
@@ -1251,7 +1253,7 @@ READ8_MEMBER(leland_state::leland_gated_paletteram_r)
 }
 
 
-WRITE8_MEMBER(leland_state::ataxx_paletteram_and_misc_w)
+WRITE8_MEMBER(ataxx_state::ataxx_paletteram_and_misc_w)
 {
 	if (m_wcol_enable)
 		m_palette->write8(space, offset, data);
@@ -1282,7 +1284,7 @@ WRITE8_MEMBER(leland_state::ataxx_paletteram_and_misc_w)
 }
 
 
-READ8_MEMBER(leland_state::ataxx_paletteram_and_misc_r)
+READ8_MEMBER(ataxx_state::ataxx_paletteram_and_misc_r)
 {
 	if (m_wcol_enable)
 		return m_palette->basemem().read8(offset);
