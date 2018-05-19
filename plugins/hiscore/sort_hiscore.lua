@@ -108,23 +108,6 @@ for num, entry in ipairs(entries) do
 end
 
 for num1, entry in ipairs(sorted) do
-	if entry.name then
-		for num2, name in ipairs(entry.name) do
-			local curname = name:match("[^:]*")
-			for num3, entry2 in ipairs(sorted) do
-				if entry2.name and entry.src == entry2.src and entry ~= entry2 then
-					for num4, name2 in ipairs(entry2.name) do
-						if curname == name2:match("[^:]*") then
-							print(name, "duplicate name")
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
-for num1, entry in ipairs(sorted) do
 	if entry.data then
 		for num2, entry2 in ipairs(sorted) do
 			if entry2.data and entry.src == entry2.src and entry ~= entry2 and #entry.data == #entry2.data then
@@ -145,6 +128,27 @@ for num1, entry in ipairs(sorted) do
 							end
 						end
 						sorted[num2] =  {}
+					end
+				end
+			end
+		end
+	end
+end
+
+for num1, entry in ipairs(sorted) do
+	if entry.name then
+		for num2, name in ipairs(entry.name) do
+			local curname = name:match("[^:]*")
+			for num3, entry2 in ipairs(sorted) do
+				if entry2.name and entry.src == entry2.src then
+					for num4, name2 in ipairs(entry2.name) do
+						if curname == name2:match("[^:]*") then
+							if entry ~= entry2 then
+								print(name, "duplicate name")
+							elseif num2 ~= num4 then
+								entry2.name[num4] = nil
+							end
+						end
 					end
 				end
 			end
