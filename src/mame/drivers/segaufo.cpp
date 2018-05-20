@@ -857,10 +857,10 @@ MACHINE_CONFIG_START(ufo_state::ufo21)
 	MCFG_315_5296_OUT_PORTG_CB(NOOP)
 
 	MCFG_DEVICE_ADD("io3", SEGA_315_5338A, 0)
-	MCFG_315_5338A_OUT0_CB(WRITE8(*this, ufo_state, ex_upd_start_w))
-	MCFG_315_5338A_IN1_CB(READ8(*this, ufo_state, ex_upd_busy_r))
-	MCFG_315_5338A_OUT4_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps1_w))
-	MCFG_315_5338A_OUT5_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps2_w))
+	MCFG_315_5338A_OUT_PA_CB(WRITE8(*this, ufo_state, ex_upd_start_w))
+	MCFG_315_5338A_IN_PB_CB(READ8(*this, ufo_state, ex_upd_busy_r))
+	MCFG_315_5338A_OUT_PE_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps1_w))
+	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps2_w))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("upd", UPD7759)

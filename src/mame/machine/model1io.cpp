@@ -137,14 +137,14 @@ MACHINE_CONFIG_START( model1io_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0)
 	MCFG_315_5338A_READ_CB(READ8(*this, model1io_device, io_r))
 	MCFG_315_5338A_WRITE_CB(WRITE8(*this, model1io_device, io_w))
-	MCFG_315_5338A_OUT0_CB(WRITE8(*this, model1io_device, out0_w))
-	MCFG_315_5338A_IN1_CB(READ8(*this, model1io_device, in1_r))
-	MCFG_315_5338A_IN2_CB(READ8(*this, model1io_device, in2_r))
-	MCFG_315_5338A_IN3_CB(READ8(*this, model1io_device, in3_r))
-	MCFG_315_5338A_IN4_CB(READ8(*this, model1io_device, in4_r))
-	MCFG_315_5338A_OUT4_CB(WRITE8(*this, model1io_device, out4_w))
-	MCFG_315_5338A_OUT5_CB(WRITE8(*this, model1io_device, out5_w))
-	MCFG_315_5338A_IN6_CB(READ8(*this, model1io_device, in6_r))
+	MCFG_315_5338A_OUT_PA_CB(WRITE8(*this, model1io_device, io_pa_w))
+	MCFG_315_5338A_IN_PB_CB(READ8(*this, model1io_device, io_pb_r))
+	MCFG_315_5338A_IN_PC_CB(READ8(*this, model1io_device, io_pc_r))
+	MCFG_315_5338A_IN_PD_CB(READ8(*this, model1io_device, io_pd_r))
+	MCFG_315_5338A_IN_PE_CB(READ8(*this, model1io_device, io_pe_r))
+	MCFG_315_5338A_OUT_PE_CB(WRITE8(*this, model1io_device, io_pe_w))
+	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, model1io_device, io_pf_w))
+	MCFG_315_5338A_IN_PG_CB(READ8(*this, model1io_device, io_pg_r))
 
 	MCFG_DEVICE_ADD("adc", MSM6253, 0)
 	MCFG_MSM6253_IN0_ANALOG_READ(model1io_device, analog0_r)
@@ -212,7 +212,7 @@ WRITE8_MEMBER( model1io_device::io_w )
 	m_write_cb(offset, data, 0xff);
 }
 
-WRITE8_MEMBER( model1io_device::out0_w )
+WRITE8_MEMBER( model1io_device::io_pa_w )
 {
 	// 7-------  eeprom clk
 	// -6------  eeprom cs
@@ -229,37 +229,37 @@ WRITE8_MEMBER( model1io_device::out0_w )
 	m_secondary_controls = bool(BIT(data, 0));
 }
 
-READ8_MEMBER( model1io_device::in1_r )
+READ8_MEMBER( model1io_device::io_pb_r )
 {
 	return m_secondary_controls ? m_in_cb[3](0) : m_in_cb[0](0);
 }
 
-READ8_MEMBER( model1io_device::in2_r )
+READ8_MEMBER( model1io_device::io_pc_r )
 {
 	return m_secondary_controls ? m_in_cb[4](0) : m_in_cb[1](0);
 }
 
-READ8_MEMBER( model1io_device::in3_r )
+READ8_MEMBER( model1io_device::io_pd_r )
 {
 	return m_secondary_controls ? m_in_cb[5](0) : m_in_cb[2](0);
 }
 
-READ8_MEMBER( model1io_device::in4_r )
+READ8_MEMBER( model1io_device::io_pe_r )
 {
 	return m_drive_read_cb(0);
 }
 
-WRITE8_MEMBER( model1io_device::out4_w )
+WRITE8_MEMBER( model1io_device::io_pe_w )
 {
 	m_drive_write_cb(data);
 }
 
-WRITE8_MEMBER( model1io_device::out5_w )
+WRITE8_MEMBER( model1io_device::io_pf_w )
 {
 	m_output_cb(data);
 }
 
-READ8_MEMBER( model1io_device::in6_r )
+READ8_MEMBER( model1io_device::io_pg_r )
 {
 	// 7-------  eeprom do
 	// -654----  unknown
