@@ -334,8 +334,8 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 	// 11 = red,   red
 	// 01 = green, red
 	// 10 = red,   green
-	m_lamp[10] = BIT(data, 0) | BIT(data, 1);
-	m_lamp[11] = BIT(data, 2) | BIT(data, 3);
+	m_lamp[10] = data & 0x03;
+	m_lamp[11] = (data >> 2) & 0x03;
 
 	// d4,d5: ?
 	// d6,d7: coincounters
