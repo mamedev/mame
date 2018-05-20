@@ -39,8 +39,8 @@ void psx_controller_port_device::disable_card(bool state)
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSXCONTROLLERPORTS, tag, owner, clock),
-	m_port0(*this, "port0"),
-	m_port1(*this, "port1"),
+	m_port0(*this, "^port1"),
+	m_port1(*this, "^port2"),
 	m_dsr_handler(*this),
 	m_rxd_handler(*this)
 {
