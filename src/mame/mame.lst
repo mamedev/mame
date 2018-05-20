@@ -35367,8 +35367,8 @@ spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
 
 @source:spyhuntertec.cpp
-spyhuntpr                       //
 spyhuntsp                       //
+spyhuntpr                       //
 
 @source:squale.cpp
 squale                          //
