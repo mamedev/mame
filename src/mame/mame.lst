@@ -35367,8 +35367,8 @@ spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
 
 @source:spyhuntertec.cpp
-spyhuntsp                       //
-spyhuntpr                       //
+spyhuntsp                       // (c) 1985 Recreativos Franco S.A. (Bally Midway license)
+spyhuntpr                       // (c) 1985 Recreativos Franco S.A.
 
 @source:squale.cpp
 squale                          //
