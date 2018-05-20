@@ -48,7 +48,6 @@ public:
 		, m_slave_base(*this, "slave")
 		, m_bg_gfxrom(*this, "bg_gfx")
 		, m_bg_prom(*this, "bg_prom")
-		, m_xrom_base(*this, "xrom")
 		, m_master_bankslot(*this, "masterbank_%u", 0U)
 		, m_slave_bankslot(*this, "slavebank")
 	{ }
@@ -70,14 +69,12 @@ public:
 	required_region_ptr<uint8_t> m_slave_base;
 	required_region_ptr<uint8_t> m_bg_gfxrom;
 	optional_region_ptr<uint8_t> m_bg_prom;
-	optional_region_ptr<uint8_t> m_xrom_base;
 
 	required_memory_bank_array<2> m_master_bankslot;
 	required_memory_bank m_slave_bankslot;
 
 	uint8_t m_dac_control;
 	uint8_t *m_alleymas_kludge_mem;
-	std::unique_ptr<uint8_t[]> m_ataxx_qram;
 	uint8_t m_gfx_control;
 	uint8_t m_wcol_enable;
 	emu_timer *m_master_int_timer;
@@ -94,12 +91,8 @@ public:
 	uint8_t m_top_board_bank;
 	uint8_t m_sound_port_bank;
 	uint8_t m_alternate_bank;
-	uint8_t m_master_bank;
 	void (leland_state::*m_update_master_bank)();
-	uint32_t m_xrom1_addr;
-	uint32_t m_xrom2_addr;
 	uint8_t m_battery_ram_enable;
-	std::unique_ptr<uint8_t[]> m_extra_tram;
 	std::unique_ptr<uint8_t[]> m_video_ram;
 	struct vram_state_data m_vram_state[2];
 	uint16_t m_xscroll;
@@ -121,23 +114,14 @@ public:
 	DECLARE_READ8_MEMBER(offroad_wheel_1_r);
 	DECLARE_READ8_MEMBER(offroad_wheel_2_r);
 	DECLARE_READ8_MEMBER(offroad_wheel_3_r);
-	DECLARE_READ8_MEMBER(ataxx_trackball_r);
-	DECLARE_READ8_MEMBER(indyheat_wheel_r);
-	DECLARE_READ8_MEMBER(indyheat_analog_r);
-	DECLARE_WRITE8_MEMBER(indyheat_analog_w);
 	DECLARE_WRITE8_MEMBER(leland_master_alt_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(leland_battery_ram_w);
-	DECLARE_WRITE8_MEMBER(ataxx_battery_ram_w);
 	DECLARE_READ8_MEMBER(leland_master_analog_key_r);
 	DECLARE_WRITE8_MEMBER(leland_master_analog_key_w);
 	DECLARE_READ8_MEMBER(leland_master_input_r);
 	DECLARE_WRITE8_MEMBER(leland_master_output_w);
-	DECLARE_READ8_MEMBER(ataxx_master_input_r);
-	DECLARE_WRITE8_MEMBER(ataxx_master_output_w);
 	DECLARE_WRITE8_MEMBER(leland_gated_paletteram_w);
 	DECLARE_READ8_MEMBER(leland_gated_paletteram_r);
-	DECLARE_WRITE8_MEMBER(ataxx_paletteram_and_misc_w);
-	DECLARE_READ8_MEMBER(ataxx_paletteram_and_misc_r);
 	DECLARE_WRITE8_MEMBER(leland_slave_small_banksw_w);
 	DECLARE_WRITE8_MEMBER(leland_slave_large_banksw_w);
 	DECLARE_WRITE8_MEMBER(ataxx_slave_banksw_w);
@@ -149,12 +133,6 @@ public:
 	DECLARE_WRITE8_MEMBER(leland_slave_video_addr_w);
 	DECLARE_WRITE8_MEMBER(leland_svram_port_w);
 	DECLARE_READ8_MEMBER(leland_svram_port_r);
-	DECLARE_WRITE8_MEMBER(ataxx_mvram_port_w);
-	DECLARE_WRITE8_MEMBER(ataxx_svram_port_w);
-	DECLARE_READ8_MEMBER(ataxx_mvram_port_r);
-	DECLARE_READ8_MEMBER(ataxx_svram_port_r);
-	DECLARE_READ8_MEMBER(ataxx_eeprom_r);
-	DECLARE_WRITE8_MEMBER(ataxx_eeprom_w);
 	DECLARE_READ8_MEMBER(leland_sound_port_r);
 	DECLARE_WRITE8_MEMBER(leland_sound_port_w);
 	DECLARE_WRITE8_MEMBER(leland_gfx_port_w);
@@ -179,26 +157,14 @@ public:
 	void init_upyoural();
 	void init_cerberus();
 	void init_aafbd2p();
-	void init_ataxx();
-	void init_ataxxj();
-	void init_wsf();
-	void init_indyheat();
-	void init_brutforc();
-	void init_asylum();
-	DECLARE_MACHINE_START(ataxx);
-	DECLARE_MACHINE_RESET(ataxx);
-	DECLARE_MACHINE_START(leland);
-	DECLARE_MACHINE_RESET(leland);
-	DECLARE_VIDEO_START(leland);
-	DECLARE_VIDEO_START(leland2);
-	DECLARE_VIDEO_START(ataxx);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	tilemap_t      *m_tilemap;
 
 	TILEMAP_MAPPER_MEMBER(leland_scan);
 	TILE_GET_INFO_MEMBER(leland_get_tile_info);
-	TILEMAP_MAPPER_MEMBER(ataxx_scan);
-	TILE_GET_INFO_MEMBER(ataxx_get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
 	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
@@ -219,31 +185,87 @@ public:
 	void redline_bankswitch();
 	void viper_bankswitch();
 	void offroad_bankswitch();
-	void ataxx_bankswitch();
 	void leland_init_eeprom(uint8_t default_val, const uint16_t *data, uint8_t serial_offset, uint8_t serial_type);
 	void ataxx_init_eeprom(const uint16_t *data);
 	int keycard_r();
 	void keycard_w(int data);
 	void leland_rotate_memory(const char *cpuname);
 	void init_master_ports(uint8_t mvram_base, uint8_t io_base);
-	void ataxx(machine_config &config);
 	void redline(machine_config &config);
 	void lelandi(machine_config &config);
 	void leland(machine_config &config);
 	void quarterb(machine_config &config);
-	void wsf(machine_config &config);
 	void leland_video(machine_config &config);
-	void ataxx_video(machine_config &config);
 	void master_map_io(address_map &map);
-	void master_map_io_2(address_map &map);
 	void master_map_program(address_map &map);
-	void master_map_program_2(address_map &map);
 	void master_redline_map_io(address_map &map);
 	void slave_large_map_program(address_map &map);
 	void slave_map_io(address_map &map);
-	void slave_map_io_2(address_map &map);
 	void slave_map_program(address_map &map);
 	void slave_small_map_program(address_map &map);
+};
+
+
+class ataxx_state : public leland_state
+{
+public:
+	ataxx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: leland_state(mconfig, type, tag)
+		, m_xrom_base(*this, "xrom")
+	{
+	}
+
+	void init_ataxx();
+	void init_ataxxj();
+	void init_wsf();
+	void init_indyheat();
+	void init_brutforc();
+	void init_asylum();
+
+	void ataxx(machine_config &config);
+	void wsf(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(ataxx_trackball_r);
+	DECLARE_READ8_MEMBER(indyheat_wheel_r);
+	DECLARE_READ8_MEMBER(indyheat_analog_r);
+	DECLARE_WRITE8_MEMBER(indyheat_analog_w);
+
+	DECLARE_WRITE8_MEMBER(ataxx_battery_ram_w);
+	DECLARE_READ8_MEMBER(ataxx_master_input_r);
+	DECLARE_WRITE8_MEMBER(ataxx_master_output_w);
+	DECLARE_WRITE8_MEMBER(ataxx_paletteram_and_misc_w);
+	DECLARE_READ8_MEMBER(ataxx_paletteram_and_misc_r);
+	DECLARE_WRITE8_MEMBER(ataxx_mvram_port_w);
+	DECLARE_WRITE8_MEMBER(ataxx_svram_port_w);
+	DECLARE_READ8_MEMBER(ataxx_mvram_port_r);
+	DECLARE_READ8_MEMBER(ataxx_svram_port_r);
+	DECLARE_READ8_MEMBER(ataxx_eeprom_r);
+	DECLARE_WRITE8_MEMBER(ataxx_eeprom_w);
+
+	TILEMAP_MAPPER_MEMBER(ataxx_scan);
+	TILE_GET_INFO_MEMBER(ataxx_get_tile_info);
+
+	void ataxx_bankswitch();
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void ataxx_video(machine_config &config);
+
+	void master_map_program_2(address_map &map);
+	void master_map_io_2(address_map &map);
+	void slave_map_io_2(address_map &map);
+
+private:
+	required_region_ptr<uint8_t> m_xrom_base;
+
+	std::unique_ptr<uint8_t[]> m_ataxx_qram;
+	uint8_t m_master_bank;
+	uint32_t m_xrom1_addr;
+	uint32_t m_xrom2_addr;
+	std::unique_ptr<uint8_t[]> m_extra_tram;
 };
 
 

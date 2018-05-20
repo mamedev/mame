@@ -79,10 +79,12 @@ class novag6502_state : public novagbase_state
 public:
 	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: novagbase_state(mconfig, type, tag),
-		m_hlcd0538(*this, "hlcd0538")
+		m_hlcd0538(*this, "hlcd0538"),
+		m_rombank(*this, "rombank")
 	{ }
 
 	optional_device<hlcd0538_device> m_hlcd0538;
+	optional_memory_bank m_rombank;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
@@ -423,7 +425,7 @@ WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
 WRITE8_MEMBER(novag6502_state::sexpert_mux_w)
 {
 	// d0: rom bankswitch
-	membank("bank1")->set_entry(data & 1);
+	m_rombank->set_entry(data & 1);
 
 	// d3: enable beeper
 	m_beeper->set_state(data >> 3 & 1);
@@ -458,12 +460,12 @@ MACHINE_RESET_MEMBER(novag6502_state, sexpert)
 	novagbase_state::machine_reset();
 
 	sexpert_set_cpu_freq();
-	membank("bank1")->set_entry(0);
+	m_rombank->set_entry(0);
 }
 
 void novag6502_state::init_sexpert()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 }
 
 
@@ -475,7 +477,7 @@ void novag6502_state::init_sexpert()
 WRITE8_MEMBER(novag6502_state::sforte_lcd_control_w)
 {
 	// d3: rom bankswitch
-	membank("bank1")->set_entry(data >> 3 & 1);
+	m_rombank->set_entry(data >> 3 & 1);
 
 	// assume same as sexpert
 	sexpert_lcd_control_w(space, 0, data);
@@ -540,7 +542,7 @@ void novag6502_state::sforte_map(address_map &map)
 	map(0x1ff7, 0x1ff7).w(this, FUNC(novag6502_state::sforte_lcd_data_w));
 	map(0x1ffc, 0x1fff).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x2000, 0x7fff).rom();
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr("rombank");
 }
 
 void novag6502_state::sexpert_map(address_map &map)
