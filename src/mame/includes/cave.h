@@ -11,6 +11,8 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "crsshair.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nmk112.h"
@@ -24,7 +26,7 @@ public:
 	enum
 	{
 		MAX_PRIORITY        = 4,
-		MAX_SPRITE_NUM      = 0x400
+		MAX_SPRITE_NUM      = 0x400 // possibly lower than 1024
 	};
 
 	struct sprite_cave
@@ -57,6 +59,7 @@ public:
 		, m_z80bank(*this, "z80bank")
 		, m_okibank_lo(*this, "oki%u_banklo", 1)
 		, m_okibank_hi(*this, "oki%u_bankhi", 1)
+		, m_ledout(*this, "led%u", 0U)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_oki(*this, "oki%u", 1)
@@ -84,6 +87,8 @@ public:
 	optional_memory_bank            m_z80bank;
 	optional_memory_bank_array<2>   m_okibank_lo;
 	optional_memory_bank_array<2>   m_okibank_hi;
+
+	output_finder<9> m_ledout;
 
 	/* video-related */
 	std::unique_ptr<sprite_cave []> m_sprite[4];
@@ -225,6 +230,7 @@ public:
 	template<int Chip> TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(cave);
 	DECLARE_MACHINE_RESET(cave);
+	DECLARE_MACHINE_START(has_led);
 	DECLARE_MACHINE_RESET(sailormn);
 	DECLARE_VIDEO_START(cave_2_layers);
 	DECLARE_PALETTE_INIT(dfeveron);

@@ -46,8 +46,6 @@ Note:   if MAME_DEBUG is defined, pressing:
 
 **************************************************************************/
 
-#include "emu.h"
-#include "crsshair.h"
 #include "includes/cave.h"
 
 
@@ -457,8 +455,7 @@ void cave_state::get_sprite_info_cave(int chip)
 
 	source = m_spriteram[chip] + (0x4000 / 2) * m_spriteram_bank[chip];
 
-	finish = source + (0x4000 / 2);
-
+	finish = source + (MAX_SPRITE_NUM * 8);
 
 	for (; source < finish; source += 8)
 	{
@@ -583,7 +580,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 
 	source = m_spriteram[chip] + (0x4000 / 2) * m_spriteram_bank[chip];
 
-	finish = source + (0x4000 / 2);
+	finish = source + (MAX_SPRITE_NUM * 8);
 
 	for (; source < finish; source += 8)
 	{
