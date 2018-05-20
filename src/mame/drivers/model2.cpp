@@ -267,10 +267,6 @@ MACHINE_RESET_MEMBER( model2_state, model2_common )
 
 	m_timerrun[0] = m_timerrun[1] = m_timerrun[2] = m_timerrun[3] = 0;
 
-	m_timers[0] = machine().device<timer_device>("timer0");
-	m_timers[1] = machine().device<timer_device>("timer1");
-	m_timers[2] = machine().device<timer_device>("timer2");
-	m_timers[3] = machine().device<timer_device>("timer3");
 	for (i=0; i<4; i++)
 		m_timers[i]->reset();
 
