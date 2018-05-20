@@ -379,9 +379,11 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
+	//MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("auxuart", i8251_device, write_txc))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("auxuart", i8251_device, write_rxc))
+	// OUT2 might be used for an internal expansion similar to the VT100 STP.
+	// The output appears to be fixed to a 307.2 kHz rate; turning this off boosts driver performance.
 
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
