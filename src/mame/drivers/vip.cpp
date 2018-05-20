@@ -464,7 +464,7 @@ READ_LINE_MEMBER( vip_state::ef1_r )
 
 READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	output().set_led_value(LED_TAPE, m_cassette->input() > 0);
+	m_led[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
@@ -485,7 +485,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	m_beeper->write(machine().dummy_space(), NODE_01, state);
 
 	// Q led
-	output().set_led_value(LED_Q, state);
+	m_led[LED_Q] = state ? 1 : 0;
 
 	// tape output
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -621,8 +621,10 @@ void vip_state::machine_start()
 		ram[addr] = machine().rand() & 0xff;
 	}
 
+	m_led.resolve();
+
 	// turn on power LED
-	output().set_led_value(LED_POWER, 1);
+	m_led[LED_POWER] = 1;
 
 	// reset sound
 	m_beeper->write(machine().dummy_space(), NODE_01, 0);

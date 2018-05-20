@@ -81,6 +81,7 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 void videopin_state::machine_start()
 {
+	m_led.resolve();
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
 
 	save_item(NAME(m_time_pushed));
@@ -156,7 +157,7 @@ WRITE8_MEMBER(videopin_state::led_w)
 	output().set_value(matrix[i][3], (data >> 3) & 1);
 
 	if (i == 7)
-		output().set_led_value(0, data & 8);   /* start button */
+		m_led = BIT(data, 3);   /* start button */
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

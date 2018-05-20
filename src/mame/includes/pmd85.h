@@ -24,8 +24,8 @@ public:
 		TIMER_CASSETTE
 	};
 
-	pmd85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pmd85_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, "cassette"),
@@ -53,7 +53,9 @@ public:
 		m_bank15(*this, "bank15"),
 		m_bank16(*this, "bank16"),
 		m_io_dsw0(*this, "DSW0"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_led(*this, "led%u", 0U)
+	{ }
 
 	uint8_t m_rom_module_present;
 	uint8_t m_ppi_port_outputs[4][3];
@@ -124,6 +126,8 @@ public:
 	void pmd85_io_map(address_map &map);
 	void pmd85_mem(address_map &map);
 protected:
+	virtual void machine_start() override { m_led.resolve(); }
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
@@ -153,6 +157,7 @@ protected:
 	optional_ioport m_io_dsw0;
 	ioport_port *m_io_port[16];
 	required_device<palette_device> m_palette;
+	output_finder<3> m_led;
 
 	void pmd851_update_memory();
 	void pmd852a_update_memory();

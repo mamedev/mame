@@ -14,11 +14,12 @@ class mcr3_state : public mcr_state
 {
 public:
 	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag),
-		m_spyhunt_alpharam(*this, "spyhunt_alpha"),
-		m_maxrpm_adc(*this, "adc"),
-		m_lamplatch(*this, "lamplatch"),
-		m_screen(*this, "screen")
+		: mcr_state(mconfig, type, tag)
+		, m_spyhunt_alpharam(*this, "spyhunt_alpha")
+		, m_maxrpm_adc(*this, "adc")
+		, m_lamplatch(*this, "lamplatch")
+		, m_screen(*this, "screen")
+		, m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(mcr3_videoram_w);
@@ -72,6 +73,7 @@ public:
 	void spyhunt_map(address_map &map);
 	void spyhunt_portmap(address_map &map);
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void video_start() override;
 
 private:
@@ -79,6 +81,7 @@ private:
 	optional_device<adc0844_device> m_maxrpm_adc;
 	optional_device<cd4099_device> m_lamplatch;
 	required_device<screen_device> m_screen;
+	output_finder<3> m_lamp;
 
 	uint8_t m_latched_input;
 	uint8_t m_maxrpm_adc_control;

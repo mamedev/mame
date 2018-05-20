@@ -94,20 +94,16 @@ class cliffhgr_state : public driver_device
 {
 public:
 	cliffhgr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc"),
-			m_port_bank(0),
-			m_phillips_code(0) ,
-		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete"),
-		m_screen(*this, "screen") { }
+		: driver_device(mconfig, type, tag)
+		, m_laserdisc(*this, "laserdisc")
+		, m_port_bank(0)
+		, m_phillips_code(0)
+		, m_maincpu(*this, "maincpu")
+		, m_discrete(*this, "discrete")
+		, m_screen(*this, "screen")
+		, m_led(*this, "led0")
+	{ }
 
-	required_device<pioneer_pr8210_device> m_laserdisc;
-
-	int m_port_bank;
-	uint32_t m_phillips_code;
-
-	emu_timer *m_irq_timer;
 	DECLARE_WRITE8_MEMBER(cliff_test_led_w);
 	DECLARE_WRITE8_MEMBER(cliff_port_bank_w);
 	DECLARE_READ8_MEMBER(cliff_port_r);
@@ -118,15 +114,27 @@ public:
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
 	void init_cliff();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
-	required_device<cpu_device> m_maincpu;
-	required_device<discrete_device> m_discrete;
-	required_device<screen_device> m_screen;
 	void cliffhgr(machine_config &config);
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<pioneer_pr8210_device> m_laserdisc;
+
+	int m_port_bank;
+	uint32_t m_phillips_code;
+
+	emu_timer *m_irq_timer;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
+	required_device<screen_device> m_screen;
+	output_finder<> m_led;
 };
 
 
@@ -134,7 +142,7 @@ public:
 
 WRITE8_MEMBER(cliffhgr_state::cliff_test_led_w)
 {
-	output().set_led_value(0, offset ^ 1);
+	m_led = offset ^ 1;
 }
 
 WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)
@@ -228,6 +236,7 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
 
 void cliffhgr_state::machine_start()
 {
+	m_led.resolve();
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cliffhgr_state::cliff_irq_callback),this));
 }
 

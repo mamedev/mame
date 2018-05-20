@@ -306,7 +306,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 			{
 				m_rapid_read_state = 0x00;
 				// Power LED remains lit again
-				output().set_led_value(0, 1);
+				m_led_pwr = 1;
 			}
 		}
 	}
@@ -1023,7 +1023,7 @@ void sms_state::setup_bios()
 	}
 }
 
-MACHINE_START_MEMBER(sms_state,sms)
+void sms_state::machine_start()
 {
 	m_led_pwr.resolve();
 
@@ -1119,7 +1119,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		m_cartslot->save_ram();
 }
 
-MACHINE_RESET_MEMBER(sms_state,sms)
+void sms_state::machine_reset()
 {
 	if (m_is_smsj)
 	{
@@ -1134,7 +1134,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 		m_rapid_last_dc = 0xff;
 		m_rapid_last_dd = 0xff;
 		// Power LED remains lit again
-		output().set_led_value(0, 1);
+		m_led_pwr = 1;
 	}
 
 	if (!m_is_mark_iii)
@@ -1254,7 +1254,7 @@ void sms_state::init_sg1000m3()
 	m_is_mark_iii = 1;
 	m_has_jpn_sms_cart_slot = 1;
 	// turn on the Power LED
-	output().set_led_value(0, 1);
+	m_led_pwr = 1;
 }
 
 
@@ -1268,7 +1268,7 @@ void sms_state::init_sms1()
 {
 	m_has_bios_full = 1;
 	// turn on the Power LED
-	output().set_led_value(0, 1);
+	m_led_pwr = 1;
 }
 
 
@@ -1279,7 +1279,7 @@ void sms_state::init_smsj()
 	m_ioctrl_region_is_japan = 1;
 	m_has_jpn_sms_cart_slot = 1;
 	// turn on the Power LED
-	output().set_led_value(0, 1);
+	m_led_pwr = 1;
 }
 
 
@@ -1289,7 +1289,7 @@ void sms_state::init_sms1kr()
 	m_ioctrl_region_is_japan = 1;
 	m_has_jpn_sms_cart_slot = 1;
 	// turn on the Power LED
-	output().set_led_value(0, 1);
+	m_led_pwr = 1;
 }
 
 
@@ -1312,7 +1312,7 @@ void sms_state::init_gamegear()
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
 	// turn on the Power LED
-	output().set_led_value(0, 1);
+	m_led_pwr = 1;
 }
 
 
@@ -1322,7 +1322,7 @@ void sms_state::init_gamegeaj()
 	m_has_bios_0400 = 1;
 	m_ioctrl_region_is_japan = 1;
 	// turn on the Power LED
-	output().set_led_value(0, 1);
+	m_led_pwr = 1;
 }
 
 

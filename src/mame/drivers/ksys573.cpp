@@ -376,29 +376,32 @@ class ksys573_state : public driver_device
 {
 public:
 	ksys573_state( const machine_config &mconfig, device_type type, const char *tag ) :
-		driver_device( mconfig, type, tag ),
-		m_analog0(*this, "analog0" ),
-		m_analog1(*this, "analog1" ),
-		m_analog2(*this, "analog2" ),
-		m_analog3(*this, "analog3" ),
-		m_pads(*this, "PADS" ),
-		m_psxirq(*this, "maincpu:irq" ),
-		m_ata(*this, "ata" ),
+		driver_device(mconfig, type, tag),
+		m_pads(*this, "PADS"),
+		m_analog0(*this, "analog0"),
+		m_analog1(*this, "analog1"),
+		m_analog2(*this, "analog2"),
+		m_analog3(*this, "analog3"),
+		m_psxirq(*this, "maincpu:irq"),
+		m_ata(*this, "ata"),
 		m_h8_response(*this, "h8_response"),
-		m_maincpu(*this, "maincpu" ),
-		m_ram(*this, "maincpu:ram" ),
-		m_flashbank(*this, "flashbank" ),
-		m_out1(*this, "OUT1" ),
-		m_out2(*this, "OUT2" ),
-		m_cd(*this, "CD" ),
-		m_upd4701(*this, "upd4701" ),
-		m_stage(*this, "STAGE" ),
-		m_gunx(*this, "GUNX" ),
-		m_sensor(*this, "SENSOR" ),
-		m_encoder(*this, "ENCODER" ),
-		m_gunmania_id(*this, "gunmania_id" )
-	{
-	}
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "maincpu:ram"),
+		m_flashbank(*this, "flashbank"),
+		m_out1(*this, "OUT1"),
+		m_out2(*this, "OUT2"),
+		m_cd(*this, "CD"),
+		m_upd4701(*this, "upd4701"),
+		m_stage(*this, "STAGE"),
+		m_gunx(*this, "GUNX"),
+		m_sensor(*this, "SENSOR"),
+		m_encoder(*this, "ENCODER"),
+		m_gunmania_id(*this, "gunmania_id"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
+
+	double m_pad_position[ 6 ];
+	optional_ioport m_pads;
 
 	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
 	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_tank_shutter_sensor );
@@ -461,12 +464,6 @@ public:
 	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void sys573_vblank( screen_device &screen, bool vblank_state );
-	double m_pad_position[ 6 ];
-	required_ioport m_analog0;
-	required_ioport m_analog1;
-	required_ioport m_analog2;
-	required_ioport m_analog3;
-	optional_ioport m_pads;
 
 	void gtfrk10mb(machine_config &config);
 	void ddr(machine_config &config);
@@ -530,7 +527,13 @@ public:
 	void konami573a_map(address_map &map);
 	void konami573d_map(address_map &map);
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void driver_start() override;
+
+	required_ioport m_analog0;
+	required_ioport m_analog1;
+	required_ioport m_analog2;
+	required_ioport m_analog3;
 
 private:
 	inline void ATTR_PRINTF( 3,4 ) verboselog( int n_level, const char *s_fmt, ... );
@@ -598,6 +601,7 @@ private:
 	optional_ioport m_sensor;
 	optional_ioport m_encoder;
 	optional_device<ds2401_device> m_gunmania_id;
+	output_finder<2> m_lamp;
 };
 
 void ATTR_PRINTF( 3,4 )  ksys573_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1173,11 +1177,11 @@ WRITE8_MEMBER( ksys573_state::ddr_output_callback )
 		break;
 
 	case 17:
-		output().set_led_value( 0, !data ); // start 1
+		m_lamp[0] = data ? 0 : 1; // start 1
 		break;
 
 	case 18:
-		output().set_led_value( 1, !data ); // start 2
+		m_lamp[1] = data ? 0 : 1; // start 2
 		break;
 
 	case 20:
@@ -1229,12 +1233,12 @@ WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b6 )
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b5 )
 {
-	output().set_led_value( 0, state ); // start left
+	m_lamp[0] = state ? 1 : 0; // start left
 }
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b4 )
 {
-	output().set_led_value( 1, state ); // start right
+	m_lamp[1] = state ? 1 : 0; // start right
 }
 
 /* ddr solo */
@@ -1271,7 +1275,7 @@ WRITE8_MEMBER( ksys573_state::ddrsolo_output_callback )
 		break;
 
 	case 20:
-		output().set_led_value( 0, !data ); // start
+		m_lamp[0] = data ? 0 : 1; // start
 		break;
 
 	case 21:
@@ -1340,7 +1344,7 @@ WRITE8_MEMBER( ksys573_state::drmn_output_callback )
 
 	case 13: // drmn2+
 	case 21: // drmn
-		output().set_led_value( 0, data ); // start
+		m_lamp[0] = data ? 1 : 0; // start
 		break;
 
 	case 14: // drmn2+
@@ -1490,7 +1494,7 @@ WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b0 )
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b1 )
 {
-	output().set_led_value( 1, state ); // start 1p
+	m_lamp[1] = state ? 1 : 0; // start 1p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b2 )
@@ -1505,7 +1509,7 @@ WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b3 )
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b4 )
 {
-	output().set_led_value( 0, state ); // start 2p
+	m_lamp[0] = state ? 1 : 0; // start 2p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b5 )
@@ -1719,7 +1723,7 @@ WRITE8_MEMBER( ksys573_state::mamboagg_output_callback )
 
 WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b3 )
 {
-	output().set_led_value( 0, state ); // start 1p
+	m_lamp[0] = state ? 1 : 0; // start 1p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b4 )

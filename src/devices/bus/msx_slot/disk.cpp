@@ -83,6 +83,7 @@ void msx_slot_disk_device::device_start()
 msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(nullptr)
+	, m_led(*this, "led0")
 {
 }
 
@@ -91,6 +92,7 @@ void msx_slot_wd_disk_device::device_start()
 {
 	msx_slot_disk_device::device_start();
 
+	m_led.resolve();
 	m_fdc = owner()->subdevice<wd_fdc_analog_device_base>(m_fdc_tag);
 
 	if (m_fdc == nullptr)
@@ -200,7 +202,7 @@ void msx_slot_disk1_device::set_control(uint8_t data)
 
 	if ((old_m_control ^ m_control) & 0x40)
 	{
-		machine().output().set_led_value(0, !(m_control & 0x40));
+		m_led =  BIT(~m_control, 6);
 	}
 }
 
@@ -349,7 +351,7 @@ void msx_slot_disk2_device::set_control(uint8_t data)
 
 	if ((old_m_control ^ m_control) & 0x40)
 	{
-		machine().output().set_led_value(0, !(m_control & 0x40));
+		m_led = BIT(~m_control, 6);
 	}
 }
 

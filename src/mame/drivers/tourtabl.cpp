@@ -23,12 +23,14 @@ class tourtabl_state : public driver_device
 public:
 	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	void tourtabl(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_led.resolve(); }
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
@@ -36,6 +38,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	output_finder<4> m_led;
 };
 
 
@@ -44,10 +47,10 @@ private:
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 {
-	output().set_led_value(0, data & 0x40); /* start 1 */
-	output().set_led_value(1, data & 0x20); /* start 2 */
-	output().set_led_value(2, data & 0x10); /* start 4 */
-	output().set_led_value(3, data & 0x80); /* select game */
+	m_led[0] = BIT(data, 6); /* start 1 */
+	m_led[1] = BIT(data, 5); /* start 2 */
+	m_led[2] = BIT(data, 4); /* start 4 */
+	m_led[3] = BIT(data, 7); /* select game */
 
 	machine().bookkeeping().coin_lockout_global_w(!(data & 0x80));
 }

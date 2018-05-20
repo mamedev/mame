@@ -85,21 +85,14 @@
 class ti74_state : public driver_device
 {
 public:
-	ti74_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ti74_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
-		m_battery_inp(*this, "BATTERY")
+		m_battery_inp(*this, "BATTERY"),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
-
-	required_device<tms70c46_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
-	required_ioport_array<8> m_key_matrix;
-	required_ioport m_battery_inp;
-
-	u8 m_key_select;
-	u8 m_power;
 
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
@@ -108,8 +101,6 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(ti74);
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
@@ -118,6 +109,21 @@ public:
 	void ti74(machine_config &config);
 	void ti95(machine_config &config);
 	void main_map(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
+private:
+	required_device<tms70c46_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<8> m_key_matrix;
+	required_ioport m_battery_inp;
+
+	u8 m_key_select;
+	u8 m_power;
+
+	output_finder<80> m_lamp;
 };
 
 
@@ -174,7 +180,7 @@ void ti74_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
 	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
-	output().set_lamp_value(y * 10 + x, state);
+	m_lamp[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
@@ -492,6 +498,8 @@ void ti74_state::machine_reset()
 
 void ti74_state::machine_start()
 {
+	m_lamp.resolve();
+
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 

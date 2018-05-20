@@ -315,12 +315,9 @@ GND  8A 8B GND
 
 class systeme_state : public driver_device
 {
-protected:
-	virtual void machine_start() override;
-
 public:
-	systeme_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	systeme_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp1(*this, "vdp1"),
 		m_vdp2(*this, "vdp2"),
@@ -328,7 +325,9 @@ public:
 		m_maincpu_region(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
-		m_bank1d(*this, "bank1d") { }
+		m_bank1d(*this, "bank1d"),
+		m_lamp(*this, "lamp0")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bank_write);
 	DECLARE_WRITE8_MEMBER(coin_counters_write);
@@ -353,6 +352,10 @@ public:
 	void systeme_map(address_map &map);
 	void vdp1_map(address_map &map);
 	void vdp2_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
@@ -364,6 +367,7 @@ private:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
+	output_finder<> m_lamp;
 
 	// Analog input related
 	uint8_t m_port_select;
@@ -447,12 +451,13 @@ WRITE8_MEMBER(systeme_state::coin_counters_write)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
-	machine().output().set_lamp_value(0, BIT(data, 2)); // used only by hangonjr?
+	m_lamp = BIT(data, 2); // used only by hangonjr?
 }
 
 
 void systeme_state::machine_start()
 {
+	m_lamp.resolve();
 	membank("vdp1_bank")->configure_entries(0, 2, m_vram[0], 0x4000);
 	membank("vdp2_bank")->configure_entries(0, 2, m_vram[1], 0x4000);
 	m_bank1->configure_entries(0, 16, m_maincpu_region->base() + 0x10000, 0x4000);

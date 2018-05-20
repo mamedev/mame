@@ -79,6 +79,7 @@ private:
 	required_device<vcs_control_port_device> m_joy;
 
 	required_ioport_array<11> m_y;
+	output_finder<2> m_led;
 
 	devcb_write_line   m_write_clock;
 	devcb_write_line   m_write_data;

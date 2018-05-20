@@ -37,31 +37,19 @@ class isbc_state : public driver_device
 {
 public:
 	isbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_uart8251(*this, "uart8251"),
-		m_uart8274(*this, "uart8274"),
-		m_pic_0(*this, "pic_0"),
-		m_pic_1(*this, "pic_1"),
-		m_centronics(*this, "centronics"),
-		m_cent_status_in(*this, "cent_status_in"),
-		m_statuslatch(*this, "statuslatch"),
-		m_bios(*this, "user1"),
-		m_biosram(*this, "biosram")
-	{
-	}
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<i8251_device> m_uart8251;
-//  optional_device<i8274_device> m_uart8274;
-	optional_device<i8274_new_device> m_uart8274;
-	required_device<pic8259_device> m_pic_0;
-	optional_device<pic8259_device> m_pic_1;
-	optional_device<centronics_device> m_centronics;
-	optional_device<input_buffer_device> m_cent_status_in;
-	optional_device<ls259_device> m_statuslatch;
-	optional_memory_region m_bios;
-	optional_shared_ptr<u16> m_biosram;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart8251(*this, "uart8251")
+		, m_uart8274(*this, "uart8274")
+		, m_pic_0(*this, "pic_0")
+		, m_pic_1(*this, "pic_1")
+		, m_centronics(*this, "centronics")
+		, m_cent_status_in(*this, "cent_status_in")
+		, m_statuslatch(*this, "statuslatch")
+		, m_bios(*this, "user1")
+		, m_biosram(*this, "biosram")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
@@ -99,7 +87,22 @@ public:
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
 protected:
-	void machine_reset() override;
+	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<i8251_device> m_uart8251;
+//  optional_device<i8274_device> m_uart8274;
+	optional_device<i8274_new_device> m_uart8274;
+	required_device<pic8259_device> m_pic_0;
+	optional_device<pic8259_device> m_pic_1;
+	optional_device<centronics_device> m_centronics;
+	optional_device<input_buffer_device> m_cent_status_in;
+	optional_device<ls259_device> m_statuslatch;
+	optional_memory_region m_bios;
+	optional_shared_ptr<u16> m_biosram;
+	output_finder<2> m_led;
+
 private:
 	bool m_upperen;
 	offs_t m_megabyte_page;
@@ -337,12 +340,12 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 
 WRITE_LINE_MEMBER(isbc_state::led_ds1_w)
 {
-	machine().output().set_led_value(0, !state);
+	m_led[0] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER(isbc_state::led_ds3_w)
 {
-	machine().output().set_led_value(1, !state);
+	m_led[1] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)

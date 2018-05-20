@@ -17,7 +17,7 @@
 #include "machine/pit8253.h"
 
 
-enum {PMD85_LED_1, PMD85_LED_2, PMD85_LED_3};
+enum {PMD85_LED_1 = 0, PMD85_LED_2, PMD85_LED_3};
 enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
 
 
@@ -257,8 +257,8 @@ WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portb_w)
 WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portc_w)
 {
 	m_ppi_port_outputs[0][2] = data;
-	output().set_led_value(PMD85_LED_2, (data & 0x08) ? 1 : 0);
-	output().set_led_value(PMD85_LED_3, (data & 0x04) ? 1 : 0);
+	m_led[PMD85_LED_2] = BIT(data, 3);
+	m_led[PMD85_LED_3] = BIT(data, 2);
 }
 
 /*******************************************************************************
@@ -290,8 +290,8 @@ READ8_MEMBER(pmd85_state::mato_ppi_0_portc_r)
 WRITE8_MEMBER(pmd85_state::mato_ppi_0_portc_w)
 {
 	m_ppi_port_outputs[0][2] = data;
-	output().set_led_value(PMD85_LED_2, BIT(data, 3));
-	output().set_led_value(PMD85_LED_3, BIT(data, 2));
+	m_led[PMD85_LED_2] = BIT(data, 3);
+	m_led[PMD85_LED_3] = BIT(data, 2);
 }
 
 /*******************************************************************************

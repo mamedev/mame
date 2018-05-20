@@ -26,7 +26,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
@@ -72,6 +73,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_led;
 
 	/* video-related */
 	const uint8_t *m_syncprom;

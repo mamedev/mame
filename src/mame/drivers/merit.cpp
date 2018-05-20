@@ -90,23 +90,16 @@ class merit_state : public driver_device
 {
 public:
 	merit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_ram_attr(*this, "raattr"),
-		m_ram_video(*this, "ravideo"),
-		m_backup_ram(*this, "backup_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		: driver_device(mconfig, type, tag)
+		, m_ram_attr(*this, "raattr")
+		, m_ram_video(*this, "ravideo")
+		, m_backup_ram(*this, "backup_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
-	pen_t m_pens[NUM_PENS];
-	required_shared_ptr<uint8_t> m_ram_attr;
-	required_shared_ptr<uint8_t> m_ram_video;
-	std::unique_ptr<uint8_t[]> m_ram_palette;
-	uint8_t m_lscnblk;
-	int m_extra_video_bank_bit;
-	int m_question_address;
-	int m_decryption_key;
-	optional_shared_ptr<uint8_t> m_backup_ram;
 	DECLARE_READ8_MEMBER(questions_r);
 	DECLARE_WRITE8_MEMBER(low_offset_w);
 	DECLARE_WRITE8_MEMBER(med_offset_w);
@@ -127,12 +120,9 @@ public:
 	void init_key_0();
 	void init_key_2();
 	void init_dtrvwz5();
-	virtual void machine_start() override;
 	DECLARE_MACHINE_START(casino5);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	void misdraw(machine_config &config);
 	void couple(machine_config &config);
 	void phrcraze(machine_config &config);
@@ -158,11 +148,28 @@ public:
 	void trvwhiz_io_map(address_map &map);
 	void trvwhiz_map(address_map &map);
 	void trvwhziv_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
+	pen_t m_pens[NUM_PENS];
+	required_shared_ptr<uint8_t> m_ram_attr;
+	required_shared_ptr<uint8_t> m_ram_video;
+	std::unique_ptr<uint8_t[]> m_ram_palette;
+	uint8_t m_lscnblk;
+	int m_extra_video_bank_bit;
+	int m_question_address;
+	int m_decryption_key;
+	optional_shared_ptr<uint8_t> m_backup_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	output_finder<10> m_led;
 };
 
 
 void merit_state::machine_start()
 {
+	m_led.resolve();
 	m_question_address = 0;
 	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 
@@ -339,24 +346,24 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 WRITE8_MEMBER(merit_state::led1_w)
 {
 	/* 5 button lamps player 1 */
-	output().set_led_value(0,~data & 0x01);
-	output().set_led_value(1,~data & 0x02);
-	output().set_led_value(2,~data & 0x04);
-	output().set_led_value(3,~data & 0x08);
-	output().set_led_value(4,~data & 0x10);
+	m_led[0] = BIT(~data, 0);
+	m_led[1] = BIT(~data, 1);
+	m_led[2] = BIT(~data, 2);
+	m_led[3] = BIT(~data, 3);
+	m_led[4] = BIT(~data, 4);
 }
 
 WRITE8_MEMBER(merit_state::led2_w)
 {
 	/* 5 button lamps player 2 */
-	output().set_led_value(5,~data & 0x01);
-	output().set_led_value(6,~data & 0x02);
-	output().set_led_value(7,~data & 0x04);
-	output().set_led_value(8,~data & 0x08);
-	output().set_led_value(9,~data & 0x10);
+	m_led[5] = BIT(~data, 0);
+	m_led[6] = BIT(~data, 1);
+	m_led[7] = BIT(~data, 2);
+	m_led[8] = BIT(~data, 3);
+	m_led[9] = BIT(~data, 4);
 
 	/* coin counter */
-	machine().bookkeeping().coin_counter_w(0,0x80-(data & 0x80));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data, 7));
 }
 
 WRITE8_MEMBER(merit_state::misc_w)

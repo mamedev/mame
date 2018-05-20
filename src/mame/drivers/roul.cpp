@@ -76,26 +76,19 @@ Stephh's notes (based on the game Z80 code and some tests) :
 class roul_state : public driver_device
 {
 public:
-	roul_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	roul_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_soundlatch(*this, "soundlatch") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<generic_latch_8_device> m_soundlatch;
-
-	uint8_t m_reg[0x10];
-	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp_old;
+		m_soundlatch(*this, "soundlatch"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(roul);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -104,6 +97,20 @@ public:
 	void roul_map(address_map &map);
 	void sound_cpu_io_map(address_map &map);
 	void sound_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<256> m_lamp;
+
+	uint8_t m_reg[0x10];
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp_old;
 };
 
 
@@ -199,8 +206,8 @@ WRITE8_MEMBER(roul_state::ball_w)
 {
 	int lamp = data;
 
-	output().set_lamp_value(data, 1);
-	output().set_lamp_value(m_lamp_old, 0);
+	m_lamp[data] = 1;
+	m_lamp[m_lamp_old] = 0;
 	m_lamp_old = lamp;
 }
 

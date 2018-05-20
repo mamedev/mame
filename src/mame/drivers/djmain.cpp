@@ -301,9 +301,9 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 	{
 		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
 		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
-		output().set_led_value(0, data & 0x00010000);            // 1P START
-		output().set_led_value(1, data & 0x00020000);            // 2P START
-		output().set_led_value(2, data & 0x00040000);            // EFFECT
+		m_led[0] = BIT(data, 16);            // 1P START
+		m_led[1] = BIT(data, 17);            // 2P START
+		m_led[2] = BIT(data, 18);            // EFFECT
 	}
 }
 
@@ -1351,6 +1351,8 @@ void djmain_state::machine_start()
 	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
+	m_led.resolve();
+
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
 	save_item(NAME(m_v_ctrl));
@@ -1364,9 +1366,9 @@ void djmain_state::machine_reset()
 	m_sndram_bank = 0;
 
 	/* reset LEDs */
-	output().set_led_value(0, 1);
-	output().set_led_value(1, 1);
-	output().set_led_value(2, 1);
+	m_led[0] = 1;
+	m_led[1] = 1;
+	m_led[2] = 1;
 }
 
 

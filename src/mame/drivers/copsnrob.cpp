@@ -79,7 +79,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 {
 	m_misc = data & 0x7f;
 	/* Multi Player Start */
-	output().set_led_value(1, !((data >> 6) & 0x01));
+	m_led[1] = BIT(~data, 6);
 }
 
 

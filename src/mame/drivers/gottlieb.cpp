@@ -223,6 +223,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 void gottlieb_state::machine_start()
 {
+	m_led.resolve();
 	/* register for save states */
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));
@@ -327,9 +328,9 @@ WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 {
 	general_output_w(space, offset, data & ~0xe0);
 
-	output().set_led_value(0, data & 0x20);
-	output().set_led_value(1, data & 0x40);
-	output().set_led_value(2, data & 0x80);
+	m_led[0] = BIT(data, 5);
+	m_led[1] = BIT(data, 6);
+	m_led[2] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(gottlieb_state::qbert_output_w)

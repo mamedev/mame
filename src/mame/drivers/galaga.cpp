@@ -762,8 +762,8 @@ CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)p
 
 WRITE8_MEMBER(galaga_state::out_0)
 {
-	output().set_led_value(1,data & 1);
-	output().set_led_value(0,data & 2);
+	m_led[1] = BIT(data, 0);
+	m_led[0] = BIT(data, 1);
 	machine().bookkeeping().coin_counter_w(1,~data & 4);
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
@@ -810,8 +810,9 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-MACHINE_START_MEMBER(galaga_state,galaga)
+void galaga_state::machine_start()
 {
+	m_led.resolve();
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
 	save_item(NAME(m_main_irq_mask));
@@ -819,14 +820,14 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 	save_item(NAME(m_sub2_nmi_mask));
 }
 
-MACHINE_RESET_MEMBER(galaga_state,galaga)
+void galaga_state::machine_reset()
 {
 	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
 MACHINE_RESET_MEMBER(xevious_state,battles)
 {
-	MACHINE_RESET_CALL_MEMBER(galaga);
+	galaga_state::machine_reset();
 	battles_customio_init();
 }
 
@@ -1631,8 +1632,6 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(bosco_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(bosco_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1706,8 +1705,6 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1812,8 +1809,6 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1929,8 +1924,6 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 

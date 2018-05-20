@@ -303,28 +303,28 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
 */
-	output().set_lamp_value(0, (data >> 0) & 1);
-	output().set_lamp_value(1, (data >> 1) & 1);
-	output().set_lamp_value(2, (data >> 2) & 1);
-	output().set_lamp_value(3, (data >> 3) & 1);
-	output().set_lamp_value(4, (data >> 4) & 1);
-	output().set_lamp_value(5, (data >> 5) & 1);
-	output().set_lamp_value(6, (data >> 6) & 1);
-	output().set_lamp_value(7, (data >> 7) & 1);
+	m_lamp[0] = BIT(data, 0);
+	m_lamp[1] = BIT(data, 1);
+	m_lamp[2] = BIT(data, 2);
+	m_lamp[3] = BIT(data, 3);
+	m_lamp[4] = BIT(data, 4);
+	m_lamp[5] = BIT(data, 5);
+	m_lamp[6] = BIT(data, 6);
+	m_lamp[7] = BIT(data, 7);
 
 //  popmessage("p1 lamps: %02X", data);
 }
 
 WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 {
-	output().set_lamp_value(8 + 0, (data >> 0) & 1);
-	output().set_lamp_value(8 + 1, (data >> 1) & 1);
-	output().set_lamp_value(8 + 2, (data >> 2) & 1);
-	output().set_lamp_value(8 + 3, (data >> 3) & 1);
-	output().set_lamp_value(8 + 4, (data >> 4) & 1);
-	output().set_lamp_value(8 + 5, (data >> 5) & 1);
-	output().set_lamp_value(8 + 6, (data >> 6) & 1);
-	output().set_lamp_value(8 + 7, (data >> 7) & 1);
+	m_lamp[8 + 0] = BIT(data, 0);
+	m_lamp[8 + 1] = BIT(data, 1);
+	m_lamp[8 + 2] = BIT(data, 2);
+	m_lamp[8 + 3] = BIT(data, 3);
+	m_lamp[8 + 4] = BIT(data, 4);
+	m_lamp[8 + 5] = BIT(data, 5);
+	m_lamp[8 + 6] = BIT(data, 6);
+	m_lamp[8 + 7] = BIT(data, 7);
 
 //  popmessage("p2 lamps: %02X", data);
 }
@@ -1203,12 +1203,12 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 	if (!m_vblank_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	output().set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* Info / Small / Stop 3 */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* Big */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* Bet-B / D-Up */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
+	m_lamp[0] = BIT(data, 0);  /* Bet-A / Stop 2 */
+	m_lamp[1] = BIT(data, 1);  /* Start / Stop All */
+	m_lamp[2] = BIT(data, 2);  /* Info / Small / Stop 3 */
+	m_lamp[3] = BIT(data, 3);  /* Big */
+	m_lamp[4] = BIT(data, 4);  /* Bet-B / D-Up */
+	m_lamp[5] = BIT(data, 5);  /* Take / Stop 1 */
 }
 
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)

@@ -38,6 +38,8 @@ public:
 		, m_digitalker(*this, "digitalker")
 		, m_aysnd(*this, "aysnd")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{
 	}
 
@@ -87,6 +89,8 @@ private:
 	required_device<digitalker_device> m_digitalker;
 	optional_device<ay8910_device> m_aysnd; // only faceoffh
 	output_finder<4> m_digits;
+	output_finder<3> m_leds;
+	output_finder<2> m_lamps;
 };
 
 
@@ -151,9 +155,9 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	m_digits[3] = patterns[(m_shift >>  (8+0)) & 0xf];
 
 	// Leds (period being played)
-	output().set_led_value(0, BIT(m_shift,2));
-	output().set_led_value(1, BIT(m_shift,1));
-	output().set_led_value(2, BIT(m_shift,0));
+	m_leds[0] = BIT(m_shift,2);
+	m_leds[1] = BIT(m_shift,1);
+	m_leds[2] = BIT(m_shift,0);
 
 //  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
@@ -190,8 +194,8 @@ void chexx_state::chexx83_map(address_map &map)
 WRITE8_MEMBER(chexx_state::lamp_w)
 {
 	m_lamp = data;
-	output().set_lamp_value(0, BIT(m_lamp,0));
-	output().set_lamp_value(1, BIT(m_lamp,1));
+	m_lamps[0] = BIT(m_lamp,0);
+	m_lamps[1] = BIT(m_lamp,1);
 }
 
 WRITE8_MEMBER(chexx_state::ay_w)
@@ -262,6 +266,8 @@ INPUT_PORTS_END
 void chexx_state::machine_start()
 {
 	m_digits.resolve();
+	m_leds.resolve();
+	m_lamps.resolve();
 }
 
 void chexx_state::digitalker_set_bank(uint8_t bank)

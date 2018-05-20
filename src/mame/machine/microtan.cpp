@@ -358,7 +358,7 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 		m_lastrow = row;
 		/* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			output().set_led_value(1, (m_keyrows[3] & 0x80) ? 0 : 1);
+			m_led[1] = BIT(~m_keyrows[3], 7);
 
 		if (newvar & chg)  /* key(s) pressed ? */
 		{
@@ -514,7 +514,7 @@ void microtan_state::machine_reset()
 	{
 		m_keyrows[i] = ioport(keynames[i-1])->read();
 	}
-	output().set_led_value(1, (m_keyrows[3] & 0x80) ? 0 : 1);
+	m_led[1] = BIT(~m_keyrows[3], 7);
 }
 
 image_verify_result microtan_state::microtan_verify_snapshot(uint8_t *data, int size)

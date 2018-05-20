@@ -86,29 +86,18 @@ class subsino2_state : public driver_device
 {
 public:
 	subsino2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_outputs16(*this, "outputs16"),
-		m_outputs(*this, "outputs"),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper") { }
+		: driver_device(mconfig, type, tag)
+		, m_outputs16(*this, "outputs16")
+		, m_outputs(*this, "outputs")
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_hopper(*this, "hopper")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
-	layer_t m_layers[2];
-	uint8_t m_ss9601_byte_lo;
-	uint8_t m_ss9601_byte_lo2;
-	std::unique_ptr<uint8_t[]> m_ss9601_reelrams[2];
-	std::unique_ptr<bitmap_ind16> m_reelbitmap;
-	uint8_t m_ss9601_scrollctrl;
-	uint8_t m_ss9601_tilesize;
-	uint8_t m_ss9601_disable;
-	uint8_t m_dsw_mask;
-	optional_shared_ptr<uint16_t> m_outputs16;
-	optional_shared_ptr<uint8_t> m_outputs;
-	uint16_t m_bishjan_sound;
-	uint16_t m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
 	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_w);
@@ -176,12 +165,6 @@ public:
 	DECLARE_VIDEO_START(subsino2);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<ticket_dispenser_device> m_hopper;
 
 	void bishjan(machine_config &config);
 	void saklove(machine_config &config);
@@ -204,6 +187,32 @@ public:
 	void xplan_io(address_map &map);
 	void xplan_map(address_map &map);
 	void xtrain_io(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+
+	layer_t m_layers[2];
+	uint8_t m_ss9601_byte_lo;
+	uint8_t m_ss9601_byte_lo2;
+	std::unique_ptr<uint8_t[]> m_ss9601_reelrams[2];
+	std::unique_ptr<bitmap_ind16> m_reelbitmap;
+	uint8_t m_ss9601_scrollctrl;
+	uint8_t m_ss9601_tilesize;
+	uint8_t m_ss9601_disable;
+	uint8_t m_dsw_mask;
+	optional_shared_ptr<uint16_t> m_outputs16;
+	optional_shared_ptr<uint8_t> m_outputs;
+	uint16_t m_bishjan_sound;
+	uint16_t m_bishjan_input;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_hopper;
+	output_finder<9> m_led;
+
 private:
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
@@ -988,20 +997,20 @@ WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
 		case 0:
 			if (ACCESSING_BITS_8_15)
 			{
-				output().set_led_value(0, data & 0x4000); // record?
-				output().set_led_value(1, data & 0x2000); // shoot now
-				output().set_led_value(2, data & 0x1000); // double
-				output().set_led_value(3, data & 0x0800); // black/red
+				m_led[0] = BIT(data, 14); // record?
+				m_led[1] = BIT(data, 13); // shoot now
+				m_led[2] = BIT(data, 12); // double
+				m_led[3] = BIT(data, 11); // black/red
 			}
 			if (ACCESSING_BITS_0_7)
 			{
-				output().set_led_value(4, data & 0x0080); // start
-				output().set_led_value(5, data & 0x0040); // take
-				output().set_led_value(6, data & 0x0020); // black/red
+				m_led[4] = BIT(data, 7); // start
+				m_led[5] = BIT(data, 6); // take
+				m_led[6] = BIT(data, 5); // black/red
 
 				machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
-				output().set_led_value(7, data & 0x0004); // ?
-				output().set_led_value(8, data & 0x0002); // ?
+				m_led[7] = BIT(data, 2); // ?
+				m_led[8] = BIT(data, 1); // ?
 			}
 			break;
 	}
@@ -1083,15 +1092,15 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 		case 0:
 			if (ACCESSING_BITS_8_15)
 			{
-				output().set_led_value(5, data & 0x2000); // big or small
-				output().set_led_value(4, data & 0x0400); // double
-				output().set_led_value(3, data & 0x0200); // big or small
-				output().set_led_value(2, data & 0x0100); // bet
+				m_led[5] = BIT(data, 13); // big or small
+				m_led[4] = BIT(data, 10); // double
+				m_led[3] = BIT(data, 9); // big or small
+				m_led[2] = BIT(data, 8); // bet
 			}
 			if (ACCESSING_BITS_0_7)
 			{
-				output().set_led_value(1, data & 0x0080); // take
-				output().set_led_value(0, data & 0x0040); // start
+				m_led[1] = BIT(data, 7); // take
+				m_led[0] = BIT(data, 6); // start
 				machine().bookkeeping().coin_counter_w(1, data & 0x0004); // key in
 				machine().bookkeeping().coin_counter_w(0, data & 0x0002); // coin in
 			}
@@ -1122,21 +1131,21 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 			break;
 
 		case 1: // C
-			output().set_led_value(0,    data & 0x02);   // raise
+			m_led[0] = BIT(data, 1);   // raise
 			break;
 
 		case 2: // B
-			output().set_led_value(1,    data & 0x04);   // hold 4 / small & hold 5 / big ?
-			output().set_led_value(2,    data & 0x08);   // hold 1 / bet
-			output().set_led_value(3,    data & 0x10);   // hold 2 / take ?
-			output().set_led_value(4,    data & 0x20);   // hold 3 / double up ?
+			m_led[1] = BIT(data, 2);   // hold 4 / small & hold 5 / big ?
+			m_led[2] = BIT(data, 3);   // hold 1 / bet
+			m_led[3] = BIT(data, 4);   // hold 2 / take ?
+			m_led[4] = BIT(data, 5);   // hold 3 / double up ?
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			output().set_led_value(5,    data & 0x10);   // start
+			m_led[5] = BIT(data, 4);   // start
 			break;
 	}
 
@@ -1161,11 +1170,11 @@ WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 			break;
 
 		case 1:
-			output().set_led_value(0,    data & 0x01);   // stop reel?
-			output().set_led_value(1,    data & 0x02);   // stop reel? (double or take)
-			output().set_led_value(2,    data & 0x04);   // start all
-			output().set_led_value(3,    data & 0x08);   // bet / stop all
-			output().set_led_value(4,    data & 0x20);   // stop reel? (double or take)
+			m_led[0] = BIT(data, 0);   // stop reel?
+			m_led[1] = BIT(data, 1);   // stop reel? (double or take)
+			m_led[2] = BIT(data, 2);   // start all
+			m_led[3] = BIT(data, 3);   // bet / stop all
+			m_led[4] = BIT(data, 5);   // stop reel? (double or take)
 			break;
 
 		case 2:
@@ -1376,22 +1385,22 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 			break;
 
 		case 1:
-			output().set_led_value(0,    data & 0x02);   // raise
+			m_led[0] = BIT(data, 1);   // raise
 			break;
 
 		case 2: // B
-			output().set_led_value(1,    data & 0x04);   // hold 1 / big ?
-			output().set_led_value(2,    data & 0x08);   // hold 5 / bet
-			output().set_led_value(3,    data & 0x10);   // hold 4 ?
-			output().set_led_value(4,    data & 0x20);   // hold 2 / double up
-			output().set_led_value(5,    data & 0x40);   // hold 3 / small ?
+			m_led[1] = BIT(data, 2);   // hold 1 / big ?
+			m_led[2] = BIT(data, 3);   // hold 5 / bet
+			m_led[3] = BIT(data, 4);   // hold 4 ?
+			m_led[4] = BIT(data, 5);   // hold 2 / double up
+			m_led[5] = BIT(data, 6);   // hold 3 / small ?
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
 
-			output().set_led_value(6,    data & 0x10);   // start / take
+			m_led[6] = BIT(data, 4);   // start / take
 			break;
 	}
 
@@ -1480,23 +1489,23 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 
 		case 1: // C
-			output().set_led_value(0,    data & 0x02);   // re-double
-			output().set_led_value(1,    data & 0x04);   // half double
+			m_led[0] = BIT(data, 1);   // re-double
+			m_led[1] = BIT(data, 2);   // half double
 			break;
 
 		case 2: // B
-			output().set_led_value(2,    data & 0x02);   // hold 3 / small
-			output().set_led_value(3,    data & 0x04);   // hold 2 / big
-			output().set_led_value(4,    data & 0x08);   // bet
-			output().set_led_value(5,    data & 0x10);   // hold1 / take
-			output().set_led_value(6,    data & 0x20);   // double up
+			m_led[2] = BIT(data, 1);   // hold 3 / small
+			m_led[3] = BIT(data, 2);   // hold 2 / big
+			m_led[4] = BIT(data, 3);   // bet
+			m_led[5] = BIT(data, 4);   // hold1 / take
+			m_led[6] = BIT(data, 5);   // double up
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			output().set_led_value(7,    data & 0x10);   // start
+			m_led[7] = BIT(data, 4);   // start
 			break;
 	}
 

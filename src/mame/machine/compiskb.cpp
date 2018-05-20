@@ -228,7 +228,7 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 		m_y(*this, "Y%u", 1),
 		m_special(*this, "SPECIAL"),
 		m_out_tx_handler(*this),
-		m_bus(0xff),
+		m_led_caps(*this, "led_caps"),
 		m_keylatch(0)
 {
 }
@@ -297,7 +297,7 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 	m_speaker->level_w(BIT(data, 5));
 
 	// LEDs
-	machine().output().set_led_value(LED_CAPS, BIT(data, 6));
+	m_led_caps = BIT(data, 6);
 
 	// serial data out
 	m_out_tx_handler(BIT(data, 7));

@@ -114,9 +114,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	    7   CONT. M1
 	*/
 
-	output().set_led_value(0, data & 0x08); // 1P
-	output().set_led_value(1, data & 0x10); // 2P
-	output().set_led_value(2, data & 0x20); // FIRE
+	m_led[0] = BIT(data, 3); // 1P
+	m_led[1] = BIT(data, 4); // 2P
+	m_led[2] = BIT(data, 5); // FIRE
 }
 
 WRITE8_MEMBER( draco_state::out1_w )
@@ -370,18 +370,21 @@ void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void cidelsa_state::machine_start()
 {
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_reset));
 }
 
 void draco_state::machine_start()
 {
+	cidelsa_state::machine_start();
+
 	/* setup COP402 memory banking */
 	membank("bank1")->configure_entries(0, 2, memregion(COP402N_TAG)->base(), 0x400);
 	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
-	save_item(NAME(m_reset));
 	save_item(NAME(m_sound));
 	save_item(NAME(m_psg_latch));
 }

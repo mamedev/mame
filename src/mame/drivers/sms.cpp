@@ -494,9 +494,6 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(sms_state::sms_base)
-	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
-	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
-
 	/* basic machine hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -948,9 +945,6 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	MCFG_DEVICE_IO_MAP(gg_io)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
-	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

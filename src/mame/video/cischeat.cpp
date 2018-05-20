@@ -132,8 +132,8 @@ WRITE16_MEMBER(cischeat_state::leds_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		output().set_led_value(0, data & 0x10);   // start button
-		output().set_led_value(1, data & 0x20);   // ?
+		m_led[0] = BIT(data, 4);   // start button
+		m_led[1] = BIT(data, 5);   // ?
 	}
 }
 
@@ -148,7 +148,7 @@ WRITE16_MEMBER(cischeat_state::motor_out_w)
 {
 	// motor (seat?)
 	if (ACCESSING_BITS_0_7)
-		output().set_led_value(2, (data & 0xff) != m_motor_value ? 1 : 0);
+		m_led[2] = (data & 0xff) != m_motor_value ? 1 : 0;
 	m_motor_value = data & 0xff;
 }
 
@@ -249,10 +249,10 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_motor_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		output().set_led_value(0, data & 0x04);   // start button
-		output().set_led_value(1, data & 0x20);   // ?
+		m_led[0] = BIT(data, 2);   // start button
+		m_led[1] = BIT(data, 5);   // ?
 		// wheel | seat motor
-		output().set_led_value(2, ((data >> 3) | (data >> 4)) & 1 );
+		m_led[2] = BIT(data, 3) | BIT(data, 4);
 	}
 }
 

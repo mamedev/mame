@@ -227,7 +227,7 @@ D5 = Spare (Not used)
 
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 {
-	output().set_led_value(0, data & 0x10);
+	m_led = BIT(data, 4);
 
 	m_crash_en = data & 0x01;
 
@@ -274,6 +274,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 
 void nitedrvr_state::machine_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_gear));
 	save_item(NAME(m_track));
 	save_item(NAME(m_steering_buf));

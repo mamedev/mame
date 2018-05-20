@@ -1703,7 +1703,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
 	// on system 22: two rows of 4 red leds
 	// on super system 22: GYRGYRGY green/yellow/red
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, (~data << i & 0x80) ? 0 : 1);
+		m_cpuled[i] = (~data << i & 0x80) ? 0 : 1;
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
@@ -2985,7 +2985,7 @@ WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
 	// bit 1 = fan
 	// bit 2 = button light
 	output().set_value("fan0", data & 1);
-	output().set_led_value(0, data & 2);
+	m_led = BIT(data, 1);
 }
 
 void namcos22_state::propcycl_io_map(address_map &map)
@@ -3744,6 +3744,8 @@ void namcos22_state::machine_reset()
 
 void namcos22_state::machine_start()
 {
+	m_led.resolve();
+	m_cpuled.resolve();
 	m_slave_simulation_active = false;
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;

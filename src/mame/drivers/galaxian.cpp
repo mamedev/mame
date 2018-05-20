@@ -720,7 +720,7 @@ WRITE8_MEMBER(galaxian_state::start_lamp_w)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
-	output().set_led_value(offset, data & 1);
+	m_lamp[offset] = BIT(data, 0);
 }
 
 
