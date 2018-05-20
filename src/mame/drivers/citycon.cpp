@@ -19,6 +19,17 @@ Dip locations added from dip listing at crazykong.com
 #include "screen.h"
 #include "speaker.h"
 
+#define MASTER_CLOCK (20_MHz_XTAL)
+#define PIXEL_CLOCK  (MASTER_CLOCK/4) // guess
+#define CPU_CLOCK    (8_MHz_XTAL)
+
+/* also a guess, need to extract PAL equations to get further answers */
+#define HTOTAL       (320)
+#define HBEND        (8)
+#define HBSTART      (248)
+#define VTOTAL       (262)
+#define VBEND        (16)
+#define VBSTART      (240)
 
 READ8_MEMBER(citycon_state::citycon_in_r)
 {
@@ -190,20 +201,17 @@ void citycon_state::machine_reset()
 MACHINE_CONFIG_START(citycon_state::citycon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000)) // HD68B09P
+	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK) // HD68B09P
 	MCFG_DEVICE_PROGRAM_MAP(citycon_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(20'000'000) / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) //actually unused, probably it was during development
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) // actually unused, probably it was during development
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -217,10 +225,10 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(20'000'000) / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(20'000'000) / 16)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch2", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
