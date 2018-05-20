@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/timer.h"
+#include "sound/pokey.h"
 
 #define MHAVOC_CLOCK        10000000
 #define MHAVOC_CLOCK_5M     (MHAVOC_CLOCK/2)
@@ -28,6 +29,7 @@ public:
 		m_zram1(*this, "zram1"),
 		m_alpha(*this, "alpha"),
 		m_gamma(*this, "gamma"),
+		m_pokey(*this, "pokey%u", 1U),
 		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
@@ -73,6 +75,7 @@ protected:
 	required_shared_ptr<uint8_t> m_zram1;
 	required_device<cpu_device> m_alpha;
 	optional_device<cpu_device> m_gamma;
+	optional_device_array<pokey_device, 4> m_pokey;
 	output_finder<2> m_lamp;
 	uint8_t m_alpha_data;
 	uint8_t m_alpha_rcvd;
