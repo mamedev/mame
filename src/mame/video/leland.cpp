@@ -445,8 +445,9 @@ READ8_MEMBER(ataxx_state::ataxx_svram_port_r)
 
 uint32_t leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind16 const &src = m_tilemap->pixmap();
-	int const height_mask = m_tilemap->height() - 1;
+	m_tilemap->set_scrollx(0, m_xscroll);
+	m_tilemap->set_scrolly(0, m_yscroll);
+	m_tilemap->draw(screen, bitmap, cliprect, 0);
 
 	/* for each scanline in the visible region */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -457,12 +458,8 @@ uint32_t leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		/* for each pixel on the scanline */
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			/* compute the effective scrolled pixel coordinates */
-			uint16_t const sx = (x + m_xscroll) & 0x07ff;
-			uint16_t const sy = (y + m_yscroll) & height_mask;
-
 			/* build the pen, background is d0-d5 */
-			pen_t pen = src.pix16(sy, sx) & 0x3f;
+			pen_t pen = dst[x] & 0x3f;
 
 			/* foreground is d6-d9 */
 			if (x & 0x01)
