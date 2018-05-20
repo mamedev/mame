@@ -4828,6 +4828,13 @@ void nmk16_state::decode_ssmissin()
 	}
 }
 
+void nmk16_state::save_protregs()
+{
+	save_item(NAME(m_input_pressed));
+	save_item(NAME(m_start_helper));
+	save_item(NAME(m_coin_count));
+	save_item(NAME(m_coin_count_frac));
+}
 
 void nmk16_state::init_nmk()
 {
@@ -4843,6 +4850,7 @@ void nmk16_state::init_tharrier()
 {
 	m_okibank[0]->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 	m_okibank[1]->configure_entries(0, 4, memregion("oki2")->base() + 0x20000, 0x20000);
+	save_item(NAME(m_prot_count));
 }
 
 void nmk16_state::init_hachamf_prot()
@@ -4856,6 +4864,7 @@ void nmk16_state::init_hachamf_prot()
 	rom[0x04aa/2] = 0x4e71;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0f0000, 0x0fffff, write16_delegate(FUNC(nmk16_state::hachamf_mainram_w),this));
+	save_protregs();
 }
 
 void nmk16_state::init_tdragonb()
@@ -4875,6 +4884,7 @@ void nmk16_state::init_tdragon_prot()
 	rom[0x04aa/2] = 0x4e71;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0b0000, 0x0bffff, write16_delegate(FUNC(nmk16_state::tdragon_mainram_w),this));
+	save_protregs();
 }
 
 void nmk16_state::init_ssmissin()

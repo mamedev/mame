@@ -104,6 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER(twinactn_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
 	DECLARE_WRITE16_MEMBER(nmk16_bioship_x0016_w);
+	void save_protregs();
 	void init_nmk();
 	void init_tharrier();
 	void init_vandykeb();
