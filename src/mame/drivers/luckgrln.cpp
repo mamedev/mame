@@ -153,21 +153,21 @@ void luckgrln_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-template<uint8_t Reel> 
+template<uint8_t Reel>
 WRITE8_MEMBER(luckgrln_state::reel_ram_w)
 {
 	m_reel_ram[Reel][offset] = data;
 	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
 }
 
-template<uint8_t Reel> 
+template<uint8_t Reel>
 WRITE8_MEMBER(luckgrln_state::reel_attr_w)
 {
 	m_reel_attr[Reel][offset] = data;
 	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
 }
 
-template<uint8_t Reel> 
+template<uint8_t Reel>
 TILE_GET_INFO_MEMBER(luckgrln_state::get_reel_tile_info)
 {
 	int code = m_reel_ram[Reel][tile_index];
@@ -212,10 +212,10 @@ uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int i = 0; i < 64; i++)
 	{
-        m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
-        m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
-        m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
-        m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
+		m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+		m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+		m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+		m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
 	}
 
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 
 }
 
-/* Analizing the lamps, the game should have a 12-buttons control layout */
+/* Analyzing the lamps, the game should have a 12-buttons control layout */
 WRITE8_MEMBER(luckgrln_state::lamps_a_w)
 {
 /*  LAMPS A:
@@ -417,7 +417,7 @@ WRITE8_MEMBER(luckgrln_state::lamps_b_w)
     xx-- ----  unused
 
 */
-	for (int i = 0; i < 4; i++) // Lamps 8 - 15
+	for (int i = 0; i < 4; i++)
 		m_lamps[i + 8] = BIT(data, i);
 }
 
