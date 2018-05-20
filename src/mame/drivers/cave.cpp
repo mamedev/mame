@@ -78,7 +78,6 @@ Versions known to exist but not dumped:
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "includes/cave.h"
 
 #include "cpu/m68000/m68000.h"
@@ -700,10 +699,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 {
 	COMBINE_DATA(&m_leds[0]);
 
-	output().set_led_value(0, data & 0x8000);
-	output().set_led_value(1, data & 0x4000);
-	output().set_led_value(2, data & 0x1000);    // square button
-	output().set_led_value(3, data & 0x0800);    // round  button
+	m_ledout[0] = BIT(data, 15);
+	m_ledout[1] = BIT(data, 14);
+	m_ledout[2] = BIT(data, 12);    // square button
+	m_ledout[3] = BIT(data, 11);    // round  button
 //  machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);   // coin lockouts?
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
 
@@ -711,10 +710,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 //  machine().bookkeeping().coin_counter_w(1, data & 0x0020);
 	machine().bookkeeping().coin_counter_w(0, data & 0x0010);
 
-	output().set_led_value(5, data & 0x0008);
-	output().set_led_value(6, data & 0x0004);
-	output().set_led_value(7, data & 0x0002);
-	output().set_led_value(8, data & 0x0001);
+	m_ledout[5] = BIT(data, 3);
+	m_ledout[6] = BIT(data, 2);
+	m_ledout[7] = BIT(data, 1);
+	m_ledout[8] = BIT(data, 0);
 
 	show_leds();
 }
@@ -907,17 +906,17 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 
-		output().set_led_value(0, data & 0x0010);
-		output().set_led_value(1, data & 0x0020);
-		output().set_led_value(2, data & 0x0040);
-		output().set_led_value(3, data & 0x0080);
+		m_ledout[0] = BIT(data, 4);
+		m_ledout[1] = BIT(data, 5);
+		m_ledout[2] = BIT(data, 6);
+		m_ledout[3] = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(4, data & 0x0100);
-		output().set_led_value(5, data & 0x0200);
-		output().set_led_value(6, data & 0x0400);    // not tested in service mode
-		output().set_led_value(7, data & 0x0800);    // not tested in service mode
+		m_ledout[4] = BIT(data, 8);
+		m_ledout[5] = BIT(data, 9);
+		m_ledout[6] = BIT(data, 10);    // not tested in service mode
+		m_ledout[7] = BIT(data, 11);    // not tested in service mode
 
 		m_oki[0]->set_rom_bank((data & 0x8000) >> 15);
 	}
@@ -1133,14 +1132,11 @@ WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0,    data & 0x0001); // suru
-		output().set_led_value(1,    data & 0x0002); // shinai
-		output().set_led_value(2,    data & 0x0004); // payout
-		output().set_led_value(3,    data & 0x0008); // go
-		output().set_led_value(4,    data & 0x0010); // 1 bet
-		output().set_led_value(5,    data & 0x0020); // medal
+		for (int i = 0; i < 6; i++)
+			m_ledout[i] = BIT(data, i);
+
 		m_hopper    =                   data & 0x0040;  // hopper
-		output().set_led_value(6,    data & 0x0080); // 3 bet
+		m_ledout[6] =    BIT(data, 7); // 3 bet
 	}
 
 //  popmessage("led %04X", data);
@@ -1179,12 +1175,9 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0,    data & 0x0001); // pac-man
-		output().set_led_value(1,    data & 0x0002); // ms. pac-man
-		output().set_led_value(2,    data & 0x0004); // payout
-		output().set_led_value(3,    data & 0x0008); // start
-		output().set_led_value(4,    data & 0x0010); // bet
-		output().set_led_value(5,    data & 0x0020); // medal
+		for (int i = 0; i < 6; i++)
+			m_ledout[i] = BIT(data, i);
+
 		m_hopper    =                   data & 0x0040;  // hopper
 	}
 
@@ -2090,6 +2083,12 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 	m_agallet_vblank_irq = 0;
 }
 
+MACHINE_START_MEMBER(cave_state,has_led)
+{
+	m_ledout.resolve();
+	MACHINE_START_CALL_MEMBER(cave);
+}
+
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
@@ -2403,7 +2402,7 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_DEVICE_PROGRAM_MAP(korokoro_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,has_led)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -2569,7 +2568,7 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,has_led)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2592,17 +2591,14 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// oki2 chip is present but its rom socket is unpopulated
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::paceight)
@@ -2629,7 +2625,7 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,has_led)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2668,12 +2664,10 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
 
@@ -2829,7 +2823,7 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,has_led)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2852,12 +2846,10 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
@@ -2885,7 +2877,7 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_START_OVERRIDE(cave_state,has_led)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2908,12 +2900,10 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
