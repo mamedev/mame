@@ -516,7 +516,7 @@ void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 	for (i=0; i<16; i++)
 	{
 		m_Lamps[16*(m_lamp_strobe+i)] = data & 1;
-		output().set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
+		m_lamp_output[(16*lamp_strobe)+i] = m_Lamps[(16*lamp_strobe)+i];
 		data = data >> 1;
 	}
 }

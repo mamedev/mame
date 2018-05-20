@@ -168,72 +168,14 @@ class ddenlovr_state : public dynax_state
 {
 public:
 	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dynax_state(mconfig, type, tag),
-		m_protection1(*this, "protection1"),
-		m_protection2(*this, "protection2"),
-		m_soundlatch(*this, "soundlatch") { }
+		: dynax_state(mconfig, type, tag)
+		, m_protection1(*this, "protection1")
+		, m_protection2(*this, "protection2")
+		, m_soundlatch(*this, "soundlatch")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	void set_blitter_irq(write_line_delegate &&handler) { m_blitter_irq_handler = std::move(handler); }
-
-	write_line_delegate m_blitter_irq_handler;
-
-	optional_shared_ptr<uint16_t> m_protection1;
-	optional_shared_ptr<uint16_t> m_protection2;
-
-	optional_device<generic_latch_8_device> m_soundlatch;
-
-	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
-
-	/* blitter (TODO: merge with the dynax.h, where possible) */
-	int m_extra_layers;
-	int m_ddenlovr_dest_layer;
-	int m_ddenlovr_blit_flip;
-	int m_ddenlovr_blit_x;
-	int m_ddenlovr_blit_y;
-	int m_ddenlovr_blit_address;
-	int m_ddenlovr_blit_pen;
-	int m_ddenlovr_blit_pen_mode;
-	int m_ddenlovr_blitter_irq_flag;
-	int m_ddenlovr_blitter_irq_enable;
-	int m_ddenlovr_rect_width;
-	int m_ddenlovr_rect_height;
-	int m_ddenlovr_clip_width;
-	int m_ddenlovr_clip_height;
-	int m_ddenlovr_line_length;
-	int m_ddenlovr_clip_ctrl;
-	int m_ddenlovr_clip_x;
-	int m_ddenlovr_clip_y;
-	int m_ddenlovr_scroll[8*2];
-	int m_ddenlovr_priority;
-	int m_ddenlovr_priority2;
-	int m_ddenlovr_bgcolor;
-	int m_ddenlovr_bgcolor2;
-	int m_ddenlovr_layer_enable;
-	int m_ddenlovr_layer_enable2;
-	int m_ddenlovr_palette_base[8];
-	int m_ddenlovr_palette_mask[8];
-	int m_ddenlovr_transparency_pen[8];
-	int m_ddenlovr_transparency_mask[8];
-	int m_ddenlovr_blit_latch;
-	int m_ddenlovr_blit_pen_mask;   // not implemented
-	int m_ddenlovr_blit_rom_bits;           // usually 8, 16 in hanakanz
-	const int *m_ddenlovr_blit_commands;
-	int m_ddenlovr_blit_regs[2];
-
-	/* ddenlovr misc (TODO: merge with dynax.h, where possible) */
-	uint8_t m_palram[0x200];
-	int m_okibank;
-	uint8_t m_prot_val;
-	uint16_t m_prot_16;
-	uint16_t m_quiz365_protection[2];
-
-	uint16_t m_mmpanic_leds;  /* A led for each of the 9 buttons */
-	uint8_t m_funkyfig_lockout;
-	uint8_t m_romdata[2];
-	int m_palette_index;
-	uint8_t m_hginga_rombank;
-	uint8_t m_mjflove_irq_cause;
-	uint8_t m_daimyojn_palette_sel;
 
 	DECLARE_MACHINE_START(ddenlovr);
 	DECLARE_MACHINE_RESET(ddenlovr);
@@ -532,6 +474,67 @@ public:
 	void sryudens_map(address_map &map);
 	void sryudens_portmap(address_map &map);
 	void ultrchmp_map(address_map &map);
+
+protected:
+	write_line_delegate m_blitter_irq_handler;
+
+	optional_shared_ptr<uint16_t> m_protection1;
+	optional_shared_ptr<uint16_t> m_protection2;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	output_finder<2> m_led;
+	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
+
+	/* blitter (TODO: merge with the dynax.h, where possible) */
+	int m_extra_layers;
+	int m_ddenlovr_dest_layer;
+	int m_ddenlovr_blit_flip;
+	int m_ddenlovr_blit_x;
+	int m_ddenlovr_blit_y;
+	int m_ddenlovr_blit_address;
+	int m_ddenlovr_blit_pen;
+	int m_ddenlovr_blit_pen_mode;
+	int m_ddenlovr_blitter_irq_flag;
+	int m_ddenlovr_blitter_irq_enable;
+	int m_ddenlovr_rect_width;
+	int m_ddenlovr_rect_height;
+	int m_ddenlovr_clip_width;
+	int m_ddenlovr_clip_height;
+	int m_ddenlovr_line_length;
+	int m_ddenlovr_clip_ctrl;
+	int m_ddenlovr_clip_x;
+	int m_ddenlovr_clip_y;
+	int m_ddenlovr_scroll[8*2];
+	int m_ddenlovr_priority;
+	int m_ddenlovr_priority2;
+	int m_ddenlovr_bgcolor;
+	int m_ddenlovr_bgcolor2;
+	int m_ddenlovr_layer_enable;
+	int m_ddenlovr_layer_enable2;
+	int m_ddenlovr_palette_base[8];
+	int m_ddenlovr_palette_mask[8];
+	int m_ddenlovr_transparency_pen[8];
+	int m_ddenlovr_transparency_mask[8];
+	int m_ddenlovr_blit_latch;
+	int m_ddenlovr_blit_pen_mask;   // not implemented
+	int m_ddenlovr_blit_rom_bits;           // usually 8, 16 in hanakanz
+	const int *m_ddenlovr_blit_commands;
+	int m_ddenlovr_blit_regs[2];
+
+	/* ddenlovr misc (TODO: merge with dynax.h, where possible) */
+	uint8_t m_palram[0x200];
+	int m_okibank;
+	uint8_t m_prot_val;
+	uint16_t m_prot_16;
+	uint16_t m_quiz365_protection[2];
+
+	uint16_t m_mmpanic_leds;  /* A led for each of the 9 buttons */
+	uint8_t m_funkyfig_lockout;
+	uint8_t m_romdata[2];
+	int m_palette_index;
+	uint8_t m_hginga_rombank;
+	uint8_t m_mjflove_irq_cause;
+	uint8_t m_daimyojn_palette_sel;
+
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -2386,7 +2389,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_blitter_irq)
 
 void ddenlovr_state::mmpanic_update_leds()
 {
-	output().set_led_value(0, m_mmpanic_leds);
+	m_led[0] = m_mmpanic_leds;
 }
 
 /* leds 1-8 */
@@ -2409,7 +2412,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_lockout_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);
 		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
-		output().set_led_value(1, (~data) & 0x04);
+		m_led[1] = BIT(~data, 2);
 	}
 }
 
@@ -3896,7 +3899,7 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 {
 	m_prot_val = data;
 
-	output().set_led_value(0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
+	m_led[0] = BIT(data, 0);  // led? 1 in-game, 0 in service mode / while booting
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // coin-out
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // coin-in
@@ -9573,6 +9576,8 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 {
+	m_led.resolve();
+
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));
 	save_item(NAME(m_keyb));

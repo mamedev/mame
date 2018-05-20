@@ -428,13 +428,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // start
-		output().set_led_value(1, data & 0x0002 );  // small
-		output().set_led_value(2, data & 0x0004 );  // bet
-		output().set_led_value(3, data & 0x0008 );  // big
-		output().set_led_value(4, data & 0x0010 );  // double up
-		output().set_led_value(5, data & 0x0020 );  // collect
-		output().set_led_value(6, data & 0x0040 );  // bet cancel
+		m_led[0] = BIT(data, 0);  // start
+		m_led[1] = BIT(data, 1);  // small
+		m_led[2] = BIT(data, 2);  // bet
+		m_led[3] = BIT(data, 3);  // big
+		m_led[4] = BIT(data, 4);  // double up
+		m_led[5] = BIT(data, 5);  // collect
+		m_led[6] = BIT(data, 6);  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -556,9 +556,9 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps1_w)
 	COMBINE_DATA(&m_lamps1);
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // Lamp 1 |
-		output().set_led_value(1, data & 0x0002 );  // Lamp 2 |- Camera Lamps
-		output().set_led_value(2, data & 0x0004 );  // Lamp 3 |
+		m_led[0] = BIT(data, 0);  // Lamp 1 |
+		m_led[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
+		m_led[2] = BIT(data, 2);  // Lamp 3 |
 		//                        data & 0x0008 );  // Degauss
 	}
 	staraudi_debug_outputs();
@@ -570,8 +570,8 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps2_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		//                        data & 0x0020 );  // ? Always On
-		output().set_led_value(3, data & 0x0040 );  // 2P Switch Lamp
-		output().set_led_value(4, data & 0x0080 );  // 1P Switch Lamp
+		m_led[3] = BIT(data, 6);  // 2P Switch Lamp
+		m_led[4] = BIT(data, 7);  // 1P Switch Lamp
 	}
 	staraudi_debug_outputs();
 }
@@ -651,14 +651,14 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp1_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value(0, data & 0x0001 ); //
-		output().set_lamp_value(1, data & 0x0002 ); //
-		output().set_lamp_value(2, data & 0x0004 ); //
-		output().set_lamp_value(3, data & 0x0008 ); //
-		output().set_lamp_value(4, data & 0x0010 ); //
-		output().set_lamp_value(5, data & 0x0020 ); //
-		output().set_lamp_value(6, data & 0x0040 ); //
-		output().set_lamp_value(7, data & 0x0080 ); //
+		m_lamp[0] = BIT(data, 0); //
+		m_lamp[1] = BIT(data, 1); //
+		m_lamp[2] = BIT(data, 2); //
+		m_lamp[3] = BIT(data, 3); //
+		m_lamp[4] = BIT(data, 4); //
+		m_lamp[5] = BIT(data, 5); //
+		m_lamp[6] = BIT(data, 6); //
+		m_lamp[7] = BIT(data, 7); //
 	}
 
 //  popmessage("LAMP1 %04X", data);
@@ -668,9 +668,9 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value( 8, data & 0x0001 ); // on/off lamp (throughout)
-		output().set_lamp_value( 9, data & 0x0002 ); // bet lamp
-		output().set_lamp_value(10, data & 0x0004 ); // payout lamp
+		m_lamp[8] = BIT(data, 0); // on/off lamp (throughout)
+		m_lamp[9] = BIT(data, 1); // bet lamp
+		m_lamp[10] = BIT(data, 2); // payout lamp
 		m_dispenser->motor_w(       data & 0x0008 ); // coin out motor
 		machine().bookkeeping().coin_counter_w(0,  data & 0x0010); // coin out counter
 		//                          data & 0x0020 ); // on credit increase
@@ -993,14 +993,14 @@ WRITE16_MEMBER(seta2_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
-	output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
+	m_led[0] = BIT(~data, 0); // win lamp (red)
+	m_led[1] = BIT(~data, 1); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	output().set_led_value(2, (~data) & 0x10 );
-	output().set_led_value(3, (~data) & 0x20 );
-	output().set_led_value(4, (~data) & 0x40 );
-	output().set_led_value(5, (~data) & 0x80 );
+	m_led[2] = BIT(~data, 4);
+	m_led[3] = BIT(~data, 5);
+	m_led[4] = BIT(~data, 6);
+	m_led[5] = BIT(~data, 7);
 
 	funcube_debug_outputs();
 }
@@ -1023,7 +1023,7 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	output().set_led_value(6, (~data) & 0x08 );
+	m_led[6] = BIT(~data, 3);
 
 	funcube_debug_outputs();
 }

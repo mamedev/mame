@@ -41,6 +41,7 @@ public:
 		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
 
@@ -85,6 +86,7 @@ private:
 	required_device<beep_device> m_beeper;
 	optional_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
+	output_finder<116> m_led;
 
 	uint8_t m_lcd_mux;
 	uint8_t m_input_mux;
@@ -104,6 +106,7 @@ private:
 void mephisto_montec_state::machine_start()
 {
 	m_digits.resolve();
+	m_led.resolve();
 
 	save_item(NAME(m_lcd_mux));
 	save_item(NAME(m_input_mux));
@@ -133,7 +136,7 @@ WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
 	for(int i=0; i<4; i++)
 		for(int j=0; j<4; j++)
 			if (BIT(data, i))
-				output().set_led_value(100 + i * 4 + j, BIT(data, 4 + j) ? 0 : 1);
+				m_led[100 + i * 4 + j] = BIT(data, 4 + j);
 }
 
 
@@ -228,9 +231,9 @@ WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 		{
 			if (!BIT(m_leds_mux, i))
 			{
-				output().set_led_value(100 + i, BIT(data, 0) | BIT(data, 1));
-				output().set_led_value(0 + i, BIT(data, 2) | BIT(data, 3));
-				output().set_led_value(8 + i, BIT(data, 4) | BIT(data, 5));
+				m_led[100 + i] = BIT(data, 0) | BIT(data, 1);
+				m_led[0 + i] = BIT(data, 2) | BIT(data, 3);
+				m_led[8 + i] = BIT(data, 4) | BIT(data, 5);
 			}
 		}
 	}
@@ -299,9 +302,9 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_board_mux_w)
 
 	for (int i=0; i<8; i++)
 	{
-		if (m_leds_mux & 0x03)      output().set_led_value(100 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x0c)      output().set_led_value(  8 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x30)      output().set_led_value(  0 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
+		if (m_leds_mux & 0x03)      m_led[100 + i] = BIT(~m_smondial_board_mux, i);
+		if (m_leds_mux & 0x0c)      m_led[  8 + i] = BIT(~m_smondial_board_mux, i);
+		if (m_leds_mux & 0x30)      m_led[  0 + i] = BIT(~m_smondial_board_mux, i);
 	}
 }
 
@@ -336,9 +339,9 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 	{
 		if (!BIT(leds_data, i))
 		{
-			if (data & 0x10)    output().set_led_value(100 + i, 1);
-			if (data & 0x20)    output().set_led_value(  8 + i, 1);
-			if (data & 0x40)    output().set_led_value(  0 + i, 1);
+			if (data & 0x10)    m_led[100 + i] = 1;
+			if (data & 0x20)    m_led[  8 + i] = 1;
+			if (data & 0x40)    m_led[  0 + i] = 1;
 		}
 	}
 
@@ -360,9 +363,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_montec_state::refresh_leds)
 {
 	for (int i=0; i<8; i++)
 	{
-		output().set_led_value(0 + i, 0);
-		output().set_led_value(8 + i, 0);
-		output().set_led_value(100 + i, 0);
+		m_led[0 + i] = 0;
+		m_led[8 + i] = 0;
+		m_led[100 + i] = 0;
 	}
 }
 

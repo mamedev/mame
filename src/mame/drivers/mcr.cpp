@@ -414,24 +414,24 @@ READ8_MEMBER(mcr_dpoker_state::ip0_r)
 WRITE8_MEMBER(mcr_dpoker_state::lamps1_w)
 {
 	// cpanel button lamps (white)
-	output().set_lamp_value(0, data >> 0 & 1); // hold 1
-	output().set_lamp_value(1, data >> 4 & 1); // hold 2
-	output().set_lamp_value(2, data >> 5 & 1); // hold 3
-	output().set_lamp_value(3, data >> 6 & 1); // hold 4
-	output().set_lamp_value(4, data >> 7 & 1); // hold 5
-	output().set_lamp_value(5, data >> 1 & 1); // deal
-	output().set_lamp_value(6, data >> 2 & 1); // cancel
-	output().set_lamp_value(7, data >> 3 & 1); // stand
+	m_lamp[0] = BIT(data, 0); // hold 1
+	m_lamp[1] = BIT(data, 4); // hold 2
+	m_lamp[2] = BIT(data, 5); // hold 3
+	m_lamp[3] = BIT(data, 6); // hold 4
+	m_lamp[4] = BIT(data, 7); // hold 5
+	m_lamp[5] = BIT(data, 1); // deal
+	m_lamp[6] = BIT(data, 2); // cancel
+	m_lamp[7] = BIT(data, 3); // stand
 }
 
 WRITE8_MEMBER(mcr_dpoker_state::lamps2_w)
 {
 	// d5: button lamp: service or change
-	output().set_lamp_value(8, data >> 5 & 1);
+	m_lamp[8] = BIT(data, 5);
 
 	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
 	for (int i = 0; i < 5; i++)
-		output().set_lamp_value(9 + i, data >> i & 1);
+		m_lamp[9 + i] = BIT(data, i);
 
 	// d6, d7: unused?
 }

@@ -31,12 +31,14 @@
 class chance32_state : public driver_device
 {
 public:
-	chance32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	chance32_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
 	{
@@ -54,6 +56,18 @@ public:
 	DECLARE_WRITE8_MEMBER(muxout_w);
 	DECLARE_READ8_MEMBER(mux_r);
 
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void chance32(machine_config &config);
+	void chance32_map(address_map &map);
+	void chance32_portmap(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
@@ -61,17 +75,9 @@ public:
 	required_shared_ptr<uint8_t> m_bgram;
 
 	uint8_t mux_data;
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void chance32(machine_config &config);
-	void chance32_map(address_map &map);
-	void chance32_portmap(address_map &map);
+	output_finder<13> m_lamp;
 };
 
 
@@ -173,13 +179,13 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	if (data & 1)   // bit 0 is the mux selector.
 
 	{
-		output().set_lamp_value(0, (data >> 1) & 1);  /* Lamp 0 - Small / Big */
-		output().set_lamp_value(1, (data >> 2) & 1);  /* Lamp 1 - Big / Small */
-		output().set_lamp_value(2, (data >> 3) & 1);  /* Lamp 2 - Hold 5 */
-		output().set_lamp_value(3, (data >> 4) & 1);  /* Lamp 3 - Hold 4 */
-		output().set_lamp_value(4, (data >> 5) & 1);  /* Lamp 4 - Hold 3 */
-		output().set_lamp_value(5, (data >> 6) & 1);  /* Lamp 5 - Hold 2 */
-		output().set_lamp_value(6, (data >> 7) & 1);  /* Lamp 6 - Hold 1 */
+		m_lamp[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
+		m_lamp[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
+		m_lamp[2] = BIT(data, 3);  /* Lamp 2 - Hold 5 */
+		m_lamp[3] = BIT(data, 4);  /* Lamp 3 - Hold 4 */
+		m_lamp[4] = BIT(data, 5);  /* Lamp 4 - Hold 3 */
+		m_lamp[5] = BIT(data, 6);  /* Lamp 5 - Hold 2 */
+		m_lamp[6] = BIT(data, 7);  /* Lamp 6 - Hold 1 */
 
 		logerror("Lamps A: %02x\n", data);
 	}
@@ -187,12 +193,12 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	else
 	{
 		// bit 1 is unknown...
-		output().set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 - Fever! */
-		output().set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 - Cancel */
-		output().set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 - D-Up / Take */
-		output().set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 - Take / D-Up */
-		output().set_lamp_value(11, (data >> 6) & 1); /* Lamp 11 - Deal */
-		output().set_lamp_value(12, (data >> 7) & 1); /* Lamp 12 - Bet */
+		m_lamp[7] = BIT(data, 2);  /* Lamp 7 - Fever! */
+		m_lamp[8] = BIT(data, 3);  /* Lamp 8 - Cancel */
+		m_lamp[9] = BIT(data, 4);  /* Lamp 9 - D-Up / Take */
+		m_lamp[10] = BIT(data, 5); /* Lamp 10 - Take / D-Up */
+		m_lamp[11] = BIT(data, 6); /* Lamp 11 - Deal */
+		m_lamp[12] = BIT(data, 7); /* Lamp 12 - Bet */
 
 		logerror("Lamps B: %02x\n", data);
 	}
@@ -442,6 +448,7 @@ GFXDECODE_END
 
 void chance32_state::machine_start()
 {
+	m_lamp.resolve();
 }
 
 void chance32_state::machine_reset()

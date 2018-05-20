@@ -22,29 +22,15 @@
 class mhavoc_state : public driver_device
 {
 public:
-	mhavoc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mhavoc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_zram0(*this, "zram0"),
 		m_zram1(*this, "zram1"),
 		m_alpha(*this, "alpha"),
-		m_gamma(*this, "gamma"){ }
+		m_gamma(*this, "gamma"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
-	required_shared_ptr<uint8_t> m_zram0;
-	required_shared_ptr<uint8_t> m_zram1;
-	required_device<cpu_device> m_alpha;
-	optional_device<cpu_device> m_gamma;
-	uint8_t m_alpha_data;
-	uint8_t m_alpha_rcvd;
-	uint8_t m_alpha_xmtd;
-	uint8_t m_gamma_data;
-	uint8_t m_gamma_rcvd;
-	uint8_t m_gamma_xmtd;
-	uint8_t m_player_1;
-	uint8_t m_alpha_irq_clock;
-	uint8_t m_alpha_irq_clock_enable;
-	uint8_t m_gamma_irq_clock;
-	uint8_t m_has_gamma_cpu;
-	uint8_t m_speech_write_buffer;
 	DECLARE_READ8_MEMBER(dual_pokey_r);
 	DECLARE_WRITE8_MEMBER(dual_pokey_w);
 	DECLARE_WRITE8_MEMBER(mhavoc_alpha_irq_ack_w);
@@ -70,8 +56,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	void init_mhavocrv();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
 	void alphaone(machine_config &config);
@@ -80,4 +64,26 @@ public:
 	void alpha_map(address_map &map);
 	void alphaone_map(address_map &map);
 	void gamma_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_shared_ptr<uint8_t> m_zram0;
+	required_shared_ptr<uint8_t> m_zram1;
+	required_device<cpu_device> m_alpha;
+	optional_device<cpu_device> m_gamma;
+	output_finder<2> m_lamp;
+	uint8_t m_alpha_data;
+	uint8_t m_alpha_rcvd;
+	uint8_t m_alpha_xmtd;
+	uint8_t m_gamma_data;
+	uint8_t m_gamma_rcvd;
+	uint8_t m_gamma_xmtd;
+	uint8_t m_player_1;
+	uint8_t m_alpha_irq_clock;
+	uint8_t m_alpha_irq_clock_enable;
+	uint8_t m_gamma_irq_clock;
+	uint8_t m_has_gamma_cpu;
+	uint8_t m_speech_write_buffer;
 };

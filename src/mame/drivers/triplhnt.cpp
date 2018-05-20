@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
 
 WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
 {
-	output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -111,6 +111,12 @@ READ8_MEMBER(triplhnt_state::da_latch_r)
 	/* the following is a slight simplification */
 
 	return (offset & 1) ? cross_x : cross_y;
+}
+
+
+void triplhnt_state::machine_start()
+{
+	m_lamp.resolve();
 }
 
 

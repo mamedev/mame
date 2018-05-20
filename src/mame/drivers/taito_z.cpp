@@ -1306,8 +1306,8 @@ WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	output().set_lamp_value(0, (m_cpua_ctrl & 0x20) ? 1 : 0);
-	output().set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
+	m_lamp[0] = BIT(m_cpua_ctrl, 5);
+	m_lamp[1] = BIT(m_cpua_ctrl, 6);
 }
 
 WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)

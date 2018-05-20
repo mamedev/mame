@@ -58,9 +58,9 @@ WRITE8_MEMBER(poolshrk_state::da_latch_w)
 WRITE8_MEMBER(poolshrk_state::led_w)
 {
 	if (offset & 2)
-		output().set_led_value(0, offset & 1);
+		m_led[0] = BIT(offset, 0);
 	if (offset & 4)
-		output().set_led_value(1, offset & 1);
+		m_led[1] = BIT(offset, 0);
 }
 
 

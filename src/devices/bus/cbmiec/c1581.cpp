@@ -171,10 +171,10 @@ WRITE8_MEMBER( c1581_device::cia_pa_w )
 	m_floppy->mon_w(BIT(data, 2));
 
 	// power led
-	machine().output().set_led_value(LED_POWER, BIT(data, 5));
+	m_led[LED_POWER] = BIT(data, 5);
 
 	// activity led
-	machine().output().set_led_value(LED_ACT, BIT(data, 6));
+	m_led[LED_ACT] = BIT(data, 6);
 }
 
 READ8_MEMBER( c1581_device::cia_pb_r )
@@ -326,6 +326,7 @@ c1581_device::c1581_device(const machine_config &mconfig, device_type type, cons
 		m_fdc(*this, WD1772_TAG),
 		m_floppy(*this, WD1772_TAG":0:35dd"),
 		m_address(*this, "ADDRESS"),
+		m_led(*this, "led%u", 0U),
 		m_data_out(0),
 		m_atn_ack(0),
 		m_fast_ser_dir(0),
@@ -354,6 +355,8 @@ c1563_device::c1563_device(const machine_config &mconfig, const char *tag, devic
 
 void c1581_device::device_start()
 {
+	m_led.resolve();
+
 	// state saving
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_atn_ack));

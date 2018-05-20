@@ -302,13 +302,12 @@
 class notechan_state : public driver_device
 {
 public:
-	notechan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	notechan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki;
+		m_oki(*this, "oki"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(out_f8_w);
 	DECLARE_WRITE8_MEMBER(out_f9_w);
@@ -317,6 +316,14 @@ public:
 	void notechan(machine_config &config);
 	void notechan_map(address_map &map);
 	void notechan_port_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
+	output_finder<32> m_lamp;
 };
 
 
@@ -348,28 +355,28 @@ void notechan_state::notechan_port_map(address_map &map)
 
 WRITE8_MEMBER(notechan_state::out_f8_w)
 {
-	output().set_lamp_value(0, data & 1 );
-	output().set_lamp_value(1, data >> 1 & 1);
-	output().set_lamp_value(2, data >> 2 & 1);
-	output().set_lamp_value(3, data >> 3 & 1);
-	output().set_lamp_value(4, data >> 4 & 1);
-	output().set_lamp_value(5, data >> 5 & 1);
-	output().set_lamp_value(6, data >> 6 & 1);
-	output().set_lamp_value(7, data >> 7 & 1);
+	m_lamp[0] = BIT(data, 0);
+	m_lamp[1] = BIT(data, 1);
+	m_lamp[2] = BIT(data, 2);
+	m_lamp[3] = BIT(data, 3);
+	m_lamp[4] = BIT(data, 4);
+	m_lamp[5] = BIT(data, 5);
+	m_lamp[6] = BIT(data, 6);
+	m_lamp[7] = BIT(data, 7);
 
 	logerror("Output %02X to $F8\n", data);
 }
 
 WRITE8_MEMBER(notechan_state::out_f9_w)
 {
-	output().set_lamp_value(8, data & 1 );
-	output().set_lamp_value(9, data >> 1 & 1);
-	output().set_lamp_value(10, data >> 2 & 1);
-	output().set_lamp_value(11, data >> 3 & 1);
-	output().set_lamp_value(12, data >> 4 & 1);
-	output().set_lamp_value(13, data >> 5 & 1);
-	output().set_lamp_value(14, data >> 6 & 1);
-	output().set_lamp_value(15, data >> 7 & 1);
+	m_lamp[8] = BIT(data, 0);
+	m_lamp[9] = BIT(data, 1);
+	m_lamp[10] = BIT(data, 2);
+	m_lamp[11] = BIT(data, 3);
+	m_lamp[12] = BIT(data, 4);
+	m_lamp[13] = BIT(data, 5);
+	m_lamp[14] = BIT(data, 6);
+	m_lamp[15] = BIT(data, 7);
 
 	logerror("Output %02X to $F9\n", data);
 }
@@ -378,28 +385,28 @@ WRITE8_MEMBER(notechan_state::out_fa_w)
 {
 	m_oki->set_rom_bank(BIT(data, 5));
 
-	output().set_lamp_value(16, data & 1 );
-	output().set_lamp_value(17, data >> 1 & 1);
-	output().set_lamp_value(18, data >> 2 & 1);
-	output().set_lamp_value(19, data >> 3 & 1);
-	output().set_lamp_value(20, data >> 4 & 1);
-	output().set_lamp_value(21, data >> 5 & 1);
-	output().set_lamp_value(22, data >> 6 & 1);
-	output().set_lamp_value(23, data >> 7 & 1);
+	m_lamp[16] = BIT(data, 0);
+	m_lamp[17] = BIT(data, 1);
+	m_lamp[18] = BIT(data, 2);
+	m_lamp[19] = BIT(data, 3);
+	m_lamp[20] = BIT(data, 4);
+	m_lamp[21] = BIT(data, 5);
+	m_lamp[22] = BIT(data, 6);
+	m_lamp[23] = BIT(data, 7);
 
 	logerror("Output %02X to $FA\n", data);
 }
 
 WRITE8_MEMBER(notechan_state::out_ff_w)
 {
-	output().set_lamp_value(24, data & 1 );
-	output().set_lamp_value(25, data >> 1 & 1);
-	output().set_lamp_value(26, data >> 2 & 1);
-	output().set_lamp_value(27, data >> 3 & 1);
-	output().set_lamp_value(28, data >> 4 & 1);
-	output().set_lamp_value(29, data >> 5 & 1);
-	output().set_lamp_value(30, data >> 6 & 1);
-	output().set_lamp_value(31, data >> 7 & 1);
+	m_lamp[24] = BIT(data, 0);
+	m_lamp[25] = BIT(data, 1);
+	m_lamp[26] = BIT(data, 2);
+	m_lamp[27] = BIT(data, 3);
+	m_lamp[28] = BIT(data, 4);
+	m_lamp[29] = BIT(data, 5);
+	m_lamp[30] = BIT(data, 6);
+	m_lamp[31] = BIT(data, 7);
 
 	logerror("Output %02X to $FF\n", data);
 }

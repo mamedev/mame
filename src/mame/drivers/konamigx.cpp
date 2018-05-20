@@ -978,7 +978,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 // cabinet lamps for type 1 games
 WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 {
-	output().set_led_value(0, (data>>24)&1);
+	m_lamp = BIT(data, 24);
 }
 
 /**********************************************************************************/
@@ -3727,6 +3727,8 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 

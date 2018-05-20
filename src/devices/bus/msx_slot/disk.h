@@ -109,6 +109,7 @@ protected:
 	virtual void device_start() override;
 
 	wd_fdc_analog_device_base *m_fdc;
+	output_finder<> m_led;
 };
 
 

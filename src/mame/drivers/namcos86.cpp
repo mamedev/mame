@@ -284,8 +284,8 @@ WRITE8_MEMBER(namcos86_state::coin_w)
 
 WRITE8_MEMBER(namcos86_state::led_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_led[0] = BIT(data, 3);
+	m_led[1] = BIT(data, 4);
 }
 
 

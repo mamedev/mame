@@ -100,8 +100,8 @@ struct CPS1config
 class cps_state : public driver_device
 {
 public:
-	cps_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cps_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_gfxram(*this, "gfxram"),
 		m_cps_a_regs(*this, "cps_a_regs"),
@@ -131,117 +131,9 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_region_key(*this, "key"),
-		m_region_stars(*this, "stars")
+		m_region_stars(*this, "stars"),
+		m_led_cboard(*this, "led_cboard%u", 0U)
 	{ }
-
-	/* memory pointers */
-	// cps1
-	optional_shared_ptr<uint16_t> m_mainram;
-	required_shared_ptr<uint16_t> m_gfxram;
-	required_shared_ptr<uint16_t> m_cps_a_regs;
-	required_shared_ptr<uint16_t> m_cps_b_regs;
-	uint16_t *     m_scroll1;
-	uint16_t *     m_scroll2;
-	uint16_t *     m_scroll3;
-	uint16_t *     m_obj;
-	uint16_t *     m_other;
-	std::unique_ptr<uint16_t[]>     m_buffered_obj;
-	optional_shared_ptr<uint8_t> m_qsound_sharedram1;
-	optional_shared_ptr<uint8_t> m_qsound_sharedram2;
-	std::unique_ptr<uint8_t[]> m_decrypt_kabuki;
-	// cps2
-	optional_shared_ptr<uint16_t> m_objram1;
-	optional_shared_ptr<uint16_t> m_objram2;
-	optional_shared_ptr<uint16_t> m_output;
-
-	optional_ioport m_io_in0;
-	optional_ioport m_io_in1;
-	std::unique_ptr<uint16_t[]>     m_cps2_buffered_obj;
-	// game-specific
-	std::unique_ptr<uint16_t[]>    m_gigaman2_dummyqsound_ram;
-	uint16_t  sf2ceblp_prot;
-
-	/* video-related */
-	tilemap_t      *m_bg_tilemap[3];
-	int          m_scanline1;
-	int          m_scanline2;
-	int          m_scancalls;
-
-	int          m_scroll1x;
-	int          m_scroll1y;
-	int          m_scroll2x;
-	int          m_scroll2y;
-	int          m_scroll3x;
-	int          m_scroll3y;
-
-	int          m_stars_enabled[2];        /* Layer enabled [Y/N] */
-	int          m_stars1x;
-	int          m_stars1y;
-	int          m_stars2x;
-	int          m_stars2y;
-	int          m_last_sprite_offset;      /* Offset of the last sprite */
-	int          m_cps2_last_sprite_offset; /* Offset of the last sprite */
-	int          m_pri_ctrl;                /* Sprite layer priorities */
-	int          m_objram_bank;
-
-	/* misc */
-	int          m_readpaddle;  // pzloop2
-	int          m_cps2networkpresent;
-	int          m_cps2digitalvolumelevel;
-	int          m_cps2disabledigitalvolume;
-	emu_timer    *m_digital_volume_timer;
-	int          m_cps2_dial_type;
-	int          m_ecofghtr_dial_direction0;
-	int          m_ecofghtr_dial_direction1;
-	int          m_ecofghtr_dial_last0;
-	int          m_ecofghtr_dial_last1;
-
-
-	/* fcrash sound hw */
-	int          m_sample_buffer1;
-	int          m_sample_buffer2;
-	int          m_sample_select1;
-	int          m_sample_select2;
-
-	/* video config (never changed after video_start) */
-	const struct CPS1config *m_game_config;
-	int          m_scroll_size;
-	int          m_obj_size;
-	int          m_cps2_obj_size;
-	int          m_other_size;
-	int          m_palette_align;
-	int          m_palette_size;
-	int          m_stars_rom_size;
-	uint8_t        m_empty_tile[32*32];
-	int          m_cps_version;
-
-	/* fcrash video config */
-	uint8_t        m_layer_enable_reg;
-	uint8_t        m_layer_mask_reg[4];
-	int          m_layer_scroll1x_offset;
-	int          m_layer_scroll2x_offset;
-	int          m_layer_scroll3x_offset;
-	int          m_sprite_base;
-	int          m_sprite_list_end_marker;
-	int          m_sprite_x_offset;
-	std::unique_ptr<uint16_t[]> m_bootleg_sprite_ram;
-	std::unique_ptr<uint16_t[]> m_bootleg_work_ram;
-
-	/* devices */
-	required_device<m68000_base_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki;
-	optional_device<m48t35_device> m_m48t35;
-	optional_device<msm5205_device> m_msm_1;    // fcrash
-	optional_device<msm5205_device> m_msm_2;    // fcrash
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<generic_latch_8_device> m_soundlatch2;
-	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
-	optional_memory_region m_region_key;
-	optional_memory_region m_region_stars;
 
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
@@ -463,6 +355,119 @@ public:
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void varthb_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led_cboard.resolve(); }
+
+	/* memory pointers */
+	// cps1
+	optional_shared_ptr<uint16_t> m_mainram;
+	required_shared_ptr<uint16_t> m_gfxram;
+	required_shared_ptr<uint16_t> m_cps_a_regs;
+	required_shared_ptr<uint16_t> m_cps_b_regs;
+	uint16_t *     m_scroll1;
+	uint16_t *     m_scroll2;
+	uint16_t *     m_scroll3;
+	uint16_t *     m_obj;
+	uint16_t *     m_other;
+	std::unique_ptr<uint16_t[]>     m_buffered_obj;
+	optional_shared_ptr<uint8_t> m_qsound_sharedram1;
+	optional_shared_ptr<uint8_t> m_qsound_sharedram2;
+	std::unique_ptr<uint8_t[]> m_decrypt_kabuki;
+	// cps2
+	optional_shared_ptr<uint16_t> m_objram1;
+	optional_shared_ptr<uint16_t> m_objram2;
+	optional_shared_ptr<uint16_t> m_output;
+
+	optional_ioport m_io_in0;
+	optional_ioport m_io_in1;
+	std::unique_ptr<uint16_t[]>     m_cps2_buffered_obj;
+	// game-specific
+	std::unique_ptr<uint16_t[]>    m_gigaman2_dummyqsound_ram;
+	uint16_t  sf2ceblp_prot;
+
+	/* video-related */
+	tilemap_t      *m_bg_tilemap[3];
+	int          m_scanline1;
+	int          m_scanline2;
+	int          m_scancalls;
+
+	int          m_scroll1x;
+	int          m_scroll1y;
+	int          m_scroll2x;
+	int          m_scroll2y;
+	int          m_scroll3x;
+	int          m_scroll3y;
+
+	int          m_stars_enabled[2];        /* Layer enabled [Y/N] */
+	int          m_stars1x;
+	int          m_stars1y;
+	int          m_stars2x;
+	int          m_stars2y;
+	int          m_last_sprite_offset;      /* Offset of the last sprite */
+	int          m_cps2_last_sprite_offset; /* Offset of the last sprite */
+	int          m_pri_ctrl;                /* Sprite layer priorities */
+	int          m_objram_bank;
+
+	/* misc */
+	int          m_readpaddle;  // pzloop2
+	int          m_cps2networkpresent;
+	int          m_cps2digitalvolumelevel;
+	int          m_cps2disabledigitalvolume;
+	emu_timer    *m_digital_volume_timer;
+	int          m_cps2_dial_type;
+	int          m_ecofghtr_dial_direction0;
+	int          m_ecofghtr_dial_direction1;
+	int          m_ecofghtr_dial_last0;
+	int          m_ecofghtr_dial_last1;
+
+
+	/* fcrash sound hw */
+	int          m_sample_buffer1;
+	int          m_sample_buffer2;
+	int          m_sample_select1;
+	int          m_sample_select2;
+
+	/* video config (never changed after video_start) */
+	const struct CPS1config *m_game_config;
+	int          m_scroll_size;
+	int          m_obj_size;
+	int          m_cps2_obj_size;
+	int          m_other_size;
+	int          m_palette_align;
+	int          m_palette_size;
+	int          m_stars_rom_size;
+	uint8_t        m_empty_tile[32*32];
+	int          m_cps_version;
+
+	/* fcrash video config */
+	uint8_t        m_layer_enable_reg;
+	uint8_t        m_layer_mask_reg[4];
+	int          m_layer_scroll1x_offset;
+	int          m_layer_scroll2x_offset;
+	int          m_layer_scroll3x_offset;
+	int          m_sprite_base;
+	int          m_sprite_list_end_marker;
+	int          m_sprite_x_offset;
+	std::unique_ptr<uint16_t[]> m_bootleg_sprite_ram;
+	std::unique_ptr<uint16_t[]> m_bootleg_work_ram;
+
+	/* devices */
+	required_device<m68000_base_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<m48t35_device> m_m48t35;
+	optional_device<msm5205_device> m_msm_1;    // fcrash
+	optional_device<msm5205_device> m_msm_2;    // fcrash
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
+	optional_memory_region m_region_key;
+	optional_memory_region m_region_stars;
+	output_finder<3> m_led_cboard;
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

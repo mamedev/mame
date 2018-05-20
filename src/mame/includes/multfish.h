@@ -16,31 +16,17 @@
 class igrosoft_gamble_state : public driver_device
 {
 public:
-	igrosoft_gamble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	igrosoft_gamble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_m48t35(*this, "m48t35" ),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper")
-	{
-	}
+		m_hopper(*this, "hopper"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
-	/* Video related */
-
-	int m_disp_enable;
-	int m_xor_paltype;
-	int m_xor_palette;
-
-	tilemap_t *m_tilemap;
-	tilemap_t *m_reel_tilemap;
-
-	/* Misc related */
-
-	uint8_t m_rambk;
-
-	uint8_t m_vid[igrosoft_gamble_VIDRAM_SIZE];
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
 	DECLARE_READ8_MEMBER(bankedram_r);
@@ -81,21 +67,39 @@ public:
 	void init_crzmon2ent();
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_tile_info);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_reel_tile_info);
+	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void rollfr(machine_config &config);
+	void igrosoft_gamble(machine_config &config);
+	void igrosoft_gamble_map(address_map &map);
+	void igrosoft_gamble_portmap(address_map &map);
+	void rollfr_portmap(address_map &map);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	/* Video related */
+
+	int m_disp_enable;
+	int m_xor_paltype;
+	int m_xor_palette;
+
+	tilemap_t *m_tilemap;
+	tilemap_t *m_reel_tilemap;
+
+	/* Misc related */
+
+	uint8_t m_rambk;
+
+	uint8_t m_vid[igrosoft_gamble_VIDRAM_SIZE];
 	required_device<cpu_device> m_maincpu;
 	required_device<timekeeper_device> m_m48t35;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
-	void rollfr(machine_config &config);
-	void igrosoft_gamble(machine_config &config);
-	void igrosoft_gamble_map(address_map &map);
-	void igrosoft_gamble_portmap(address_map &map);
-	void rollfr_portmap(address_map &map);
+	output_finder<13> m_lamp;
 };
 
 

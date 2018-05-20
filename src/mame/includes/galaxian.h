@@ -40,65 +40,26 @@ class galaxian_state : public driver_device
 {
 public:
 	galaxian_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_audio2(*this, "audio2"),
-			m_dac(*this, "dac"),
-			m_ay8910(*this, "8910.%u", 0),
-			m_ay8910_cclimber(*this, "cclimber_audio:aysnd"),
-			m_digitalker(*this, "digitalker"),
-			m_ppi8255(*this, "ppi8255_%u", 0),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_soundlatch(*this, "soundlatch"),
-			m_fake_select(*this, "FAKE_SELECT"),
-			m_tenspot_game_dsw(*this, {"IN2_GAME0", "IN2_GAME1", "IN2_GAME2", "IN2_GAME3", "IN2_GAME4", "IN2_GAME5", "IN2_GAME6", "IN2_GAME7", "IN2_GAME8", "IN2_GAME9"}),
-			m_spriteram(*this, "spriteram"),
-			m_videoram(*this, "videoram"),
-			m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_audio2;
-	optional_device<dac_byte_interface> m_dac;
-	optional_device_array<ay8910_device, 3> m_ay8910;
-	optional_device<ay8910_device> m_ay8910_cclimber;
-	optional_device<digitalker_device> m_digitalker;
-	optional_device_array<i8255_device, 3> m_ppi8255;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch;
-
-	optional_ioport m_fake_select;
-	optional_ioport_array<10> m_tenspot_game_dsw;
-
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-
-	int m_bullets_base;
-	int m_sprites_base;
-	int m_numspritegens;
-	int m_counter_74ls161[2];
-	int m_direction[2];
-	uint8_t m_gmgalax_selected_game;
-	uint8_t m_zigzag_ay8910_latch;
-	uint8_t m_kingball_speech_dip;
-	uint8_t m_kingball_sound;
-	uint8_t m_mshuttle_ay8910_cs;
-	uint16_t m_protection_state;
-	uint8_t m_protection_result;
-	uint8_t m_konami_sound_control;
-	uint8_t m_sfx_sample_control;
-	uint8_t m_moonwar_port_select;
-	uint8_t m_irq_enabled;
-	int m_irq_line;
-	int m_tenspot_current_game;
-	uint8_t m_frogger_adjust;
-	uint8_t m_sfx_tilemap;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_audio2(*this, "audio2")
+		, m_dac(*this, "dac")
+		, m_ay8910(*this, "8910.%u", 0)
+		, m_ay8910_cclimber(*this, "cclimber_audio:aysnd")
+		, m_digitalker(*this, "digitalker")
+		, m_ppi8255(*this, "ppi8255_%u", 0)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_fake_select(*this, "FAKE_SELECT")
+		, m_tenspot_game_dsw(*this, {"IN2_GAME0", "IN2_GAME1", "IN2_GAME2", "IN2_GAME3", "IN2_GAME4", "IN2_GAME5", "IN2_GAME6", "IN2_GAME7", "IN2_GAME8", "IN2_GAME9"})
+		, m_spriteram(*this, "spriteram")
+		, m_videoram(*this, "videoram")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	/* video extension callbacks */
 	typedef void (galaxian_state::*galaxian_extend_tile_info_func)(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
@@ -106,26 +67,6 @@ public:
 	typedef void (galaxian_state::*galaxian_draw_bullet_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	typedef void (galaxian_state::*galaxian_draw_background_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	galaxian_extend_tile_info_func m_extend_tile_info_ptr;
-	galaxian_extend_sprite_info_func m_extend_sprite_info_ptr;
-	galaxian_draw_bullet_func m_draw_bullet_ptr;
-	galaxian_draw_background_func m_draw_background_ptr;
-
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_flipscreen_x;
-	uint8_t m_flipscreen_y;
-	uint8_t m_background_enable;
-	uint8_t m_background_red;
-	uint8_t m_background_green;
-	uint8_t m_background_blue;
-	uint32_t m_star_rng_origin;
-	uint32_t m_star_rng_origin_frame;
-	rgb_t m_star_color[64];
-	std::unique_ptr<uint8_t[]> m_stars;
-	uint8_t m_stars_enabled;
-	uint8_t m_stars_blink_state;
-	rgb_t m_bullet_color[8];
-	uint8_t m_gfxbank[5];
 	DECLARE_WRITE8_MEMBER(galaxian_videoram_w);
 	DECLARE_WRITE8_MEMBER(galaxian_objram_w);
 	DECLARE_WRITE8_MEMBER(galaxian_flip_screen_x_w);
@@ -269,7 +210,6 @@ public:
 	void init_victoryc();
 	void init_victorycb();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(galaxian);
 	DECLARE_PALETTE_INIT(moonwar);
 	void tenspot_set_game_bank(int bank, int from_game);
@@ -422,4 +362,71 @@ public:
 	void turpins_sound_map(address_map &map);
 	void turtles_map(address_map &map);
 	void zigzag_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audio2;
+	optional_device<dac_byte_interface> m_dac;
+	optional_device_array<ay8910_device, 3> m_ay8910;
+	optional_device<ay8910_device> m_ay8910_cclimber;
+	optional_device<digitalker_device> m_digitalker;
+	optional_device_array<i8255_device, 3> m_ppi8255;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+	optional_ioport m_fake_select;
+	optional_ioport_array<10> m_tenspot_game_dsw;
+
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	output_finder<2> m_lamp;
+
+	int m_bullets_base;
+	int m_sprites_base;
+	int m_numspritegens;
+	int m_counter_74ls161[2];
+	int m_direction[2];
+	uint8_t m_gmgalax_selected_game;
+	uint8_t m_zigzag_ay8910_latch;
+	uint8_t m_kingball_speech_dip;
+	uint8_t m_kingball_sound;
+	uint8_t m_mshuttle_ay8910_cs;
+	uint16_t m_protection_state;
+	uint8_t m_protection_result;
+	uint8_t m_konami_sound_control;
+	uint8_t m_sfx_sample_control;
+	uint8_t m_moonwar_port_select;
+	uint8_t m_irq_enabled;
+	int m_irq_line;
+	int m_tenspot_current_game;
+	uint8_t m_frogger_adjust;
+	uint8_t m_sfx_tilemap;
+
+	galaxian_extend_tile_info_func m_extend_tile_info_ptr;
+	galaxian_extend_sprite_info_func m_extend_sprite_info_ptr;
+	galaxian_draw_bullet_func m_draw_bullet_ptr;
+	galaxian_draw_background_func m_draw_background_ptr;
+
+	tilemap_t *m_bg_tilemap;
+	uint8_t m_flipscreen_x;
+	uint8_t m_flipscreen_y;
+	uint8_t m_background_enable;
+	uint8_t m_background_red;
+	uint8_t m_background_green;
+	uint8_t m_background_blue;
+	uint32_t m_star_rng_origin;
+	uint32_t m_star_rng_origin_frame;
+	rgb_t m_star_color[64];
+	std::unique_ptr<uint8_t[]> m_stars;
+	uint8_t m_stars_enabled;
+	uint8_t m_stars_blink_state;
+	rgb_t m_bullet_color[8];
+	uint8_t m_gfxbank[5];
 };

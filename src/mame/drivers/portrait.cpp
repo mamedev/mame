@@ -105,8 +105,8 @@ WRITE8_MEMBER(portrait_state::ctrl_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	/* the 2 lamps near the camera */
-	output().set_led_value(0, data & 0x08);
-	output().set_led_value(1, data & 0x40);
+	m_lamp[0] = BIT(data, 3);
+	m_lamp[1] = BIT(data, 6);
 
 	/* shows the black and white photo from the camera */
 	output().set_value("photo", (data >> 7) & 1);

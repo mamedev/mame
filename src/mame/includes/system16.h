@@ -32,102 +32,8 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_led(*this, "led%u", 0U)
 	{ }
-
-	required_shared_ptr<uint16_t> m_textram;
-	optional_shared_ptr<uint16_t> m_bg0_tileram;
-	optional_shared_ptr<uint16_t> m_bg1_tileram;
-	optional_shared_ptr<uint16_t> m_tileram;
-	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
-	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
-
-	optional_memory_region m_sprites_region;
-	optional_memory_region m_soundcpu_region;
-	optional_memory_bank m_soundbank;
-	optional_memory_bank m_okibank;
-
-	optional_device<sega_16bit_sprite_device> m_sprites;
-
-	uint16_t m_coinctrl;
-
-	/* game specific */
-	int m_passht4b_io1_val;
-	int m_passht4b_io2_val;
-	int m_passht4b_io3_val;
-
-	int m_beautyb_unkx;
-
-	int m_shinobl_kludge;
-
-	int m_eswat_tilebank0;
-
-
-	/* video-related */
-	tilemap_t *m_background[2];
-	tilemap_t *m_foreground[2];
-	tilemap_t *m_text_layer;
-	tilemap_t *m_bg_tilemaps[2];
-	tilemap_t *m_text_tilemap;
-	double m_weights[2][3][6];
-
-	int m_spritebank_type;
-	int m_back_yscroll;
-	int m_fore_yscroll;
-	int m_text_yscroll;
-
-	int m_bg1_trans; // alien syn + sys18
-
-	int m_tile_bank[2];
-	int m_bg_page[2][4];
-	int m_fg_page[2][4];
-
-	uint16_t m_datsu_page[4];
-
-	int m_old_bg_page[2][4];
-	int m_old_fg_page[2][4];
-	int m_old_tile_bank[2];
-
-	int m_bg_scrollx;
-	int m_bg_scrolly;
-	int m_fg_scrollx;
-	int m_fg_scrolly;
-	uint16_t m_tilemapselect;
-
-	int m_textlayer_lo_min;
-	int m_textlayer_lo_max;
-	int m_textlayer_hi_min;
-	int m_textlayer_hi_max;
-
-	int m_tilebank_switch;
-
-
-	/* sound-related */
-	int m_sample_buffer;
-	int m_sample_select;
-
-	uint8_t *m_soundbank_ptr;     /* Pointer to currently selected portion of ROM */
-
-	/* sys18 */
-	uint8_t *m_sound_bank;
-	uint16_t *m_splittab_bg_x;
-	uint16_t *m_splittab_bg_y;
-	uint16_t *m_splittab_fg_x;
-	uint16_t *m_splittab_fg_y;
-	int     m_sound_info[4*2];
-	int     m_refreshenable;
-	int     m_system18;
-
-	uint8_t *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<msm5205_device> m_msm;
-	optional_device<upd7759_device> m_upd7759;
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<ls157_device> m_adpcm_select;
-	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
@@ -289,4 +195,103 @@ public:
 	void tturfbl_sound_io_map(address_map &map);
 	void tturfbl_sound_map(address_map &map);
 	void wb3bbl_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+
+	required_shared_ptr<uint16_t> m_textram;
+	optional_shared_ptr<uint16_t> m_bg0_tileram;
+	optional_shared_ptr<uint16_t> m_bg1_tileram;
+	optional_shared_ptr<uint16_t> m_tileram;
+	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
+	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
+
+	optional_memory_region m_sprites_region;
+	optional_memory_region m_soundcpu_region;
+	optional_memory_bank m_soundbank;
+	optional_memory_bank m_okibank;
+
+	optional_device<sega_16bit_sprite_device> m_sprites;
+
+	uint16_t m_coinctrl;
+
+	/* game specific */
+	int m_passht4b_io1_val;
+	int m_passht4b_io2_val;
+	int m_passht4b_io3_val;
+
+	int m_beautyb_unkx;
+
+	int m_shinobl_kludge;
+
+	int m_eswat_tilebank0;
+
+
+	/* video-related */
+	tilemap_t *m_background[2];
+	tilemap_t *m_foreground[2];
+	tilemap_t *m_text_layer;
+	tilemap_t *m_bg_tilemaps[2];
+	tilemap_t *m_text_tilemap;
+	double m_weights[2][3][6];
+
+	int m_spritebank_type;
+	int m_back_yscroll;
+	int m_fore_yscroll;
+	int m_text_yscroll;
+
+	int m_bg1_trans; // alien syn + sys18
+
+	int m_tile_bank[2];
+	int m_bg_page[2][4];
+	int m_fg_page[2][4];
+
+	uint16_t m_datsu_page[4];
+
+	int m_old_bg_page[2][4];
+	int m_old_fg_page[2][4];
+	int m_old_tile_bank[2];
+
+	int m_bg_scrollx;
+	int m_bg_scrolly;
+	int m_fg_scrollx;
+	int m_fg_scrolly;
+	uint16_t m_tilemapselect;
+
+	int m_textlayer_lo_min;
+	int m_textlayer_lo_max;
+	int m_textlayer_hi_min;
+	int m_textlayer_hi_max;
+
+	int m_tilebank_switch;
+
+
+	/* sound-related */
+	int m_sample_buffer;
+	int m_sample_select;
+
+	uint8_t *m_soundbank_ptr;     /* Pointer to currently selected portion of ROM */
+
+	/* sys18 */
+	uint8_t *m_sound_bank;
+	uint16_t *m_splittab_bg_x;
+	uint16_t *m_splittab_bg_y;
+	uint16_t *m_splittab_fg_x;
+	uint16_t *m_splittab_fg_y;
+	int     m_sound_info[4*2];
+	int     m_refreshenable;
+	int     m_system18;
+
+	uint8_t *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<msm5205_device> m_msm;
+	optional_device<upd7759_device> m_upd7759;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<ls157_device> m_adpcm_select;
+	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
+	output_finder<2> m_led;
 };

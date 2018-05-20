@@ -1296,14 +1296,16 @@
 class goldnpkr_state : public driver_device
 {
 public:
-	goldnpkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	goldnpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
@@ -1377,7 +1379,10 @@ public:
 	void wildcrdb_mcu_map(address_map &map);
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
+
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
@@ -1385,6 +1390,7 @@ protected:
 	optional_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	output_finder<5> m_lamp;
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_mux_data;
@@ -1394,22 +1400,14 @@ protected:
 class blitz_state : public goldnpkr_state
 {
 public:
-	blitz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: goldnpkr_state(mconfig, type, tag),
+	blitz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		goldnpkr_state(mconfig, type, tag),
 		m_cpubank(*this, "cpubank"),
 		m_mcu(*this, "mcu"),
 		m_bankdev(*this, "bankdev"),
 		m_cpubank_xor(0),
 		m_portc_data(0x0f)
 	{ }
-
-	required_region_ptr<uint8_t> m_cpubank;
-
-	required_device<m68705p_device> m_mcu;
-	required_device<address_map_bank_device> m_bankdev;
-
-	uint8_t m_cpubank_xor;
-	uint8_t m_portc_data;
 
 	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
@@ -1418,6 +1416,15 @@ public:
 	void megadpkr(machine_config &config);
 	void megadpkr_banked_map(address_map &map);
 	void megadpkr_map(address_map &map);
+
+private:
+	required_region_ptr<uint8_t> m_cpubank;
+
+	required_device<m68705p_device> m_mcu;
+	required_device<address_map_bank_device> m_bankdev;
+
+	uint8_t m_cpubank_xor;
+	uint8_t m_portc_data;
 };
 
 
@@ -1765,11 +1772,11 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 */
 	data = data ^ 0xff;
 
-	output().set_lamp_value(0, (data) & 1);         /* Lamp 0 */
-	output().set_lamp_value(1, (data >> 1) & 1);    /* Lamp 1 */
-	output().set_lamp_value(2, (data >> 2) & 1);    /* Lamp 2 */
-	output().set_lamp_value(3, (data >> 3) & 1);    /* Lamp 3 */
-	output().set_lamp_value(4, (data >> 4) & 1);    /* Lamp 4 */
+	m_lamp[0] = BIT(data, 0);    /* Lamp 0 */
+	m_lamp[1] = BIT(data, 1);    /* Lamp 1 */
+	m_lamp[2] = BIT(data, 2);    /* Lamp 2 */
+	m_lamp[3] = BIT(data, 3);    /* Lamp 3 */
+	m_lamp[4] = BIT(data, 4);    /* Lamp 4 */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* counter1 */
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);  /* counter2 */

@@ -2371,6 +2371,11 @@ void seta_state::drgnunit_map(address_map &map)
                                 The Roulette
 ***************************************************************************/
 
+MACHINE_START_MEMBER(setaroul_state, setaroul)
+{
+	m_leds.resolve();
+}
+
 // Coin drop
 MACHINE_RESET_MEMBER(setaroul_state, setaroul)
 {
@@ -2489,8 +2494,8 @@ WRITE8_MEMBER(setaroul_state::led_w)
 {
 	m_led = data;
 
-	output().set_led_value(0,   data  & 0x01);  // pay out        (hop.c in input test, touch '1')
-	output().set_led_value(1,   data  & 0x02);  // call attendant (cal.o in input test, touch '9')
+	m_leds[0] = BIT(data, 0);  // pay out        (hop.c in input test, touch '1')
+	m_leds[1] = BIT(data, 1);  // call attendant (cal.o in input test, touch '9')
 	//
 	//                          data  & 0x10    // hopper divider (divider in input test, touch '10')
 	//                          data  & 0x80    // video enable?
@@ -2641,7 +2646,7 @@ WRITE16_MEMBER(seta_state::magspeed_lights_w)
 	COMBINE_DATA( &m_magspeed_lights[offset] );
 
 	for (int i = 0; i < 16; i++)
-		output().set_led_value(offset * 16 + i, BIT(m_magspeed_lights[offset], i));
+		m_leds[offset * 16 + i] = BIT(m_magspeed_lights[offset], i);
 
 //  popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
 }
@@ -8520,6 +8525,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
+	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -9034,6 +9040,8 @@ MACHINE_CONFIG_END
                                 Magical Speed
 ***************************************************************************/
 
+MACHINE_START_MEMBER(seta_state,magspeed){ m_leds.resolve(); }
+
 /*  magspeed: lev 2 by vblank, lev 4 by timer */
 MACHINE_CONFIG_START(seta_state::magspeed)
 
@@ -9043,6 +9051,8 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)

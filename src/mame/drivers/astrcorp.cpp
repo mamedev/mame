@@ -59,7 +59,8 @@ public:
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
 		m_ticket(*this, "ticket"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	// devices
@@ -101,6 +102,11 @@ public:
 	void showhand_map(address_map &map);
 	void skilldrp_map(address_map &map);
 	void speeddrp_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
+	output_finder<7> m_lamp;
 };
 
 /***************************************************************************
@@ -240,17 +246,17 @@ WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0,    (data & 0x0004));   // coin counter
-		output().set_led_value(0,    (data & 0x0008));   // you win
+		m_lamp[0] = BIT(data, 3);   // you win
 		if ((data & 0x0010)) machine().bookkeeping().increment_dispensed_tickets(1); // coin out
-		output().set_led_value(1,    (data & 0x0020));   // coin/hopper jam
+		m_lamp[1] = BIT(data, 5);   // coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(2,    (data & 0x0100));   // bet
-		output().set_led_value(3,    (data & 0x0800));   // start
-		output().set_led_value(4,    (data & 0x1000));   // ? select/choose
-		output().set_led_value(5,    (data & 0x2000));   // ? select/choose
-		output().set_led_value(6,    (data & 0x4000));   // look
+		m_lamp[2] = BIT(data, 8);   // bet
+		m_lamp[3] = BIT(data, 11);   // start
+		m_lamp[4] = BIT(data, 12);   // ? select/choose
+		m_lamp[5] = BIT(data, 13);   // ? select/choose
+		m_lamp[6] = BIT(data, 15);   // look
 	}
 //  popmessage("%04X",data);
 }
@@ -280,18 +286,18 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));   // key out |
 		m_hopper->motor_w(BIT(data, 3));                           // hopper motor?
 		//                                  BIT(data, 4)           // hopper?
-		output().set_led_value(0, BIT(data, 5));                   // error lamp (coin/hopper jam: "call attendant")
+		m_lamp[0] = BIT(data, 5);                   // error lamp (coin/hopper jam: "call attendant")
 		m_ticket->motor_w(BIT(data, 7));                           // ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// lamps:
-		output().set_led_value(1, BIT(data, 8));    // select
-		output().set_led_value(2, BIT(data, 10));   // take
-		output().set_led_value(3, BIT(data, 11));   // bet
-		output().set_led_value(4, BIT(data, 12));   // start
-		output().set_led_value(5, BIT(data, 14));   // win / test
-		output().set_led_value(6, BIT(data, 15));   // ticket?
+		m_lamp[1] = BIT(data, 8);    // select
+		m_lamp[2] = BIT(data, 10);   // take
+		m_lamp[3] = BIT(data, 11);   // bet
+		m_lamp[4] = BIT(data, 12);   // start
+		m_lamp[5] = BIT(data, 14);   // win / test
+		m_lamp[6] = BIT(data, 15);   // ticket?
 	}
 
 //  popmessage("%04X",data);
@@ -493,6 +499,12 @@ GFXDECODE_END
 ***************************************************************************/
 
 static const uint16_t showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
+
+
+void astrocorp_state::machine_start()
+{
+	m_lamp.resolve();
+}
 
 
 /*

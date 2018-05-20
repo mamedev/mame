@@ -45,43 +45,18 @@ class dacholer_state : public driver_device
 {
 public:
 	dacholer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_audiocpu(*this,"audiocpu"),
-		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_spriteram(*this, "spriteram") { }
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_bgvideoram;
-	required_shared_ptr<uint8_t> m_fgvideoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_bg_bank;
-	uint8_t    m_scroll_x;
-	uint8_t    m_scroll_y;
-
-	/* sound-related */
-	int m_msm_data;
-	int m_msm_toggle;
-	uint8_t m_snd_interrupt_enable;
-	uint8_t m_music_interrupt_enable;
-	uint8_t m_snd_ack;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_audiocpu(*this,"audiocpu")
+		, m_msm(*this, "msm")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_bgvideoram(*this, "bgvideoram")
+		, m_fgvideoram(*this, "fgvideoram")
+		, m_spriteram(*this, "spriteram")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
@@ -97,9 +72,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dacholer);
 	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
@@ -114,6 +86,42 @@ public:
 	void main_map(address_map &map);
 	void snd_io_map(address_map &map);
 	void snd_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	output_finder<2> m_led;
+
+	/* video-related */
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
+	int      m_bg_bank;
+	uint8_t    m_scroll_x;
+	uint8_t    m_scroll_y;
+
+	/* sound-related */
+	int m_msm_data;
+	int m_msm_toggle;
+	uint8_t m_snd_interrupt_enable;
+	uint8_t m_music_interrupt_enable;
+	uint8_t m_snd_ack;
+
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -223,8 +231,8 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	output().set_led_value(0, data & 4);
-	output().set_led_value(1, data & 8);
+	m_led[0] = BIT(data, 2);
+	m_led[1] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
@@ -596,6 +604,8 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 
 void dacholer_state::machine_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_toggle));

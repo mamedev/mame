@@ -154,8 +154,8 @@ READ8_MEMBER(baraduke_state::inputport_r)
 
 WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_lamp[0] = BIT(data, 3);
+	m_lamp[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
@@ -371,6 +371,11 @@ static GFXDECODE_START( gfx_baraduke )
 	GFXDECODE_ENTRY( "gfx3", 0,      spritelayout, 0, 128 )
 GFXDECODE_END
 
+
+void baraduke_state::machine_start()
+{
+	m_lamp.resolve();
+}
 
 
 MACHINE_CONFIG_START(baraduke_state::baraduke)

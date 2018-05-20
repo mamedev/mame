@@ -19,8 +19,8 @@
 class taitoz_state : public driver_device
 {
 public:
-	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taitoz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -35,7 +35,9 @@ public:
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_steer(*this, "STEER") { }
+		m_steer(*this, "STEER"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
 
@@ -55,6 +57,7 @@ public:
 	void init_bshark();
 
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -91,6 +94,7 @@ private:
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_steer;
+	output_finder<2> m_lamp;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
