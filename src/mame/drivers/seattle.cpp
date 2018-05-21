@@ -451,12 +451,12 @@ void seattle_state::machine_reset()
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs") != nullptr)
+	if (m_dcs != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-	else if (machine().device("cage") != nullptr)
+	else if (m_cage != nullptr)
 	{
 		m_cage->control_w(0);
 		m_cage->control_w(3);

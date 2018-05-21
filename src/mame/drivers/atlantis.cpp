@@ -342,7 +342,7 @@ READ8_MEMBER(atlantis_state::cmos_r)
 	uint8_t result = m_rtc->read(space, offset);
 	// Initial RTC check expects reads to the RTC to take some time
 	if (offset == 0x7ff9)
-		machine().device<cpu_device>("maincpu")->eat_cycles(30);
+		m_maincpu->eat_cycles(30);
 	if (LOG_RTC || ((offset >= 0x7ff0) && (offset != 0x7ff9)))
 		logerror("%s:RTC read from offset %04X = %08X\n", machine().describe_context(), offset, result);
 	return result;

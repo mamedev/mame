@@ -150,6 +150,9 @@ public:
 
 	void williams_adpcm_map(address_map &map);
 	void williams_adpcm_oki_map(address_map &map);
+
+	mc6809e_device *get_cpu() { return m_cpu; }
+
 protected:
 	// timer IDs
 	enum

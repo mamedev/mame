@@ -821,10 +821,10 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 {
 	int count;
 
-	if (LOG_VBLANK_SWAP) vd->logerror("--- swap_buffers @ %d\n", vd->screen->vpos());
+	if (LOG_VBLANK_SWAP) vd->logerror("--- swap_buffers @ %d\n", vd->m_screen->vpos());
 
 	/* force a partial update */
-	vd->screen->update_partial(vd->screen->vpos());
+	vd->m_screen->update_partial(vd->m_screen->vpos());
 	vd->fbi.video_changed = true;
 
 	/* keep a history of swap intervals */
@@ -880,7 +880,7 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 	/* update the statistics (debug) */
 	if (vd->stats.display)
 	{
-		const rectangle &visible_area = vd->screen->visible_area();
+		const rectangle &visible_area = vd->m_screen->visible_area();
 		int screen_area = visible_area.width() * visible_area.height();
 		char *statsptr = vd->stats.buffer;
 		int pixelcount;
@@ -934,11 +934,11 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 
 void voodoo_device::adjust_vblank_timer()
 {
-	attotime vblank_period = screen->time_until_pos(fbi.vsyncstart);
+	attotime vblank_period = m_screen->time_until_pos(fbi.vsyncstart);
 	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
-		vblank_period = screen->frame_period();
+		vblank_period = m_screen->frame_period();
 	fbi.vsync_start_timer->adjust(vblank_period);
 }
 
@@ -997,7 +997,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 		swap_buffers(this);
 
 	/* set a timer for the next off state */
-	fbi.vsync_stop_timer->adjust(screen->time_until_pos(fbi.vsyncstop));
+	fbi.vsync_stop_timer->adjust(m_screen->time_until_pos(fbi.vsyncstop));
 
 
 
@@ -2151,7 +2151,7 @@ void voodoo_device::stall_cpu(int state, attotime current_time)
 	if (!m_stall.isnull())
 		m_stall(true);
 	else
-		cpu->spin_until_trigger(trigger);
+		m_cpu->spin_until_trigger(trigger);
 
 	/* set a timer to clear the stall */
 	pci.continue_timer->adjust(pci.op_end_time - current_time);
@@ -2564,7 +2564,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 				if (vd->reg[hSync].u != 0 && vd->reg[vSync].u != 0 && vd->reg[videoDimensions].u != 0)
 				{
 					int hvis, vvis, htotal, vtotal, hbp, vbp;
-					attoseconds_t refresh = vd->screen->frame_period().attoseconds();
+					attoseconds_t refresh = vd->m_screen->frame_period().attoseconds();
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
@@ -2615,17 +2615,17 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					/* configure the screen based on which one matches the closest */
 					if (stddiff < meddiff && stddiff < vgadiff)
 					{
-						vd->screen->configure(htotal, vtotal, visarea, stdperiod);
+						vd->m_screen->configure(htotal, vtotal, visarea, stdperiod);
 						osd_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 					}
 					else if (meddiff < vgadiff)
 					{
-						vd->screen->configure(htotal, vtotal, visarea, medperiod);
+						vd->m_screen->configure(htotal, vtotal, visarea, medperiod);
 						osd_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
 					}
 					else
 					{
-						vd->screen->configure(htotal, vtotal, visarea, vgaperiod);
+						vd->m_screen->configure(htotal, vtotal, visarea, vgaperiod);
 						osd_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
 					}
 
@@ -3939,7 +3939,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->eat_cycles(1000);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3951,21 +3951,21 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		/* return the current visible scanline */
 		case vRetrace:
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->eat_cycles(10);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(10);
 			// Return 0 if vblank is active
 			if (vd->fbi.vblank) {
 				result = 0;
 			}
 			else {
 				// Want screen position from vblank off
-				result = vd->screen->vpos();
+				result = vd->m_screen->vpos();
 			}
 			break;
 
 		/* return visible horizontal and vertical positions. Read by the Vegas startup sequence */
 		case hvRetrace:
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->eat_cycles(10);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(10);
 			//result = 0x200 << 16;   /* should be between 0x7b and 0x267 */
 			//result |= 0x80;         /* should be between 0x17 and 0x103 */
 			// Return 0 if vblank is active
@@ -3974,10 +3974,10 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			}
 			else {
 				// Want screen position from vblank off
-				result = vd->screen->vpos();
+				result = vd->m_screen->vpos();
 			}
 			// Hpos
-			result |= vd->screen->hpos() << 16;
+			result |= vd->m_screen->hpos() << 16;
 			break;
 
 		/* cmdFifo -- Voodoo2 only */
@@ -3985,7 +3985,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			result = vd->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->eat_cycles(1000);
+			if (EAT_CYCLES) vd->m_cpu->eat_cycles(1000);
 			break;
 
 		case cmdFifoAMin:
@@ -4023,7 +4023,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		/* don't log multiple identical status reads from the same address */
 		if (regnum == vdstatus)
 		{
-			offs_t pc = vd->cpu->pc();
+			offs_t pc = vd->m_cpu->pc();
 			if (pc == vd->last_status_pc && result == vd->last_status_value)
 				logit = false;
 			vd->last_status_pc = pc;
@@ -4987,7 +4987,7 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
 			if (htotal > 0 && vtotal > 0) {
 				rectangle visarea(0, width - 1, 0, height - 1);
-				screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
+				m_screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
 				// Set the vsync start and stop
 				fbi.vsyncstart = vstart;
@@ -5047,8 +5047,6 @@ void voodoo_device::device_start()
 	int val;
 
 	/* validate configuration */
-	assert(m_screen != nullptr);
-	assert(m_cputag != nullptr);
 	assert(m_fbmem > 0);
 
 	/* copy config data */
@@ -5137,10 +5135,6 @@ void voodoo_device::device_start()
 				break;
 			index++;
 		}
-	screen = machine().device<screen_device>(m_screen);
-	assert_always(screen != nullptr, "Unable to find screen attached to voodoo");
-	cpu = machine().device<cpu_device>(m_cputag);
-	assert_always(cpu != nullptr, "Unable to find CPU attached to voodoo");
 
 	if (m_tmumem1 != 0)
 		tmu_config |= 0xc0;  // two TMUs
@@ -5868,11 +5862,11 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	, m_fbmem(0)
 	, m_tmumem0(0)
 	, m_tmumem1(0)
-	, m_screen(nullptr)
-	, m_cputag(nullptr)
 	, m_vblank(*this)
 	, m_stall(*this)
 	, m_pciint(*this)
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, vd_type(vdt)
 {
 }

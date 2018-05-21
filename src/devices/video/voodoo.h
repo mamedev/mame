@@ -13,9 +13,9 @@
 
 #pragma once
 
-
 #include "video/polylgcy.h"
 #include "video/rgbutil.h"
+#include "screen.h"
 
 
 /*************************************
@@ -1468,8 +1468,8 @@ public:
 
 	void set_fbmem(int value) { m_fbmem = value; }
 	void set_tmumem(int value1, int value2) { m_tmumem0 = value1; m_tmumem1 = value2; }
-	void set_screen_tag(const char *tag) { m_screen = tag; }
-	void set_cpu_tag(const char *tag) { m_cputag = tag; }
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
 	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_stall_callback(Object &&cb)  { return m_stall.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pciint_callback(Object &&cb) { return m_pciint.set_callback(std::forward<Object>(cb)); }
@@ -1477,15 +1477,13 @@ public:
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
 
-	uint8_t               m_fbmem;
-	uint8_t               m_tmumem0;
-	uint8_t               m_tmumem1;
-	const char *        m_screen;
-	const char *        m_cputag;
-	devcb_write_line   m_vblank;
-	devcb_write_line   m_stall;
+	uint8_t             m_fbmem;
+	uint8_t             m_tmumem0;
+	uint8_t             m_tmumem1;
+	devcb_write_line	m_vblank;
+	devcb_write_line	m_stall;
 	// This is for internally generated PCI interrupts in Voodoo3
-	devcb_write_line   m_pciint;
+	devcb_write_line    m_pciint;
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
@@ -1873,20 +1871,20 @@ protected:
 
 // FIXME: this stuff should not be public
 public:
-	uint8_t               index;                  /* index of board */
-	screen_device *screen;              /* the screen we are acting on */
-	cpu_device *cpu;                  /* the CPU we interact with */
-	const uint8_t         vd_type;                   /* type of system */
-	uint8_t               chipmask;               /* mask for which chips are available */
-	uint32_t              freq;                   /* operating frequency */
+	uint8_t             index;                  /* index of board */
+	optional_device<screen_device> m_screen;    /* the screen we are acting on */
+	optional_device<cpu_device>    m_cpu;       /* the CPU we interact with */
+	const uint8_t		vd_type;                /* type of system */
+	uint8_t             chipmask;               /* mask for which chips are available */
+	uint32_t            freq;                   /* operating frequency */
 	attoseconds_t       attoseconds_per_cycle;  /* attoseconds per cycle */
-	uint32_t              extra_cycles;           /* extra cycles not yet accounted for */
+	uint32_t            extra_cycles;           /* extra cycles not yet accounted for */
 	int                 trigger;                /* trigger used for stalling */
 
 	voodoo_reg          reg[0x400];             /* raw registers */
-	const uint8_t *       regaccess;              /* register access array */
-	const char *const * regnames;               /* register names array */
-	uint8_t               alt_regmap;             /* enable alternate register map? */
+	const uint8_t *		regaccess;              /* register access array */
+	const char *const *	regnames;               /* register names array */
+	uint8_t             alt_regmap;             /* enable alternate register map? */
 
 	pci_state           pci;                    /* PCI state */
 	dac_state           dac;                    /* DAC state */
@@ -1902,14 +1900,14 @@ public:
 	voodoo_stats        stats;                  /* internal statistics */
 
 	offs_t              last_status_pc;         /* PC of last status description (for logging) */
-	uint32_t              last_status_value;      /* value of last status read (for logging) */
+	uint32_t            last_status_value;      /* value of last status read (for logging) */
 
 	int                 next_rasterizer;        /* next rasterizer index */
 	raster_info         rasterizer[MAX_RASTERIZERS]; /* array of rasterizers */
 	raster_info *       raster_hash[RASTER_HASH_SIZE]; /* hash table of rasterizers */
 
 	bool                send_config;
-	uint32_t              tmu_config;
+	uint32_t            tmu_config;
 
 };
 

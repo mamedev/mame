@@ -386,7 +386,7 @@ void midtunit_state::init_mktunit()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),this), write16_delegate(FUNC(midtunit_state::mk_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
 }
 
 void midtunit_state::init_mkturbo()
@@ -417,9 +417,9 @@ void midtunit_state::init_nbajam_common(int te_protection)
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
 	else
-		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
 }
 
 void midtunit_state::init_nbajam()
@@ -444,8 +444,8 @@ void midtunit_state::init_jdreddp()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(FUNC(midtunit_state::jdredd_prot_r),this), write16_delegate(FUNC(midtunit_state::jdredd_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	membank("adpcm:bank9")->set_base(auto_alloc_array(machine(), uint8_t, 0x80));
 }
 

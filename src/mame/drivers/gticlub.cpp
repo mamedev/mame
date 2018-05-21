@@ -259,6 +259,9 @@ public:
 		m_k001006_2(*this, "k001006_2"),
 		m_k001604_1(*this, "k001604_1"),
 		m_k001604_2(*this, "k001604_2"),
+		m_lscreen(*this, "lscreen"),
+		m_rscreen(*this, "rscreen"),
+		m_voodoo(*this, "voodoo%u", 0U),
 		m_work_ram(*this, "work_ram"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_analog0(*this, "AN0"),
@@ -287,6 +290,9 @@ public:
 	optional_device<k001006_device> m_k001006_2;
 	optional_device<k001604_device> m_k001604_1;
 	optional_device<k001604_device> m_k001604_2;
+	optional_device<screen_device> m_lscreen;
+	optional_device<screen_device> m_rscreen;
+	optional_device_array<voodoo_device, 2> m_voodoo;
 
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
@@ -327,7 +333,8 @@ public:
 	ADC1038_INPUT_CB(adc1038_input_callback);
 
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void thunderh(machine_config &config);
 	void hangplt(machine_config &config);
@@ -920,36 +927,34 @@ uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-uint32_t gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gticlub_state::screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if (strcmp(screen.tag(), ":lscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
-
-	//  m_k001604_1->draw_back_layer(bitmap, cliprect);
-
-		voodoo->voodoo_update(bitmap, cliprect);
-
-		m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
-	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
-
-	//  m_k001604_2->draw_back_layer(bitmap, cliprect);
-
-		voodoo->voodoo_update(bitmap, cliprect);
-
-		m_k001604_2->draw_front_layer(screen, bitmap, cliprect);
-	}
+//  m_k001604_1->draw_back_layer(bitmap, cliprect);
+	m_voodoo[0]->voodoo_update(bitmap, cliprect);
+	m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_gticlub_led_reg[0]);
 	draw_7segment_led(bitmap, 9, 3, m_gticlub_led_reg[1]);
 
 	return 0;
 }
+
+uint32_t gticlub_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->pen(0), cliprect);
+
+//  m_k001604_2->draw_back_layer(bitmap, cliprect);
+	m_voodoo[1]->voodoo_update(bitmap, cliprect);
+	m_k001604_2->draw_front_layer(screen, bitmap, cliprect);
+
+	draw_7segment_led(bitmap, 3, 3, m_gticlub_led_reg[0]);
+	draw_7segment_led(bitmap, 9, 3, m_gticlub_led_reg[1]);
+
+	return 0;
+}
+
 MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	/* basic machine hardware */
@@ -1117,13 +1122,13 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
+	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_lscreen)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
+	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_rscreen)
 
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
 	MCFG_K001604_LAYER_SIZE(0)
