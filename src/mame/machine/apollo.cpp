@@ -1185,7 +1185,7 @@ MACHINE_CONFIG_START(apollo_state::apollo_terminal)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(apollo_state,apollo)
+void apollo_state::init_apollo()
 {
 	MLOG1(("driver_init_apollo"));
 }

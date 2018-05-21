@@ -333,16 +333,26 @@ WRITE8_MEMBER( pic8259_device::write )
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void pic8259_device::device_start()
+void pic8259_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_out_int_func.resolve_safe();
 	m_in_sp_func.resolve_safe(1);
 	m_read_slave_ack_func.resolve_safe(0);
+}
 
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pic8259_device::device_start()
+{
 	// Register save state items
 	save_item(NAME(m_state));
 	save_item(NAME(m_isr));

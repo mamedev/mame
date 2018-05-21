@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	MCFG_PALETTE_INIT_OWNER(gridlee_state,gridlee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("gridlee", GRIDLEE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -471,4 +471,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, gridlee, 0, gridlee, gridlee, gridlee_state, 0, ROT0, "Videa", "Gridlee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, gridlee, 0, gridlee, gridlee, gridlee_state, empty_init, ROT0, "Videa", "Gridlee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

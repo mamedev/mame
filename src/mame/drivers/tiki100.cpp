@@ -281,10 +281,10 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	if (floppy) floppy->mon_w(!BIT(data, 6));
 
 	/* GRAFIKK key led */
-	output().set_led_value(1, BIT(data, 5));
+	m_leds[0] = BIT(data, 5);
 
 	/* LOCK key led */
-	output().set_led_value(2, BIT(data, 7));
+	m_leds[1] = BIT(data, 7);
 
 	/* bankswitch */
 	m_rome = BIT(data, 2);
@@ -671,6 +671,8 @@ WRITE_LINE_MEMBER( tiki100_state::busrq_w )
 
 void tiki100_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* allocate video RAM */
 	m_video_ram.allocate(TIKI100_VIDEORAM_SIZE);
 
@@ -771,7 +773,7 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", tiki100_state, tape_tick, attotime::from_hz(44100))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(AY8912_TAG, AY8912, XTAL(8'000'000)/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tiki100_state, video_scroll_w))
@@ -810,6 +812,6 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY             FULLNAME        FLAGS
-COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, tiki100_state, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, tiki100_state, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME        FLAGS
+COMP( 1984, kontiki, 0,       0,      tiki100, tiki100, tiki100_state, empty_init, "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tiki100, kontiki, 0,      tiki100, tiki100, tiki100_state, empty_init, "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )

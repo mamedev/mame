@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	DECLARE_DRIVER_INIT(esh);
+	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
@@ -331,7 +331,7 @@ static const gfx_layout esh_gfx_layout =
 	8*8
 };
 
-static GFXDECODE_START( esh )
+static GFXDECODE_START( gfx_esh )
 	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
 	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
@@ -375,15 +375,16 @@ MACHINE_CONFIG_START(esh_state::esh)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(esh_state, esh)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esh)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -466,11 +467,11 @@ ROM_START( eshb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(esh_state,esh)
+void esh_state::init_esh()
 {
 }
 
-//    YEAR  NAME   PARENT   MACHINE  INPUT  STATE      INIT     MONITOR  COMPANY          FULLNAME                     FLAGS
-GAME( 1983, esh,   0,       esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
-GAME( 1983, esha,  esh,     esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
-GAME( 1983, eshb,  esh,     esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+//    YEAR  NAME   PARENT   MACHINE  INPUT  STATE      INIT      MONITOR  COMPANY          FULLNAME                     FLAGS
+GAME( 1983, esh,   0,       esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, esha,  esh,     esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, eshb,  esh,     esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)

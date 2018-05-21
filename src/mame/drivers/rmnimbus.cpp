@@ -194,7 +194,7 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
+	SPEAKER(config, MONO_TAG).front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, rmnimbus_state, nimbus_sound_ay8910_porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, rmnimbus_state, nimbus_sound_ay8910_portb_w))
@@ -232,5 +232,5 @@ ROM_START( nimbus )
 	ROM_LOAD("er59256", 0x00, 0x20, CRC(1a39de76) SHA1(0b6607f008dd92d6ab9af62b0b042fc3f5f4461c))
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY              FULLNAME  FLAGS
-COMP( 1986, nimbus,     0,      0,      nimbus,  nimbus, rmnimbus_state, 0,    "Research Machines", "Nimbus", 0)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS           INIT        COMPANY              FULLNAME  FLAGS
+COMP( 1986, nimbus, 0,      0,      nimbus,  nimbus, rmnimbus_state, empty_init, "Research Machines", "Nimbus", 0)

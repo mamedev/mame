@@ -16,7 +16,7 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/clock.h"
@@ -147,4 +147,4 @@ ROM_START( altos2 )
 	ROM_LOAD( "us_v1.1_14410.u34", 0x0000, 0x2000, CRC(0ebb78bf) SHA1(96a1f7d34ff35037cbbc93049c0e2b9c9f11f1db) )
 ROM_END
 
-COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, 0, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )

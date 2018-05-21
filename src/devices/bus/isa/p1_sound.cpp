@@ -64,7 +64,7 @@ MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
 	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
 //  MCFG_PIT8253_OUT2_HANDLER(XXX)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("filter", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter", 0.5) // unknown DAC

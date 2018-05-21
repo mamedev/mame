@@ -17,8 +17,8 @@ public:
 
 	required_shared_ptr<uint16_t> m_sharedprotram;
 
-	DECLARE_DRIVER_INIT(killbld);
-	DECLARE_DRIVER_INIT(drgw3);
+	void init_killbld();
+	void init_drgw3();
 	DECLARE_MACHINE_RESET(killbld);
 	DECLARE_MACHINE_RESET(dw3);
 

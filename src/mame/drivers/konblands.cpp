@@ -241,7 +241,7 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
-static GFXDECODE_START( konblands )
+static GFXDECODE_START( gfx_konblands )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -260,7 +260,7 @@ void konblands_state::machine_reset()
 INTERRUPT_GEN_MEMBER(konblands_state::vblank_irq)
 {
 	if (m_nmi_enable == true)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(konblands_state::timer_irq)
@@ -293,13 +293,13 @@ MACHINE_CONFIG_START(konblands_state::konblands)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", konblands)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_konblands)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(konblands_state, konblands)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn", SN76496, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -348,5 +348,5 @@ ROM_START( kbadlandsh )
 ROM_END
 
 
-GAME( 1984, kbadlands,  0,           konblands,  konblands, konblands_state,  0,       ROT0, "Konami",      "Badlands (Konami, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1984, kbadlandsh, kbadlands,   konblandsh, konblands, konblands_state,  0,       ROT0, "Konami",      "Badlands (Konami, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, kbadlands,  0,         konblands,  konblands, konblands_state, empty_init, ROT0, "Konami",      "Badlands (Konami, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, kbadlandsh, kbadlands, konblandsh, konblands, konblands_state, empty_init, ROT0, "Konami",      "Badlands (Konami, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

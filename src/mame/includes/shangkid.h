@@ -57,9 +57,9 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(dynamski);
-	DECLARE_DRIVER_INIT(shangkid);
-	DECLARE_DRIVER_INIT(chinhero);
+	void init_dynamski();
+	void init_shangkid();
+	void init_chinhero();
 	DECLARE_VIDEO_START(shangkid);
 	DECLARE_PALETTE_INIT(dynamski);
 	DECLARE_MACHINE_RESET(shangkid);

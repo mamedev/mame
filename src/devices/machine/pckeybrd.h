@@ -102,6 +102,7 @@ private:
 	static const int m_scancode_set_2_3[];
 	static const extended_keyboard_code m_mf2_code[0x10][2];
 
+	output_finder<3> m_leds;
 	int m_scan_code_set;
 	int m_input_state;
 };

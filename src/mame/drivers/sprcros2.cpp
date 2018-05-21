@@ -358,7 +358,7 @@ static const gfx_layout fg_layout =
 	8*8*2
 };
 
-static GFXDECODE_START( sprcros2 )
+static GFXDECODE_START( gfx_sprcros2 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0,   16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 256, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, fg_layout,     512, 64 )
@@ -433,13 +433,13 @@ PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
 INTERRUPT_GEN_MEMBER(sprcros2_state::master_vblank_irq)
 {
 	if(m_master_nmi_enable == true)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(sprcros2_state::slave_vblank_irq)
 {
 	if(m_slave_nmi_enable == true)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
@@ -473,14 +473,14 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 343, 8, 256-8, 262, 16, 240) // TODO: Wrong screen parameters
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprcros2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprcros2)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -576,5 +576,5 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) ) //fg clut
 ROM_END
 
-GAME( 1986, sprcros2,  0,        sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sprcros2a, sprcros2, sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2,  0,        sprcros2, sprcros2, sprcros2_state, empty_init, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2a, sprcros2, sprcros2, sprcros2, sprcros2_state, empty_init, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

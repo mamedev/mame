@@ -781,5 +781,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY            FULLNAME    FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,   mpz80, mpz80_state,  0,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME    FLAGS
+COMP( 1980, mpz80, 0,      0,      mpz80,   mpz80, mpz80_state, empty_init, "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

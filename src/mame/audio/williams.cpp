@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(williams_adpcm_sound_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, ADPCM_MASTER_CLOCK/8, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, williams_adpcm_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.15)
 MACHINE_CONFIG_END

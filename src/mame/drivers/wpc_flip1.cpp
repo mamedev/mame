@@ -153,7 +153,7 @@ static INPUT_PORTS_START( wpc_flip1 )
 	PORT_DIPSETTING(0xf0,"USA 2")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(wpc_flip1_state,wpc_flip1)
+void wpc_flip1_state::init_wpc_flip1()
 {
 	wpc_dot_state::init_wpc_dot();
 }
@@ -171,7 +171,7 @@ MACHINE_CONFIG_START(wpc_flip1_state::wpc_flip1)
 	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_dot_state,wpc_sound_data_r),WRITE8(*this, wpc_dot_state,wpc_sound_data_w))
 	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_dot_state,wpc_dmdbank_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
 	MCFG_WPC_ROM_REGION("sound1")
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_dot_state,wpcsnd_reply_w))
@@ -264,12 +264,12 @@ ROM_END
 /*--------------
 /  Game drivers
 /---------------*/
-GAME(1992,  taf_l5,  0,       wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-5)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_p2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (Prototype) (P-2)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_l1,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-1)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_l2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-2)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_l3,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-3)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_l4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_l7,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (Prototype L-5) (L-7)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_l6,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (L-6)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  taf_h4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state,  wpc_flip1,  ROT0,  "Bally",    "The Addams Family (H-4)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_l5,  0,       wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-5)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_p2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (Prototype) (P-2)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_l1,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-1)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_l2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-2)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_l3,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-3)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_l4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_l7,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (Prototype L-5) (L-7)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_l6,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-6)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  taf_h4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (H-4)",                    MACHINE_IS_SKELETON_MECHANICAL)

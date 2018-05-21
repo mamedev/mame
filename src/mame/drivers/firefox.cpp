@@ -424,7 +424,7 @@ WRITE8_MEMBER(firefox_state::main_firq_clear_w)
 
 WRITE8_MEMBER(firefox_state::self_reset_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE );
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -634,7 +634,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( firefox )
+static GFXDECODE_START( gfx_firefox )
 	GFXDECODE_ENTRY("tiles",   0, tilelayout,   0,   1)
 	GFXDECODE_ENTRY("sprites", 0, spritelayout, 256, 4)
 GFXDECODE_END
@@ -688,7 +688,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firefox)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firefox)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")
@@ -709,7 +709,8 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -839,5 +840,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, firefox,  0,       firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 1)", 0 )
-GAME( 1984, firefoxa, firefox, firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 2)", 0 )
+GAME( 1984, firefox,  0,       firefox, firefox, firefox_state, empty_init, ROT0, "Atari", "Fire Fox (set 1)", 0 )
+GAME( 1984, firefoxa, firefox, firefox, firefox, firefox_state, empty_init, ROT0, "Atari", "Fire Fox (set 2)", 0 )

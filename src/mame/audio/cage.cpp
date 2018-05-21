@@ -637,7 +637,8 @@ MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("cage_timer1", DEVICE_SELF, atari_cage_device, cage_timer_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 

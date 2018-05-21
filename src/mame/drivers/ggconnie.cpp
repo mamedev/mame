@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD("huc6260", HUC6260, PCE_MAIN_CLOCK/3)
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6202", huc6202_device, next_pixel))
@@ -306,13 +306,14 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", PCE_MAIN_CLOCK/12, PIN7_HIGH) /* unknown clock / pin 7 */
+	MCFG_DEVICE_ADD("oki", OKIM6295, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH) /* unknown clock / pin 7 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -343,5 +344,5 @@ ROM_START(smf)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, smf,      0, ggconnie, smf, ggconnie_state, pce_common, ROT0, "Eighting", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

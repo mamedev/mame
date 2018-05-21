@@ -122,14 +122,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 
-	DECLARE_DRIVER_INIT(rimrockn);
-	DECLARE_DRIVER_INIT(grmatch);
-	DECLARE_DRIVER_INIT(peggle);
-	DECLARE_DRIVER_INIT(slikshot);
-	DECLARE_DRIVER_INIT(neckneck);
-	DECLARE_DRIVER_INIT(arligntn);
-	DECLARE_DRIVER_INIT(hstennis);
-	DECLARE_DRIVER_INIT(sstrike);
+	void init_rimrockn();
+	void init_grmatch();
+	void init_peggle();
+	void init_slikshot();
+	void init_neckneck();
+	void init_arligntn();
+	void init_hstennis();
+	void init_sstrike();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

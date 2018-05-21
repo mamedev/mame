@@ -24,7 +24,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
@@ -166,7 +166,7 @@ MACHINE_CONFIG_START(brandt8641_state::brandt8641)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -195,4 +195,4 @@ ROM_START( br8641 )
 ROM_END
 
 /* Driver */
-COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, 0, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING )
+COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, empty_init, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING )

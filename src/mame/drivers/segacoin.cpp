@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(segacoin_state::westdrm)
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym0", YM3438, 8000000) // clock frequency unknown
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -174,4 +174,4 @@ ROM_START( westdrm )
 ROM_END
 
 
-GAME (1992, westdrm, 0, westdrm, westdrm, segacoin_state, 0, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, westdrm, 0, westdrm, westdrm, segacoin_state, empty_init, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )

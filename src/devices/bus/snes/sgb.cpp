@@ -167,7 +167,7 @@ MACHINE_CONFIG_START(sns_rom_sgb1_device::device_add_mconfig)
 	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
 	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, 4295454)
 
@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(sns_rom_sgb2_device::device_add_mconfig)
 	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
 	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
 

@@ -59,10 +59,10 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x01);
-		output().set_led_value(1, data & 0x02);
-		output().set_led_value(2, data & 0x04);
-		output().set_led_value(3, data & 0x08);
+		m_led[0] = BIT(data, 0);
+		m_led[1] = BIT(data, 1);
+		m_led[2] = BIT(data, 2);
+		m_led[3] = BIT(data, 3);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
 	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
@@ -74,8 +74,8 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		output().set_led_value(0, data & 0x02);
-		output().set_led_value(1, data & 0x04);
+		m_led[0] = BIT(data, 1);
+		m_led[1] = BIT(data, 2);
 	}
 	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
@@ -309,6 +309,8 @@ void suna16_state::bestbest_sound_map(address_map &map)
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
+	m_led.resolve();
+
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
@@ -399,6 +401,8 @@ void suna16_state::uballoon_pcm_1_io_map(address_map &map)
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+
+	m_led.resolve();
 
 	save_item(NAME(m_prot));
 }
@@ -776,12 +780,12 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-static GFXDECODE_START( suna16 )
+static GFXDECODE_START( gfx_suna16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites
 GFXDECODE_END
 
 // Two sprites chips
-static GFXDECODE_START( bestbest )
+static GFXDECODE_START( gfx_bestbest )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 256*8/16 ) // [0] Sprites (Chip 1)
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 256*8/16 ) // [1] Sprites (Chip 2)
 GFXDECODE_END
@@ -843,12 +847,13 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -905,12 +910,13 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -961,12 +967,13 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1020,12 +1027,13 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestbest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestbest)
 	MCFG_PALETTE_ADD("palette", 256*8)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1382,8 +1390,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest,  0,        bestbest, bestbest, suna16_state, 0, ROT0, "SunA",                 "Best Of Best",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, sunaq,     0,        sunaq,    sunaq,    suna16_state, 0, ROT0, "SunA",                 "SunA Quiz 6000 Academy (940620-6)",  MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, uballoon,  0,        uballoon, uballoon, suna16_state, 0, ROT0, "SunA (Unico license)", "Ultra Balloon",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bestbest,  0,        bestbest, bestbest, suna16_state, empty_init, ROT0, "SunA",                 "Best Of Best",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, sunaq,     0,        sunaq,    sunaq,    suna16_state, empty_init, ROT0, "SunA",                 "SunA Quiz 6000 Academy (940620-6)",  MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, uballoon,  0,        uballoon, uballoon, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Ultra Balloon",                      MACHINE_SUPPORTS_SAVE )

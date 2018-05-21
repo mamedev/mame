@@ -235,8 +235,8 @@ protected:
 	virtual void get_opcode_param() { }
 	virtual void update_w_latch() { }
 
-	u8 ram_r();
-	void ram_w(u8 data);
+	virtual u8 ram_r();
+	virtual void ram_w(u8 data);
 	void pop_stack();
 	void push_stack();
 	virtual void do_branch(u8 pu, u8 pm, u8 pl);
@@ -317,7 +317,7 @@ protected:
 class sm510_device : public sm510_base_device
 {
 public:
-	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
 	void program_2_7k(address_map &map);
@@ -336,7 +336,7 @@ protected:
 class sm511_device : public sm510_base_device
 {
 public:
-	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
 	sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
@@ -358,7 +358,7 @@ protected:
 class sm512_device : public sm511_device
 {
 public:
-	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
 	void data_80_48x4(address_map &map);

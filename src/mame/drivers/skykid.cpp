@@ -62,8 +62,8 @@ READ8_MEMBER(skykid_state::inputport_r)
 
 WRITE8_MEMBER(skykid_state::skykid_led_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_led[0] = BIT(data, 3);
+	m_led[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_subreset_w)
@@ -95,6 +95,8 @@ WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
 
 void skykid_state::machine_start()
 {
+	m_led.resolve();
+
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 
@@ -416,7 +418,7 @@ static const gfx_layout sprite_layout =
 	64*8
 };
 
-static GFXDECODE_START( skykid )
+static GFXDECODE_START( gfx_skykid )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   64*4, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 64*4+128*4, 64 )
@@ -457,13 +459,13 @@ MACHINE_CONFIG_START(skykid_state::skykid)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skykid_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skykid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skykid)
 	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(skykid_state, skykid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
@@ -623,14 +625,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(skykid_state,skykid)
+void skykid_state::init_skykid()
 {
-	uint8_t *rom;
-	int i;
-
 	/* unpack the third sprite ROM */
-	rom = memregion("gfx3")->base() + 0x4000;
-	for (i = 0;i < 0x2000;i++)
+	uint8_t *rom = memregion("gfx3")->base() + 0x4000;
+	for (int i = 0;i < 0x2000;i++)
 	{
 		rom[i + 0x4000] = rom[i];       // sprite set #1, plane 3
 		rom[i + 0x6000] = rom[i] >> 4;  // sprite set #2, plane 3
@@ -639,11 +638,11 @@ DRIVER_INIT_MEMBER(skykid_state,skykid)
 	}
 }
 
-GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid_state, skykid,  ROT0,   "Namco", "Dragon Buster", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skykid,   0,      skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (new version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykido,  skykid, skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (old version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykidd,  skykid, skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (CUS60 version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
+GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid_state, init_skykid, ROT0,   "Namco", "Dragon Buster", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skykid,   0,      skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (new version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykido,  skykid, skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (old version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (CUS60 version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
 
 // no license text is displayed but the PCB was licensed by Namco for production by Sipem (formerly Sidam) with Namco supplying the Custom chips (MCU etc.)
 // the level select is handled in a much more user-friendly way in this set and the dip for it is inverted (although this is displayed incorrectly in the test mode)
-GAME( 1985, skykids,  skykid, skykid, skykids, skykid_state,  skykid,  ROT180, "Namco (Sipem license)", "Sky Kid (Sipem)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykids,  skykid, skykid, skykids,  skykid_state, init_skykid, ROT180, "Namco (Sipem license)", "Sky Kid (Sipem)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */

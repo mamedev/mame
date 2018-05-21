@@ -213,7 +213,7 @@ WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 	m_via6522_0->write_pb7((d >> 7) & 1);
 }
 
-DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
+void ssystem3_state::init_ssystem3()
 {
 	ssystem3_playfield_reset();
 	ssystem3_lcd_reset();
@@ -324,6 +324,6 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY            FULLNAME                            FLAGS
-CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "SciSys / Novag",  "Chess Champion: Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY           FULLNAME                            FLAGS
+CONS( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 //chess champion MK III in germany

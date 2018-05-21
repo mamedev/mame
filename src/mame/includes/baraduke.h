@@ -14,7 +14,43 @@ public:
 		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(inputport_select_w);
+	DECLARE_READ8_MEMBER(inputport_r);
+	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);
+	DECLARE_WRITE8_MEMBER(baraduke_irq_ack_w);
+	DECLARE_READ8_MEMBER(soundkludge_r);
+	DECLARE_READ8_MEMBER(readFF);
+	DECLARE_READ8_MEMBER(baraduke_videoram_r);
+	DECLARE_WRITE8_MEMBER(baraduke_videoram_w);
+	DECLARE_READ8_MEMBER(baraduke_textram_r);
+	DECLARE_WRITE8_MEMBER(baraduke_textram_w);
+	DECLARE_WRITE8_MEMBER(baraduke_scroll0_w);
+	DECLARE_WRITE8_MEMBER(baraduke_scroll1_w);
+	DECLARE_READ8_MEMBER(baraduke_spriteram_r);
+	DECLARE_WRITE8_MEMBER(baraduke_spriteram_w);
+	void init_baraduke();
+	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
+	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(baraduke);
+	uint32_t screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_baraduke);
+	void scroll_w(address_space &space, int layer, int offset, int data);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
+	void set_scroll(int layer);
+	void baraduke(machine_config &config);
+	void baraduke_map(address_map &map);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
 
 	int m_inputport_selected;
 	int m_counter;
@@ -31,34 +67,5 @@ public:
 	int m_xscroll[2];
 	int m_yscroll[2];
 	int m_copy_sprites;
-	DECLARE_WRITE8_MEMBER(inputport_select_w);
-	DECLARE_READ8_MEMBER(inputport_r);
-	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);
-	DECLARE_WRITE8_MEMBER(baraduke_irq_ack_w);
-	DECLARE_READ8_MEMBER(soundkludge_r);
-	DECLARE_READ8_MEMBER(readFF);
-	DECLARE_READ8_MEMBER(baraduke_videoram_r);
-	DECLARE_WRITE8_MEMBER(baraduke_videoram_w);
-	DECLARE_READ8_MEMBER(baraduke_textram_r);
-	DECLARE_WRITE8_MEMBER(baraduke_textram_w);
-	DECLARE_WRITE8_MEMBER(baraduke_scroll0_w);
-	DECLARE_WRITE8_MEMBER(baraduke_scroll1_w);
-	DECLARE_READ8_MEMBER(baraduke_spriteram_r);
-	DECLARE_WRITE8_MEMBER(baraduke_spriteram_w);
-	DECLARE_DRIVER_INIT(baraduke);
-	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
-	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(baraduke);
-	uint32_t screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_baraduke);
-	void scroll_w(address_space &space, int layer, int offset, int data);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
-	void set_scroll(int layer);
-	void baraduke(machine_config &config);
-	void baraduke_map(address_map &map);
-	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
+	output_finder<2> m_lamp;
 };

@@ -30,24 +30,24 @@ class galaxold_state : public driver_device
 {
 public:
 	galaxold_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_7474_9m_1(*this, "7474_9m_1"),
-			m_7474_9m_2(*this, "7474_9m_2"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_videoram(*this,"videoram"),
-			m_spriteram(*this,"spriteram"),
-			m_spriteram2(*this,"spriteram2"),
-			m_attributesram(*this,"attributesram"),
-			m_bulletsram(*this,"bulletsram"),
-			m_rockclim_videoram(*this,"rockclim_vram"),
-			m_racknrol_tiles_bank(*this,"racknrol_tbank"),
-			m_leftclip(2)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_7474_9m_1(*this, "7474_9m_1")
+		, m_7474_9m_2(*this, "7474_9m_2")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_videoram(*this,"videoram")
+		, m_spriteram(*this,"spriteram")
+		, m_spriteram2(*this,"spriteram2")
+		, m_attributesram(*this,"attributesram")
+		, m_bulletsram(*this,"bulletsram")
+		, m_rockclim_videoram(*this,"rockclim_vram")
+		, m_racknrol_tiles_bank(*this,"racknrol_tbank")
+		, m_led(*this, "led%u", 0U)
+		, m_leftclip(2)
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -66,6 +66,7 @@ public:
 	optional_shared_ptr<uint8_t> m_bulletsram;
 	optional_shared_ptr<uint8_t> m_rockclim_videoram;
 	optional_shared_ptr<uint8_t> m_racknrol_tiles_bank;
+	output_finder<2> m_led;
 
 	int m_irq_line;
 	uint8_t m__4in1_bank;
@@ -157,11 +158,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
-	DECLARE_DRIVER_INIT(bullsdrtg);
-	DECLARE_DRIVER_INIT(ladybugg);
-	DECLARE_DRIVER_INIT(4in1);
-	DECLARE_DRIVER_INIT(guttangt);
-	DECLARE_DRIVER_INIT(ckonggx);
+	void init_bullsdrtg();
+	void init_ladybugg();
+	void init_4in1();
+	void init_guttangt();
+	void init_ckonggx();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -323,6 +324,9 @@ public:
 	void scrambler_map(address_map &map);
 	void spcwarp(address_map &map);
 	void tazzmang(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

@@ -274,7 +274,7 @@ static const gfx_layout hanaroku_charlayout =
 
 
 
-static GFXDECODE_START( hanaroku )
+static GFXDECODE_START( gfx_hanaroku )
 	GFXDECODE_ENTRY( "gfx1", 0, hanaroku_charlayout,   0, 32  )
 GFXDECODE_END
 
@@ -298,13 +298,13 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_SCREEN_UPDATE_DRIVER(albazc_state, screen_update_hanaroku)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hanaroku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hanaroku)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(albazc_state, albazc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -329,4 +329,4 @@ ROM_START( hanaroku )
 ROM_END
 
 
-GAME( 1988, hanaroku, 0,        hanaroku, hanaroku, albazc_state, 0, ROT0, "Alba", "Hanaroku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanaroku, 0, hanaroku, hanaroku, albazc_state, empty_init, ROT0, "Alba", "Hanaroku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -173,5 +173,5 @@ ROM_START( vax785 )
 
 ROM_END
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                          FULLNAME      FLAGS */
-COMP( 1984, vax785,  0,       0,      vax11,   vax11, vax11_state, 0,    "Digital Equipment Corporation", "VAX-11/785", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME      FLAGS */
+COMP( 1984, vax785, 0,      0,      vax11,   vax11, vax11_state, empty_init, "Digital Equipment Corporation", "VAX-11/785", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

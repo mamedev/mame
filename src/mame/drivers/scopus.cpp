@@ -40,7 +40,7 @@ public:
 		m_dma8257(*this, "dma"),
 		m_maincpu(*this, "maincpu"){ }
 
-	DECLARE_DRIVER_INIT(sagitta180);
+	void init_sagitta180();
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
@@ -84,7 +84,7 @@ const gfx_layout sagitta180_charlayout =
 	8*16                /* space between characters */
 };
 
-static GFXDECODE_START( sagitta180 )
+static GFXDECODE_START( gfx_sagitta180 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sagitta180_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*5, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sagitta180 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sagitta180 )
 
 	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8) /* guessed xtal */
 	MCFG_I8275_CHARACTER_WIDTH(8)
@@ -233,5 +233,5 @@ ROM_START( sagitta180 )
 	ROM_LOAD("cga.chr",  0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card (Actual IC is a 2708 that I was not able to dump yet)
 ROM_END
 
-//    YEAR    NAME       PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY   FULLNAME       FLAGS */
-COMP( 1979?, sagitta180, 0,      0,      sagitta180, sagitta180, sagitta180_state, 0,    "Scopus", "Sagitta 180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR    NAME       PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 1979?, sagitta180, 0,      0,      sagitta180, sagitta180, sagitta180_state, empty_init, "Scopus", "Sagitta 180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -75,6 +75,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 6; }
 	virtual uint32_t execute_max_cycles() const override { return 27; }
 	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return true; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
 	virtual void execute_run() override;
@@ -99,7 +100,7 @@ private:
 	address_space_config m_data_config;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 
 	// callbacks

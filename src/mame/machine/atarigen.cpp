@@ -271,7 +271,7 @@ void atari_sound_comm_device::delayed_sound_reset(int param)
 	if (param == 0)
 	{
 		m_sound_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_sound_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_sound_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	// reset the sound write state

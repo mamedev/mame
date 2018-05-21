@@ -116,7 +116,7 @@ const tiny_rom_entry *cpc_dkspeech_device::device_rom_region() const
 
 // device machine config
 MACHINE_CONFIG_START(cpc_ssa1_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sp0256",SP0256,XTAL(3'120'000))
 	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, cpc_ssa1_device, lrq_cb))
 	MCFG_SP0256_STANDBY_CB(WRITELINE(*this, cpc_ssa1_device, sby_cb))
@@ -132,7 +132,7 @@ MACHINE_CONFIG_START(cpc_ssa1_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cpc_dkspeech_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sp0256",SP0256,XTAL(4'000'000))  // uses the CPC's clock from pin 50 of the expansion port
 	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, cpc_dkspeech_device, lrq_cb))
 	MCFG_SP0256_STANDBY_CB(WRITELINE(*this, cpc_dkspeech_device, sby_cb))

@@ -232,7 +232,7 @@ static const gfx_layout orbit_tile_layout =
 };
 
 
-static GFXDECODE_START( orbit )
+static GFXDECODE_START( gfx_orbit )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_full_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_upper_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_lower_sprite_layout, 0, 1 )
@@ -295,15 +295,15 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update_orbit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbit)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(orbit)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, orbit_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -352,4 +352,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, orbit, 0, orbit, orbit, orbit_state, 0, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, orbit, 0, orbit, orbit, orbit_state, empty_init, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )

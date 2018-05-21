@@ -521,7 +521,7 @@ static const gfx_layout slotcarntiles8x8x1_layout =
 *          Graphics Decode          *
 ************************************/
 
-static GFXDECODE_START( slotcarn )
+static GFXDECODE_START( gfx_slotcarn )
 	GFXDECODE_ENTRY( "gfx1", 0, slotcarntiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 8, slotcarntiles8x8x3_layout, 0, 16 ) // flipped
 	GFXDECODE_ENTRY( "gfx2", 0, slotcarntiles8x8x1_layout, 0, 4 )
@@ -572,11 +572,11 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, slotcarn_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotcarn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd",AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
@@ -706,6 +706,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT   ROT   COMPANY           FULLNAME                FLAGS
-GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
-GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT        ROT   COMPANY           FULLNAME                FLAGS
+GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, empty_init, ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
+GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, empty_init, ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )

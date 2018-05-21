@@ -631,7 +631,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
 
-	DECLARE_DRIVER_INIT(fanucspmg);
+	void init_fanucspmg();
 
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
@@ -650,7 +650,7 @@ private:
 	uint8_t m_dma_page;
 };
 
-DRIVER_INIT_MEMBER(fanucspmg_state, fanucspmg)
+void fanucspmg_state::init_fanucspmg()
 {
 	memset(m_vram, 0, sizeof(m_vram));
 
@@ -1067,6 +1067,6 @@ ROM_START( fanucspgm )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT       COMPANY  FULLNAME                         FLAGS
-COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT            COMPANY  FULLNAME                         FLAGS
+COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, init_fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, init_fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

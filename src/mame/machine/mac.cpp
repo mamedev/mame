@@ -2197,7 +2197,7 @@ void mac_state::mac_driver_init(model_t model)
 }
 
 #define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(mac_state,label)     \
+void mac_state::init_##label()     \
 {   \
 	mac_driver_init(model); \
 }

@@ -129,10 +129,10 @@ public:
 
 	void keyboard_put(u8 data);
 
-	DECLARE_DRIVER_INIT(rm380z);
-	DECLARE_DRIVER_INIT(rm380z34d);
-	DECLARE_DRIVER_INIT(rm380z34e);
-	DECLARE_DRIVER_INIT(rm480z);
+	void init_rm380z();
+	void init_rm380z34d();
+	void init_rm380z34e();
+	void init_rm480z();
 	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();

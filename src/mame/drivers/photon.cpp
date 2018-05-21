@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(photon_state::photon)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_base_state, _84_portc_w))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -276,6 +276,6 @@ ROM_START( phklad )
 	ROM_LOAD( "klad.bin", 0x10000, 0x4000, BAD_DUMP CRC(49cc7d65) SHA1(d966cfc1d973a533df8044a71fad37f7177da554) )
 ROM_END
 
-GAME( 19??,  phtetris, 0,      photon, photon, photon_state, 0, ROT0, "<unknown>", "Tetris (Photon System)",           0 )
-GAME( 1989?, phpython,  0,     photon, photon, photon_state, 0, ROT0, "<unknown>", "Python (Photon System)",           0 )
-GAME( 19??,  phklad,   0,      photon, photon, photon_state, 0, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )
+GAME( 19??,  phtetris, 0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           0 )
+GAME( 1989?, phpython,  0,     photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           0 )
+GAME( 19??,  phklad,   0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )

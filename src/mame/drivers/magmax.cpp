@@ -322,7 +322,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( magmax )
+static GFXDECODE_START( gfx_magmax )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0,  1 ) /*no color codes*/
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      1*16, 16 ) /*16 color codes*/
 GFXDECODE_END
@@ -350,13 +350,13 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update_magmax)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magmax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magmax)
 	MCFG_PALETTE_ADD("palette", 1*16 + 16*16 + 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(magmax_state, magmax)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, magmax_state, ay8910_portA_0_w))  /*write port A*/
@@ -424,4 +424,4 @@ ROM_START( magmax )
 ROM_END
 
 
-GAME( 1985, magmax, 0, magmax, magmax, magmax_state, 0, ROT0, "Nichibutsu", "Mag Max", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, magmax, 0, magmax, magmax, magmax_state, empty_init, ROT0, "Nichibutsu", "Mag Max", MACHINE_SUPPORTS_SAVE )

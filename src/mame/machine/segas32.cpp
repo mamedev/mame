@@ -103,7 +103,7 @@ WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 		}
 		else
 		{
-			const uint8_t *ROM = memregion("maincpu")->base();
+			const uint8_t *ROM = m_maincpu_region->base();
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -153,7 +153,7 @@ WRITE16_MEMBER(segas32_state::brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = m_maincpu_region->base();
 
 	switch (offset)
 	{

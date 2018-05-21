@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(upd_reset_w);
 	DECLARE_WRITE8_MEMBER(upd_start_w);
 
-	DECLARE_DRIVER_INIT(twin16);
+	void init_twin16();
 
 	TILE_GET_INFO_MEMBER(fix_tile_info);
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
@@ -108,7 +108,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
-	DECLARE_DRIVER_INIT(fround);
+	void init_fround();
 
 	void fround(machine_config &config);
 	void fround_map(address_map &map);
@@ -128,7 +128,7 @@ public:
 	{}
 
 	DECLARE_WRITE8_MEMBER(nvram_bank_w);
-	DECLARE_DRIVER_INIT(cuebrickj);
+	void init_cuebrickj();
 
 	void cuebrickj(machine_config &config);
 private:

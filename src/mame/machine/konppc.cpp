@@ -3,9 +3,6 @@
 /* Konami PowerPC-based 3D games common functions */
 
 #include "emu.h"
-#include "cpu/sharc/sharc.h"
-#include "machine/k033906.h"
-#include "video/voodoo.h"
 #include "konppc.h"
 
 #define DSP_BANK_SIZE           0x10000
@@ -17,10 +14,13 @@
 DEFINE_DEVICE_TYPE(KONPPC, konppc_device, "konppc", "Konami PowerPC Common Functions")
 
 konppc_device::konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KONPPC, tag, owner, clock),
-	cgboard_type(0),
-	num_cgboards(0)/*,
-	cgboard_id(MAX_CG_BOARDS)*/
+	: device_t(mconfig, KONPPC, tag, owner, clock)
+	, m_dsp(*this, {"^dsp", "^dsp2"})
+	, m_k033906(*this, "^k033906_%u", 1U)
+	, m_voodoo(*this, "^voodoo%u", 0U)
+	, cgboard_type(0)
+	, num_cgboards(0)
+	//, cgboard_id(MAX_CG_BOARDS)
 {
 }
 
@@ -125,10 +125,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
 
 WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 {
-	const char *dsptag = (cgboard_id == 0) ? "dsp" : "dsp2";
-	const char *pcitag = (cgboard_id == 0) ? "k033906_1" : "k033906_2";
-	device_t *dsp = machine().device(dsptag);
-	k033906_device *k033906 = machine().device<k033906_device>(pcitag);
+	cpu_device &dsp = *m_dsp[cgboard_id];
 //  osd_printf_debug("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context().c_str(), cgboard_id, data, offset, mem_mask);
 
 	if (cgboard_id < MAX_CG_BOARDS)
@@ -143,19 +140,19 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 				if (data & 0x80000000)
 					dsp_state[cgboard_id] |= 0x10;
 
-				if (k033906 != nullptr)    /* zr107.c has no PCI and some games only have one PCI Bridge */
-					k033906->set_reg((data & 0x20000000) ? 1 : 0);
+				if (m_k033906[cgboard_id].found())    /* zr107.c has no PCI and some games only have one PCI Bridge */
+					m_k033906[cgboard_id]->set_reg((data & 0x20000000) ? 1 : 0);
 
 				if (data & 0x10000000)
-					dsp->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					dsp.set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				else
-					dsp->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+					dsp.set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 				if (data & 0x02000000)
-					dsp->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+					dsp.set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
 				if (data & 0x04000000)
-					dsp->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+					dsp.set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -210,13 +207,13 @@ void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset
 		case CGBOARD_TYPE_ZR107:
 		case CGBOARD_TYPE_GTICLUB:
 		{
-			//machine.device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
-			machine().device<adsp21062_device>("dsp")->set_flag_input(0, ASSERT_LINE);
+			//m_dsp[0]->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
+			m_dsp[0]->set_flag_input(0, ASSERT_LINE);
 
 			if (offset == 1)
 			{
 				if (data & 0x03)
-					machine().device<adsp21062_device>("dsp")->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+					m_dsp[0]->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}
@@ -427,7 +424,6 @@ WRITE32_MEMBER( konppc_device::K033906_1_w)
 
 WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[0] & 0x01)
 	{
 		nwk_fifo_w(0, data);
@@ -439,13 +435,12 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[0]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
 WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo1");
 	if (nwk_device_sel[1] & 0x01)
 	{
 		nwk_fifo_w(1, data);
@@ -457,39 +452,36 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[1]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
 READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if ((nwk_device_sel[0] == 0x4) && offset >= 0x100000 && offset < 0x200000)
 	{
 		return nwk_ram[0][offset & 0x1fff];
 	}
 	else
 	{
-		return device->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[0]->voodoo_r(space, offset, mem_mask);
 	}
 }
 
 READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo1");
 	if ((nwk_device_sel[1] == 0x4) && offset >= 0x100000 && offset < 0x200000)
 	{
 		return nwk_ram[1][offset & 0x1fff];
 	}
 	else
 	{
-		return device->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[1]->voodoo_r(space, offset, mem_mask);
 	}
 }
 
 WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[0] & 0x01)
 	{
 		nwk_fifo_w(0, data);
@@ -501,13 +493,12 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[0]->voodoo_w(space, offset, data, mem_mask);
 	}
 }
 
 WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[1] & 0x01)
 	{
 		nwk_fifo_w(1, data);
@@ -519,7 +510,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[1]->voodoo_w(space, offset, data, mem_mask);
 	}
 }
 

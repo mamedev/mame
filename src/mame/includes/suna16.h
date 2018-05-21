@@ -9,40 +9,20 @@ class suna16_state : public driver_device
 {
 public:
 	suna16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_pcm1(*this,"pcm1"),
-		m_pcm2(*this,"pcm2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2")
-
-
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_pcm1(*this,"pcm1")
+		, m_pcm2(*this,"pcm2")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_spriteram(*this, "spriteram")
+		, m_spriteram2(*this, "spriteram2")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_led(*this, "led%u", 0U)
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_pcm1;
-	optional_device<cpu_device> m_pcm2;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_spriteram2;
-
-	optional_memory_bank m_bank1;
-	optional_memory_bank m_bank2;
-
-
-	std::unique_ptr<uint16_t[]> m_paletteram;
-	int m_color_bank;
-	uint8_t m_prot;
 
 	// common
 	DECLARE_WRITE16_MEMBER(soundlatch_w);
@@ -70,7 +50,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
 
-	DECLARE_DRIVER_INIT(uballoon);
+	void init_uballoon();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
@@ -100,4 +80,25 @@ public:
 	void uballoon_pcm_1_io_map(address_map &map);
 	void uballoon_pcm_1_map(address_map &map);
 	void uballoon_sound_map(address_map &map);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_pcm1;
+	optional_device<cpu_device> m_pcm2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_spriteram2;
+
+	optional_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+
+	output_finder<4> m_led;
+
+	std::unique_ptr<uint16_t[]> m_paletteram;
+	int m_color_bank;
+	uint8_t m_prot;
 };

@@ -950,7 +950,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT     STATE             INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,   0,          0,      newbrain_ad,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain AD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain A",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbrainmd, newbrain,   0,      newbrain_md,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain MD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY                        FULLNAME       FLAGS
+COMP( 1981, newbrain,   0,        0,      newbrain_ad, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain AD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbraina,  newbrain, 0,      newbrain_a,  newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain A",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbrainmd, newbrain, 0,      newbrain_md, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain MD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

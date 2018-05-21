@@ -66,12 +66,14 @@ public:
 	quantum_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_avg(*this, "avg")
+		m_avg(*this, "avg"),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	void quantum(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_led.resolve(); }
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_1_r);
@@ -81,6 +83,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
+	output_finder<2> m_led;
 };
 
 
@@ -130,8 +133,8 @@ WRITE16_MEMBER(quantum_state::led_w)
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		output().set_led_value(0, data & 0x10);
-		output().set_led_value(1, data & 0x20);
+		m_led[0] = BIT(data, 4);
+		m_led[1] = BIT(data, 5);
 
 		/* bits 6 and 7 flip screen */
 		m_avg->set_flip_x (data & 0x40);
@@ -248,7 +251,7 @@ static discrete_mixer_desc quantum_mixer = {
 		1.0                         /* gain */
 };
 
-static DISCRETE_SOUND_START(quantum)
+static DISCRETE_SOUND_START(quantum_discrete)
 
 	/************************************************/
 	/* FINAL MIX                                    */
@@ -295,7 +298,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, 600000)
 	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_1_r))
@@ -321,9 +324,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(quantum)
-
+	MCFG_DEVICE_ADD("discrete", DISCRETE, quantum_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -405,6 +406,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )

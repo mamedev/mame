@@ -30,6 +30,7 @@ public:
 	marywu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_digits(*this, "digit%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(display_7seg_data_w);
@@ -46,6 +47,7 @@ private:
 	uint8_t m_selected_7seg_module;
 	virtual void machine_start() override;
 	output_finder<32> m_digits;
+	output_finder<30> m_led;
 };
 
 static INPUT_PORTS_START( marywu )
@@ -109,21 +111,21 @@ INPUT_PORTS_END
 WRITE8_MEMBER( marywu_state::ay1_port_a_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i, (data & (1 << i)) ? 1 : 0);
+		m_led[i] = BIT(data, i);
 	}
 }
 
 WRITE8_MEMBER( marywu_state::ay1_port_b_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i+8, (data & (1 << i)) ? 1 : 0);
+		m_led[i+8] = BIT(data, i);
 	}
 }
 
 WRITE8_MEMBER( marywu_state::ay2_port_a_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i+16, (data & (1 << i)) ? 1 : 0);
+		m_led[i+16] = BIT(data, i);
 	}
 }
 
@@ -131,7 +133,7 @@ WRITE8_MEMBER( marywu_state::ay2_port_b_w )
 {
 	for (uint8_t i=0; i<6; i++){
 		/* we only have 30 LEDs. The last 2 bits in this port are unused.  */
-		output().set_led_value(i+24, (data & (1 << i)) ? 1 : 0);
+		m_led[i+24] = BIT(data, i);
 	}
 }
 
@@ -179,6 +181,7 @@ void marywu_state::io_map(address_map &map)
 void marywu_state::machine_start()
 {
 	m_digits.resolve();
+	m_led.resolve();
 }
 
 MACHINE_CONFIG_START(marywu_state::marywu)
@@ -198,7 +201,7 @@ MACHINE_CONFIG_START(marywu_state::marywu)
 	MCFG_DEFAULT_LAYOUT(layout_marywu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_a_w))
@@ -215,5 +218,5 @@ ROM_START( marywu )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
-//    YEAR  NAME       PARENT   MACHINE   INPUT     STATE         INIT   ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( ????, marywu,    0,       marywu,   marywu,   marywu_state, 0,     ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
+GAME( ????, marywu, 0,       marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )

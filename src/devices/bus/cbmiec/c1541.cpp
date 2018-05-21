@@ -726,7 +726,7 @@ WRITE8_MEMBER( c1541_device_base::via1_pb_w )
 	m_ga->stp_w(data & 0x03);
 
 	// activity LED
-	machine().output().set_led_value(LED_ACT, BIT(data, 3));
+	m_led[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -943,6 +943,7 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 	m_via1(*this, M6522_1_TAG),
 	m_ga(*this, C64H156_TAG),
 	m_address(*this, "ADDRESS"),
+	m_led(*this, "led%u", 0U),
 	m_data_out(1),
 	m_via0_irq(CLEAR_LINE),
 	m_via1_irq(CLEAR_LINE)
@@ -1057,6 +1058,8 @@ indus_gt_device::indus_gt_device(const machine_config &mconfig, const char *tag,
 
 void c1541_device_base::device_start()
 {
+	m_led.resolve();
+
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 

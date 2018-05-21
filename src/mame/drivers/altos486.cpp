@@ -238,4 +238,4 @@ ROM_START( altos486 )
 	ROM_LOAD("16019_z80.bin", 0x0000, 0x1000, CRC(68b1b2e1) SHA1(5d83609a465029212d5e3f72ac9c520b3dbed838))
 ROM_END
 
-COMP( 1984, altos486, 0, 0, altos486, 0, altos486_state, 0, "Altos Computer Systems", "Altos 486",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, altos486, 0, 0, altos486, 0, altos486_state, empty_init, "Altos Computer Systems", "Altos 486", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

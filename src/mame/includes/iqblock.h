@@ -36,8 +36,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
-	DECLARE_DRIVER_INIT(grndtour);
-	DECLARE_DRIVER_INIT(iqblock);
+	void init_grndtour();
+	void init_iqblock();
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

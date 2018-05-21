@@ -17,10 +17,8 @@
 /*
     driver init function
 */
-DRIVER_INIT_MEMBER(tx0_state,tx0)
+void tx0_state::init_tx0()
 {
-	uint8_t *dst;
-
 	static const unsigned char fontdata6x8[tx0_fontdata_size] =
 	{   /* ASCII characters */
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00,
@@ -74,7 +72,7 @@ DRIVER_INIT_MEMBER(tx0_state,tx0)
 	};
 
 	/* set up our font */
-	dst = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }
@@ -227,7 +225,7 @@ static const uint8_t tx0_palette[] =
 
 static const uint8_t total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
 
-static GFXDECODE_START( tx0 )
+static GFXDECODE_START( gfx_tx0 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(tx0_colors) / 3, 3 )
 GFXDECODE_END
 
@@ -1579,7 +1577,7 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	MCFG_DEVICE_ADD("typewriter", TX0_PRINTER, 0)
 	MCFG_DEVICE_ADD("magtape", TX0_MAGTAPE, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tx0)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tx0)
 	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(tx0_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
 	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
@@ -1620,6 +1618,6 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE        INIT   COMPANY  FULLNAME                                          FLAGS
-COMP( 1956, tx0_64kw, 0,        0,      tx0_64kw, tx0,   tx0_state,   tx0,   "MIT",   "TX-0 original demonstrator (64 kWords of RAM)" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-COMP( 1962, tx0_8kw,  tx0_64kw, 0,      tx0_8kw,  tx0,   tx0_state,   tx0,   "MIT",   "TX-0 upgraded system (8 kWords of RAM)" ,        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE      INIT      COMPANY  FULLNAME                                         FLAGS
+COMP( 1956, tx0_64kw, 0,        0,      tx0_64kw, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 original demonstrator (64 kWords of RAM)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1962, tx0_8kw,  tx0_64kw, 0,      tx0_8kw,  tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM)",        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)

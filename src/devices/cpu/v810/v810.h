@@ -118,7 +118,7 @@ private:
 	uint8_t m_irq_state;
 	uint8_t m_nmi_line;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_io;
 	uint32_t m_PPC;
 	int m_icount;

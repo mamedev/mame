@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(22'000'000),640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("h46505", H46505, "screen", XTAL(22'000'000)/8)
@@ -313,4 +313,4 @@ ROM_START( olypeopl )
 	ROMX_LOAD( "u01277g3.bin", 0x00001, 0x1000, CRC(3295691c) SHA1(7d7ade62117d11656b8dd86cf0703127616d55bc), ROM_SKIP(1)|ROM_BIOS(2))
 ROM_END
 
-COMP( 198?, olypeopl,   0,    0,         olypeopl,      0, peoplepc_state,      0,      "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 198?, olypeopl, 0, 0, olypeopl, 0, peoplepc_state, empty_init, "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

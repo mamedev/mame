@@ -801,7 +801,7 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u75_cb2_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, AY_CLOCK)
 	// TODO : Add port I/O handler
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, squale_state, ay_porta_r))
@@ -853,5 +853,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, 0,    "Apollo 7", "Squale", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, empty_init, "Apollo 7", "Squale", 0 )

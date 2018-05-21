@@ -153,4 +153,4 @@ ROM_START(quake)
 ROM_END
 
 
-GAME( 1998, quake,  0,   quake, quake, quakeat_state, 0, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )
+GAME( 1998, quake,  0,   quake, quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )

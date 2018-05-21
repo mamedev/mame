@@ -66,6 +66,7 @@ Final Fight (USA 900613)                                           89624B-3   S2
 Final Fight (Japan)                                                ?          S222B            ?     ?            CPS-B-04  DL-0411-10005
 Final Fight (Japan 900112)                                         89625B-1   S222B            LWIO  88622-C-5    CPS-B-01  DL-0411-10001  None
 Final Fight (Japan 900305)                                         88622B-3   S222B            LWIO  88622-C-5    CPS-B-02  DL-0411-10002  None
+Final Fight (Japan 900405)                                         88622B-2   S222B            LWIO  88622-C-5    CPS-B-03  DL-0411-10003  None
 Final Fight (Japan 900613)                                         89625B-1   S222B            LWIO  88622-C-5    CPS-B-05  DL-0411-10006  None
 
 1941: Counter Attack (World)                                 1990  89624B-3   YI24B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
@@ -1440,7 +1441,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B
-	{"ffightj3",    CPS_B_05,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj3",    CPS_B_03,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj4",    CPS_B_05,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightjh",    CPS_B_01,     mapper_S224B },   // wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
@@ -1549,6 +1551,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2amf",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 }, // probably wrong but this set is not completely dumped anyway
 	{"sf2amf2",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2level",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m2",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m3",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
@@ -1852,9 +1855,9 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
-				output().set_led_value(0, data & 0x02);
-				output().set_led_value(1, data & 0x04);
-				output().set_led_value(2, data & 0x08);
+				m_led_cboard[0] = BIT(data, 1);
+				m_led_cboard[1] = BIT(data, 2);
+				m_led_cboard[2] = BIT(data, 3);
 			}
 			else    // kod, captcomm, knights
 			{
@@ -1919,7 +1922,7 @@ void cps_state::cps2_gfx_decode()
 }
 
 
-DRIVER_INIT_MEMBER(cps_state,cps1)
+void cps_state::init_cps1()
 {
 	m_scanline1 = 0;
 	m_scanline2 = 0;
@@ -1931,7 +1934,7 @@ DRIVER_INIT_MEMBER(cps_state,cps1)
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2_video)
+void cps_state::init_cps2_video()
 {
 	cps2_gfx_decode();
 

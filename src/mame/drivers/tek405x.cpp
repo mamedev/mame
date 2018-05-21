@@ -622,9 +622,9 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	*/
 
 	// lamps
-	output().set_led_value(1, !BIT(data, 5));
-	output().set_led_value(2, !BIT(data, 6));
-	output().set_led_value(3, !BIT(data, 7));
+	m_lamps[0] = BIT(~data, 5);
+	m_lamps[1] = BIT(~data, 6);
+	m_lamps[2] = BIT(~data, 7);
 
 	// end or identify
 	m_gpib->eoi_w(!BIT(data, 4));
@@ -958,6 +958,8 @@ WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
 
 void tek4051_state::machine_start()
 {
+	m_lamps.resolve();
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
@@ -1015,7 +1017,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1122,7 +1124,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1251,7 +1253,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1975, tek4051,    0,       0,      tek4051,    tek4051, tek4051_state, 0,    "Tektronix", "Tektronix 4051",  MACHINE_NOT_WORKING )
-COMP( 1978, tek4052a,   tek4051, 0,      tek4052,    tek4051, tek4052_state, 0,    "Tektronix", "Tektronix 4052A", MACHINE_NOT_WORKING )
-//COMP( 1979, tek4054,  tek4051, 0,      tek4054,    tek4054, tek4052_state, 0,    "Tektronix", "Tektronix 4054",  MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1975, tek4051,   0,       0,      tek4051, tek4051, tek4051_state, empty_init, "Tektronix", "Tektronix 4051",  MACHINE_NOT_WORKING )
+COMP( 1978, tek4052a,  tek4051, 0,      tek4052, tek4051, tek4052_state, empty_init, "Tektronix", "Tektronix 4052A", MACHINE_NOT_WORKING )
+//COMP( 1979, tek4054,   tek4051, 0,      tek4054, tek4054, tek4052_state, empty_init, "Tektronix", "Tektronix 4054",  MACHINE_NOT_WORKING )

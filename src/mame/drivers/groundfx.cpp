@@ -218,7 +218,7 @@ static const gfx_layout scclayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( groundfx )
+static GFXDECODE_START( gfx_groundfx )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  4096, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_SCREEN_UPDATE_DRIVER(groundfx_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", groundfx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_groundfx)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -356,17 +356,17 @@ READ32_MEMBER(groundfx_state::irq_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(groundfx_state,groundfx)
+void groundfx_state::init_groundfx()
 {
 	uint8_t *gfx = memregion("gfx3")->base();
-	int size=memregion("gfx3")->bytes();
+	int size = memregion("gfx3")->bytes();
 
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));
 
 	/* make SCC tile GFX format suitable for gfxdecode */
 	uint32_t offset = size/2;
-	for (uint32_t i = size/2+size/4; i<size; i++)
+	for (uint32_t i = size/2 + size/4; i < size; i++)
 	{
 		/* Expand 2bits into 4bits format */
 		int data = gfx[i];
@@ -384,4 +384,4 @@ DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 }
 
 
-GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN )
+GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, init_groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN )

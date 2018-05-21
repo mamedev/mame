@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "jy.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 #ifdef NES_PCB_DEBUG
@@ -76,7 +75,7 @@ void nes_jy_typea_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
-	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(1);
+	timer_freq = clocks_to_attotime(1);
 
 	save_item(NAME(m_mul));
 	save_item(NAME(m_latch));
@@ -221,7 +220,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 
 		// if count wraps, check if IRQ is enabled
 		if (fire && m_irq_enable && !blanked)
-			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			set_irq_line(ASSERT_LINE);
 
 	}
 }
@@ -478,7 +477,7 @@ WRITE8_MEMBER(nes_jy_typea_device::write_h)
 						m_irq_enable = 1;
 					else
 					{
-						m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+						set_irq_line(CLEAR_LINE);
 						m_irq_enable = 0;
 					}
 					break;
@@ -493,7 +492,7 @@ WRITE8_MEMBER(nes_jy_typea_device::write_h)
 						irq_timer->adjust(attotime::never);
 					break;
 				case 2:
-					m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 					m_irq_enable = 0;
 					break;
 				case 3:

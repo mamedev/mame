@@ -21,6 +21,8 @@ public:
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
 
+	DECLARE_WRITE_LINE_MEMBER(smi_act_w);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -41,6 +43,7 @@ private:
 	uint8_t pcon, cc, dramec, dramc, dramt;
 	uint8_t pam[7], drb[8];
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
+	int smiact_n;
 
 	DECLARE_READ8_MEMBER (pcon_r);
 	DECLARE_WRITE8_MEMBER(pcon_w);

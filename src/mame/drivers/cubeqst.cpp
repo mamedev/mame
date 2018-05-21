@@ -553,7 +553,8 @@ MACHINE_CONFIG_START(cubeqst_state::cubeqst)
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cubeqst_state, vblank_irq))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -780,5 +781,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cubeqst,  0,       cubeqst, cubeqst, cubeqst_state, 0, ROT0, "Simutrek", "Cube Quest (01/04/84)", 0 )
-GAME( 1983, cubeqsta, cubeqst, cubeqst, cubeqst, cubeqst_state, 0, ROT0, "Simutrek", "Cube Quest (12/30/83)", 0 )
+GAME( 1983, cubeqst,  0,       cubeqst, cubeqst, cubeqst_state, empty_init, ROT0, "Simutrek", "Cube Quest (01/04/84)", 0 )
+GAME( 1983, cubeqsta, cubeqst, cubeqst, cubeqst, cubeqst_state, empty_init, ROT0, "Simutrek", "Cube Quest (12/30/83)", 0 )

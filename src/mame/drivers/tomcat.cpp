@@ -372,7 +372,8 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_DEVICE_ADD("avg", AVG_TOMCAT, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 
@@ -397,4 +398,4 @@ ROM_START( tomcat )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
 
-GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, 0, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, empty_init, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )

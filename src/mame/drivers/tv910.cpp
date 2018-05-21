@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_cts))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("bell", BEEP, MASTER_CLOCK / 8400) // 1620 Hz (Row 10 signal)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -570,5 +570,5 @@ ROM_START( tv910 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY              FULLNAME               FLAGS
-COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo Systems", "TeleVideo Model 910", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME               FLAGS
+COMP( 1981, tv910, 0,      0,      tv910,   tv910, tv910_state, empty_init, "TeleVideo Systems", "TeleVideo Model 910", 0 )

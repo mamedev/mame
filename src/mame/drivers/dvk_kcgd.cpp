@@ -342,7 +342,7 @@ static const gfx_layout kcgd_charlayout =
 	8*10                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( kcgd )
+static GFXDECODE_START( gfx_kcgd )
 	GFXDECODE_ENTRY("maincpu", 0112236, kcgd_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(kcgd_state, kcgd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kcgd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kcgd)
 #if 0
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
 	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
@@ -385,5 +385,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE        INIT   COMPANY     FULLNAME       FLAGS */
-COMP( 1987, dvk_kcgd, 0,      0,       kcgd,      0,       kcgd_state,  0,     "USSR",     "DVK KCGD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME    FLAGS */
+COMP( 1987, dvk_kcgd, 0,      0,      kcgd,    0,     kcgd_state, empty_init, "USSR",  "DVK KCGD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

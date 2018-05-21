@@ -113,7 +113,7 @@ INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
 {
 	if( ioport("COIN")->read() )
 		/* the service coin as conntected to the CPU's RDY pin as well */
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	device.execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
@@ -542,7 +542,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0,        panther,  panther,  redalert_state, 0, ROT270, "Irem",               "Panther",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redalert, 0,        redalert, redalert, redalert_state, 0, ROT270, "Irem (GDI license)", "Red Alert",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ww3,      redalert, ww3,      redalert, redalert_state, 0, ROT270, "Irem",               "WW III",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, demoneye, 0,        demoneye, demoneye, redalert_state, 0, ROT270, "Irem",               "Demoneye-X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, panther,  0,        panther,  panther,  redalert_state, empty_init, ROT270, "Irem",               "Panther",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redalert, 0,        redalert, redalert, redalert_state, empty_init, ROT270, "Irem (GDI license)", "Red Alert",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ww3,      redalert, ww3,      redalert, redalert_state, empty_init, ROT270, "Irem",               "WW III",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, demoneye, 0,        demoneye, demoneye, redalert_state, empty_init, ROT270, "Irem",               "Demoneye-X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -5,6 +5,8 @@
     Atari Subs hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SUBS_H
+#define MAME_INCLUDES_SUBS_H
 
 #include "sound/discrete.h"
 
@@ -70,4 +72,6 @@ public:
 
 /*----------- defined in audio/subs.c -----------*/
 
-DISCRETE_SOUND_EXTERN( subs );
+DISCRETE_SOUND_EXTERN( subs_discrete );
+
+#endif // MAME_INCLUDES_SUBS_H

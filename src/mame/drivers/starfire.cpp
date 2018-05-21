@@ -324,7 +324,7 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 {
 	// starfire has a jumper for disabling NMI, used to do a complete RAM test
 	if (m_nmi.read_safe(0x01))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(starfire_state::starfire)
 	fireone(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
@@ -451,7 +451,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(starfire_state,starfire)
+void starfire_state::init_starfire()
 {
 	m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),this);
 	m_io2_write = write8_delegate(FUNC(starfire_state::starfire_sound_w),this);
@@ -460,7 +460,7 @@ DRIVER_INIT_MEMBER(starfire_state,starfire)
 	save_item(NAME(m_prev_sound));
 }
 
-DRIVER_INIT_MEMBER(starfire_state,fireone)
+void starfire_state::init_fireone()
 {
 	m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),this);
 	m_io2_write = write8_delegate(FUNC(starfire_state::fireone_sound_w),this);
@@ -477,7 +477,7 @@ DRIVER_INIT_MEMBER(starfire_state,fireone)
  *
  *************************************/
 
-GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fireone,  0,        fireone,  fireone,  starfire_state, fireone,  ROT0, "Exidy", "Fire One", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, init_starfire, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, init_starfire, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fireone,  0,        fireone,  fireone,  starfire_state, init_fireone,  ROT0, "Exidy", "Fire One", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, init_starfire, ROT0, "Exidy", "Star Fire 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

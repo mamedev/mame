@@ -77,7 +77,8 @@ MACHINE_CONFIG_START(tg100_state::tg100)
 	MCFG_DEVICE_PROGRAM_MAP( tg100_map )
 	MCFG_DEVICE_IO_MAP( tg100_io_map )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymw258", MULTIPCM, 9400000)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymw258_map)
@@ -96,5 +97,5 @@ ROM_START( tg100 )
 
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
-CONS( 1991, tg100,    0,      0,      tg100,    tg100,    tg100_state,    0,    "Yamaha", "TG100",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME      FLAGS
+CONS( 1991, tg100, 0,      0,      tg100,   tg100, tg100_state, empty_init, "Yamaha", "TG100",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -39,7 +39,7 @@ public:
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(suprloco);
-	DECLARE_DRIVER_INIT(suprloco);
+	void init_suprloco();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);

@@ -133,7 +133,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", mx2178)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -182,5 +182,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                FULLNAME                FLAGS
-COMP( 198?, sys9002, 0,      0,       sys9002,   sys9002, sys9002_state, 0,    "Mannesmann Kienzle",  "System 9002 Terminal", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME                FLAGS
+COMP( 198?, sys9002, 0,      0,      sys9002, sys9002, sys9002_state, empty_init, "Mannesmann Kienzle", "System 9002 Terminal", MACHINE_IS_SKELETON )

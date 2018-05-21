@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
-	DECLARE_DRIVER_INIT(upscope);
+	void init_upscope();
 
 	void upscope(machine_config &config);
 	void a500_mem(address_map &map);
@@ -287,7 +287,8 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
@@ -361,7 +362,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(upscope_state, upscope)
+void upscope_state::init_upscope()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
@@ -378,4 +379,4 @@ DRIVER_INIT_MEMBER(upscope_state, upscope)
  *
  *************************************/
 
-GAME( 1986, upscope, 0, upscope, upscope, upscope_state, upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", MACHINE_IMPERFECT_SOUND )
+GAME( 1986, upscope, 0, upscope, upscope, upscope_state, init_upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", MACHINE_IMPERFECT_SOUND )

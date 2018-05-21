@@ -48,7 +48,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
 		m_maincpu->set_input_line(HD6309_FIRQ_LINE, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in or timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /*************************************
@@ -73,8 +73,8 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	output().set_led_value(0,data & 0x04);
-	output().set_led_value(1,data & 0x08);
+	m_lamp[0] = BIT(data, 2);
+	m_lamp[1] = BIT(data, 3);
 
 	/* bit 4 = relay (???) */
 
@@ -270,7 +270,7 @@ static const gfx_layout spritelayout =
 	32*8            /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( bladestl )
+static GFXDECODE_START( gfx_bladestl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0,  2 ) /* colors 00..31 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 32, 16 ) /* colors 32..47 but using lookup table */
 GFXDECODE_END
@@ -285,6 +285,7 @@ GFXDECODE_END
 void bladestl_state::machine_start()
 {
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
+	m_lamp.resolve();
 
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_last_track));
@@ -325,7 +326,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", bladestl)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_bladestl)
 	MCFG_PALETTE_ADD("palette", 32 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -346,7 +347,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	/* sound hardware */
 	/* the initialization order is important, the port callbacks being
 	   called at initialization time */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, M6809_IRQ_LINE))
@@ -448,6 +449,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )

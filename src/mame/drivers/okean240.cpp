@@ -91,7 +91,7 @@ public:
 	DECLARE_READ8_MEMBER(okean240a_port42_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_DRIVER_INIT(okean240);
+	void init_okean240();
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void okean240a(machine_config &config);
@@ -441,7 +441,7 @@ void okean240_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-DRIVER_INIT_MEMBER(okean240_state,okean240)
+void okean240_state::init_okean240()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
@@ -494,11 +494,11 @@ static const gfx_layout okean240_charlayout =
 	8*7                 /* every char takes 7 bytes */
 };
 
-static GFXDECODE_START( okean240 )
+static GFXDECODE_START( gfx_okean240 )
 	GFXDECODE_ENTRY( "maincpu", 0xec08, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( okean240a )
+static GFXDECODE_START( gfx_okean240a )
 	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(okean240_state::okean240a)
 	okean240t(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(okean240a_io)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240a)
 	MCFG_DEVICE_REMOVE("rs232")
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(okean240_state::okean240)
 	okean240t(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(okean240_io)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240)
 	MCFG_DEVICE_REMOVE("uart")
 	MCFG_DEVICE_REMOVE("rs232")
 	MCFG_DEVICE_MODIFY("pit")
@@ -601,7 +601,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      INIT            COMPANY    FULLNAME     FLAGS
-COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, okean240,  "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, okean240,  "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, okean240,  "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT           COMPANY      FULLNAME              FLAGS
+COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, init_okean240, "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, init_okean240, "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, init_okean240, "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

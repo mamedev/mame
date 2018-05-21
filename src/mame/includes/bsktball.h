@@ -87,6 +87,6 @@ private:
 
 /*----------- defined in audio/bsktball.c -----------*/
 
-DISCRETE_SOUND_EXTERN( bsktball );
+DISCRETE_SOUND_EXTERN( bsktball_discrete );
 
 #endif // MAME_INCLUDES_BSKTBALL_H

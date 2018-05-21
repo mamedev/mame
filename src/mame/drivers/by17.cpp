@@ -52,9 +52,9 @@ public:
 		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(by17);
-	DECLARE_DRIVER_INIT(matahari);
-	DECLARE_DRIVER_INIT(pwerplay);
+	void init_by17();
+	void init_matahari();
+	void init_pwerplay();
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -65,31 +65,8 @@ public:
 	void by17(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_READ8_MEMBER(nibble_nvram_r);
-	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
-	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
-	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
-
-	void by17_map(address_map &map);
 
 private:
 	uint8_t m_u10a;
@@ -122,6 +99,31 @@ private:
 	output_finder<15 * 4> m_lamps;
 	output_finder<5, 8> m_digits;
 	output_finder<20> m_solenoids;
+
+	DECLARE_READ8_MEMBER(u10_a_r);
+	DECLARE_WRITE8_MEMBER(u10_a_w);
+	DECLARE_READ8_MEMBER(u10_b_r);
+	DECLARE_WRITE8_MEMBER(u10_b_w);
+	DECLARE_READ8_MEMBER(u11_a_r);
+	DECLARE_WRITE8_MEMBER(u11_a_w);
+	DECLARE_WRITE8_MEMBER(u11_b_w);
+	DECLARE_READ8_MEMBER(nibble_nvram_r);
+	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
+	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
+	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
+	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
+	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
+	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
+
+	void by17_map(address_map &map);
 };
 
 
@@ -849,7 +851,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 
 
-DRIVER_INIT_MEMBER( by17_state, by17 )
+void by17_state::init_by17()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -889,7 +891,7 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, matahari )
+void by17_state::init_matahari()
 {
 	static const uint8_t solenoid_features_matahari[20][4] =
 	{
@@ -925,7 +927,7 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, pwerplay )
+void by17_state::init_pwerplay()
 {
 	static const uint8_t solenoid_features_pwerplay[20][4] =
 	{
@@ -1050,6 +1052,16 @@ ROM_START(bowarrow)
 	ROM_LOAD("b1e.bin", 0x0e00, 0x0200, CRC(ff2f97de) SHA1(28a8fdeccb1382d3a1153c97466426459c9fa075))
 ROM_END
 
+ROM_START(bowarrowa)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("u42704", 0x0400, 0x0200, CRC(b2ccd455) SHA1(07ba19ce2bcd0d2d0d27cab5aafd510423d2e8fe))
+	ROM_LOAD("u32704", 0x0600, 0x0200, CRC(ec673d77) SHA1(f350df32182da4958b4607db6952ffce89cda18f))
+	ROM_LOAD("u22704", 0x0800, 0x0200, CRC(4b4512da) SHA1(b427c504667769bd3b5c78ad3866c750cb7b1ed4))
+	ROM_LOAD("u12704", 0x0a00, 0x0200, CRC(a35e7473) SHA1(d5cadd968cad931dfe92d6ba4f013844f5b5d244))
+	ROM_LOAD("u62704", 0x0c00, 0x0200, CRC(8c421ae4) SHA1(93fcf26667308467215d35685c1acb04b0555d6b))
+	ROM_LOAD("u52704", 0x0e00, 0x0200, CRC(a6644eee) SHA1(8afa941d1dd94308272bbc1874603d3ed41d3b89))
+ROM_END
+
 /*--------------------------------
 / Freedom #1066
 /-------------------------------*/
@@ -1140,14 +1152,15 @@ ROM_END
 /---------------------------------------------------------------*/
 
 
-GAME(  1976, bowarrow, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Bow & Arrow (Prototype)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, freedom,  0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Freedom",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 21)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 20)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel",            MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
-GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 20)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, eightblo, eightbll, by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 17)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
-GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1976, bowarrow,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 23)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1976, bowarrowa, bowarrow, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 22)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, freedom,   0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Freedom",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightrdr,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 21)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightr20,  nightrdr, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 20)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1978, blackjck,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Black Jack (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, evelknie,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Evel Knievel",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, matahari,  0,        by17, matahari, by17_state, init_matahari, ROT0, "Bally", "Mata Hari",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
+GAME(  1977, eightbll,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 20)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, eightblo,  eightbll, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 17)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, pwerplay,  0,        by17, pwerplay, by17_state, init_pwerplay, ROT0, "Bally", "Power Play (Pinball)",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
+GAME(  1978, stk_sprs,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Strikes and Spares",               MACHINE_IS_SKELETON_MECHANICAL)

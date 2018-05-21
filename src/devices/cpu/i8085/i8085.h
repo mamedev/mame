@@ -85,7 +85,8 @@ protected:
 	virtual u32 execute_min_cycles() const override { return 4; }
 	virtual u32 execute_max_cycles() const override { return 16; }
 	virtual u32 execute_input_lines() const override { return 4; }
-	virtual u32 execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == I8085_RST75_LINE; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; }
@@ -139,8 +140,8 @@ private:
 	bool m_ietemp;       /* import/export temp space */
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
-	direct_read_data<0> *m_opcode_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcode_cache;
 	address_space *m_io;
 	int m_icount;
 

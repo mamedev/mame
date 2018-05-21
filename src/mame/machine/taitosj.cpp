@@ -34,9 +34,6 @@ void taitosj_state::machine_reset()
 	/* never write to the bank selector register) */
 	taitosj_bankswitch_w(space, 0, 0);
 
-	if (m_mcu)
-		m_mcu->reset_w(PULSE_LINE);
-
 	m_spacecr_prot_value = 0;
 }
 

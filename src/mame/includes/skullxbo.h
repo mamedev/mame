@@ -28,7 +28,7 @@ public:
 		m_playfield_latch(-1)
 	{ }
 
-	DECLARE_DRIVER_INIT(skullxbo);
+	void init_skullxbo();
 	void skullxbo(machine_config &config);
 
 protected:

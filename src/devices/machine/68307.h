@@ -76,15 +76,6 @@ private:
 
 	int calc_cs(offs_t address) const;
 
-	uint16_t simple_read_immediate_16_m68307(offs_t address);
-
-	uint8_t read_byte_m68307(offs_t address);
-	uint16_t read_word_m68307(offs_t address);
-	uint32_t read_dword_m68307(offs_t address);
-	void write_byte_m68307(offs_t address, uint8_t data);
-	void write_word_m68307(offs_t address, uint16_t data);
-	void write_dword_m68307(offs_t address, uint32_t data);
-
 	DECLARE_READ16_MEMBER( m68307_internal_base_r );
 	DECLARE_WRITE16_MEMBER( m68307_internal_base_w );
 	DECLARE_READ16_MEMBER( m68307_internal_timer_r );

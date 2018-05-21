@@ -452,7 +452,7 @@ static const gfx_layout layout_16x16x4 =
 };
 
 
-static GFXDECODE_START( sandscrp )
+static GFXDECODE_START( gfx_sandscrp )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0x000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4_2, 0x400, 0x40 ) // [1] Layers
 GFXDECODE_END
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sandscrp_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sandscrp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sandscrp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -504,14 +504,14 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* YM3014B + YM2203C */
@@ -569,7 +569,7 @@ ROM_START( sandscrpa ) /* Z03VA-003 PCB, earlier program version */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
-
+//快打獅子皇帝/Kuài dǎ shīzi huángdì
 ROM_START( sandscrpb ) /* Different rev PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) ) /* Chinese title screen */
@@ -590,6 +590,6 @@ ROM_START( sandscrpb ) /* Different rev PCB */
 ROM_END
 
 
-GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, empty_init, ROT90, "Face",   "Sand Scorpion", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, empty_init, ROT90, "Face",   "Sand Scorpion (Earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, empty_init, ROT90, "Face",   "Kuai Da Shizi Huangdi (China?, Revised Hardware)", MACHINE_SUPPORTS_SAVE )

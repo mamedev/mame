@@ -349,7 +349,7 @@ static const gfx_layout sm7238_charlayout =
 	16*8                 /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( sm7238 )
+static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm7238)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm7238)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
@@ -449,5 +449,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT   COMPANY     FULLNAME       FLAGS
-COMP( 1989, sm7238,   0,      0,       sm7238,    0,       sm7238_state,     0,     "USSR",     "SM 7238",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1989, sm7238, 0,      0,      sm7238,  0,     sm7238_state, empty_init, "USSR",  "SM 7238", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )

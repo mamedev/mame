@@ -68,12 +68,13 @@ mae(forward), migi(right), ushiro(back), hidari(left)
 class kungfur_state : public driver_device
 {
 public:
-	kungfur_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kungfur_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm1(*this, "adpcm1"),
 		m_adpcm2(*this, "adpcm2"),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
@@ -101,6 +102,7 @@ private:
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
 	output_finder<14> m_digits;
+	output_finder<8> m_lamp;
 };
 
 
@@ -137,13 +139,13 @@ WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 	if ((data & 7) == 6)
 	{
 		for (u8 i = 0; i < 5; i++)
-			output().set_lamp_value(i, BIT(m_latch[2], i));
+			m_lamp[i] = BIT(m_latch[2], i);
 	}
 
 	// d7: game-over lamp, d3-d4: marquee lamps
-	output().set_lamp_value(5, BIT(data, 7));
-	output().set_lamp_value(6, BIT(data, 3));
-	output().set_lamp_value(7, BIT(data, 4));
+	m_lamp[5] = BIT(data, 7);
+	m_lamp[6] = BIT(data, 3);
+	m_lamp[7] = BIT(data, 4);
 
 	// d5: N/C?
 	// d6: coincounter
@@ -278,6 +280,7 @@ INPUT_PORTS_END
 void kungfur_state::machine_start()
 {
 	m_digits.resolve();
+	m_lamp.resolve();
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_latch));
@@ -315,7 +318,8 @@ MACHINE_CONFIG_START(kungfur_state::kungfur)
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("adpcm1", MSM5205, XTAL(384'000))  // clock verified with recording
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kungfur_state, kfr_adpcm1_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
@@ -348,4 +352,4 @@ ROM_START( kungfur )
 	ROM_LOAD( "kr6.bin",   0x20000, 0x10000, CRC(9ea75d4a) SHA1(57445ccb961acb11a25cdac81f2e543d92bcb7f9) )
 ROM_END
 
-GAMEL(1987, kungfur,  0,       kungfur,  kungfur, kungfur_state,  0, ROT0, "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, layout_kungfur )
+GAMEL( 1987, kungfur, 0, kungfur,  kungfur, kungfur_state, empty_init, ROT0, "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, layout_kungfur )

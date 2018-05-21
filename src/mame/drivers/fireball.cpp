@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 	MCFG_EEPROM_SERIAL_X24C44_ADD("eeprom")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -529,5 +529,5 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY  FULLNAME    FLAGS
-GAME( 1989, fireball, 0,      fireball, fireball, fireball_state, 0,    ROT0, "Valco", "Fireball", MACHINE_MECHANICAL ) //1989 by rom name
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY  FULLNAME    FLAGS
+GAME( 1989, fireball, 0,      fireball, fireball, fireball_state, empty_init, ROT0, "Valco", "Fireball", MACHINE_MECHANICAL ) //1989 by rom name

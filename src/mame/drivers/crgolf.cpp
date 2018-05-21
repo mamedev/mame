@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -771,7 +771,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(crgolf_state,crgolfhi)
+void crgolf_state::init_crgolfhi()
 {
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
 }
@@ -784,11 +784,11 @@ DRIVER_INIT_MEMBER(crgolf_state,crgolfhi)
  *
  *************************************/
 
-GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, init_crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, 0,        ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, empty_init,    ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

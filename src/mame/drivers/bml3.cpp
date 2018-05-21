@@ -1013,11 +1013,9 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* slot devices */
 	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
@@ -1121,7 +1119,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY    FULLNAME                               FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,  bml3_state, 0,    "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
-COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,  bml3_state, 0,    "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
-COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,  bml3_state, 0,    "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY    FULLNAME                               FLAGS */
+COMP( 1980, bml3,    0,     0,      bml3,    bml3,  bml3_state, empty_init, "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
+COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,  bml3_state, empty_init, "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
+COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3,  bml3_state, empty_init, "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)

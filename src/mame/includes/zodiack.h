@@ -63,8 +63,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_DRIVER_INIT(zodiack);
-	DECLARE_DRIVER_INIT(percuss);
+	void init_zodiack();
+	void init_percuss();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_PALETTE_INIT(zodiack);

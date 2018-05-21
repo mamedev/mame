@@ -30,7 +30,8 @@ MACHINE_CONFIG_START(cpc_playcity_device::device_add_mconfig)
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc",z80ctc_device, trg3))
 	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, cpc_playcity_device, ctc_intr_cb))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymz_1",YMZ294,XTAL(4'000'000))  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 	MCFG_DEVICE_ADD("ymz_2",YMZ294,XTAL(4'000'000))

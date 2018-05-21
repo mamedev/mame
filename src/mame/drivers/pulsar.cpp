@@ -38,7 +38,7 @@ X - Test off-board memory banks
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dart.h"
 #include "machine/msm5832.h"
 #include "machine/i8255.h"
@@ -59,7 +59,7 @@ public:
 		, m_rtc(*this, "rtc")
 		{ }
 
-	DECLARE_DRIVER_INIT(pulsar);
+	void init_pulsar();
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(baud_w);
@@ -198,7 +198,7 @@ MACHINE_RESET_MEMBER( pulsar_state, pulsar )
 	m_rtc->cs_w(1); // always enabled
 }
 
-DRIVER_INIT_MEMBER( pulsar_state, pulsar )
+void pulsar_state::init_pulsar()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -264,5 +264,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT     COMPANY   FULLNAME            FLAGS
-COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY   FULLNAME            FLAGS
+COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar, pulsar_state, init_pulsar, "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW )

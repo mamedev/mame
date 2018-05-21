@@ -39,8 +39,8 @@ public:
 	void undrfire(machine_config &config);
 	void cbombers(machine_config &config);
 
-	DECLARE_DRIVER_INIT(undrfire);
-	DECLARE_DRIVER_INIT(cbombers);
+	void init_undrfire();
+	void init_cbombers();
 
 protected:
 	virtual void video_start() override;

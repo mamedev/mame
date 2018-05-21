@@ -666,5 +666,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE       INIT    COMPANY             FULLNAME            FLAGS
-COMP( 1985, bw2,    0,      0,      bw2,        bw2,    bw2_state,  0,      "Bondwell Holding", "Bondwell Model 2", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY             FULLNAME            FLAGS
+COMP( 1985, bw2,  0,      0,      bw2,     bw2,    bw2_state, empty_init, "Bondwell Holding", "Bondwell Model 2", MACHINE_NO_SOUND_HW )

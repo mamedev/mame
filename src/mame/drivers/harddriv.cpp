@@ -361,6 +361,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
 			m_adc8(*this, "adc8"),
+			m_lamps(*this, "lamp%u", 1U),
 			m_hd34010_host_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
@@ -1624,7 +1625,8 @@ MACHINE_CONFIG_START(harddriv_state::ds3)
 	MCFG_DEVICE_DATA_MAP(ds3xdsp_data_map)
 	MCFG_TIMER_DRIVER_ADD("ds3xdsp_timer", harddriv_state, ds3xdsp_internal_timer_callback)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
@@ -1868,7 +1870,7 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
 
 	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
@@ -1935,7 +1937,7 @@ MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
@@ -5083,7 +5085,7 @@ void harddriv_state::init_racedrivb1(void)
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x002000, 0x5fffff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x640000, 0xfff7ff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
 
-	DRIVER_INIT_CALL(racedriv);
+	init_racedriv();
 }
 
 READ32_MEMBER(harddriv_state::rddsp_unmap_r)
@@ -5244,64 +5246,64 @@ void harddriv_state::init_hdrivairp(void)
  *
  *************************************/
 
-GAME( 1988, harddriv,     0,        harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
-GAME( 1988, harddrivb,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
-GAME( 1988, harddrivg,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
-GAME( 1988, harddrivj,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )
-GAME( 1988, harddrivb6,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 6)", 0 )
-GAME( 1988, harddrivj6,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 6)", 0 )
-GAME( 1988, harddrivb5,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 5)", 0 )
-GAME( 1988, harddrivg4,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 4)", 0 )
-GAME( 1988, harddriv3,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 3)", 0 )
-GAME( 1988, harddriv2,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 2)", 0 )
-GAME( 1988, harddriv1,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", 0 )
+GAME(  1988, harddriv,    0,        harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
+GAME(  1988, harddrivb,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
+GAME(  1988, harddrivg,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
+GAME(  1988, harddrivj,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )
+GAME(  1988, harddrivb6,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 6)", 0 )
+GAME(  1988, harddrivj6,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 6)", 0 )
+GAME(  1988, harddrivb5,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 5)", 0 )
+GAME(  1988, harddrivg4,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 4)", 0 )
+GAME(  1988, harddriv3,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 3)", 0 )
+GAME(  1988, harddriv2,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 2)", 0 )
+GAME(  1988, harddriv1,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", 0 )
 
-GAME( 1990, harddrivc,    harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 2)", 0 )
-GAME( 1990, harddrivcg,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
-GAME( 1990, harddrivcb,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, British, rev 2)", 0 )
-GAME( 1990, harddrivc1,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 1)", 0 )
+GAME(  1990, harddrivc,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, rev 2)", 0 )
+GAME(  1990, harddrivcg,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
+GAME(  1990, harddrivcb,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, British, rev 2)", 0 )
+GAME(  1990, harddrivc1,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, rev 1)", 0 )
 
-GAME( 1989, stunrun,      0,        stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 6)", 0 )
-GAME( 1989, stunrunj,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 7, Japan)", 0 )
-GAME( 1989, stunrun5,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5)", 0 )
-GAME( 1989, stunrune,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5, Europe)", 0 )
-GAME( 1989, stunrun4,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 4)", 0 )
-GAME( 1989, stunrun3,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3)", 0 )
-GAME( 1989, stunrun3e,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3, Europe)", 0 )
-GAME( 1989, stunrun2,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2)", 0 )
-GAME( 1989, stunrun2e,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2, Europe)", 0 )
-GAME( 1989, stunrun0,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 0)", 0 )
-GAME( 1989, stunrunp,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (upright prototype)", 0 )
+GAME(  1989, stunrun,     0,        stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 6)", 0 )
+GAME(  1989, stunrunj,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 7, Japan)", 0 )
+GAME(  1989, stunrun5,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5)", 0 )
+GAME(  1989, stunrune,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5, Europe)", 0 )
+GAME(  1989, stunrun4,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 4)", 0 )
+GAME(  1989, stunrun3,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3)", 0 )
+GAME(  1989, stunrun3e,   stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3, Europe)", 0 )
+GAME(  1989, stunrun2,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2)", 0 )
+GAME(  1989, stunrun2e,   stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2, Europe)", 0 )
+GAME(  1989, stunrun0,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 0)", 0 )
+GAME(  1989, stunrunp,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (upright prototype)", 0 )
 
-GAME( 1990, racedriv,     0,        racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
-GAME( 1990, racedrivb,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
-GAME( 1990, racedrivg,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
-GAME( 1990, racedriv4,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
-GAME( 1990, racedrivb4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
-GAME( 1990, racedrivg4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
-GAME( 1990, racedriv3,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
-GAME( 1990, racedriv2,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
-GAME( 1990, racedriv1,    racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
-GAME( 1990, racedrivb1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
-GAME( 1990, racedrivg1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
+GAME(  1990, racedriv,    0,        racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
+GAME(  1990, racedrivb,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
+GAME(  1990, racedrivg,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
+GAME(  1990, racedriv4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
+GAME(  1990, racedrivb4,  racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
+GAME(  1990, racedrivg4,  racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
+GAME(  1990, racedriv3,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
+GAME(  1990, racedriv2,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
+GAME(  1990, racedriv1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
+GAME(  1990, racedrivb1,  racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
+GAME(  1990, racedrivg1,  racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
 
-GAME( 1990, racedrivc,    racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 5)", 0 )
-GAME( 1990, racedrivcb,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 5)", 0 )
-GAME( 1990, racedrivcg,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 5)", 0 )
-GAME( 1990, racedrivc4,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 4)", 0 )
-GAME( 1990, racedrivcb4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 4)", 0 )
-GAME( 1990, racedrivcg4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
-GAME( 1990, racedrivc2,   racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
-GAME( 1990, racedrivc1,   racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
+GAME(  1990, racedrivc,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 5)", 0 )
+GAME(  1990, racedrivcb,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 5)", 0 )
+GAME(  1990, racedrivcg,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 5)", 0 )
+GAME(  1990, racedrivc4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 4)", 0 )
+GAME(  1990, racedrivcb4, racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 4)", 0 )
+GAME(  1990, racedrivcg4, racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
+GAME(  1990, racedrivc2,  racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
+GAME(  1990, racedrivc1,  racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
 
-GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
+GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
 
-GAME( 1991, steeltal,     0,        steeltal_machine,  steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
-GAME( 1991, steeltalg,    steeltal, steeltal_machine,  steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
-GAME( 1991, steeltal1,    steeltal, steeltal1_machine, steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
-GAME( 1991, steeltalp,    steeltal, steeltalp_machine, steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
+GAME(  1991, steeltal,    0,        steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
+GAME(  1991, steeltalg,   steeltal, steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
+GAME(  1991, steeltal1,   steeltal, steeltal1_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
+GAME(  1991, steeltalp,   steeltal, steeltalp_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
 
-GAME( 1993, strtdriv,     0,        strtdriv_machine,  strtdriv,   harddriv_new_state, 0, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
+GAME(  1993, strtdriv,    0,        strtdriv_machine,   strtdriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
 
-GAME( 1993, hdrivair,     0,        hdrivair_machine,  hdrivair,   harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, hdrivairp,    hdrivair, hdrivairp_machine, hdrivair,   harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME(  1993, hdrivair,    0,        hdrivair_machine,   hdrivair,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME(  1993, hdrivairp,   hdrivair, hdrivairp_machine,  hdrivair,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

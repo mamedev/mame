@@ -35,7 +35,7 @@ public:
 		m_dma8257(*this, "dma8257")
 	{ }
 
-	DECLARE_DRIVER_INIT(fi6845);
+	void init_fi6845();
 
 	void fastinvaders(machine_config &config);
 	void fastinvaders_8275(machine_config &config);
@@ -638,7 +638,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( fastinvaders )
+static GFXDECODE_START( gfx_fastinvaders )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -674,7 +674,7 @@ MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, 
 	MCFG_SCREEN_UPDATE_DRIVER(fastinvaders_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastinvaders)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastinvaders)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -707,15 +707,14 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(fastinvaders_state, fi6845)
+void fastinvaders_state::init_fi6845()
 {
-const uint8_t *prom = memregion("prom")->base();
-	int i;
-	for (i=0;i<256;i++){
-		m_prom[i]=prom[i];
+	const uint8_t *prom = memregion("prom")->base();
+	for (int i = 0; i < 256; i++){
+		m_prom[i] = prom[i];
 	}
-	m_dma1=0;
-	m_io_40=0;
+	m_dma1 = 0;
+	m_io_40 = 0;
 }
 
 
@@ -792,6 +791,6 @@ ROM_START( fi6845 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
 ROM_END
 
-//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT    ROT     COMPANY       FULLNAME                        FLAGS
-GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT         ROT     COMPANY       FULLNAME                        FLAGS
+GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, init_fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, init_fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
