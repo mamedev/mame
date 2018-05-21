@@ -79,7 +79,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 {
 	m_misc = data & 0x7f;
 	/* Multi Player Start */
-	m_led[1] = BIT(~data, 6);
+	m_leds[1] = BIT(~data, 6);
 }
 
 
@@ -238,7 +238,7 @@ void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_ic_h3_data));
 	save_item(NAME(m_misc));
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 void copsnrob_state::machine_reset()

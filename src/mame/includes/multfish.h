@@ -24,7 +24,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
@@ -99,7 +99,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
-	output_finder<13> m_lamp;
+	output_finder<13> m_lamps;
 };
 
 

@@ -311,7 +311,7 @@ public:
 		, m_dac(*this, "dac")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_digits(*this, "digit%u", 0U)
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 		{ }
 
 	DECLARE_READ8_MEMBER(videopkr_io_r);
@@ -400,7 +400,7 @@ protected:
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<28> m_digits;
-	output_finder<14> m_lamp;
+	output_finder<14> m_lamps;
 };
 
 
@@ -695,14 +695,14 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 
 		case 0xef:  /* Port 2.4 */
 		{
-			m_lamp[0] = BIT(data, 0);    /* L_1 */
-			m_lamp[1] = BIT(data, 1);    /* L_2 */
-			m_lamp[2] = BIT(data, 2);    /* L_3 */
-			m_lamp[3] = BIT(data, 3);    /* L_4 */
-			m_lamp[4] = BIT(data, 4);    /* Coin */
-			m_lamp[5] = BIT(data, 5);    /* Hopper_1 */
-			m_lamp[6] = BIT(data, 6);    /* Hopper_2 */
-			m_lamp[7] = BIT(data, 7);    /* Diverter */
+			m_lamps[0] = BIT(data, 0);    /* L_1 */
+			m_lamps[1] = BIT(data, 1);    /* L_2 */
+			m_lamps[2] = BIT(data, 2);    /* L_3 */
+			m_lamps[3] = BIT(data, 3);    /* L_4 */
+			m_lamps[4] = BIT(data, 4);    /* Coin */
+			m_lamps[5] = BIT(data, 5);    /* Hopper_1 */
+			m_lamps[6] = BIT(data, 6);    /* Hopper_2 */
+			m_lamps[7] = BIT(data, 7);    /* Diverter */
 			m_p24_data = data;
 			m_hp_1 = (~m_p24_data >> 6) & 1;
 			m_hp_2 = (~m_p24_data >> 5) & 1;
@@ -732,12 +732,12 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 {
 	m_p1 = data;
 
-	m_lamp[8] = BIT(data, 0);    /* Aux_0 - Jackpot mech. counter (Baby Games)*/
-	m_lamp[9] = BIT(data, 1);    /* Aux_1 - */
-	m_lamp[10] = BIT(data, 2);   /* Aux_2 - */
-	m_lamp[11] = BIT(data, 3);   /* Aux_3 - */
-	m_lamp[12] = BIT(data, 4);   /* Aux_4 - Bell */
-	m_lamp[13] = BIT(data, 5);   /* Aux_5 - /CIO */
+	m_lamps[8] = BIT(data, 0);    /* Aux_0 - Jackpot mech. counter (Baby Games)*/
+	m_lamps[9] = BIT(data, 1);    /* Aux_1 - */
+	m_lamps[10] = BIT(data, 2);   /* Aux_2 - */
+	m_lamps[11] = BIT(data, 3);   /* Aux_3 - */
+	m_lamps[12] = BIT(data, 4);   /* Aux_4 - Bell */
+	m_lamps[13] = BIT(data, 5);   /* Aux_5 - /CIO */
 
 	m_jckp = m_p1 & 1;
 
@@ -1250,7 +1250,7 @@ GFXDECODE_END
 void videopkr_state::machine_start()
 {
 	m_digits.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 	m_vp_sound_p2 = 0xff;   /* default P2 latch value */
 	m_sound_latch = 0xff;   /* default sound data latch value */
 	m_p24_data = 0xff;

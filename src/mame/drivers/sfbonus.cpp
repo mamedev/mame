@@ -298,7 +298,7 @@ public:
 		m_2c01_regs(*this, "2c01_regs"),
 		m_3000_regs(*this, "3000_regs"),
 		m_3800_regs(*this, "3800_regs"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
@@ -450,7 +450,7 @@ public:
 	void sfbonus_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -478,7 +478,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_reel3_ram;
 	std::unique_ptr<uint8_t[]> m_reel4_ram;
 	std::unique_ptr<uint8_t[]> m_videoram;
-	output_finder<6> m_lamp;
+	output_finder<6> m_lamps;
 };
 
 
@@ -1193,22 +1193,22 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		m_lamp[0] = BIT(m_1800_regs[6], 0);
-		m_lamp[1] = BIT(m_1800_regs[6], 2);
-		m_lamp[2] = BIT(m_1800_regs[5], 2);
-		m_lamp[3] = BIT(m_1800_regs[5], 0);
-		m_lamp[4] = BIT(m_1800_regs[4], 2);
-		m_lamp[5] = BIT(m_1800_regs[4], 0);
+		m_lamps[0] = BIT(m_1800_regs[6], 0);
+		m_lamps[1] = BIT(m_1800_regs[6], 2);
+		m_lamps[2] = BIT(m_1800_regs[5], 2);
+		m_lamps[3] = BIT(m_1800_regs[5], 0);
+		m_lamps[4] = BIT(m_1800_regs[4], 2);
+		m_lamps[5] = BIT(m_1800_regs[4], 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		m_lamp[0] = BIT(m_1800_regs[0], 1);
-		m_lamp[1] = BIT(m_1800_regs[4], 1);
-		m_lamp[2] = BIT(m_1800_regs[3], 1);
-		m_lamp[3] = BIT(m_1800_regs[6], 2);
-		m_lamp[4] = BIT(m_1800_regs[4], 2);
-		m_lamp[5] = BIT(m_1800_regs[3], 2);
+		m_lamps[0] = BIT(m_1800_regs[0], 1);
+		m_lamps[1] = BIT(m_1800_regs[4], 1);
+		m_lamps[2] = BIT(m_1800_regs[3], 1);
+		m_lamps[3] = BIT(m_1800_regs[6], 2);
+		m_lamps[4] = BIT(m_1800_regs[4], 2);
+		m_lamps[5] = BIT(m_1800_regs[3], 2);
 	}
 
 	return 0;

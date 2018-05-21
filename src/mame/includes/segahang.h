@@ -40,7 +40,7 @@ public:
 		, m_adc_select(0)
 		, m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"})
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	// PPI read/write callbacks
@@ -113,7 +113,7 @@ protected:
 
 	// driver overrides
 	virtual void video_start() override;
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -144,5 +144,5 @@ protected:
 	optional_ioport_array<4> m_adc_ports;
 	bool                    m_shadow;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 };

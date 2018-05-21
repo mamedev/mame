@@ -159,7 +159,7 @@ public:
 		m_from68k_st4(0),
 		m_from68k_st3(0),
 		m_from68k_st2(0),
-		m_lamp(*this, "lamp%u", 1U)
+		m_lamps(*this, "lamp%u", 1U)
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -254,7 +254,7 @@ private:
 
 	int mole_state_a[6];
 	int mole_state_b[6];
-	output_finder<20> m_lamp;
+	output_finder<20> m_lamps;
 };
 
 
@@ -265,7 +265,7 @@ private:
 void kenseim_state::set_leds(uint32_t ledstates)
 {
 	for (int i=0; i<20; i++)
-		m_lamp[i] = BIT(ledstates, i);
+		m_lamps[i] = BIT(ledstates, i);
 }
 
 // could be wrong
@@ -702,7 +702,7 @@ void kenseim_state::init_kenseim()
 	m_led_clock = 0;
 	m_led_latch = 0;
 
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 

@@ -150,7 +150,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_vregs(*this, "vregs"),
 		m_vtable(*this, "vtable"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(gegege_regs_w);
@@ -281,7 +281,7 @@ public:
 	void tdoboon_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void video_start() override;
 
 	// Required devices
@@ -301,7 +301,7 @@ protected:
 	optional_shared_ptr<uint8_t> m_spriteram; // optional as some games allocate it themselves (due to banking)
 	optional_shared_ptr<uint8_t> m_vregs;     // optional as some games allocate it themselves (due to banking)
 	optional_shared_ptr<uint8_t> m_vtable;    // optional as some games allocate it themselves (due to banking)
-	output_finder<8> m_led;
+	output_finder<8> m_leds;
 
 	std::vector<uint8_t> m_paletteram;
 
@@ -964,7 +964,7 @@ WRITE8_MEMBER(sigmab98_state::eeprom_w)
 // 10 led?
 WRITE8_MEMBER(sigmab98_state::c4_w)
 {
-	m_led[0] = BIT(data, 4);
+	m_leds[0] = BIT(data, 4);
 
 	m_c4 = data;
 	show_outputs();
@@ -985,8 +985,8 @@ WRITE8_MEMBER(sigmab98_state::c6_w)
 	if ((data & 0x08) && !(m_c6 & 0x08))
 		m_buffered_spriteram->copy();
 
-	m_led[1] = BIT(data, 4);
-	m_led[2] = BIT(data, 5);
+	m_leds[1] = BIT(data, 4);
+	m_leds[2] = BIT(data, 5);
 
 	m_c6 = data;
 	show_outputs();
@@ -1207,10 +1207,10 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c6_w)
 //  machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04); // medal in
 	machine().bookkeeping().coin_counter_w(3, data & 0x08); // medal out
-	m_led[0] = BIT(data, 4); // button led
-//  m_led[1] = BIT(data, 5); // (unused button led)
-//  m_led[2] = BIT(data, 6); // (unused button led)
-//  m_led[3] = BIT(data, 7); // (unused button led)
+	m_leds[0] = BIT(data, 4); // button led
+//  m_leds[1] = BIT(data, 5); // (unused button led)
+//  m_leds[2] = BIT(data, 6); // (unused button led)
+//  m_leds[3] = BIT(data, 7); // (unused button led)
 
 	m_c6 = data;
 	show_outputs();
@@ -1451,7 +1451,7 @@ READ8_MEMBER(sigmab98_state::sammymdl_leds_r)
 }
 WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 {
-	m_led[0] = BIT(data, 0);   // button
+	m_leds[0] = BIT(data, 0);   // button
 
 	m_out[1] = data;
 	show_3_outputs();
@@ -1783,10 +1783,10 @@ void sigmab98_state::gocowboy_map(address_map &map)
 
 WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
 {
-	m_led[0] = BIT(data, 0);   // button
-	m_led[1] = BIT(data, 1);   // coin lockout? (after coining up, but not for service coin)
-	m_led[2] = BIT(data, 2);   // ? long after a prize is not collected
-	m_led[3] = BIT(data, 3);   // ? "don't forget the large prizes"
+	m_leds[0] = BIT(data, 0);   // button
+	m_leds[1] = BIT(data, 1);   // coin lockout? (after coining up, but not for service coin)
+	m_leds[2] = BIT(data, 2);   // ? long after a prize is not collected
+	m_leds[3] = BIT(data, 3);   // ? "don't forget the large prizes"
 
 	// 10 hopper enable?
 	// 20 hopper motor on (active low)?
@@ -2011,14 +2011,14 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 {
 	// All used
-	m_led[0] = BIT(data, 0);
-	m_led[1] = BIT(data, 1);
-	m_led[2] = BIT(data, 2);
-	m_led[3] = BIT(data, 3);
-	m_led[4] = BIT(data, 4);
-	m_led[5] = BIT(data, 5);
-	m_led[6] = BIT(data, 6);
-	m_led[7] = BIT(data, 7);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
+	m_leds[2] = BIT(data, 2);
+	m_leds[3] = BIT(data, 3);
+	m_leds[4] = BIT(data, 4);
+	m_leds[5] = BIT(data, 5);
+	m_leds[6] = BIT(data, 6);
+	m_leds[7] = BIT(data, 7);
 
 	m_out[1] = data;
 	show_3_outputs();

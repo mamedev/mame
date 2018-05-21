@@ -878,10 +878,10 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
     ---- xx--  BIG + SMALL (need to be individualized)
 */
 
-	m_lamp[8] = BIT(data, 0);      /* D-UP */
-	m_lamp[9] = BIT(data, 1);      /* TAKE SCORE */
-	m_lamp[10] = BIT(data, 2);     /* BIG */
-	m_lamp[11] = BIT(data, 3);     /* SMALL */
+	m_lamps[8] = BIT(data, 0);      /* D-UP */
+	m_lamps[9] = BIT(data, 1);      /* TAKE SCORE */
+	m_lamps[10] = BIT(data, 2);     /* BIG */
+	m_lamps[11] = BIT(data, 3);     /* SMALL */
 }
 
 WRITE8_MEMBER(lucky74_state::lamps_b_w)
@@ -898,14 +898,14 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
     x--- ----  CANCEL (should lit start too?)
 */
 
-	m_lamp[0] = BIT(data, 0);                 /* HOLD1 */
-	m_lamp[1] = BIT(data, 1);                 /* HOLD2 */
-	m_lamp[2] = BIT(data, 2);                 /* HOLD3 */
-	m_lamp[3] = BIT(data, 3);                 /* HOLD4 */
-	m_lamp[4] = BIT(data, 4);                 /* HOLD5 */
-	m_lamp[5] = BIT(data, 5);                 /* BET */
-	m_lamp[6] = BIT(data, 6) | BIT(data, 7);  /* START */
-	m_lamp[7] = BIT(data, 7);                 /* CANCEL */
+	m_lamps[0] = BIT(data, 0);                 /* HOLD1 */
+	m_lamps[1] = BIT(data, 1);                 /* HOLD2 */
+	m_lamps[2] = BIT(data, 2);                 /* HOLD3 */
+	m_lamps[3] = BIT(data, 3);                 /* HOLD4 */
+	m_lamps[4] = BIT(data, 4);                 /* HOLD5 */
+	m_lamps[5] = BIT(data, 5);                 /* BET */
+	m_lamps[6] = BIT(data, 6) | BIT(data, 7);  /* START */
+	m_lamps[7] = BIT(data, 7);                 /* CANCEL */
 }
 
 

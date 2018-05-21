@@ -109,7 +109,7 @@ WRITE8_MEMBER( c1551_device::port_w )
 	m_ga->mtr_w(BIT(data, 2));
 
 	// activity LED
-	m_led[LED_ACT] = BIT(data, 3);
+	m_leds[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -416,7 +416,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
 	, m_exp(*this, PLUS4_EXPANSION_SLOT_TAG)
 	, m_jp1(*this, "JP1")
-	, m_led(*this, "led%u", 0U)
+	, m_leds(*this, "led%u", 0U)
 	, m_tcbm_data(0xff)
 	, m_status(1)
 	, m_dav(1)
@@ -433,7 +433,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 
 void c1551_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// allocate timers
 	m_irq_timer = timer_alloc();

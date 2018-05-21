@@ -114,9 +114,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	    7   CONT. M1
 	*/
 
-	m_led[0] = BIT(data, 3); // 1P
-	m_led[1] = BIT(data, 4); // 2P
-	m_led[2] = BIT(data, 5); // FIRE
+	m_leds[0] = BIT(data, 3); // 1P
+	m_leds[1] = BIT(data, 4); // 2P
+	m_leds[2] = BIT(data, 5); // FIRE
 }
 
 WRITE8_MEMBER( draco_state::out1_w )
@@ -370,7 +370,7 @@ void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void cidelsa_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_reset));

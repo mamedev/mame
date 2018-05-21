@@ -157,7 +157,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
@@ -202,7 +202,7 @@ public:
 	void ramdac_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	tilemap_t *m_tmap;
@@ -230,7 +230,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
-	output_finder<8> m_lamp;
+	output_finder<7> m_lamps;
 };
 
 
@@ -435,13 +435,13 @@ WRITE8_MEMBER(skylncr_state::skylncr_nmi_enable_w)
 
 WRITE8_MEMBER(skylncr_state::mbutrfly_prot_w)
 {
-	m_lamp[1] = BIT(data, 0); // Slot Stop 2
-	m_lamp[2] = BIT(data, 1); // Slot Stop 1
-	m_lamp[3] = BIT(data, 2); // Take
-	m_lamp[4] = BIT(data, 3); // Bet
-	m_lamp[5] = BIT(data, 4); // Slot Stop 3
-	m_lamp[6] = BIT(data, 5); // Start
-	m_lamp[7] = BIT(data, 6); // Payout
+	m_lamps[0] = BIT(data, 0); // Slot Stop 2
+	m_lamps[1] = BIT(data, 1); // Slot Stop 1
+	m_lamps[2] = BIT(data, 2); // Take
+	m_lamps[3] = BIT(data, 3); // Bet
+	m_lamps[4] = BIT(data, 4); // Slot Stop 3
+	m_lamps[5] = BIT(data, 5); // Start
+	m_lamps[6] = BIT(data, 6); // Payout
 	m_mbutrfly_prot = BIT(data, 7);
 }
 

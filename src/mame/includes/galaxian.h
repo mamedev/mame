@@ -58,7 +58,7 @@ public:
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	/* video extension callbacks */
@@ -364,7 +364,7 @@ public:
 	void zigzag_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -386,7 +386,7 @@ protected:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 
 	int m_bullets_base;
 	int m_sprites_base;

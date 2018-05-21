@@ -74,7 +74,7 @@ public:
 		m_adpcm1(*this, "adpcm1"),
 		m_adpcm2(*this, "adpcm2"),
 		m_digits(*this, "digit%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
@@ -102,7 +102,7 @@ private:
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
 	output_finder<14> m_digits;
-	output_finder<8> m_lamp;
+	output_finder<8> m_lamps;
 };
 
 
@@ -139,13 +139,13 @@ WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 	if ((data & 7) == 6)
 	{
 		for (u8 i = 0; i < 5; i++)
-			m_lamp[i] = BIT(m_latch[2], i);
+			m_lamps[i] = BIT(m_latch[2], i);
 	}
 
 	// d7: game-over lamp, d3-d4: marquee lamps
-	m_lamp[5] = BIT(data, 7);
-	m_lamp[6] = BIT(data, 3);
-	m_lamp[7] = BIT(data, 4);
+	m_lamps[5] = BIT(data, 7);
+	m_lamps[6] = BIT(data, 3);
+	m_lamps[7] = BIT(data, 4);
 
 	// d5: N/C?
 	// d6: coincounter
@@ -280,7 +280,7 @@ INPUT_PORTS_END
 void kungfur_state::machine_start()
 {
 	m_digits.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_latch));

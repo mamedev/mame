@@ -480,7 +480,7 @@ public:
 		m_rom_bank(*this, "rom_bank"),
 		m_fg_vram(*this, "fg_vram"),
 		m_bg_vram(*this, "bg_vram"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
@@ -506,7 +506,7 @@ public:
 	void vrambanks(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -521,7 +521,7 @@ protected:
 
 	int m_mux_data;
 	int m_flip_state;
-	output_finder<13> m_lamp;
+	output_finder<13> m_lamps;
 };
 
 
@@ -684,13 +684,13 @@ WRITE8_MEMBER(majorpkr_state::lamps_a_w)
     -x-- ----   Small lamp.
     x--- ----   Unknown.
 */
-	m_lamp[0] = BIT(data, 0);       // Lamp 0: Hold 1.
-	m_lamp[1] = BIT(data, 1);  // Lamp 1: Hold 2.
-	m_lamp[2] = BIT(data, 2);  // Lamp 2: Hold 3.
-	m_lamp[3] = BIT(data, 3);  // Lamp 3: Hold 4.
-	m_lamp[4] = BIT(data, 4);  // Lamp 4: Hold 5.
-	m_lamp[5] = BIT(data, 5);  // Lamp 5: Big or Small (need identification).
-	m_lamp[6] = BIT(data, 6);  // Lamp 6: Big or Small (need identification).
+	m_lamps[0] = BIT(data, 0);       // Lamp 0: Hold 1.
+	m_lamps[1] = BIT(data, 1);  // Lamp 1: Hold 2.
+	m_lamps[2] = BIT(data, 2);  // Lamp 2: Hold 3.
+	m_lamps[3] = BIT(data, 3);  // Lamp 3: Hold 4.
+	m_lamps[4] = BIT(data, 4);  // Lamp 4: Hold 5.
+	m_lamps[5] = BIT(data, 5);  // Lamp 5: Big or Small (need identification).
+	m_lamps[6] = BIT(data, 6);  // Lamp 6: Big or Small (need identification).
 
 	if (data & 0x80)
 		logerror("Lamps A: Write to 13h: %02x\n", data);
@@ -710,12 +710,12 @@ WRITE8_MEMBER(majorpkr_state::lamps_b_w)
     --x- ----   Fever lamp.
     xx-- ----   Unknown.
 */
-	m_lamp[7] = BIT(data, 0);        // Lamp 7: Bet.
-	m_lamp[8] = BIT(data, 1);   // Lamp 8: Draw.
-	m_lamp[9] = BIT(data, 2);   // Lamp 9: Cancel.
-	m_lamp[10] = BIT(data, 3);  // Lamp 10: Take.
-	m_lamp[11] = BIT(data, 4);  // Lamp 11: D-UP.
-	m_lamp[12] = BIT(data, 5);  // Lamp 12: Fever.
+	m_lamps[7] = BIT(data, 0);        // Lamp 7: Bet.
+	m_lamps[8] = BIT(data, 1);   // Lamp 8: Draw.
+	m_lamps[9] = BIT(data, 2);   // Lamp 9: Cancel.
+	m_lamps[10] = BIT(data, 3);  // Lamp 10: Take.
+	m_lamps[11] = BIT(data, 4);  // Lamp 11: D-UP.
+	m_lamps[12] = BIT(data, 5);  // Lamp 12: Fever.
 
 	if (data & 0xc0)
 		logerror("Lamps B: Write to 14h: %02x\n", data);

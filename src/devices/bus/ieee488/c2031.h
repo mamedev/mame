@@ -68,7 +68,7 @@ private:
 	required_device<c64h156_device> m_ga;
 	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	// IEEE-488 bus
 	int m_nrfd_out;             // not ready for data

@@ -48,7 +48,7 @@ public:
 		, m_statuslatch(*this, "statuslatch")
 		, m_bios(*this, "user1")
 		, m_biosram(*this, "biosram")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
@@ -87,7 +87,7 @@ public:
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ protected:
 	optional_device<ls259_device> m_statuslatch;
 	optional_memory_region m_bios;
 	optional_shared_ptr<u16> m_biosram;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 private:
 	bool m_upperen;
@@ -340,12 +340,12 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 
 WRITE_LINE_MEMBER(isbc_state::led_ds1_w)
 {
-	m_led[0] = state ? 0 : 1;
+	m_leds[0] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER(isbc_state::led_ds3_w)
 {
-	m_led[1] = state ? 0 : 1;
+	m_leds[1] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)

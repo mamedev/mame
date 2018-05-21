@@ -213,7 +213,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
@@ -228,7 +228,7 @@ public:
 	void jubileep_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	uint8_t mux_sel;
@@ -239,7 +239,7 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<9> m_lamp;
+	output_finder<9> m_lamps;
 };
 
 
@@ -418,19 +418,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				m_lamp[0] = BIT(data, 0);  /* lamp */
+				m_lamps[0] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 0 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 0");
 			}
 		if (muxlamps == 2)
 			{
-				m_lamp[3] = BIT(data, 0);  /* lamp */
+				m_lamps[3] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 3 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 3");
 			}
 		if (muxlamps == 3)
 			{
-				m_lamp[6] = BIT(data, 0);  /* lamp */
+				m_lamps[6] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 6 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 6");
 			}
@@ -440,19 +440,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				m_lamp[1] = BIT(data, 0);  /* lamp */
+				m_lamps[1] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 1 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 1");
 			}
 		if (muxlamps == 2)
 			{
-				m_lamp[4] = BIT(data, 0);  /* lamp */
+				m_lamps[4] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 4 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 4");
 			}
 		if (muxlamps == 3)
 			{
-				m_lamp[7] = BIT(data, 0);  /* lamp */
+				m_lamps[7] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 7 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 7");
 			}
@@ -462,19 +462,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				m_lamp[2] = BIT(data, 0);  /* lamp */
+				m_lamps[2] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 2 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 2");
 			}
 		if (muxlamps == 2)
 			{
-				m_lamp[5] = BIT(data, 0);  /* lamp */
+				m_lamps[5] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 5 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 5");
 			}
 		if (muxlamps == 3)
 			{
-				m_lamp[8] = BIT(data, 0);  /* lamp */
+				m_lamps[8] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 8 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 8");
 			}
