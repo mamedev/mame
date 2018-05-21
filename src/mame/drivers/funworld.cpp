@@ -1023,17 +1023,17 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
     -x-- ----   Hopper Motor (inverted).
     x--- ----   HOLD4 lamp.
 */
-	m_lamp[0] = BIT(~data, 1);  /* Hold1 (inverted) */
-	m_lamp[2] = BIT(~data, 1);  /* Hold3 (inverted, see pinouts) */
+	m_lamps[0] = BIT(~data, 1);  /* Hold1 (inverted) */
+	m_lamps[2] = BIT(~data, 1);  /* Hold3 (inverted, see pinouts) */
 
-	m_lamp[1] = BIT(~data, 3);  /* Hold2 / Low (inverted) */
-	m_lamp[3] = BIT(data, 7);      /* Hold4 / High */
-	m_lamp[5] = BIT(~data, 5);  /* Cancel / Collect (inverted) */
+	m_lamps[1] = BIT(~data, 3);  /* Hold2 / Low (inverted) */
+	m_lamps[3] = BIT(data, 7);      /* Hold4 / High */
+	m_lamps[5] = BIT(~data, 5);  /* Cancel / Collect (inverted) */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Credit In counter */
 	machine().bookkeeping().coin_counter_w(7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
 
-	m_lamp[7] = BIT(~data, 6);      /* Hopper Motor (inverted) */
+	m_lamps[7] = BIT(~data, 6);      /* Hopper Motor (inverted) */
 
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
@@ -1047,8 +1047,8 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
     ---- -x--   Unknown (inverted).
     xxxx x---   Unknown.
 */
-	m_lamp[4] = BIT(data, 0);      /* Hold5 / Bet */
-	m_lamp[6] = BIT(data, 1);      /* Start / Deal / Draw */
+	m_lamps[4] = BIT(data, 0);      /* Hold5 / Bet */
+	m_lamps[6] = BIT(data, 1);      /* Start / Deal / Draw */
 
 //  popmessage("Lamps B: %02X", data);
 }
