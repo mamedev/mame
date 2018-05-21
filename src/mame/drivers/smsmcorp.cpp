@@ -539,6 +539,7 @@ void smsmfg_state::machine_start()
 
 MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
+	m_lamp.resolve();
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));
 }

@@ -1302,6 +1302,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
+		m_ay8910(*this, "ay8910"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_lamp(*this, "lamp%u", 0U)
@@ -1388,6 +1389,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
+	optional_device<ay8910_device> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<5> m_lamp;
@@ -1701,11 +1703,11 @@ WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
 {
 	if (wcfalcon_flag == 0)
 	{
-		machine().device<ay8910_device>("ay8910")->data_address_w(space, 0, data);
+		m_ay8910->data_address_w(space, 0, data);
 	}
 	else
 	{
-		machine().device<ay8910_device>("ay8910")->data_address_w(space, 1, data);
+		m_ay8910->data_address_w(space, 1, data);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;
@@ -4283,6 +4285,8 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(goldnpkr_state, mondial)
 {
+	m_lamp.resolve();
+
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
