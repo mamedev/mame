@@ -81,7 +81,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_soundlatch(*this, "soundlatch"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(blitter_status_r);
@@ -99,14 +99,14 @@ public:
 	void sound_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 
 	uint8_t m_reg[0x10];
 	std::unique_ptr<uint8_t[]> m_videobuf;
@@ -206,8 +206,8 @@ WRITE8_MEMBER(roul_state::ball_w)
 {
 	int lamp = data;
 
-	m_lamp[data] = 1;
-	m_lamp[m_lamp_old] = 0;
+	m_lamps[data] = 1;
+	m_lamps[m_lamp_old] = 0;
 	m_lamp_old = lamp;
 }
 

@@ -284,8 +284,8 @@ WRITE8_MEMBER(namcos86_state::coin_w)
 
 WRITE8_MEMBER(namcos86_state::led_w)
 {
-	m_led[0] = BIT(data, 3);
-	m_led[1] = BIT(data, 4);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 
@@ -329,7 +329,7 @@ void namcos86_state::machine_start()
 	if (membank("bank2"))
 		membank("bank2")->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
 
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_wdog));
 }

@@ -55,7 +55,7 @@ public:
 		, m_bg_scroll2(*this, "bg_scroll2")
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
@@ -116,7 +116,7 @@ protected:
 	required_shared_ptr<uint8_t> m_bg_scroll2;
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
-	output_finder<7> m_led;
+	output_finder<7> m_leds;
 
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
@@ -408,7 +408,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin out mech
 
-	m_led[6] = BIT(data, 6);   // led for coin out / m_hopper active
+	m_leds[6] = BIT(data, 6);   // led for coin out / m_hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
@@ -418,8 +418,8 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(igs009_state::video_and_leds_w)
 {
-	m_led[4] = BIT(data, 0); // start?
-	m_led[5] = BIT(data, 2); // l_bet?
+	m_leds[4] = BIT(data, 0); // start?
+	m_leds[5] = BIT(data, 2); // l_bet?
 
 	m_video_enable  =     data & 0x40;
 	m_hopper            =   (~data)& 0x80;
@@ -430,10 +430,10 @@ WRITE8_MEMBER(igs009_state::video_and_leds_w)
 
 WRITE8_MEMBER(igs009_state::leds_w)
 {
-	m_led[0] = BIT(data, 0);  // stop_1
-	m_led[1] = BIT(data, 1);  // stop_2
-	m_led[2] = BIT(data, 2);  // stop_3
-	m_led[3] = BIT(data, 3);  // stop
+	m_leds[0] = BIT(data, 0);  // stop_1
+	m_leds[1] = BIT(data, 1);  // stop_2
+	m_leds[2] = BIT(data, 2);  // stop_3
+	m_leds[3] = BIT(data, 3);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -801,7 +801,7 @@ GFXDECODE_END
 
 void igs009_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 
 	save_item(NAME(m_video_enable));

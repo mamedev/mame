@@ -24,6 +24,7 @@
 
 void fastfred_state::machine_start()
 {
+	galaxold_state::machine_start();
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_colorbank));
 	save_item(NAME(m_nmi_mask));

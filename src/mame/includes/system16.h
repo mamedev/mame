@@ -32,7 +32,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
@@ -197,7 +197,7 @@ public:
 	void wb3bbl_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_shared_ptr<uint16_t> m_textram;
 	optional_shared_ptr<uint16_t> m_bg0_tileram;
@@ -293,5 +293,5 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };

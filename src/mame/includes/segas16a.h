@@ -54,7 +54,7 @@ public:
 		, m_read_port(0)
 		, m_mj_input_num(0)
 		, m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	// PPI read/write callbacks
@@ -132,7 +132,7 @@ protected:
 
 	// driver overrides
 	virtual void video_start() override;
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -184,7 +184,7 @@ protected:
 	uint8_t                   m_read_port;
 	uint8_t                   m_mj_input_num;
 	optional_ioport_array<6> m_mj_inputs;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 };
 
 class afighter_16a_analog_state : public segas16a_state

@@ -24,7 +24,7 @@ public:
 		, m_k052109(*this, "k052109")
 		, m_k051960(*this, "k051960")
 		, m_rombank(*this, "rombank")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(dv_nmienable_w);
@@ -73,5 +73,5 @@ protected:
 	required_device<k051960_device> m_k051960;
 
 	required_memory_bank m_rombank;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 };

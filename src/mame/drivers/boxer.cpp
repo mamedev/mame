@@ -40,7 +40,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void boxer(machine_config &config);
@@ -82,7 +82,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };
 
 /*************************************
@@ -333,8 +333,8 @@ WRITE8_MEMBER(boxer_state::crowd_w)
 
 WRITE8_MEMBER(boxer_state::led_w)
 {
-	m_led[1] = BIT(~data, 0);
-	m_led[0] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 1);
 }
 
 
@@ -473,7 +473,7 @@ GFXDECODE_END
 
 void boxer_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_pot_interrupt = timer_alloc(TIMER_POT_INTERRUPT);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 

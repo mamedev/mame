@@ -42,7 +42,7 @@ public:
 		, m_customio_3(*this,"customio_3")
 		, m_videoram(*this,"videoram")
 		, m_spriteram(*this,"spriteram")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
@@ -102,7 +102,7 @@ protected:
 	required_shared_ptr<uint8_t> m_customio_3;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 
 	int m_type;
 

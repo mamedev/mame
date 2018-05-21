@@ -109,7 +109,7 @@ WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
 
 WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
 {
-	m_led[offset] = BIT(data, 0);
+	m_leds[offset] = BIT(data, 0);
 }
 
 READ8_MEMBER(galaxold_state::scramblb_protection_1_r)

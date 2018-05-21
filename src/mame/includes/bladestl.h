@@ -32,7 +32,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_trackball(*this, "TRACKBALL.%u", 0),
 		m_rombank(*this, "rombank"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	/* devices */
@@ -75,5 +75,5 @@ protected:
 	/* misc */
 	int        m_last_track[4];
 
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 };

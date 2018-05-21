@@ -38,7 +38,7 @@ TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
 
 void runaway_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(runaway_state::interrupt_callback),this));
 }
 
@@ -73,7 +73,7 @@ READ8_MEMBER(runaway_state::runaway_pot_r)
 
 WRITE8_MEMBER(runaway_state::runaway_led_w)
 {
-	m_led[offset] = BIT(~data, 0);
+	m_leds[offset] = BIT(~data, 0);
 }
 
 

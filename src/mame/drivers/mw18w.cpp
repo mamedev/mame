@@ -30,7 +30,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_digits(*this, "digit%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
@@ -43,10 +43,10 @@ public:
 	void mw18w_map(address_map &map);
 	void mw18w_portmap(address_map &map);
 private:
-	virtual void machine_start() override { m_digits.resolve(); m_lamp.resolve(); }
+	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	output_finder<10> m_digits;
-	output_finder<81> m_lamp;
+	output_finder<81> m_lamps;
 };
 
 
@@ -74,7 +74,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 	// d6: bell sound
 	// d7: backdrop lamp dim control
 
-	m_lamp[80] = BIT(data, 7);
+	m_lamps[80] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
@@ -87,7 +87,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 
 	// refresh lamp status
 	for (int i = 0; i < 5; i++)
-		m_lamp[col * 10 + i] = BIT(rows, i);
+		m_lamps[col * 10 + i] = BIT(rows, i);
 
 	/* lamps info:
 

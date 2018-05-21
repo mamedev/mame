@@ -119,7 +119,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
@@ -151,7 +151,7 @@ public:
 	void sgsafari_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	tilemap_t *m_layer0_tilemap;
@@ -166,7 +166,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<9> m_lamp;
+	output_finder<8> m_lamps;
 };
 
 
@@ -307,14 +307,14 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 
 //  popmessage("lamps: %02X", data);
 
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
-	m_lamp[2] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
-	m_lamp[3] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
-	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamp[5] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
-	m_lamp[6] = BIT(data, 5);      /* Lamp 6 - START  */
-	m_lamp[7] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
-	m_lamp[8] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
+	m_lamps[2] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 5);      /* Lamp 6 - START  */
+	m_lamps[6] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
+	m_lamps[7] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x400);
 }

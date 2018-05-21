@@ -40,7 +40,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
@@ -59,7 +59,7 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	//virtual void machine_reset();
 
 	virtual void video_start() override;
@@ -73,7 +73,7 @@ protected:
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<7> m_lamp;
+	output_finder<7> m_lamps;
 };
 
 
@@ -157,11 +157,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
-	m_lamp[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
+	m_lamps[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
 	machine().bookkeeping().coin_counter_w(1, data & 0x04);  // Payout / Ticket Out pulse
-	m_lamp[1] = BIT(data, 3);  // Hold 2 / Low (Bassa) lamp.
+	m_lamps[1] = BIT(data, 3);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
-	m_lamp[5] = BIT(data, 5);  // BET lamp
+	m_lamps[5] = BIT(data, 5);  // BET lamp
 	// D6: ticket motor...
 	// D7: unused...
 
@@ -172,11 +172,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		m_lamp[2] = 1;            // HOLD 3 ON
+		m_lamps[2] = 1;            // HOLD 3 ON
 	}
 	else
 	{
-		m_lamp[2] = 0;            // otherwise HOLD 3 OFF
+		m_lamps[2] = 0;            // otherwise HOLD 3 OFF
 	}
 }
 
@@ -184,11 +184,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
-	m_lamp[3] = BIT(data, 2);  // Hold 4 / High (Alta) lamp.
+	m_lamps[3] = BIT(data, 2);  // Hold 4 / High (Alta) lamp.
 	// D3: unused...
 	// D4: unused...
-	m_lamp[4] = BIT(data, 5);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
-	m_lamp[6] = BIT(data, 6);  // Start / Gamble (Raddoppio) lamp.
+	m_lamps[4] = BIT(data, 5);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
+	m_lamps[6] = BIT(data, 6);  // Start / Gamble (Raddoppio) lamp.
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
@@ -198,11 +198,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		m_lamp[2] = 1;    // Hold 3 ON
+		m_lamps[2] = 1;    // Hold 3 ON
 	}
 	else
 	{
-		m_lamp[2] = 0;    // Hold 3 OFF
+		m_lamps[2] = 0;    // Hold 3 OFF
 	}
 }
 

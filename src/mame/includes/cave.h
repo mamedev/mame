@@ -68,7 +68,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_led(*this, "led%u", 0U)
+		, m_led_outputs(*this, "led%u", 0U)
 	{ }
 
 	struct
@@ -315,7 +315,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_16_device> m_soundlatch;
-	output_finder<9> m_led;
+	output_finder<9> m_led_outputs;
 
 	int m_rasflag;
 	int m_old_rasflag;

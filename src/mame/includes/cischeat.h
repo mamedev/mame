@@ -39,7 +39,7 @@ public:
 		, m_captflag_motor_right(*this, "motor_right")
 		, m_oki1_bank(*this, "oki1_bank")
 		, m_oki2_bank(*this, "oki2_bank")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{
 		for (int side = 0; side < 2; ++side)
 			m_captflag_motor_command[side] = m_captflag_motor_pos[side] = 0;
@@ -141,7 +141,7 @@ public:
 	void wildplt_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void video_start() override;
 
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
@@ -192,5 +192,5 @@ protected:
 	optional_memory_bank m_oki2_bank;
 
 	uint16_t m_captflag_leds;
-	output_finder<5> m_led;
+	output_finder<5> m_leds;
 };
