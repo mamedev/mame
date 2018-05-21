@@ -8,6 +8,7 @@
 
 #include "machine/timer.h"
 #include "sound/pokey.h"
+#include "sound/tms5220.h"
 
 #define MHAVOC_CLOCK        10000000
 #define MHAVOC_CLOCK_5M     (MHAVOC_CLOCK/2)
@@ -30,6 +31,7 @@ public:
 		m_alpha(*this, "alpha"),
 		m_gamma(*this, "gamma"),
 		m_pokey(*this, "pokey%u", 1U),
+		m_tms(*this, "tms"),
 		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
@@ -76,6 +78,7 @@ protected:
 	required_device<cpu_device> m_alpha;
 	optional_device<cpu_device> m_gamma;
 	optional_device_array<pokey_device, 4> m_pokey;
+	optional_device<tms5220_device> m_tms;
 	output_finder<2> m_lamp;
 	uint8_t m_alpha_data;
 	uint8_t m_alpha_rcvd;

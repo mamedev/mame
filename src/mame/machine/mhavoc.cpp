@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/tms5220.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/mhavoc.h"
 
@@ -207,8 +206,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
 
 CUSTOM_INPUT_MEMBER(mhavoc_state::tms5220_r)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	return tms5220->readyq_r() ? 1 : 0;
+	return m_tms->readyq_r() ? 1 : 0;
 }
 
 CUSTOM_INPUT_MEMBER(mhavoc_state::mhavoc_bit67_r)
@@ -316,8 +314,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_data_w)
 
 WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	tms5220->data_w(space, 0, m_speech_write_buffer);
+	m_tms->data_w(space, 0, m_speech_write_buffer);
 }
 
 /*************************************

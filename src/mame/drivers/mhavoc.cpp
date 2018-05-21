@@ -192,7 +192,6 @@
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-#include "sound/tms5220.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "screen.h"
