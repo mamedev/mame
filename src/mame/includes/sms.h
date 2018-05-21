@@ -58,16 +58,17 @@ public:
 		m_led_pwr(*this, "led_pwr"),
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
-		m_is_gamegear(0),
-		m_is_smsj(0),
-		m_is_mark_iii(0),
-		m_is_sdisp(0),
-		m_ioctrl_region_is_japan(0),
-		m_has_bios_0400(0),
-		m_has_bios_2000(0),
-		m_has_bios_full(0),
-		m_has_jpn_sms_cart_slot(0),
-		m_store_cart_selection_data(0)
+		m_is_gamegear(false),
+		m_is_smsj(false),
+		m_is_mark_iii(false),
+		m_is_sdisp(false),
+		m_ioctrl_region_is_japan(false),
+		m_has_bios_0400(false),
+		m_has_bios_2000(false),
+		m_has_bios_full(false),
+		m_has_jpn_sms_cart_slot(false),
+		m_has_pwr_led(false),
+		m_store_cart_selection_data(false)
 	{ }
 
 	void store_post_load();
@@ -109,15 +110,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
 	DECLARE_READ32_MEMBER(sms_pixel_color);
 
-	void init_sg1000m3();
-	void init_gamegear();
-	void init_gamegeaj();
-	void init_sms1krfm();
-	void init_sms1kr();
-	void init_smskr();
-	void init_smsj();
-	void init_sms1();
-	void init_sms();
 	DECLARE_VIDEO_START(gamegear);
 	DECLARE_VIDEO_RESET(gamegear);
 	DECLARE_VIDEO_START(sms1);
@@ -140,6 +132,7 @@ public:
 	void sms1_paln(machine_config &config);
 	void sms1_ntsc(machine_config &config);
 	void gamegear(machine_config &config);
+	void gamegeaj(machine_config &config);
 	void sms3_paln(machine_config &config);
 	void sms1_pal(machine_config &config);
 	void sms2_pal(machine_config &config);
@@ -210,15 +203,16 @@ protected:
 	std::unique_ptr<int[]> m_line_buffer;
 
 	// model identifiers
-	uint8_t m_is_gamegear;
-	uint8_t m_is_smsj;
-	uint8_t m_is_mark_iii;
-	uint8_t m_is_sdisp;
-	uint8_t m_ioctrl_region_is_japan;
-	uint8_t m_has_bios_0400;
-	uint8_t m_has_bios_2000;
-	uint8_t m_has_bios_full;
-	uint8_t m_has_jpn_sms_cart_slot;
+	bool m_is_gamegear;
+	bool m_is_smsj;
+	bool m_is_mark_iii;
+	bool m_is_sdisp;
+	bool m_ioctrl_region_is_japan;
+	bool m_has_bios_0400;
+	bool m_has_bios_2000;
+	bool m_has_bios_full;
+	bool m_has_jpn_sms_cart_slot;
+	bool m_has_pwr_led;
 
 	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
 	uint8_t m_bios_page[4];
