@@ -183,47 +183,12 @@ READ8_MEMBER(polyplay_state::pio_portb_r)
 
 WRITE8_MEMBER(polyplay_state::pio_portb_w)
 {
-	uint8_t lightState = data & 0x07;
+	uint8_t const lightState = data & 0x07;
 	//uint8_t soundState = data & 0xe0;
 
 	// there is a DS8205D attached to bit 0 and 1
-	switch (lightState)
-	{
-		case 0:
-			m_lamp[1] = 1;
-			m_lamp[2] = 0;
-			m_lamp[3] = 0;
-			m_lamp[4] = 0;
-			break;
-
-		case 1:
-			m_lamp[1] = 0;
-			m_lamp[2] = 1;
-			m_lamp[3] = 0;
-			m_lamp[4] = 0;
-			break;
-
-		case 2:
-			m_lamp[1] = 0;
-			m_lamp[2] = 0;
-			m_lamp[3] = 1;
-			m_lamp[4] = 0;
-			break;
-
-		case 3:
-			m_lamp[1] = 0;
-			m_lamp[2] = 0;
-			m_lamp[3] = 0;
-			m_lamp[4] = 1;
-			break;
-
-		default:
-			m_lamp[1] = 0;
-			m_lamp[2] = 0;
-			m_lamp[3] = 0;
-			m_lamp[4] = 0;
-			break;
-	}
+	for (unsigned i = 0; 4 > i; ++i)
+		m_lamps[i] = (lightState == i) ? 1 : 0;
 }
 
 INPUT_CHANGED_MEMBER(polyplay_state::input_changed)

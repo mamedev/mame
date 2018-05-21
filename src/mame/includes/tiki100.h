@@ -62,9 +62,9 @@ public:
 		m_y(*this, "Y%u", 1),
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
+		m_leds(*this, "led%u", 1U),
 		m_rome(1),
-		m_vire(1),
-		m_led(*this, "led%u", 0U)
+		m_vire(1)
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -122,6 +122,7 @@ protected:
 	required_ioport_array<12> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_leds;
 
 	enum
 	{
@@ -151,7 +152,6 @@ protected:
 	// serial state
 	bool m_st;
 
-	output_finder<3> m_led;
 };
 
 #endif // MAME_INCLUDES_TIKI100_H

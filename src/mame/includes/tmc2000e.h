@@ -29,7 +29,7 @@ public:
 		, m_colorram(*this, "colorram")
 		, m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
 		, m_run(*this, "RUN")
-		, m_led(*this, "led%u", 0U)
+		, m_led(*this, "led1")
 	{ }
 
 	DECLARE_READ8_MEMBER( vismac_r );
@@ -71,7 +71,7 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_ioport_array<8> m_key_row;
 	required_ioport m_run;
-	output_finder<2> m_led;
+	output_finder<> m_led;
 };
 
 #endif

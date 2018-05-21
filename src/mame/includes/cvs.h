@@ -44,7 +44,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
@@ -141,7 +141,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	output_finder<3> m_lamp;
+	output_finder<2> m_lamps;
 
 	/* memory */
 	uint8_t      m_color_ram[0x400];

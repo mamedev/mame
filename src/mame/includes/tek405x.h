@@ -52,7 +52,7 @@ public:
 		m_bsofl_rom(*this, "020_0147_00"),
 		m_bscom_rom(*this, "021_0188_00"),
 		m_special(*this, "SPECIAL"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	void bankswitch(uint8_t data);
@@ -125,7 +125,7 @@ protected:
 	required_memory_region m_bsofl_rom;
 	required_memory_region m_bscom_rom;
 	required_ioport m_special;
-	output_finder<4> m_lamp;
+	output_finder<3> m_lamps;
 
 	// interrupts
 	int m_x_pia_irqa;

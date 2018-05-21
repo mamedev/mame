@@ -38,7 +38,7 @@ public:
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_led(*this, "led%u", 0U)
+		m_led(*this, "led1")
 	{ }
 
 	DECLARE_READ8_MEMBER(microtan_sound_r);
@@ -103,7 +103,7 @@ protected:
 	required_device<via6522_device> m_via6522_0;
 	required_device<via6522_device> m_via6522_1;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<2> m_led;
+	output_finder<> m_led;
 };
 
 #endif // MAME_INCLUDES_MICROTAN_H

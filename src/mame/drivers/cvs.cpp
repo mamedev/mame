@@ -928,7 +928,7 @@ GFXDECODE_END
 
 void cvs_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	/* allocate memory */
 	if (m_gfxdecode->gfx(1) != nullptr)

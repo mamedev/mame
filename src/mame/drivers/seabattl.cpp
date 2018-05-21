@@ -53,12 +53,12 @@ public:
 		m_digits(*this, { "sc_thousand", "sc_hundred", "sc_half", "sc_unity", "tm_half", "tm_unity" }),
 		m_s2636(*this, "s2636"),
 		m_7segs(*this, "digit%u", 0U),
+		m_lamp(*this, "lamp0"),
 		m_waveenable(false),
 		m_collision(0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp0")
+		m_palette(*this, "palette")
 	{ }
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -96,6 +96,7 @@ private:
 	required_device_array<dm9368_device, 6> m_digits;
 	required_device<s2636_device> m_s2636;
 	output_finder<6> m_7segs;
+	output_finder<> m_lamp;
 
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_collision_bg;
@@ -105,7 +106,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<> m_lamp;
 };
 
 

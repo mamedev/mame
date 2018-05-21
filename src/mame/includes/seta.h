@@ -64,7 +64,7 @@ public:
 		m_vctrl(*this,"vctrl_%u", 0),
 		m_paletteram(*this,"paletteram%u", 1),
 		m_subbank(*this,"subbank"),
-		m_leds(*this,"led%u", 0U),
+		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
