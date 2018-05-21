@@ -264,6 +264,7 @@ void md6802_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
 
+	didact_state::machine_start();
 	m_7segs.resolve();
 
 	save_item(NAME(m_reset));
@@ -458,6 +459,7 @@ void mp68a_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
 
+	didact_state::machine_start();
 	m_7segs.resolve();
 
 	/* register for state saving */

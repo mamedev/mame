@@ -82,8 +82,6 @@ public:
 	void uballoon_sound_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
-
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_pcm1;
 	optional_device<cpu_device> m_pcm2;

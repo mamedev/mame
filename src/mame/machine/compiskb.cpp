@@ -243,6 +243,9 @@ void compis_keyboard_device::device_start()
 	// resolve callbacks
 	m_out_tx_handler.resolve_safe();
 	m_out_tx_handler(1);
+
+	// resolve output finder
+	m_led_caps.resolve();
 }
 
 

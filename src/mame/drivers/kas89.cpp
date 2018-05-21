@@ -267,7 +267,7 @@ protected:
 	required_ioport m_svc;
 	required_ioport m_dsw;
 	required_ioport m_unk;
-	output_finder<37> m_lamp;
+	output_finder<38> m_lamp;
 };
 
 

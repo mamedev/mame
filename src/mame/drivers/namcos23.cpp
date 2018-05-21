@@ -3472,6 +3472,8 @@ INPUT_PORTS_END
 
 void namcos23_state::machine_start()
 {
+	m_lamp.resolve();
+
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 
