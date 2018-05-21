@@ -349,6 +349,10 @@ void video992_device::device_reset()
 
 io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: bus::hexbus::hexbus_chained_device(mconfig, type, tag, owner, clock),
+		m_hexbus(*this, "^" TI_HEXBUS_TAG),
+		m_cassette(*this, "^" TI_CASSETTE),
+		m_videoctrl(*this, "^" TI992_VDC_TAG),
+		m_keyboard(*this, "LINE%u", 0U),
 		m_set_rom_bank(*this),
 		m_key_row(0),
 		m_latch_out(0xd7),
@@ -444,9 +448,7 @@ INPUT_PORTS_END
 
 void io992_device::device_start()
 {
-	m_hexbus_outbound = dynamic_cast<bus::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
-	m_cassette = dynamic_cast<cassette_image_device*>(machine().device(TI_CASSETTE));
-	m_videoctrl = dynamic_cast<video992_device*>(machine().device(TI992_VDC_TAG));
+	set_outbound_hexbus(m_hexbus.target());
 
 	// Establish callback for inbound propagations
 	m_hexbus_outbound->set_chain_element(this);
@@ -456,8 +458,6 @@ void io992_device::device_start()
 
 READ8_MEMBER(io992_device::cruread)
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
-
 	int address = offset << 4;
 	uint8_t value = 0x7f;  // All Hexbus lines high
 	double inp = 0;
@@ -469,7 +469,7 @@ READ8_MEMBER(io992_device::cruread)
 	case 0xe000:
 		// CRU E000-E7fE: Keyboard
 		//   Read: 0000 1110 0*** **** (mirror 007f)
-		value = ioport(keynames[m_key_row])->read();
+		value = m_keyboard[m_key_row]->read();
 		break;
 	case 0xe800:
 		// CRU E800-EFFE: Hexbus and other functions

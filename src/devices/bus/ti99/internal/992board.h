@@ -117,8 +117,10 @@ protected:
 private:
 	const uint8_t m_hexbval[6] = { 0x01, 0x02, 0x40, 0x80, 0x10, 0x04 };
 
-	cassette_image_device* m_cassette;
-	video992_device* m_videoctrl;
+	required_device<hexbus::hexbus_device> m_hexbus;
+	required_device<cassette_image_device> m_cassette;
+	required_device<video992_device> m_videoctrl;
+	required_ioport_array<8> m_keyboard;
 
 	// Set ROM bank
 	devcb_write_line m_set_rom_bank;
