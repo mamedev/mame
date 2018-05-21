@@ -40,8 +40,6 @@ public:
 	DECLARE_PALETTE_INIT(funworld);
 	DECLARE_VIDEO_START(magicrd2);
 	DECLARE_VIDEO_START(chinatow);
-	DECLARE_MACHINE_START(lunapark);
-	DECLARE_MACHINE_RESET(lunapark);
 	uint32_t screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void royalcd1(machine_config &config);
 	void royalcd2(machine_config &config);

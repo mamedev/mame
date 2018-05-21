@@ -3055,7 +3055,6 @@ void lunapark_state::machine_start()
 
 void lunapark_state::machine_reset()
 {
-	funworld_state::machine_reset();
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
 
