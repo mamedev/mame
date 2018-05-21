@@ -94,8 +94,8 @@ MACHINE_CONFIG_START(m74_state::m74)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -113,4 +113,4 @@ ROM_START(shootaw2)
 	ROM_LOAD( "unknown_label.5e", 0x000000, 0x040000, CRC(fa75e91e) SHA1(d06ca906135a3f23c1f0dadff75f940ea7ca0e4a) )
 ROM_END
 
-GAME( 1996,  shootaw2,  0,  m74,  m74, m74_state,  0,  ROT0,  "Namco",    "Shoot Away II", MACHINE_NOT_WORKING )
+GAME( 1996,  shootaw2,  0,  m74,  m74, m74_state, empty_init, ROT0, "Namco", "Shoot Away II", MACHINE_NOT_WORKING )

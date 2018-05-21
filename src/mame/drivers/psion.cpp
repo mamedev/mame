@@ -32,7 +32,7 @@
 TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {
 	if (m_enable_nmi)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 uint8_t psion_state::kb_read()
@@ -565,7 +565,7 @@ static const gfx_layout psion_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( psion )
+static GFXDECODE_START( gfx_psion )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, psion_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -586,13 +586,13 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -806,15 +806,15 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE    INPUT   STATE          INIT  COMPANY   FULLNAME               FLAGS
-COMP( 1984, psion1,     0,       0,      psion1,    psion1, psion1_state,  0,    "Psion",  "Organiser I",         MACHINE_NOT_WORKING )
-COMP( 1986, psioncm,    0,       0,      psioncm,   psion,  psion_state,   0,    "Psion",  "Organiser II CM",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionla,    psioncm, 0,      psionla,   psion,  psion_state,   0,    "Psion",  "Organiser II LA",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionxp,    psioncm, 0,      psionla,   psion,  psion_state,   0,    "Psion",  "Organiser II XP",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionp200,  psioncm, 0,      psionp350, psion,  psion_state,   0,    "Psion",  "Organiser II P200",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionp350,  psioncm, 0,      psionp350, psion,  psion_state,   0,    "Psion",  "Organiser II P350",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionlam,   psioncm, 0,      psionlam,  psion,  psion_state,   0,    "Psion",  "Organiser II LAM",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionlz,    0,       0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II LZ",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionlz64,  psionlz, 0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II LZ64",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionlz64s, psionlz, 0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II LZ64S",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionp464,  psionlz, 0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II P464",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE    INPUT   CLASS         INIT        COMPANY  FULLNAME              FLAGS
+COMP( 1984, psion1,     0,       0,      psion1,    psion1, psion1_state, empty_init, "Psion", "Organiser I",        MACHINE_NOT_WORKING )
+COMP( 1986, psioncm,    0,       0,      psioncm,   psion,  psion_state,  empty_init, "Psion", "Organiser II CM",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionla,    psioncm, 0,      psionla,   psion,  psion_state,  empty_init, "Psion", "Organiser II LA",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionxp,    psioncm, 0,      psionla,   psion,  psion_state,  empty_init, "Psion", "Organiser II XP",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionp200,  psioncm, 0,      psionp350, psion,  psion_state,  empty_init, "Psion", "Organiser II P200",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionp350,  psioncm, 0,      psionp350, psion,  psion_state,  empty_init, "Psion", "Organiser II P350",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionlam,   psioncm, 0,      psionlam,  psion,  psion_state,  empty_init, "Psion", "Organiser II LAM",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionlz,    0,       0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II LZ",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionlz64,  psionlz, 0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II LZ64",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionlz64s, psionlz, 0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II LZ64S", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionp464,  psionlz, 0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II P464",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

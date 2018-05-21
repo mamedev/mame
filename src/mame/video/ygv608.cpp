@@ -228,7 +228,7 @@ static const gfx_layout pts_16x16_8bits_layout =
 	16*16*8
 };
 
-static GFXDECODE_START( ygv608 )
+static GFXDECODE_START( gfx_ygv608 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_8x8_4bits_layout,    0,  16 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_16x16_4bits_layout,  0,  16 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_32x32_4bits_layout,  0,  16 )
@@ -316,8 +316,9 @@ void ygv608_device::port_map(address_map &map)
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, YGV608, tag, owner, clock),
-	  device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608)),
+	  device_gfx_interface(mconfig, *this, gfx_ygv608),
 	  device_memory_interface(mconfig, *this),
+	  device_video_interface(mconfig, *this),
 	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ygv608_device::regs_map), this)),
 	  m_vblank_handler(*this),
 	  m_raster_handler(*this)
@@ -378,7 +379,6 @@ void ygv608_device::device_start()
 	m_iospace = &space(AS_IO);
 
 	// TODO: tagging configuration
-	m_screen = downcast<screen_device *>(machine().device("screen"));
 	m_vblank_handler.resolve();
 	m_raster_handler.resolve();
 	m_vblank_timer = timer_alloc(VBLANK_TIMER);
@@ -1386,7 +1386,7 @@ READ8_MEMBER(ygv608_device::register_data_r)
 READ8_MEMBER( ygv608_device::status_port_r )
 {
 	// TODO: we need to use h/vpos in case of border support instead due of how MAME framework works here.
-	return (m_screen_status & 0x1c) | (m_screen->hblank()<<1) | m_screen->vblank();
+	return (m_screen_status & 0x1c) | (screen().hblank()<<1) | screen().vblank();
 }
 
 // P#7R - system control port
@@ -2085,7 +2085,7 @@ attotime ygv608_device::raster_sync_offset()
 	}
 
 	// TODO: actual sync not taken into account, needs a better test than NCV2 limited case
-	return m_screen->time_until_pos(m_raster_irq_vpos,m_raster_irq_hpos);
+	return screen().time_until_pos(m_raster_irq_vpos,m_raster_irq_hpos);
 }
 
 // R#17 / R#24 - base address
@@ -2261,14 +2261,14 @@ void ygv608_device::screen_configure()
 
 	// TODO: Dig Dug Original wants this to be 60.60 Hz (like original Namco HW), lets compensate somehow
 	//      (clock is really 6144000 x 8 = 49152000, so it must have same parameters in practice)
-	attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
+	attoseconds_t period = HZ_TO_ATTOSECONDS(screen().clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
 
-	m_screen->configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
+	screen().configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
 
 	// reset vblank timer
 	m_vblank_timer->reset();
-	//m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_vstart+m_crtc.display_height,0), 0, m_screen->frame_period());
-	m_vblank_timer->adjust(m_screen->time_until_pos(m_crtc.display_height,0), 0, m_screen->frame_period());
+	//m_vblank_timer->adjust(screen().time_until_pos(m_crtc.display_vstart+m_crtc.display_height,0), 0, screen().frame_period());
+	m_vblank_timer->adjust(screen().time_until_pos(m_crtc.display_height,0), 0, screen().frame_period());
 }
 
 

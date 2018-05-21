@@ -215,9 +215,9 @@ WRITE8_MEMBER( softbox_device::ppi1_pc_w )
 
 	*/
 
-	machine().output().set_led_value(LED_A, !BIT(data, 0));
-	machine().output().set_led_value(LED_B, !BIT(data, 1));
-	machine().output().set_led_value(LED_READY, !BIT(data, 2));
+	m_led[LED_A] = BIT(~data, 0);
+	m_led[LED_B] = BIT(~data, 1);
+	m_led[LED_READY] = BIT(~data, 2);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -324,6 +324,7 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 	, m_maincpu(*this, Z80_TAG)
 	, m_dbrg(*this, COM8116_TAG)
 	, m_hdc(*this, CORVUS_HDC_TAG)
+	, m_led(*this, "led%u", 0U)
 	, m_ifc(0)
 {
 }
@@ -335,6 +336,7 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 
 void softbox_device::device_start()
 {
+	m_led.resolve();
 }
 
 

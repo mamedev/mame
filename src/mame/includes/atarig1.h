@@ -56,10 +56,10 @@ public:
 	DECLARE_READ16_MEMBER(a2d_data_r);
 	DECLARE_READ16_MEMBER(pitfightb_cheap_slapstic_r);
 	void update_bank(int bank);
-	DECLARE_DRIVER_INIT(hydrap);
-	DECLARE_DRIVER_INIT(hydra);
-	DECLARE_DRIVER_INIT(pitfight);
-	DECLARE_DRIVER_INIT(pitfightb);
+	void init_hydrap();
+	void init_hydra();
+	void init_pitfight();
+	void init_pitfightb();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(atarig1);

@@ -19,82 +19,82 @@
 //**************************************************************************
 
 #define MCFG_315_5649_IN_PA_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 0);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_OUT_PA_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 0);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_IN_PB_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 1);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_OUT_PB_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 1);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_IN_PC_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 2);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_OUT_PC_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 2);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_IN_PD_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 3);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_OUT_PD_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 3);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_IN_PE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 4);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback<4>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_OUT_PE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 4);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback<4>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_IN_PF_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 5);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback<5>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_OUT_PF_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 5);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback<5>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_IN_PG_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 6);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback<6>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_OUT_PG_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 6);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback<6>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN0_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 0);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN1_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 1);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN2_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 2);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN3_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 3);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN4_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 4);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<4>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN5_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 5);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<5>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN6_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 6);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<6>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_AN7_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 7);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback<7>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_SERIAL_CH1_READ_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_rd_callback(DEVCB_##_devcb, 0);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_rd_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_SERIAL_CH1_WRITE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_wr_callback(DEVCB_##_devcb, 0);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_wr_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_SERIAL_CH2_READ_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_rd_callback(DEVCB_##_devcb, 1);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_rd_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_315_5649_SERIAL_CH2_WRITE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_wr_callback(DEVCB_##_devcb, 1);
+	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_wr_callback<1>(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -108,20 +108,20 @@ public:
 	sega_315_5649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> devcb_base &set_in_port_callback(Object &&cb, int index)
-	{ return m_in_port_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <int N, class Object> devcb_base &set_in_port_callback(Object &&cb)
+	{ return m_in_port_cb[N].set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> devcb_base &set_out_port_callback(Object &&cb, int index)
-	{ return m_out_port_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <int N, class Object> devcb_base &set_out_port_callback(Object &&cb)
+	{ return m_out_port_cb[N].set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> devcb_base &set_an_port_callback(Object &&cb, int index)
-	{ return m_an_port_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <int N, class Object> devcb_base &set_an_port_callback(Object &&cb)
+	{ return m_an_port_cb[N].set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> devcb_base &set_serial_rd_callback(Object &&cb, int index)
-	{ return m_serial_rd_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <int N, class Object> devcb_base &set_serial_rd_callback(Object &&cb)
+	{ return m_serial_rd_cb[N].set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> devcb_base &set_serial_wr_callback(Object &&cb, int index)
-	{ return m_serial_wr_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <int N, class Object> devcb_base &set_serial_wr_callback(Object &&cb)
+	{ return m_serial_wr_cb[N].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

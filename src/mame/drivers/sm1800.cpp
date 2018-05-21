@@ -153,7 +153,7 @@ static const gfx_layout sm1800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( sm1800 )
+static GFXDECODE_START( gfx_sm1800 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sm1800_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -176,7 +176,7 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm1800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
@@ -203,5 +203,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT   COMPANY      FULLNAME   FLAGS */
-COMP( ????, sm1800,  0,      0,       sm1800,    sm1800, sm1800_state,   0,     "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY      FULLNAME   FLAGS */
+COMP( ????, sm1800, 0,      0,      sm1800,  sm1800, sm1800_state, empty_init, "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

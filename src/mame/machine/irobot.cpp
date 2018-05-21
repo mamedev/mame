@@ -140,8 +140,8 @@ WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 			membank("bank1")->set_base(&RAM[0x1A000]);
 			break;
 	}
-	output().set_led_value(0,data & 0x10);
-	output().set_led_value(1,data & 0x20);
+	m_led[0] = BIT(data, 4);
+	m_led[1] = BIT(data, 5);
 }
 
 TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
@@ -376,15 +376,14 @@ void irobot_state::load_oproms()
 
 
 /* Init mathbox (only called once) */
-DRIVER_INIT_MEMBER(irobot_state,irobot)
+void irobot_state::init_irobot()
 {
-	int i;
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		m_irmb_stack[i] = &m_mbops[0];
 		m_irmb_regs[i] = 0;
 	}
-	m_irmb_latch=0;
+	m_irmb_latch = 0;
 	load_oproms();
 }
 

@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "ef9340_1.h"
-#include "ef9341_chargen.h"
 
 #include "screen.h"
 
@@ -28,11 +27,25 @@ static constexpr uint8_t bgr2rgb[8] =
 
 ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EF9340_1, tag, owner, clock)
-	, device_video_interface(mconfig, *this), m_line_timer(nullptr)
+	, device_video_interface(mconfig, *this)
+	, m_line_timer(nullptr)
+	, m_charset(*this, "ef9340_1")
 //, m_start_vpos(START_Y)
 	//, m_start_vblank(START_Y + SCREEN_HEIGHT)
 	//, m_screen_lines(LINES)
 {
+}
+
+
+ROM_START( ef9340_1 )
+	ROM_REGION( 0xA00, "ef9340_1", 0 )
+	ROM_LOAD( "charset_ef9340_1.rom", 0x0000, 0x0A00, CRC(d557a7bf) SHA1(d100b0f6a0d5a2d540844bf362788659ed9a6eb4) )
+ROM_END
+
+
+const tiny_rom_entry *ef9340_1_device::device_rom_region() const
+{
+	return ROM_NAME( ef9340_1 );
 }
 
 
@@ -327,7 +340,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 				else
 				{
 					// Normal
-					char_data = ef9341_char_set[1][b & 0x7f][slice];
+					char_data = m_charset[((b | 0x80) * 10) + slice];
 					fg = bgr2rgb[ a & 0x07 ];
 					bg = bgr2rgb[ ( a >> 4 ) & 0x07 ];
 				}
@@ -362,7 +375,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 				else
 				{
 					// Normal
-					char_data = ef9341_char_set[0][b & 0x7f][slice];
+					char_data = m_charset[((b & 0x7f) * 10) + slice];
 
 					if ( a & 0x40 )
 					{

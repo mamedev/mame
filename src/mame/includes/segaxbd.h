@@ -153,6 +153,7 @@ protected:
 	required_ioport m_io0_porta;
 	optional_ioport_array<8> m_adc_ports;
 	optional_ioport_array<4> m_mux_ports;
+	output_finder<4> m_lamp;
 
 protected:
 	virtual void device_start() override;

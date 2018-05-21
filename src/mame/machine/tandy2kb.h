@@ -73,6 +73,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<12> m_y;
+	output_finder<2> m_led;
 
 	devcb_write_line   m_write_clock;
 	devcb_write_line   m_write_data;

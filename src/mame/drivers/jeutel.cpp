@@ -39,7 +39,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(jeutel);
+	void init_jeutel();
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
@@ -189,10 +189,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
 	m_timer_a ^= 1;
 	m_cpu2->set_input_line(0, (m_timer_a) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_cpu2->state_int(Z80_HALT))
-		m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-DRIVER_INIT_MEMBER( jeutel_state, jeutel )
+void jeutel_state::init_jeutel()
 {
 }
 
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	genpin_audio(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 639450)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, jeutel_state,porta_w))
@@ -280,5 +280,5 @@ ROM_START(olympic)
 ROM_END
 
 
-GAME(1983,  leking,   0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  olympic,  0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, leking,  0, jeutel, jeutel, jeutel_state, init_jeutel, ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, olympic, 0, jeutel, jeutel, jeutel_state, init_jeutel, ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)

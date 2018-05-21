@@ -14,6 +14,9 @@ Chips: P8251, D8253C, MK3880N-4 (Z80). 3x 6-sw dips. Unmarked crystal.
 
 A blue jumper marked 4M and 2M (between U11 and U12) selects the CPU clock.
 
+The RS232 port uses a 26-pin header (J1) rather than the conventional DB25
+connector. The second 26-pin header (J2) is for the parallel port. 
+
 Feature list from QT ad:
 - 1K RAM (which can be located at any 1K boundary) plus one each
   Parallel and Serial I/O ports on board
@@ -509,5 +512,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                  FULLNAME       FLAGS
-COMP( 19??, qtsbc,  0,      0,      qtsbc,   qtsbc, qtsbc_state, 0,    "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                     FULLNAME     FLAGS
+COMP( 19??, qtsbc, 0,      0,      qtsbc,   qtsbc, qtsbc_state, empty_init, "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

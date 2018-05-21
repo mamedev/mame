@@ -377,12 +377,12 @@ static const gfx_layout gberetb_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( gberet )
+static GFXDECODE_START( gfx_gberet )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( gberetb )
+static GFXDECODE_START( gfx_gberetb )
 	GFXDECODE_ENTRY( "gfx1", 0, gberetb_charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, gberetb_spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -428,14 +428,14 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gberet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberet)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(18'432'000)/12) /* type verified on real and bootleg pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -469,14 +469,14 @@ MACHINE_CONFIG_START(gberet_state::gberetb)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberetb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gberetb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberetb)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(20'000'000)/12) // divider guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -580,7 +580,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(gberet_state,mrgoemon)
+void gberet_state::init_mrgoemon()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);
@@ -593,7 +593,7 @@ DRIVER_INIT_MEMBER(gberet_state,mrgoemon)
  *
  *************************************/
 
-GAME( 1985, gberet,   0,      gberet,   gberet,   gberet_state, 0,        ROT0, "Konami",  "Green Beret", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rushatck, gberet, gberet,   gberet,   gberet_state, 0,        ROT0, "Konami",  "Rush'n Attack (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  gberet_state, 0,        ROT0, "bootleg", "Green Beret (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, gberet_state, mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gberet,   0,      gberet,   gberet,   gberet_state, empty_init,    ROT0, "Konami",  "Green Beret", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rushatck, gberet, gberet,   gberet,   gberet_state, empty_init,    ROT0, "Konami",  "Rush'n Attack (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  gberet_state, empty_init,    ROT0, "bootleg", "Green Beret (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, gberet_state, init_mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -18,29 +18,8 @@ public:
 		, m_rthunder_videoram2(*this, "videoram2")
 		, m_rthunder_spriteram(*this, "spriteram")
 		, m_user1_ptr(*this, "user1")
-	{
-	}
-
-	required_device<cpu_device> m_cpu1;
-	required_device<cpu_device> m_cpu2;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<namco_cus30_device> m_cus30;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_rthunder_videoram1;
-	required_shared_ptr<uint8_t> m_rthunder_videoram2;
-	required_shared_ptr<uint8_t> m_rthunder_spriteram;
-	optional_region_ptr<uint8_t> m_user1_ptr;
-
-	uint8_t *m_spriteram;
-	int m_wdog;
-	int m_tilebank;
-	int m_xscroll[4];
-	int m_yscroll[4];
-	tilemap_t *m_bg_tilemap[4];
-	int m_backcolor;
-	const uint8_t *m_tile_address_prom;
-	int m_copy_sprites;
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bankswitch1_w);
 	DECLARE_WRITE8_MEMBER(bankswitch1_ext_w);
@@ -70,9 +49,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info3);
 
-	DECLARE_DRIVER_INIT(namco86);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	void init_namco86();
 	DECLARE_PALETTE_INIT(namcos86);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -98,6 +75,33 @@ public:
 	void rthunder_mcu_map(address_map &map);
 	void wndrmomo_cpu2_map(address_map &map);
 	void wndrmomo_mcu_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_cpu1;
+	required_device<cpu_device> m_cpu2;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<namco_cus30_device> m_cus30;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_rthunder_videoram1;
+	required_shared_ptr<uint8_t> m_rthunder_videoram2;
+	required_shared_ptr<uint8_t> m_rthunder_spriteram;
+	optional_region_ptr<uint8_t> m_user1_ptr;
+	output_finder<2> m_led;
+
+	uint8_t *m_spriteram;
+	int m_wdog;
+	int m_tilebank;
+	int m_xscroll[4];
+	int m_yscroll[4];
+	tilemap_t *m_bg_tilemap[4];
+	int m_backcolor;
+	const uint8_t *m_tile_address_prom;
+	int m_copy_sprites;
+
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
 	void set_scroll(int layer);

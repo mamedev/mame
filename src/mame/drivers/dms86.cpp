@@ -46,7 +46,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ16_MEMBER( port82_r );
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+
 	DECLARE_READ16_MEMBER( port9a_r );
 	DECLARE_READ16_MEMBER( port9c_r );
 	void kbd_put(u8 data);
@@ -61,12 +62,11 @@ private:
 };
 
 
-READ16_MEMBER( dms86_state::port82_r )
+WRITE_LINE_MEMBER(dms86_state::nmi_w)
 {
-// HiNet / Monitor switch
-
-	return 8;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
+
 
 READ16_MEMBER( dms86_state::port9a_r )
 {
@@ -92,8 +92,7 @@ void dms86_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x82, 0x83).r(this, FUNC(dms86_state::port82_r));
-	//AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("sio1", z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
+	map(0x80, 0x87).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x88, 0x8f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x90, 0x97).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x9A, 0x9B).r(this, FUNC(dms86_state::port9a_r)); // parallel SASI port
@@ -103,6 +102,8 @@ void dms86_state::io_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( dms86 )
+	PORT_START("FRONT")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Interrupt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, dms86_state, nmi_w)
 INPUT_PORTS_END
 
 
@@ -145,7 +146,7 @@ MACHINE_CONFIG_START(dms86_state::dms86)
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcdb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcdb_w)) // HiNet / Monitor switch
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(14'745'600) / 3)
@@ -162,5 +163,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                 FULLNAME  FLAGS */
-COMP( 1982, dms86,  0,       0,      dms86,     dms86,  dms86_state,  0,    "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS */
+COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

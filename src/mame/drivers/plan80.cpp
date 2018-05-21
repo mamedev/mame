@@ -45,7 +45,7 @@ public:
 
 	DECLARE_READ8_MEMBER(plan80_04_r);
 	DECLARE_WRITE8_MEMBER(plan80_09_w);
-	DECLARE_DRIVER_INIT(plan80);
+	void init_plan80();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void plan80(machine_config &config);
@@ -174,7 +174,7 @@ void plan80_state::machine_reset()
 	timer_set(attotime::from_usec(10), TIMER_BOOT);
 }
 
-DRIVER_INIT_MEMBER(plan80_state,plan80)
+void plan80_state::init_plan80()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
@@ -224,7 +224,7 @@ static const gfx_layout plan80_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( plan80 )
+static GFXDECODE_START( gfx_plan80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, plan80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(plan80_state::plan80)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plan80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plan80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
@@ -262,5 +262,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY         FULLNAME   FLAGS
-COMP( 1988, plan80, 0,       0,     plan80,    plan80, plan80_state, plan80,  "Tesla Eltos",  "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY        FULLNAME   FLAGS
+COMP( 1988, plan80, 0,      0,      plan80,  plan80, plan80_state, init_plan80, "Tesla Eltos", "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

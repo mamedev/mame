@@ -204,4 +204,4 @@ ROM_START( micro20 )
 	ROM_LOAD32_BYTE( "d24-31_u13_d115.bin", 0x000000, 0x010000, CRC(3646d943) SHA1(97ee54063e2fe49fef2ff68d0f2e39345a75eac5) )
 ROM_END
 
-COMP( 1984, micro20,  0,        0,      micro20,  micro20, micro20_state, 0,  "GMX", "Micro 20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, micro20, 0, 0, micro20, micro20, micro20_state, empty_init, "GMX", "Micro 20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

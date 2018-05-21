@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(tek440x_state::tek4404)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("aica", mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("aica", mos6551_device, write_cts))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76496, VIDEO_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -253,5 +253,5 @@ ROM_END
  *  Game driver(s)
  *
  *************************************/
-//    YEAR  NAME      PARENT  COMPAT   MACHINE  INPUT    DEVICE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, tek4404,  0,      0,       tek4404, tek4404, tek440x_state, 0,    "Tektronix", "4404 Artificial Intelligence System",   MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                               FLAGS
+COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_NOT_WORKING )

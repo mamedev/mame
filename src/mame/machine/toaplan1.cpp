@@ -173,7 +173,7 @@ void toaplan1_state::toaplan1_reset_sound()
 	/* rallybik, truxton, hellfire, demonwld write to a port to cause a reset */
 	/* zerowing, fireshrk, outzone, vimana use a RESET instruction instead */
 	machine().device("ymsnd")->reset();
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound_w)

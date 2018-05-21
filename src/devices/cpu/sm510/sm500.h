@@ -77,7 +77,7 @@ O34 60 | *                                                          | 16 O48
 class sm500_device : public sm510_base_device
 {
 public:
-	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 	// configuration helpers
 	template <class Object> devcb_base &set_write_o_callback(Object &&cb) { return m_write_o.set_callback(std::forward<Object>(cb)); }
@@ -153,7 +153,7 @@ protected:
 class sm5a_device : public sm500_device
 {
 public:
-	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
 	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
@@ -169,13 +169,13 @@ protected:
 class sm5l_device : public sm5a_device
 {
 public:
-	sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 };
 
 class kb1013vk12_device : public sm5a_device
 {
 public:
-	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 };
 
 

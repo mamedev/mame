@@ -12,7 +12,6 @@ Template for skeleton device
 #pragma once
 
 #include "bus/cbus/pc9801_cbus.h"
-#include "machine/pic8259.h"
 #include "sound/2203intf.h"
 
 

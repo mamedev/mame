@@ -295,9 +295,9 @@ WRITE8_MEMBER( softbox_state::ppi1_pc_w )
 
 	*/
 
-	output().set_led_value(LED_A, !BIT(data, 0));
-	output().set_led_value(LED_B, !BIT(data, 1));
-	output().set_led_value(LED_READY, !BIT(data, 2));
+	m_led[LED_A] = BIT(~data, 0);
+	m_led[LED_B] = BIT(~data, 1);
+	m_led[LED_READY] = BIT(~data, 2);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -321,6 +321,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void softbox_state::machine_start()
 {
+	m_led.resolve();
 }
 
 
@@ -451,5 +452,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                      FULLNAME   FLAGS
-COMP( 1981, softbox, 0,      0,      softbox, softbox, softbox_state, 0,    "Small Systems Engineering", "SoftBox", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                      FULLNAME   FLAGS
+COMP( 1981, softbox, 0,      0,      softbox, softbox, softbox_state, empty_init, "Small Systems Engineering", "SoftBox", MACHINE_NO_SOUND_HW )

@@ -182,5 +182,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT   STATE         INIT    COMPANY                         FULLNAME                            FLAGS
-COMP( 2009, zexall,  0,      0,      zexall,   zexall, zexall_state, 0,      "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                         FULLNAME                            FLAGS
+COMP( 2009, zexall, 0,      0,      zexall,  zexall, zexall_state, empty_init, "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )

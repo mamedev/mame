@@ -161,7 +161,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( blstroid )
+static GFXDECODE_START( gfx_blstroid )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,    0, 16 )
 GFXDECODE_END
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blstroid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blstroid)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -207,7 +207,8 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 7)
@@ -412,7 +413,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blstroid_state,blstroid)
+void blstroid_state::init_blstroid()
 {
 }
 
@@ -424,8 +425,8 @@ DRIVER_INIT_MEMBER(blstroid_state,blstroid)
  *
  *************************************/
 
-GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
-GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
-GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
-GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
-GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )
+GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
+GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
+GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
+GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
+GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )

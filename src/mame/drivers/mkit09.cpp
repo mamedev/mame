@@ -204,9 +204,8 @@ MACHINE_CONFIG_START(mkit09_state::mkit09)
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -229,9 +228,8 @@ MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -258,6 +256,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT  COMPANY       FULLNAME                    FLAGS
-COMP( 1983, mkit09,  0,      0,       mkit09,     mkit09, mkit09_state,  0,    "Multitech",  "Microkit09",               MACHINE_NO_SOUND_HW )
-COMP( 1983, mkit09a, mkit09, 0,       mkit09a,    mkit09, mkit09_state,  0,    "Multitech",  "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME                    FLAGS
+COMP( 1983, mkit09,  0,      0,      mkit09,  mkit09, mkit09_state, empty_init, "Multitech", "Microkit09",               MACHINE_NO_SOUND_HW )
+COMP( 1983, mkit09a, mkit09, 0,      mkit09a, mkit09, mkit09_state, empty_init, "Multitech", "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

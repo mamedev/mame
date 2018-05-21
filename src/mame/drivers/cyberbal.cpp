@@ -372,13 +372,13 @@ static const gfx_layout molayout =
 	16*8
 };
 
-static GFXDECODE_START( cyberbal )
+static GFXDECODE_START( gfx_cyberbal )
 	GFXDECODE_ENTRY( "gfx2", 0, pfanlayout,     0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,   0x600, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, pfanlayout, 0x780, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( interleaved )
+static GFXDECODE_START( gfx_interleaved )
 	GFXDECODE_ENTRY( "gfx2", 0, pfanlayout_interleaved,     0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,               0x600, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, pfanlayout_interleaved, 0x780, 8 )
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", interleaved)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_interleaved)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
@@ -453,7 +453,8 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_1))
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
@@ -490,7 +491,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyberbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyberbal)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -509,7 +510,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cyberbal2p_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_3))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 15)
@@ -1048,7 +1049,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
+void cyberbal_state::init_cyberbalt()
 {
 	slapstic_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
 }
@@ -1061,15 +1062,15 @@ DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
  *
  *************************************/
 
-GAMEL(1988, cyberbal,    0,        cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbal2,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbal1,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 1)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbalp,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
+GAMEL( 1988, cyberbal,    0,        cyberbal,   cyberbal,   cyberbal_state,   empty_init,     ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
+GAMEL( 1988, cyberbal2,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   empty_init,     ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
+GAMEL( 1988, cyberbal1,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   empty_init,     ROT0, "Atari Games", "Cyberball (rev 1)", 0, layout_dualhsxs )
+GAMEL( 1988, cyberbalp,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   empty_init,     ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
 
-GAME( 1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
-GAME( 1989, cyberbal2p3, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
-GAME( 1989, cyberbal2p2, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
-GAME( 1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
+GAME(  1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, empty_init,     ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
+GAME(  1989, cyberbal2p3, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, empty_init,     ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
+GAME(  1989, cyberbal2p2, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, empty_init,     ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
+GAME(  1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, empty_init,     ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
 
-GAMEL(1989, cyberbalt,   cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
-GAMEL(1989, cyberbalt1,  cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
+GAMEL( 1989, cyberbalt,   cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   init_cyberbalt, ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
+GAMEL( 1989, cyberbalt1,  cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   init_cyberbalt, ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )

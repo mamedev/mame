@@ -233,28 +233,34 @@ class omegrace_state : public driver_device
 {
 public:
 	omegrace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_dvg(*this, "dvg"),
-		m_soundlatch(*this, "soundlatch") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<dvg_device> m_dvg;
-	required_device<generic_latch_8_device> m_soundlatch;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_dvg(*this, "dvg")
+		, m_soundlatch(*this, "soundlatch")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
-	DECLARE_DRIVER_INIT(omegrace);
-	virtual void machine_reset() override;
+	void init_omegrace();
 	void omegrace(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_port(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<dvg_device> m_dvg;
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<4> m_led;
 };
 
 
@@ -337,10 +343,10 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	output().set_led_value(0,~data & 0x04);
-	output().set_led_value(1,~data & 0x08);
-	output().set_led_value(2,~data & 0x10);
-	output().set_led_value(3,~data & 0x20);
+	m_led[0] = BIT(~data, 2);
+	m_led[1] = BIT(~data, 3);
+	m_led[2] = BIT(~data, 4);
+	m_led[3] = BIT(~data, 5);
 
 	/* bit 6 flips screen (not supported) */
 }
@@ -542,7 +548,7 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -618,9 +624,9 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(omegrace_state,omegrace)
+void omegrace_state::init_omegrace()
 {
-	int i, len = memregion("user1")->bytes();
+	int len = memregion("user1")->bytes();
 	uint8_t *prom = memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
@@ -628,7 +634,7 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 	 * Since all other avg/dvg games connect the PROM
 	 * in a consistent way to the decoder, we swap the bits
 	 * here. */
-	for (i=0; i<len; i++)
+	for (int i = 0; i < len; i++)
 		prom[i] = bitswap<8>(prom[i],7,6,5,4,1,0,3,2);
 }
 
@@ -639,6 +645,6 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
  *
  *************************************/
 
-GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
-GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
-GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "Midway", "Omega Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "Midway", "Omega Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )

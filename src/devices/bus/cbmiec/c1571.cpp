@@ -459,7 +459,7 @@ WRITE8_MEMBER( c1571_device::via1_pb_w )
 	m_ga->stp_w(data & 0x03); // TODO actually STP1=0, STP0=!(PB0^PB1), Y0=PB1, Y2=!PB1
 
 	// activity LED
-	machine().output().set_led_value(LED_ACT, BIT(data, 3));
+	m_led[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -791,6 +791,7 @@ c1571_device::c1571_device(const machine_config &mconfig, device_type type, cons
 		m_ga(*this, C64H156_TAG),
 		m_floppy(*this, C64H156_TAG":0:525qd"),
 		m_address(*this, "ADDRESS"),
+		m_led(*this, "led%u", 0U),
 		m_1_2mhz(0),
 		m_data_out(1),
 		m_ser_dir(0),
@@ -844,6 +845,8 @@ mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *
 
 void c1571_device::device_start()
 {
+	m_led.resolve();
+
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 	//m_fdc->set_floppy(m_floppy);

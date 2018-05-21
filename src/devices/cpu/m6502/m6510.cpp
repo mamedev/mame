@@ -44,7 +44,7 @@ void m6510_device::device_start()
 	read_port.resolve_safe(0);
 	write_port.resolve_safe();
 
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_6510_nd>(this);
 	else
 		mintf = std::make_unique<mi_6510_normal>(this);
@@ -118,7 +118,7 @@ uint8_t m6510_device::mi_6510_normal::read(uint16_t adr)
 
 uint8_t m6510_device::mi_6510_normal::read_sync(uint16_t adr)
 {
-	uint8_t res = sdirect->read_byte(adr);
+	uint8_t res = scache->read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -128,7 +128,7 @@ uint8_t m6510_device::mi_6510_normal::read_sync(uint16_t adr)
 
 uint8_t m6510_device::mi_6510_normal::read_arg(uint16_t adr)
 {
-	uint8_t res = direct->read_byte(adr);
+	uint8_t res = cache->read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)

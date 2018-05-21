@@ -118,7 +118,7 @@ static const gfx_layout a51xx_charlayout =
 	8*8                 /* every char takes 2 x 8 bytes */
 };
 
-static GFXDECODE_START( a51xx )
+static GFXDECODE_START( gfx_a51xx )
 	GFXDECODE_ENTRY( "chargen", 0x0000, a51xx_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(a51xx_state::a5120)
 	MCFG_SCREEN_UPDATE_DRIVER(a51xx_state, screen_update_a5120)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", a51xx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a51xx)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -185,6 +185,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT  STATE         INIT    COMPANY           FULLNAME  FLAGS
-COMP( 1982, a5120,  0,      0,       a5120,      a5120, a51xx_state,  0,      "VEB Robotron",   "A5120",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1983, a5130,  a5120,  0,       a5130,      a5130, a51xx_state,  0,      "VEB Robotron",   "A5130",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
+COMP( 1982, a5120, 0,      0,      a5120,   a5120, a51xx_state, empty_init, "VEB Robotron", "A5120",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, a5130, a5120,  0,      a5130,   a5130, a51xx_state, empty_init, "VEB Robotron", "A5130",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

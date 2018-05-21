@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
-	DECLARE_DRIVER_INIT(livequiz);
+	void init_livequiz();
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -329,7 +329,7 @@ static const gfx_layout layout8x8x8_2 =
 	32*8*2
 };
 
-static GFXDECODE_START( midas )
+static GFXDECODE_START( gfx_midas )
 	GFXDECODE_ENTRY( "sprites", 0, layout16x16x8, 0, 0x100 )
 	GFXDECODE_ENTRY( "tiles",   0, layout8x8x8_2, 0,  0x80 )
 GFXDECODE_END
@@ -645,12 +645,13 @@ MACHINE_CONFIG_START(midas_state::livequiz)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -677,13 +678,14 @@ MACHINE_CONFIG_START(midas_state::hammer)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -802,7 +804,7 @@ ROM_START( livequiz )
 	/* uploaded */
 ROM_END
 
-DRIVER_INIT_MEMBER(midas_state,livequiz)
+void midas_state::init_livequiz()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -897,5 +899,5 @@ ROM_START( hammer )
 	/* uploaded */
 ROM_END
 
-GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
-GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, 0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, init_livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
+GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, empty_init,    ROT0, "Andamiro", "Hammer",         0 )

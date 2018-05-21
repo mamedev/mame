@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "z80ctc.h"
-#include "cpu/z80/z80daisy.h"
 
 
 
@@ -30,7 +29,7 @@
 // these are the bits of the incoming commands to the CTC
 constexpr u16 INTERRUPT         = 0x80;
 constexpr u16 INTERRUPT_ON      = 0x80;
-//constexpr u16 INTERRUPT_OFF     = 0x00;
+constexpr u16 INTERRUPT_OFF     = 0x00;
 
 constexpr u16 MODE              = 0x40;
 constexpr u16 MODE_TIMER        = 0x00;
@@ -447,6 +446,14 @@ void z80ctc_channel_device::write(u8 data)
 		m_mode = data;
 		LOG("Channel mode = %02x\n", data);
 
+		// clearing this bit resets the interrupt state regardless of M1 activity (or lack thereof)
+		if ((data & INTERRUPT) == INTERRUPT_OFF && (m_int_state & Z80_DAISY_INT))
+		{
+			m_int_state &= ~Z80_DAISY_INT;
+			LOG("Interrupt forced off\n");
+			m_device->interrupt_check();
+		}
+
 		// if we're being reset, clear out any pending timers for this channel
 		if ((data & RESET) == RESET_ACTIVE)
 		{
@@ -511,6 +518,7 @@ TIMER_CALLBACK_MEMBER(z80ctc_channel_device::timer_callback)
 	}
 
 	// generate the clock pulse
+	// FIXME: should only be cleared after one cycle of the channel input clock
 	m_device->m_zc_cb[m_index](1);
 	m_device->m_zc_cb[m_index](0);
 

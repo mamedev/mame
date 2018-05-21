@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "bus/cbus/pc9801_118.h"
 
-#include "machine/pic8259.h"
 #include "sound/2608intf.h"
 #include "speaker.h"
 
@@ -43,7 +42,7 @@ WRITE8_MEMBER(pc9801_118_device::opn_portb_w){ m_joy_sel = data; }
 WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 {
 	/* TODO: seems to die very often */
-	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
+	m_bus->int_w<5>(state);
 }
 
 //-------------------------------------------------
@@ -51,7 +50,7 @@ WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc9801_118_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("opn3", YM2608, MAIN_CLOCK_X2*4) // actually YMF288, unknown clock / divider, might be X1 x 5 actually
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc9801_118_device, pc9801_sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_118_device, opn_porta_r))

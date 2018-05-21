@@ -11,7 +11,7 @@ total rom size 0x8000
 ram at 0x8000-0x87ff
 lots of reads from 0xe000 at the start
 
-JPM style Reel MCU? Certainly reel data seems to be muxed together in aweird way
+JPM style Reel MCU? Certainly reel data seems to be muxed together in a weird way
 
  Hardware overview
   - Z80
@@ -60,6 +60,15 @@ public:
 			m_lamps(*this, "lamp%u", 0U),
 			m_digits(*this, "digit%u", 0U)
 	{ }
+
+	void init_aces1();
+	void aces1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	int m_input_strobe;
 	int m_lamp_strobe;
 	int m_led_strobe;
@@ -228,12 +237,8 @@ public:
 	output_finder<128> m_lamps;
 	output_finder<16> m_digits;
 
-	DECLARE_DRIVER_INIT(aces1);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
 	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
-	void aces1(machine_config &config);
 	void aces1_map(address_map &map);
 	void aces1_portmap(address_map &map);
 };
@@ -252,7 +257,7 @@ TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_irq_timer_callback)
 TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 {
 //  printf("nmi\n");
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	aces1_reset_nmi_timer();
 }
 
@@ -466,7 +471,7 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	MCFG_DEFAULT_LAYOUT(layout_aces1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// 0xadf0 - Dips, Sound
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ?? MHz */
@@ -840,56 +845,63 @@ ROM_START( ac1hideha )
 	ROM_LOAD( "hh563p4r", 0x0000, 0x8000, CRC(c82aabb1) SHA1(6a94cbae10edc544117a6bc5849ac8c9ad80a333) )
 ROM_END
 
+ROM_START( ac1unk )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "system_one_prom1_2764.bin", 0x0000, 0x2000, CRC(ea532fe4) SHA1(8b77d9e8fad0cd022c8386c509ad2ecbc7032d90) )
+	ROM_LOAD( "system_one_prom2_2764.bin", 0x2000, 0x2000, CRC(729599b7) SHA1(da9aedc50a281cb6626a4c03fc06e5dd62b4edd1) )
+	ROM_LOAD( "system_one_prom3_2764.bin", 0x4000, 0x2000, CRC(29b644e6) SHA1(fd7c82086a4812b26ff673f7734fe50a398aa063) )
+	// 4th socket not populated.
+ROM_END
 
-
-DRIVER_INIT_MEMBER(aces1_state,aces1)
+void aces1_state::init_aces1()
 {
 }
 
-GAMEL( 199?, ac1clbmn    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Club Money (Ace) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL, layout_ac1clbmn )
-GAMEL( 199?, ac1gogld    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Go For Gold (Ace) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL, layout_ac1gogld )
-GAME(  199?, ac1hotpf    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Hot Profit (Ace) (ACESYS1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 199?, ac1pster    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Pound Sterling (Ace) (ACESYS1)",              MACHINE_IS_SKELETON_MECHANICAL, layout_ac1pster )
-GAMEL( 199?, ac1pstrt    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Pound Stretcher (Pcp) (ACESYS1)",             MACHINE_IS_SKELETON_MECHANICAL, layout_ac1pstrt )
-GAMEL( 199?, ac1primt    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Primetime (Ace) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL, layout_ac1primt )
-GAMEL( 199?, ac1taklv    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_ac1taklv )
-GAME(  199?, ac1cshtw    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Cash Towers (Ace) (ACESYS1)",                 MACHINE_IS_SKELETON_MECHANICAL ) // same ROM as above, combined, original machine apparently plays the same, reskinned machine?
-GAME(  199?, ac1bbclb    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Big Break Club (Ace) (ACESYS1) (set 1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1bbclba   , ac1bbclb   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Big Break Club (Ace) (ACESYS1) (set 2)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1clbsv    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Club Sovereign (Ace) (ACESYS1)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1clbxt    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Club Xtra (Ace) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1clbxta   , ac1clbxt   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Club Xtra (Ace) (ACESYS1) (set 2)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1piaca    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Play It Again Casino (Ace) (ACESYS1)",        MACHINE_IS_SKELETON_MECHANICAL ) // Same ROMs were in 'Play It Again Deluxe'
-GAME(  199?, ac1piacl    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1piacla   , ac1piacl   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1piaclb   , ac1piacl   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 3)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1piaclc   , ac1piacl   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 4)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1prmcl    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 1)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1prmcla   , ac1prmcl   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 2)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1prmclb   , ac1prmcl   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 3)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1prmclc   , ac1prmcl   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 4)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1rundx    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Runner Deluxe Club (Ace) (ACESYS1) (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1rundxa   , ac1rundx   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Runner Deluxe Club (Ace) (ACESYS1) (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1totb     , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Top Of The Bill (Ace) (ACESYS1)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1shid     , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Super Hi De Hi (Ace) (ACESYS1) (set 1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1shida    , ac1shid    , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Super Hi De Hi (Ace) (ACESYS1) (set 2)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1dbldx    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Double Deluxe (Pcp) (ACESYS1)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1nudbk    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1nudbka   , ac1nudbk   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 2)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1nudbkb   , ac1nudbk   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 3)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1nudbkc   , ac1nudbk   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 4)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1nudbkd   , ac1nudbk   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 5)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1sstrk    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Starstruck (Pcp) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1sstrka   , ac1sstrk   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Starstruck (Pcp) (ACESYS1) (set 2)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1sstrkb   , ac1sstrk   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Starstruck (Pcp) (ACESYS1) (set 3)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1xpres    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Xpress (Pcp) (ACESYS1)",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1roll     , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Roll Up (Pcp) (ACESYS1) (set 1)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1rolla    , ac1roll    , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Roll Up (Pcp) (ACESYS1) (set 2)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1rollb    , ac1roll    , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Roll Up (Pcp) (ACESYS1) (set 3)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1bluec    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1blueca   , ac1bluec   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 2)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1bluecb   , ac1bluec   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 3)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1bluecc   , ac1bluec   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 4)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1bluecd   , ac1bluec   , aces1, aces1, aces1_state, aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 5)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  199?, ac1hideh    , 0          , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Hi De Hi Deluxe (Ace) (ACESYS1) (set 1)",     MACHINE_IS_SKELETON_MECHANICAL ) // was in Hi De Hi (Ace) (sp.ACE) set
-GAME(  199?, ac1hideha   , sp_hideh   , aces1, aces1, aces1_state, aces1, ROT0, "Ace", "Hi De Hi Deluxe (Ace) (ACESYS1) (set 2)",     MACHINE_IS_SKELETON_MECHANICAL ) //  ^^
+GAMEL( 199?, ac1clbmn,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Money (Ace) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL, layout_ac1clbmn )
+GAMEL( 199?, ac1gogld,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Go For Gold (Ace) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL, layout_ac1gogld )
+GAME(  199?, ac1hotpf,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Hot Profit (Ace) (ACESYS1)",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAMEL( 199?, ac1pster,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Pound Sterling (Ace) (ACESYS1)",              MACHINE_IS_SKELETON_MECHANICAL, layout_ac1pster )
+GAMEL( 199?, ac1pstrt,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Pound Stretcher (Pcp) (ACESYS1)",             MACHINE_IS_SKELETON_MECHANICAL, layout_ac1pstrt )
+GAMEL( 199?, ac1primt,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Primetime (Ace) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL, layout_ac1primt )
+GAMEL( 199?, ac1taklv,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_ac1taklv )
+GAME(  199?, ac1cshtw,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Cash Towers (Ace) (ACESYS1)",                 MACHINE_IS_SKELETON_MECHANICAL ) // same ROM as above, combined, original machine apparently plays the same, reskinned machine?
+GAME(  199?, ac1bbclb,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Big Break Club (Ace) (ACESYS1) (set 1)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1bbclba, ac1bbclb, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Big Break Club (Ace) (ACESYS1) (set 2)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1clbsv,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Sovereign (Ace) (ACESYS1)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1clbxt,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Xtra (Ace) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1clbxta, ac1clbxt, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Xtra (Ace) (ACESYS1) (set 2)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1piaca,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Play It Again Casino (Ace) (ACESYS1)",        MACHINE_IS_SKELETON_MECHANICAL ) // Same ROMs were in 'Play It Again Deluxe'
+GAME(  199?, ac1piacl,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1piacla, ac1piacl, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1piaclb, ac1piacl, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 3)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1piaclc, ac1piacl, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Play It Again Club (Ace) (ACESYS1) (set 4)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1prmcl,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 1)",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1prmcla, ac1prmcl, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 2)",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1prmclb, ac1prmcl, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 3)",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1prmclc, ac1prmcl, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Premier Club (Ace) (ACESYS1) (set 4)",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1rundx,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Runner Deluxe Club (Ace) (ACESYS1) (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1rundxa, ac1rundx, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Runner Deluxe Club (Ace) (ACESYS1) (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1totb,   0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Top Of The Bill (Ace) (ACESYS1)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1shid,   0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Super Hi De Hi (Ace) (ACESYS1) (set 1)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1shida,  ac1shid , aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Super Hi De Hi (Ace) (ACESYS1) (set 2)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1dbldx,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Double Deluxe (Pcp) (ACESYS1)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1nudbk,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1nudbka, ac1nudbk, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 2)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1nudbkb, ac1nudbk, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 3)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1nudbkc, ac1nudbk, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 4)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1nudbkd, ac1nudbk, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Nudge Break (Pcp) (ACESYS1) (set 5)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1sstrk,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Starstruck (Pcp) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1sstrka, ac1sstrk, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Starstruck (Pcp) (ACESYS1) (set 2)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1sstrkb, ac1sstrk, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Starstruck (Pcp) (ACESYS1) (set 3)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1xpres,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Xpress (Pcp) (ACESYS1)",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1roll,   0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Roll Up (Pcp) (ACESYS1) (set 1)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1rolla,  ac1roll , aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Roll Up (Pcp) (ACESYS1) (set 2)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1rollb,  ac1roll , aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Roll Up (Pcp) (ACESYS1) (set 3)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1bluec,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1blueca, ac1bluec, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 2)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1bluecb, ac1bluec, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 3)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1bluecc, ac1bluec, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 4)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1bluecd, ac1bluec, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 5)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  199?, ac1hideh,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Hi De Hi Deluxe (Ace) (ACESYS1) (set 1)",     MACHINE_IS_SKELETON_MECHANICAL ) // was in Hi De Hi (Ace) (sp.ACE) set
+GAME(  199?, ac1hideha, sp_hideh, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Hi De Hi Deluxe (Ace) (ACESYS1) (set 2)",     MACHINE_IS_SKELETON_MECHANICAL ) //  ^^
+GAME(  199?, ac1unk,    0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "unknown Ace System 1 game",                   MACHINE_IS_SKELETON_MECHANICAL )

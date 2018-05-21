@@ -28,7 +28,7 @@ public:
 	}
 
 	void dynamoah(machine_config &config);
-	DECLARE_DRIVER_INIT(security_decrypt);
+	void security_decrypt();
 
 private:
 	DECLARE_WRITE8_MEMBER(p1_w);
@@ -97,7 +97,7 @@ ROM_START(dynamoah)
 	ROM_LOAD("a-hocky6.03", 0x0000, 0x2000, CRC(6a4ff3e4) SHA1(b38637e0e9dc046e3b9e48da84fba29e23db9585)) // 2764A
 ROM_END
 
-DRIVER_INIT_MEMBER(dynamoah_state, security_decrypt)
+void dynamoah_state::security_decrypt()
 {
 	u8 *romdata = memregion("maincpu")->base();
 	for (offs_t addr = 0; addr < 0x2000; addr++)

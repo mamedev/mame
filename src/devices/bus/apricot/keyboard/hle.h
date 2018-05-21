@@ -14,6 +14,7 @@
 #include "keyboard.h"
 #include "machine/keyboard.h"
 #include "machine/msm5832.h"
+#include "diserial.h"
 
 
 //**************************************************************************

@@ -48,6 +48,8 @@ TODO:
 
 void spcforce_state::machine_start()
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_sn76496_latch));
 	save_item(NAME(m_sn76496_select));
 	save_item(NAME(m_sn1_ready));
@@ -108,9 +110,9 @@ WRITE8_MEMBER(spcforce_state::soundtrigger_w)
 
 WRITE8_MEMBER(spcforce_state::misc_outputs_w)
 {
-	machine().output().set_lamp_value(0, BIT(data, 0)); // 1P start lamp
+	m_lamp[0] = BIT(data, 0); // 1P start lamp
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
-	machine().output().set_lamp_value(1, BIT(data, 2)); // 2P start lamp
+	m_lamp[1] = BIT(data, 2); // 2P start lamp
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
 }
 
@@ -243,7 +245,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( spcforce )
+static GFXDECODE_START( gfx_spcforce )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -311,12 +313,12 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spcforce)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spcforce)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
 	MCFG_PALETTE_INIT_OWNER(spcforce_state, spcforce)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -440,7 +442,7 @@ ROM_START( meteors )
 ROM_END
 
 
-GAME( 1980, spcforce, 0,        spcforce, spcforce, spcforce_state, 0, ROT270, "Venture Line",     "Space Force (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, spcforce_state, 0, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, meteor,   spcforce, spcforce, spcforc2, spcforce_state, 0, ROT270, "Venture Line",     "Meteoroids",          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, meteors,  spcforce, meteors,  spcforc2, spcforce_state, 0, ROT0,   "Amusement World",  "Meteors",             MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spcforce, 0,        spcforce, spcforce, spcforce_state, empty_init, ROT270, "Venture Line",     "Space Force (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, meteor,   spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "Venture Line",     "Meteoroids",          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, meteors,  spcforce, meteors,  spcforc2, spcforce_state, empty_init, ROT0,   "Amusement World",  "Meteors",             MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

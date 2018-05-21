@@ -71,8 +71,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_DRIVER_INIT(esb);
-	DECLARE_DRIVER_INIT(starwars);
+	void init_esb();
+	void init_starwars();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 	DECLARE_READ8_MEMBER(r6532_porta_r);

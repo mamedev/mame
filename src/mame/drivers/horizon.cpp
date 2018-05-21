@@ -265,9 +265,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                 FULLNAME                          FLAGS
-COMP( 1976, nshrz,     0,     0, horizon,     horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 4MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1976, nshrz2mhz, nshrz, 0, horizon2mhz, horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 2MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT    CLASS          INIT        COMPANY                 FULLNAME                                FLAGS
+COMP( 1976, nshrz,     0,      0,      horizon,     horizon, horizon_state, empty_init, "North Star Computers", "Horizon (North Star Computers, 4MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, nshrz2mhz, nshrz,  0,      horizon2mhz, horizon, horizon_state, empty_init, "North Star Computers", "Horizon (North Star Computers, 2MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 
 // This really should be in its own driver
-COMP( 1979, vector1,  0,      0, horizon,     horizon, horizon_state, 0, "Vector Graphic",       "Vector 1+ (DD drive)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1979, vector1,   0,      0,      horizon,     horizon, horizon_state, empty_init, "Vector Graphic",       "Vector 1+ (DD drive)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

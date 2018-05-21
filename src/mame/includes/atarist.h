@@ -122,7 +122,8 @@ public:
 			m_ikbd_joy(1),
 			m_monochrome(1),
 			m_palette(*this, "palette"),
-			m_screen(*this, "screen")
+			m_screen(*this, "screen"),
+			m_led(*this, "led1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -154,10 +155,6 @@ public:
 	optional_ioport m_mousex;
 	optional_ioport m_mousey;
 	optional_ioport m_config;
-
-	void machine_start() override;
-
-	void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -344,6 +341,10 @@ public:
 	void st_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	output_finder<> m_led;
 };
 
 class megast_state : public st_state
@@ -374,10 +375,6 @@ public:
 	{ }
 
 	optional_device<lmc1992_device> m_lmc1992;
-
-	void machine_start() override;
-
-	void video_start() override;
 
 	DECLARE_READ8_MEMBER( shifter_base_low_r );
 	DECLARE_WRITE8_MEMBER( shifter_base_low_w );
@@ -443,6 +440,8 @@ public:
 	void ste_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 };
 
 class megaste_state : public ste_state
@@ -452,14 +451,15 @@ public:
 		: ste_state(mconfig, type, tag)
 	{ }
 
-	void machine_start() override;
-
 	DECLARE_READ16_MEMBER( cache_r );
 	DECLARE_WRITE16_MEMBER( cache_w );
 
 	uint16_t m_cache;
 	void megaste(machine_config &config);
 	void megaste_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
 };
 
 class stbook_state : public ste_state
@@ -472,15 +472,15 @@ public:
 
 	required_ioport m_sw400;
 
-	void machine_start() override;
-	void video_start() override;
-
 	DECLARE_READ16_MEMBER( config_r );
 	DECLARE_WRITE16_MEMBER( lcd_control_w );
 
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	void stbook_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 };
 
 #endif // MAME_INCLUDES_ATARI_ST_H

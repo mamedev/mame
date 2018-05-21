@@ -78,4 +78,4 @@ ROM_START( strkzn )
 	ROM_LOAD( "strkznu16", 0x00000, 0x80000, CRC(67f7674b) SHA1(451a26da55315fcaccdc02817521c78acdd8eb8a) )
 ROM_END
 
-GAME( 1994, strkzn, 0, strkzn, strkzn, strkzn_state, 0, ROT0, "Purple Star", "Strike Zone (Purple Star)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, strkzn, 0, strkzn, strkzn, strkzn_state, empty_init, ROT0, "Purple Star", "Strike Zone (Purple Star)", MACHINE_IS_SKELETON_MECHANICAL )

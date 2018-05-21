@@ -380,7 +380,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	m_bit6++;
 	if (m_t_c > 0x40)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_t_c++;
 
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -543,8 +543,8 @@ ROM_START(spcrider)
 ROM_END
 
 
-GAME( 1976, atarians, 0,         atarians, atari_s1, atari_s1_state, 0, ROT0, "Atari", "The Atarians",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, time2000, 0,         atari_s1, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Time 2000",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, aavenger, 0,         atari_s1, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Airborne Avenger", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1978, midearth, 0,         midearth, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Middle Earth",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, spcrider, 0,         atari_s1, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Space Riders",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1976, atarians, 0, atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, time2000, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, aavenger, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1978, midearth, 0, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, spcrider, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Space Riders",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

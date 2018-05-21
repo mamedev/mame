@@ -158,7 +158,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( headonb )
+static GFXDECODE_START( gfx_headonb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -179,7 +179,7 @@ MACHINE_CONFIG_START(headonb_state::headonb)
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", headonb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_headonb)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -210,4 +210,4 @@ ROM_START( headonb )
 ROM_END
 
 
-GAME( 1979, headonb, headon, headonb, headonb, headonb_state, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonb, headon, headonb, headonb, headonb_state, empty_init, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

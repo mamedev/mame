@@ -895,6 +895,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1985, compis,  0,      0,      compis,  compis, compis_state, 0,    "Telenova", "Compis",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, compis2, compis, 0,      compis2, compis, compis_state, 0,    "Telenova", "Compis II", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME     FLAGS
+COMP( 1985, compis,  0,      0,      compis,  compis, compis_state, empty_init, "Telenova", "Compis",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, compis2, compis, 0,      compis2, compis, compis_state, empty_init, "Telenova", "Compis II", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

@@ -116,70 +116,6 @@ machine_config::~machine_config()
 
 
 //-------------------------------------------------
-//  resolve_owner - get the actual owner and base
-//  tag given tag relative to current context
-//-------------------------------------------------
-
-std::pair<const char *, device_t *> machine_config::resolve_owner(const char *tag) const
-{
-	assert(bool(m_current_device) == bool(m_root_device));
-	char const *const orig_tag = tag;
-	device_t *owner(m_current_device);
-
-	// if the device path is absolute, start from the root
-	if (tag[0] == ':')
-	{
-		tag++;
-		owner = m_root_device.get();
-	}
-
-	// go down the path until we're done with it
-	while (strchr(tag, ':'))
-	{
-		const char *next = strchr(tag, ':');
-		assert(next != tag);
-		std::string part(tag, next-tag);
-		owner = owner->subdevices().find(part);
-		if (!owner)
-			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part.c_str(), orig_tag);
-		tag = next+1;
-	}
-	assert(tag[0] != '\0');
-
-	return std::make_pair(tag, owner);
-}
-
-
-//-------------------------------------------------
-//  add_device - add a new device at the correct
-//  point in the hierarchy
-//-------------------------------------------------
-
-device_t *machine_config::add_device(std::unique_ptr<device_t> &&device, device_t *owner)
-{
-	current_device_stack context(*this);
-	if (owner)
-	{
-		// allocate the new device and append it to the owner's list
-		device_t *const result = &owner->subdevices().m_list.append(*device.release());
-		result->add_machine_configuration(*this);
-		return result;
-	}
-	else
-	{
-		// allocate the root device directly
-		assert(!m_root_device);
-		m_root_device = std::move(device);
-		driver_device *driver = dynamic_cast<driver_device *>(m_root_device.get());
-		if (driver)
-			driver->set_game_driver(m_gamedrv);
-		m_root_device->add_machine_configuration(*this);
-		return m_root_device.get();
-	}
-}
-
-
-//-------------------------------------------------
 //  device_add - configuration helper to add a
 //  new device
 //-------------------------------------------------
@@ -187,7 +123,7 @@ device_t *machine_config::add_device(std::unique_ptr<device_t> &&device, device_
 device_t *machine_config::device_add(const char *tag, device_type type, u32 clock)
 {
 	std::pair<const char *, device_t *> const owner(resolve_owner(tag));
-	return add_device(type.create(*this, owner.first, owner.second, clock), owner.second);
+	return &add_device(type.create(*this, owner.first, owner.second, clock), owner.second);
 }
 
 
@@ -198,37 +134,9 @@ device_t *machine_config::device_add(const char *tag, device_type type, u32 cloc
 
 device_t *machine_config::device_replace(const char *tag, device_type type, u32 clock)
 {
-	// find the original device by relative tag (must exist)
-	assert(m_current_device);
-	device_t *old_device = m_current_device->subdevice(tag);
-	if (!old_device)
-	{
-		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
-		return device_add(tag, type, clock);
-	}
-	else
-	{
-		// make sure we have the old device's actual owner
-		device_t *const owner = old_device->owner();
-		assert(owner);
-
-		// remove references to the old device
-		remove_references(*old_device);
-
-		// allocate the new device and substitute it for the old one in the owner's list
-		device_t *const new_device = &owner->subdevices().m_list.replace_and_remove(*type.create(*this, tag, owner, clock).release(), *old_device);
-		current_device_stack context(*this);
-		new_device->add_machine_configuration(*this);
-		return new_device;
-	}
-}
-
-
-device_t *machine_config::device_replace(const char *tag, device_type type, const XTAL &clock)
-{
-	std::string msg = std::string("Replacing device ") + tag;
-	clock.validate(msg);
-	return device_replace(tag, type, clock.value());
+	std::tuple<const char *, device_t *, device_t *> const existing(prepare_replace(tag));
+	std::unique_ptr<device_t> device(type.create(*this, std::get<0>(existing), std::get<1>(existing), clock));
+	return &replace_device(std::move(device), *std::get<1>(existing), std::get<2>(existing));
 }
 
 
@@ -259,6 +167,109 @@ device_t *machine_config::device_remove(const char *tag)
 		owner->subdevices().m_list.remove(*device);
 	}
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  resolve_owner - get the actual owner and base
+//  tag given tag relative to current context
+//-------------------------------------------------
+
+std::pair<const char *, device_t *> machine_config::resolve_owner(const char *tag) const
+{
+	assert(bool(m_current_device) == bool(m_root_device));
+	char const *const orig_tag = tag;
+	device_t *owner(m_current_device);
+
+	// if the device path is absolute, start from the root
+	if (tag[0] == ':')
+	{
+		tag++;
+		owner = m_root_device.get();
+	}
+
+	// go down the path until we're done with it
+	std::string part;
+	while (strchr(tag, ':'))
+	{
+		const char *next = strchr(tag, ':');
+		assert(next != tag);
+		part.assign(tag, next - tag);
+		owner = owner->subdevices().find(part);
+		if (!owner)
+			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part.c_str(), orig_tag);
+		tag = next+1;
+	}
+	assert(tag[0] != '\0');
+
+	return std::make_pair(tag, owner);
+}
+
+
+//-------------------------------------------------
+//  prepare_replace - ensure owner is present and
+//  existing device is removed if necessary
+//-------------------------------------------------
+
+std::tuple<const char *, device_t *, device_t *> machine_config::prepare_replace(const char *tag)
+{
+	// make sure we have the old device's actual owner
+	std::pair<const char *, device_t *> const owner(resolve_owner(tag));
+	assert(owner.second);
+
+	// remove references to the old device
+	device_t *const old_device(owner.second->subdevice(owner.first));
+	if (old_device)
+		remove_references(*old_device);
+	else
+		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
+
+	return std::make_tuple(owner.first, owner.second, old_device);
+}
+
+
+//-------------------------------------------------
+//  add_device - add a new device at the correct
+//  point in the hierarchy
+//-------------------------------------------------
+
+device_t &machine_config::add_device(std::unique_ptr<device_t> &&device, device_t *owner)
+{
+	current_device_stack const context(*this);
+	if (owner)
+	{
+		// allocate the new device and append it to the owner's list
+		device_t &result(owner->subdevices().m_list.append(*device.release()));
+		result.add_machine_configuration(*this);
+		return result;
+	}
+	else
+	{
+		// allocate the root device directly
+		assert(!m_root_device);
+		m_root_device = std::move(device);
+		driver_device *driver = dynamic_cast<driver_device *>(m_root_device.get());
+		if (driver)
+			driver->set_game_driver(m_gamedrv);
+		m_root_device->add_machine_configuration(*this);
+		return *m_root_device;
+	}
+}
+
+
+//-------------------------------------------------
+//  replace_device - substitute the new device for
+//  the old one in the owner's list
+//-------------------------------------------------
+
+device_t &machine_config::replace_device(std::unique_ptr<device_t> &&device, device_t &owner, device_t *existing)
+{
+	current_device_stack const context(*this);
+	device_t &result(existing
+			? owner.subdevices().m_list.replace_and_remove(*device.release(), *existing)
+			: owner.subdevices().m_list.append(*device.release()));
+	result.add_machine_configuration(*this);
+	return result;
 }
 
 

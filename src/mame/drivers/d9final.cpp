@@ -288,7 +288,7 @@ static const gfx_layout tiles16x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( d9final )
+static GFXDECODE_START( gfx_d9final )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x8_layout, 0, 16*4 )
 GFXDECODE_END
 
@@ -316,11 +316,11 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", d9final)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_d9final)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -346,4 +346,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final, 0, d9final, d9final, d9final_state, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, d9final, 0, d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

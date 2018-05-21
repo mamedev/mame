@@ -750,7 +750,7 @@ void pcw16_state::trigger_fdc_int()
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
 					it would clear - to be checked */
-					m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+					m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 				}
 			}
 		}
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_PALETTE_INIT_OWNER(pcw16_state, pcw16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1097,5 +1097,5 @@ ROM_START(pcw16)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY         FULLNAME */
-COMP( 1995, pcw16,   0,        0,      pcw16,   pcw16, pcw16_state, 0,    "Amstrad plc",  "PcW16", MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY        FULLNAME */
+COMP( 1995, pcw16, 0,      0,      pcw16,   pcw16, pcw16_state, empty_init, "Amstrad plc", "PcW16", MACHINE_NOT_WORKING )

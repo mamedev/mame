@@ -400,7 +400,8 @@ MACHINE_CONFIG_START(hng64_state::hng64_audio)
 	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(*this, hng64_state, tcu_tm1_cb))
 	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(*this, hng64_state, tcu_tm2_cb))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

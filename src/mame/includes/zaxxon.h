@@ -78,8 +78,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
-	DECLARE_DRIVER_INIT(razmataz);
-	DECLARE_DRIVER_INIT(zaxxonj);
+	void init_razmataz();
+	void init_zaxxonj();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);

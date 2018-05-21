@@ -98,7 +98,7 @@ public:
 		m_rscreen(*this, "rscreen")
 	{ }
 
-	DECLARE_DRIVER_INIT(cyberbalt);
+	void init_cyberbalt();
 	void cyberbal(machine_config &config);
 	void cyberbalt(machine_config &config);
 

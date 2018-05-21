@@ -161,6 +161,7 @@ public:
 	DECLARE_WRITE8_MEMBER( outcoin_w );
 	DECLARE_WRITE8_MEMBER( vcrctrl_w );
 
+	required_device<cpu_device> m_maincpu;
 	const char * m_sndromrgntag;
 	int m_sndrombank1;
 	int m_sndrombank2;
@@ -188,6 +189,7 @@ private:
 	int m_gfxrombank;
 	int m_outcoin_enable;
 	emu_timer *m_timer_cb;
+	output_finder<> m_led;
 	TIMER_CALLBACK_MEMBER( timer_callback );
 };
 

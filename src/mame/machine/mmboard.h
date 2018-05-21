@@ -65,6 +65,7 @@ protected:
 
 private:
 	required_ioport_array<8> m_sensors;
+	output_finder<64>        m_led;
 	emu_timer *              m_leds_update_timer;
 	emu_timer *              m_leds_refresh_timer;
 	bool                     m_disable_leds;

@@ -204,7 +204,7 @@ WRITE8_MEMBER(m24_z8000_device::handshake_w)
 	if(data & 1)
 	{
 		m_z8000->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_z8000->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_z8000->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_z8000->mi_w(CLEAR_LINE);
 		m_z8000_halt = false;
 	}

@@ -283,6 +283,7 @@ DAC_GENERATOR(MC3410, mc3410_device, dac_word_interface, dac_code_binary<10>, da
 DAC_GENERATOR(PCM54HP, pcm54hp_device, dac_word_interface, dac_code_binary<16>, dac_gain_r2r, "PCM54HP", "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_interface, dac_code_twos_complement<16>, dac_gain_r2r, "UDA1341TS", "uda1341ts") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E, zn425e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN425E", "zn425e")
+DAC_GENERATOR(ZN428E, zn428e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN428E-8", "zn428e")
 DAC_GENERATOR(ZN429E, zn429e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN429E-8", "zn429e")
 
 // DAC circuits/unidentified chips

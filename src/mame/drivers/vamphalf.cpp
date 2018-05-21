@@ -179,31 +179,31 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(vamphalf);
-	DECLARE_DRIVER_INIT(vamphalfr1);
-	DECLARE_DRIVER_INIT(vamphafk);
-	DECLARE_DRIVER_INIT(coolmini);
-	DECLARE_DRIVER_INIT(coolminii);
-	DECLARE_DRIVER_INIT(mrkickera);
-	DECLARE_DRIVER_INIT(mrdig);
-	DECLARE_DRIVER_INIT(jmpbreak);
-	DECLARE_DRIVER_INIT(poosho);
-	DECLARE_DRIVER_INIT(newxpang);
-	DECLARE_DRIVER_INIT(dtfamily);
-	DECLARE_DRIVER_INIT(dquizgo2);
-	DECLARE_DRIVER_INIT(suplup);
-	DECLARE_DRIVER_INIT(luplup);
-	DECLARE_DRIVER_INIT(luplup29);
-	DECLARE_DRIVER_INIT(luplup10);
-	DECLARE_DRIVER_INIT(puzlbang);
-	DECLARE_DRIVER_INIT(toyland);
-	DECLARE_DRIVER_INIT(aoh);
-	DECLARE_DRIVER_INIT(finalgdr);
-	DECLARE_DRIVER_INIT(misncrft);
-	DECLARE_DRIVER_INIT(boonggab);
-	DECLARE_DRIVER_INIT(wyvernwg);
-	DECLARE_DRIVER_INIT(yorijori);
-	DECLARE_DRIVER_INIT(mrkicker);
+	void init_vamphalf();
+	void init_vamphalfr1();
+	void init_vamphafk();
+	void init_coolmini();
+	void init_coolminii();
+	void init_mrkickera();
+	void init_mrdig();
+	void init_jmpbreak();
+	void init_poosho();
+	void init_newxpang();
+	void init_dtfamily();
+	void init_dquizgo2();
+	void init_suplup();
+	void init_luplup();
+	void init_luplup29();
+	void init_luplup10();
+	void init_puzlbang();
+	void init_toyland();
+	void init_aoh();
+	void init_finalgdr();
+	void init_misncrft();
+	void init_boonggab();
+	void init_wyvernwg();
+	void init_yorijori();
+	void init_mrkicker();
 
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1033,7 +1033,7 @@ static const gfx_layout sprites_layout =
 	16*16*8,
 };
 
-static GFXDECODE_START( vamphalf )
+static GFXDECODE_START( gfx_vamphalf )
 	GFXDECODE_ENTRY( "gfx", 0, sprites_layout, 0, 0x80 )
 GFXDECODE_END
 
@@ -1059,17 +1059,18 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vamphalf)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'000'000)/8) /* 3.5MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(28'000'000)/16 , PIN7_HIGH) /* 1.75MHz */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'000'000)/16 , okim6295_device::PIN7_HIGH) /* 1.75MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1082,20 +1083,22 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(14'318'181)/8, PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
@@ -1234,20 +1237,21 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vamphalf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki_1", XTAL(32'000'000)/8, PIN7_HIGH) /* 4MHz */
+	MCFG_DEVICE_ADD("oki_1", OKIM6295, XTAL(32'000'000)/8, okim6295_device::PIN7_HIGH) /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/32, PIN7_HIGH) /* 1MHz */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH) /* 1MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -1491,7 +1495,7 @@ ROM_START( luplup10 ) /* version 1.05 / 981214 */
 	ROM_LOAD( "p1_rom2.rom2", 0x80000, 0x80000, CRC(1043ce44) SHA1(13a23f35ff2335d837f682761f774a70e298e77a) )
 
 	ROM_REGION( 0x800000, "gfx", 0 ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "roml00.roml00", 0x000000, 0x200000, BAD_DUMP CRC(1575b2be) SHA1(e4e67ecc15518a1c8ea7ab5cbd0fe9c6f7f64edd) )
+	ROM_LOAD32_WORD( "roml00.roml00", 0x000000, 0x200000, CRC(e2eeb61e) SHA1(5261cf29cd7e10d86c0dd4bc640ad9c3db99cec3) )
 	ROM_LOAD32_WORD( "romu00.romu00", 0x000002, 0x200000, CRC(9ee855b9) SHA1(a51b268a640b667d88a8ceab562607a811602fff) )
 	ROM_LOAD32_WORD( "roml01.roml01", 0x400000, 0x200000, CRC(7182864c) SHA1(48789b20d9b8f41d7c9f5690f4f44bc6f15b8cfe) )
 	ROM_LOAD32_WORD( "romu01.romu01", 0x400002, 0x200000, CRC(44f76640) SHA1(6a49ed4d5584ecd0496b9ce19aefd5f4e0126da7) )
@@ -3066,7 +3070,7 @@ READ16_MEMBER(vamphalf_state::boonggab_speedup_r)
 	return m_wram[0xf1b74 / 2];
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
+void vamphalf_state::init_vamphalf()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a7b8, 0x0004a7b9, read16_delegate(FUNC(vamphalf_state::vamphalf_speedup_r), this));
 
@@ -3074,7 +3078,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphalfr1)
+void vamphalf_state::init_vamphalfr1()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a468, 0x0004a469, read16_delegate(FUNC(vamphalf_state::vamphalfr1_speedup_r), this));
 
@@ -3082,7 +3086,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalfr1)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
+void vamphalf_state::init_vamphafk()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a648, 0x0004a649, read16_delegate(FUNC(vamphalf_state::vamphafk_speedup_r), this));
 
@@ -3090,7 +3094,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
+void vamphalf_state::init_misncrft()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000741e8, 0x000741e9, read16_delegate(FUNC(vamphalf_state::misncrft_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00072e2c, 0x00072e2d, read16_delegate(FUNC(vamphalf_state::misncrfta_speedup_r), this));
@@ -3102,7 +3106,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
+void vamphalf_state::init_coolmini()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d2df8, 0x000d2df9, read16_delegate(FUNC(vamphalf_state::coolmini_speedup_r), this));
 
@@ -3110,7 +3114,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
+void vamphalf_state::init_coolminii()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d30a8, 0x000d30a9, read16_delegate(FUNC(vamphalf_state::coolminii_speedup_r), this));
 
@@ -3118,7 +3122,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
+void vamphalf_state::init_mrkicker()
 {
 	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
@@ -3127,7 +3131,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,suplup)
+void vamphalf_state::init_suplup()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0011605c, 0x0011605d, read16_delegate(FUNC(vamphalf_state::suplup_speedup_r), this));
 
@@ -3135,7 +3139,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,suplup)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup)
+void vamphalf_state::init_luplup()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00115e84, 0x00115e85, read16_delegate(FUNC(vamphalf_state::luplup_speedup_r), this));
 
@@ -3143,7 +3147,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
+void vamphalf_state::init_luplup29()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f08, 0x00113f09, read16_delegate(FUNC(vamphalf_state::luplup29_speedup_r), this));
 
@@ -3151,7 +3155,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup10)
+void vamphalf_state::init_luplup10()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113b78, 0x00113b79, read16_delegate(FUNC(vamphalf_state::luplup10_speedup_r), this));
 
@@ -3159,7 +3163,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup10)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
+void vamphalf_state::init_puzlbang()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f14, 0x00113f15, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecd, read16_delegate(FUNC(vamphalf_state::puzlbanga_speedup_r), this));
@@ -3168,7 +3172,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
+void vamphalf_state::init_wyvernwg()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4cc4, 0x00b4cc7, read32_delegate(FUNC(vamphalf_state::wivernwg_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56f4, 0x00b56f7, read32_delegate(FUNC(vamphalf_state::wyvernwg_speedup_r), this));
@@ -3188,7 +3192,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
+void vamphalf_state::init_yorijori()
 {
 	// seems close to Final Godori in terms of port mappings, possibly a SemiCom game?
 
@@ -3209,7 +3213,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
+void vamphalf_state::init_finalgdr()
 {
 	banked_oki(0);
 	m_finalgdr_backupram_bank = 1;
@@ -3230,7 +3234,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
+void vamphalf_state::init_mrkickera()
 {
 	banked_oki(0);
 	// backup ram isn't used
@@ -3250,7 +3254,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
+void vamphalf_state::init_dquizgo2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00cdde8, 0x00cdde9, read16_delegate(FUNC(vamphalf_state::dquizgo2_speedup_r), this));
 
@@ -3258,7 +3262,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
+void vamphalf_state::init_dtfamily()
 {
 	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, read16_delegate(FUNC(vamphalf_state::dtfamily_speedup_r), this));
@@ -3268,7 +3272,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
 }
 
 
-DRIVER_INIT_MEMBER(vamphalf_state,toyland)
+void vamphalf_state::init_toyland()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x780d8, 0x780d9, read16_delegate(FUNC(vamphalf_state::toyland_speedup_r), this));
 
@@ -3276,7 +3280,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,toyland)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,aoh)
+void vamphalf_state::init_aoh()
 {
 	banked_oki(1);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, read32_delegate(FUNC(vamphalf_state::aoh_speedup_r), this));
@@ -3285,7 +3289,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,aoh)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,jmpbreak)
+void vamphalf_state::init_jmpbreak()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00906f4, 0x00906f5, read16_delegate(FUNC(vamphalf_state::jmpbreak_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3293,7 +3297,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,jmpbreak)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
+void vamphalf_state::init_mrdig()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0768, 0x0e0769, read16_delegate(FUNC(vamphalf_state::mrdig_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3301,7 +3305,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,poosho)
+void vamphalf_state::init_poosho()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c8b58, 0x0c8b59, read16_delegate(FUNC(vamphalf_state::poosho_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3309,7 +3313,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,poosho)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,newxpang)
+void vamphalf_state::init_newxpang()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, read16_delegate(FUNC(vamphalf_state::newxpang_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3317,7 +3321,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,newxpang)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
+void vamphalf_state::init_boonggab()
 {
 	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000f1b74, 0x000f1b75, read16_delegate(FUNC(vamphalf_state::boonggab_speedup_r), this));
@@ -3327,32 +3331,32 @@ DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 	m_flip_bit = 1;
 }
 
-GAME( 1999, coolmini,  0,        coolmini,  common,   vamphalf_state, coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coolminii, coolmini, coolmini,  common,   vamphalf_state, coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jmpbreak,  0,        jmpbreak,  common,   vamphalf_state, jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, poosho,    0,        jmpbreak,  common,   vamphalf_state, poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, newxpang,  0,        newxpang,  common,   vamphalf_state, newxpang,  ROT0,   "F2 System",                     "New Cross Pang" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup,    suplup,   suplup,    common,   vamphalf_state, luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup10,  suplup,   suplup,    common,   vamphalf_state, luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // graphics ROML00 needs redump
-GAME( 1999, puzlbang,  suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, puzlbanga, suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalf,  0,        vamphalf,  common,   vamphalf_state, vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfr1,vamphalf, vamphalf,  common,   vamphalf_state, vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfk, vamphalf, vamphalf,  common,   vamphalf_state, vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dquizgo2,  0,        coolmini,  common,   vamphalf_state, dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
-GAME( 2000, misncrft,  0,        misncrft,  common,   vamphalf_state, misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, misncrfta, misncrft, misncrft,  common,   vamphalf_state, misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mrdig,     0,        mrdig,     common,   vamphalf_state, mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, dtfamily,  0,        mrkicker,  common,   vamphalf_state, dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, finalgdr,  0,        finalgdr,  finalgdr, vamphalf_state, finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkicker,  0,        mrkicker,  common,   vamphalf_state, mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkickera, mrkicker, mrkickera, finalgdr, vamphalf_state, mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow eeprom saving works then this set corrupts the eeprom and then won't boot
-GAME( 2001, toyland,   0,        coolmini,  common,   vamphalf_state, toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wivernwg,  0,        wyvernwg,  common,   vamphalf_state, wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wyvernwg,  wivernwg, wyvernwg,  common,   vamphalf_state, wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wyvernwga, wivernwg, wyvernwg,  common,   vamphalf_state, wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, aoh,       0,        aoh,       aoh,      vamphalf_state, aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, boonggab,  0,        boonggab,  boonggab, vamphalf_state, boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, yorijori,  0,        yorijori,  common,   vamphalf_state, yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolmini,   0,        coolmini,  common,   vamphalf_state, init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolminii,  coolmini, coolmini,  common,   vamphalf_state, init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jmpbreak,   0,        jmpbreak,  common,   vamphalf_state, init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, poosho,     0,        jmpbreak,  common,   vamphalf_state, init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, newxpang,   0,        newxpang,  common,   vamphalf_state, init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, suplup,     0,        suplup,    common,   vamphalf_state, init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup,     suplup,   suplup,    common,   vamphalf_state, init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup29,   suplup,   suplup,    common,   vamphalf_state, init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup10,   suplup,   suplup,    common,   vamphalf_state, init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbang,   suplup,   suplup,    common,   vamphalf_state, init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbanga,  suplup,   suplup,    common,   vamphalf_state, init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalf,   0,        vamphalf,  common,   vamphalf_state, init_vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfr1, vamphalf, vamphalf,  common,   vamphalf_state, init_vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,   vamphalf_state, init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dquizgo2,   0,        coolmini,  common,   vamphalf_state, init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
+GAME( 2000, misncrft,   0,        misncrft,  common,   vamphalf_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, misncrfta,  misncrft, misncrft,  common,   vamphalf_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mrdig,      0,        mrdig,     common,   vamphalf_state, init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dtfamily,   0,        mrkicker,  common,   vamphalf_state, init_dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, finalgdr,   0,        finalgdr,  finalgdr, vamphalf_state, init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mrkicker,   0,        mrkicker,  common,   vamphalf_state, init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr, vamphalf_state, init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow eeprom saving works then this set corrupts the eeprom and then won't boot
+GAME( 2001, toyland,    0,        coolmini,  common,   vamphalf_state, init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, aoh,        0,        aoh,       aoh,      vamphalf_state, init_aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, boonggab,   0,        boonggab,  boonggab, vamphalf_state, init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, yorijori,   0,        yorijori,  common,   vamphalf_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -38,18 +38,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(xevious_state::battles_nmi_generate)
 	{
 		if( m_battles_customio_command_count == 0 )
 		{
-			m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 		else
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 	else
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	m_battles_customio_command_count++;
 }
@@ -138,8 +138,8 @@ WRITE8_MEMBER( xevious_state::battles_customio_data3_w )
 
 WRITE8_MEMBER( xevious_state::battles_CPU4_coin_w )
 {
-	output().set_led_value(0,data & 0x02); // Start 1
-	output().set_led_value(1,data & 0x01); // Start 2
+	m_led[0] = BIT(data, 1); // Start 1
+	m_led[1] = BIT(data, 0); // Start 2
 
 	machine().bookkeeping().coin_counter_w(0,data & 0x20);
 	machine().bookkeeping().coin_counter_w(1,data & 0x10);

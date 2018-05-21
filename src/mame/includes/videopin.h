@@ -37,7 +37,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram")
+		m_video_ram(*this, "video_ram"),
+		m_led(*this, "led0")
 	{ }
 
 	void videopin(machine_config &config);
@@ -74,6 +75,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_video_ram;
+	output_finder<> m_led;
 
 	attotime m_time_pushed;
 	attotime m_time_released;
@@ -86,6 +88,6 @@ private:
 };
 
 /*----------- defined in audio/videopin.c -----------*/
-DISCRETE_SOUND_EXTERN( videopin );
+DISCRETE_SOUND_EXTERN( videopin_discrete );
 
 #endif // MAME_INCLUDES_VIDEOPIN_H

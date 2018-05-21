@@ -65,7 +65,7 @@ MACHINE_CONFIG_START(compis_keyboard_device::device_add_mconfig)
 	MCFG_MCS48_PORT_T1_IN_CB(NOOP) // ???
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -174,7 +174,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("START-STOP") PORT_CODE(KEYCODE_PAUSE) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(a_RING " " A_RING) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
@@ -228,7 +228,7 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 		m_y(*this, "Y%u", 1),
 		m_special(*this, "SPECIAL"),
 		m_out_tx_handler(*this),
-		m_bus(0xff),
+		m_led_caps(*this, "led_caps"),
 		m_keylatch(0)
 {
 }
@@ -243,6 +243,9 @@ void compis_keyboard_device::device_start()
 	// resolve callbacks
 	m_out_tx_handler.resolve_safe();
 	m_out_tx_handler(1);
+
+	// resolve output finder
+	m_led_caps.resolve();
 }
 
 
@@ -297,7 +300,7 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 	m_speaker->level_w(BIT(data, 5));
 
 	// LEDs
-	machine().output().set_led_value(LED_CAPS, BIT(data, 6));
+	m_led_caps = BIT(data, 6);
 
 	// serial data out
 	m_out_tx_handler(BIT(data, 7));

@@ -176,7 +176,7 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -205,4 +205,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, 0, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )
+COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, empty_init, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )

@@ -24,22 +24,23 @@ class segahang_state : public sega_16bit_common_base
 public:
 	// construction/destruction
 	segahang_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_subcpu(*this, "subcpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_mcu(*this, "mcu"),
-			m_i8255_1(*this, "i8255_1"),
-			m_i8255_2(*this, "i8255_2"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_segaic16road(*this, "segaic16road"),
-			m_soundlatch(*this, "soundlatch"),
-			m_workram(*this, "workram"),
-			m_sharrier_video(false),
-			m_adc_select(0),
-			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"}),
-			m_decrypted_opcodes(*this, "decrypted_opcodes")
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_mcu(*this, "mcu")
+		, m_i8255_1(*this, "i8255_1")
+		, m_i8255_2(*this, "i8255_2")
+		, m_sprites(*this, "sprites")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_segaic16road(*this, "segaic16road")
+		, m_soundlatch(*this, "soundlatch")
+		, m_workram(*this, "workram")
+		, m_sharrier_video(false)
+		, m_adc_select(0)
+		, m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"})
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	// PPI read/write callbacks
@@ -61,11 +62,11 @@ public:
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
 
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(sharrier);
-	DECLARE_DRIVER_INIT(enduror);
-	DECLARE_DRIVER_INIT(endurobl);
-	DECLARE_DRIVER_INIT(endurob2);
+	void init_generic();
+	void init_sharrier();
+	void init_enduror();
+	void init_endurobl();
+	void init_endurob2();
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -112,6 +113,7 @@ protected:
 
 	// driver overrides
 	virtual void video_start() override;
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -142,4 +144,5 @@ protected:
 	optional_ioport_array<4> m_adc_ports;
 	bool                    m_shadow;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
+	output_finder<2> m_lamp;
 };

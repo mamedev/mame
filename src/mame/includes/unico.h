@@ -15,6 +15,7 @@ public:
 	unico_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
+		m_led(*this, "led%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -34,6 +35,7 @@ protected:
 
 	DECLARE_WRITE16_MEMBER(burglarx_sound_bank_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -41,6 +43,7 @@ protected:
 	void burglarx_map(address_map &map);
 
 	required_device<palette_device> m_palette;
+	output_finder<2> m_led;
 
 private:
 	std::unique_ptr<uint16_t[]> m_vram;

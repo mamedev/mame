@@ -79,7 +79,6 @@
 
 #define A7_CPU_TAG "maincpu"
 #define A7_KBDC_TAG "ay3600"
-#define A7_BUS_TAG "a2bus"
 #define A7_SPEAKER_TAG "speaker"
 #define A7_CASSETTE_TAG "tape"
 #define A7_UPPERBANK_TAG "inhbank"
@@ -94,7 +93,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_ay3600(*this, A7_KBDC_TAG)
 		, m_video(*this, A7_VIDEO_TAG)
-		, m_a2bus(*this, A7_BUS_TAG)
+		, m_a2bus(*this, "a2bus")
 		, m_joy1x(*this, "joystick_1_x")
 		, m_joy1y(*this, "joystick_1_y")
 		, m_joy2x(*this, "joystick_2_x")
@@ -850,7 +849,7 @@ INTERRUPT_GEN_MEMBER(agat7_state::agat_vblank)
 {
 	if (m_agat7_interrupts)
 	{
-		m_maincpu->set_input_line(M6502_NMI_LINE, PULSE_LINE);
+		m_maincpu->pulse_input_line(M6502_NMI_LINE, attotime::zero);
 	}
 }
 
@@ -1098,7 +1097,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1132,16 +1131,16 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.
 	 * slot 1 always holds the CPU card.
 	 */
-	MCFG_DEVICE_ADD(A7_BUS_TAG, A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU(A7_CPU_TAG)
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, agat7_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, agat7_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, agat7_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl2", agat7_cards, "a7lang")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl3", agat7_cards, "a7fdc")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl4", agat7_cards, "a7ports")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl5", agat7_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl6", agat7_cards, "a7ram")
+	A2BUS_SLOT(config, "sl2", m_a2bus, agat7_cards, "a7lang");
+	A2BUS_SLOT(config, "sl3", m_a2bus, agat7_cards, "a7fdc");
+	A2BUS_SLOT(config, "sl4", m_a2bus, agat7_cards, "a7ports");
+	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
 	MCFG_CASSETTE_ADD(A7_CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
@@ -1190,6 +1189,6 @@ ROM_START( agat9 )
 	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE         INIT      COMPANY            FULLNAME  FLAGS
-COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-7", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS)
-COMP( 1984, agat9,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-9", MACHINE_NOT_WORKING)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1983, agat7, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-7", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS)
+COMP( 1984, agat9, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-9", MACHINE_NOT_WORKING)

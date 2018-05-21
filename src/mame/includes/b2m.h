@@ -38,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(b2m_palette_r);
 	DECLARE_WRITE8_MEMBER(b2m_localmachine_w);
 	DECLARE_READ8_MEMBER(b2m_localmachine_r);
-	DECLARE_DRIVER_INIT(b2m);
+	void init_b2m();
 
 	DECLARE_PALETTE_INIT(b2m);
 	uint32_t screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

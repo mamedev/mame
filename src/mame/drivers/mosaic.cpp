@@ -261,7 +261,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( mosaic )
+static GFXDECODE_START( gfx_mosaic )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
 GFXDECODE_END
@@ -294,13 +294,13 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mosaic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mosaic)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'288'000)/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
@@ -375,6 +375,6 @@ ROM_END
 
 
 
-GAME( 1990, mosaic,  0,      mosaic, mosaic, mosaic_state, 0, ROT0, "Space",                 "Mosaic",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mosaica, mosaic, mosaic, mosaic, mosaic_state, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gfire2,  0,      gfire2, gfire2, mosaic_state, 0, ROT0, "Topis Corp",            "Golden Fire II", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mosaic,  0,      mosaic, mosaic, mosaic_state, empty_init, ROT0, "Space",                 "Mosaic",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mosaica, mosaic, mosaic, mosaic, mosaic_state, empty_init, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gfire2,  0,      gfire2, gfire2, mosaic_state, empty_init, ROT0, "Topis Corp",            "Golden Fire II", MACHINE_SUPPORTS_SAVE )

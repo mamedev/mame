@@ -282,5 +282,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, minifram,  0,      0,      miniframe,  miniframe, miniframe_state, 0,    "Convergent",  "Miniframe",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY       FULLNAME     FLAGS
+COMP( 1985, minifram, 0,      0,      miniframe, miniframe, miniframe_state, empty_init, "Convergent", "Miniframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

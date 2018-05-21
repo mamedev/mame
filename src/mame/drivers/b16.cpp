@@ -247,7 +247,7 @@ static const gfx_layout b16_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( b16 )
+static GFXDECODE_START( gfx_b16 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, b16_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(b16_state::b16)
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, b16_state, memory_read_byte))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, b16_state, memory_write_byte))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", b16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_b16)
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT_STANDARD(black_and_white) // TODO
 
@@ -314,5 +314,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE   INPUT  STATE      INIT  COMPANY    FULLNAME  FLAGS */
-COMP( 1983, b16,  0,      0,       b16,      b16,   b16_state, 0,    "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY    FULLNAME  FLAGS */
+COMP( 1983, b16,  0,      0,      b16,     b16,   b16_state, empty_init, "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

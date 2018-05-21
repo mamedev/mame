@@ -415,13 +415,13 @@ WRITE8_MEMBER( c8050_device::riot1_pb_w )
 	*/
 
 	// activity led 1
-	machine().output().set_led_value(LED_ACT1, BIT(data, 3));
+	m_led[LED_ACT1] = BIT(data, 3);
 
 	// activity led 0
-	machine().output().set_led_value(LED_ACT0, BIT(data, 4));
+	m_led[LED_ACT0] = BIT(data, 4);
 
 	// error led
-	machine().output().set_led_value(LED_ERR, BIT(data, 5));
+	m_led[LED_ERR] = BIT(data, 5);
 }
 
 WRITE8_MEMBER( c8050_device::via_pb_w )
@@ -782,6 +782,7 @@ c8050_device::c8050_device(const machine_config &mconfig, device_type type, cons
 	m_floppy1(*this, FDC_TAG ":1"),
 	m_fdc(*this, FDC_TAG),
 	m_address(*this, "ADDRESS"),
+	m_led(*this, "led%u", 0U),
 	m_rfdo(1),
 	m_daco(1),
 	m_atna(1),
@@ -831,6 +832,8 @@ sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, d
 
 void c8050_device::device_start()
 {
+	m_led.resolve();
+
 	// install image callbacks
 	m_fdc->set_floppy(m_floppy0, m_floppy1);
 

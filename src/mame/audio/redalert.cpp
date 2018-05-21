@@ -73,7 +73,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 	/* D7 is also connected to the NMI input of the CPU -
 	   the NMI is actually toggled by a 74121 (R1=27K, C10=330p) */
 	if ((data & 0x80) == 0x00)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -130,7 +130,7 @@ void redalert_state::redalert_audio_map(address_map &map)
  *
  *************************************/
 
-SOUND_START_MEMBER(redalert_state,redalert)
+void redalert_state::sound_start()
 {
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));
@@ -222,12 +222,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::redalert_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	redalert_audio_m37b(config);
 	redalert_audio_voice(config);
-
-	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
 MACHINE_CONFIG_END
 
@@ -239,11 +237,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	redalert_audio_m37b(config);
-
-	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
 MACHINE_CONFIG_END
 
@@ -258,7 +254,7 @@ WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 {
 	/* the byte is connected to port A of the AY8910 */
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -324,19 +320,6 @@ void redalert_state::demoneye_audio_map(address_map &map)
 }
 
 
-/*************************************
- *
- *  Demoneye-X audio start
- *
- *************************************/
-
-SOUND_START_MEMBER( redalert_state, demoneye )
-{
-	save_item(NAME(m_ay8910_latch_1));
-	save_item(NAME(m_ay8910_latch_2));
-}
-
-
 
 /*************************************
  *
@@ -355,9 +338,7 @@ MACHINE_CONFIG_START(redalert_state::demoneye_audio)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_data_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_latch_1_w))
 
-	MCFG_SOUND_START_OVERRIDE( redalert_state, demoneye )
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

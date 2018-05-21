@@ -542,13 +542,13 @@ static const gfx_layout scclayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( undrfire )
+static GFXDECODE_START( gfx_undrfire )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
 GFXDECODE_END
 
-static GFXDECODE_START( cbombers )
+static GFXDECODE_START( gfx_cbombers )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0x1000, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_undrfire)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", undrfire)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_undrfire)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -657,7 +657,7 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_cbombers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbombers)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbombers)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -1010,25 +1010,21 @@ ROM_START( cbombersp )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(undrfire_state,undrfire)
+void undrfire_state::init_undrfire()
 {
-	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx3")->base();
-	int size=memregion("gfx3")->bytes();
-	int data;
+	int size = memregion("gfx3")->bytes();
 
 	/* make SCC tile GFX format suitable for gfxdecode */
-	offset = size/2;
-	for (i = size/2+size/4; i<size; i++)
+	uint32_t offset = size / 2;
+	for (uint32_t i = size / 2 + size / 4; i < size; i++)
 	{
-		int d1,d2,d3,d4;
-
 		/* Expand 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data>>0) & 3;
-		d2 = (data>>2) & 3;
-		d3 = (data>>4) & 3;
-		d4 = (data>>6) & 3;
+		int data = gfx[i];
+		int d1 = (data>>0) & 3;
+		int d2 = (data>>2) & 3;
+		int d3 = (data>>4) & 3;
+		int d4 = (data>>6) & 3;
 
 		gfx[offset] = (d1<<2) | (d2<<6);
 		offset++;
@@ -1039,40 +1035,35 @@ DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 }
 
 
-DRIVER_INIT_MEMBER(undrfire_state,cbombers)
+void undrfire_state::init_cbombers()
 {
-	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx3")->base();
-	int size=memregion("gfx3")->bytes();
-	int data;
-
+	int size = memregion("gfx3")->bytes();
 
 	/* make SCC tile GFX format suitable for gfxdecode */
-	offset = size/2;
-	for (i = size/2+size/4; i<size; i++)
+	uint32_t offset = size/2;
+	for (uint32_t i = size/2+size/4; i<size; i++)
 	{
-		int d1,d2,d3,d4;
-
 		/* Expand 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data>>0) & 3;
-		d2 = (data>>2) & 3;
-		d3 = (data>>4) & 3;
-		d4 = (data>>6) & 3;
+		int data = gfx[i];
+		int d1 = (data >> 0) & 3;
+		int d2 = (data >> 2) & 3;
+		int d3 = (data >> 4) & 3;
+		int d4 = (data >> 6) & 3;
 
-		gfx[offset] = (d1<<2) | (d2<<6);
+		gfx[offset] = (d1 << 2) | (d2 << 6);
 		offset++;
 
-		gfx[offset] = (d3<<2) | (d4<<6);
+		gfx[offset] = (d3 << 2) | (d4 << 6);
 		offset++;
 	}
 }
 
 
 
-GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
-GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
-GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, init_undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
+GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, init_undrfire, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
+GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, init_undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, init_cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, init_cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, init_cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )

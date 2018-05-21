@@ -58,7 +58,8 @@ public:
 		m_speaker(*this, "speaker"),
 		m_eprom(*this, EPROM_TAG),
 		m_q(*this, "Q%u", 6U),
-		m_digit(*this, "digit%u", 0U)
+		m_digit(*this, "digit%u", 0U),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
@@ -85,6 +86,7 @@ private:
 	required_device<generic_slot_device> m_eprom;
 	required_ioport_array<4> m_q;
 	output_finder<6> m_digit;
+	output_finder<2> m_led;
 
 	/* EPROM state */
 	int m_eprom_oe;
@@ -259,10 +261,10 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_speaker->level_w(!BIT(data, 4));
 
 	/* address led */
-	output().set_led_value(0, BIT(data, 5));
+	m_led[0] = BIT(data, 5);
 
 	/* data led */
-	output().set_led_value(1, !BIT(data, 5));
+	m_led[1] = !BIT(data, 5);
 
 	/* EPROM address shift */
 	if (!BIT(m_old_data, 5) && BIT(data, 5))
@@ -315,6 +317,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 void beta_state::machine_start()
 {
 	m_digit.resolve();
+	m_led.resolve();
 
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
 
@@ -350,7 +353,7 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_DEFAULT_LAYOUT( layout_beta )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -382,5 +385,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, beta,   0,      0,      beta,   beta, beta_state, 0,    "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1984, beta, 0,      0,      beta,    beta,  beta_state, empty_init, "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )

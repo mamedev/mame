@@ -43,7 +43,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(carpolo);
+	void init_carpolo();
 	void carpolo(machine_config &config);
 
 protected:

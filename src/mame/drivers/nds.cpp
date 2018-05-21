@@ -1004,5 +1004,5 @@ ROM_START( nds )
 	ROM_LOAD( "firmware.bin", 0x0000, 0x40000, CRC(945f9dc9) SHA1(cfe072921ee3fb93f688743f8beef89043c3e9ad) )
 ROM_END
 
-//   YEAR  NAME PARENT COMPAT MACHINE INPUT  STATE      INIT  COMPANY     FULLNAME    FLAGS
-CONS(2004, nds, 0,     0,     nds,    nds,   nds_state, 0,    "Nintendo", "DS",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME  FLAGS
+CONS( 2004, nds,  0,      0,      nds,     nds,   nds_state, empty_init, "Nintendo", "DS",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
