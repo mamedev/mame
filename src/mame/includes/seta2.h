@@ -38,8 +38,6 @@ public:
 		m_spriteram(*this, "spriteram", 0),
 		m_tileram(*this, "tileram", 0),
 		m_vregs(*this, "vregs", 0),
-		m_funcube_outputs(*this, "funcube_outputs"),
-		m_funcube_leds(*this, "funcube_leds"),
 		m_led(*this, "led%u", 0U),
 		m_lamp(*this, "lamp%u", 0U)
 	{ }
@@ -73,22 +71,6 @@ public:
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 
-	DECLARE_READ32_MEMBER(funcube_nvram_dword_r);
-	DECLARE_WRITE32_MEMBER(funcube_nvram_dword_w);
-	DECLARE_READ32_MEMBER(funcube_debug_r);
-	DECLARE_READ16_MEMBER(funcube_coins_r);
-	DECLARE_WRITE16_MEMBER(funcube_leds_w);
-	DECLARE_READ16_MEMBER(funcube_outputs_r);
-	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
-	DECLARE_READ16_MEMBER(funcube_battery_r);
-
-	void init_funcube3();
-	void init_funcube();
-	void init_funcube2();
-
-	DECLARE_MACHINE_START(mj4simai);
-	DECLARE_MACHINE_START(funcube);
-	DECLARE_MACHINE_RESET(funcube);
 
 	DECLARE_VIDEO_START(yoffset);
 	DECLARE_VIDEO_START(xoffset);
@@ -100,16 +82,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(seta2_interrupt);
 	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
-	void funcube_debug_outputs();
 	void seta2(machine_config &config);
-	void funcube(machine_config &config);
-	void funcube3(machine_config &config);
-	void funcube2(machine_config &config);
 	void grdians(machine_config &config);
 	void myangel(machine_config &config);
-	void mj4simai(machine_config &config);
 	void penbros(machine_config &config);
 	void pzlbowl(machine_config &config);
 	void myangel2(machine_config &config);
@@ -120,11 +96,6 @@ public:
 	void samshoot(machine_config &config);
 	void namcostr(machine_config &config);
 	void ablastb_map(address_map &map);
-	void funcube2_map(address_map &map);
-	void funcube2_sub_io(address_map &map);
-	void funcube_map(address_map &map);
-	void funcube_sub_io(address_map &map);
-	void funcube_sub_map(address_map &map);
 	void grdians_map(address_map &map);
 	void gundamex_map(address_map &map);
 	void mj4simai_map(address_map &map);
@@ -159,8 +130,6 @@ protected:
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_tileram;
 	optional_shared_ptr<uint16_t> m_vregs;
-	optional_shared_ptr<uint16_t> m_funcube_outputs;
-	optional_shared_ptr<uint16_t> m_funcube_leds;
 	output_finder<7> m_led;
 	output_finder<11> m_lamp;
 
@@ -169,6 +138,64 @@ protected:
 	int m_keyboard_row;
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
+};
+
+
+class mj4simai_state : public seta2_state
+{
+public:
+	mj4simai_state(const machine_config &mconfig, device_type type, const char *tag)
+		: seta2_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_start() override;
+};
+
+
+class funcube_state : public seta2_state
+{
+public:
+	funcube_state(const machine_config &mconfig, device_type type, const char *tag)
+		: seta2_state(mconfig, type, tag)
+		, m_funcube_outputs(*this, "funcube_outputs")
+		, m_funcube_leds(*this, "funcube_leds")
+	{ }
+
+	void funcube(machine_config &config);
+	void funcube3(machine_config &config);
+	void funcube2(machine_config &config);
+
+	void init_funcube3();
+	void init_funcube();
+	void init_funcube2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	DECLARE_READ32_MEMBER(funcube_nvram_dword_r);
+	DECLARE_WRITE32_MEMBER(funcube_nvram_dword_w);
+	DECLARE_READ32_MEMBER(funcube_debug_r);
+	DECLARE_READ16_MEMBER(funcube_coins_r);
+	DECLARE_WRITE16_MEMBER(funcube_leds_w);
+	DECLARE_READ16_MEMBER(funcube_outputs_r);
+	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
+	DECLARE_READ16_MEMBER(funcube_battery_r);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
+
+	void funcube2_map(address_map &map);
+	void funcube2_sub_io(address_map &map);
+	void funcube_map(address_map &map);
+	void funcube_sub_io(address_map &map);
+	void funcube_sub_map(address_map &map);
+
+	void funcube_debug_outputs();
+
+	required_shared_ptr<uint16_t> m_funcube_outputs;
+	required_shared_ptr<uint16_t> m_funcube_leds;
 	uint64_t m_funcube_coin_start_cycles;
 	uint8_t m_funcube_hopper_motor;
 };

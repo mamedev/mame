@@ -40,8 +40,6 @@ public:
 	DECLARE_PALETTE_INIT(funworld);
 	DECLARE_VIDEO_START(magicrd2);
 	DECLARE_VIDEO_START(chinatow);
-	DECLARE_MACHINE_START(lunapark);
-	DECLARE_MACHINE_RESET(lunapark);
 	uint32_t screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void royalcd1(machine_config &config);
 	void royalcd2(machine_config &config);
@@ -49,7 +47,6 @@ public:
 	void chinatow(machine_config &config);
 	void magicrd2(machine_config &config);
 	void fw_a7_11(machine_config &config);
-	void lunapark(machine_config &config);
 	void fw2ndpal(machine_config &config);
 	void saloon(machine_config &config);
 	void cuoreuno(machine_config &config);
@@ -79,3 +76,18 @@ protected:
 	required_device<palette_device> m_palette;
 	output_finder<8> m_lamp;
 };
+
+
+class lunapark_state : public funworld_state
+{
+public:
+	lunapark_state(const machine_config &mconfig, device_type type, const char *tag)
+		: funworld_state(mconfig, type, tag)
+	{ }
+
+	void lunapark(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+};
+
