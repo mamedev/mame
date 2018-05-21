@@ -3046,14 +3046,16 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 *     Machine Start & Reset     *
 ********************************/
 
-MACHINE_START_MEMBER(funworld_state, lunapark)
+void lunapark_state::machine_start()
 {
+	funworld_state::machine_start();
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
-MACHINE_RESET_MEMBER(funworld_state, lunapark)
+void lunapark_state::machine_reset()
 {
+	funworld_state::machine_reset();
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
 
@@ -3189,12 +3191,10 @@ MACHINE_CONFIG_START(funworld_state::witchryl)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(funworld_state::lunapark)
+MACHINE_CONFIG_START(lunapark_state::lunapark)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
-	MCFG_MACHINE_START_OVERRIDE(funworld_state, lunapark)
-	MCFG_MACHINE_RESET_OVERRIDE(funworld_state, lunapark)
 MACHINE_CONFIG_END
 
 
@@ -7109,8 +7109,8 @@ GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  funworld_state, empty_ini
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  funworld_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  funworld_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  lunapark_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  lunapark_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
 GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "<unknown>",       "Luna Park (set 3)",                               0,                       layout_jollycrd ) // regular video RAM 6000/7000.
 GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
 
