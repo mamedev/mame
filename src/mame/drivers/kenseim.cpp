@@ -237,9 +237,6 @@ public:
 	void kenseim_io_map(address_map &map);
 	void kenseim_map(address_map &map);
 
-protected:
-	virtual void machine_start() override { cps_state::machine_start(); m_lamp.resolve(); }
-
 private:
 	uint8_t m_to_68k_cmd_low;
 	uint8_t m_to_68k_cmd_d9;
@@ -704,6 +701,8 @@ void kenseim_state::init_kenseim()
 	m_led_serial_data = 0;
 	m_led_clock = 0;
 	m_led_latch = 0;
+
+	m_lamp.resolve();
 }
 
 

@@ -309,6 +309,8 @@ void suna16_state::bestbest_sound_map(address_map &map)
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
+	m_led.resolve();
+
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
@@ -399,6 +401,8 @@ void suna16_state::uballoon_pcm_1_io_map(address_map &map)
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+
+	m_led.resolve();
 
 	save_item(NAME(m_prot));
 }

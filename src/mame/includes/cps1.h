@@ -357,8 +357,6 @@ public:
 	void varthb_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led_cboard.resolve(); }
-
 	/* memory pointers */
 	// cps1
 	optional_shared_ptr<uint16_t> m_mainram;

@@ -437,6 +437,7 @@ INPUT_PORTS_END
 
 void seabattl_state::machine_start()
 {
+	m_lamp.resolve();
 }
 
 void seabattl_state::machine_reset()
