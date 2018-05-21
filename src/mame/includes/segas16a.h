@@ -29,31 +29,32 @@ class segas16a_state : public sega_16bit_common_base
 public:
 	// construction/destruction
 	segas16a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_mcu(*this, "mcu"),
-			m_i8255(*this, "i8255"),
-			m_ymsnd(*this, "ymsnd"),
-			m_n7751(*this, "n7751"),
-			m_n7751_i8243(*this, "n7751_8243"),
-			m_nvram(*this, "nvram"),
-			m_watchdog(*this, "watchdog"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_soundlatch(*this, "soundlatch"),
-			m_sprites(*this, "sprites"),
-			m_cxdio(*this, "cxdio"),
-			m_workram(*this, "nvram"),
-			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
-			m_video_control(0),
-			m_mcu_control(0),
-			m_n7751_command(0),
-			m_n7751_rom_address(0),
-			m_last_buttons1(0),
-			m_last_buttons2(0),
-			m_read_port(0),
-			m_mj_input_num(0),
-			m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_mcu(*this, "mcu")
+		, m_i8255(*this, "i8255")
+		, m_ymsnd(*this, "ymsnd")
+		, m_n7751(*this, "n7751")
+		, m_n7751_i8243(*this, "n7751_8243")
+		, m_nvram(*this, "nvram")
+		, m_watchdog(*this, "watchdog")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_soundlatch(*this, "soundlatch")
+		, m_sprites(*this, "sprites")
+		, m_cxdio(*this, "cxdio")
+		, m_workram(*this, "nvram")
+		, m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+		, m_video_control(0)
+		, m_mcu_control(0)
+		, m_n7751_command(0)
+		, m_n7751_rom_address(0)
+		, m_last_buttons1(0)
+		, m_last_buttons2(0)
+		, m_read_port(0)
+		, m_mj_input_num(0)
+		, m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
+		, m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	// PPI read/write callbacks
@@ -131,6 +132,7 @@ protected:
 
 	// driver overrides
 	virtual void video_start() override;
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -182,6 +184,7 @@ protected:
 	uint8_t                   m_read_port;
 	uint8_t                   m_mj_input_num;
 	optional_ioport_array<6> m_mj_inputs;
+	output_finder<2> m_lamp;
 };
 
 class afighter_16a_analog_state : public segas16a_state
@@ -198,7 +201,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
 
-	protected:
+protected:
 	required_ioport     m_accel;
 	required_ioport     m_steer;
 };

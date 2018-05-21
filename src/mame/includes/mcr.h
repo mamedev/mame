@@ -24,8 +24,8 @@
 class mcr_state : public driver_device
 {
 public:
-	mcr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mcr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -136,10 +136,12 @@ private:
 class mcr_dpoker_state : public mcr_state
 {
 public:
-	mcr_dpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag),
+	mcr_dpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mcr_state(mconfig, type, tag),
 		m_coin_in_timer(*this, "coinin"),
-		m_hopper_timer(*this, "hopper") {}
+		m_hopper_timer(*this, "hopper"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_READ8_MEMBER(ip0_r);
 	DECLARE_WRITE8_MEMBER(lamps1_w);
@@ -155,12 +157,17 @@ public:
 	void init_dpoker();
 
 	void mcr_90009_dp(machine_config &config);
+
+protected:
+	virtual void machine_start() override { mcr_state::machine_start(); m_lamp.resolve(); }
+
 private:
 	uint8_t m_coin_status;
 	uint8_t m_output;
 
 	required_device<timer_device> m_coin_in_timer;
 	required_device<timer_device> m_hopper_timer;
+	output_finder<14> m_lamp;
 };
 
 class mcr_nflfoot_state : public mcr_state

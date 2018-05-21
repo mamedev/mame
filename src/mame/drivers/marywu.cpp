@@ -30,6 +30,7 @@ public:
 	marywu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_digits(*this, "digit%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(display_7seg_data_w);
@@ -46,6 +47,7 @@ private:
 	uint8_t m_selected_7seg_module;
 	virtual void machine_start() override;
 	output_finder<32> m_digits;
+	output_finder<30> m_led;
 };
 
 static INPUT_PORTS_START( marywu )
@@ -109,21 +111,21 @@ INPUT_PORTS_END
 WRITE8_MEMBER( marywu_state::ay1_port_a_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i, (data & (1 << i)) ? 1 : 0);
+		m_led[i] = BIT(data, i);
 	}
 }
 
 WRITE8_MEMBER( marywu_state::ay1_port_b_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i+8, (data & (1 << i)) ? 1 : 0);
+		m_led[i+8] = BIT(data, i);
 	}
 }
 
 WRITE8_MEMBER( marywu_state::ay2_port_a_w )
 {
 	for (uint8_t i=0; i<8; i++){
-		output().set_led_value(i+16, (data & (1 << i)) ? 1 : 0);
+		m_led[i+16] = BIT(data, i);
 	}
 }
 
@@ -131,7 +133,7 @@ WRITE8_MEMBER( marywu_state::ay2_port_b_w )
 {
 	for (uint8_t i=0; i<6; i++){
 		/* we only have 30 LEDs. The last 2 bits in this port are unused.  */
-		output().set_led_value(i+24, (data & (1 << i)) ? 1 : 0);
+		m_led[i+24] = BIT(data, i);
 	}
 }
 
@@ -179,6 +181,7 @@ void marywu_state::io_map(address_map &map)
 void marywu_state::machine_start()
 {
 	m_digits.resolve();
+	m_led.resolve();
 }
 
 MACHINE_CONFIG_START(marywu_state::marywu)

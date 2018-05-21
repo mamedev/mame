@@ -708,8 +708,8 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 */
 WRITE8_MEMBER(suna8_state::brickzn_leds_w)
 {
-	output().set_led_value(0, data & 0x01);
-	output().set_led_value(1, data & 0x02);
+	m_led[0] = BIT(data, 0);
+	m_led[1] = BIT(data, 1);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 
 	logerror("CPU #0 - PC %04X: leds = %02X\n",m_maincpu->pc(),data);
@@ -922,8 +922,8 @@ WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
 
 WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
 {
-	output().set_led_value(0, data & 0x01);
-	output().set_led_value(1, data & 0x02);
+	m_led[0] = BIT(data, 0);
+	m_led[1] = BIT(data, 1);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	if (data & ~0x07)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",m_maincpu->pc(),data);
 }
@@ -1079,8 +1079,8 @@ WRITE8_MEMBER(suna8_state::starfigh_spritebank_w)
 */
 WRITE8_MEMBER(suna8_state::starfigh_leds_w)
 {
-	output().set_led_value(0,     data & 0x01);
-	output().set_led_value(1,     data & 0x02);
+	m_led[0] = BIT(data, 0);
+	m_led[1] = BIT(data, 1);
 	machine().bookkeeping().coin_counter_w(0,     data & 0x04);
 	m_gfxbank       =               (data & 0x08) ? 4 : 0;
 	if (data & ~0x0f)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",m_maincpu->pc(),data);
@@ -1194,8 +1194,8 @@ WRITE8_MEMBER(suna8_state::suna8_wram_w)
 */
 WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 {
-	output().set_led_value(0,     data & 0x01);
-	output().set_led_value(1,     data & 0x02);
+	m_led[0] = BIT(data, 0);
+	m_led[1] = BIT(data, 1);
 
 	if (data & ~0x03)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",m_maincpu->pc(),data);
 
@@ -2079,8 +2079,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 
 	if(scanline == 240)
 		m_maincpu->set_input_line(0, HOLD_LINE);
-	if(scanline == 112)
-		if (m_nmi_enable)   m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(scanline == 112 && m_nmi_enable)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(suna8_state,hardhea2)

@@ -72,10 +72,10 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	output().set_led_value(0, data & 0x01);
-	output().set_led_value(1, data & 0x02);
-	output().set_led_value(2, data & 0x04);
-	output().set_led_value(3, data & 0x08);
+	m_led[0] = BIT(data, 0);
+	m_led[1] = BIT(data, 1);
+	m_led[2] = BIT(data, 2);
+	m_led[3] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
@@ -388,6 +388,7 @@ WRITE8_MEMBER(mainevt_state::volume_callback)
 
 void mainevt_state::machine_start()
 {
+	m_led.resolve();
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_nmi_enable));
@@ -401,7 +402,7 @@ void mainevt_state::machine_reset()
 INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_sound_timer_irq)
 {
 	if(m_sound_irq_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)

@@ -83,29 +83,17 @@ class igspoker_state : public driver_device
 {
 public:
 	igspoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_bg_tile_ram(*this, "bg_tile_ram"),
-		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"){ }
-
-	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_bg_tile_ram;
-	required_shared_ptr<uint8_t> m_fg_tile_ram;
-	required_shared_ptr<uint8_t> m_fg_color_ram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	int m_nmi_enable;
-	int m_bg_enable;
-	int m_hopper;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_out[3];
-	uint8_t m_protection_res;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bg_tile_ram(*this, "bg_tile_ram")
+		, m_fg_tile_ram(*this, "fg_tile_ram")
+		, m_fg_color_ram(*this, "fg_color_ram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_led(*this, "led0")
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_READ8_MEMBER(igs_irqack_r);
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
@@ -132,8 +120,6 @@ public:
 	void init_kungfu();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(cpokerpk);
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -149,6 +135,28 @@ public:
 	void igspoker_io_map(address_map &map);
 	void igspoker_prg_map(address_map &map);
 	void number10_io_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); m_lamp.resolve(); }
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_bg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	output_finder<> m_led;
+	output_finder<7> m_lamp;
+	int m_nmi_enable;
+	int m_bg_enable;
+	int m_hopper;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	uint8_t m_out[3];
+	uint8_t m_protection_res;
 };
 
 
@@ -171,7 +179,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if((scanline % 64) == 0 && m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -265,7 +273,7 @@ WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	output().set_led_value(6,        data & 0x20);   // led for coin m_out / m_hopper active
+	m_led = BIT(data, 5);   // led for coin m_out / m_hopper active
 
 	m_nmi_enable = data & 0x80;     // nmi enable?
 #if VERBOSE
@@ -303,12 +311,12 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
     ---x ----  Hold5 lamp.
     xx-- ----  one pulse once bet amount allows start.
 */
-	output().set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
-	output().set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
-	output().set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
-	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	output().set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
-	output().set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
+	m_lamp[1] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
+	m_lamp[2] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
+	m_lamp[3] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
+	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamp[5] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
+	m_lamp[6] = BIT(data, 0);      /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 

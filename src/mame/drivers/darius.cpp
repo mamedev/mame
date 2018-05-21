@@ -450,7 +450,7 @@ void darius_state::darius_sound2_map(address_map &map)
 WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 {
 	if (m_nmi_enable)
-		m_adpcm->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_adpcm->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(darius_state::adpcm_command_read)

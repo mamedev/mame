@@ -419,7 +419,7 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	output().set_led_value(1, !(data & 0x10));
+	m_lamp[1] = BIT(~data, 4);
 }
 
 /*************************************
@@ -430,6 +430,8 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 
 void lockon_state::machine_start()
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_ground_ctrl));
 	save_item(NAME(m_scroll_h));
 	save_item(NAME(m_scroll_v));

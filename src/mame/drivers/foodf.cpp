@@ -142,6 +142,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 void foodf_state::machine_start()
 {
 	atarigen_state::machine_start();
+	m_led.resolve();
 }
 
 
@@ -170,8 +171,8 @@ WRITE8_MEMBER(foodf_state::digital_w)
 	if (!(data & 0x08))
 		video_int_ack_w(space,0,0);
 
-	output().set_led_value(0, (data >> 4) & 1);
-	output().set_led_value(1, (data >> 5) & 1);
+	m_led[0] = BIT(data, 4);
+	m_led[1] = BIT(data, 5);
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 6) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 7) & 1);

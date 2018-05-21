@@ -42,44 +42,21 @@ class igs009_state : public driver_device
 {
 public:
 	igs009_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_bg_scroll(*this, "bg_scroll"),
-		m_reel1_ram(*this, "reel1_ram"),
-		m_reel2_ram(*this, "reel2_ram"),
-		m_reel3_ram(*this, "reel3_ram"),
-		m_reel4_ram(*this, "reel4_ram"),
-		m_bg_scroll2(*this, "bg_scroll2"),
-		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	required_shared_ptr<uint8_t> m_bg_scroll;
-	required_shared_ptr<uint8_t> m_reel1_ram;
-	required_shared_ptr<uint8_t> m_reel2_ram;
-	required_shared_ptr<uint8_t> m_reel3_ram;
-	required_shared_ptr<uint8_t> m_reel4_ram;
-	required_shared_ptr<uint8_t> m_bg_scroll2;
-	required_shared_ptr<uint8_t> m_fg_tile_ram;
-	required_shared_ptr<uint8_t> m_fg_color_ram;
-
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	tilemap_t *m_reel4_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int m_video_enable;
-	int m_nmi_enable;
-	int m_hopper;
-	uint8_t m_out[3];
-	uint8_t m_igs_magic[2];
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_bg_scroll(*this, "bg_scroll")
+		, m_reel1_ram(*this, "reel1_ram")
+		, m_reel2_ram(*this, "reel2_ram")
+		, m_reel3_ram(*this, "reel3_ram")
+		, m_reel4_ram(*this, "reel4_ram")
+		, m_bg_scroll2(*this, "bg_scroll2")
+		, m_fg_tile_ram(*this, "fg_tile_ram")
+		, m_fg_color_ram(*this, "fg_color_ram")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
 	DECLARE_WRITE8_MEMBER(reel2_ram_w);
@@ -112,9 +89,6 @@ public:
 	void init_jingbell();
 	void init_jingbelli();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(gp98);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -123,6 +97,37 @@ public:
 	void gp98_portmap(address_map &map);
 	void jingbell_map(address_map &map);
 	void jingbell_portmap(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_reel4_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll2;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
+	output_finder<7> m_led;
+
+	tilemap_t *m_reel1_tilemap;
+	tilemap_t *m_reel2_tilemap;
+	tilemap_t *m_reel3_tilemap;
+	tilemap_t *m_reel4_tilemap;
+	tilemap_t *m_fg_tilemap;
+	int m_video_enable;
+	int m_nmi_enable;
+	int m_hopper;
+	uint8_t m_out[3];
+	uint8_t m_igs_magic[2];
 };
 
 
@@ -403,7 +408,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin out mech
 
-	output().set_led_value(6,        data & 0x40);   // led for coin out / m_hopper active
+	m_led[6] = BIT(data, 6);   // led for coin out / m_hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
@@ -413,8 +418,8 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(igs009_state::video_and_leds_w)
 {
-	output().set_led_value(4,      data & 0x01); // start?
-	output().set_led_value(5,      data & 0x04); // l_bet?
+	m_led[4] = BIT(data, 0); // start?
+	m_led[5] = BIT(data, 2); // l_bet?
 
 	m_video_enable  =     data & 0x40;
 	m_hopper            =   (~data)& 0x80;
@@ -425,10 +430,10 @@ WRITE8_MEMBER(igs009_state::video_and_leds_w)
 
 WRITE8_MEMBER(igs009_state::leds_w)
 {
-	output().set_led_value(0, data & 0x01);  // stop_1
-	output().set_led_value(1, data & 0x02);  // stop_2
-	output().set_led_value(2, data & 0x04);  // stop_3
-	output().set_led_value(3, data & 0x08);  // stop
+	m_led[0] = BIT(data, 0);  // stop_1
+	m_led[1] = BIT(data, 1);  // stop_2
+	m_led[2] = BIT(data, 2);  // stop_3
+	m_led[3] = BIT(data, 3);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -796,6 +801,9 @@ GFXDECODE_END
 
 void igs009_state::machine_start()
 {
+	m_led.resolve();
+
+
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_hopper));
@@ -813,7 +821,7 @@ void igs009_state::machine_reset()
 WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 {
 	if (state && BIT(m_nmi_enable, 7))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(igs009_state::jingbell)

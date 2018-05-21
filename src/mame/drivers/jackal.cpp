@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER(jackal_state::vblank_irq)
 	if (state && m_irq_enable)
 	{
 		m_mastercpu->set_input_line(0, HOLD_LINE);
-		m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

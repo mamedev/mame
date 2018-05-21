@@ -191,7 +191,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(ssozumo_state::ssozumo)

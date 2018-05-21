@@ -326,7 +326,7 @@ void jp_state::machine_reset()
 {
 	genpin_class::machine_reset();
 
-	//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_digits[96] = 0x3f;
 	m_digits[97] = 0x3f;
 	m_digits[98] = 0x3f;

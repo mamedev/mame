@@ -523,7 +523,7 @@ uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 
 
 INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 {
-//  m_maincpu->set_input_line(UPD7810_INTFE1, PULSE_LINE);
+//  m_maincpu->pulse_input_line(UPD7810_INTFE1, attotime::zero);
 }
 
 void pasogo_state::machine_reset()

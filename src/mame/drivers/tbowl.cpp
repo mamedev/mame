@@ -96,7 +96,7 @@ void tbowl_state::_6206B_map(address_map &map)
 WRITE8_MEMBER(tbowl_state::trigger_nmi)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tbowl_state::_6206C_map(address_map &map)

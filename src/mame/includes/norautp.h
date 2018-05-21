@@ -18,16 +18,17 @@
 class norautp_state : public driver_device
 {
 public:
-	norautp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	norautp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255_%u", 0),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
-	std::unique_ptr<uint16_t[]> m_np_vram;
 	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
 	TIMER_CALLBACK_MEMBER(ppi2_ack);
 	DECLARE_READ8_MEMBER(test2_r);
@@ -37,15 +38,8 @@ public:
 	void init_ssa();
 	void init_enc();
 	void init_deb();
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(norautp);
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device_array<i8255_device, 3> m_ppi8255;
-	required_device<discrete_device> m_discrete;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	void noraut_base(machine_config &config);
 	void kimble(machine_config &config);
 	void kimbldhl(machine_config &config);
@@ -75,6 +69,19 @@ public:
 	void norautxp_portmap(address_map &map);
 	void nortest1_map(address_map &map);
 	void ssjkrpkr_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+
+	std::unique_ptr<uint16_t[]> m_np_vram;
+	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 3> m_ppi8255;
+	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	output_finder<12> m_lamp;
 };
 
 /*----------- defined in audio/norautp.c -----------*/

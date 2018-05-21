@@ -743,7 +743,7 @@ WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
 	if(state)
 	{
 		if(m_nmi_enable != 0)
-			m_videocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+			m_videocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

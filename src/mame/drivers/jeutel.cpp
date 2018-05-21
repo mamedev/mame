@@ -189,7 +189,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
 	m_timer_a ^= 1;
 	m_cpu2->set_input_line(0, (m_timer_a) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_cpu2->state_int(Z80_HALT))
-		m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void jeutel_state::init_jeutel()

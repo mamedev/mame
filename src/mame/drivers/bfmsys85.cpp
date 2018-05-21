@@ -74,7 +74,8 @@ ___________________________________________________________________________
 class bfmsys85_state : public driver_device
 {
 public:
-	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
+	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
 		m_reel0(*this, "reel0"),
@@ -82,28 +83,14 @@ public:
 		m_reel2(*this, "reel2"),
 		m_reel3(*this, "reel3"),
 		m_acia6850_0(*this, "acia6850_0"),
-		m_meters(*this, "meters")
-	{
-	}
+		m_meters(*this, "meters"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_alpha_clock;
-	int m_irq_status;
-	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
 	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	int m_locked;
-	int m_is_timer_enabled;
-	int m_coin_inhibits;
-	int m_mux_output_strobe;
-	int m_mux_input_strobe;
-	int m_mux_input;
-	uint8_t m_Inputs[64];
-	uint8_t m_codec_data[256];
-	uint8_t m_sys85_data_line_t;
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -122,10 +109,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	void init_decode();
 	void init_nodecode();
+	INTERRUPT_GEN_MEMBER(timer_irq);
+	int b85_find_project_string();
+	void bfmsys85(machine_config &config);
+	void memmap(address_map &map);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(timer_irq);
-	int b85_find_project_string( );
+
+	int m_mmtr_latch;
+	int m_triac_latch;
+	int m_alpha_clock;
+	int m_irq_status;
+	int m_optic_pattern;
+	int m_locked;
+	int m_is_timer_enabled;
+	int m_coin_inhibits;
+	int m_mux_output_strobe;
+	int m_mux_input_strobe;
+	int m_mux_input;
+	uint8_t m_Inputs[64];
+	uint8_t m_codec_data[256];
+	uint8_t m_sys85_data_line_t;
 	optional_device<rocvfd_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
@@ -134,8 +140,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
-	void bfmsys85(machine_config &config);
-	void memmap(address_map &map);
+	output_finder<256> m_lamp;
 };
 
 #define MASTER_CLOCK    (XTAL(4'000'000))
@@ -310,13 +315,11 @@ READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
 
 WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 {
-	int pattern = 0x01, i,
-	off = m_mux_output_strobe<<4;
+	int off = m_mux_output_strobe<<4;
 
-	for ( i = 0; i < 8; i++ )
+	for (int i = 0; i < 8; i++ )
 	{
-		output().set_lamp_value(off, (data & pattern ? 1 : 0));
-		pattern <<= 1;
+		m_lamp[off] = BIT(data, i);
 		off++;
 	}
 }
@@ -352,6 +355,7 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 void bfmsys85_state::machine_start()
 {
+	m_lamp.resolve();
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////

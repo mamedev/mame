@@ -73,11 +73,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_hopper(*this, "hopper")
 		, m_in(*this, "IN%u", 1)
+		, m_lamp(*this, "lamp")
 	{ }
 
 	void big10(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
@@ -90,6 +92,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
+	output_finder<> m_lamp;
 };
 
 
@@ -106,7 +109,7 @@ WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
 	m_hopper->motor_w(BIT(data, 6));
-	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
+	m_lamp = BIT(~data, 7); // maybe a coin counter?
 }
 
 READ8_MEMBER(big10_state::mux_r)

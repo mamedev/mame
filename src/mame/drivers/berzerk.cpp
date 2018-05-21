@@ -312,7 +312,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 
 	/* pulse the NMI line if enabled */
 	if (m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;

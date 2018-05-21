@@ -626,7 +626,7 @@ WRITE8_MEMBER( st_state::ikbd_port3_w )
 	*/
 
 	// caps lock led
-	output().set_led_value(1, BIT(data, 0));
+	m_led = BIT(data, 0);
 
 	// keyboard row select
 	m_ikbd_keylatch = (m_ikbd_keylatch & 0xff00) | data;
@@ -1890,6 +1890,8 @@ void st_state::state_save()
 
 void st_state::machine_start()
 {
+	m_led.resolve();
+
 	// configure RAM banking
 	configure_memory();
 
@@ -1952,6 +1954,8 @@ void ste_state::state_save()
 
 void ste_state::machine_start()
 {
+	m_led.resolve();
+
 	/* configure RAM banking */
 	configure_memory();
 
@@ -1990,6 +1994,8 @@ void megaste_state::machine_start()
 
 void stbook_state::machine_start()
 {
+	m_led.resolve();
+
 	/* configure RAM banking */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

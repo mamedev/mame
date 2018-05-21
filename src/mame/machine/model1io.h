@@ -37,15 +37,6 @@
 #define MCFG_MODEL1IO_IN2_CB(_devcb) \
 	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 2);
 
-#define MCFG_MODEL1IO_IN3_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 3);
-
-#define MCFG_MODEL1IO_IN4_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 4);
-
-#define MCFG_MODEL1IO_IN5_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 5);
-
 #define MCFG_MODEL1IO_DRIVE_READ_CB(_devcb) \
 	devcb = &downcast<model1io_device &>(*device).set_drive_read_callback(DEVCB_##_devcb);
 
@@ -124,18 +115,19 @@ protected:
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_buttons;
+	required_ioport_array<3> m_dsw;
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
-	DECLARE_WRITE8_MEMBER(out0_w);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_READ8_MEMBER(in2_r);
-	DECLARE_READ8_MEMBER(in3_r);
-	DECLARE_READ8_MEMBER(in4_r);
-	DECLARE_WRITE8_MEMBER(out4_w);
-	DECLARE_WRITE8_MEMBER(out5_w);
-	DECLARE_READ8_MEMBER(in6_r);
+	DECLARE_WRITE8_MEMBER(io_pa_w);
+	DECLARE_READ8_MEMBER(io_pb_r);
+	DECLARE_READ8_MEMBER(io_pc_r);
+	DECLARE_READ8_MEMBER(io_pd_r);
+	DECLARE_READ8_MEMBER(io_pe_r);
+	DECLARE_WRITE8_MEMBER(io_pe_w);
+	DECLARE_WRITE8_MEMBER(io_pf_w);
+	DECLARE_READ8_MEMBER(io_pg_r);
 
 	ioport_value analog0_r();
 	ioport_value analog1_r();
@@ -144,7 +136,7 @@ private:
 
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;
-	devcb_read8 m_in_cb[6];
+	devcb_read8 m_in_cb[3];
 	devcb_read8 m_drive_read_cb;
 	devcb_write8 m_drive_write_cb;
 	devcb_read8 m_an_cb[8];

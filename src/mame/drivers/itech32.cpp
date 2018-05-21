@@ -448,6 +448,7 @@ WRITE16_MEMBER(itech32_state::int1_ack_w)
 void itech32_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 256, memregion("soundcpu")->base() + 0x10000, 0x4000);
+	m_led.resolve();
 
 	save_item(NAME(m_vint_state));
 	save_item(NAME(m_xint_state));
@@ -741,9 +742,9 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	output().set_led_value(1, BIT(data, 0));
-	output().set_led_value(2, BIT(data, 1));
-	output().set_led_value(3, BIT(data, 2));
+	m_led[1] = BIT(data, 0);
+	m_led[2] = BIT(data, 1);
+	m_led[3] = BIT(data, 2);
 	m_ticket->motor_w(BIT(data, 4));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
@@ -751,7 +752,7 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 
 WRITE_LINE_MEMBER(itech32_state::drivedge_turbo_light)
 {
-	output().set_led_value(0, state);
+	m_led[0] = state ? 1 : 0;
 }
 
 

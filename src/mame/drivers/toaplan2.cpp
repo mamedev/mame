@@ -420,7 +420,7 @@ void toaplan2_state::machine_start()
 WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 {
 	if (m_audiocpu != nullptr)
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 

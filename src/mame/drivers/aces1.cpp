@@ -11,7 +11,7 @@ total rom size 0x8000
 ram at 0x8000-0x87ff
 lots of reads from 0xe000 at the start
 
-JPM style Reel MCU? Certainly reel data seems to be muxed together in aweird way
+JPM style Reel MCU? Certainly reel data seems to be muxed together in a weird way
 
  Hardware overview
   - Z80
@@ -60,6 +60,15 @@ public:
 			m_lamps(*this, "lamp%u", 0U),
 			m_digits(*this, "digit%u", 0U)
 	{ }
+
+	void init_aces1();
+	void aces1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	int m_input_strobe;
 	int m_lamp_strobe;
 	int m_led_strobe;
@@ -228,12 +237,8 @@ public:
 	output_finder<128> m_lamps;
 	output_finder<16> m_digits;
 
-	void init_aces1();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
 	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
-	void aces1(machine_config &config);
 	void aces1_map(address_map &map);
 	void aces1_portmap(address_map &map);
 };
@@ -252,7 +257,7 @@ TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_irq_timer_callback)
 TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 {
 //  printf("nmi\n");
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	aces1_reset_nmi_timer();
 }
 
@@ -840,7 +845,13 @@ ROM_START( ac1hideha )
 	ROM_LOAD( "hh563p4r", 0x0000, 0x8000, CRC(c82aabb1) SHA1(6a94cbae10edc544117a6bc5849ac8c9ad80a333) )
 ROM_END
 
-
+ROM_START( ac1unk )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "system_one_prom1_2764.bin", 0x0000, 0x2000, CRC(ea532fe4) SHA1(8b77d9e8fad0cd022c8386c509ad2ecbc7032d90) )
+	ROM_LOAD( "system_one_prom2_2764.bin", 0x2000, 0x2000, CRC(729599b7) SHA1(da9aedc50a281cb6626a4c03fc06e5dd62b4edd1) )
+	ROM_LOAD( "system_one_prom3_2764.bin", 0x4000, 0x2000, CRC(29b644e6) SHA1(fd7c82086a4812b26ff673f7734fe50a398aa063) )
+	// 4th socket not populated.
+ROM_END
 
 void aces1_state::init_aces1()
 {
@@ -893,3 +904,4 @@ GAME(  199?, ac1bluecc, ac1bluec, aces1, aces1, aces1_state, init_aces1, ROT0, "
 GAME(  199?, ac1bluecd, ac1bluec, aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Blue Chip (Pcp) (ACESYS1) (set 5)",           MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  199?, ac1hideh,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Hi De Hi Deluxe (Ace) (ACESYS1) (set 1)",     MACHINE_IS_SKELETON_MECHANICAL ) // was in Hi De Hi (Ace) (sp.ACE) set
 GAME(  199?, ac1hideha, sp_hideh, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Hi De Hi Deluxe (Ace) (ACESYS1) (set 2)",     MACHINE_IS_SKELETON_MECHANICAL ) //  ^^
+GAME(  199?, ac1unk,    0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "unknown Ace System 1 game",                   MACHINE_IS_SKELETON_MECHANICAL )

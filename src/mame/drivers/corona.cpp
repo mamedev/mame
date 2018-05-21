@@ -324,21 +324,15 @@
 class corona_state : public driver_device
 {
 public:
-	corona_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	corona_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	uint8_t m_blitter_x_reg;
-	uint8_t m_blitter_y_reg;
-	uint8_t m_blitter_aux_reg;
-	uint8_t m_blitter_unk_reg;
-	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp;
-	uint8_t m_lamp_old;
-	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
 	DECLARE_WRITE8_MEMBER(blitter_x_w);
@@ -356,10 +350,6 @@ public:
 	DECLARE_PALETTE_INIT(corona);
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
 	void winner81(machine_config &config);
 	void winner82(machine_config &config);
 	void rcirulet(machine_config &config);
@@ -381,6 +371,23 @@ public:
 	void winner82_map(address_map &map);
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	uint8_t m_blitter_x_reg;
+	uint8_t m_blitter_y_reg;
+	uint8_t m_blitter_aux_reg;
+	uint8_t m_blitter_unk_reg;
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp;
+	uint8_t m_lamp_old;
+	int m_input_selector;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<256> m_lamps;
 };
 
 
@@ -536,8 +543,8 @@ WRITE8_MEMBER(corona_state::ball_w)
 {
 	m_lamp = data;
 
-	output().set_lamp_value(data, 1);
-	output().set_lamp_value(m_lamp_old, 0);
+	m_lamps[data] = 1;
+	m_lamps[m_lamp_old] = 0;
 	m_lamp_old = m_lamp;
 }
 

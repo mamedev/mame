@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* PULSE led */
-	output().set_led_value(LED_PULSE, state);
+	m_led[LED_PULSE] = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -263,6 +263,8 @@ void eti660_state::machine_reset()
 
 void eti660_state::machine_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_color_ram));
 }
 

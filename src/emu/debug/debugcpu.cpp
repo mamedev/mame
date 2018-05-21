@@ -296,7 +296,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 		for (util::xml::data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
 		{
 			const char *cputag_name = cpunode->get_attribute_string("tag", "");
-			device_t *device = m_machine.device(cputag_name);
+			device_t *device = m_machine.root_device().subdevice(cputag_name);
 			if (device != nullptr)
 			{
 				if(is_inline == false)
@@ -692,7 +692,7 @@ device_t* debugger_cpu::expression_get_device(const char *tag)
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
 	std::string fullname(tag);
 	strmakelower(fullname);
-	return m_machine.device(fullname.c_str());
+	return m_machine.root_device().subdevice(fullname.c_str());
 }
 
 

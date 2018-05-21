@@ -469,7 +469,7 @@ INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback)
 	{
 		m_laserdisc->data_w(m_ldp_write_latch);
 		m_ldp_read_latch = m_laserdisc->status_r();
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */

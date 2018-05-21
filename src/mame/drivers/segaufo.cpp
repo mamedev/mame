@@ -83,7 +83,8 @@ public:
 		m_io2(*this, "io2"),
 		m_upd(*this, "upd"),
 		m_counters(*this, "counter%u", 0U),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	void ufomini(machine_config &config);
@@ -145,6 +146,7 @@ private:
 	optional_device<upd7759_device> m_upd;
 	output_finder<2 * 4> m_counters;
 	output_finder<2> m_digits;
+	output_finder<28> m_lamp;
 };
 
 
@@ -212,7 +214,7 @@ WRITE_LINE_MEMBER(ufo_state::pit_out1)
 {
 	// NMI?
 	if (state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(ufo_state::pit_out2)
@@ -293,7 +295,7 @@ WRITE8_MEMBER(ufo_state::cp_lamps_w)
 	// d0-d3: p1/p2 button lamps
 	// other bits: ?
 	for (int i = 0; i < 4; i++)
-		output().set_lamp_value(i, ~data >> i & 1);
+		m_lamp[i] = BIT(~data, i);
 }
 
 WRITE8_MEMBER(ufo_state::cp_digits_w)
@@ -332,8 +334,8 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 	// 11 = red,   red
 	// 01 = green, red
 	// 10 = red,   green
-	output().set_lamp_value(10, data & 3);
-	output().set_lamp_value(11, data >> 2 & 3);
+	m_lamp[10] = data & 0x03;
+	m_lamp[11] = (data >> 2) & 0x03;
 
 	// d4,d5: ?
 	// d6,d7: coincounters
@@ -400,7 +402,7 @@ WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
 {
 	// d0,d1,d4,d5: p1/p2 button lamps
 	for (int i = 0; i < 4; i++)
-		output().set_lamp_value(i, ~data >> ((i&1) + (i&2) * 2) & 1);
+		m_lamp[i] = BIT(~data, ((i&1) + (i&2) * 2));
 
 	// d2,d3,d6,d7: p1/p2 coincounters
 	for (int i = 0; i < 4; i++)
@@ -431,7 +433,7 @@ WRITE8_MEMBER(ufo_state::ex_ufo800_lamps_w)
 	// d0-d4: 5 red leds on ufo
 	// other bits: ?
 	for (int i = 0; i < 5; i++)
-		output().set_lamp_value(10 + i, data >> i & 1);
+		m_lamp[10 + i] = BIT(data, i);
 }
 
 /* 315-5338A */
@@ -442,13 +444,13 @@ WRITE8_MEMBER(ufo_state::ex_ufo21_lamps1_w)
 	// d1-d6 are the 6 red leds on each ufo
 	// d7: ?
 	for (int i = 1; i < 7; i++)
-		output().set_lamp_value(10 + i, data >> i & 1);
+		m_lamp[10 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(ufo_state::ex_ufo21_lamps2_w)
 {
 	for (int i = 1; i < 7; i++)
-		output().set_lamp_value(20 + i, data >> i & 1);
+		m_lamp[20 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(ufo_state::ex_upd_start_w)
@@ -747,6 +749,7 @@ void ufo_state::machine_start()
 {
 	m_counters.resolve();
 	m_digits.resolve();
+	m_lamp.resolve();
 
 	// init/zerofill/register for savestates
 	static const float motor_speeds[4] =
@@ -854,10 +857,10 @@ MACHINE_CONFIG_START(ufo_state::ufo21)
 	MCFG_315_5296_OUT_PORTG_CB(NOOP)
 
 	MCFG_DEVICE_ADD("io3", SEGA_315_5338A, 0)
-	MCFG_315_5338A_OUT0_CB(WRITE8(*this, ufo_state, ex_upd_start_w))
-	MCFG_315_5338A_IN1_CB(READ8(*this, ufo_state, ex_upd_busy_r))
-	MCFG_315_5338A_OUT4_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps1_w))
-	MCFG_315_5338A_OUT5_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps2_w))
+	MCFG_315_5338A_OUT_PA_CB(WRITE8(*this, ufo_state, ex_upd_start_w))
+	MCFG_315_5338A_IN_PB_CB(READ8(*this, ufo_state, ex_upd_busy_r))
+	MCFG_315_5338A_OUT_PE_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps1_w))
+	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps2_w))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("upd", UPD7759)

@@ -424,7 +424,7 @@ WRITE8_MEMBER(firefox_state::main_firq_clear_w)
 
 WRITE8_MEMBER(firefox_state::self_reset_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE );
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 

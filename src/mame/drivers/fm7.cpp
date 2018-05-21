@@ -1267,7 +1267,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 {
 	if(m_video.nmi_mask == 0 && m_video.sub_halt == 0)
-		m_sub->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_sub->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,

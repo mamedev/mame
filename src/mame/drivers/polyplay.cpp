@@ -155,7 +155,7 @@ static const z80_daisy_config daisy_chain_zrepp[] =
 
 INTERRUPT_GEN_MEMBER(polyplay_state::nmi_handler)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* I/O Port handling */
@@ -190,38 +190,38 @@ WRITE8_MEMBER(polyplay_state::pio_portb_w)
 	switch (lightState)
 	{
 		case 0:
-			output().set_lamp_value(1, 1);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 1;
+			m_lamp[2] = 0;
+			m_lamp[3] = 0;
+			m_lamp[4] = 0;
 			break;
 
 		case 1:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 1);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 0;
+			m_lamp[2] = 1;
+			m_lamp[3] = 0;
+			m_lamp[4] = 0;
 			break;
 
 		case 2:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 1);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 0;
+			m_lamp[2] = 0;
+			m_lamp[3] = 1;
+			m_lamp[4] = 0;
 			break;
 
 		case 3:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 1);
+			m_lamp[1] = 0;
+			m_lamp[2] = 0;
+			m_lamp[3] = 0;
+			m_lamp[4] = 1;
 			break;
 
 		default:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 0;
+			m_lamp[2] = 0;
+			m_lamp[3] = 0;
+			m_lamp[4] = 0;
 			break;
 	}
 }

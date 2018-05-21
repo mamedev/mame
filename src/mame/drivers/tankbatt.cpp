@@ -176,7 +176,7 @@ void tankbatt_state::main_map(address_map &map)
 
 INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)
 {
-	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	if (m_nmi_enable) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)

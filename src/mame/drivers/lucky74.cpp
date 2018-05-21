@@ -878,10 +878,10 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
     ---- xx--  BIG + SMALL (need to be individualized)
 */
 
-	output().set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
-	output().set_lamp_value(9, (data >> 1) & 1);      /* TAKE SCORE */
-	output().set_lamp_value(10, (data >> 2) & 1);     /* BIG */
-	output().set_lamp_value(11, (data >> 3) & 1);     /* SMALL */
+	m_lamp[8] = BIT(data, 0);      /* D-UP */
+	m_lamp[9] = BIT(data, 1);      /* TAKE SCORE */
+	m_lamp[10] = BIT(data, 2);     /* BIG */
+	m_lamp[11] = BIT(data, 3);     /* SMALL */
 }
 
 WRITE8_MEMBER(lucky74_state::lamps_b_w)
@@ -898,14 +898,14 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
     x--- ----  CANCEL (should lit start too?)
 */
 
-	output().set_lamp_value(0, (data >> 0) & 1);                      /* HOLD1 */
-	output().set_lamp_value(1, (data >> 1) & 1);                      /* HOLD2 */
-	output().set_lamp_value(2, (data >> 2) & 1);                      /* HOLD3 */
-	output().set_lamp_value(3, (data >> 3) & 1);                      /* HOLD4 */
-	output().set_lamp_value(4, (data >> 4) & 1);                      /* HOLD5 */
-	output().set_lamp_value(5, (data >> 5) & 1);                      /* BET */
-	output().set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));  /* START */
-	output().set_lamp_value(7, (data >> 7) & 1);                      /* CANCEL */
+	m_lamp[0] = BIT(data, 0);                 /* HOLD1 */
+	m_lamp[1] = BIT(data, 1);                 /* HOLD2 */
+	m_lamp[2] = BIT(data, 2);                 /* HOLD3 */
+	m_lamp[3] = BIT(data, 3);                 /* HOLD4 */
+	m_lamp[4] = BIT(data, 4);                 /* HOLD5 */
+	m_lamp[5] = BIT(data, 5);                 /* BET */
+	m_lamp[6] = BIT(data, 6) | BIT(data, 7);  /* START */
+	m_lamp[7] = BIT(data, 7);                 /* CANCEL */
 }
 
 
@@ -917,7 +917,7 @@ INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 {
 	if ((m_ym2149_portb & 0x10) == 0)   /* ym2149 portB bit 4 trigger the NMI */
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

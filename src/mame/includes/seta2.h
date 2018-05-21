@@ -19,8 +19,8 @@
 class seta2_state : public driver_device
 {
 public:
-	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	seta2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_sub(*this,"sub"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -39,36 +39,10 @@ public:
 		m_tileram(*this, "tileram", 0),
 		m_vregs(*this, "vregs", 0),
 		m_funcube_outputs(*this, "funcube_outputs"),
-		m_funcube_leds(*this, "funcube_leds")
+		m_funcube_leds(*this, "funcube_leds"),
+		m_led(*this, "led%u", 0U),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_sub;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	optional_device<tmp68301_device> m_tmp68301;
-	optional_device<okim9810_device> m_oki;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<intelfsh16_device> m_flash;
-	optional_device<upd4992_device> m_rtc;
-	optional_device<ticket_dispenser_device> m_dispenser;
-
-	optional_shared_ptr<uint16_t> m_nvram;
-	optional_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_tileram;
-	optional_shared_ptr<uint16_t> m_vregs;
-	optional_shared_ptr<uint16_t> m_funcube_outputs;
-	optional_shared_ptr<uint16_t> m_funcube_leds;
-
-	int m_xoffset;
-	int m_yoffset;
-	int m_keyboard_row;
-	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
-
-	uint64_t m_funcube_coin_start_cycles;
-	uint8_t m_funcube_hopper_motor;
 
 	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
 	DECLARE_READ16_MEMBER(spriteram16_word_r);
@@ -116,7 +90,6 @@ public:
 	DECLARE_MACHINE_START(funcube);
 	DECLARE_MACHINE_RESET(funcube);
 
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(yoffset);
 	DECLARE_VIDEO_START(xoffset);
 	DECLARE_VIDEO_START(xoffset1);
@@ -164,6 +137,40 @@ public:
 	void reelquak_map(address_map &map);
 	void samshoot_map(address_map &map);
 	void telpacfl_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); m_lamp.resolve(); }
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_sub;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	optional_device<tmp68301_device> m_tmp68301;
+	optional_device<okim9810_device> m_oki;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<intelfsh16_device> m_flash;
+	optional_device<upd4992_device> m_rtc;
+	optional_device<ticket_dispenser_device> m_dispenser;
+
+	optional_shared_ptr<uint16_t> m_nvram;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_tileram;
+	optional_shared_ptr<uint16_t> m_vregs;
+	optional_shared_ptr<uint16_t> m_funcube_outputs;
+	optional_shared_ptr<uint16_t> m_funcube_leds;
+	output_finder<7> m_led;
+	output_finder<11> m_lamp;
+
+	int m_xoffset;
+	int m_yoffset;
+	int m_keyboard_row;
+	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
+
+	uint64_t m_funcube_coin_start_cycles;
+	uint8_t m_funcube_hopper_motor;
 };
 
 

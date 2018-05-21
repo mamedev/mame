@@ -942,7 +942,7 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 {
 	if (state && !m_vdp_nmi)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	m_vdp_nmi = state;

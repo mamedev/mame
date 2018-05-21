@@ -149,8 +149,8 @@ GND | 20
 class kenseim_state : public cps_state
 {
 public:
-	kenseim_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag),
+	kenseim_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cps_state(mconfig, type, tag),
 		m_to_68k_cmd_low(0),
 		m_to_68k_cmd_d9(0),
 		m_to_68k_cmd_req(0),
@@ -158,8 +158,8 @@ public:
 		m_from68k_ack(0),
 		m_from68k_st4(0),
 		m_from68k_st3(0),
-		m_from68k_st2(0)
-
+		m_from68k_st2(0),
+		m_lamp(*this, "lamp%u", 1U)
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -224,17 +224,6 @@ public:
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
 
-	uint8_t m_to_68k_cmd_low;
-	uint8_t m_to_68k_cmd_d9;
-	uint8_t m_to_68k_cmd_req;
-	uint8_t m_to_68k_cmd_LVm;
-
-
-	int m_from68k_ack;
-	int m_from68k_st4;
-	int m_from68k_st3;
-	int m_from68k_st2;
-
 
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
@@ -243,16 +232,29 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
 
 	void set_leds(uint32_t ledstates);
+
+	void kenseim(machine_config &config);
+	void kenseim_io_map(address_map &map);
+	void kenseim_map(address_map &map);
+
+private:
+	uint8_t m_to_68k_cmd_low;
+	uint8_t m_to_68k_cmd_d9;
+	uint8_t m_to_68k_cmd_req;
+	uint8_t m_to_68k_cmd_LVm;
+
+	int m_from68k_ack;
+	int m_from68k_st4;
+	int m_from68k_st3;
+	int m_from68k_st2;
+
 	int m_led_latch;
 	int m_led_serial_data;
 	int m_led_clock;
 
 	int mole_state_a[6];
 	int mole_state_b[6];
-
-	void kenseim(machine_config &config);
-	void kenseim_io_map(address_map &map);
-	void kenseim_map(address_map &map);
+	output_finder<20> m_lamp;
 };
 
 
@@ -263,7 +265,7 @@ public:
 void kenseim_state::set_leds(uint32_t ledstates)
 {
 	for (int i=0; i<20; i++)
-		output().set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
+		m_lamp[i] = BIT(ledstates, i);
 }
 
 // could be wrong
@@ -699,6 +701,8 @@ void kenseim_state::init_kenseim()
 	m_led_serial_data = 0;
 	m_led_clock = 0;
 	m_led_latch = 0;
+
+	m_lamp.resolve();
 }
 
 

@@ -36,21 +36,16 @@
 class cardline_state : public driver_device
 {
 public:
-	cardline_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cardline_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
-
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-
-	uint8_t m_video;
-	uint8_t m_hsync_q;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
@@ -64,24 +59,34 @@ public:
 
 	DECLARE_PALETTE_INIT(cardline);
 
-	virtual void machine_start() override;
-
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void cardline(machine_config &config);
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	uint8_t m_video;
+	uint8_t m_hsync_q;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	void cardline(machine_config &config);
-	void mem_io(address_map &map);
-	void mem_prg(address_map &map);
+	output_finder<8> m_lamp;
 };
 
 void cardline_state::machine_start()
 {
+	m_lamp.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
 	for (int i=0; i < 0x2000; i++)
@@ -202,14 +207,14 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	output().set_lamp_value(5,(data >> 0) & 1);
-	output().set_lamp_value(0,(data >> 1) & 1);
-	output().set_lamp_value(1,(data >> 2) & 1);
-	output().set_lamp_value(2,(data >> 3) & 1);
-	output().set_lamp_value(3,(data >> 4) & 1);
-	output().set_lamp_value(4,(data >> 5) & 1);
-	output().set_lamp_value(6,(data >> 6) & 1);
-	output().set_lamp_value(7,(data >> 7) & 1);
+	m_lamp[5] = BIT(data, 0);
+	m_lamp[0] = BIT(data, 1);
+	m_lamp[1] = BIT(data, 2);
+	m_lamp[2] = BIT(data, 3);
+	m_lamp[3] = BIT(data, 4);
+	m_lamp[4] = BIT(data, 5);
+	m_lamp[6] = BIT(data, 6);
+	m_lamp[7] = BIT(data, 7);
 }
 
 void cardline_state::mem_prg(address_map &map)

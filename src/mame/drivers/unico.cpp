@@ -96,8 +96,8 @@ WRITE16_MEMBER(zeropnt_state::zeropnt_sound_bank_w)
 		memcpy(dst + 0x20000, src, 0x20000);
 
 		machine().bookkeeping().coin_counter_w(0,data & 0x1000);
-		output().set_led_value(0,data & 0x0800); // Start 1
-		output().set_led_value(1,data & 0x0400); // Start 2
+		m_led[0] = BIT(data, 11); // Start 1
+		m_led[1] = BIT(data, 10); // Start 2
 	}
 }
 
@@ -192,8 +192,8 @@ WRITE32_MEMBER(zeropnt2_state::zeropnt2_leds_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		machine().bookkeeping().coin_counter_w(0,data & 0x00010000);
-		output().set_led_value(0,data & 0x00800000); // Start 1
-		output().set_led_value(1,data & 0x00400000); // Start 2
+		m_led[0] = BIT(data, 23); // Start 1
+		m_led[1] = BIT(data, 22); // Start 2
 	}
 }
 
@@ -563,6 +563,12 @@ GFXDECODE_END
 
 
 ***************************************************************************/
+
+
+void unico_state::machine_start()
+{
+	m_led.resolve();
+}
 
 
 /***************************************************************************

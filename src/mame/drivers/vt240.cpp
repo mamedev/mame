@@ -250,7 +250,7 @@ READ8_MEMBER(vt240_state::i8085_comm_r)
 			return m_i8085_out;
 		case 2:
 			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
-			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_i8085->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_t11 = 1;
 			break;
 	}
@@ -268,7 +268,7 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 			break;
 		case 2:
 			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
-			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_i8085->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_t11 = 1;
 			break;
 	}

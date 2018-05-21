@@ -132,16 +132,15 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	while (source < finish)
 	{
-		int xpos, ypos;
-		int tileno;
-		xpos = (source[0] & 0xff00) >> 8;
-		ypos = (source[0] & 0x00ff) >> 0;
-		tileno = (source2[0] & 0x7ffe) >> 1;
-		xpos |=  (source2[0] & 0x0001) << 8;
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos, 0);
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
+		int xpos = (source[0] & 0xff00) >> 8 | (source2[0] & 0x0001) << 8;
+		int ypos = (source[0] & 0x00ff) >> 0;
+		int tileno = (source2[0] & 0x7ffe) >> 1;
+		int color = BIT(source2[0], 15) ? 0 : 1;
+
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos, 0);
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos - 0x100, 0); // wrap
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos, 0); // wrap
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
 
 		source++;
 		source2++;
@@ -198,11 +197,12 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 void k3_state::k3_base_map(address_map &map)
 {
 	map(0x0009ce, 0x0009cf).nopw();    // k3 - bug in code? (clean up log)
+	map(0x0009d0, 0x0009d1).nopw();
 	map(0x0009d2, 0x0009d3).nopw();    // l3 - bug in code? (clean up log)
 
 	map(0x000000, 0x0fffff).rom(); // ROM
 	map(0x100000, 0x10ffff).ram(); // Main Ram
-	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x240000, 0x240fff).ram().share("spritera1");
 	map(0x280000, 0x280fff).ram().share("spritera2");
 	map(0x2c0000, 0x2c07ff).ram().w(this, FUNC(k3_state::k3_bgram_w)).share("bgram");
@@ -220,8 +220,8 @@ void k3_state::k3_map(address_map &map)
 
 	map(0x3c0000, 0x3c0001).w(this, FUNC(k3_state::k3_soundbanks_w));
 
-	map(0x4c0000, 0x4c0000).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x500000, 0x500000).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x4c0001, 0x4c0001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
+	map(0x500001, 0x500001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
 	map(0x8c0000, 0x8cffff).ram(); // not used? (bug in code?)
 }
 
@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(k3_state::flagrall)
 	MCFG_SCREEN_UPDATE_DRIVER(k3_state, screen_update_k3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	SPEAKER(config, "mono").front_center();

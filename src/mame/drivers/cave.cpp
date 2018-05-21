@@ -700,10 +700,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 {
 	COMBINE_DATA(&m_leds[0]);
 
-	output().set_led_value(0, data & 0x8000);
-	output().set_led_value(1, data & 0x4000);
-	output().set_led_value(2, data & 0x1000);    // square button
-	output().set_led_value(3, data & 0x0800);    // round  button
+	m_led[0] = BIT(data, 15);
+	m_led[1] = BIT(data, 14);
+	m_led[2] = BIT(data, 12);    // square button
+	m_led[3] = BIT(data, 11);    // round  button
 //  machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);   // coin lockouts?
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
 
@@ -711,10 +711,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 //  machine().bookkeeping().coin_counter_w(1, data & 0x0020);
 	machine().bookkeeping().coin_counter_w(0, data & 0x0010);
 
-	output().set_led_value(5, data & 0x0008);
-	output().set_led_value(6, data & 0x0004);
-	output().set_led_value(7, data & 0x0002);
-	output().set_led_value(8, data & 0x0001);
+	m_led[5] = BIT(data, 3);
+	m_led[6] = BIT(data, 2);
+	m_led[7] = BIT(data, 1);
+	m_led[8] = BIT(data, 0);
 
 	show_leds();
 }
@@ -907,17 +907,17 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 
-		output().set_led_value(0, data & 0x0010);
-		output().set_led_value(1, data & 0x0020);
-		output().set_led_value(2, data & 0x0040);
-		output().set_led_value(3, data & 0x0080);
+		m_led[0] = BIT(data, 4);
+		m_led[1] = BIT(data, 5);
+		m_led[2] = BIT(data, 6);
+		m_led[3] = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(4, data & 0x0100);
-		output().set_led_value(5, data & 0x0200);
-		output().set_led_value(6, data & 0x0400);    // not tested in service mode
-		output().set_led_value(7, data & 0x0800);    // not tested in service mode
+		m_led[4] = BIT(data, 8);
+		m_led[5] = BIT(data, 9);
+		m_led[6] = BIT(data, 10);    // not tested in service mode
+		m_led[7] = BIT(data, 11);    // not tested in service mode
 
 		m_oki[0]->set_rom_bank((data & 0x8000) >> 15);
 	}
@@ -1133,14 +1133,14 @@ WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0,    data & 0x0001); // suru
-		output().set_led_value(1,    data & 0x0002); // shinai
-		output().set_led_value(2,    data & 0x0004); // payout
-		output().set_led_value(3,    data & 0x0008); // go
-		output().set_led_value(4,    data & 0x0010); // 1 bet
-		output().set_led_value(5,    data & 0x0020); // medal
-		m_hopper    =                   data & 0x0040;  // hopper
-		output().set_led_value(6,    data & 0x0080); // 3 bet
+		m_led[0] = BIT(data, 0); // suru
+		m_led[1] = BIT(data, 1); // shinai
+		m_led[2] = BIT(data, 2); // payout
+		m_led[3] = BIT(data, 3); // go
+		m_led[4] = BIT(data, 4); // 1 bet
+		m_led[5] = BIT(data, 5); // medal
+		m_hopper = BIT(data, 6);  // hopper
+		m_led[6] = BIT(data, 7); // 3 bet
 	}
 
 //  popmessage("led %04X", data);
@@ -1179,13 +1179,13 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0,    data & 0x0001); // pac-man
-		output().set_led_value(1,    data & 0x0002); // ms. pac-man
-		output().set_led_value(2,    data & 0x0004); // payout
-		output().set_led_value(3,    data & 0x0008); // start
-		output().set_led_value(4,    data & 0x0010); // bet
-		output().set_led_value(5,    data & 0x0020); // medal
-		m_hopper    =                   data & 0x0040;  // hopper
+		m_led[0] = data & 0x0001; // pac-man
+		m_led[1] = data & 0x0002; // ms. pac-man
+		m_led[2] = data & 0x0004; // payout
+		m_led[3] = data & 0x0008; // start
+		m_led[4] = data & 0x0010; // bet
+		m_led[5] = data & 0x0020; // medal
+		m_hopper = data & 0x0040;  // hopper
 	}
 
 //  popmessage("led %04X", data);
@@ -2062,8 +2062,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(cave_state,cave)
+void cave_state::machine_start()
 {
+	m_led.resolve();
 	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::cave_vblank_end), this));
 
 	save_item(NAME(m_soundbuf_wptr));
@@ -2101,7 +2102,6 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	MCFG_DEVICE_PROGRAM_MAP(dfeveron_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2142,7 +2142,6 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	MCFG_DEVICE_PROGRAM_MAP(ddonpach_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2182,7 +2181,6 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_DEVICE_PROGRAM_MAP(donpachi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2229,7 +2227,6 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	MCFG_DEVICE_PROGRAM_MAP(esprade_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2269,7 +2266,6 @@ MACHINE_CONFIG_START(cave_state::gaia)
 	MCFG_DEVICE_PROGRAM_MAP(gaia_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2310,7 +2306,6 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	MCFG_DEVICE_PROGRAM_MAP(guwange_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2353,7 +2348,6 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_DEVICE_PROGRAM_MAP(hotdogst_sound_map)
 	MCFG_DEVICE_IO_MAP(hotdogst_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2403,7 +2397,6 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_DEVICE_PROGRAM_MAP(korokoro_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -2456,7 +2449,6 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2513,7 +2505,6 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)    /* start with the watchdog armed */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2569,7 +2560,6 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2629,7 +2619,6 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2694,7 +2683,6 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_sound_map)
 	MCFG_DEVICE_IO_MAP(pwrinst2_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2745,7 +2733,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(cave_state,sailormn)
@@ -2771,7 +2759,6 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2829,7 +2816,6 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2885,7 +2871,6 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2930,7 +2915,6 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	MCFG_DEVICE_PROGRAM_MAP(uopoko_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)

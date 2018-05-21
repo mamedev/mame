@@ -58,43 +58,21 @@ class jackie_state : public driver_device
 {
 public:
 	jackie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_bg_scroll2(*this, "bg_scroll2"),
-		m_bg_scroll(*this, "bg_scroll"),
-		m_reel1_ram(*this, "reel1_ram"),
-		m_reel2_ram(*this, "reel2_ram"),
-		m_reel3_ram(*this, "reel3_ram"),
-		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	required_shared_ptr<uint8_t> m_bg_scroll2;
-	required_shared_ptr<uint8_t> m_bg_scroll;
-	required_shared_ptr<uint8_t> m_reel1_ram;
-	required_shared_ptr<uint8_t> m_reel2_ram;
-	required_shared_ptr<uint8_t> m_reel3_ram;
-	required_shared_ptr<uint8_t> m_fg_tile_ram;
-	required_shared_ptr<uint8_t> m_fg_color_ram;
-
-	int m_exp_bank;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	int m_irq_enable;
-	int m_nmi_enable;
-	int m_bg_enable;
-	int m_hopper;
-	uint8_t m_out[3];
-	uint16_t m_unk_reg[3][5];
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_bg_scroll2(*this, "bg_scroll2")
+		, m_bg_scroll(*this, "bg_scroll")
+		, m_reel1_ram(*this, "reel1_ram")
+		, m_reel2_ram(*this, "reel2_ram")
+		, m_reel3_ram(*this, "reel3_ram")
+		, m_fg_tile_ram(*this, "fg_tile_ram")
+		, m_fg_color_ram(*this, "fg_color_ram")
+		, m_led(*this, "led")
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
@@ -126,15 +104,44 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
 	void init_jackie();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void jackie(machine_config &config);
 	void jackie_io_map(address_map &map);
 	void jackie_prg_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_bg_scroll2;
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
+	output_finder<> m_led;
+	output_finder<7> m_lamp;
+
+	int m_exp_bank;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_reel1_tilemap;
+	tilemap_t *m_reel2_tilemap;
+	tilemap_t *m_reel3_tilemap;
+	int m_irq_enable;
+	int m_nmi_enable;
+	int m_bg_enable;
+	int m_hopper;
+	uint8_t m_out[3];
+	uint16_t m_unk_reg[3][5];
 };
 
 
@@ -271,6 +278,9 @@ uint32_t jackie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void jackie_state::machine_start()
 {
+	m_led.resolve();
+	m_lamp.resolve();
+
 	save_item(NAME(m_exp_bank));
 	// save_item(NAME(m_irq_enable)); //always 1?
 	save_item(NAME(m_nmi_enable));
@@ -330,7 +340,7 @@ WRITE8_MEMBER(jackie_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	output().set_led_value(6,        data & 0x20);   // led for coin m_out / m_hopper active
+	m_led = BIT(data, 5);   // led for coin m_out / m_hopper active
 
 	m_exp_bank   = (data & 0x02) ? 1 : 0;       // expram bank number
 	m_nmi_enable = data & 0x80;     // nmi enable?
@@ -352,12 +362,12 @@ WRITE8_MEMBER(jackie_state::lamps_w)
     ---- -x--  Hold5 lamp.
     ---- ---x  Start lamp.
 */
-	output().set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
-	output().set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
-	output().set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
-	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	output().set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
-	output().set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
+	m_lamp[1] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
+	m_lamp[2] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
+	m_lamp[3] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
+	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamp[5] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
+	m_lamp[6] = BIT(data, 0);           /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 
@@ -597,7 +607,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 	if((scanline % 64) == 32 && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if ((scanline % 64) == 0 && m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(jackie_state::jackie)

@@ -807,7 +807,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(nss_state::nss_vblank_irq)
 {
 	if (state && m_nmi_enable)
-		m_bioscpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_bioscpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void nss_state::machine_reset()

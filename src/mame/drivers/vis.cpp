@@ -824,7 +824,7 @@ READ8_MEMBER(vis_state::sysctl_r)
 WRITE8_MEMBER(vis_state::sysctl_w)
 {
 	if(BIT(data, 0) && !BIT(m_sysctl, 0))
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	//m_maincpu->set_input_line(INPUT_LINE_A20, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 	m_sysctl = data;
 }

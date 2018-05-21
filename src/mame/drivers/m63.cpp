@@ -749,7 +749,7 @@ MACHINE_RESET_MEMBER(m63_state,m63)
 INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(m63_state::m63)

@@ -123,7 +123,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 	{
 		m_port_1ffd_data |= 0x02;
 		scorpion_update_memory();
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

@@ -781,13 +781,13 @@ void wiz_state::machine_start()
 INTERRUPT_GEN_MEMBER(wiz_state::wiz_vblank_interrupt)
 {
 	if (m_main_nmi_mask & 1)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 {
 	if (m_sound_nmi_mask & 1)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(wiz_state::kungfut)

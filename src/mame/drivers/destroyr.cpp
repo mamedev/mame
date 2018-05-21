@@ -189,7 +189,7 @@ TIMER_CALLBACK_MEMBER(destroyr_state::dial_callback)
 
 	if (m_potmask[dial])
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

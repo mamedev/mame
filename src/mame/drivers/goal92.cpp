@@ -228,7 +228,7 @@ WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 	m_adpcm_toggle^= 1;
 
 	if (m_adpcm_toggle)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 static const gfx_layout layout_8x8x4 =

@@ -104,13 +104,13 @@ WRITE16_MEMBER(m20_8086_device::handshake_w)
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_8086_halt = true;
 	}
 	else
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_8086->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_8086->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_8086_halt = false;
 	}

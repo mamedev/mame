@@ -39,7 +39,7 @@ Royal Ascot        (C) Sega 1991    dumped, but very likely incomplete
 Super Monaco GP    (C) Sega 1989
 Thunder Blade      (C) Sega 1987
 
-* denotes not dumped. There are also several revisions of the above games not dumper either.
+* denotes not dumped. There are also several revisions of the above games not dumped either.
 
 Main Board
 ----------
@@ -283,34 +283,35 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 }
 
 segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_soundcpu2(*this, "soundcpu2"),
-		m_mcu(*this, "mcu"),
-		m_watchdog(*this, "watchdog"),
-		m_cmptimer_1(*this, "cmptimer_main"),
-		m_sprites(*this, "sprites"),
-		m_segaic16vid(*this, "segaic16vid"),
-		m_segaic16road(*this, "segaic16road"),
-		m_soundlatch(*this, "soundlatch"),
-		m_subram0(*this, "subram0"),
-		m_road_priority(1),
-		m_scanline_timer(nullptr),
-		m_timer_irq_state(0),
-		m_vblank_irq_state(0),
-		m_pc_0(0),
-		m_loffire_sync(nullptr),
-		m_lastsurv_mux(0),
-		m_paletteram(*this, "paletteram"),
-		m_gprider_hack(false),
-		m_palette_entries(0),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_io0_porta(*this, "IO0PORTA"),
-		m_adc_ports(*this, "ADC%u", 0),
-		m_mux_ports(*this, "MUX%u", 0)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_maincpu(*this, "maincpu")
+	, m_subcpu(*this, "subcpu")
+	, m_soundcpu(*this, "soundcpu")
+	, m_soundcpu2(*this, "soundcpu2")
+	, m_mcu(*this, "mcu")
+	, m_watchdog(*this, "watchdog")
+	, m_cmptimer_1(*this, "cmptimer_main")
+	, m_sprites(*this, "sprites")
+	, m_segaic16vid(*this, "segaic16vid")
+	, m_segaic16road(*this, "segaic16road")
+	, m_soundlatch(*this, "soundlatch")
+	, m_subram0(*this, "subram0")
+	, m_road_priority(1)
+	, m_scanline_timer(nullptr)
+	, m_timer_irq_state(0)
+	, m_vblank_irq_state(0)
+	, m_pc_0(0)
+	, m_loffire_sync(nullptr)
+	, m_lastsurv_mux(0)
+	, m_paletteram(*this, "paletteram")
+	, m_gprider_hack(false)
+	, m_palette_entries(0)
+	, m_screen(*this, "screen")
+	, m_palette(*this, "palette")
+	, m_io0_porta(*this, "IO0PORTA")
+	, m_adc_ports(*this, "ADC%u", 0)
+	, m_mux_ports(*this, "MUX%u", 0)
+	, m_lamp(*this, "lamp%u", 0U)
 {
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 	palette_init();
@@ -322,6 +323,7 @@ void segaxbd_state::device_start()
 	if(!m_segaic16road->started())
 		throw device_missing_dependencies();
 
+	m_lamp.resolve();
 	// point globals to allocated memory regions
 	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
@@ -733,10 +735,10 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 	// d6: danger lamp
 	// in clone aburner, lamps work only in testmode?
 
-	machine().output().set_lamp_value(0, (data >> 5) & 0x01);
-	machine().output().set_lamp_value(1, (data >> 6) & 0x01);
-	machine().output().set_lamp_value(2, (data >> 1) & 0x01);
-	machine().output().set_lamp_value(3, (data >> 2) & 0x01);
+	m_lamp[0] = BIT(data, 5);
+	m_lamp[1] = BIT(data, 6);
+	m_lamp[2] = BIT(data, 1);
+	m_lamp[3] = BIT(data, 2);
 }
 
 
@@ -866,7 +868,7 @@ void segaxbd_state::update_main_irqs()
 
 WRITE_LINE_MEMBER(segaxbd_state::m68k_reset_callback)
 {
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

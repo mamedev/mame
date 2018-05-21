@@ -117,6 +117,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 	virtual uint32_t execute_input_lines() const override { return 8; }; // number of input lines
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return M68K_INT_ACK_AUTOVECTOR; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == M68K_IRQ_7; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -352,8 +354,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -375,8 +375,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -395,8 +393,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -411,8 +407,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -429,8 +423,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -445,8 +437,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -463,8 +453,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -479,8 +467,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -497,8 +483,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -513,8 +497,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	virtual bool memory_translate(int space, int intention, offs_t &address) override;
 
@@ -533,8 +515,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -549,8 +529,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -567,8 +545,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -583,8 +559,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -601,8 +575,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -617,8 +589,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -637,8 +607,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -660,8 +628,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 
 	// device-level overrides

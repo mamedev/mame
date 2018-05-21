@@ -503,7 +503,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 	{
 		if (data & 0x100000000U)
 		{
-			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_unk3 = 0;
 		}
 	}

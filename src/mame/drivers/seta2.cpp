@@ -44,6 +44,7 @@ B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-006B                 2001-2  Funcube 2 - 5                           Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
+P0-145-1                2002    Trophy Hunting - Bear & Moose (test)    Sammy
 -------------------------------------------------------------------------------------------
 
 TODO:
@@ -427,13 +428,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // start
-		output().set_led_value(1, data & 0x0002 );  // small
-		output().set_led_value(2, data & 0x0004 );  // bet
-		output().set_led_value(3, data & 0x0008 );  // big
-		output().set_led_value(4, data & 0x0010 );  // double up
-		output().set_led_value(5, data & 0x0020 );  // collect
-		output().set_led_value(6, data & 0x0040 );  // bet cancel
+		m_led[0] = BIT(data, 0);  // start
+		m_led[1] = BIT(data, 1);  // small
+		m_led[2] = BIT(data, 2);  // bet
+		m_led[3] = BIT(data, 3);  // big
+		m_led[4] = BIT(data, 4);  // double up
+		m_led[5] = BIT(data, 5);  // collect
+		m_led[6] = BIT(data, 6);  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -555,9 +556,9 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps1_w)
 	COMBINE_DATA(&m_lamps1);
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x0001 );  // Lamp 1 |
-		output().set_led_value(1, data & 0x0002 );  // Lamp 2 |- Camera Lamps
-		output().set_led_value(2, data & 0x0004 );  // Lamp 3 |
+		m_led[0] = BIT(data, 0);  // Lamp 1 |
+		m_led[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
+		m_led[2] = BIT(data, 2);  // Lamp 3 |
 		//                        data & 0x0008 );  // Degauss
 	}
 	staraudi_debug_outputs();
@@ -569,8 +570,8 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps2_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		//                        data & 0x0020 );  // ? Always On
-		output().set_led_value(3, data & 0x0040 );  // 2P Switch Lamp
-		output().set_led_value(4, data & 0x0080 );  // 1P Switch Lamp
+		m_led[3] = BIT(data, 6);  // 2P Switch Lamp
+		m_led[4] = BIT(data, 7);  // 1P Switch Lamp
 	}
 	staraudi_debug_outputs();
 }
@@ -650,14 +651,14 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp1_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value(0, data & 0x0001 ); //
-		output().set_lamp_value(1, data & 0x0002 ); //
-		output().set_lamp_value(2, data & 0x0004 ); //
-		output().set_lamp_value(3, data & 0x0008 ); //
-		output().set_lamp_value(4, data & 0x0010 ); //
-		output().set_lamp_value(5, data & 0x0020 ); //
-		output().set_lamp_value(6, data & 0x0040 ); //
-		output().set_lamp_value(7, data & 0x0080 ); //
+		m_lamp[0] = BIT(data, 0); //
+		m_lamp[1] = BIT(data, 1); //
+		m_lamp[2] = BIT(data, 2); //
+		m_lamp[3] = BIT(data, 3); //
+		m_lamp[4] = BIT(data, 4); //
+		m_lamp[5] = BIT(data, 5); //
+		m_lamp[6] = BIT(data, 6); //
+		m_lamp[7] = BIT(data, 7); //
 	}
 
 //  popmessage("LAMP1 %04X", data);
@@ -667,9 +668,9 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_lamp_value( 8, data & 0x0001 ); // on/off lamp (throughout)
-		output().set_lamp_value( 9, data & 0x0002 ); // bet lamp
-		output().set_lamp_value(10, data & 0x0004 ); // payout lamp
+		m_lamp[8] = BIT(data, 0); // on/off lamp (throughout)
+		m_lamp[9] = BIT(data, 1); // bet lamp
+		m_lamp[10] = BIT(data, 2); // payout lamp
 		m_dispenser->motor_w(       data & 0x0008 ); // coin out motor
 		machine().bookkeeping().coin_counter_w(0,  data & 0x0010); // coin out counter
 		//                          data & 0x0020 ); // on credit increase
@@ -992,14 +993,14 @@ WRITE16_MEMBER(seta2_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
-	output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
+	m_led[0] = BIT(~data, 0); // win lamp (red)
+	m_led[1] = BIT(~data, 1); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	output().set_led_value(2, (~data) & 0x10 );
-	output().set_led_value(3, (~data) & 0x20 );
-	output().set_led_value(4, (~data) & 0x40 );
-	output().set_led_value(5, (~data) & 0x80 );
+	m_led[2] = BIT(~data, 4);
+	m_led[3] = BIT(~data, 5);
+	m_led[4] = BIT(~data, 6);
+	m_led[5] = BIT(~data, 7);
 
 	funcube_debug_outputs();
 }
@@ -1022,7 +1023,7 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	output().set_led_value(6, (~data) & 0x08 );
+	m_led[6] = BIT(~data, 3);
 
 	funcube_debug_outputs();
 }
@@ -2126,6 +2127,29 @@ static INPUT_PORTS_START( trophyh )
 	PORT_DIPNAME( 0x0020, 0x0020, "Blood Color" ) PORT_DIPLOCATION("SW2:6") /* WSChamp doesn't use Blood Color, so add it back in */
 	PORT_DIPSETTING(      0x0020, "Red" )
 	PORT_DIPSETTING(      0x0000, "Yellow" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( trophyht )
+	PORT_INCLUDE(wschamp)
+
+	PORT_MODIFY("DSW2") // fffd0a.w
+	PORT_DIPNAME( 0x0020, 0x0020, "Blood Color" ) PORT_DIPLOCATION("SW2:6") /* WSChamp doesn't use Blood Color, so add it back in */
+	PORT_DIPSETTING(      0x0020, "Red" )
+	PORT_DIPSETTING(      0x0000, "Yellow" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Gun Type (Leave on Hand Gun)" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, "Pump Action" )
+	PORT_DIPSETTING(      0x0000, "Hand Gun" )
+
+	PORT_MODIFY("TRIGGER")  // $700000
+	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PCB only allows for two 4 pin gun connections - trigger p1
+
+	PORT_MODIFY("PUMP") // $700003.b
+	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PCB only allows for two 4 pin gun connections - trigger p2
+
+	PORT_MODIFY("BUTTONS")  // $400002
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )  // trigger P1
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(2)  // trigger P2
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -3840,17 +3864,6 @@ PCB B0-010A:
    Trophy Hunting - Bear & Moose (c) 2002 Sammy USA
 
 
-   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
- Video: NEC DX-101 (240 Pin PQFP)
-        NEC DX-102 (52 Pin PQFP x3)
- Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
-EEPROM: 93LC46BX (1K Low-power 64 x 16-bit organization serial EEPROM)
-   OSC: 50MHz & 28MHz
- Other: 8 Position Dipswitch x 2
-        Lattice ispLSI2032 - stamped "KW001"
-        Lattice isp1016E - stamped "GUN" (2 for PCB B0-010A, used for light gun input)
-        BAT1 - CR2032 3Volt
-
 PCB Number: B0-003A (or B0-003B)
 +-----------------------------------------------------------+
 |             VOL                          +------+         |
@@ -3858,8 +3871,8 @@ PCB Number: B0-003A (or B0-003B)
 |   +---+ +---+                            |M60016|         |
 |   |   | |   |  M    M                    |CALRUA|  +---+  |
 +-+ | U | | U |  2    1                    +------+  |   |  |
-  | | 0 | | 0 |                                      |   |  |
-+-+ | 7 | | 6 |  M    M                              | U |  |
+  | | 0 | | 0 |                   D4992              |   |  |
++-+ | 7 | | 6 |  M    M         32.768kHz            | U |  |
 |   |   | |   |  2    1                              | 1 |  |
 |   +---+ +---+                                      | 8 |  |
 |                                          Lattice   |   |  |
@@ -3871,22 +3884,22 @@ PCB Number: B0-003A (or B0-003B)
 |            N  Lattice         +-------+  2              2 |
 |C           6  isp1016E                                    |
 |o                              +----------+    50MHz       |
-|n    +---+                     |          |                |
-|n    |DX |  SW1                |   NEC    |    M   M       |
-|e    |102|                     |  DX-101  |    3   3       |
-|c    +---+         M  M        |          |                |
-|t                  1  1        |          |                |
-|e                              +----------+                |
-|r                                                          |
-|                             +---+      +---++---++---+    |
-|                  28MHz      |   |      |   ||   ||   |    |
-|     +---+                   |   |      |   ||   ||   |    |
-+-+   |DX |                   | U |      | U || U || U |    |
-  |   |102|                   | 4 |      | 4 || 3 || 3 |    |
-+-+   +---+                   | 0 |      | 1 || 8 || 9 |    |
-|                             |   |      |   ||   ||   |    |
-|                             |   |      |   ||   ||   |    |
-|                             +---+      +---++---++---+    |
+|n    +---+                     |          |              +-+
+|n    |DX |  SW1                |   NEC    |    M   M     | |
+|e    |102|                     |  DX-101  |    3   3     | |
+|c    +---+         M  M        |          |              | |
+|t                  1  1        |          |              | |
+|e                              +----------+              | |
+|r                                                        |C|
+|                             +---+      +---++---++---+  |N|
+|                  28MHz      |   |      |   ||   ||   |  |3|
+|     +---+                   |   |      |   ||   ||   |  | |
++-+   |DX |                   | U |      | U || U || U |  | |
+  |   |102|                   | 4 |      | 4 || 3 || 3 |  | |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |  | |
+| C                           |   |      |   ||   ||   |  | |
+| N                           |   |      |   ||   ||   |  +-+
+| 1                           +---+      +---++---++---+    |
 +-----------------------------------------------------------+
 
 PCB Number: B0-010A - This PCB is slightly revised for 2 player play
@@ -3896,8 +3909,8 @@ PCB Number: B0-010A - This PCB is slightly revised for 2 player play
 |   +---+ +---+                            |M60016|         |
 |   |   | |   |  M    M                    |CALRUA|  +---+  |
 +-+ | U | | U |  2    1                    +------+  |   |  |
-  | | 0 | | 0 |                                      |   |  |
-+-+ | 7 | | 6 |  M    M                              | U |  |
+  | | 0 | | 0 |                   D4992              |   |  |
++-+ | 7 | | 6 |  M    M         32.768kHz            | U |  |
 |   |   | |   |  2    1                              | 1 |  |
 |   +---+ +---+                                      | 8 |  |
 |                                          Lattice   |   |  |
@@ -3909,23 +3922,36 @@ PCB Number: B0-010A - This PCB is slightly revised for 2 player play
 |            N  Lattice         +-------+  2              2 |
 |C           6  isp1016E                                    |
 |o                              +----------+    50MHz       |
-|n    +---+                     |          |                |
-|n    |DX |  SW1                |   NEC    |    M   M       |
-|e    |102|                     |  DX-101  |    3   3       |
-|c    +---+         M  M        |          |                |
-|t                  1  1        |          |                |
-|e                              +----------+                |
-|r                                                          |
-|                             +---+      +---++---++---+    |
-|                  28MHz      |   |      |   ||   ||   |    |
-|     +---+              C    |   |      |   ||   ||   |    |
-+-+   |DX |              N    | U |      | U || U || U |    |
-  |   |102|              7    | 4 |      | 4 || 3 || 3 |    |
-+-+   +---+                   | 0 |      | 1 || 8 || 9 |    |
-|             Lattice    C    |   |      |   ||   ||   |    |
-|             isp1016E   N    |   |      |   ||   ||   |    |
-|                        8    +---+      +---++---++---+    |
+|n    +---+                     |          |              +-+
+|n    |DX |  SW1                |   NEC    |    M   M     | |
+|e    |102|                     |  DX-101  |    3   3     | |
+|c    +---+         M  M        |          |              | |
+|t                  1  1        |          |              | |
+|e                              +----------+              | |
+|r                                                        |C|
+|                             +---+      +---++---++---+  |N|
+|                  28MHz      |   |      |   ||   ||   |  |3|
+|     +---+              C    |   |      |   ||   ||   |  | |
++-+   |DX |              N    | U |      | U || U || U |  | |
+  |   |102|              7    | 4 |      | 4 || 3 || 3 |  | |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |  | |
+| C           Lattice    C    |   |      |   ||   ||   |  | |
+| N           isp1016E   N    |   |      |   ||   ||   |  +-+
+| 1                      8    +---+      +---++---++---+    |
 +-----------------------------------------------------------+
+
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP)
+        NEC DX-102 (52 Pin PQFP x3)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
+EEPROM: 93LC46BX (1K Low-power 64 x 16-bit organization serial EEPROM)
+   OSC: 50MHz, 28MHz & 32.768kHz
+ Other: 8 Position Dipswitch x 2
+        Lattice ispLSI2032 - stamped "KW001"
+        Lattice isp1016E - stamped "GUN" (2 for PCB B0-010A, used for light gun input)
+        NEC D4992 CMOS 8-Bit Parallel I/O Calendar Clock
+        BAT1 - CR2032 3Volt
 
 Ram M1 are Toshiba TC55257DFL-70L
 Ram M2 are NEC D43001GU-70L
@@ -3937,6 +3963,111 @@ U07 Program rom ST27C801 (odd)
 U18 Mask rom (Samples 23C32000 32Mbit (read as 27C322))
 
 U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pin11 +5v & 27C322 with pin11 GND
+
+Connectors:
+  CN1 - Unpopulated 8 pin header
+  CN2 - 8 Pin header - use unknown
+  CN3 - Unpopulated 3 row, 96 pin header
+  CN5 + CN6 labeled GUN:
+   CN6-4 Pin (1-4)          CN5-4 Pin (7-10, standard HAPP light gun pinout)
+    1 No Connection          7 Red    +5VDC
+    2 Green  Pump Switch     8 White  Trigger Switch
+    3 Brown  Pump Switch     9 Black  Ground
+    4 No Connection         10 Blue   Optical
+  CN7 + CN8 labeled GUN (on B0-010A only, same pinout as CN5 + CN6)
+
+==========================================
+
+Location Test version of Trophy Hunter:
+
+On service menu is an additional option: "9. PLAY DATA ( for LOC TEST )"
+
+  Under "7. OPTIONAL SETTING" is an added option:
+        3. PLAY DATA CLEAR
+        4. RETURN TO TEST MENU
+    Release versions show selection 3. RETURN TO TEST MENU, with no fourth selection
+
+Although in the I/O TEST screen seems to test for the shotgun PUMP, The PCB seems to be set up
+ for two standard HAPP light guns.  It's unknown how, if at all, the PUMP buttons are mapped or
+ hooked up through the PCB
+
+PCB Number: P0-145-1
++-----------------------------------------------------------+
+|             VOL                          +------+         |
+|                                          |X1-010|     M1  |
+|   +---+ +---+                            |M60016|         |
+|   |   | |   |  M    M                    |CALRUA|  +---+  |
++-+ | U | | U |  2    1                    +------+  |   |  |
+  | | 0 | | 0 |                   D4992              |   |  |
++-+ | 7 | | 6 |  M    M         32.768kHz            | U |  |
+|   |   | |   |  2    1                              | 1 |  |
+|   +---+ +---+                                      | 8 |  |
+|                                          Lattice   |   |  |
+|J  D +---+  C                            ispLSI2032 |   |  |
+|A  S |DX |  N   BAT1           +-------+            +---+  |
+|M  W |102|  5                  |Toshiba|  D                |
+|M  1 +---+                     |  TMP  |  S EEPROM       C |
+|A           C                  | 68301 |  W              N |
+|            N  Lattice         +-------+  2              2 |
+|C           6  isp1016E                                    |
+|o                              +----------+    50MHz       |
+|n    +---+                     |          |              +-+
+|n    |DX |  SW1                |   NEC    |    M   M     | |
+|e    |102|                     |  DX-101  |    3   3     | |
+|c    +---+         M  M        |          |              | |
+|t                  1  1        |          |              | |
+|e                              +----------+              | |
+|r                                                        |C|
+|                             +---+      +---++---++---+  |N|
+|                  28MHz      |   |      |   ||   ||   |  |3|
+|     +---+                   |   |      |   ||   ||   |  | |
++-+   |DX |                   | U |      | U || U || U |  | |
+  |   |102|                   | 4 |      | 4 || 3 || 3 |  | |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |  | |
+| C                           |   |      |   ||   ||   |  | |
+| N                           |   |      |   ||   ||   |  +-+
+| 1                           +---+      +---++---++---+    |
++-----------------------------------------------------------+
+
+Differences from PCB B0-003A (or B0-003B):
+
+CN1 is populated - unknown use
+CN3 Female 3 row, 96 pin connection populated on the underside to connect to the P1-115A flash ROM PCB
+CN5 is labeled pins 1-4 and silkscreened GUN1
+CN6 is labeled pins 1-4 and silkscreened GUN2
+Lattice isp1016E - labeled "2GUN"
+
+U38 - U40 unpopulated (data comes from P0-145-1 PCB)
+
+P1-115A
++-+--------------------+------------------------------------+
+| |        CN3         |                   SW3              |
+| +--------------------+                                    |
+| |        CN4         |                           U  J  U  |
+| +--------------------+                           5  P  6  |
+|                                                  9  4  0  |
+|                                                           |
+|                                                           |
+|    28F016.U23    28F016.U31    28F016.U27    28F016.U35   |
+|                                                           |
+|    28F016.U22    28F016.U30    28F016.U26    28F016.U34   |
+|                                                           |
+|    28F016.U21    28F016.U29    28F016.U25    28F016.U33   |
+|                                                           |
+|    28F016.U20    28F016.U28    28F016.U24    28F016.U32   |
+|  +--------------------+                                   |
+|  |        CN6         |                                   |
++--+--------------------+-----------------------------------+
+
+Flash ROMs are SHARP LH28F016SAT-70
+
+SW3 unpopulated switch
+CN3 Unused 3 row, 96 pin connection (underside)
+CN4 Male 3 row, 96 pin connection (underside, to main P0-145-1 PCB)
+CN6 Unused 3 row, 96 pin connection (top side)
+JP4 3 pin Jumper header - unknown use
+U59 GAL labeled FLASHA02U59 3869
+U60 GAL labeled FLASH3A 2A29
 
 --------------------------------------------------------------------------
 
@@ -4122,10 +4253,10 @@ ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed ch
 	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
-ROM_START( trophyh ) /* V1.0 is currently the only known version */
+ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all MASK ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* checksum D8DA printed on label */
-	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* checksum CEEF printed on label */
+	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* also commonly labeled as: Trophy U6 Ver. 1.00 D8DA */
+	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* also commonly labeled as: Trophy U7 Ver. 1.00 CEEF */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD( "as1101m01.u38", 0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) )
@@ -4135,7 +4266,39 @@ ROM_START( trophyh ) /* V1.0 is currently the only known version */
 
 	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
+	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) 
+ROM_END
+
+ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9 - on a P0-145-1 main PCB with a P1-115A flash ROM board */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "trophy_2-26_u6_2e9c.u06", 0x000000, 0x100000, CRC(74496d65) SHA1(8af7bce528557efe68e0ed8be8b60d0ba4409c35) ) /* hand written label:  Trophy 2/26 U6  2E9C */
+	ROM_LOAD16_BYTE( "trophy_2-26_u6_de45.u07", 0x000001, 0x100000, CRC(9ae364f6) SHA1(9df8352345e59f1e0a5cb66a8b43d5ad7785ca29) ) /* hand written label:  Trophy 2/26 U7  DE45 */
+
+	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
+	ROM_LOAD( "lh28f016sat.u20", 0x0000000, 0x200000, NO_DUMP ) /* None of the 28F016 flash ROMs are dumped */
+	ROM_LOAD( "lh28f016sat.u21", 0x0200000, 0x200000, NO_DUMP ) /* The correct loading order is unknown    */
+	ROM_LOAD( "lh28f016sat.u22", 0x0400000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u23", 0x0600000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u24", 0x0800000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u25", 0x0a00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u26", 0x0c00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u27", 0x0e00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u28", 0x1000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u29", 0x1200000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u30", 0x1400000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u31", 0x1600000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u32", 0x1800000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u33", 0x1a00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u34", 0x1c00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "lh28f016sat.u35", 0x1e00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "as1101m01.u38",   0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD( "as1102m01.u39",   0x0800000, 0x800000, CRC(d186d271) SHA1(3c54438b35adfab8be91df0a633270d6db49beef) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD( "as1103m01.u40",   0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD( "as1104m01.u41",   0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) ) /* Load these in until the flash ROMs are dumped */
+
+	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
+	// Leave 1MB empty (addressable by the chip)
+	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 MASK rom */
 ROM_END
 
 /***************************************************************************
@@ -4209,6 +4372,7 @@ GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state, empty_init,   
 GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyht,  trophyh,  samshoot, trophyht, seta2_state, empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0 (Location Test)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, funcube,   0,        funcube,  funcube,  seta2_state, init_funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
 GAME( 2001, funcube2,  0,        funcube2, funcube,  seta2_state, init_funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
 GAME( 2001, funcube3,  0,        funcube3, funcube,  seta2_state, init_funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )

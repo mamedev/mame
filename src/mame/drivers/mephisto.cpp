@@ -239,14 +239,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
 	if (m_allowNMI)
 	{
 		m_allowNMI = 0;
-		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	m_beep->set_state(m_outlatch->q6_r() ? 1 : 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_beep->set_state(m_outlatch->q6_r() ? 1 : 0);
 }
 

@@ -435,7 +435,7 @@ void jaguar_state::machine_reset()
 	if (!m_is_r3000)
 	{
 		memcpy(m_shared_ram, m_rom_base, 0x400);    // do not increase, or Doom breaks
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 		if(m_is_jagcd)
 		{

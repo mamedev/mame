@@ -383,14 +383,17 @@ namespace
 	std::vector<std::string> get_full_option_names(const device_image_interface &image)
 	{
 		std::vector<std::string> result;
+		bool same_name = image.instance_name() == image.brief_instance_name();
 
 		result.push_back(image.instance_name());
-		result.push_back(image.brief_instance_name());
+		if (!same_name)
+			result.push_back(image.brief_instance_name());
 
 		if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
 		{
 			result.push_back(image.instance_name() + "1");
-			result.push_back(image.brief_instance_name() + "1");
+			if (!same_name)
+				result.push_back(image.brief_instance_name() + "1");
 		}
 		return result;
 	}

@@ -32,7 +32,7 @@
 TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {
 	if (m_enable_nmi)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 uint8_t psion_state::kb_read()

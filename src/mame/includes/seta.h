@@ -204,12 +204,12 @@ public:
 	DECLARE_VIDEO_START(seta_2_layers);
 	DECLARE_PALETTE_INIT(blandia);
 	DECLARE_PALETTE_INIT(zingzip);
-	DECLARE_MACHINE_START(magspeed);
 	DECLARE_MACHINE_START(wrofaero);
 	DECLARE_PALETTE_INIT(gundhara);
 	DECLARE_PALETTE_INIT(jjsquawk);
 	DECLARE_MACHINE_START(keroppi);
 	DECLARE_MACHINE_START(zombraid);
+	DECLARE_MACHINE_START(magspeed);
 	DECLARE_VIDEO_START(oisipuzl_2_layers);
 	uint32_t screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

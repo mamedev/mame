@@ -241,7 +241,7 @@ uint32_t fun_tech_corp_state::screen_update(screen_device &screen, bitmap_ind16 
 INTERRUPT_GEN_MEMBER(fun_tech_corp_state::vblank_interrupt)
 {
 //  if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

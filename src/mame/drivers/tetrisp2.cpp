@@ -343,10 +343,10 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_coincounter_w)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(0, data & 0x1000 );  // +
-		output().set_led_value(1, data & 0x2000 );  // -
-		output().set_led_value(2, data & 0x4000 );  // Cancel
-		output().set_led_value(3, data & 0x8000 );  // OK
+		m_led[0] = BIT(data, 12);  // +
+		m_led[1] = BIT(data, 13);  // -
+		m_led[2] = BIT(data, 14);  // Cancel
+		m_led[3] = BIT(data, 15);  // OK
 	}
 //  popmessage("%04x",data);
 }
@@ -595,20 +595,20 @@ WRITE16_MEMBER(stepstag_state::stepstag_neon_w)
 //  1f60, 1c60, 0790, 0490, 0b60, 0860, 1390, 1090, 1f60, 1c60, 1390, 1090, 0b60, 0860, 0790, 0490, ...
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(32,   data & 0x0000); // Spot Lights?
-		output().set_led_value(33,   data & 0x0010);
-		output().set_led_value(34,   data & 0x0020);
-		output().set_led_value(35,   data & 0x0040);
+		m_led[32] = 0; //data & 0x0000; // Spot Lights?
+		m_led[33] = BIT(data, 4);
+		m_led[34] = BIT(data, 5);
+		m_led[35] = BIT(data, 6);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(40,   data & 0x0100); //
-		output().set_led_value(41,   data & 0x0200);
+		m_led[40] = BIT(data, 8);
+		m_led[41] = BIT(data, 9);
 
-		output().set_led_value(42,   data & 0x0400);
-		output().set_led_value(43,   data & 0x0800);
-		output().set_led_value(44,   data & 0x1000);
+		m_led[42] = BIT(data, 10);
+		m_led[43] = BIT(data, 11);
+		m_led[44] = BIT(data, 12);
 	}
 }
 
@@ -616,22 +616,22 @@ WRITE16_MEMBER(stepstag_state::stepstag_step_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value( 0,   data & 0x0001); // P2 Front-Left
-		output().set_led_value( 1,   data & 0x0002); // P2 Front-Right
-		output().set_led_value( 2,   data & 0x0004); // P2 Left
-		output().set_led_value( 3,   data & 0x0008); // P2 Right
-		output().set_led_value( 4,   data & 0x0010); // P2 Back-Left
-		output().set_led_value( 5,   data & 0x0020); // P2 Back-Right
+		m_led[0] = BIT(data, 0); // P2 Front-Left
+		m_led[1] = BIT(data, 1); // P2 Front-Right
+		m_led[2] = BIT(data, 2); // P2 Left
+		m_led[3] = BIT(data, 3); // P2 Right
+		m_led[4] = BIT(data, 4); // P2 Back-Left
+		m_led[5] = BIT(data, 5); // P2 Back-Right
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 6,   data & 0x0100); // P1 Front-Left
-		output().set_led_value( 7,   data & 0x0200); // P1 Front-Right
-		output().set_led_value( 8,   data & 0x0400); // P1 Left
-		output().set_led_value( 9,   data & 0x0800); // P1 Right
-		output().set_led_value(10,   data & 0x1000); // P1 Back-Left
-		output().set_led_value(11,   data & 0x2000); // P1 Back-Right
+		m_led[6] = BIT(data, 8); // P1 Front-Left
+		m_led[7] = BIT(data, 9); // P1 Front-Right
+		m_led[8] = BIT(data, 10); // P1 Left
+		m_led[9] = BIT(data, 11); // P1 Right
+		m_led[10] = BIT(data, 12); // P1 Back-Left
+		m_led[11] = BIT(data, 13); // P1 Back-Right
 	}
 }
 
@@ -639,12 +639,12 @@ WRITE16_MEMBER(stepstag_state::stepstag_button_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(17,   data & 0x0100); // P2 Start
-		output().set_led_value(18,   data & 0x0200); // P2 Left
-		output().set_led_value(19,   data & 0x0400); // P2 Right
-		output().set_led_value(20,   data & 0x1000); // P1 Start
-		output().set_led_value(21,   data & 0x2000); // P1 Left
-		output().set_led_value(22,   data & 0x4000); // P1 Right
+		m_led[17] = BIT(data, 8); // P2 Start
+		m_led[18] = BIT(data, 9); // P2 Left
+		m_led[19] = BIT(data, 10); // P2 Right
+		m_led[20] = BIT(data, 12); // P1 Start
+		m_led[21] = BIT(data, 13); // P1 Left
+		m_led[22] = BIT(data, 14); // P1 Right
 	}
 }
 

@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(starshp1_state::mux_w)
 
 WRITE_LINE_MEMBER(starshp1_state::led_w)
 {
-	output().set_led_value(0, !state);
+	m_led = state ? 0 : 1;
 }
 
 
@@ -175,6 +175,12 @@ void starshp1_state::starshp1_map(address_map &map)
 	map(0xde00, 0xde07).mirror(0x0008).w("audiolatch", FUNC(f9334_device::write_d0));
 	map(0xdf00, 0xdf0f).w(this, FUNC(starshp1_state::starshp1_analog_out_w));
 	map(0xf000, 0xffff).rom();
+}
+
+
+void starshp1_state::machine_start()
+{
+	m_led.resolve();
 }
 
 

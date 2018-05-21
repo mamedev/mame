@@ -139,7 +139,7 @@ MACHINE_RESET_MEMBER( s11c_state, s11c )
 {
 //  membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
-//  m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+//  m_bgcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void s11c_state::init_s11c()

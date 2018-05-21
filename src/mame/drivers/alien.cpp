@@ -9,7 +9,7 @@
    Main board:
    Capcom AMT-04054
     - Hitachi SH-4 HD6417750S at 200MHz
-	- Elpida DS1232AA-75 1M x 32-bit x 4-banks (128Mbit) SDRAM
+    - Elpida DS1232AA-75 1M x 32-bit x 4-banks (128Mbit) SDRAM
     - Altera ACEX EP1K50TC144-3 FPGA
     - 2 x Xilinx XC9572XL CPLD (TQFP-100) stamped AMTPS005 and AMTPS011
     - M48T35Y timekeeper device
@@ -31,8 +31,8 @@
 
    Capcom AMT-05057 (Pingu's Ice Block and Donkey Kong Banana Kingdom)
     - Altera MAX EPM3064ATC100-10 CPLD (QFP-100) stamped PS015
-	- S29JL064H 64Mbit FlashROM (TSOP-48)
-	- Compact Flash connector
+    - S29JL064H 64Mbit FlashROM (TSOP-48)
+    - Compact Flash connector
 
    Known undumped games:
     - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
@@ -160,7 +160,9 @@ ROM_START( pingu )
 	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
 
 	DISK_REGION( "card" ) //compact flash
-	DISK_IMAGE( "pingu", 0, SHA1(9163fb1d4dd96ef4417cad458f2270bf7bd58f01) )
+	DISK_IMAGE( "pingu", 0, BAD_DUMP SHA1(bab4f005f779cc2cc804ef1fce29cb17c7d613b9) )
+	// sectors 2-255 is empty (2 sectors of header / file list and 252 sectors of main.abs ELF executable), which makes this dump almost useless.
+	// if not this, high probable this game card can be booted using dkbanana boot ROMs.
 ROM_END
 
 // Host unit board, GPUs and YMZ770B not populated.

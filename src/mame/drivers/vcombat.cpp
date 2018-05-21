@@ -54,7 +54,7 @@ NOTES : Shadow Fighters appears to have been dumped from an earlier
             from Virtual Combat have been used.
         The Shadow Fighters bottom board has an extra 20 mhz xtal on it.
         The data stored in "samples" is simply a series of
-            Creative Media VOC files concatenated to eachother.
+            Creative Media VOC files concatenated to each other.
         The sound program ("sound") is about 640 bytes long.
         The hardware is said to run at medium resolution.
         The SRAM module dump can likely be thrown away for both games.
@@ -106,13 +106,29 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_vid_0(*this, "vid_0"),
 		m_vid_1(*this, "vid_1"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_crtc(*this, "crtc") { }
+
+	void init_shadfgtr();
+	void init_vcombat();
+
+	void shadfgtr(machine_config &config);
+	void vcombat(machine_config &config);
+
+private:
+	required_device<tlc34076_device> m_tlc34076;
+	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<i860_cpu_device> m_vid_0;
+	optional_device<i860_cpu_device> m_vid_1;
+	required_device<dac_word_interface> m_dac;
+	optional_device<mc6845_device> m_crtc;
 
 	std::unique_ptr<uint16_t[]> m_m68k_framebuffer[2];
 	std::unique_ptr<uint16_t[]> m_i860_framebuffer[2][2];
-	required_device<tlc34076_device> m_tlc34076;
-	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	int m_crtc_select;
+
 	DECLARE_WRITE16_MEMBER(main_video_write);
 	DECLARE_READ16_MEMBER(control_1_r);
 	DECLARE_READ16_MEMBER(control_2_r);
@@ -126,20 +142,13 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
-	void init_shadfgtr();
-	void init_vcombat();
+
 	DECLARE_MACHINE_RESET(vcombat);
 	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<i860_cpu_device> m_vid_0;
-	optional_device<i860_cpu_device> m_vid_1;
-	required_device<dac_word_interface> m_dac;
-	void shadfgtr(machine_config &config);
-	void vcombat(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void vid_0_map(address_map &map);
@@ -285,7 +294,7 @@ READ16_MEMBER(vcombat_state::main_irqiack_r)
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 
@@ -335,15 +344,13 @@ WRITE64_MEMBER(vcombat_state::v1_fb_w)
 
 WRITE16_MEMBER(vcombat_state::crtc_w)
 {
-	mc6845_device *crtc = machine().device<mc6845_device>("crtc");
-
-	if (crtc == nullptr)
+	if (m_crtc == nullptr)
 		return;
 
 	if (m_crtc_select == 0)
-		crtc->address_w(space, 0, data >> 8);
+		m_crtc->address_w(space, 0, data >> 8);
 	else
-		crtc->register_w(space, 0, data >> 8);
+		m_crtc->register_w(space, 0, data >> 8);
 
 	m_crtc_select ^= 1;
 }

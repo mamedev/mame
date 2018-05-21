@@ -1936,7 +1936,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 	{
 		mz2500_reset(this, WRAM_RESET);
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	/* bit 2 is speaker */

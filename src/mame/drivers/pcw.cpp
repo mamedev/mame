@@ -425,7 +425,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* reboot */
 		case 1:
 		{
-			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			popmessage("SYS: Reboot");
 		}
 		break;

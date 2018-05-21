@@ -416,7 +416,7 @@ void appoooh_state::machine_reset()
 INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(appoooh_state::appoooh_common)

@@ -188,6 +188,8 @@ void ccastles_state::machine_start()
 {
 	rectangle visarea;
 
+	m_led.resolve();
+
 	/* initialize globals */
 	m_syncprom = memregion("proms")->base() + 0x000;
 
@@ -250,7 +252,7 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 
 WRITE8_MEMBER(ccastles_state::led_w)
 {
-	output().set_led_value(offset, ~data & 1);
+	m_led[offset] = BIT(~data, 0);
 }
 
 

@@ -371,6 +371,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 	m_maincpu(*this, I8051_TAG),
 	m_y(*this, "Y%u", 0),
 	m_txd_handler(*this),
+	m_led(*this, "led%u", 0U),
 	m_keylatch(0),
 	m_rxd(1)
 {
@@ -384,6 +385,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 void wangpc_keyboard_device::device_start()
 {
 	m_txd_handler.resolve_safe();
+	m_led.resolve();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 
@@ -533,7 +535,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 
 	for (int i = 0; i < 6; i++)
 	{
-		machine().output().set_led_value(i, !BIT(data, i));
+		m_led[i] = BIT(~data, i);
 	}
 
 	//if (LOG) logerror("P1 %02x\n", data);

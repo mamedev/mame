@@ -48,6 +48,8 @@ TODO:
 
 void spcforce_state::machine_start()
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_sn76496_latch));
 	save_item(NAME(m_sn76496_select));
 	save_item(NAME(m_sn1_ready));
@@ -108,9 +110,9 @@ WRITE8_MEMBER(spcforce_state::soundtrigger_w)
 
 WRITE8_MEMBER(spcforce_state::misc_outputs_w)
 {
-	machine().output().set_lamp_value(0, BIT(data, 0)); // 1P start lamp
+	m_lamp[0] = BIT(data, 0); // 1P start lamp
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
-	machine().output().set_lamp_value(1, BIT(data, 2)); // 2P start lamp
+	m_lamp[1] = BIT(data, 2); // 2P start lamp
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
 }
 

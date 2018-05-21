@@ -353,7 +353,7 @@ void mephisto_modena_state::modena_mem(address_map &map)
 INTERRUPT_GEN_MEMBER(mephisto_academy_state::academy_irq)
 {
 	if (m_enable_nmi)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(mephisto_academy_state::academy_nmi_w)

@@ -119,7 +119,7 @@ READ8_MEMBER( univac_state::ram_r )
 	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effects_disabled())
 	{
 		LOGPARITY("parity check failed offset = %04X\n", offset);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	return m_p_videoram[offset];
 }

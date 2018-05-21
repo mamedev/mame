@@ -319,9 +319,9 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 	/* bit 3 -> J1-10 = lamp 1 */
 	/* bit 2 -> J1-8 = lamp 2 */
 	/* bit 1 -> J1-6 = lamp 3 */
-	output().set_led_value(0, (data >> 3) & 1);
-	output().set_led_value(1, (data >> 2) & 1);
-	output().set_led_value(2, (data >> 1) & 1);
+	m_lamp[0] = BIT(data, 3);
+	m_lamp[1] = BIT(data, 2);
+	m_lamp[2] = BIT(data, 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -362,9 +362,9 @@ WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 	/* bit 2 controls light #0 */
 	/* bit 3 controls light #1 */
 	/* bit 4 controls light #2 */
-	output().set_led_value(0, (data >> 2) & 1);
-	output().set_led_value(1, (data >> 3) & 1);
-	output().set_led_value(2, (data >> 4) & 1);
+	m_lamp[0] = BIT(data, 2);
+	m_lamp[1] = BIT(data, 3);
+	m_lamp[2] = BIT(data, 4);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);

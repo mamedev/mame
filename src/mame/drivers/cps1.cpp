@@ -3362,6 +3362,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cps_state,common)
 {
+	m_led_cboard.resolve();
 }
 
 MACHINE_START_MEMBER(cps_state,cps1)

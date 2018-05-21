@@ -107,26 +107,26 @@ void leland_state::master_redline_map_io(address_map &map)
 }
 
 
-void leland_state::master_map_program_2(address_map &map)
+void ataxx_state::master_map_program_2(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x9fff).bankr("masterbank_0");
-	map(0xa000, 0xdfff).bankr("masterbank_1").w(this, FUNC(leland_state::ataxx_battery_ram_w)).share("battery");
+	map(0xa000, 0xdfff).bankr("masterbank_1").w(this, FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
 	map(0xe000, 0xf7ff).ram().share("mainram");
-	map(0xf800, 0xffff).rw(this, FUNC(leland_state::ataxx_paletteram_and_misc_r), FUNC(leland_state::ataxx_paletteram_and_misc_w)).share("palette");
+	map(0xf800, 0xffff).rw(this, FUNC(ataxx_state::ataxx_paletteram_and_misc_r), FUNC(ataxx_state::ataxx_paletteram_and_misc_w)).share("palette");
 }
 
 
-void leland_state::master_map_io_2(address_map &map)
+void ataxx_state::master_map_io_2(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x04, 0x04).r(m_sound, FUNC(leland_80186_sound_device::leland_80186_response_r));
 	map(0x05, 0x05).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
 	map(0x06, 0x06).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
 	map(0x0c, 0x0c).w(m_sound, FUNC(leland_80186_sound_device::ataxx_80186_control_w));
-	map(0x20, 0x20).rw(this, FUNC(leland_state::ataxx_eeprom_r), FUNC(leland_state::ataxx_eeprom_w));
-	map(0xd0, 0xef).rw(this, FUNC(leland_state::ataxx_mvram_port_r), FUNC(leland_state::ataxx_mvram_port_w));
-	map(0xf0, 0xff).rw(this, FUNC(leland_state::ataxx_master_input_r), FUNC(leland_state::ataxx_master_output_w));
+	map(0x20, 0x20).rw(this, FUNC(ataxx_state::ataxx_eeprom_r), FUNC(ataxx_state::ataxx_eeprom_w));
+	map(0xd0, 0xef).rw(this, FUNC(ataxx_state::ataxx_mvram_port_r), FUNC(ataxx_state::ataxx_mvram_port_w));
+	map(0xf0, 0xff).rw(this, FUNC(ataxx_state::ataxx_master_input_r), FUNC(ataxx_state::ataxx_master_output_w));
 }
 
 
@@ -179,10 +179,10 @@ void leland_state::slave_map_program(address_map &map)
 }
 
 
-void leland_state::slave_map_io_2(address_map &map)
+void ataxx_state::slave_map_io_2(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x60, 0x7f).rw(this, FUNC(leland_state::ataxx_svram_port_r), FUNC(leland_state::ataxx_svram_port_w));
+	map(0x60, 0x7f).rw(this, FUNC(ataxx_state::ataxx_svram_port_r), FUNC(ataxx_state::ataxx_svram_port_w));
 }
 
 /*************************************
@@ -990,9 +990,6 @@ MACHINE_CONFIG_START(leland_state::leland)
 	MCFG_DEVICE_PROGRAM_MAP(slave_small_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io)
 
-	MCFG_MACHINE_START_OVERRIDE(leland_state,leland)
-	MCFG_MACHINE_RESET_OVERRIDE(leland_state,leland)
-
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_0FILL("battery")
 
@@ -1053,7 +1050,7 @@ MACHINE_CONFIG_START(leland_state::lelandi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(leland_state::ataxx)
+MACHINE_CONFIG_START(ataxx_state::ataxx)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("master", Z80, 6000000)
@@ -1063,9 +1060,6 @@ MACHINE_CONFIG_START(leland_state::ataxx)
 	MCFG_DEVICE_ADD("slave", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(slave_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io_2)
-
-	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
-	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -1080,7 +1074,7 @@ MACHINE_CONFIG_START(leland_state::ataxx)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(leland_state::wsf)
+MACHINE_CONFIG_START(ataxx_state::wsf)
 	ataxx(config);
 
 	MCFG_DEVICE_REMOVE("custom")
@@ -3218,27 +3212,27 @@ void leland_state::init_pigout()
 }
 
 
-void leland_state::init_ataxx()
+void ataxx_state::init_ataxx()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(ataxx_state::ataxx_trackball_r),this));
 }
 
 
-void leland_state::init_ataxxj()
+void ataxx_state::init_ataxxj()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(ataxx_state::ataxx_trackball_r),this));
 }
 
 
-void leland_state::init_wsf()
+void ataxx_state::init_wsf()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3250,24 +3244,24 @@ void leland_state::init_wsf()
 }
 
 
-void leland_state::init_indyheat()
+void ataxx_state::init_indyheat()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x00, 0x02, read8_delegate(FUNC(leland_state::indyheat_wheel_r),this));
-	m_master->space(AS_IO).install_read_handler(0x08, 0x0b, read8_delegate(FUNC(leland_state::indyheat_analog_r),this));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x02, read8_delegate(FUNC(ataxx_state::indyheat_wheel_r),this));
+	m_master->space(AS_IO).install_read_handler(0x08, 0x0b, read8_delegate(FUNC(ataxx_state::indyheat_analog_r),this));
 	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P1");
 	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P2");
 	m_master->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 
 	/* set up additional output ports */
-	m_master->space(AS_IO).install_write_handler(0x08, 0x0b, write8_delegate(FUNC(leland_state::indyheat_analog_w),this));
+	m_master->space(AS_IO).install_write_handler(0x08, 0x0b, write8_delegate(FUNC(ataxx_state::indyheat_analog_w),this));
 }
 
 
-void leland_state::init_brutforc()
+void ataxx_state::init_brutforc()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3279,7 +3273,7 @@ void leland_state::init_brutforc()
 }
 
 
-void leland_state::init_asylum()
+void ataxx_state::init_asylum()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3342,11 +3336,11 @@ GAME( 1990, pigout,     0,        lelandi,  pigout,     leland_state, init_pigou
 GAME( 1990, pigouta,    pigout,   lelandi,  pigout,     leland_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */
-GAME( 1990, ataxx,      0,        ataxx,    ataxx,      leland_state, init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
-GAME( 1990, ataxxa,     ataxx,    ataxx,    ataxx,      leland_state, init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
-GAME( 1990, ataxxe,     ataxx,    ataxx,    ataxx,      leland_state, init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
-GAME( 1990, ataxxj,     ataxx,    ataxx,    ataxx,      leland_state, init_ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
-GAME( 1990, wsf,        0,        wsf,      wsf,        leland_state, init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
-GAME( 1991, indyheat,   0,        wsf,      indyheat,   leland_state, init_indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
-GAME( 1991, brutforc,   0,        wsf,      brutforc,   leland_state, init_brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
-GAME( 1991, asylum,     0,        wsf,      brutforc,   leland_state, init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )
+GAME( 1990, ataxx,      0,        ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
+GAME( 1990, ataxxa,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
+GAME( 1990, ataxxe,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
+GAME( 1990, ataxxj,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
+GAME( 1990, wsf,        0,        wsf,      wsf,        ataxx_state,  init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
+GAME( 1991, indyheat,   0,        wsf,      indyheat,   ataxx_state,  init_indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
+GAME( 1991, brutforc,   0,        wsf,      brutforc,   ataxx_state,  init_brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
+GAME( 1991, asylum,     0,        wsf,      brutforc,   ataxx_state,  init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )
