@@ -1297,12 +1297,12 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( arkanoid )
+static GFXDECODE_START( gfx_arkanoid )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 64 )
 	// sprites use the same characters above, but are 16x8
 GFXDECODE_END
 
-static GFXDECODE_START( hexa )
+static GFXDECODE_START( gfx_hexa )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,  0 , 32 )
 GFXDECODE_END
 
@@ -1365,7 +1365,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
@@ -1439,7 +1439,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexa)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
@@ -1482,7 +1482,7 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */

@@ -301,7 +301,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( cloak )
+static GFXDECODE_START( gfx_cloak )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  32,  1 )
 GFXDECODE_END
@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 	MCFG_SCREEN_UPDATE_DRIVER(cloak_state, screen_update_cloak)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cloak)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloak)
 	MCFG_PALETTE_ADD("palette", 64)
 
 

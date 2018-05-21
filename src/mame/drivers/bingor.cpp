@@ -685,7 +685,7 @@ static const gfx_layout bingor_layout =
 	8*32
 };
 
-static GFXDECODE_START( bingor )
+static GFXDECODE_START( gfx_bingor )
 	GFXDECODE_ENTRY( "gfx", 0, bingor_layout,   0x0, 2  )
 GFXDECODE_END
 
@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(bingor_state::bingor)
 
 	MCFG_DEVICE_ADD("pic", PIC16C57, 12000000) //?? Mhz
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bingor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bingor)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

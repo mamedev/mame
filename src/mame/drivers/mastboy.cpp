@@ -599,7 +599,7 @@ WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 
 	m_m5205_part ^= 1;
 	if(!m_m5205_part)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -782,7 +782,7 @@ static const gfx_layout tiles8x8_layout_2 =
 };
 
 
-static GFXDECODE_START( mastboy )
+static GFXDECODE_START( gfx_mastboy )
 	GFXDECODE_RAM(   "vram", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "vrom", 0, tiles8x8_layout_2, 0, 16 )
 GFXDECODE_END
@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mastboy_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboy)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	// sound hardware

@@ -320,7 +320,7 @@ static const gfx_layout amust_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( amust )
+static GFXDECODE_START( gfx_amust )
 	GFXDECODE_ENTRY( "chargen", 0x0000, amust_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amust)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amust)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

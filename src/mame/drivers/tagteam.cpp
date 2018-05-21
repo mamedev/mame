@@ -196,7 +196,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( tagteam )
+static GFXDECODE_START( gfx_tagteam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 4 ) /* chars */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 4 ) /* sprites */
 GFXDECODE_END
@@ -205,7 +205,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tagteam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tagteam)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 

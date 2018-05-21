@@ -156,7 +156,7 @@ static const gfx_layout ms6102_charlayout =
 	16*8
 };
 
-static GFXDECODE_START(ms6102)
+static GFXDECODE_START(gfx_ms6102)
 	GFXDECODE_ENTRY("chargen", 0x0000, ms6102_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275_1", i8275_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms6102)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms6102)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)

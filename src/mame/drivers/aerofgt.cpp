@@ -77,7 +77,7 @@ Verification still needed for the other PCBs.
 WRITE8_MEMBER(aerofgt_state::karatblzbl_soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(aerofgt_state::pending_command_r)
@@ -1379,54 +1379,54 @@ static const gfx_layout kickball_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( pspikes )
+static GFXDECODE_START( gfx_pspikes )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( pspikesb )
+static GFXDECODE_START( gfx_pspikesb )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikesb_charlayout,      0, 64 )   /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikesb_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( spikes91 )
+static GFXDECODE_START( gfx_spikes91 )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikesb_charlayout,      0, 64 )   /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, spikes91_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( kickball )
+static GFXDECODE_START( gfx_kickball )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, kickball_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( turbofrc )
+static GFXDECODE_START( gfx_turbofrc )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0, pspikes_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, pspikes_spritelayout, 768, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( aerofgt )
+static GFXDECODE_START( gfx_aerofgt )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, aerofgt_spritelayout, 512, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( aerfboot )
+static GFXDECODE_START( gfx_aerfboot )
 	GFXDECODE_ENTRY( "gfx1", 0,       aerfboot_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x20000, aerfboot_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0,       aerfboot_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0,       aerfboot_spritelayout, 768, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( aerfboo2 )
+static GFXDECODE_START( gfx_aerfboo2 )
 	GFXDECODE_ENTRY( "gfx1", 0,       aerfboo2_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0,       aerfboo2_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0,       aerfboo2_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0x100000,aerfboo2_spritelayout, 768, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wbbc97 )
+static GFXDECODE_START( gfx_wbbc97 )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, wbbc97_spritelayout, 1024, 64 ) /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
@@ -1485,7 +1485,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pspikes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikes)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1535,7 +1535,7 @@ MACHINE_CONFIG_START(aerofgt_state::spikes91)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spikes91)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spikes91)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spikes91)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1571,7 +1571,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikesb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pspikesb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikesb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1616,7 +1616,7 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kickball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kickball)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1663,7 +1663,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pspikes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikes)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1707,7 +1707,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1764,7 +1764,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1821,7 +1821,7 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spinlbrk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024) // doesn't fully initialize palette at start-up ...
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1880,7 +1880,7 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1939,7 +1939,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2010,7 +2010,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerofgt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aerofgt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerofgt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2060,7 +2060,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aerfboot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerfboot)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2100,7 +2100,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboo2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aerfboo2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerfboo2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2136,7 +2136,7 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+14, 44*8-1+4, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_wbbc97)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wbbc97)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wbbc97)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

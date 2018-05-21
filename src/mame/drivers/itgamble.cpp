@@ -192,7 +192,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( itgamble )
+static GFXDECODE_START( gfx_itgamble )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 16  )
 GFXDECODE_END
 
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(itgamble_state::itgamble)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgamble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgamble)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */

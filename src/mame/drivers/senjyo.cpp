@@ -537,7 +537,7 @@ static const gfx_layout spritelayout2 =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( senjyo )
+static GFXDECODE_START( gfx_senjyo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 8 )    /*   0- 63 characters */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  64, 8 )    /*  64-127 background #1 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 128, 8 )    /* 128-191 background #2 */
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", senjyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_senjyo)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, senjyo_state, IIBBGGRR)

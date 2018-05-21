@@ -1185,7 +1185,7 @@ static const gfx_layout legionna_spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( legionna )
+static GFXDECODE_START( gfx_legionna )
 	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout, 48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,      0*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,     32*16, 16 )
@@ -1194,7 +1194,7 @@ static GFXDECODE_START( legionna )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( heatbrl )
+static GFXDECODE_START( gfx_heatbrl )
 	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
@@ -1203,7 +1203,7 @@ static GFXDECODE_START( heatbrl )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( cupsoc )
+static GFXDECODE_START( gfx_cupsoc )
 	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
@@ -1213,7 +1213,7 @@ static GFXDECODE_START( cupsoc )
 GFXDECODE_END
 
 
-static GFXDECODE_START( grainbow )
+static GFXDECODE_START( gfx_grainbow )
 	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,        0*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,        32*16, 16 ) /* unused */
@@ -1251,7 +1251,7 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", legionna)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1303,7 +1303,7 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1357,7 +1357,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(WRITE16(*this, legionna_state, tile_scroll_base_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1404,7 +1404,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
@@ -1463,7 +1463,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grainbow)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grainbow)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1517,7 +1517,7 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cupsoc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cupsoc)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

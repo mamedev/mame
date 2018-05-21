@@ -174,7 +174,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( mouser )
+static GFXDECODE_START( gfx_mouser )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, spritelayout,     0, 16 )
@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mouser_state, mouser_nmi_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mouser)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mouser)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
 

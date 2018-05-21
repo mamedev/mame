@@ -875,7 +875,7 @@ static const gfx_layout rex6000_graph_charlayout =
 	8*28            /* every char takes 28 bytes, first 2 bytes are used for the char size */
 };
 
-static GFXDECODE_START( rex6000 )
+static GFXDECODE_START( gfx_rex6000 )
 	GFXDECODE_ENTRY( "flash0a", 0x0f0000, rex6000_bold_charlayout,  0, 0 )  //normal
 	GFXDECODE_ENTRY( "flash0a", 0x0f2000, rex6000_bold_charlayout,  0, 0 )  //bold
 	GFXDECODE_ENTRY( "flash0a", 0x0f4000, rex6000_tiny_charlayout,  0, 0 )  //tiny
@@ -905,7 +905,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rex6000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rex6000)
 
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rex6000_banked_map)

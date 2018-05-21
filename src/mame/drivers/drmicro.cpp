@@ -31,7 +31,7 @@ Quite similar to Appoooh
 INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
 {
 	if (m_nmi_enable)
-			device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(drmicro_state::nmi_enable_w)
@@ -211,7 +211,7 @@ static const gfx_layout charlayout8 =
 	8*8*1
 };
 
-static GFXDECODE_START( drmicro )
+static GFXDECODE_START( gfx_drmicro )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout4,     0, 64 ) /* tiles */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout8,   256, 32 ) /* tiles */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout4,   0, 64 ) /* sprites */
@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(drmicro_state::drmicro)
 	MCFG_SCREEN_UPDATE_DRIVER(drmicro_state, screen_update_drmicro)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drmicro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drmicro)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)

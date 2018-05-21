@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000 / 8)  // xtal freq unknown
 	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown

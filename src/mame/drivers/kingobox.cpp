@@ -374,7 +374,7 @@ static const gfx_layout tilelayout =
 	16*8
 };
 
-static GFXDECODE_START( kingobox )
+static GFXDECODE_START( gfx_kingobox )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   256,  8 )   /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x01000, charlayout,   256,  8 )   /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,   0, 32 )   /* sprites */
@@ -444,7 +444,7 @@ static const gfx_layout rk_bglayout =
 };
 
 
-static GFXDECODE_START( rk )
+static GFXDECODE_START( gfx_rk )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rk_charlayout1,  256,  8 )    /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rk_charlayout2,  256,  8 )    /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rk_spritelayout,   0, 32 )    /* sprites */
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingobox)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingobox)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rk)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)

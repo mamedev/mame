@@ -20,12 +20,25 @@
 
 void astrocde_state::machine_start()
 {
-	save_item(NAME(m_port_1_last));
-	save_item(NAME(m_port_2_last));
 	save_item(NAME(m_ram_write_enable));
 	save_item(NAME(m_input_select));
+}
+
+void seawolf2_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_port_2_last));
 
 	m_port_1_last = m_port_2_last = 0xff;
+}
+
+void tenpindx_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	m_lamps.resolve();
 }
 
 

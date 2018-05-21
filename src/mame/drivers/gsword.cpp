@@ -259,7 +259,7 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 WRITE8_MEMBER(gsword_state::sound_command_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(gsword_state::adpcm_data_w)
@@ -305,7 +305,7 @@ READ8_MEMBER(gsword_state::i8741_3_r )
 INTERRUPT_GEN_MEMBER(gsword_state::sound_interrupt)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void gsword_state::init_gsword()
@@ -412,7 +412,7 @@ WRITE8_MEMBER(josvolly_state::mcu1_p2_w)
 		// this is just a hacky guess at how it works
 		if (m_cpu2_nmi_enable && (data & (data ^ m_mcu1_p2) & 0x01))
 		{
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			m_cpu2_nmi_enable = false;
 		}
 
@@ -775,7 +775,7 @@ static const gfx_layout gsword_sprites2 =
 	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
 };
 
-static GFXDECODE_START( gsword )
+static GFXDECODE_START( gfx_gsword )
 	GFXDECODE_ENTRY( "gfx1", 0, gsword_text,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, gsword_sprites1,  64*4, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, gsword_sprites2,  64*4, 64 )
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	MCFG_SCREEN_UPDATE_DRIVER(gsword_state, screen_update_gsword)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gsword)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gsword_state,gsword)
@@ -886,7 +886,7 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	MCFG_SCREEN_UPDATE_DRIVER(josvolly_state, screen_update_gsword)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gsword)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(josvolly_state, josvolly)

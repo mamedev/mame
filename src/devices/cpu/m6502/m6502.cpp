@@ -140,6 +140,11 @@ uint32_t m6502_device::execute_input_lines() const
 	return NMI_LINE+1;
 }
 
+bool m6502_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == NMI_LINE;
+}
+
 void m6502_device::do_adc_d(uint8_t val)
 {
 	uint8_t c = P & F_C ? 1 : 0;

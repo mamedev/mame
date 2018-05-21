@@ -570,27 +570,27 @@ static const gfx_layout meritum_charlayout =
 	8*16           /* every char takes 16 bytes (unused scanlines are blank) */
 };
 
-static GFXDECODE_START(trs80)
+static GFXDECODE_START(gfx_trs80)
 	GFXDECODE_ENTRY( "chargen", 0, trs80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(ht1080z)
+static GFXDECODE_START(gfx_ht1080z)
 	GFXDECODE_ENTRY( "chargen", 0, ht1080z_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(trs80m4)
+static GFXDECODE_START(gfx_trs80m4)
 	GFXDECODE_ENTRY( "chargen", 0, trs80m4_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(lnw80)
+static GFXDECODE_START(gfx_lnw80)
 	GFXDECODE_ENTRY( "chargen", 0, lnw80_charlayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START(radionic)
+static GFXDECODE_START(gfx_radionic)
 	GFXDECODE_ENTRY( "chargen", 0, radionic_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(meritum)
+static GFXDECODE_START(gfx_meritum)
 	GFXDECODE_ENTRY( "chargen", 0, meritum_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -619,7 +619,7 @@ MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I,
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trs80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trs80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -681,7 +681,7 @@ MACHINE_CONFIG_START(trs80_state::model3)
 
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", trs80m4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_trs80m4)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80m4)
@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(trs80_state::ht1080z)
 	sys80(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ht1080z)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::lnw80)
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(trs80_state::lnw80)
 	MCFG_DEVICE_IO_MAP(lnw80_io)
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnw80)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8)
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", radionic)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_radionic)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::meritum)
@@ -754,7 +754,7 @@ MACHINE_CONFIG_START(trs80_state::meritum)
 	MCFG_DEVICE_IO_MAP(meritum_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_meritum)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_meritum)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::cp500)

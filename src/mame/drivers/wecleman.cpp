@@ -967,7 +967,7 @@ static const gfx_layout wecleman_road_layout =
 	nullptr
 };
 
-static GFXDECODE_START( wecleman )
+static GFXDECODE_START( gfx_wecleman )
 	// "sprites" holds sprite, which are not decoded here
 	GFXDECODE_ENTRY( "layers", 0, wecleman_bg_layout,   0, 2048/8 )   // [0] bg + fg + txt
 	GFXDECODE_ENTRY( "road",   0, wecleman_road_layout, 0, 2048/8 )   // [1] road
@@ -1001,7 +1001,7 @@ static const gfx_layout hotchase_road_layout =
 	nullptr
 };
 
-static GFXDECODE_START( hotchase )
+static GFXDECODE_START( gfx_hotchase )
 	// "sprites" holds sprite, which are not decoded here
 	GFXDECODE_ENTRY( "road", 0, hotchase_road_layout, 0x70*16, 16 ) // road
 GFXDECODE_END
@@ -1067,7 +1067,7 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_wecleman)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wecleman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wecleman)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 
@@ -1146,7 +1146,7 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotchase)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotchase)
 	MCFG_PALETTE_ADD("palette", 2048*2)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)

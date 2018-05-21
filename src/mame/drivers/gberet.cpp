@@ -377,12 +377,12 @@ static const gfx_layout gberetb_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( gberet )
+static GFXDECODE_START( gfx_gberet )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( gberetb )
+static GFXDECODE_START( gfx_gberetb )
 	GFXDECODE_ENTRY( "gfx1", 0, gberetb_charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, gberetb_spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gberet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberet)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
@@ -469,7 +469,7 @@ MACHINE_CONFIG_START(gberet_state::gberetb)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberetb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gberetb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberetb)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)

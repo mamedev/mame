@@ -272,7 +272,7 @@ const gfx_layout homez80_charlayout =
 	8*8                 /* size of one char */
 };
 
-static GFXDECODE_START( homez80 )
+static GFXDECODE_START( gfx_homez80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homez80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(homez80_state::homez80)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homez80 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homez80)
 MACHINE_CONFIG_END
 
 /* ROM definition */

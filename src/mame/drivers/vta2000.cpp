@@ -148,7 +148,7 @@ static const gfx_layout vta2000_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vta2000 )
+static GFXDECODE_START( gfx_vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -176,7 +176,7 @@ MACHINE_CONFIG_START(vta2000_state::vta2000)
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vta2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vta2000)
 MACHINE_CONFIG_END
 
 

@@ -344,7 +344,7 @@ static const gfx_layout drgnmst_char32x32_layout =
 };
 
 
-static GFXDECODE_START( drgnmst )
+static GFXDECODE_START( gfx_drgnmst )
 	GFXDECODE_ENTRY( "gfx1", 0, drgnmst_char16x16_layout,   0,      0x200  ) /* sprite tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char8x8_layout,     0x200,  0x200  ) /* fg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char16x16_layout,   0x0400, 0x200  ) /* md tiles */
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, drgnmst_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, drgnmst_snd_control_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnmst)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

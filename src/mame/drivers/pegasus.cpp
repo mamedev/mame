@@ -383,7 +383,7 @@ static const gfx_layout pegasus_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( pegasus )
+static GFXDECODE_START( gfx_pegasus )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pegasus_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, pegasus_charlayout, 0, 1 )
 GFXDECODE_END
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pegasus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pegasus)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

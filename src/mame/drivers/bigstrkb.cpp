@@ -191,7 +191,7 @@ static const gfx_layout bigstrkb_char16layout =
 
 
 
-static GFXDECODE_START( bigstrkb )
+static GFXDECODE_START( gfx_bigstrkb )
 	GFXDECODE_ENTRY( "gfx1", 0, bigstrkb_charlayout,   0x200, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bigstrkb_char16layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, bigstrkb_char16layout,   0x300, 16 )
@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	MCFG_DEVICE_PROGRAM_MAP(bigstrkb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigstrkb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigstrkb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

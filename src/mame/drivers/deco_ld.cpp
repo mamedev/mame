@@ -303,7 +303,7 @@ WRITE8_MEMBER(deco_ld_state::nmimask_w)
 
 INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
-	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmimask) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -451,7 +451,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( rblaster )
+static GFXDECODE_START( gfx_rblaster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 8 )
 GFXDECODE_END
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rblaster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 

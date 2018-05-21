@@ -455,12 +455,17 @@ class gfxdecode_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: gfxdecode_device(mconfig, tag, owner, 0)
+	{
+		set_palette(std::forward<T>(palette_tag));
+		set_info(gfxinfo);
+	}
 	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_start() override {}
 };
-
-GFXDECODE_EXTERN(empty);
 
 #endif  // MAME_EMU_DRAWGFX_H

@@ -19,7 +19,8 @@ public:
 		m_workram(*this, "workram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_generic_paletteram_8(*this, "paletteram")
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_led(*this, "led0")
 	{ }
 
 	void tunhunt(machine_config &config);
@@ -36,6 +37,7 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
+	virtual void machine_start() override { m_led.resolve(); }
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tunhunt);
 
@@ -57,6 +59,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	output_finder<> m_led;
 
 	uint8_t m_control;
 	tilemap_t *m_fg_tilemap;

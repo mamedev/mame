@@ -233,7 +233,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( madmotor )
+static GFXDECODE_START( gfx_madmotor )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   512, 16 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout2,  768, 16 ) /* Tiles 16x16 */
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madmotor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madmotor)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

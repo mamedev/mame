@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_resume)
 {
 	m_subcpu->resume(SUSPEND_REASON_HALT);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(sothello_state::subcpu_halt_set)

@@ -1525,11 +1525,11 @@ static const gfx_layout insectx_charlayout =
 	64*8
 };
 
-static GFXDECODE_START( tnzs )
+static GFXDECODE_START( gfx_tnzs )
 	GFXDECODE_ENTRY( "gfx1", 0, tnzs_charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( insectx )
+static GFXDECODE_START( gfx_insectx )
 	GFXDECODE_ENTRY( "gfx1", 0, insectx_charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -1560,7 +1560,7 @@ MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnzs_base_state, screen_vblank_tnzs))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnzs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnzs)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1634,7 +1634,7 @@ MACHINE_CONFIG_START(insectx_state::insectx)
 	MCFG_DEVICE_PROGRAM_MAP(insectx_sub_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", insectx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_insectx)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */

@@ -147,7 +147,7 @@ number 0 on each voice. That sample is 00000-00000.
 		if ((data & 0xff) != 0x3a)
 		{
 			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }
@@ -547,7 +547,7 @@ static const gfx_layout layout_16x16x8 =
 };
 
 
-static GFXDECODE_START( yunsun16 )
+static GFXDECODE_START( gfx_yunsun16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x1000, 0x10 ) // [0] Layers
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x0000, 0x20 ) // [1] Sprites
 GFXDECODE_END
@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(yunsun16_state::magicbub)
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsun16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(yunsun16_state::shocking)
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsun16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

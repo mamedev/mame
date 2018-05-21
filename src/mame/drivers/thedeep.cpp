@@ -355,7 +355,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16
 };
 
-static GFXDECODE_START( thedeep )
+static GFXDECODE_START( gfx_thedeep )
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4,  0x080,  8 ) // [0] Sprites
 	GFXDECODE_ENTRY( "bg_gfx", 0, layout_16x16x4,   0x100, 16 ) // [1] Background Layer
 	GFXDECODE_ENTRY( "text", 0, layout_8x8x2,   0x000, 16 ) // [2] Text Layer
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(thedeep_state::thedeep)
 	MCFG_SCREEN_UPDATE_DRIVER(thedeep_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedeep)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedeep)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(thedeep_state, thedeep)
 

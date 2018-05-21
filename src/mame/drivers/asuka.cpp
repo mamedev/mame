@@ -779,7 +779,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( asuka )
+static GFXDECODE_START( gfx_asuka )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* OBJ */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* SCR */
 GFXDECODE_END
@@ -870,7 +870,7 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -932,7 +932,7 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -1007,7 +1007,7 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -1142,7 +1142,7 @@ MACHINE_CONFIG_START(asuka_state::eto)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)

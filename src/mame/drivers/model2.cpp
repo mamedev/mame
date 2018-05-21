@@ -267,10 +267,6 @@ MACHINE_RESET_MEMBER( model2_state, model2_common )
 
 	m_timerrun[0] = m_timerrun[1] = m_timerrun[2] = m_timerrun[3] = 0;
 
-	m_timers[0] = machine().device<timer_device>("timer0");
-	m_timers[1] = machine().device<timer_device>("timer1");
-	m_timers[2] = machine().device<timer_device>("timer2");
-	m_timers[3] = machine().device<timer_device>("timer3");
 	for (i=0; i<4; i++)
 		m_timers[i]->reset();
 
@@ -598,7 +594,7 @@ void model2_tgp_state::copro_halt()
 void model2_tgp_state::copro_boot()
 {
 	m_copro_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	m_copro_tgp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_copro_tgp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 READ32_MEMBER(model2_tgp_state::copro_fifo_r)
@@ -1689,6 +1685,38 @@ static INPUT_PORTS_START( model2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ioboard_dipswitches )
+	PORT_START("ioboard:dsw1")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW1:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_START("ioboard:dsw2")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_START("ioboard:dsw3")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW3:8")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gears )
 	PORT_START("GEARS") // fake to handle gear bits
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("GEAR N")
@@ -1724,6 +1752,8 @@ static INPUT_PORTS_START( daytona )
 
 	PORT_START("BRAKE")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( desert )
@@ -1752,6 +1782,8 @@ static INPUT_PORTS_START( desert )
 
 	PORT_START("BRAKE")
 	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Y) PORT_SENSITIVITY(60) PORT_KEYDELTA(20)
+
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vcop )
@@ -1764,7 +1796,7 @@ static INPUT_PORTS_START( vcop )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME(0x02, 0x02, "No enemies") PORT_DIPLOCATION("DEBUG:1")
+	PORT_DIPNAME(0x02, 0x02, "No Enemies") // I/O board connector CN5
 	PORT_DIPSETTING(   0x02, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1780,6 +1812,16 @@ static INPUT_PORTS_START( vcop )
 
 	PORT_START("P2_Y")
 	PORT_BIT(0x3ff, 0x0e8, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x027, 0x1a9) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_INCLUDE(ioboard_dipswitches)
+
+	PORT_MODIFY("ioboard:dsw1")
+	PORT_DIPNAME(0x80, 0x80, "Reloading")       PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(   0x80, "Normal")
+	PORT_DIPSETTING(   0x00, "Auto Reload")
+	PORT_DIPNAME(0x40, 0x40, "Enemy Character") PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(   0x40, "Normal")
+	PORT_DIPSETTING(   0x00, "Robot")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( vf2 )

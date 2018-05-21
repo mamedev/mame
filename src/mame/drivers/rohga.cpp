@@ -809,14 +809,14 @@ static const gfx_layout tilelayout =
 	16*16*2
 };
 
-static GFXDECODE_START( rohga )
+static GFXDECODE_START( gfx_rohga )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,        512, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_6bpp,1024, 16 )    /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( wizdfire )
+static GFXDECODE_START( gfx_wizdfire )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 32 )  /* Gfx chip 1 as 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0, 32 )  /* Gfx chip 1 as 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 32 )  /* Gfx chip 2 as 16x16 */
@@ -824,7 +824,7 @@ static GFXDECODE_START( wizdfire )
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout, 0/*1536*/, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( schmeisr )
+static GFXDECODE_START( gfx_schmeisr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,        512, 32 )    /* Tiles 16x16 */
@@ -894,7 +894,7 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_rohga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rohga)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rohga)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECOCOMN_ADD("deco_common")
@@ -984,7 +984,7 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_wizdfire)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wizdfire)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wizdfire)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECOCOMN_ADD("deco_common")
@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_nitrobal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wizdfire)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wizdfire)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECOCOMN_ADD("deco_common")
@@ -1175,7 +1175,7 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_rohga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", schmeisr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_schmeisr)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECOCOMN_ADD("deco_common")

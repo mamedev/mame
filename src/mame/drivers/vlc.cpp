@@ -272,7 +272,7 @@ WRITE16_MEMBER( nevada_state::vram_w )
 }
 
 /***************************************************************************/
-static GFXDECODE_START( nevada )
+static GFXDECODE_START( gfx_nevada )
 	/* Todo  , just for sample */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 GFXDECODE_END
@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nevada)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nevada)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(nevada_state, nevada)
 

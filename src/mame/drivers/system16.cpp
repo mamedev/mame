@@ -112,7 +112,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_nmi_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -174,8 +174,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
 	{
 		m_coinctrl = data & 0xff;
 		m_refreshenable = m_coinctrl & 0x20;
-		output().set_led_value(1, m_coinctrl & 0x08);
-		output().set_led_value(0, m_coinctrl & 0x04);
+		m_led[1] = BIT(m_coinctrl, 3);
+		m_led[0] = BIT(m_coinctrl, 2);
 		machine().bookkeeping().coin_counter_w(1, m_coinctrl & 0x02);
 		machine().bookkeeping().coin_counter_w(0, m_coinctrl & 0x01);
 		/* bit 6 is also used (1 most of the time; 0 in dduxbl, sdi, wb3;
@@ -373,7 +373,7 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 	m_sample_buffer <<=  4;
 	m_sample_select ^=  1;
 	if(m_sample_select == 0)
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
@@ -1180,7 +1180,7 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 	m_sample_buffer >>=  4;
 	m_sample_select ^=  1;
 	if (m_sample_select == 0)
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
@@ -2048,7 +2048,7 @@ static const gfx_layout charlayout  =
 	8*8
 };
 
-GFXDECODE_START( sys16 )
+GFXDECODE_START( gfx_sys16 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1024 )
 GFXDECODE_END
 
@@ -2077,7 +2077,7 @@ MACHINE_CONFIG_END
 WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 {
 	/* upd7759 callback */
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
@@ -2176,7 +2176,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
@@ -2280,7 +2280,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 2048*SHADOW_COLORS_MULTIPLIER)
 
@@ -2445,7 +2445,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
@@ -2501,7 +2501,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
@@ -2596,7 +2596,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
 	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)

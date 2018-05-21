@@ -238,7 +238,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( scregg )
+static GFXDECODE_START( gfx_scregg )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 1 )     /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,        0, 1 )     /* sprites */
 GFXDECODE_END
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(scregg_state::dommy)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(scregg_state::scregg)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)

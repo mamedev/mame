@@ -916,7 +916,7 @@ static const gfx_layout shape_layout =
 	8*8
 };
 
-static GFXDECODE_START( namcona1 )
+static GFXDECODE_START( gfx_namcona1 )
 	GFXDECODE_RAM( "cgram", 0, cg_layout_8bpp, 0, 0x2000/256 )
 	GFXDECODE_RAM( "cgram", 0, cg_layout_4bpp, 0, 0x2000/16  )
 	GFXDECODE_RAM(  nullptr,   0, shape_layout,   0, 0x2000/2   )
@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcona1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcona1)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

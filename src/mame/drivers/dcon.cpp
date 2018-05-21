@@ -255,7 +255,7 @@ static const gfx_layout dcon_tilelayout =
 	1024
 };
 
-static GFXDECODE_START( dcon )
+static GFXDECODE_START( gfx_dcon )
 	GFXDECODE_ENTRY( "gfx1", 0, dcon_charlayout,    1024+768, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, dcon_tilelayout,    1024+0,   16 )
 	GFXDECODE_ENTRY( "gfx3", 0, dcon_tilelayout,    1024+512, 16 )
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

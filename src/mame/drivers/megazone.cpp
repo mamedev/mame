@@ -271,7 +271,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( megazone )
+static GFXDECODE_START( gfx_megazone )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megazone_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megazone)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megazone)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(megazone_state, megazone)

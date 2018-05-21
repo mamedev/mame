@@ -182,7 +182,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( ssozumo )
+static GFXDECODE_START( gfx_ssozumo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
@@ -191,7 +191,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(ssozumo_state::ssozumo)
@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssozumo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssozumo)
 	MCFG_PALETTE_ADD("palette", 64 + 16)
 	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
 

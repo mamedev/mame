@@ -1132,11 +1132,11 @@ static const gfx_layout charlayout =
 	16*16*2
 };
 
-static GFXDECODE_START( srmp2 )
+static GFXDECODE_START( gfx_srmp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( srmp3 )
+static GFXDECODE_START( gfx_srmp3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -1164,7 +1164,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp2)
 	MCFG_PALETTE_ADD("palette", 1024)   /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1211,7 +1211,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1266,7 +1266,7 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_mjyuugi)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
 	MCFG_PALETTE_ADD("palette", 512)            /* sprites only */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

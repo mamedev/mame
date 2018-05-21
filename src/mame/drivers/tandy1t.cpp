@@ -642,7 +642,7 @@ void tandy1000_state::cfg_fdc_525(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-static GFXDECODE_START( t1000 )
+static GFXDECODE_START( gfx_t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)

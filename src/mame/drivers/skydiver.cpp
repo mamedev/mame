@@ -161,7 +161,7 @@ INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
 	m_discrete->write(space, SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);  // NAM - Noise Amplitude
 
 	if (m_nmion)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -334,7 +334,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( skydiver )
+static GFXDECODE_START( gfx_skydiver )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 4 )
 GFXDECODE_END
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skydiver)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skydiver)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
 	MCFG_PALETTE_INIT_OWNER(skydiver_state, skydiver)
 

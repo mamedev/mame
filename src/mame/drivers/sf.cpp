@@ -135,7 +135,7 @@ WRITE8_MEMBER(sf_state::coin_w)
 WRITE8_MEMBER(sf_state::soundcmd_w)
 {
 	m_soundlatch->write(space, offset, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
@@ -516,7 +516,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( sf )
+static GFXDECODE_START( gfx_sf )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 512, 16 )
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(sf_state::sfan)
 	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sf)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)

@@ -70,8 +70,8 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	m_segaic16vid->set_display_enable(data & 0x10);
 
 	// bits 2 & 3: control the lamps
-	output().set_led_value(1, data & 0x08);
-	output().set_led_value(0, data & 0x04);
+	m_lamp[1] = BIT(data, 3);
+	m_lamp[0] = BIT(data, 2);
 
 	// bits 0 & 1: update coin counters
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -747,7 +747,7 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segahang )
+static GFXDECODE_START( gfx_segahang )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -783,7 +783,7 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segahang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segahang)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

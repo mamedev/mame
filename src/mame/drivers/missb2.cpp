@@ -420,12 +420,12 @@ static const gfx_layout bglayout_alt =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( missb2 )
+static GFXDECODE_START( gfx_missb2 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bglayout,   0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( bublpong )
+static GFXDECODE_START( gfx_bublpong )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bglayout_alt,   0, 2 )
 GFXDECODE_END
@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", missb2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_missb2)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -522,7 +522,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(missb2_state::bublpong)
 	missb2(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bublpong)
 MACHINE_CONFIG_END
 
 /* ROMs */

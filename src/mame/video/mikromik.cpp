@@ -113,7 +113,7 @@ static const gfx_layout charlayout =
 //  GFXDECODE( mm1 )
 //-------------------------------------------------
 
-static GFXDECODE_START( mm1 )
+static GFXDECODE_START( gfx_mm1 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -137,7 +137,7 @@ MACHINE_CONFIG_START(mm1_state::mm1m6_video)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 375-1 )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'720'000), ...)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mm1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mm1)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(mm1_state, mm1)
 

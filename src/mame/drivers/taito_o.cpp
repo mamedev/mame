@@ -213,7 +213,7 @@ static const gfx_layout parentj_layout =
 	1*128
 };
 
-static GFXDECODE_START( parentj )
+static GFXDECODE_START( gfx_parentj )
 	GFXDECODE_ENTRY( "gfx1", 0, parentj_layout,  0x0, 0x400/16  )
 GFXDECODE_END
 
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", parentj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_parentj)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -1290,7 +1290,7 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("scn2674_vid", scn2674_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))
@@ -3696,7 +3696,7 @@ GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crm
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
-GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cybcas,   0,        bwbvid5,    mpu4,     mpu4vid_state, init_cybcas,    ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4miami,    0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4missis,   0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4picdil,   0,        bwbvid5,    mpu4,     mpu4vid_state, empty_init,     ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )

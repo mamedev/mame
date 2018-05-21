@@ -357,7 +357,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// rising edge
 	if (state)

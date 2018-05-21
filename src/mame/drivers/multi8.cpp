@@ -504,7 +504,7 @@ static const gfx_layout multi8_kanjilayout =
 	16*16
 };
 
-static GFXDECODE_START( multi8 )
+static GFXDECODE_START( gfx_multi8 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x0000, multi8_kanjilayout, 0, 1 )
 GFXDECODE_END
@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multi8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_multi8)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();

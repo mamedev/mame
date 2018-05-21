@@ -321,7 +321,7 @@ static const gfx_layout bmjr_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( bmjr )
+static GFXDECODE_START( gfx_bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmjr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();

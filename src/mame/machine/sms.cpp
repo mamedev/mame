@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 	if (pause_pressed)
 	{
 		if (!m_paused)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 		m_paused = 1;
 	}
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 
 			// Power LED blinks while Rapid Fire is enabled.
 			// It switches between on/off at each 2048 C-Sync pulses.
-			if ((m_csync_counter & 0x7ff) == 0)
+			if ((m_csync_counter & 0x7ff) == 0 && m_has_pwr_led)
 			{
 				m_led_pwr = !m_led_pwr;
 			}
@@ -306,7 +306,8 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 			{
 				m_rapid_read_state = 0x00;
 				// Power LED remains lit again
-				output().set_led_value(0, 1);
+				if (m_has_pwr_led)
+					m_led_pwr = 1;
 			}
 		}
 	}
@@ -999,9 +1000,9 @@ void sms_state::setup_bios()
 	if (m_BIOS == nullptr || m_BIOS[0] == 0x00)
 	{
 		m_BIOS = nullptr;
-		m_has_bios_0400 = 0;
-		m_has_bios_2000 = 0;
-		m_has_bios_full = 0;
+		m_has_bios_0400 = false;
+		m_has_bios_2000 = false;
+		m_has_bios_full = false;
 	}
 
 	if (m_BIOS)
@@ -1023,9 +1024,14 @@ void sms_state::setup_bios()
 	}
 }
 
-MACHINE_START_MEMBER(sms_state,sms)
+void sms_state::machine_start()
 {
-	m_led_pwr.resolve();
+	// turn on the Power LED
+	if (m_has_pwr_led)
+	{
+		m_led_pwr.resolve();
+		m_led_pwr = 1;
+	}
 
 	char str[7];
 
@@ -1119,7 +1125,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		m_cartslot->save_ram();
 }
 
-MACHINE_RESET_MEMBER(sms_state,sms)
+void sms_state::machine_reset()
 {
 	if (m_is_smsj)
 	{
@@ -1134,7 +1140,8 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 		m_rapid_last_dc = 0xff;
 		m_rapid_last_dd = 0xff;
 		// Power LED remains lit again
-		output().set_led_value(0, 1);
+		if (m_has_pwr_led)
+			m_led_pwr = 1;
 	}
 
 	if (!m_is_mark_iii)
@@ -1247,82 +1254,6 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 	{
 		m_maincpu->set_input_line( 0, state );
 	}
-}
-
-void sms_state::init_sg1000m3()
-{
-	m_is_mark_iii = 1;
-	m_has_jpn_sms_cart_slot = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-void sms_state::init_sms()
-{
-	m_has_bios_full = 1;
-}
-
-
-void sms_state::init_sms1()
-{
-	m_has_bios_full = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-void sms_state::init_smsj()
-{
-	m_is_smsj = 1;
-	m_has_bios_2000 = 1;
-	m_ioctrl_region_is_japan = 1;
-	m_has_jpn_sms_cart_slot = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-void sms_state::init_sms1kr()
-{
-	m_has_bios_2000 = 1;
-	m_ioctrl_region_is_japan = 1;
-	m_has_jpn_sms_cart_slot = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-void sms_state::init_smskr()
-{
-	m_has_bios_full = 1;
-	// Despite having a Japanese cartridge slot, this version is detected as Export region.
-	m_has_jpn_sms_cart_slot = 1;
-}
-
-
-void smssdisp_state::init_smssdisp()
-{
-	m_is_sdisp = 1;
-}
-
-
-void sms_state::init_gamegear()
-{
-	m_is_gamegear = 1;
-	m_has_bios_0400 = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-void sms_state::init_gamegeaj()
-{
-	m_is_gamegear = 1;
-	m_has_bios_0400 = 1;
-	m_ioctrl_region_is_japan = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
 }
 
 

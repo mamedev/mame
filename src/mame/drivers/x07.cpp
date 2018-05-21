@@ -1371,7 +1371,7 @@ static const gfx_layout x07_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( x07 )
+static GFXDECODE_START( gfx_x07 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, x07_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -1498,7 +1498,7 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(x07_state, x07)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x07)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x07)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

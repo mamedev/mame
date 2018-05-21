@@ -1703,7 +1703,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
 	// on system 22: two rows of 4 red leds
 	// on super system 22: GYRGYRGY green/yellow/red
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, (~data << i & 0x80) ? 0 : 1);
+		m_cpuled[i] = (~data << i & 0x80) ? 0 : 1;
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
@@ -2985,7 +2985,7 @@ WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
 	// bit 1 = fan
 	// bit 2 = button light
 	output().set_value("fan0", data & 1);
-	output().set_led_value(0, data & 2);
+	m_led = BIT(data, 1);
 }
 
 void namcos22_state::propcycl_io_map(address_map &map)
@@ -3721,12 +3721,12 @@ static const gfx_layout namcos22_cg_layout =
 
 #undef XOR
 
-static GFXDECODE_START( namcos22 )
+static GFXDECODE_START( gfx_namcos22 )
 	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 GFXDECODE_END
 
-static GFXDECODE_START( super )
+static GFXDECODE_START( gfx_super )
 	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 	GFXDECODE_ENTRY( "sprite",  0, sprite_layout,        0, 0x80 )
@@ -3744,6 +3744,8 @@ void namcos22_state::machine_reset()
 
 void namcos22_state::machine_start()
 {
+	m_led.resolve();
+	m_cpuled.resolve();
 	m_slave_simulation_active = false;
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
@@ -3796,7 +3798,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos22)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos22)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3864,7 +3866,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

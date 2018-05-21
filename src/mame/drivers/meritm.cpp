@@ -175,7 +175,7 @@ Not all regional versions are available for each Megatouch series
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/ds1204.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"

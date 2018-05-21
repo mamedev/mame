@@ -438,7 +438,7 @@ void slapfght_state::getstarb2_io_map(address_map &map)
 INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
 {
 	if (m_sound_nmi_enabled)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
@@ -870,12 +870,12 @@ static const gfx_layout perfrman_spritelayout =
 };
 
 
-static GFXDECODE_START( perfrman )
+static GFXDECODE_START( gfx_perfrman )
 	GFXDECODE_ENTRY( "gfx1", 0, perfrman_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, perfrman_spritelayout, 128, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( slapfght )
+static GFXDECODE_START( gfx_slapfght )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0,  16 )
@@ -921,7 +921,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", perfrman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 

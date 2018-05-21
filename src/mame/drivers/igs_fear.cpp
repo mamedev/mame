@@ -64,7 +64,7 @@ static const gfx_layout fearlayout =
 };
 
 
-static GFXDECODE_START( igs_fear )
+static GFXDECODE_START( gfx_igs_fear )
 	GFXDECODE_ENTRY( "gfx1", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx3", 0, fearlayout,   0, 16  )
@@ -94,7 +94,7 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_fear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs_fear)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

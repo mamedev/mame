@@ -176,7 +176,7 @@ void tankbatt_state::main_map(address_map &map)
 
 INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)
 {
-	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	if (m_nmi_enable) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
@@ -251,7 +251,7 @@ static const gfx_layout bulletlayout =
 };
 
 
-static GFXDECODE_START( tankbatt )
+static GFXDECODE_START( gfx_tankbatt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0, bulletlayout, 0, 256 )
 GFXDECODE_END
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(tankbatt_state::tankbatt)
 	MCFG_SCREEN_UPDATE_DRIVER(tankbatt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbatt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tankbatt)
 	MCFG_PALETTE_ADD("palette", 256*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(tankbatt_state, tankbatt)

@@ -91,17 +91,48 @@
 class cc40_state : public driver_device
 {
 public:
-	cc40_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cc40_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
-		m_battery_inp(*this, "BATTERY")
+		m_battery_inp(*this, "BATTERY"),
+		m_lamp(*this, "lamp%u", 0U)
 	{
 		m_sysram[0] = nullptr;
 		m_sysram[1] = nullptr;
 	}
 
+	void postload();
+	void init_sysram(int chip, u16 size);
+	void update_lcd_indicator(u8 y, u8 x, int state);
+	void update_clock_divider();
+
+	DECLARE_READ8_MEMBER(sysram_r);
+	DECLARE_WRITE8_MEMBER(sysram_w);
+	DECLARE_READ8_MEMBER(bus_control_r);
+	DECLARE_WRITE8_MEMBER(bus_control_w);
+	DECLARE_WRITE8_MEMBER(power_w);
+	DECLARE_READ8_MEMBER(battery_r);
+	DECLARE_READ8_MEMBER(bankswitch_r);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(clock_control_r);
+	DECLARE_WRITE8_MEMBER(clock_control_w);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(keyboard_w);
+
+	DECLARE_PALETTE_INIT(cc40);
+	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
+	HD44780_PIXEL_UPDATE(cc40_pixel_update);
+	void cc40(machine_config &config);
+	void main_map(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
+private:
 	required_device<tms70c20_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
@@ -122,33 +153,7 @@ public:
 	u16 m_sysram_size[2];
 	u16 m_sysram_end[2];
 	u16 m_sysram_mask[2];
-
-	void postload();
-	void init_sysram(int chip, u16 size);
-	void update_lcd_indicator(u8 y, u8 x, int state);
-	void update_clock_divider();
-
-	DECLARE_READ8_MEMBER(sysram_r);
-	DECLARE_WRITE8_MEMBER(sysram_w);
-	DECLARE_READ8_MEMBER(bus_control_r);
-	DECLARE_WRITE8_MEMBER(bus_control_w);
-	DECLARE_WRITE8_MEMBER(power_w);
-	DECLARE_READ8_MEMBER(battery_r);
-	DECLARE_READ8_MEMBER(bankswitch_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(clock_control_r);
-	DECLARE_WRITE8_MEMBER(clock_control_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(cc40);
-	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
-	HD44780_PIXEL_UPDATE(cc40_pixel_update);
-	void cc40(machine_config &config);
-	void main_map(address_map &map);
+	output_finder<80> m_lamp;
 };
 
 
@@ -199,7 +204,7 @@ void cc40_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// ---- raw lcd screen here ----
 	// under    |    ERROR   v      v      v      v      v      v    _LOW
 	// output#  |    60     61     62     63     50     51     52     53
-	output().set_lamp_value(y * 10 + x, state);
+	m_lamp[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
@@ -543,6 +548,7 @@ void cc40_state::postload()
 void cc40_state::machine_start()
 {
 	// init
+	m_lamp.resolve();
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 

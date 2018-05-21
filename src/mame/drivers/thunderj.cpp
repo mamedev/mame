@@ -226,7 +226,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( thunderj )
+static GFXDECODE_START( gfx_thunderj )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  512,  96 ) /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 112 ) /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,      0, 512 ) /* characters 8x8 */
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thunderj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thunderj)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

@@ -1105,7 +1105,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( darkhors )
+static GFXDECODE_START( gfx_darkhors )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 ) // color codes should be doubled
 GFXDECODE_END
 
@@ -1228,7 +1228,7 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkhors)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkhors)
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
 
 	// layout

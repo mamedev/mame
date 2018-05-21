@@ -676,14 +676,14 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( sslam )
+static GFXDECODE_START( gfx_sslam )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0x300, 16 ) /* spr */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout,     0, 16 ) /* bg */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0x100, 16 ) /* mid */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x200, 16 ) /* tx */
 GFXDECODE_END
 
-static GFXDECODE_START( powerbls )
+static GFXDECODE_START( gfx_powerbls )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0x100, 16 ) /* spr */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,       0, 16 ) /* bg */
 GFXDECODE_END
@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(sslam_state::sslam)
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_sslam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sslam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sslam)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(sslam_state::powerbls)
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_powerbls)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbls)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbls)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

@@ -72,6 +72,7 @@ protected:
 	optional_device<floppy_connector> m_floppy1;
 	required_device<c8050_fdc_device> m_fdc;
 	required_ioport m_address;
+	output_finder<4> m_led;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

@@ -86,13 +86,15 @@ class gei_state : public driver_device
 {
 public:
 	gei_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
-		m_ticket(*this, "ticket"),
-		m_screen(*this, "screen"),
-		m_signature(*this, "signature"),
-		m_rombank(*this, "rombank") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dac(*this, "dac")
+		, m_ticket(*this, "ticket")
+		, m_screen(*this, "screen")
+		, m_signature(*this, "signature")
+		, m_rombank(*this, "rombank")
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -138,6 +140,7 @@ public:
 	void sprtauth_map(address_map &map);
 	void suprpokr_map(address_map &map);
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void video_start() override;
 
 private:
@@ -157,6 +160,7 @@ private:
 	required_device<screen_device> m_screen;
 	optional_region_ptr<uint8_t> m_signature;
 	optional_memory_bank m_rombank;
+	output_finder<13> m_lamp;
 };
 
 
@@ -211,24 +215,24 @@ uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 WRITE8_MEMBER(gei_state::lamps_w)
 {
 	/* 5 button lamps */
-	output().set_led_value(0, BIT(data, 0));
-	output().set_led_value(1, BIT(data, 1));
-	output().set_led_value(2, BIT(data, 2));
-	output().set_led_value(3, BIT(data, 3));
-	output().set_led_value(4, BIT(data, 4));
+	m_lamp[0] = BIT(data, 0);
+	m_lamp[1] = BIT(data, 1);
+	m_lamp[2] = BIT(data, 2);
+	m_lamp[3] = BIT(data, 3);
+	m_lamp[4] = BIT(data, 4);
 
 	/* 3 button lamps for deal, cancel, stand in poker games;
 	lamp order verified in poker and selection self tests */
-	output().set_led_value(7, BIT(data, 5));
-	output().set_led_value(5, BIT(data, 6));
-	output().set_led_value(6, BIT(data, 7));
+	m_lamp[7] = BIT(data, 5);
+	m_lamp[5] = BIT(data, 6);
+	m_lamp[6] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(gei_state::sound_w)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 3));
-	output().set_led_value(9, BIT(data, 3));
+	m_lamp[9] = BIT(data, 3);
 
 	/* bit 5 - ticket out in trivia games */
 	if (m_ticket.found())
@@ -246,13 +250,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	/* bit 3,6 - coin lockout, lamp 10 + 11 in selection test mode */
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));
 	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 6));
-	output().set_led_value(9, BIT(data, 3));
-	output().set_led_value(10, BIT(data, 6));
+	m_lamp[9] = BIT(data, 3);
+	m_lamp[10] = BIT(data, 6);
 
 	/* bit 4,5 - lamps 12, 13 in selection test mode;
 	12 lights up if dsw maximum bet = 30 an bet > 15 or if dsw maximum bet = 10 an bet = 10 */
-	output().set_led_value(11, BIT(data, 4));
-	output().set_led_value(12, BIT(data, 5));
+	m_lamp[11] = BIT(data, 4);
+	m_lamp[12] = BIT(data, 5);
 
 	/* bit 7 goes directly to the sound amplifier */
 	m_dac->write(BIT(data, 7));
@@ -261,13 +265,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 WRITE8_MEMBER(gei_state::lamps2_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
-	output().set_led_value(8, BIT(data, 4));
+	m_lamp[8] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(gei_state::nmi_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
-	output().set_led_value(8, BIT(data, 4));
+	m_lamp[8] = BIT(data, 4);
 
 	/* bit 6 enables NMI */
 	m_nmi_mask = data & 0x40;
@@ -966,7 +970,7 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 {
 	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

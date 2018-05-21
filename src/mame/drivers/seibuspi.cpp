@@ -1756,7 +1756,7 @@ static const gfx_layout spi_spritelayout5 =
 };
 #endif
 
-static GFXDECODE_START( spi )
+static GFXDECODE_START( gfx_spi )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_charlayout,   5632, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spi_tilelayout,   4096, 24 )
 	GFXDECODE_ENTRY( "gfx3", 0, spi_spritelayout,    0, 96 )
@@ -1801,7 +1801,7 @@ static const gfx_layout sys386f_spritelayout =
 	16*32
 };
 
-static GFXDECODE_START( sys386f )
+static GFXDECODE_START( gfx_sys386f )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_charlayout,          5632, 16 ) // Not used
 	GFXDECODE_ENTRY( "gfx2", 0, spi_tilelayout,          4096, 24 ) // Not used
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,       0, 96 )
@@ -1888,7 +1888,7 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
@@ -2014,7 +2014,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
@@ -2073,7 +2073,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys386f)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys386f)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 

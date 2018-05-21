@@ -626,11 +626,11 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 #include "emu.h"
 #include "includes/cps1.h"
+#include "machine/cps2crypt.h"
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/qsound.h"
-#include "sound/okim6295.h"
 #include "speaker.h"
 
 
@@ -1338,7 +1338,7 @@ MACHINE_CONFIG_START(cps_state::cps2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state, cps2)
@@ -1364,7 +1364,7 @@ MACHINE_CONFIG_START(cps_state::gigaman2)
 	cps2(config);
 
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
-	MCFG_CPU_REPLACE("audiocpu", AT89C4051, XTAL(12'000'000)) // clock unverified
+	MCFG_DEVICE_REPLACE("audiocpu", AT89C4051, XTAL(12'000'000)) // clock unverified
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_REMOVE("qsound")
@@ -4471,9 +4471,8 @@ ROM_START( mshbr1 )
 	ROMX_LOAD( "msh.20m",   0x1000006, 0x400000, CRC(a2b0c6c0) SHA1(71016c01c1a706b73cf5b9ac7e384a030c6cf08d) , ROM_GROUPWORD | ROM_SKIP(6) )
 
 	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "msh.01",   0x00000, 0x08000, CRC(c976e6f9) SHA1(281025e5aaf97c0aeddc8bd0f737d092daadad9e) )
-	ROM_CONTINUE(         0x10000, 0x18000 )
-	ROM_LOAD( "msh.02",   0x28000, 0x20000, CRC(ce67d0d9) SHA1(324226597cc5a11603f04085fef7715a314ecc05) )
+	ROM_LOAD( "msh.01",   0x00000, 0x20000, CRC(c976e6f9) SHA1(281025e5aaf97c0aeddc8bd0f737d092daadad9e) )
+	ROM_LOAD( "msh.02",   0x20000, 0x20000, CRC(ce67d0d9) SHA1(324226597cc5a11603f04085fef7715a314ecc05) )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
 	ROM_LOAD16_WORD_SWAP( "msh.11m",   0x000000, 0x200000, CRC(37ac6d30) SHA1(ec67421fbf4a08a686e76792cb35e9cbf04d022d) )
@@ -9636,7 +9635,7 @@ void cps_state::init_ssf2tb()
 
 void cps_state::init_mmatrix()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	m_cps2lockoutreversebit = 1; // Mars Matrix seems to require the coin lockout bit to be reversed
 

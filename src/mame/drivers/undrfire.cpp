@@ -542,13 +542,13 @@ static const gfx_layout scclayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( undrfire )
+static GFXDECODE_START( gfx_undrfire )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
 GFXDECODE_END
 
-static GFXDECODE_START( cbombers )
+static GFXDECODE_START( gfx_cbombers )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0x1000, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_undrfire)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", undrfire)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_undrfire)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -657,7 +657,7 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_cbombers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbombers)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbombers)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 

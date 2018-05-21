@@ -509,7 +509,7 @@ static const gfx_layout tilelayout =
 
 // we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.cpp */
 
-static GFXDECODE_START( jchan )
+static GFXDECODE_START( gfx_jchan )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
 GFXDECODE_END
 
@@ -611,7 +611,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jchan)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

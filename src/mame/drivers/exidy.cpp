@@ -798,7 +798,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( exidy )
+static GFXDECODE_START( gfx_exidy )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 2 )
 GFXDECODE_END
 
@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(exidy_state::base)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exidy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exidy)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

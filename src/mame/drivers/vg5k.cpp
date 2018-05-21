@@ -336,7 +336,7 @@ static const gfx_layout vg5k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vg5k )
+static GFXDECODE_START( gfx_vg5k )
 	GFXDECODE_ENTRY( "ef9345", 0x2000, vg5k_charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vg5k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vg5k)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */

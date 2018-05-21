@@ -59,11 +59,11 @@ class i7000_state : public driver_device
 {
 public:
 	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_card(*this, "cardslot"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_card(*this, "cardslot")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_videoram(*this, "videoram")
 	{ }
 
 	void video_start() override;
@@ -306,7 +306,7 @@ static const gfx_layout i7000_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( i7000 )
+static GFXDECODE_START( gfx_i7000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, i7000_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update_i7000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_i7000)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
 

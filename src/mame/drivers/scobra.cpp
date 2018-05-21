@@ -122,7 +122,7 @@ static const gfx_layout scobra_spritelayout =
 };
 
 
-static GFXDECODE_START( scobra )
+static GFXDECODE_START( gfx_scobra )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scobra_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scobra_spritelayout, 0, 8 )
 GFXDECODE_END
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scobra)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scobra)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,scrambold)
@@ -1086,7 +1086,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scobra)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scobra)
 	MCFG_PALETTE_ADD("palette", 32+64+2)    /* 32 for characters, 64 for stars, 2 for bullets */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,galaxold)

@@ -402,7 +402,7 @@ static const gfx_layout spritelayoutdw =
 	128*8
 };
 
-static GFXDECODE_START( vastar )
+static GFXDECODE_START( gfx_vastar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayoutdw, 0, 64 )
@@ -414,7 +414,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(vastar_state::vastar)
@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(vastar_state::vastar)
 	MCFG_SCREEN_UPDATE_DRIVER(vastar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vastar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vastar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */

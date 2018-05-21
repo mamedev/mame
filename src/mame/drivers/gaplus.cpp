@@ -466,7 +466,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( gaplus )
+static GFXDECODE_START( gfx_gaplus )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout, 64*4, 64 )
 GFXDECODE_END
@@ -486,8 +486,8 @@ static const char *const gaplus_sample_names[] =
 
 WRITE8_MEMBER(gaplus_state::out_lamps0)
 {
-	output().set_led_value(0, data & 1);
-	output().set_led_value(1, data & 2);
+	m_lamp[0] = BIT(data, 0);
+	m_lamp[1] = BIT(data, 1);
 	machine().bookkeeping().coin_lockout_global_w(data & 4);
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
@@ -499,6 +499,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps1)
 
 void gaplus_state::machine_start()
 {
+	m_lamp.resolve();
 	m_namcoio0_run_timer = timer_alloc(TIMER_NAMCOIO0_RUN);
 	m_namcoio1_run_timer = timer_alloc(TIMER_NAMCOIO1_RUN);
 
@@ -570,7 +571,7 @@ MACHINE_CONFIG_START(gaplus_state::gaplus)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaplus_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaplus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaplus)
 	MCFG_PALETTE_ADD("palette", 64*4+64*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gaplus_state, gaplus)

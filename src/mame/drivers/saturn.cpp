@@ -832,7 +832,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SCREEN_UPDATE_DRIVER(sat_console_state, screen_update_stv_vdp2)
 	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
 
 	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
 

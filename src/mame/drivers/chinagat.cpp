@@ -512,7 +512,7 @@ static const gfx_layout tilelayout =
 	64*8 /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( chinagat )
+static GFXDECODE_START( gfx_chinagat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,16 )    /*  8x8  chars */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128, 8 )    /* 16x16 sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 256, 8 )    /* 16x16 background tiles */
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -682,7 +682,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

@@ -278,7 +278,7 @@ static const gfx_layout osborne1_charlayout =
 	8                   // every char takes 16 x 1 bytes
 };
 
-static GFXDECODE_START( osborne1 )
+static GFXDECODE_START( gfx_osborne1 )
 	GFXDECODE_ENTRY("chargen", 0x0000, osborne1_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", osborne1)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_osborne1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	SPEAKER(config, "mono").front_center();

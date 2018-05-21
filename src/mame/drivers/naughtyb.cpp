@@ -402,7 +402,7 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( naughtyb )
+static GFXDECODE_START( gfx_naughtyb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(naughtyb_state::naughtyb)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(naughtyb_state::popflame)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 

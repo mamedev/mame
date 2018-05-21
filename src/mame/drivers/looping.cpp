@@ -613,7 +613,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( looping )
+static GFXDECODE_START( gfx_looping )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,    0, 8 )
 GFXDECODE_END
@@ -660,7 +660,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", looping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_looping)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)

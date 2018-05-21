@@ -394,7 +394,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( retofinv )
+static GFXDECODE_START( gfx_retofinv )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256*2,  64 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     64*16+256*2,  64 )
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", retofinv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_retofinv)
 	MCFG_PALETTE_ADD("palette", 256*2+64*16+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv)

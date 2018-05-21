@@ -326,7 +326,7 @@ INPUT_CHANGED_MEMBER( blockade_state::coin_inserted )
 	m_coin_inserted = newval;
 
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 CUSTOM_INPUT_MEMBER( blockade_state::coin_r )
@@ -367,7 +367,7 @@ uint32_t blockade_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static GFXDECODE_START( blockade )
+static GFXDECODE_START( gfx_blockade )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(blockade_state::blockade)
 	MCFG_SCREEN_UPDATE_DRIVER(blockade_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blockade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blockade)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

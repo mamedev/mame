@@ -268,7 +268,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( molecula )
+static GFXDECODE_START( gfx_molecula )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(molecula_state::molecula)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", molecula)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_molecula)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(molecula_state, molecula)

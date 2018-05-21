@@ -170,7 +170,7 @@ static const gfx_layout galaxy_charlayout =
 	8                   /* every char takes 1 x 16 bytes */
 };
 
-static GFXDECODE_START( galaxy )
+static GFXDECODE_START( gfx_galaxy )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxy_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxy)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 

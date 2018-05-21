@@ -924,13 +924,13 @@ static const gfx_layout spritelayout  =
 	64*8
 };
 
-static GFXDECODE_START( ppking )
+static GFXDECODE_START( gfx_ppking )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( gladiatr )
+static GFXDECODE_START( gfx_gladiatr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x200, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
@@ -978,7 +978,7 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppking)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_SCREEN_UPDATE_DRIVER(gladiatr_state, screen_update_gladiatr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gladiatr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gladiatr)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)

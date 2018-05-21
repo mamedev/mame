@@ -127,7 +127,8 @@ public:
 		m_reels(*this, "reel%u", 0U),
 		m_upd7759(*this, "upd"),
 		m_vfd0(*this, "vfd0"),
-		m_meters(*this, "meters")
+		m_meters(*this, "meters"),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	void init_toppoker();
@@ -175,6 +176,7 @@ protected:
 
 	void save_state();
 
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
@@ -213,6 +215,7 @@ private:
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_device> m_vfd0;
 	required_device<meters_device> m_meters;
+	output_finder<256> m_lamp;
 };
 
 #define VFD_RESET  0x20
@@ -464,17 +467,13 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 		int input_strobe = data & 0x07;
 		if ( !(data & 0x08) )
 		{ // clock changed to low
-			int strobe, offset, pattern, i;
+			int strobe  = data & 0x07;
+			int offset  = strobe<<4;
 
-			strobe  = data & 0x07;
-			offset  = strobe<<4;
-			pattern = 0x01;
-
-			for ( i = 0; i < 8; i++ )
+			for ( int i = 0; i < 8; i++ )
 			{
-				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux1_datalo & pattern?1:0) );
-				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux1_datahi & pattern?1:0) );
-				pattern<<=1;
+				m_lamp[BFM_strcnv[offset  ]] = BIT(m_mux1_datalo, i);
+				m_lamp[BFM_strcnv[offset+8]] = BIT(m_mux1_datahi, i);
 				offset++;
 			}
 
@@ -537,17 +536,13 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 		if ( !(data & 0x08) )
 		{ // clock changed to low
-			int strobe, offset, pattern, i;
+			int strobe  = data & 0x07;
+			int offset  = 128+(strobe<<4);
 
-			strobe  = data & 0x07;
-			offset  = 128+(strobe<<4);
-			pattern = 0x01;
-
-			for ( i = 0; i < 8; i++ )
+			for ( int i = 0; i < 8; i++ )
 			{
-				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux2_datalo & pattern?1:0) );
-				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux2_datahi & pattern?1:0) );
-				pattern<<=1;
+				m_lamp[BFM_strcnv[offset  ]] = BIT(m_mux2_datalo, i);
+				m_lamp[BFM_strcnv[offset+8]] = BIT(m_mux2_datahi, i);
 				offset++;
 			}
 		}

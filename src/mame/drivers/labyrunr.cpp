@@ -30,7 +30,7 @@ WRITE_LINE_MEMBER(labyrunr_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 {
 	if (m_k007121->ctrlram_r(7) & 0x01)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -147,7 +147,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( labyrunr )
+static GFXDECODE_START( gfx_labyrunr )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", labyrunr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_labyrunr)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

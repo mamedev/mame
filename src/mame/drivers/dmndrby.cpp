@@ -337,7 +337,7 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8,
 };
 
-static GFXDECODE_START( dmndrby )
+static GFXDECODE_START( gfx_dmndrby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 32*16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0, 8)
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmndrby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmndrby)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)

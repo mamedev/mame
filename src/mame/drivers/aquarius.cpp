@@ -340,7 +340,7 @@ static const gfx_layout aquarius_charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( aquarius )
+static GFXDECODE_START( gfx_aquarius )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarius )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarius)
 	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)

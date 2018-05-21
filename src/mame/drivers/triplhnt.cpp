@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
 
 WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
 {
-	output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -111,6 +111,12 @@ READ8_MEMBER(triplhnt_state::da_latch_r)
 	/* the following is a slight simplification */
 
 	return (offset & 1) ? cross_x : cross_y;
+}
+
+
+void triplhnt_state::machine_start()
+{
+	m_lamp.resolve();
 }
 
 
@@ -270,7 +276,7 @@ static const gfx_layout triplhnt_tile_layout =
 };
 
 
-static GFXDECODE_START( triplhnt )
+static GFXDECODE_START( gfx_triplhnt )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_small_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_large_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, triplhnt_tile_layout, 4, 2 )
@@ -321,7 +327,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triplhnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
 

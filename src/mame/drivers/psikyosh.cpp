@@ -305,7 +305,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( psikyosh )
+static GFXDECODE_START( gfx_psikyosh )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x100 ) // 4bpp tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
@@ -799,7 +799,7 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram32_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyosh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyosh)
 	MCFG_PALETTE_ADD("palette", 0x5000/4)
 	MCFG_PALETTE_FORMAT(RGBX)
 

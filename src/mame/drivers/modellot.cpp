@@ -126,7 +126,7 @@ const gfx_layout modellot_charlayout =
 	8*8             /* space between characters */
 };
 
-static GFXDECODE_START( modellot )
+static GFXDECODE_START( gfx_modellot )
 	GFXDECODE_ENTRY( "chargen", 0x0000, modellot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(modellot_state::modellot)
 	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", modellot )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_modellot)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */

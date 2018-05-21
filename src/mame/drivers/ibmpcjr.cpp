@@ -539,7 +539,7 @@ static const gfx_layout kanji_layout =
 	16*16                   /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pcjr )
+static GFXDECODE_START( gfx_pcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
 
@@ -631,7 +631,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
 	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", pcjr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_pcjr:palette", gfx_pcjr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -677,7 +677,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
-static GFXDECODE_START( ibmpcjx )
+static GFXDECODE_START( gfx_ibmpcjx )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
@@ -694,7 +694,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ibmpcjx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
 	/* internal ram */
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")

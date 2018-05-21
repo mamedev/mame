@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "hosenkan.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "screen.h"
 
@@ -100,7 +99,7 @@ void nes_hosenkan_device::hblank_irq( int scanline, int vblank, int blanked )
 		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear))
 		{
 			LOG_MMC(("irq fired, scanline: %d\n", scanline));
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			hold_irq_line();
 		}
 	}
 	m_irq_clear = 0;

@@ -568,7 +568,7 @@ static const gfx_layout objlayout =
 	32*32*2
 };
 
-static GFXDECODE_START( marinedt )
+static GFXDECODE_START( gfx_marinedt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, objlayout,     48, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, objlayout,     32, 4 )
@@ -640,7 +640,7 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256) // template to get ~60 fps
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marinedt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marinedt)
 
 	MCFG_PALETTE_ADD("palette", 64+64)
 	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)

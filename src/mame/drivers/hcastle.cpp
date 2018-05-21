@@ -151,7 +151,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static GFXDECODE_START( hcastle )
+static GFXDECODE_START( gfx_hcastle )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 8*16 ) /* 007121 #0 */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 8*16*16, 8*16 ) /* 007121 #1 */
 GFXDECODE_END
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 	MCFG_SCREEN_UPDATE_DRIVER(hcastle_state, screen_update_hcastle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hcastle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hcastle)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

@@ -474,7 +474,7 @@ static const gfx_layout angelkds_spritelayout =
 	16*32
 };
 
-static GFXDECODE_START( angelkds )
+static GFXDECODE_START( gfx_angelkds )
 	GFXDECODE_ENTRY( "gfx1", 0, angelkds_charlayout,   0x30, 1  )
 	GFXDECODE_ENTRY( "gfx3", 0, angelkds_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, angelkds_charlayout,   0, 16 )
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 	MCFG_SCREEN_UPDATE_DRIVER(angelkds_state, screen_update_angelkds)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", angelkds)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_angelkds)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

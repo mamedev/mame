@@ -213,7 +213,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( usgames )
+static GFXDECODE_START( gfx_usgames )
 	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usgames)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usgames)
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 

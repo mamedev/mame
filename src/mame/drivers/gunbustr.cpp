@@ -218,7 +218,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( gunbustr )
+static GFXDECODE_START( gfx_gunbustr )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 256 )
 GFXDECODE_END
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunbustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunbustr)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

@@ -544,15 +544,15 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(0, data & 0x0100);    // 3 buttons
-		output().set_led_value(1, data & 0x0200);
-		output().set_led_value(2, data & 0x0400);
+		m_led[0] = BIT(data, 8);    // 3 buttons
+		m_led[1] = BIT(data, 9);
+		m_led[2] = BIT(data, 10);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-//      output().set_led_value(3, data & 0x0010);   // if we had more leds..
-//      output().set_led_value(4, data & 0x0020);
+		m_led[3] = BIT(data, 4);
+		m_led[4] = BIT(data, 5);
 	}
 }
 
@@ -647,10 +647,10 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(0, data & 0x0100);
-		output().set_led_value(1, data & 0x1000);
-		output().set_led_value(2, data & 0x2000);
-		output().set_led_value(3, data & 0x4000);
+		m_led[0] = BIT(data, 8);
+		m_led[1] = BIT(data, 12);
+		m_led[2] = BIT(data, 13);
+		m_led[3] = BIT(data, 14);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -694,9 +694,9 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
-		output().set_led_value(0, data & 0x0200);    // decide
+		m_led[0] = BIT(data, 8);    // decide
 		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
-		output().set_led_value(1, data & 0x2000);    // select
+		m_led[1] = BIT(data, 13);    // select
 
 		int power = (data & 0x1000);
 		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
@@ -1844,7 +1844,7 @@ static const gfx_layout road_layout =
                                 Big Run
 **************************************************************************/
 
-static GFXDECODE_START( bigrun )
+static GFXDECODE_START( gfx_bigrun )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x0e00/2 , 16 ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
@@ -1857,7 +1857,7 @@ GFXDECODE_END
                                 Cisco Heat
 **************************************************************************/
 
-static GFXDECODE_START( cischeat )
+static GFXDECODE_START( gfx_cischeat )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1c00/2, 32  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2c00/2, 32  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6c00/2, 32  ) // Scroll 2
@@ -1870,7 +1870,7 @@ GFXDECODE_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static GFXDECODE_START( f1gpstar )
+static GFXDECODE_START( gfx_f1gpstar )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1e00/2, 16  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2e00/2, 16  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6e00/2, 16  ) // Scroll 2
@@ -1883,7 +1883,7 @@ GFXDECODE_END
                                 Scud Hammer
 **************************************************************************/
 
-static GFXDECODE_START( scudhamm )
+static GFXDECODE_START( gfx_scudhamm )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x1e00/2, 16  )   // Scroll 0
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x0000/2, 16  )   // UNUSED
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,          0x4e00/2, 16  )   // Scroll 2
@@ -1961,7 +1961,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigrun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigrun)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2012,7 +2012,7 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cischeat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cischeat)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2049,7 +2049,7 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gpstar)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2132,7 +2132,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2223,7 +2223,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()

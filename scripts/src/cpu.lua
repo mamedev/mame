@@ -2407,17 +2407,12 @@ end
 --------------------------------------------------
 -- Zilog Z80
 --@src/devices/cpu/z80/z80.h,CPUS["Z80"] = true
---@src/devices/cpu/z80/z80daisy.h,CPUS["Z80"] = true
 --------------------------------------------------
 
 if (CPUS["Z80"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy.cpp",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy.h",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy_generic.cpp",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy_generic.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
@@ -2468,8 +2463,6 @@ if (CPUS["Z180"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z180/z180ops.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180tbl.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy.cpp",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy.h",
 	}
 end
 

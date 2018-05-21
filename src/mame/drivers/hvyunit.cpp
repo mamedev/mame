@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(hvyunit_state::screen_vblank)
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 {
-	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
@@ -584,7 +584,7 @@ static const gfx_layout tile_layout =
 	4*8*32
 };
 
-static GFXDECODE_START( hvyunit )
+static GFXDECODE_START( gfx_hvyunit )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hvyunit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvyunit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvyunit)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

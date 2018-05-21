@@ -226,7 +226,7 @@ static const gfx_layout spritelayout =
 	32*32    /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( rollrace )
+static GFXDECODE_START( gfx_rollrace )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0,  32 ) /* foreground */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,    0,  32 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout,    0,  32 )
@@ -246,7 +246,7 @@ WRITE_LINE_MEMBER(rollrace_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(rollrace_state::rollrace)
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rollrace_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rollrace)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
 

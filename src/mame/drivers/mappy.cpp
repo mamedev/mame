@@ -1273,22 +1273,22 @@ static const gfx_layout spritelayout_4bpp =
 
 
 
-static GFXDECODE_START( superpac )
+static GFXDECODE_START( gfx_superpac )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_2bpp, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( phozon )
+static GFXDECODE_START( gfx_phozon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_8x8, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( mappy )
+static GFXDECODE_START( gfx_mappy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( todruaga )
+static GFXDECODE_START( gfx_todruaga )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 64 )
 GFXDECODE_END
@@ -1302,14 +1302,16 @@ GFXDECODE_END
 
 WRITE8_MEMBER(mappy_state::out_lamps)
 {
-	output().set_led_value(0, data & 1);
-	output().set_led_value(1, data & 2);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
 	machine().bookkeeping().coin_lockout_global_w(data & 4);
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
 void mappy_state::machine_start()
 {
+	m_leds.resolve();
+	
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));
@@ -1343,7 +1345,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superpac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superpac)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
@@ -1471,7 +1473,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phozon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
@@ -1521,7 +1523,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mappy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mappy)
 	MCFG_PALETTE_ADD("palette", 64*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
@@ -1585,7 +1587,7 @@ MACHINE_CONFIG_START(mappy_state::todruaga)
 	digdug2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_todruaga)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END

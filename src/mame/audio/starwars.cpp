@@ -75,5 +75,5 @@ WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
 	m_mainlatch->acknowledge_w(space, 0, 0);
 
 	/* reset sound CPU here  */
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }

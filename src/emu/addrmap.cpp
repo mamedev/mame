@@ -504,11 +504,9 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 			device_t *mapdevice = entry->m_submap_device;
 			if (!mapdevice)
 			{
-				std::string tag = owner.subtag(entry->m_read.m_tag);
-				mapdevice = machine.device(tag.c_str());
-				if (mapdevice == nullptr) {
-					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, m_device->basetag());
-				}
+				mapdevice = owner.subdevice(entry->m_read.m_tag);
+				if (mapdevice == nullptr)
+					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", owner.subtag(entry->m_read.m_tag).c_str(), m_spacenum, m_device->basetag());
 			}
 
 			// Grab the submap

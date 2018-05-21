@@ -602,7 +602,7 @@ static const gfx_layout hd44780_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( replicator )
+static GFXDECODE_START( gfx_replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(replicator_state::replicator)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", replicator)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_replicator)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_HD44780_ADD("hd44780")

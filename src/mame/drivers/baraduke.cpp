@@ -154,8 +154,8 @@ READ8_MEMBER(baraduke_state::inputport_r)
 
 WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_lamp[0] = BIT(data, 3);
+	m_lamp[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
@@ -364,13 +364,18 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( baraduke )
+static GFXDECODE_START( gfx_baraduke )
 	GFXDECODE_ENTRY( "gfx1", 0,      text_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,  0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0x4000, tile_layout,  0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0,      spritelayout, 0, 128 )
 GFXDECODE_END
 
+
+void baraduke_state::machine_start()
+{
+	m_lamp.resolve();
+}
 
 
 MACHINE_CONFIG_START(baraduke_state::baraduke)
@@ -394,7 +399,7 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, baraduke_state, screen_vblank_baraduke))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", baraduke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_baraduke)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_INIT_OWNER(baraduke_state, baraduke)
 

@@ -235,7 +235,7 @@ static const gfx_layout gs_16x16x4_layout =
 	16*64
 };
 
-static GFXDECODE_START( gstriker )
+static GFXDECODE_START( gfx_gstriker )
 	GFXDECODE_ENTRY( "gfx1", 0, gs_8x8x4_layout,     0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,   0, 256 )
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gstriker_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstriker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gstriker)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

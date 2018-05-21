@@ -616,24 +616,24 @@ static const gfx_layout layout16x16 =
 	128*8
 };
 
-static GFXDECODE_START( nova2001 )
+static GFXDECODE_START( gfx_nova2001 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16,    0x000, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout8x8_part, 0x000, 16 )    // fg tiles (using only 1/4th of the ROM space)
 	GFXDECODE_ENTRY( "gfx1", 0x4000, layout8x8_part, 0x100, 16 )    // bg tiles (using only 1/4th of the ROM space)
 GFXDECODE_END
 
-static GFXDECODE_START( ninjakun )
+static GFXDECODE_START( gfx_ninjakun )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x200, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x000, 16 )    // fg tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
-static GFXDECODE_START( pkunwar )
+static GFXDECODE_START( gfx_pkunwar )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x000, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
-static GFXDECODE_START( raiders5 )
+static GFXDECODE_START( gfx_raiders5 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,    0x200, 16 ) // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part, 0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,      0x100, 16 ) // bg tiles
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_nova2001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nova2001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nova2001)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -708,7 +708,7 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_ninjakun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakun)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_pkunwar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkunwar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkunwar)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -787,7 +787,7 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_raiders5)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiders5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiders5)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 

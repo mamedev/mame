@@ -157,7 +157,7 @@ static const gfx_layout v6809_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( v6809 )
+static GFXDECODE_START( gfx_v6809 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

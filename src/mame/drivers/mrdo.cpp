@@ -164,7 +164,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( mrdo )
+static GFXDECODE_START( gfx_mrdo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )    /* colors 0-255 directly mapped */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 4*64, 16 )
@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrdo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrdo)
 	MCFG_PALETTE_ADD("palette", 64*4+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)

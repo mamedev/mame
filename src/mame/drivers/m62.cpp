@@ -883,51 +883,51 @@ static const gfx_layout spritelayout =
 
 /* standard decodes */
 
-static GFXDECODE_START( m62_sprites )
+static GFXDECODE_START( gfx_m62_sprites )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_tiles )
+static GFXDECODE_START( gfx_m62_tiles )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_charlayout,       0, 32 )
 GFXDECODE_END
 
 /* per game modified decodes */
 
-static GFXDECODE_START( m62_tiles_lotlot )
+static GFXDECODE_START( gfx_m62_tiles_lotlot )
 	GFXDECODE_ENTRY( "gfx1", 0, lotlot_charlayout,    0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_tiles_spelunk2 )
+static GFXDECODE_START( gfx_m62_tiles_spelunk2 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_charlayout,         0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_tiles_youjyudn )
+static GFXDECODE_START( gfx_m62_tiles_youjyudn )
 	GFXDECODE_ENTRY( "gfx1", 0, youjyudn_tilelayout,  0, 32 )
 GFXDECODE_END
 
 /* Games with FG layers */
 
-static GFXDECODE_START( m62_fg_battroad )
+static GFXDECODE_START( gfx_m62_fg_battroad )
 	GFXDECODE_ENTRY( "gfx3", 0, battroad_charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_fg_lotlot )
+static GFXDECODE_START( gfx_m62_fg_lotlot )
 	GFXDECODE_ENTRY( "gfx3", 0, lotlot_charlayout,  0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_fg_kidniki )
+static GFXDECODE_START( gfx_m62_fg_kidniki )
 	GFXDECODE_ENTRY( "gfx3", 0, kidniki_charlayout,   0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_fg_spelunkr )
+static GFXDECODE_START( gfx_m62_fg_spelunkr )
 	GFXDECODE_ENTRY( "gfx3", 0, spelunk2_charlayout,  0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_fg_spelunk2 )
+static GFXDECODE_START( gfx_m62_fg_spelunk2 )
 	GFXDECODE_ENTRY( "gfx3", 0, spelunk2_charlayout,  0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( m62_fg_youjyudn )
+static GFXDECODE_START( gfx_m62_fg_youjyudn )
 	GFXDECODE_ENTRY( "gfx3", 0, kidniki_charlayout, 128, 16 )
 GFXDECODE_END
 
@@ -982,8 +982,8 @@ MACHINE_CONFIG_START(m62_state::ldrun)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
 
-	MCFG_GFXDECODE_ADD("spr_decode", "spr_palette", m62_sprites)
-	MCFG_GFXDECODE_ADD("chr_decode", "chr_palette", m62_tiles)
+	MCFG_DEVICE_ADD("spr_decode", GFXDECODE, "spr_palette", gfx_m62_sprites)
+	MCFG_DEVICE_ADD("chr_decode", GFXDECODE, "chr_palette", gfx_m62_tiles)
 
 	MCFG_PALETTE_ADD("chr_palette", 256)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62_chr)
@@ -1032,7 +1032,7 @@ MACHINE_CONFIG_START(m62_state::battroad)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_battroad)
 
-	MCFG_GFXDECODE_ADD("fg_decode", "fg_palette", m62_fg_battroad)
+	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "fg_palette", gfx_m62_fg_battroad)
 
 	MCFG_PALETTE_ADD("fg_palette", 32)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62_battroad_fg)
@@ -1094,8 +1094,8 @@ MACHINE_CONFIG_START(m62_state::lotlot)
 
 	/* video hardware */
 
-	MCFG_GFXDECODE_ADD("fg_decode", "fg_palette", m62_fg_lotlot)
-	MCFG_GFXDECODE_MODIFY("chr_decode", m62_tiles_lotlot)
+	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "fg_palette", gfx_m62_fg_lotlot)
+	MCFG_GFXDECODE_MODIFY("chr_decode", gfx_m62_tiles_lotlot)
 
 	MCFG_PALETTE_ADD("fg_palette", 256)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62_lotlot_fg)
@@ -1116,7 +1116,7 @@ MACHINE_CONFIG_START(m62_state::kidniki)
 	MCFG_DEVICE_IO_MAP(kidniki_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("fg_decode", "chr_palette", m62_fg_kidniki)
+	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_kidniki)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kidniki)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1132,7 +1132,7 @@ MACHINE_CONFIG_START(m62_state::spelunkr)
 	MCFG_DEVICE_PROGRAM_MAP(spelunkr_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("fg_decode", "chr_palette", m62_fg_spelunkr)
+	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_spelunkr)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunkr)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1149,8 +1149,8 @@ MACHINE_CONFIG_START(m62_state::spelunk2)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("chr_decode", m62_tiles_spelunk2)
-	MCFG_GFXDECODE_ADD("fg_decode", "chr_palette", m62_fg_spelunk2)
+	MCFG_GFXDECODE_MODIFY("chr_decode", gfx_m62_tiles_spelunk2)
+	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_spelunk2)
 
 	MCFG_PALETTE_MODIFY("chr_palette")
 	MCFG_PALETTE_ENTRIES(512)
@@ -1176,8 +1176,8 @@ MACHINE_CONFIG_START(m62_state::youjyudn)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_youjyudn)
 
-	MCFG_GFXDECODE_MODIFY("chr_decode", m62_tiles_youjyudn)
-	MCFG_GFXDECODE_ADD("fg_decode", "chr_palette", m62_fg_youjyudn)
+	MCFG_GFXDECODE_MODIFY("chr_decode", gfx_m62_tiles_youjyudn)
+	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_youjyudn)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,youjyudn)
 MACHINE_CONFIG_END

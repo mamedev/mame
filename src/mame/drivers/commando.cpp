@@ -215,7 +215,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( commando )
+static GFXDECODE_START( gfx_commando )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   192, 16 ) // colors 192-255
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 16 ) // colors   0-127
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 128,  4 ) // colors 128-191
@@ -275,7 +275,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, commando_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_commando)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)

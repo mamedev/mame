@@ -406,7 +406,7 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( supercrd )  /* Adressing the first half of the palette */
+static GFXDECODE_START( gfx_supercrd )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supercrd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supercrd)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(supercrd_state, supercrd)

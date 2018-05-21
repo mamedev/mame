@@ -2057,3 +2057,4 @@ COMP( 1988, c64c_es,  c64,    0,      pal_c,   c64sw, c64c_state,  empty_init, "
 COMP( 1986, c64c_se,  c64,    0,      pal_c,   c64sw, c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",          MACHINE_SUPPORTS_SAVE )
 COMP( 1986, c64g,     c64,    0,      pal_c,   c64,   c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64G (PAL)",                     MACHINE_SUPPORTS_SAVE )
 CONS( 1990, c64gs,    c64,    0,      pal_gs,  c64gs, c64gs_state, empty_init, "Commodore Business Machines", "Commodore 64 Games System (PAL)",         MACHINE_SUPPORTS_SAVE )
+

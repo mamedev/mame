@@ -42,7 +42,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 			break;
 		case 6: /* 6502 sound cpu */
 			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+offset);
@@ -193,7 +193,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( stadhero )
+static GFXDECODE_START( gfx_stadhero )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_3bpp,    512, 16 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 256, 16 ) /* Sprites 16x16 */
@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	MCFG_SCREEN_UPDATE_DRIVER(stadhero_state, screen_update_stadhero)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stadhero)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stadhero)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

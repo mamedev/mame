@@ -53,8 +53,8 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	/*
 	if (~m_cpu_control & 0x08)
 	{
-	    m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	    m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	*/
 
@@ -88,8 +88,8 @@ INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 	/* See note in battlane_cpu_command_w */
 	if (~m_cpu_control & 0x08)
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -246,7 +246,7 @@ static const gfx_layout tilelayout2 =
 };
 
 
-static GFXDECODE_START( battlane )
+static GFXDECODE_START( gfx_battlane )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 2 )   /* colors 0x00-0x0f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   32, 4 )   /* colors 0x20-0x3f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,  32, 4 )   /* colors 0x20-0x3f */
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(battlane_state::battlane)
 	MCFG_SCREEN_UPDATE_DRIVER(battlane_state, screen_update_battlane)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlane)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlane)
 	MCFG_PALETTE_ADD("palette", 64)
 
 

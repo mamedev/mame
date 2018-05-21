@@ -254,7 +254,7 @@ static const gfx_layout tiles16x16_layout =
 	16*64
 };
 
-static GFXDECODE_START( ashnojoe )
+static GFXDECODE_START( gfx_ashnojoe )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 0x100 )
@@ -285,7 +285,7 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 	else
 	{
 		m_msm->data_w(m_adpcm_byte & 0xf);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	m_msm5205_vclk_toggle ^= 1;
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	MCFG_SCREEN_UPDATE_DRIVER(ashnojoe_state, screen_update_ashnojoe)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ashnojoe)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ashnojoe)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

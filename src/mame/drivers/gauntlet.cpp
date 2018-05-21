@@ -474,7 +474,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( gauntlet )
+static GFXDECODE_START( gfx_gauntlet )
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout,      0, 64 )
 GFXDECODE_END
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gauntlet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gauntlet)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)

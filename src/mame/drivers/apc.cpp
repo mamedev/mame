@@ -784,7 +784,7 @@ static const gfx_layout charset_pcg =
 };
 #endif
 
-static GFXDECODE_START( apc )
+static GFXDECODE_START( gfx_apc )
 	GFXDECODE_ENTRY( "gfx", 0x0000, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x0800, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, charset_8x16, 0, 128 )
@@ -976,7 +976,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apc)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)

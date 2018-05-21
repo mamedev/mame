@@ -26,7 +26,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/wd_fdc.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"

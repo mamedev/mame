@@ -488,7 +488,7 @@ static const gfx_layout sp2_layout =
 #undef O2
 
 
-static GFXDECODE_START( lastbank )
+static GFXDECODE_START( gfx_lastbank )
 	GFXDECODE_ENTRY( "gfx1",        0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1",        0, sp2_layout, 0, 16 )
 GFXDECODE_END
@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lastbank_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastbank )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)

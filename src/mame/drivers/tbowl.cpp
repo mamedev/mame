@@ -96,7 +96,7 @@ void tbowl_state::_6206B_map(address_map &map)
 WRITE8_MEMBER(tbowl_state::trigger_nmi)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tbowl_state::_6206C_map(address_map &map)
@@ -390,7 +390,7 @@ static const gfx_layout sprite8layout =
 	8*32    /* offset to next tile */
 };
 
-static GFXDECODE_START( tbowl )
+static GFXDECODE_START( gfx_tbowl )
 	GFXDECODE_ENTRY( "characters", 0, charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 768, 16 )
 	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 512, 16 )
@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tbowl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tbowl)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

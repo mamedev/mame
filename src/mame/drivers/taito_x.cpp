@@ -788,11 +788,11 @@ static const gfx_layout ballbros_tilelayout =
 	32*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( superman )
+static GFXDECODE_START( gfx_superman )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,    0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( ballbros )
+static GFXDECODE_START( gfx_ballbros )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, ballbros_tilelayout,    0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
@@ -855,7 +855,7 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(taitox_state::daisenpu)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(taitox_state::gigandes)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -997,7 +997,7 @@ MACHINE_CONFIG_START(taitox_state::ballbros)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ballbros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ballbros)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

@@ -14,11 +14,10 @@
     - Source organization is a big mess. Each machine family could be in its own
       sub driverclass, and separate files.
     - verify cpu speed and rom labels where unknown
-    - improve SC12 CPU divider? it seems a little bit slower than the real machine.
+    - improve SC12/AS12 CPU divider? it seems a little bit slower than the real machine.
       Currently, a dummy timer workaround is needed, or it's much worse.
       Is the problem here is due to timing of CPU addressbus changes? We can only 'sense'
       the addressbus at read or write accesses.
-    - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
 	- PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
@@ -451,6 +450,7 @@ I/O is via TTL, very similar to Designer Display
 #include "speaker.h"
 
 // internal artwork
+#include "fidel_as12.lh" // clickable
 #include "fidel_chesster.lh" // clickable
 #include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
 #include "fidel_des.lh" // clickable
@@ -473,11 +473,13 @@ public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
+		m_rombank(*this, "rombank"),
 		m_sc12_map(*this, "sc12_map")
 	{ }
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
+	optional_memory_bank m_rombank;
 	optional_device<address_map_bank_device> m_sc12_map;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
@@ -516,6 +518,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eas_ppi_porta_w);
 	DECLARE_READ8_MEMBER(eas_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(eas_ppi_portc_w);
+	void init_eag();
 	void eas_map(address_map &map);
 	void eag_map(address_map &map);
 	void pc_map(address_map &map);
@@ -549,6 +552,14 @@ public:
 	void sc12_trampoline(address_map &map);
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
+
+	// AS12
+	void as12_prepare_display();
+	DECLARE_WRITE8_MEMBER(as12_control_w);
+	DECLARE_WRITE8_MEMBER(as12_led_w);
+	DECLARE_READ8_MEMBER(as12_input_r);
+	void as12_map(address_map &map);
+	void as12(machine_config &config);
 
 	// Excellence
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
@@ -766,6 +777,11 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 	return read_inputs(9) ^ 0xff;
 }
 
+void fidel6502_state::init_eag()
+{
+	m_rombank->configure_entries(0, 4, memregion("rombank")->base(), 0x2000);
+}
+
 
 // 8255 PPI (PC: done with TTL instead)
 
@@ -797,7 +813,9 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 	// d5: lower TSI volume
 	m_speech->set_output_gain(0, (data & 0x20) ? 0.5 : 1.0);
 
-	// d6,d7: N/C?
+	// d6,d7: bookrom bankswitch (model EAG)
+	if (m_rombank != nullptr)
+		m_rombank->set_entry(data >> 6 & 3);
 }
 
 READ8_MEMBER(fidel6502_state::eas_ppi_portb_r)
@@ -906,7 +924,9 @@ WRITE8_MEMBER(fidel6502_state::sc12_trampoline_w)
 
 READ8_MEMBER(fidel6502_state::sc12_trampoline_r)
 {
-	sc12_set_cpu_freq(offset);
+	if (!machine().side_effects_disabled())
+		sc12_set_cpu_freq(offset);
+
 	return m_sc12_map->read8(space, offset);
 }
 
@@ -931,6 +951,49 @@ READ8_MEMBER(fidel6502_state::sc12_input_r)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+}
+
+
+
+/******************************************************************************
+    AS12
+******************************************************************************/
+
+// TTL/generic
+
+void fidel6502_state::as12_prepare_display()
+{
+	// 8*8(+1) chessboard leds
+	display_matrix(8, 9, m_led_data, m_inp_mux);
+}
+
+WRITE8_MEMBER(fidel6502_state::as12_control_w)
+{
+	// d0-d3: 74245 P0-P3
+	// 74245 Q0-Q8: input mux, led select
+	u16 sel = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux = bitswap<9>(sel,5,8,7,6,4,3,1,0,2);
+	as12_prepare_display();
+
+	// 74245 Q9: speaker out
+	m_dac->write(BIT(sel, 9));
+
+	// d4,d5: printer?
+	// d6,d7: N/C?
+}
+
+WRITE8_MEMBER(fidel6502_state::as12_led_w)
+{
+	// a0-a2,d0: led data via NE591N
+	m_led_data = (data & 1) << offset;
+	as12_prepare_display();
+}
+
+READ8_MEMBER(fidel6502_state::as12_input_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	u8 inp = bitswap<8>(read_inputs(9),4,3,2,1,0,5,6,7);
+	return (inp >> offset & 1) ? 0 : 0x80;
 }
 
 
@@ -1054,7 +1117,7 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
 
 	// 74259 Q2: book rom A14
-	membank("bank1")->set_entry(~m_led_select >> 2 & 1);
+	m_rombank->set_entry(~m_led_select >> 2 & 1);
 
 	// 74259 Q3: lcd common, update on rising edge
 	if (~q3_old & m_led_select & 8)
@@ -1087,7 +1150,7 @@ READ8_MEMBER(fidel6502_state::fdesdis_input_r)
 
 void fidel6502_state::init_fdesdis()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
+	m_rombank->configure_entries(0, 2, memregion("rombank")->base(), 0x4000);
 }
 
 
@@ -1101,12 +1164,12 @@ void fidel6502_state::init_fdesdis()
 MACHINE_RESET_MEMBER(fidel6502_state, fphantom)
 {
 	fidelbase_state::machine_reset();
-	membank("bank1")->set_entry(0);
+	m_rombank->set_entry(0);
 }
 
 void fidel6502_state::init_fphantom()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
+	m_rombank->configure_entries(0, 2, memregion("rombank")->base(), 0x4000);
 }
 
 
@@ -1134,7 +1197,7 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 	// 74259 Q2,Q3: speechrom A14,A15
 	// a0-a2,d0: 74259(2) where Q3 is speechrom A16, other outputs unconnected
 	m_speech_bank = (m_speech_bank & ~mask) | ((data & 1) ? mask : 0);
-	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
+	m_rombank->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
 }
 
 WRITE8_MEMBER(fidel6502_state::kishon_control_w)
@@ -1143,12 +1206,12 @@ WRITE8_MEMBER(fidel6502_state::kishon_control_w)
 
 	// 2 more bankswitch bits: 74259(2) Q2 to A17, Q0 to A18
 	u8 bank = (m_led_select >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
-	membank("bank1")->set_entry(bank);
+	m_rombank->set_entry(bank);
 }
 
 void fidel6502_state::init_chesster()
 {
-	membank("bank1")->configure_entries(0, memregion("user1")->bytes() / 0x4000, memregion("user1")->base(), 0x4000);
+	m_rombank->configure_entries(0, memregion("rombank")->bytes() / 0x4000, memregion("rombank")->base(), 0x4000);
 }
 
 
@@ -1214,7 +1277,9 @@ void fidel6502_state::eag_map(address_map &map)
 	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
 	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
 	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
-	map(0x8000, 0xffff).rom(); //.nopw()
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).bankr("rombank");
+	map(0xc000, 0xffff).rom();
 }
 
 void fidel6502_state::pc_map(address_map &map)
@@ -1253,7 +1318,7 @@ void fidel6502_state::sc9d_map(address_map &map)
 }
 
 
-// SC12
+// SC12, AS12
 
 void fidel6502_state::sc12_trampoline(address_map &map)
 {
@@ -1270,6 +1335,18 @@ void fidel6502_state::sc12_map(address_map &map)
 	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc12_input_r));
 	map(0xc000, 0xcfff).mirror(0x1000).rom();
 	map(0xe000, 0xffff).rom();
+}
+
+void fidel6502_state::as12_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();
+	map(0x1800, 0x1807).w(this, FUNC(fidel6502_state::as12_led_w)).nopr();
+	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::as12_control_w));
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::as12_input_r));
+	map(0xc000, 0xffff).rom();
 }
 
 
@@ -1304,7 +1381,7 @@ void fidel6502_state::fdesdis_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::fdesdis_control_w));
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x6000, 0x6007).mirror(0x1ff8).w(this, FUNC(fidel6502_state::fdesdis_lcd_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -1312,7 +1389,7 @@ void fidel6502_state::fdesdis_map(address_map &map)
 void fidel6502_state::fphantom_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1320,7 +1397,7 @@ void fidel6502_state::chesster_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::write));
 	map(0x8000, 0xffff).rom();
 }
@@ -1576,6 +1653,17 @@ static INPUT_PORTS_START( sc12b )
 	PORT_INCLUDE( sc12 )
 
 	PORT_MODIFY("IN.9") // hardwired, modify default to /4
+	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "Disabled" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( as12 )
+	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( sc12_sidepanel )
+
+	PORT_START("IN.9") // hardwired, default to /4
 	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
 	PORT_CONFSETTING(    0x00, "Disabled" )
 	PORT_CONFSETTING(    0x02, "2" )
@@ -1935,6 +2023,23 @@ MACHINE_CONFIG_START(fidel6502_state::sc12b)
 
 	MCFG_DEVICE_REMOVE("dummy_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(fidel6502_state::as12)
+	sc12b(config);
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("sc12_map")
+	MCFG_DEVICE_PROGRAM_MAP(as12_map)
+
+	// change irq timer frequency
+	MCFG_DEVICE_REMOVE("irq_on")
+	MCFG_DEVICE_REMOVE("irq_off")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(585)) // from 556 timer (22nF, 110K, 1K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(585) - attotime::from_nsec(15250)) // active for 15.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(585))
+
+	MCFG_DEFAULT_LAYOUT(layout_fidel_as12)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcel)
@@ -2444,9 +2549,11 @@ ROM_END
 
 ROM_START( feag2100 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
-	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
+	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+
+	ROM_REGION( 0x8000, "rombank", 0 )
+	ROM_LOAD("el2100.1",  0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-32107", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
@@ -2455,9 +2562,11 @@ ROM_END
 
 ROM_START( feag2100sp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
-	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
+	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+
+	ROM_REGION( 0x8000, "rombank", 0 )
+	ROM_LOAD("el2100.1",  0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
@@ -2465,9 +2574,11 @@ ROM_END
 
 ROM_START( feag2100g )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
-	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
+	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+
+	ROM_REGION( 0x8000, "rombank", 0 )
+	ROM_LOAD("el2100.1",  0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
@@ -2475,9 +2586,11 @@ ROM_END
 
 ROM_START( feag2100fr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
-	ROM_LOAD("el2100.2", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
-	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
+	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+
+	ROM_REGION( 0x8000, "rombank", 0 )
+	ROM_LOAD("el2100.1",  0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
@@ -2521,6 +2634,14 @@ ROM_START( fscc12b ) // model 6086, PCB label 510-1084B01
 	ROM_LOAD("101-1068a01.ic15", 0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
 	ROM_LOAD("orange.ic13",      0xc000, 0x1000, CRC(45070a71) SHA1(8aeecff828f26fb7081902c757559903be272649) ) // TI TMS2732AJL-45, no label, orange sticker
 	ROM_LOAD("red.ic14",         0xe000, 0x2000, CRC(183d3edc) SHA1(3296a4c3bce5209587d4a1694fce153558544e63) ) // Toshiba TMM2764D-2, no label, red sticker
+ROM_END
+
+
+ROM_START( feleg ) // model AS12(or 6085), PCB label 510-1084B01
+	ROM_REGION( 0x10000, "sc12_map", 0 )
+	ROM_LOAD("feleg.1", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
+	ROM_LOAD("feleg.2", 0xc000, 0x2000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "
+	ROM_LOAD("feleg.3", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
 ROM_END
 
 
@@ -2588,7 +2709,7 @@ ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01. The 'rev B' dump ca
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // WSI 27C256L-12
 
-	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_REGION( 0x8000, "rombank", 0 )
 	ROM_LOAD("bk3_white.ic10", 0x0000, 0x8000, CRC(3857cc35) SHA1(f073dafb9fd885c7ddb7fbff10e3653f343ef1c6) ) // WSI 27C256L-12
 ROM_END
 
@@ -2596,7 +2717,7 @@ ROM_START( fdes2000d ) // model 6105, PCB label 510.1130A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("27c256.ic9", 0x8000, 0x8000, CRC(b136d1a1) SHA1(8438790a62f45284ff33a0255c5c89f526726d3e) ) // 27C256, no label
 
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF ) // no rom in ic10
+	ROM_REGION( 0x8000, "rombank", ROMREGION_ERASEFF ) // no rom in ic10
 ROM_END
 
 
@@ -2604,7 +2725,7 @@ ROM_START( fphantom ) // model 6100, PCB label 510.1128A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("u_3c_yellow.u3", 0x8000, 0x8000, CRC(fb7c38ae) SHA1(a1aa7637705052cb4eec92644dc79aee7ba4d77c) ) // 27C256
 
-	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_REGION( 0x8000, "rombank", 0 )
 	ROM_LOAD("u_4_white.u4",  0x0000, 0x8000, CRC(e4181ba2) SHA1(1f77d1867c6f566be98645fc252a01108f412c96) ) // 27C256
 ROM_END
 
@@ -2613,7 +2734,7 @@ ROM_START( chesster ) // model 6120, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("ch_1.3.ic9", 0x8000, 0x8000, CRC(8b42d1ad) SHA1(2161fc5ab2476fe7ca4ffc226e3cb329b8a57a01) ) // 27256, CH 1.3 on sticker
 
-	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_REGION( 0x20000, "rombank", 0 )
 	ROM_LOAD("101-1091b02.ic10", 0x0000, 0x20000, CRC(fa370e88) SHA1(a937c8f1ec295cf9539d12466993974e40771493) ) // AMI, 27C010 or equivalent
 ROM_END
 
@@ -2621,7 +2742,7 @@ ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("chesster.ic9", 0x8000, 0x8000, CRC(29f9a698) SHA1(4c83ca46fd5fc9c40302e9c7f16b4ae2c18b06e6) ) // M27C256B, sticker but no label
 
-	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_REGION( 0x20000, "rombank", 0 )
 	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
 ROM_END
 
@@ -2629,7 +2750,7 @@ ROM_START( kishon ) // model 6120G or 6127(same), PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("kishon.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256
 
-	ROM_REGION( 0x80000, "user1", 0 )
+	ROM_REGION( 0x80000, "rombank", 0 )
 	ROM_LOAD("kishon_v2.6_1-14-91.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, aka 101-1094A01
 ROM_END
 
@@ -2670,10 +2791,10 @@ CONS( 1983, fpresbusp,  fpres,    0, pc,        eassp,     fidel6502_state, empt
 CONS( 1983, fpresbug,   fpres,    0, pc,        easg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, fpresbufr,  fpres,    0, pc,        easfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100fr, feag2100, 0, eag,       eagfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, init_eag,      "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, init_eag,      "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, init_eag,      "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100fr, feag2100, 0, eag,       eagfr,     fidel6502_state, init_eag,      "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1982, fscc9,      0,        0, sc9d,      sc9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
 CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
@@ -2682,6 +2803,8 @@ CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, empt
 
 CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12b,     fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+
+CONS( 1985, feleg,      0,        0, as12,      as12,      fidel6502_state, empty_init,    "Fidelity Electronics", "Elegance Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 
 CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, empty_init,    "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

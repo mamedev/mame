@@ -35,8 +35,7 @@ enum line_state
 {
 	CLEAR_LINE = 0,             // clear (a fired or held) line
 	ASSERT_LINE,                // assert an interrupt immediately
-	HOLD_LINE,                  // hold interrupt line until acknowledged
-	PULSE_LINE                  // pulse interrupt line instantaneously (only for NMI, RESET)
+	HOLD_LINE                   // hold interrupt line until acknowledged
 };
 
 
@@ -136,7 +135,8 @@ public:
 	attotime cycles_to_attotime(u64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
 	u64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 	u32 input_lines() const { return execute_input_lines(); }
-	u32 default_irq_vector() const { return execute_default_irq_vector(); }
+	u32 default_irq_vector(int linenum) const { return execute_default_irq_vector(linenum); }
+	bool input_edge_triggered(int linenum) const { return execute_input_edge_triggered(linenum); }
 
 	// inline configuration helpers
 	void set_disable() { m_disabled = true; }
@@ -203,7 +203,8 @@ protected:
 
 	// input line information getters
 	virtual u32 execute_input_lines() const;
-	virtual u32 execute_default_irq_vector() const;
+	virtual u32 execute_default_irq_vector(int linenum) const;
+	virtual bool execute_input_edge_triggered(int linenum) const;
 
 	// optional operation overrides
 	virtual void execute_run() = 0;

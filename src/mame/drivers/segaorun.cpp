@@ -830,7 +830,7 @@ void segaorun_state::update_main_irqs()
 
 WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
 {
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -1134,7 +1134,7 @@ INPUT_PORTS_END
 //  GRAPHICS DEFINITIONS
 //**************************************************************************
 
-static GFXDECODE_START( segaorun )
+static GFXDECODE_START( gfx_segaorun )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -1175,7 +1175,7 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segaorun)
 	MCFG_PALETTE_ADD("palette", 4096*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

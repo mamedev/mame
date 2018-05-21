@@ -237,7 +237,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( srumbler )
+static GFXDECODE_START( gfx_srumbler )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   448, 16 ) /* colors 448 - 511 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   128,  8 ) /* colors 128 - 255 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 256,  8 ) /* colors 256 - 383 */
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(srumbler_state::srumbler)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srumbler)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srumbler)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)

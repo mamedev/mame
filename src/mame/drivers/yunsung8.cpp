@@ -293,7 +293,7 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8/4
 };
 
-static GFXDECODE_START( yunsung8 )
+static GFXDECODE_START( gfx_yunsung8 )
 	GFXDECODE_ENTRY( "bgfx", 0, layout_8x8x8, 0, 0x08 ) // [0] Tiles (Background)
 	GFXDECODE_ENTRY( "text", 0, layout_8x8x4, 0,    0x40 ) // [1] Tiles (Text)
 GFXDECODE_END
@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsung8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsung8)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 

@@ -129,7 +129,7 @@ void bw12_state::ls259_w(int address, int data)
 		break;
 
 	case 4: /* CAP LOCK */
-		output().set_led_value(0, data);
+		m_led = data ? 1 : 0;
 		break;
 
 	case 5: /* MOTOR 0 */
@@ -479,6 +479,8 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 void bw12_state::machine_start()
 {
+	m_led.resolve();
+
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());
@@ -541,7 +543,7 @@ static const gfx_layout bw12_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( bw12 )
+static GFXDECODE_START( gfx_bw12 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bw12_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -561,7 +563,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bw12)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bw12)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(16'000'000)/8)

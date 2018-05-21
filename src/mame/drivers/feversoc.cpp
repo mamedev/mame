@@ -228,7 +228,7 @@ static const gfx_layout spi_spritelayout =
 };
 
 
-static GFXDECODE_START( feversoc )
+static GFXDECODE_START( gfx_feversoc )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_spritelayout,   0, 0x40 )
 GFXDECODE_END
 
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, feversoc_state, feversoc_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", feversoc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_feversoc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

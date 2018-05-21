@@ -325,7 +325,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( rampart )
+static GFXDECODE_START( gfx_rampart )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
 GFXDECODE_END
 
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rampart)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)

@@ -1856,7 +1856,7 @@ static const gfx_layout mz2500_16_layout =
 };
 
 /* these are just for viewer sake, actually they aren't used in drawing routines */
-static GFXDECODE_START( mz2500 )
+static GFXDECODE_START( gfx_mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
@@ -1936,7 +1936,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 	{
 		mz2500_reset(this, WRAM_RESET);
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	/* bit 2 is speaker */
@@ -2136,7 +2136,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2500)
 
 
 	SPEAKER(config, "mono").front_center();

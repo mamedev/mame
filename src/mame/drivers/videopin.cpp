@@ -81,6 +81,7 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 void videopin_state::machine_start()
 {
+	m_led.resolve();
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
 
 	save_item(NAME(m_time_pushed));
@@ -156,7 +157,7 @@ WRITE8_MEMBER(videopin_state::led_w)
 	output().set_value(matrix[i][3], (data >> 3) & 1);
 
 	if (i == 7)
-		output().set_led_value(0, data & 8);   /* start button */
+		m_led = BIT(data, 3);   /* start button */
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -346,7 +347,7 @@ static const gfx_layout ball_layout =
 };
 
 
-static GFXDECODE_START( videopin )
+static GFXDECODE_START( gfx_videopin )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, ball_layout, 0, 1 )
 GFXDECODE_END
@@ -375,7 +376,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	MCFG_SCREEN_UPDATE_DRIVER(videopin_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopin)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

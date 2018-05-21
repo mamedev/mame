@@ -628,7 +628,7 @@ static const gfx_layout bios_charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( playch10 )
+static GFXDECODE_START( gfx_playch10 )
 	GFXDECODE_ENTRY( "gfx1", 0, bios_charlayout,   0,  32 )
 GFXDECODE_END
 
@@ -638,9 +638,9 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 	{
 		/* LS161A, Sheet 1 - bottom left of Z80 */
 		if (!m_pc10_dog_di && !m_pc10_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		else if (m_pc10_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -669,7 +669,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
 	MCFG_DEFAULT_LAYOUT(layout_playch10)

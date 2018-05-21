@@ -670,7 +670,7 @@ static const gfx_layout avigo_6_by_8 =
 	16*16                   /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( avigo )
+static GFXDECODE_START( gfx_avigo )
 	GFXDECODE_ENTRY( "flash0", 0x08992, avigo_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "flash0", 0x0c020, avigo_8_by_14, 0, 1 )
 	GFXDECODE_ENTRY( "flash0", 0x0c020, avigo_16_by_15, 0, 1 )
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 
 	MCFG_DEFAULT_LAYOUT(layout_avigo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", avigo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_avigo)
 	MCFG_PALETTE_ADD("palette", AVIGO_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(avigo_state, avigo)
 

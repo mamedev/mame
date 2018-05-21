@@ -117,7 +117,7 @@ image_init_result apexc_cylinder_image_device::call_load()
 	fread( machine().root_device().memshare("maincpu")->ptr(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
-		uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
+		uint32_t *RAM = (uint32_t *)(machine().root_device().memshare("maincpu")->ptr());
 
 		for (int i=0; i < 0x0400; i++)
 			RAM[i] = big_endianize_int32(RAM[i]);
@@ -138,14 +138,14 @@ void apexc_cylinder_image_device::call_unload()
 		fseek(0, SEEK_SET);
 #ifdef LSB_FIRST
 		{   /* fix endianness */
-			uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
+			uint32_t *RAM = (uint32_t *)(machine().root_device().memshare("maincpu")->ptr());
 
 			for (int i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = big_endianize_int32(RAM[i]);
 		}
 #endif
 		/* write */
-		fwrite(machine().root_device().memregion("maincpu")->base(), /*0x8000*/0x1000);
+		fwrite(machine().root_device().memshare("maincpu")->ptr(), /*0x8000*/0x1000);
 	}
 }
 
@@ -837,7 +837,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( apexc )
+static GFXDECODE_START( gfx_apexc )
 	GFXDECODE_ENTRY( "chargen", 0, fontlayout, 0, 2 )
 GFXDECODE_END
 
@@ -870,7 +870,7 @@ MACHINE_CONFIG_START(apexc_state::apexc)
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apexc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apexc)
 	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
 

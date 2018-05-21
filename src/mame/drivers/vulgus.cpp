@@ -207,7 +207,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( vulgus )
+static GFXDECODE_START( gfx_vulgus )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  64*4+16*16, 32*4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,      64*4, 16 )
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(vulgus_state::vulgus)
 	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vulgus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vulgus)
 
 	MCFG_PALETTE_ADD("palette", 64*4+16*16+4*32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)

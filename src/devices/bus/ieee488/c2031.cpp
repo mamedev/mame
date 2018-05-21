@@ -261,7 +261,7 @@ WRITE8_MEMBER( c2031_device::via1_pb_w )
 	m_ga->stp_w(data & 0x03);
 
 	// activity LED
-	machine().output().set_led_value(LED_ACT, BIT(data, 3));
+	m_led[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -398,6 +398,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 	, m_ga(*this, C64H156_TAG)
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
 	, m_address(*this, "ADDRESS")
+	, m_led(*this, "led%u", 0U)
 	, m_nrfd_out(1)
 	, m_ndac_out(1)
 	, m_atna(1)
@@ -414,6 +415,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 
 void c2031_device::device_start()
 {
+	m_led.resolve();
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 

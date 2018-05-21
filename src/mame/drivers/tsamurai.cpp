@@ -82,7 +82,7 @@ WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
 WRITE_LINE_MEMBER(tsamurai_state::vblank_irq)
 {
 	if (state && m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(tsamurai_state::tsamurai_unknown_d803_r)
@@ -311,7 +311,8 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_sound_nmi_enable_w)
 
 INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
 {
-	if (m_vsgongf_sound_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_vsgongf_sound_nmi_enabled)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* what are these, protection of some kind? */
@@ -341,7 +342,7 @@ READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
 WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tsamurai_state::vsgongf_map(address_map &map)
@@ -707,7 +708,7 @@ static const gfx_layout tile_layout =
 	8*8
 };
 
-static GFXDECODE_START( tsamurai )
+static GFXDECODE_START( gfx_tsamurai )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 0, 32 )
@@ -748,7 +749,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
@@ -796,7 +797,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
@@ -852,7 +853,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audio3", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 

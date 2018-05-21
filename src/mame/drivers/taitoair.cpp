@@ -666,7 +666,7 @@ static const gfx_layout tilelayout =
 	16*16
 };
 
-static GFXDECODE_START( airsys )
+static GFXDECODE_START( gfx_airsys )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 32*16 )
 GFXDECODE_END
 
@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airsys)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_airsys)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
 

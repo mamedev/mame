@@ -763,13 +763,13 @@ static const gfx_layout dotlayout =
 	16*8
 };
 
-static GFXDECODE_START( rallyx )
+static GFXDECODE_START( gfx_rallyx )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_spritelayout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,         64*4,  1 )
 GFXDECODE_END
 
-static GFXDECODE_START( jungler )
+static GFXDECODE_START( gfx_jungler )
 	GFXDECODE_ENTRY( "gfx1", 0, jungler_charlayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, jungler_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,          64*4,  1 )
@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, rallyx_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rallyx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallyx)
 
 	MCFG_PALETTE_ADD("palette", 64*4+4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, jungler_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jungler)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jungler)
 
 	MCFG_PALETTE_ADD("palette", 64*4+4+64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)

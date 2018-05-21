@@ -1821,20 +1821,20 @@ static const gfx_layout tiles_r =
 	16*16
 };
 
-static GFXDECODE_START( cobracom )
+static GFXDECODE_START( gfx_cobracom )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_32k, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,       64, 4 )
 	GFXDECODE_ENTRY( "gfx4", 0, tiles,      128, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,      192, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( ghostb )
+static GFXDECODE_START( gfx_ghostb )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp, 0,  4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles_r,   512, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( srdarwin )
+static GFXDECODE_START( gfx_srdarwin )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout_16k,128, 4 ) /* Only 1 used so far :/ */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sr_sprites,    64, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, srdarwin_tiles,  0, 8 )
@@ -1843,19 +1843,19 @@ static GFXDECODE_START( srdarwin )
 	GFXDECODE_ENTRY( "gfx3", 0x30000, srdarwin_tiles,  0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( gondo )
+static GFXDECODE_START( gfx_gondo )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp,  0, 16 ) /* Chars */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   256, 32 ) /* Sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,   768, 16 ) /* Tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( oscar )
+static GFXDECODE_START( gfx_oscar )
 	GFXDECODE_ENTRY( "gfx1", 0, oscar_charlayout, 256,  8 ) /* Chars */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,            0, 16 ) /* Sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,          384,  8 ) /* Tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( shackled )
+static GFXDECODE_START( gfx_shackled )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp,   0,  4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,    256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,    768, 16 )
@@ -1978,7 +1978,7 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2043,7 +2043,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2104,7 +2104,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2165,7 +2165,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2227,7 +2227,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dec8_state, ghostb_nmi_w))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ghostb)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
@@ -2285,7 +2285,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2349,7 +2349,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oscar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oscar)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2403,7 +2403,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srdarwin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srdarwin)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(144)
 
@@ -2460,7 +2460,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cobracom)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cobracom)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(256)
 

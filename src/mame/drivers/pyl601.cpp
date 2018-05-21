@@ -526,11 +526,11 @@ static const gfx_layout pyl601a_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( pyl601 )
+static GFXDECODE_START( gfx_pyl601 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( pyl601a )
+static GFXDECODE_START( gfx_pyl601a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pyl601)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pyl601)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601a)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( XTAL(2'000'000))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pyl601a)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
 
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))

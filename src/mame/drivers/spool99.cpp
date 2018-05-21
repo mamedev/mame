@@ -307,7 +307,7 @@ static const gfx_layout spool99_layout =
 	8*32
 };
 
-static GFXDECODE_START( spool99 )
+static GFXDECODE_START( gfx_spool99 )
 	GFXDECODE_ENTRY( "gfx", 0, spool99_layout,   0x00, 0x20  )
 GFXDECODE_END
 
@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_DEVICE_PROGRAM_MAP(spool99_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spool99)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spool99)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

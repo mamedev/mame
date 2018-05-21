@@ -273,7 +273,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( gunsmoke )
+static GFXDECODE_START( gfx_gunsmoke )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         32*4, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 32*4+16*16, 16 )
@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 	MCFG_SCREEN_UPDATE_DRIVER(gunsmoke_state, screen_update_gunsmoke)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunsmoke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunsmoke)
 
 	MCFG_PALETTE_ADD("palette", 32*4+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)

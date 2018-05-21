@@ -294,7 +294,7 @@ static const gfx_layout fg_layout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( dynduke )
+static GFXDECODE_START( gfx_dynduke )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0x500, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bg_layout,     0x000, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, fg_layout,     0x200, 16 )
@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dynduke_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynduke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynduke)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

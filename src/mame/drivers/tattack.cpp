@@ -367,7 +367,7 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( tattack )
+static GFXDECODE_START( gfx_tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
 GFXDECODE_END
 
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(tattack_state::tattack)
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tattack)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 

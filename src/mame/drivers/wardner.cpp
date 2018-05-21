@@ -355,7 +355,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( wardner )
+static GFXDECODE_START( gfx_wardner )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   1536, 32 )  /* colors 1536-1791 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   1280, 16 )  /* colors 1280-1535 */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,   1024, 16 )  /* colors 1024-1079 */
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, wardner_state, wardner_vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wardner)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

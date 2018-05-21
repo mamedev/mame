@@ -307,7 +307,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( arcadecl )
+static GFXDECODE_START( gfx_arcadecl )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
 GFXDECODE_END
 
@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arcadecl)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)

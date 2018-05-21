@@ -318,7 +318,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( zaccaria )
+static GFXDECODE_START( gfx_zaccaria )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*8, 32 )
 GFXDECODE_END
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaccaria_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaccaria)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaccaria)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)

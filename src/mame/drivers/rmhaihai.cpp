@@ -493,11 +493,11 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( rmhaihai )
+static GFXDECODE_START( gfx_rmhaihai )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( themj )
+static GFXDECODE_START( gfx_themj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rmhaihai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rmhaihai)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
@@ -544,7 +544,7 @@ MACHINE_CONFIG_START(rmhaisei_state::rmhaisei)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(themj_state::themj)
 	MCFG_DEVICE_REMOVE("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END

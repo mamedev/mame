@@ -67,7 +67,7 @@ static const gfx_layout glass_tilelayout16 =
 	32*8
 };
 
-static GFXDECODE_START( glass )
+static GFXDECODE_START( gfx_glass )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, glass_tilelayout16, 0, 64 )
 GFXDECODE_END
 
@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(glass_state::glass)
 	MCFG_SCREEN_UPDATE_DRIVER(glass_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", glass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glass)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

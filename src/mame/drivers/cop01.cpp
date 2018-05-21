@@ -414,7 +414,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( cop01 )
+static GFXDECODE_START( gfx_cop01 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        16,  8 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 16+8*16, 16 )
@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cop01)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cop01)
 	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cop01)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cop01)
 	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)

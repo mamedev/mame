@@ -207,7 +207,7 @@ static const gfx_layout dambustr_spritelayout =
 };
 
 
-static GFXDECODE_START( dambustr )
+static GFXDECODE_START( gfx_dambustr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_spritelayout, 0, 8 )
 GFXDECODE_END
@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	MCFG_SCREEN_UPDATE_DRIVER(dambustr_state, screen_update_dambustr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dambustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dambustr)
 	MCFG_PALETTE_ADD("palette", 32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
 	MCFG_PALETTE_INIT_OWNER(dambustr_state,dambustr)

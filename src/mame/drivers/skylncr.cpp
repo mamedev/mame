@@ -137,8 +137,8 @@
 class skylncr_state : public driver_device
 {
 public:
-	skylncr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	skylncr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_reeltiles_1_ram(*this, "reeltiles_1_ram"),
@@ -156,29 +156,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper") { }
-
-	tilemap_t *m_tmap;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_reeltiles_1_ram;
-	required_shared_ptr<uint8_t> m_reeltiles_2_ram;
-	required_shared_ptr<uint8_t> m_reeltiles_3_ram;
-	required_shared_ptr<uint8_t> m_reeltiles_4_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_1_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_2_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_3_ram;
-	required_shared_ptr<uint8_t> m_reeltileshigh_4_ram;
-	tilemap_t *m_reel_1_tilemap;
-	tilemap_t *m_reel_2_tilemap;
-	tilemap_t *m_reel_3_tilemap;
-	tilemap_t *m_reel_4_tilemap;
-	required_shared_ptr<uint8_t> m_reelscroll1;
-	required_shared_ptr<uint8_t> m_reelscroll2;
-	required_shared_ptr<uint8_t> m_reelscroll3;
-	required_shared_ptr<uint8_t> m_reelscroll4;
-	uint8_t m_nmi_enable;
-	bool m_mbutrfly_prot;
+		m_hopper(*this, "hopper"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
 	DECLARE_WRITE8_MEMBER(skylncr_colorram_w);
@@ -207,13 +187,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
-	virtual void video_start() override;
 	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<ticket_dispenser_device> m_hopper;
 	void neraidou(machine_config &config);
 	void sstar97(machine_config &config);
 	void bdream97(machine_config &config);
@@ -225,6 +200,37 @@ public:
 	void mem_map_skylncr(address_map &map);
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+
+	tilemap_t *m_tmap;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_reeltiles_1_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_2_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_3_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_4_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_1_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_2_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_3_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_4_ram;
+	tilemap_t *m_reel_1_tilemap;
+	tilemap_t *m_reel_2_tilemap;
+	tilemap_t *m_reel_3_tilemap;
+	tilemap_t *m_reel_4_tilemap;
+	required_shared_ptr<uint8_t> m_reelscroll1;
+	required_shared_ptr<uint8_t> m_reelscroll2;
+	required_shared_ptr<uint8_t> m_reelscroll3;
+	required_shared_ptr<uint8_t> m_reelscroll4;
+	uint8_t m_nmi_enable;
+	bool m_mbutrfly_prot;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_hopper;
+	output_finder<8> m_lamp;
 };
 
 
@@ -429,13 +435,13 @@ WRITE8_MEMBER(skylncr_state::skylncr_nmi_enable_w)
 
 WRITE8_MEMBER(skylncr_state::mbutrfly_prot_w)
 {
-	machine().output().set_lamp_value(1, BIT(data, 0)); // Slot Stop 2
-	machine().output().set_lamp_value(2, BIT(data, 1)); // Slot Stop 1
-	machine().output().set_lamp_value(3, BIT(data, 2)); // Take
-	machine().output().set_lamp_value(4, BIT(data, 3)); // Bet
-	machine().output().set_lamp_value(5, BIT(data, 4)); // Slot Stop 3
-	machine().output().set_lamp_value(6, BIT(data, 5)); // Start
-	machine().output().set_lamp_value(7, BIT(data, 6)); // Payout
+	m_lamp[1] = BIT(data, 0); // Slot Stop 2
+	m_lamp[2] = BIT(data, 1); // Slot Stop 1
+	m_lamp[3] = BIT(data, 2); // Take
+	m_lamp[4] = BIT(data, 3); // Bet
+	m_lamp[5] = BIT(data, 4); // Slot Stop 3
+	m_lamp[6] = BIT(data, 5); // Start
+	m_lamp[7] = BIT(data, 6); // Payout
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
@@ -719,25 +725,25 @@ static const gfx_layout layout8x32x8_bdream97 =  /* for bdream97 */
 *           Graphics Decode           *
 **************************************/
 
-static GFXDECODE_START( skylncr )
+static GFXDECODE_START( gfx_skylncr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,        0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,       0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_rot,   0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( neraidou )
+static GFXDECODE_START( gfx_neraidou )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt2,  0, 2 )
 //  GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( sstar97 )
+static GFXDECODE_START( gfx_sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( bdream97 )
+static GFXDECODE_START( gfx_bdream97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_bdream97,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0x100, 1 )
@@ -1626,7 +1632,7 @@ INPUT_PORTS_END
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
-	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -1666,7 +1672,7 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skylncr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1697,7 +1703,7 @@ MACHINE_CONFIG_START(skylncr_state::neraidou)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", neraidou)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_neraidou)
 MACHINE_CONFIG_END
 
 
@@ -1706,7 +1712,7 @@ MACHINE_CONFIG_START(skylncr_state::sstar97)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sstar97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sstar97)
 MACHINE_CONFIG_END
 
 
@@ -1717,7 +1723,7 @@ MACHINE_CONFIG_START(skylncr_state::bdream97)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bdream97)
 MACHINE_CONFIG_END
 
 

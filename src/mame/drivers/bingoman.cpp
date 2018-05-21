@@ -358,7 +358,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( bingoman )
+static GFXDECODE_START( gfx_bingoman )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(bingoman_state::bingoman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bingoman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bingoman)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(bingoman_state, bingoman)

@@ -1011,13 +1011,13 @@ static const gfx_layout spritelayout_32x32 =
 };
 
 
-static GFXDECODE_START( equites )
+static GFXDECODE_START( gfx_equites )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0x000, 0x80/4 ) // chars
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_3bpp,    0x080, 0x80/8 ) // tiles
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_16x14, 0x100, 0x80/8 ) // sprites
 GFXDECODE_END
 
-static GFXDECODE_START( splndrbt )
+static GFXDECODE_START( gfx_splndrbt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0x000, 0x100/4 ) // chars
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_2bpp,    0x100, 0x080/4 ) // tiles
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_32x32, 0x180, 0x100/8 ) // sprites
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_SCREEN_UPDATE_DRIVER(equites_state, screen_update_equites)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", equites)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_equites)
 	MCFG_PALETTE_ADD("palette", 0x180)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(equites_state,equites)
@@ -1230,7 +1230,7 @@ MACHINE_CONFIG_START(splndrbt_state::splndrbt)
 	MCFG_SCREEN_UPDATE_DRIVER(splndrbt_state, screen_update_splndrbt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splndrbt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splndrbt)
 	MCFG_PALETTE_ADD("palette", 0x280)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(splndrbt_state,splndrbt)

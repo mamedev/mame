@@ -75,7 +75,7 @@ WRITE8_MEMBER(exzisus_state::coincounter_w)
 // is it ok that cpub_reset refers to cpuc?
 WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 {
-	m_cpuc->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_cpuc->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 #if 0
@@ -221,7 +221,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( exzisus )
+static GFXDECODE_START( gfx_exzisus )
 	GFXDECODE_ENTRY( "bg0", 0, charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "bg1", 0, charlayout, 256, 256 )
 GFXDECODE_END
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exzisus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exzisus)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */

@@ -468,7 +468,7 @@ static const gfx_layout tilelayout16 =
 	32*8
 };
 
-static GFXDECODE_START( splash )
+static GFXDECODE_START( gfx_splash )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout8 ,0,128 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16,0,128 )
 GFXDECODE_END
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_SCREEN_UPDATE_DRIVER(funystrp_state, screen_update_funystrp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

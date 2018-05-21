@@ -254,7 +254,7 @@ static const gfx_layout hyperspt_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( hyperspt )
+static GFXDECODE_START( gfx_hyperspt )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperspt_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, hyperspt_charlayout,    16*16, 16 )
 GFXDECODE_END
@@ -284,7 +284,7 @@ static const gfx_layout roadf_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( roadf )
+static GFXDECODE_START( gfx_roadf )
 	GFXDECODE_ENTRY( "gfx1", 0, roadf_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,    16*16, 16 )
 GFXDECODE_END
@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperspt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hyperspt)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(hyperspt_state::roadf)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(roadf_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", roadf)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_roadf)
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 
 	MCFG_DEVICE_MODIFY("audiocpu")

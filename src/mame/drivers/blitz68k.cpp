@@ -59,35 +59,24 @@ class blitz68k_state : public driver_device
 {
 public:
 	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_frame_buffer(*this, "frame_buffer"),
-			m_blit_romaddr(*this, "blit_romaddr"),
-			m_blit_attr1_ram(*this, "blit_attr1_ram"),
-			m_blit_dst_ram_loword(*this, "blitram_loword"),
-			m_blit_attr2_ram(*this, "blit_attr2_ram"),
-			m_blit_dst_ram_hiword(*this, "blitram_hiword"),
-			m_blit_vregs(*this, "blit_vregs"),
-			m_blit_transpen(*this, "blit_transpen"),
-			m_leds0(*this, "leds0"),
-			m_leds1(*this, "leds1"),
-			m_leds2(*this, "leds2") ,
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_nvram(*this, "nvram")
+		, m_frame_buffer(*this, "frame_buffer")
+		, m_blit_romaddr(*this, "blit_romaddr")
+		, m_blit_attr1_ram(*this, "blit_attr1_ram")
+		, m_blit_dst_ram_loword(*this, "blitram_loword")
+		, m_blit_attr2_ram(*this, "blit_attr2_ram")
+		, m_blit_dst_ram_hiword(*this, "blitram_hiword")
+		, m_blit_vregs(*this, "blit_vregs")
+		, m_blit_transpen(*this, "blit_transpen")
+		, m_leds0(*this, "leds0")
+		, m_leds1(*this, "leds1")
+		, m_leds2(*this, "leds2")
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
-	optional_shared_ptr<uint16_t> m_nvram;
-	std::unique_ptr<uint8_t[]> m_blit_buffer;
-	optional_shared_ptr<uint16_t> m_frame_buffer;
-	optional_shared_ptr<uint16_t> m_blit_romaddr;
-	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
-	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
-	optional_shared_ptr<uint16_t> m_blit_attr2_ram;
-	optional_shared_ptr<uint16_t> m_blit_dst_ram_hiword;
-	optional_shared_ptr<uint16_t> m_blit_vregs;
-	optional_shared_ptr<uint16_t> m_blit_transpen;
-	optional_shared_ptr<uint16_t> m_leds0;
-	optional_shared_ptr<uint16_t> m_leds1;
-	optional_shared_ptr<uint16_t> m_leds2;
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -182,8 +171,6 @@ public:
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	void hermit(machine_config &config);
 	void bankrob(machine_config &config);
 	void cjffruit(machine_config &config);
@@ -203,6 +190,26 @@ public:
 	void maxidbl_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void steaser_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+
+	optional_shared_ptr<uint16_t> m_nvram;
+	std::unique_ptr<uint8_t[]> m_blit_buffer;
+	optional_shared_ptr<uint16_t> m_frame_buffer;
+	optional_shared_ptr<uint16_t> m_blit_romaddr;
+	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
+	optional_shared_ptr<uint16_t> m_blit_attr2_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_hiword;
+	optional_shared_ptr<uint16_t> m_blit_vregs;
+	optional_shared_ptr<uint16_t> m_blit_transpen;
+	optional_shared_ptr<uint16_t> m_leds0;
+	optional_shared_ptr<uint16_t> m_leds1;
+	optional_shared_ptr<uint16_t> m_leds2;
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	output_finder<17> m_led;
 };
 
 /*************************************************************************************************************
@@ -869,13 +876,13 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
-		output().set_led_value(0, data & 0x0200);    // win???
+		m_led[0] = BIT(data, 9);     // win???
 //                                     1  data & 0x0400     // win???
-		output().set_led_value(2, data & 0x0800);    // small
-		output().set_led_value(3, data & 0x1000);    // big
-		output().set_led_value(4, data & 0x2000);    // take
-		output().set_led_value(5, data & 0x4000);    // double up
-		output().set_led_value(6, data & 0x8000);    // cancel
+		m_led[2] = BIT(data, 11);    // small
+		m_led[3] = BIT(data, 12);    // big
+		m_led[4] = BIT(data, 13);    // take
+		m_led[5] = BIT(data, 14);    // double up
+		m_led[6] = BIT(data, 15);    // cancel
 		show_leds123();
 	}
 }
@@ -885,14 +892,14 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // start
-		output().set_led_value( 8, data & 0x0200);   // bet
-		output().set_led_value( 9, data & 0x0400);   // hold 5
-		output().set_led_value(10, data & 0x0800);   // hold 4
-		output().set_led_value(11, data & 0x1000);   // hold 3
-		output().set_led_value(12, data & 0x2000);   // hold 2
-		output().set_led_value(13, data & 0x4000);   // collect
-		output().set_led_value(14, data & 0x8000);   // call attendant
+		m_led[ 7] = BIT(data, 8);    // start
+		m_led[ 8] = BIT(data, 9);    // bet
+		m_led[ 9] = BIT(data, 10);   // hold 5
+		m_led[10] = BIT(data, 11);   // hold 4
+		m_led[11] = BIT(data, 12);   // hold 3
+		m_led[12] = BIT(data, 13);   // hold 2
+		m_led[13] = BIT(data, 14);   // collect
+		m_led[14] = BIT(data, 15);   // call attendant
 		show_leds123();
 	}
 }
@@ -902,8 +909,8 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(15, data & 0x0100);   // hopper coins?
-		output().set_led_value(16, data & 0x0400);   // coin out?
+		m_led[15] = BIT(data, 8);    // hopper coins?
+		m_led[16] = BIT(data, 10);   // coin out?
 		show_leds123();
 	}
 }
@@ -1010,13 +1017,13 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
-		output().set_led_value(0, data & 0x0200);    // win???
+		m_led[0] = BIT(data, 9);     // win???
 //                                     1  data & 0x0400     // win???
-		output().set_led_value(2, data & 0x0800);    // small
-		output().set_led_value(3, data & 0x1000);    // big
-		output().set_led_value(4, data & 0x2000);    // take
-		output().set_led_value(5, data & 0x4000);    // double up
-		output().set_led_value(6, data & 0x8000);    // cancel
+		m_led[2] = BIT(data, 11);    // small
+		m_led[3] = BIT(data, 12);    // big
+		m_led[4] = BIT(data, 13);    // take
+		m_led[5] = BIT(data, 14);    // double up
+		m_led[6] = BIT(data, 15);    // cancel
 		show_leds123();
 	}
 }
@@ -1026,14 +1033,14 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // start
-		output().set_led_value( 8, data & 0x0200);   // bet
-		output().set_led_value( 9, data & 0x0400);   // hold 5
-		output().set_led_value(10, data & 0x0800);   // hold 4
-		output().set_led_value(11, data & 0x1000);   // hold 3
-		output().set_led_value(12, data & 0x2000);   // hold 2
-		output().set_led_value(13, data & 0x4000);   // hold 1
-		output().set_led_value(14, data & 0x8000);   // call attendant
+		m_led[ 7] = BIT(data, 8);    // start
+		m_led[ 8] = BIT(data, 9);    // bet
+		m_led[ 9] = BIT(data, 10);   // hold 5
+		m_led[10] = BIT(data, 11);   // hold 4
+		m_led[11] = BIT(data, 12);   // hold 3
+		m_led[12] = BIT(data, 13);   // hold 2
+		m_led[13] = BIT(data, 14);   // hold 1
+		m_led[14] = BIT(data, 15);   // call attendant
 		show_leds123();
 	}
 }
@@ -1043,8 +1050,8 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(15, data & 0x0100);   // hopper coins?
-		output().set_led_value(16, data & 0x0400);   // coin out?
+		m_led[15] = BIT(data, 8);    // hopper coins?
+		m_led[16] = BIT(data, 10);   // coin out?
 		show_leds123();
 	}
 }
@@ -1211,7 +1218,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // button
+		m_led[7] = BIT(data, 8);    // button
 		show_leds12();
 	}
 }

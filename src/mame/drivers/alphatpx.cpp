@@ -939,7 +939,7 @@ uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 //  VIDEO - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-static GFXDECODE_START( alphatp3 )
+static GFXDECODE_START( gfx_alphatp3 )
 	GFXDECODE_ENTRY("gfx", 0, charlayout, 0, 1)
 GFXDECODE_END
 
@@ -1237,7 +1237,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1318,7 +1318,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

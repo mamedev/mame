@@ -178,16 +178,16 @@ WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	m_ticket->motor_w(BIT(data, 1));
-	output().set_lamp_value(0, BIT(data, 2));
+	m_lamp[0] = BIT(data, 2);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	output().set_lamp_value(0, BIT(data, 2));
-	output().set_lamp_value(1, BIT(data, 3));
-	output().set_lamp_value(2, BIT(data, 4));
+	m_lamp[0] = BIT(data, 2);
+	m_lamp[1] = BIT(data, 3);
+	m_lamp[2] = BIT(data, 4);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
@@ -195,9 +195,9 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	output().set_lamp_value(0, BIT(data, 2));
-	output().set_lamp_value(1, BIT(data, 4));
-	output().set_lamp_value(2, BIT(data, 5));
+	m_lamp[0] = BIT(data, 2);
+	m_lamp[1] = BIT(data, 4);
+	m_lamp[2] = BIT(data, 5);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
 }
 

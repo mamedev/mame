@@ -2756,28 +2756,28 @@ static const gfx_layout pivotlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( finalb )
+static GFXDECODE_START( gfx_finalb )
 	GFXDECODE_ENTRY( "gfx2", 0, finalb_tilelayout,  0, 64 ) /* sprites & playfield, 6-bit deep */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( taitof2 )
+static GFXDECODE_START( gfx_taitof2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( pivot )
+static GFXDECODE_START( gfx_pivot )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, pivotlayout, 0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( yuyugogo )
+static GFXDECODE_START( gfx_yuyugogo )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, yuyugogo_charlayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( thundfox )
+static GFXDECODE_START( gfx_thundfox )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* TC0100SCN #1 */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* TC0100SCN #2 */
@@ -2794,7 +2794,7 @@ static const gfx_layout deadconx_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( deadconx )
+static GFXDECODE_START( gfx_deadconx )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, deadconx_charlayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
@@ -2821,7 +2821,7 @@ static const gfx_layout footchmpbl_charlayout =
 	8*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( footchmpbl )
+static GFXDECODE_START( gfx_footchmpbl )
 	GFXDECODE_ENTRY( "gfx2", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_charlayout,  0, 256 )    // gets wiped out by the dynamic decode atm
@@ -2872,7 +2872,7 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitof2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitof2)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2946,7 +2946,7 @@ MACHINE_CONFIG_START(taitof2_state::finalb)
 	MCFG_DEVICE_PROGRAM_MAP(finalb_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", finalb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_finalb)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_finalb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
@@ -2971,7 +2971,7 @@ MACHINE_CONFIG_START(taitof2_state::dondokod)
 	MCFG_DEVICE_PROGRAM_MAP(dondokod_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
@@ -3029,7 +3029,7 @@ MACHINE_CONFIG_START(taitof2_state::thundfox)
 	MCFG_DEVICE_PROGRAM_MAP(thundfox_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", thundfox)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_thundfox)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_thundfox)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_thundfox)
@@ -3067,7 +3067,7 @@ MACHINE_CONFIG_START(taitof2_state::cameltry)
 	MCFG_DEVICE_PROGRAM_MAP(cameltry_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
@@ -3095,7 +3095,7 @@ MACHINE_CONFIG_START(taitof2_state::qtorimon)
 	MCFG_DEVICE_PROGRAM_MAP(qtorimon_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
 
@@ -3142,7 +3142,7 @@ MACHINE_CONFIG_START(taitof2_state::quizhq)
 	MCFG_DEVICE_PROGRAM_MAP(quizhq_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
 
@@ -3264,7 +3264,7 @@ MACHINE_CONFIG_START(taitof2_state::footchmp)
 	MCFG_DEVICE_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_footchmp)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
@@ -3285,7 +3285,7 @@ MACHINE_CONFIG_START(taitof2_state::footchmpbl)
 	footchmp(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", footchmpbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_footchmpbl)
 MACHINE_CONFIG_END
 
 
@@ -3297,7 +3297,7 @@ MACHINE_CONFIG_START(taitof2_state::hthero)
 	MCFG_DEVICE_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_hthero)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
@@ -3353,7 +3353,7 @@ MACHINE_CONFIG_START(taitof2_state::yuyugogo)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_yesnoj)
@@ -3452,7 +3452,7 @@ MACHINE_CONFIG_START(taitof2_state::pulirula)
 	MCFG_DEVICE_PROGRAM_MAP(pulirula_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_pulirula)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
@@ -3480,7 +3480,7 @@ MACHINE_CONFIG_START(taitof2_state::metalb)
 	MCFG_DEVICE_PROGRAM_MAP(metalb_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8192)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -3533,7 +3533,7 @@ MACHINE_CONFIG_START(taitof2_state::yesnoj)
 	MCFG_DEVICE_PROGRAM_MAP(yesnoj_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3560,7 +3560,7 @@ MACHINE_CONFIG_START(taitof2_state::deadconx)
 	MCFG_DEVICE_PROGRAM_MAP(deadconx_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3588,7 +3588,7 @@ MACHINE_CONFIG_START(taitof2_state::deadconxj)
 	MCFG_DEVICE_PROGRAM_MAP(deadconx_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_deadconxj)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
@@ -3717,7 +3717,7 @@ MACHINE_CONFIG_START(taitof2_state::driftout)
 	MCFG_DEVICE_PROGRAM_MAP(driftout_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
 	MCFG_SCREEN_MODIFY("screen")
@@ -3768,7 +3768,7 @@ MACHINE_CONFIG_START(taitof2_state::cameltrya)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pivot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pivot)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -3837,7 +3837,7 @@ MACHINE_CONFIG_START(taitof2_state::driveout)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pivot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pivot)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

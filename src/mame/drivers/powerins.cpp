@@ -279,7 +279,7 @@ static const gfx_layout layout_16x16x4_swap =
 };
 
 
-static GFXDECODE_START( powerins )
+static GFXDECODE_START( gfx_powerins )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,      0x000, 0x20 ) // [0] Tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x200, 0x10 ) // [1] Tiles
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4_swap, 0x400, 0x40 ) // [2] Sprites
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerins)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerins)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

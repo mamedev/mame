@@ -1614,7 +1614,7 @@ static const gfx_layout spritelayout =
 	16*8                                    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( dkong )
+static GFXDECODE_START( gfx_dkong )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,       0, 64 )
 GFXDECODE_END
@@ -1716,7 +1716,7 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dkong)
 	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)
@@ -1811,7 +1811,7 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03a", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03b", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dkong)
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)

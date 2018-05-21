@@ -1664,7 +1664,7 @@ static const gfx_layout layout8x8x6 =
 	8*8
 };
 
-static GFXDECODE_START(aristmk4)
+static GFXDECODE_START(gfx_aristmk4)
 	GFXDECODE_ENTRY("tile_gfx",0x0,layout8x8x6, 0, 8 )
 GFXDECODE_END
 
@@ -1784,7 +1784,7 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aristmk4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aristmk4)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state, aristmk4)
 

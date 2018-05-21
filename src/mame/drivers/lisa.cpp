@@ -498,3 +498,4 @@ COMP( 1983, lisa,    0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "
 COMP( 1984, lisa2,   0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa2",        MACHINE_NOT_WORKING )
 COMP( 1984, lisa210, lisa2,  0,      lisa210, lisa,  lisa_state, init_lisa210, "Apple Computer", "Lisa2/10",     MACHINE_NOT_WORKING )
 COMP( 1985, macxl,   lisa2,  0,      macxl,   lisa,  lisa_state, init_mac_xl,  "Apple Computer", "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+

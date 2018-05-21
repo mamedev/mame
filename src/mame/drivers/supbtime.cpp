@@ -327,7 +327,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( supbtime )
+static GFXDECODE_START( gfx_supbtime )
 	GFXDECODE_ENTRY( "tiles",   0, tile_8x8_layout,   256, 32 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",   0, tile_16x16_layout, 256, 32 ) // 16x16
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,        0, 16 ) // 16x16
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supbtime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supbtime)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

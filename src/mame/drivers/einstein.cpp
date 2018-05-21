@@ -12,8 +12,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "cpu/z80/z80daisy_generic.h"
+#include "machine/z80daisy.h"
+#include "machine/z80daisy_generic.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"

@@ -1072,25 +1072,25 @@ static const gfx_layout swimmer_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( cclimber )
+static GFXDECODE_START( gfx_cclimber )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_charlayout,      0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_spritelayout,    0, 16 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( cannonb )
+static GFXDECODE_START( gfx_cannonb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cannonb_charlayout,       0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x1000, cannonb_spritelayout,     0, 16 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( swimmer )
+static GFXDECODE_START( gfx_swimmer )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swimmer_charlayout,       0, 32 ) /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swimmer_spritelayout,     0, 32 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, swimmer_charlayout,    32*8,  4 ) /* big sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( toprollr )
+static GFXDECODE_START( gfx_toprollr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_charlayout,      0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_spritelayout,    0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
@@ -1100,7 +1100,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(cclimber_state::vblank_irq)
 {
 	if (state && m_nmi_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
@@ -1131,7 +1131,7 @@ MACHINE_CONFIG_START(cclimber_state::root)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cclimber)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cclimber)
 	MCFG_PALETTE_ADD("palette", 16*4+8*4)
 
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,cclimber)
@@ -1176,7 +1176,7 @@ MACHINE_CONFIG_START(cclimber_state::cannonb)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // not used
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cannonb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cannonb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cclimber_state::bagmanf)
@@ -1239,7 +1239,7 @@ MACHINE_CONFIG_START(cclimber_state::toprollr)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, cclimber_state, toprollr_rombank_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", toprollr)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_toprollr)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32*5)
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,toprollr)
@@ -1278,7 +1278,7 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", swimmer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_swimmer)
 	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
 
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,swimmer)

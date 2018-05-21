@@ -256,7 +256,7 @@ static const gfx_layout chinhero_sprite_layout2 = {
 	8*0x40
 };
 
-static GFXDECODE_START( chinhero )
+static GFXDECODE_START( gfx_chinhero )
 	GFXDECODE_ENTRY( "gfx1", 0, shangkid_char_layout,   0, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, chinhero_sprite_layout1,    0, 0x20 )
 	GFXDECODE_ENTRY( "gfx2", 0, chinhero_sprite_layout2,    0, 0x20 )
@@ -264,12 +264,12 @@ static GFXDECODE_START( chinhero )
 	GFXDECODE_ENTRY( "gfx3", 0, chinhero_sprite_layout2,    0, 0x20 )
 GFXDECODE_END
 
-static GFXDECODE_START( shangkid )
+static GFXDECODE_START( gfx_shangkid )
 	GFXDECODE_ENTRY( "gfx1", 0, shangkid_char_layout,   0, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, shangkid_sprite_layout, 0, 0x40 )
 GFXDECODE_END
 
-static GFXDECODE_START( dynamski )
+static GFXDECODE_START( gfx_dynamski )
 	GFXDECODE_ENTRY( "gfx1", 0, shangkid_char_layout,      0, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, shangkid_sprite_layout, 0x40, 0x10 )
 GFXDECODE_END
@@ -413,7 +413,7 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shangkid_state, irq_1_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, shangkid_state, irq_2_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinhero)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinhero)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(shangkid_state,shangkid)
 
@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", shangkid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)
 
 	MCFG_DEVICE_MODIFY("aysnd")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shangkid_state, shangkid_ay8910_porta_w))
@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shangkid_state, irq_1_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynamski)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynamski)
 	MCFG_PALETTE_ADD("palette", 16*4+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(shangkid_state,dynamski)

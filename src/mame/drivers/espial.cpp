@@ -80,7 +80,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
 	int scanline = param;
 
 	if(scanline == 240 && m_main_nmi_enabled) // vblank-out irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if(scanline == 16) // timer irq, checks soundlatch port then updates some sound related work RAM buffers
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -311,7 +311,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( espial )
+static GFXDECODE_START( gfx_espial )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 64 )
 GFXDECODE_END
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", espial)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_espial)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
 

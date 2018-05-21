@@ -862,7 +862,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( trackfld )
+static GFXDECODE_START( gfx_trackfld )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -937,7 +937,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
@@ -1013,7 +1013,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)

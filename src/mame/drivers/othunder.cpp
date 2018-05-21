@@ -587,7 +587,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static GFXDECODE_START( othunder )
+static GFXDECODE_START( gfx_othunder )
 	GFXDECODE_ENTRY( "gfx2", 0, tile16x8_layout, 0, 256 )   /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 256 )   /* sprites & playfield */
 GFXDECODE_END
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, othunder_state, vblank_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_othunder)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)

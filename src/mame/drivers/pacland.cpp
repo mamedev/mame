@@ -200,6 +200,8 @@ Notes:
 
 void pacland_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_mcu_irq_mask));
 }
@@ -237,8 +239,8 @@ WRITE8_MEMBER(pacland_state::coin_w)
 
 WRITE8_MEMBER(pacland_state::led_w)
 {
-	output().set_led_value(0, data & 0x08);
-	output().set_led_value(1, data & 0x10);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
@@ -409,7 +411,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( pacland )
+static GFXDECODE_START( gfx_pacland )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,          256*4, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  256*4+256*4, 64 )
@@ -446,7 +448,7 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacland_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacland)
 	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)

@@ -927,7 +927,7 @@ static const gfx_layout charlayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( magicfly )
+static GFXDECODE_START( gfx_magicfly )
 	GFXDECODE_ENTRY( "gfxbnk1", 0, tilelayout, 16, 1 )
 	GFXDECODE_ENTRY( "gfxbnk0", 0, charlayout, 0, 8 )
 GFXDECODE_END
@@ -954,7 +954,7 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magicfly)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magicfly)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(magicfly_state, magicfly)
 

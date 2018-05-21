@@ -374,7 +374,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( galivan )
+static GFXDECODE_START( gfx_galivan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0,   8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         8*16,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*16+16*16, 256 )
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galivan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galivan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)

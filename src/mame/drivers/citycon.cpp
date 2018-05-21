@@ -157,7 +157,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( citycon )
+static GFXDECODE_START( gfx_citycon )
 //  GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 512, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 640, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0, 16 ) /* colors 0-255 */
@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", citycon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_citycon)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

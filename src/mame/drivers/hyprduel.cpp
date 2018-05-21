@@ -440,7 +440,7 @@ static const gfx_layout layout_16x16x4 =
 /* 16x16x8 tiles for later games */
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 32*8 )
 
-static GFXDECODE_START( i4220 )
+static GFXDECODE_START( gfx_i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(hyprduel_state::i4220_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE(":vdp:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp:palette", i4220)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, ":vdp:palette", gfx_i4220)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hyprduel_state::hyprduel)

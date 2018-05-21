@@ -409,7 +409,7 @@ static const gfx_layout arcadia_charlayout =
 	1*8
 };
 
-static GFXDECODE_START( arcadia )
+static GFXDECODE_START( gfx_arcadia )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, arcadia_charlayout, 0, 68 )
 GFXDECODE_END
 
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(arcadia_state::arcadia)
 	MCFG_SCREEN_UPDATE_DRIVER(arcadia_state, screen_update_arcadia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arcadia)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(arcadia_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)

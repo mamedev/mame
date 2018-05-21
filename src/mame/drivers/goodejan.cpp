@@ -622,7 +622,7 @@ static const gfx_layout charlayout =
 	8*32
 };
 
-static GFXDECODE_START( goodejan )
+static GFXDECODE_START( gfx_goodejan )
 	GFXDECODE_ENTRY( "spr_gfx", 0,tilelayout, 0x200, 0x40 ) /* Sprites */
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x000, 0x30 ) /* Tiles */
 	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x300, 0x10 ) /* Text */
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(goodejan_state::goodejan)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, goodejan_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, goodejan_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goodejan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goodejan)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

@@ -40,7 +40,7 @@ WRITE16_MEMBER(fromanc2_state::sndcmd_w)
 	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
 	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
 
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_sndcpu_nmi_flag = 0;
 }
 
@@ -103,7 +103,7 @@ WRITE16_MEMBER(fromanc2_state::subcpu_w)
 
 READ16_MEMBER(fromanc2_state::subcpu_r)
 {
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_subcpu_nmi_flag = 0;
 
 	return (m_datalatch_2h << 8) | m_datalatch_2l;
@@ -436,7 +436,7 @@ static const gfx_layout fromanc2_tilelayout =
 	32*8
 };
 
-static GFXDECODE_START( fromanc2 )
+static GFXDECODE_START( gfx_fromanc2 )
 	GFXDECODE_ENTRY( "gfx1", 0, fromanc2_tilelayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, fromanc2_tilelayout, 256, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, fromanc2_tilelayout, 512, 4 )
@@ -454,7 +454,7 @@ static const gfx_layout fromancr_tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( fromancr )
+static GFXDECODE_START( gfx_fromancr )
 	GFXDECODE_ENTRY( "gfx1", 0, fromancr_tilelayout, 512, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, fromancr_tilelayout, 256, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, fromancr_tilelayout,   0, 1 )
@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromanc2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	//MCFG_INS8250_OUT_RTS_CB(WRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

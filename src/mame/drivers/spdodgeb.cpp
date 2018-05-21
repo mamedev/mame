@@ -371,7 +371,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( spdodgeb )
+static GFXDECODE_START( gfx_spdodgeb )
 	GFXDECODE_ENTRY( "text", 0, charlayout,   0x000, 32 )   /* colors 0x000-0x1ff */
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x200, 32 )   /* colors 0x200-0x3ff */
 GFXDECODE_END
@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spdodgeb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spdodgeb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(spdodgeb_state, spdodgeb)
 

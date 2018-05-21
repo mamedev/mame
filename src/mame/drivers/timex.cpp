@@ -682,7 +682,7 @@ static const gfx_layout ts2068_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ts2068 )
+static GFXDECODE_START( gfx_ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ts2068)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 

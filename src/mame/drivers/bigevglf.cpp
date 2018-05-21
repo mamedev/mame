@@ -344,7 +344,7 @@ static const gfx_layout gfxlayout =
 	8*8
 };
 
-static GFXDECODE_START( bigevglf )
+static GFXDECODE_START( gfx_bigevglf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0x20*16, 16 )
 GFXDECODE_END
 
@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 	MCFG_SCREEN_UPDATE_DRIVER(bigevglf_state, screen_update_bigevglf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigevglf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigevglf)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */

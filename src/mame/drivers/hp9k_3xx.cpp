@@ -45,7 +45,7 @@
     RTC_DATA: 0x420001
     RTC_CMD:  0x420003
     HIL:      0x428000
-    HPIB:     0x478000
+    HPIB:     0x470000
     KBDNMIST: 0x478005
     DMA:      0x500000
     FRAMEBUF: 0x560000
@@ -201,12 +201,11 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(this, FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
 	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
-	map(0x00478000, 0x0047ffff).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x00470000, 0x0047ffff).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
 	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
-	map(0x00474000, 0x00474fff).ram(); // unknown
 
 }
 
@@ -216,7 +215,7 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
 	map(0x428000, 0x428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
-	map(0x478000, 0x47800f).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
+	map(0x470000, 0x47800f).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x510000, 0x510003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
 	map(0x538000, 0x538003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
@@ -319,6 +318,8 @@ WRITE_LINE_MEMBER(hp9k3xx_state::gpib_irq)
 
 WRITE8_MEMBER(hp9k3xx_state::gpib_w)
 {
+	offset &= 0xf;
+
 	if (offset >= 0x08) {
 		m_tms9914->reg8_w(space, offset & 0x07, data);
 		return;
@@ -329,6 +330,8 @@ WRITE8_MEMBER(hp9k3xx_state::gpib_w)
 READ8_MEMBER(hp9k3xx_state::gpib_r)
 {
 	uint8_t data = 0xff;
+
+	offset &= 0xf;
 
 	if (offset >= 0x8) {
 		data = m_tms9914->reg8_r(space, offset & 0x07);
@@ -452,7 +455,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_46021a")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 0.0f, 250000.0f)
+	MCFG_PTM6840_O3_CB(WRITELINE(PTM6840_TAG, ptm6840_device , set_c2))
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
@@ -465,7 +469,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(4000000))
+	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(5000000))
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp9k3xx_state, gpib_irq));
 	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, dio_w))
 	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
@@ -520,7 +524,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
 	MCFG_DIO32_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(4000000))
+	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(5000000))
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp9k3xx_state, gpib_irq));
 	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, dio_w))
 	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
@@ -581,7 +585,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 390-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
 
-	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(4000000))
+	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(5000000))
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp9k3xx_state, gpib_irq));
 	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, dio_w))
 	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, eoi_w))

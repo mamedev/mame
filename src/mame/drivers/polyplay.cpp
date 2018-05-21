@@ -130,7 +130,7 @@ playing the automaton. Bits 0-2 of PORTB control the organ.
 #include "includes/polyplay.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -155,7 +155,7 @@ static const z80_daisy_config daisy_chain_zrepp[] =
 
 INTERRUPT_GEN_MEMBER(polyplay_state::nmi_handler)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* I/O Port handling */
@@ -190,38 +190,38 @@ WRITE8_MEMBER(polyplay_state::pio_portb_w)
 	switch (lightState)
 	{
 		case 0:
-			output().set_lamp_value(1, 1);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 1;
+			m_lamp[2] = 0;
+			m_lamp[3] = 0;
+			m_lamp[4] = 0;
 			break;
 
 		case 1:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 1);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 0;
+			m_lamp[2] = 1;
+			m_lamp[3] = 0;
+			m_lamp[4] = 0;
 			break;
 
 		case 2:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 1);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 0;
+			m_lamp[2] = 0;
+			m_lamp[3] = 1;
+			m_lamp[4] = 0;
 			break;
 
 		case 3:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 1);
+			m_lamp[1] = 0;
+			m_lamp[2] = 0;
+			m_lamp[3] = 0;
+			m_lamp[4] = 1;
 			break;
 
 		default:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
+			m_lamp[1] = 0;
+			m_lamp[2] = 0;
+			m_lamp[3] = 0;
+			m_lamp[4] = 0;
 			break;
 	}
 }
@@ -305,7 +305,7 @@ static const gfx_layout charlayout_3_bit =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( polyplay )
+static GFXDECODE_START( gfx_polyplay )
 	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout_1_bit, 0, 1 )
 	GFXDECODE_ENTRY( nullptr, 0xec00, charlayout_3_bit, 2, 1 )
 GFXDECODE_END
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", polyplay)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_polyplay)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
 

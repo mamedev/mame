@@ -700,7 +700,7 @@ static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
-static GFXDECODE_START( bnstars )
+static GFXDECODE_START( gfx_bnstars )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x5000, 0x10 ) /* Roz scr1 */
 	GFXDECODE_ENTRY( "gfx4", 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
@@ -817,7 +817,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bnstars)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bnstars)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(XBRG)

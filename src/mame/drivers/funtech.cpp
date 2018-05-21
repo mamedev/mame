@@ -241,7 +241,7 @@ uint32_t fun_tech_corp_state::screen_update(screen_device &screen, bitmap_ind16 
 INTERRUPT_GEN_MEMBER(fun_tech_corp_state::vblank_interrupt)
 {
 //  if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -471,7 +471,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( funtech )
+static GFXDECODE_START( gfx_funtech )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32_layout, 0x100, 1 )
 GFXDECODE_END
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funtech)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funtech)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

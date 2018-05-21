@@ -773,3 +773,4 @@ COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi1_state, empty_init, 
 COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi1_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi1_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi1_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+

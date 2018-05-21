@@ -677,7 +677,7 @@ static const gfx_layout qx10_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( qx10 )
+static GFXDECODE_START( gfx_qx10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 1 )
 GFXDECODE_END
 
@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_SCREEN_UPDATE_DRIVER(qx10_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qx10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_qx10)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(qx10_state, qx10)
 

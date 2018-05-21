@@ -269,7 +269,7 @@ static const gfx_layout paso1600_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( paso1600 )
+static GFXDECODE_START( gfx_paso1600 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, paso1600_charlayout, 0, 4 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, paso1600_charlayout, 0, 4 )
 GFXDECODE_END
@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(paso1600_state::paso1600)
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", paso1600)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paso1600)
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
 

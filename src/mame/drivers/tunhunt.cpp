@@ -72,9 +72,9 @@ WRITE8_MEMBER(tunhunt_state::control_w)
 	*/
 
 	m_control = data;
-	machine().bookkeeping().coin_counter_w(0,data&0x01 );
-	machine().bookkeeping().coin_counter_w(1,data&0x02 );
-	output().set_led_value(0, data&0x40 ); /* start */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	m_led = BIT(data , 6); /* start */
 }
 
 
@@ -256,7 +256,7 @@ static const gfx_layout obj_layout =
 };
 
 
-static GFXDECODE_START( tunhunt )
+static GFXDECODE_START( gfx_tunhunt )
 	GFXDECODE_ENTRY( "gfx1", 0x000, alpha_layout, 0x10, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x200, obj_layout,   0x18, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x000, obj_layout,   0x18, 1 ) /* second bank, or second bitplane? */
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tunhunt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tunhunt)
 	MCFG_PALETTE_ADD("palette", 0x1a)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(tunhunt_state, tunhunt)

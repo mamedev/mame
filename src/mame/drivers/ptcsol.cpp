@@ -699,7 +699,7 @@ static const gfx_layout sol20_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( sol20 )
+static GFXDECODE_START( gfx_sol20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sol20_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sol20)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sol20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

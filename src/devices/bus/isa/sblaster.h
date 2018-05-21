@@ -11,6 +11,7 @@
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/saa1099.h"
+#include "diserial.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

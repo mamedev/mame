@@ -35,6 +35,7 @@ public:
 		, m_tms5220(*this, "tms")
 		, m_rombank(*this, "rombank%u", 1U)
 		, m_slapstic(*this, "slapstic")
+		, m_led(*this, "led%u", 0U)
 	{ }
 
 	required_device<t11_device> m_maincpu;
@@ -126,4 +127,7 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void vrambank_map(address_map &map);
+
+protected:
+	output_finder<2> m_led;
 };

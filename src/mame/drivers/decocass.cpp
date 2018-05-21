@@ -932,7 +932,7 @@ static const gfx_layout objlayout =
 	objlayout_yoffset
 };
 
-static GFXDECODE_START( decocass )
+static GFXDECODE_START( gfx_decocass )
 	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
 	GFXDECODE_ENTRY( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
 	GFXDECODE_ENTRY( nullptr, 0xd000, tilelayout,       0, 8 )  /* background tiles */
@@ -980,7 +980,7 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", decocass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_decocass)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)

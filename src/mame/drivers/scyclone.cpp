@@ -563,7 +563,7 @@ static const gfx_layout tiles32x32_layout =
 	8*32*8
 };
 
-static GFXDECODE_START( scyclone )
+static GFXDECODE_START( gfx_scyclone )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles32x32_layout, 8, 4 )
 GFXDECODE_END
 
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(scyclone_state::scyclone)
 	MCFG_SCREEN_UPDATE_DRIVER(scyclone_state, screen_update_scyclone)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // due to hw collisions
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scyclone)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scyclone)
 	MCFG_PALETTE_ADD("palette", 8 + 4*4)
 
 	/* sound hardware */

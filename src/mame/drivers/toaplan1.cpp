@@ -1883,12 +1883,12 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( toaplan1 )
+static GFXDECODE_START( gfx_toaplan1 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,       0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   64*16, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( rallybik )
+static GFXDECODE_START( gfx_rallybik )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,             0, 64 )
 GFXDECODE_END
 
@@ -1939,7 +1939,7 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rallybik)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallybik)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1976,7 +1976,7 @@ MACHINE_CONFIG_START(toaplan1_state::truxton)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2013,7 +2013,7 @@ MACHINE_CONFIG_START(toaplan1_state::hellfire)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_START(toaplan1_state::zerowing)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2092,7 +2092,7 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2129,7 +2129,7 @@ MACHINE_CONFIG_START(toaplan1_state::samesame)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_samesame))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2166,7 +2166,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzone)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2203,7 +2203,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2240,7 +2240,7 @@ MACHINE_CONFIG_START(toaplan1_state::vimana)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

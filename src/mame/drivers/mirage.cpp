@@ -266,7 +266,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( mirage )
+static GFXDECODE_START( gfx_mirage )
 	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)  /* Tiles (8x8) */
 	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)  /* Tiles (16x16) */
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)  /* Sprites (16x16) */
@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

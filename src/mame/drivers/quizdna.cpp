@@ -428,7 +428,7 @@ static const gfx_layout objlayout =
 	16*16*4
 };
 
-static GFXDECODE_START( quizdna )
+static GFXDECODE_START( gfx_quizdna )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, fglayout,  0x7e0,  16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, bglayout,  0x000, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, objlayout, 0x600,  32 )
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SCREEN_UPDATE_DRIVER(quizdna_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizdna)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizdna)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 

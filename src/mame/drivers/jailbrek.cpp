@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(jailbrek_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -243,7 +243,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( jailbrek )
+static GFXDECODE_START( gfx_jailbrek )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 ) /* sprites */
 GFXDECODE_END
@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jailbrek)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jailbrek)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)

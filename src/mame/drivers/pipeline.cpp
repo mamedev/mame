@@ -69,7 +69,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
@@ -326,7 +326,7 @@ static const gfx_layout layout_8x8x3 =
 	8*8
 };
 
-static GFXDECODE_START( pipeline )
+static GFXDECODE_START( gfx_pipeline )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0x000, 1 ) // 8bpp tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x3, 0x100, 32 ) // 3bpp tiles
 GFXDECODE_END
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipeline)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pipeline)
 
 	MCFG_PALETTE_ADD("palette", 0x100+0x100)
 	MCFG_PALETTE_INIT_OWNER(pipeline_state, pipeline)

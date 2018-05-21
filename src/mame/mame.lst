@@ -365,6 +365,7 @@ ac1sstrka                       //
 ac1sstrkb                       //
 ac1taklv                        // Take It Or Leave It (Ace)
 ac1totb                         // Top Of The Bill (Ace)
+ac1unk                          // ???
 ac1xpres                        // Xpress (Pcp)
 
 @source:acesp.cpp
@@ -1023,6 +1024,7 @@ zortonbr                        // (c) 1993 Web Picmatic
 @source:alien.cpp
 alien                           // (c) 2005 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
+dkbanana                        // (c) 2007 Capcom
 
 @source:aliens.cpp
 aliens                          // GX875 (c) 1990 (World)
@@ -9033,6 +9035,7 @@ zavigaj                         // (c)
 @source:by17.cpp
 blackjck                        //
 bowarrow                        //
+bowarrowa                       //
 eightbll                        //
 eightblo                        //
 evelknie                        //
@@ -9560,6 +9563,7 @@ cedmag
 mag_time
 mag_exzi
 mag_xain
+mag_war
 
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
@@ -10195,6 +10199,7 @@ sf2jf                           // 11/04/1991 (c) 1991 (Japan)
 sf2jh                           // 22/05/1991 (c) 1991 (Japan)
 sf2jl                           // 12/03/1992 (c) 1991 (Japan)
 sf2koryu                        // hack
+sf2level                        // hack
 sf2m10                          // bootleg
 sf2m2                           // hack
 sf2m3                           // hack
@@ -12691,6 +12696,7 @@ feag2100                        // EAG: Elite Avant Garde 2100 (English)
 feag2100fr                      // * French
 feag2100g                       // * German
 feag2100sp                      // * Spanish
+feleg                           //
 fexcel                          //
 fexcel12                        //
 fexcel124                       //
@@ -14857,6 +14863,7 @@ taltbeast                       // Tiger
 tapollo13                       // Tiger
 tbatfor                         // Tiger
 tbatman                         // Tiger
+tbatmana                        // Tiger
 tbtoads                         // Tiger
 tbttf                           // Tiger
 tddragon                        // Tiger
@@ -14879,9 +14886,11 @@ tkarnov                         // Tiger
 tmchammer                       // Tiger
 tmkombat                        // Tiger
 tnmarebc                        // Tiger
+topaliens                       // Tiger
 trobhood                        // Tiger
 trobocop2                       // Tiger
 trobocop3                       // Tiger
+trockteer                       // Tiger
 tsddragon                       // Tiger
 tsf2010                         // Tiger
 tsfight2                        // Tiger
@@ -14896,6 +14905,8 @@ tstrider                        // Tiger
 tswampt                         // Tiger
 ttransf2                        // Tiger
 tvindictr                       // Tiger
+twworld                         // Tiger
+txmen                           // Tiger
 txmenpx                         // Tiger
 
 @source:hh_tms1k.cpp
@@ -15469,6 +15480,10 @@ ip2400                          // Intergraph InterPro/InterServe 24x0
 ip2500                          // Intergraph InterPro/InterServe 25x0
 ip2700                          // Intergraph InterPro/InterServe 27x0
 ip2800                          // Intergraph InterPro/InterServe 28x0
+ip6000                          // Intergraph InterPro/InterServe 60x0
+ip6400                          // Intergraph InterPro/InterServe 64x0
+ip6700                          // Intergraph InterPro/InterServe 67x0
+ip6800                          // Intergraph InterPro/InterServe 68x0
 
 @source:intrscti.cpp
 intrscti                        // ????
@@ -18541,6 +18556,10 @@ masao                           // bootleg
 
 @source:markham.cpp
 markham                         // TVG14 (c) 1983 Sun Electronics
+banbam                          // TVG16 (c) 1984 Sun Electronics
+guiness                         // TVG15 (c) 1984 Sun Electronics
+pettanp                         // TVG16 (c) 1984 Sun Electronics (Japan)
+strnskil                        // TVG15 (c) 1984 Sun Electronics
 
 @source:marywu.cpp
 marywu                          //
@@ -20562,6 +20581,7 @@ sutapper                        // (c) 1983
 tapper                          // (c) 1983
 tappera                         // (c) 1983
 tapperb                         // (c) 1983
+tapperg                         // (c) 1983
 timber                          // (c) 1984
 tron                            // (c) 1982
 tron2                           // (c) 1982
@@ -29871,8 +29891,10 @@ twinspri                        // 0224 (c) 1996 ADK
 twsoc96                         // 0086 (c) 1996 Tecmo
 viewpoin                        // 0051 (c) 1992 Sammy
 vliner                          //
+vliner7e                        //
 vliner6e                        //
 vliner54                        //
+vliner53                        //
 wakuwak7                        // 0225 (c) 1996 Sunsoft
 wh1                             // 0053 (c) 1992 Alpha Denshi Co.
 wh1h                            // 0053 (c) 1992 Alpha Denshi Co.
@@ -34427,6 +34449,7 @@ pzlbowl                         // (c) 1999 Nihon System / Moss
 reelquak                        // (c) 1997 <unknown>
 telpacfl                        // (c) 1996 Sunsoft
 trophyh                         // (c) 2002 Sammy USA Corporation
+trophyht                        // (c) 2002 Sammy USA Corporation
 turkhunt                        // (c) 2001 Sammy USA Corporation
 wschamp                         // (c) 2001 Sammy USA Corporation
 wschampa                        // (c) 2001 Sammy USA Corporation
@@ -35349,7 +35372,8 @@ spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
 
 @source:spyhuntertec.cpp
-spyhuntpr                       //
+spyhuntsp                       // (c) 1985 Recreativos Franco S.A. (Bally Midway license)
+spyhuntpr                       // (c) 1985 Recreativos Franco S.A.
 
 @source:squale.cpp
 squale                          //
@@ -35598,12 +35622,6 @@ stratos                         // Kasparov Stratos Chess Computer
 
 @source:strkzn.cpp
 strkzn                          // (c) 1994 Purple Star
-
-@source:strnskil.cpp
-banbam                          // TVG16 (c) 1984 Sun Electronics
-guiness                         // TVG15 (c) 1984 Sun Electronics
-pettanp                         // TVG16 (c) 1984 Sun Electronics (Japan)
-strnskil                        // TVG15 (c) 1984 Sun Electronics
 
 @source:studio2.cpp
 apollo80                        //

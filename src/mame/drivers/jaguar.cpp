@@ -435,7 +435,7 @@ void jaguar_state::machine_reset()
 	if (!m_is_r3000)
 	{
 		memcpy(m_shared_ram, m_rom_base, 0x400);    // do not increase, or Doom breaks
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 		if(m_is_jagcd)
 		{
@@ -568,23 +568,32 @@ WRITE32_MEMBER(jaguar_state::eeprom_w)
 	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
 	{
 		m_eeprom->di_write(data >> 31);
-		m_eeprom->clk_write(PULSE_LINE);
+		m_eeprom->clk_write(0);
+		m_eeprom->clk_write(1);
 	}
 }
 
 READ32_MEMBER(jaguar_state::eeprom_clk)
 {
-	m_eeprom->clk_write(PULSE_LINE); /* get next bit when reading */
+	if (!machine().side_effects_disabled())
+	{
+		m_eeprom->clk_write(0);
+		m_eeprom->clk_write(1); /* get next bit when reading */
+	}
 	return 0;
 }
 
 READ32_MEMBER(jaguar_state::eeprom_cs)
 {
-	m_eeprom->cs_write(CLEAR_LINE);   /* must do at end of an operation */
-	m_eeprom->cs_write(ASSERT_LINE);        /* enable chip for next operation */
-	m_eeprom->di_write(1);           /* write a start bit */
-	m_eeprom->clk_write(PULSE_LINE);
-	m_eeprom_bit_count = 0;
+	if (!machine().side_effects_disabled())
+	{
+		m_eeprom->cs_write(CLEAR_LINE);   /* must do at end of an operation */
+		m_eeprom->cs_write(ASSERT_LINE);        /* enable chip for next operation */
+		m_eeprom->di_write(1);           /* write a start bit */
+		m_eeprom->clk_write(0);
+		m_eeprom->clk_write(1);
+		m_eeprom_bit_count = 0;
+	}
 	return 0;
 }
 

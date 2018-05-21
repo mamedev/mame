@@ -96,8 +96,8 @@ WRITE16_MEMBER(zeropnt_state::zeropnt_sound_bank_w)
 		memcpy(dst + 0x20000, src, 0x20000);
 
 		machine().bookkeeping().coin_counter_w(0,data & 0x1000);
-		output().set_led_value(0,data & 0x0800); // Start 1
-		output().set_led_value(1,data & 0x0400); // Start 2
+		m_led[0] = BIT(data, 11); // Start 1
+		m_led[1] = BIT(data, 10); // Start 2
 	}
 }
 
@@ -192,8 +192,8 @@ WRITE32_MEMBER(zeropnt2_state::zeropnt2_leds_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		machine().bookkeeping().coin_counter_w(0,data & 0x00010000);
-		output().set_led_value(0,data & 0x00800000); // Start 1
-		output().set_led_value(1,data & 0x00400000); // Start 2
+		m_led[0] = BIT(data, 23); // Start 1
+		m_led[1] = BIT(data, 22); // Start 2
 	}
 }
 
@@ -549,7 +549,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( unico )
+static GFXDECODE_START( gfx_unico )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x0, 0x20 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x0, 0x20 ) // [1] Layers
 GFXDECODE_END
@@ -563,6 +563,12 @@ GFXDECODE_END
 
 
 ***************************************************************************/
+
+
+void unico_state::machine_start()
+{
+	m_led.resolve();
+}
 
 
 /***************************************************************************
@@ -585,7 +591,7 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
@@ -623,7 +629,7 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
@@ -663,7 +669,7 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */

@@ -227,7 +227,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( gotcha )
+static GFXDECODE_START( gfx_gotcha )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0x100, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 16 )
 GFXDECODE_END
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotcha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotcha)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

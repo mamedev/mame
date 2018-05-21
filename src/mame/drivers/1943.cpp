@@ -287,7 +287,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( 1943 )
+static GFXDECODE_START( gfx_1943 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                  0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,               32*4, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, bgtilelayout,       32*4+16*16, 16 )
@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 	MCFG_SCREEN_UPDATE_DRIVER(_1943_state, screen_update_1943)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1943)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1943)
 	MCFG_PALETTE_ADD("palette", 32*4+16*16+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(_1943_state, 1943)

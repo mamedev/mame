@@ -5771,7 +5771,7 @@ MACHINE_CONFIG_START(model3_state::model3_10)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -5818,7 +5818,7 @@ MACHINE_CONFIG_START(model3_state::model3_15)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -5881,7 +5881,7 @@ MACHINE_CONFIG_START(model3_state::model3_20)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -5947,7 +5947,7 @@ MACHINE_CONFIG_START(model3_state::model3_21)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

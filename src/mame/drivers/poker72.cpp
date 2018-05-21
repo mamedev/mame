@@ -343,7 +343,7 @@ static const gfx_layout tiles8x8_layout =
 
 
 
-static GFXDECODE_START( poker72 )
+static GFXDECODE_START( gfx_poker72 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poker72)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poker72)
 	MCFG_PALETTE_ADD("palette", 0xe00)
 	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
 

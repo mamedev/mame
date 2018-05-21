@@ -1023,17 +1023,17 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
     -x-- ----   Hopper Motor (inverted).
     x--- ----   HOLD4 lamp.
 */
-	output().set_lamp_value(0, 1-((data >> 1) & 1));  /* Hold1 (inverted) */
-	output().set_lamp_value(2, 1-((data >> 1) & 1));  /* Hold3 (inverted, see pinouts) */
+	m_lamp[0] = BIT(~data, 1);  /* Hold1 (inverted) */
+	m_lamp[2] = BIT(~data, 1);  /* Hold3 (inverted, see pinouts) */
 
-	output().set_lamp_value(1, 1-((data >> 3) & 1));  /* Hold2 / Low (inverted) */
-	output().set_lamp_value(3, (data >> 7) & 1);      /* Hold4 / High */
-	output().set_lamp_value(5, 1-((data >> 5) & 1));  /* Cancel / Collect (inverted) */
+	m_lamp[1] = BIT(~data, 3);  /* Hold2 / Low (inverted) */
+	m_lamp[3] = BIT(data, 7);      /* Hold4 / High */
+	m_lamp[5] = BIT(~data, 5);  /* Cancel / Collect (inverted) */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Credit In counter */
 	machine().bookkeeping().coin_counter_w(7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
 
-	output().set_lamp_value(7, 1-((data >> 6) & 1));      /* Hopper Motor (inverted) */
+	m_lamp[7] = BIT(~data, 6);      /* Hopper Motor (inverted) */
 
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
@@ -1047,8 +1047,8 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
     ---- -x--   Unknown (inverted).
     xxxx x---   Unknown.
 */
-	output().set_lamp_value(4, (data >> 0) & 1);      /* Hold5 / Bet */
-	output().set_lamp_value(6, (data >> 1) & 1);      /* Start / Deal / Draw */
+	m_lamp[4] = BIT(data, 0);      /* Hold5 / Bet */
+	m_lamp[6] = BIT(data, 1);      /* Start / Deal / Draw */
 
 //  popmessage("Lamps B: %02X", data);
 }
@@ -2960,11 +2960,11 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( fw1stpal )  /* Adressing the first half of the palette */
+static GFXDECODE_START( gfx_fw1stpal )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( fw2ndpal )  /* Adressing the second half of the palette */
+static GFXDECODE_START( gfx_fw2ndpal )  /* Adressing the second half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x100, 16 )
 GFXDECODE_END
 
@@ -3090,7 +3090,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fw1stpal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fw1stpal)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
@@ -3115,7 +3115,7 @@ MACHINE_CONFIG_START(funworld_state::fw2ndpal)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -3217,7 +3217,7 @@ MACHINE_CONFIG_START(funworld_state::intrgmes)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(intergames_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -3225,7 +3225,7 @@ MACHINE_CONFIG_START(funworld_state::fw_a7_11)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 

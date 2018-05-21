@@ -156,7 +156,7 @@ void z80ne_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	switch (id)
 	{
 	case 0:
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		break;
 	case 1:
 		// switch to RAM bank at address 0x0000
@@ -333,7 +333,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 
 	if ( ! BIT(nmi, 0))
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

@@ -28,7 +28,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 	if(scanline == 240 && m_k007121->ctrlram_r(7) & 0x02) // vblank irq
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(7) & 0x01) // timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -170,7 +170,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( fastlane )
+static GFXDECODE_START( gfx_fastlane )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 64*16 )
 GFXDECODE_END
 
@@ -217,7 +217,7 @@ MACHINE_CONFIG_START(fastlane_state::fastlane)
 	MCFG_SCREEN_UPDATE_DRIVER(fastlane_state, screen_update_fastlane)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastlane)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastlane)
 	MCFG_PALETTE_ADD("palette", 1024*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

@@ -349,7 +349,7 @@ static const gfx_layout char_layout =
 	8*8
 };
 
-static GFXDECODE_START( lockon )
+static GFXDECODE_START( gfx_lockon )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,  0, 128 )
 GFXDECODE_END
 
@@ -419,7 +419,7 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	output().set_led_value(1, !(data & 0x10));
+	m_lamp[1] = BIT(~data, 4);
 }
 
 /*************************************
@@ -430,6 +430,8 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 
 void lockon_state::machine_start()
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_ground_ctrl));
 	save_item(NAME(m_scroll_h));
 	save_item(NAME(m_scroll_v));
@@ -500,7 +502,7 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lockon_state, screen_vblank_lockon))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockon)
 	MCFG_PALETTE_ADD("palette", 1024 + 2048)
 	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
 

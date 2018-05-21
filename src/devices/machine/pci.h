@@ -42,7 +42,7 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 
 	// Specify if this device must be mapped before all the others on the pci bus
-	virtual bool map_first() { return false; }
+	virtual bool map_first() const { return false; }
 
 	void map_config(uint8_t device, address_space *config_space);
 

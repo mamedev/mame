@@ -217,7 +217,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( sonson )
+static GFXDECODE_START( gfx_sonson )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 32 )
 GFXDECODE_END
@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	MCFG_SCREEN_UPDATE_DRIVER(sonson_state, screen_update_sonson)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sonson)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sonson)
 
 	MCFG_PALETTE_ADD("palette", 64*4+32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)

@@ -201,7 +201,7 @@ static const gfx_layout mikrosha_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mikrosha )
+static GFXDECODE_START( gfx_mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikrosha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikrosha)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(mikrosha_state,radio86)
 

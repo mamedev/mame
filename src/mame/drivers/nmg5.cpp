@@ -325,7 +325,7 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -962,12 +962,12 @@ static const gfx_layout layout_16x16x5 =
 	32*8
 };
 
-static GFXDECODE_START( nmg5 )
+static GFXDECODE_START( gfx_nmg5 )
 	GFXDECODE_ENTRY( "gfx1", 0, nmg5_layout_8x8x8, 0x000,  2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,   0x200, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( pclubys )
+static GFXDECODE_START( gfx_pclubys )
 	GFXDECODE_ENTRY( "gfx1", 0, pclubys_layout_8x8x8, 0x000,  2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,      0x200, 16 )
 GFXDECODE_END
@@ -1010,7 +1010,7 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update_nmg5)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nmg5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nmg5)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1059,7 +1059,7 @@ MACHINE_CONFIG_START(nmg5_state::pclubys)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pclubys)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmg5_state::searchp2)
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(nmg5_state::searchp2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(55) // !
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pclubys)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmg5_state::_7ordi)

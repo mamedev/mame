@@ -1113,8 +1113,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 				m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
-			output().set_led_value(1, data & 0x08);
-			output().set_led_value(0, data & 0x04);
+			m_lamp[1] = BIT(data, 3);
+			m_lamp[0] = BIT(data, 2);
 			machine().bookkeeping().coin_counter_w(1, data & 0x02);
 			machine().bookkeeping().coin_counter_w(0, data & 0x01);
 			return;
@@ -1237,7 +1237,7 @@ READ8_MEMBER( segas16b_state::upd7759_status_r )
 WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
 {
 	if (state)
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -3703,11 +3703,11 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segas16b )
+static GFXDECODE_START( gfx_segas16b )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 1024 )
 GFXDECODE_END
 
-static GFXDECODE_START( lockonph )
+static GFXDECODE_START( gfx_lockonph )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   0, 1024 )
 GFXDECODE_END
 
@@ -3734,7 +3734,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas16b)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3930,7 +3930,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockonph)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)
 	MCFG_PALETTE_ADD("palette", 0x2000*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -151,6 +151,8 @@ constexpr XTAL amiga_state::CLK_E_NTSC;
 
 void amiga_state::machine_start()
 {
+	m_power_led.resolve();
+
 	// add callback for RESET instruction
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(amiga_state::m68k_reset), this));
 
@@ -1097,8 +1099,7 @@ WRITE8_MEMBER( amiga_state::cia_0_port_a_write )
 	m_overlay->set_bank(BIT(data, 0));
 
 	// bit 1, power led
-	output().set_led_value(0, !BIT(data, 1));
-	output().set_value("power_led", !BIT(data, 1));
+	m_power_led = BIT(~data, 1);
 }
 
 WRITE_LINE_MEMBER( amiga_state::cia_0_irq )

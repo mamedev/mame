@@ -345,7 +345,7 @@ static const gfx_layout radio86_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( radio86 )
+static GFXDECODE_START( gfx_radio86 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, radio86_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radio86)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radio86)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(radio86_state,radio86)
 

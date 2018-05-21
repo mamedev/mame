@@ -1104,36 +1104,36 @@ static const gfx_layout bnj_tile16layout =
 	64*8
 };
 
-static GFXDECODE_START( btime )
+static GFXDECODE_START( gfx_btime )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    8, 1 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( cookrace )
+static GFXDECODE_START( gfx_cookrace )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tile8layout,     8, 1 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( lnc )
+static GFXDECODE_START( gfx_lnc )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( bnj )
+static GFXDECODE_START( gfx_bnj )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, bnj_tile16layout,8, 1 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( zoar )
+static GFXDECODE_START( gfx_zoar )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 8 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx3", 0, tile16layout,    0, 8 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    0, 8 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( disco )
+static GFXDECODE_START( gfx_disco )
 	GFXDECODE_ENTRY( nullptr, 0, disco_tile8layout,  0, 4 ) /* char set #1 */
 	GFXDECODE_ENTRY( nullptr, 0, disco_tile16layout, 0, 4 ) /* sprites */
 GFXDECODE_END
@@ -1299,7 +1299,7 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", btime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_btime)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
@@ -1342,7 +1342,7 @@ MACHINE_CONFIG_START(btime_state::cookrace)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cookrace)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cookrace)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
@@ -1359,7 +1359,7 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", lnc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8)
@@ -1401,7 +1401,7 @@ MACHINE_CONFIG_START(btime_state::bnj)
 	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bnj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bnj)
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 
@@ -1428,7 +1428,7 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", zoar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64)
@@ -1464,7 +1464,7 @@ MACHINE_CONFIG_START(btime_state::disco)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", disco)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_disco)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32)
@@ -1484,7 +1484,7 @@ MACHINE_CONFIG_START(btime_state::tisland)
 	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", zoar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
 MACHINE_CONFIG_END
 
 

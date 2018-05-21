@@ -767,12 +767,12 @@ static const gfx_layout tilelayout_b =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( opwolf )
+static GFXDECODE_START( gfx_opwolf )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 128 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 128 )   /* scr tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( opwolfb )
+static GFXDECODE_START( gfx_opwolfb )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_b,  0, 128 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_b,  0, 128 ) /* scr tiles */
 GFXDECODE_END
@@ -807,7 +807,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opwolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -885,7 +885,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opwolfb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolfb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

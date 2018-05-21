@@ -1719,16 +1719,16 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( 1x4bit_1x4bit )
+static GFXDECODE_START( gfx_1x4bit_1x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0,          0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [1] Layers
 GFXDECODE_END
-static GFXDECODE_START( 1x4bit_2x4bit )
+static GFXDECODE_START( gfx_1x4bit_2x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0,          0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [1] Layers
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4, 0x40 * 16,  0x40 ) // [2] Layers
 GFXDECODE_END
-static GFXDECODE_START( 1x8bit_2x4bit )
+static GFXDECODE_START( gfx_1x8bit_2x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x40 * 256, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0,          0x40 ) // [1] Layers
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4, 0,          0x40 ) // [2] Layers
@@ -1793,7 +1793,7 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_berlwall)
 //  MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048 )
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -1862,7 +1862,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1x4bit_2x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -1937,7 +1937,7 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -1993,7 +1993,7 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -2074,7 +2074,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x8bit_2x4bit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1x8bit_2x4bit)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -2202,7 +2202,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1x4bit_2x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -2324,7 +2324,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 

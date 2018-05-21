@@ -685,13 +685,13 @@ static const gfx_layout gridlayout2 =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( ladybug )
+static GFXDECODE_START( gfx_ladybug )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 4*8, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sraider )
+static GFXDECODE_START( gfx_sraider )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout2,             0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,          4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,         4*8, 16 )
@@ -736,7 +736,7 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladybug)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladybug)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
@@ -786,7 +786,7 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sraider_state, screen_vblank_sraider))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sraider)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sraider)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32+2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32+1)
 	MCFG_PALETTE_INIT_OWNER(sraider_state,sraider)

@@ -513,7 +513,7 @@ static const gfx_layout h19_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( h19 )
+static GFXDECODE_START( gfx_h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", h19)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)

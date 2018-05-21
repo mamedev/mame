@@ -545,7 +545,7 @@ static const gfx_layout bulletlayout =
 	0   /* no use */
 };
 
-static GFXDECODE_START( zodiack )
+static GFXDECODE_START( gfx_zodiack )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   8*4    , 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, spritelayout, 0      , 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, bulletlayout, 8*4+8*2, 1 )
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(zodiack_state::zodiack)
 	MCFG_SCREEN_UPDATE_DRIVER(zodiack_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zodiack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zodiack)
 	MCFG_PALETTE_ADD("palette", 4*8+2*8+2*1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(48+1)
 	MCFG_PALETTE_INIT_OWNER(zodiack_state,zodiack)

@@ -338,7 +338,7 @@ static const gfx_layout tiles8x8x6_layout =
 	16*8
 };
 
-static GFXDECODE_START( onetwo )
+static GFXDECODE_START( gfx_onetwo )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x6_layout, 0, 2 )
 GFXDECODE_END
 
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(onetwo_state::onetwo)
 	MCFG_SCREEN_UPDATE_DRIVER(onetwo_state, screen_update_onetwo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", onetwo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_onetwo)
 	MCFG_PALETTE_ADD("palette", 0x80)
 
 

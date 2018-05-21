@@ -107,7 +107,7 @@ INTERRUPT_GEN_MEMBER(lwings_state::lwings_interrupt)
 INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -833,13 +833,13 @@ static const gfx_layout bg2_tilelayout =
 };
 
 
-static GFXDECODE_START( lwings )
+static GFXDECODE_START( gfx_lwings )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     512, 16 ) /* colors 512-575 */
 	GFXDECODE_ENTRY( "gfx2", 0, bg1_tilelayout,   0,  8 ) /* colors   0-127 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   384,  8 ) /* colors 384-511 */
 GFXDECODE_END
 
-static GFXDECODE_START( trojan )
+static GFXDECODE_START( gfx_trojan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     768, 16 ) /* colors 768-831 */
 	GFXDECODE_ENTRY( "gfx2", 0, bg1_tilelayout, 256,  8 ) /* colors 256-383 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   640,  8 ) /* colors 640-767 */
@@ -951,7 +951,7 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lwings)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lwings)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
@@ -1001,7 +1001,7 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lwings)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lwings)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
@@ -1035,7 +1035,7 @@ MACHINE_CONFIG_START(lwings_state::trojan)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold,  4000)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", trojan)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_trojan)
 
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
 	MCFG_SCREEN_MODIFY("screen")

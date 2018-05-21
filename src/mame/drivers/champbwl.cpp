@@ -446,7 +446,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static GFXDECODE_START( champbwl )
+static GFXDECODE_START( gfx_champbwl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_champbwl))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_doraemon))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)

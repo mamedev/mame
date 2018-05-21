@@ -265,7 +265,7 @@ static const gfx_layout sys386f_spritelayout =
 };
 
 
-static GFXDECODE_START( seibucats )
+static GFXDECODE_START( gfx_seibucats )
 	GFXDECODE_ENTRY( "gfx1", 0, sys386f_spritelayout,   5632, 16 ) // Not used, legacy charlayout
 	GFXDECODE_ENTRY( "gfx2", 0, sys386f_spritelayout,   4096, 24 ) // Not used, legacy tilelayout
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,   0, 96 )
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seibucats)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seibucats)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 //  MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

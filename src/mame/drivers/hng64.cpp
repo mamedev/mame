@@ -1357,7 +1357,7 @@ static const gfx_layout hng64_texlayout =
 	texlayout_yoffset
 };
 
-static GFXDECODE_START( hng64 )
+static GFXDECODE_START( gfx_hng64 )
 	/* tilemap tiles */
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x4_tilelayout,  0x0, 0x100 )
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x8_tilelayout,  0x0, 0x10 )
@@ -1544,7 +1544,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 
 	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL(32'768))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hng64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)

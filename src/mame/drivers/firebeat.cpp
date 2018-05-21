@@ -1837,3 +1837,4 @@ GAME(  2000, bm3core,  0,   firebeat_spu, popn, firebeat_state, init_ppp, ROT0, 
 GAME(  2001, bm36th,   0,   firebeat_spu, popn, firebeat_state, init_ppp, ROT0,   "Konami",  "Beatmania III Append 6th Mix", MACHINE_NOT_WORKING)
 GAME(  2002, bm37th,   0,   firebeat_spu, popn, firebeat_state, init_ppp, ROT0,   "Konami",  "Beatmania III Append 7th Mix", MACHINE_NOT_WORKING)
 GAME(  2003, bm3final, 0,   firebeat_spu, popn, firebeat_state, init_ppp, ROT0,   "Konami",  "Beatmania III The Final", MACHINE_NOT_WORKING)
+

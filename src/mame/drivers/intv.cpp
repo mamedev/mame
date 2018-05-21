@@ -136,7 +136,7 @@ static const gfx_layout intvkbd_charlayout =
 	8 * 8
 };
 
-static GFXDECODE_START( intvkbd )
+static GFXDECODE_START( gfx_intvkbd )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, intvkbd_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intvkbd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_intvkbd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 

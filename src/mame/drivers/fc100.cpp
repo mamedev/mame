@@ -393,7 +393,7 @@ static const gfx_layout u53_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( fc100 )
+static GFXDECODE_START( gfx_fc100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u53_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	// other lines not connected
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
-	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "f4palette", gfx_fc100)
 	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
 
 	/* sound hardware */

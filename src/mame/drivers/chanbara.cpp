@@ -347,7 +347,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( chanbara )
+static GFXDECODE_START( gfx_chanbara )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chanbara)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chanbara)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)

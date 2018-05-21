@@ -655,14 +655,14 @@ static const gfx_layout pro_tiles =
 };
 
 
-static GFXDECODE_START( liberate )
+static GFXDECODE_START( gfx_liberate )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles1,      0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles2,      0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( prosport )
+static GFXDECODE_START( gfx_prosport )
 	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, charlayout,  0, 4 )
@@ -674,7 +674,7 @@ static GFXDECODE_START( prosport )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, pro_tiles,   0, 4 ) //backgrounds
 GFXDECODE_END
 
-static GFXDECODE_START( prosoccr )
+static GFXDECODE_START( gfx_prosoccr )
 	GFXDECODE_ENTRY( "fg_gfx", 0x00000, charlayout,        0, 4 )
 	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,           0, 4 )
 	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   8, 2 )
@@ -767,7 +767,7 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", liberate)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_liberate)
 	MCFG_PALETTE_ADD("palette", 33)
 	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
 
@@ -826,7 +826,7 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosoccr)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", prosoccr)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_prosoccr)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
@@ -857,7 +857,7 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prosport)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prosport)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 

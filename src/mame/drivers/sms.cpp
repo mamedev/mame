@@ -494,9 +494,6 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(sms_state::sms_base)
-	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
-	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
-
 	/* basic machine hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -586,6 +583,8 @@ MACHINE_CONFIG_START(sms_state::sms2_ntsc)
 	MCFG_SEGA315_5246_IS_PAL(false)
 	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+
+	m_has_bios_full = true;
 MACHINE_CONFIG_END
 
 
@@ -624,6 +623,9 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+
+	m_has_bios_full = true;
+	m_has_pwr_led = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
@@ -672,6 +674,10 @@ MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
 	MCFG_SMS_CARD_ADD("slot30", sms_cart, nullptr)
 	MCFG_SMS_CARD_ADD("slot31", sms_cart, nullptr)
 	MCFG_SMS_CARD_ADD("slot32", sms_cart, nullptr)
+
+	m_has_bios_full = false;
+	m_is_sdisp = true;
+	m_has_pwr_led = false;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::sms_pal_base)
@@ -701,6 +707,8 @@ MACHINE_CONFIG_START(sms_state::sms2_pal)
 	MCFG_SEGA315_5246_IS_PAL(true)
 	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+
+	m_has_bios_full = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::sms1_pal)
@@ -738,6 +746,9 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+
+	m_has_bios_full = true;
+	m_has_pwr_led = true;
 MACHINE_CONFIG_END
 
 
@@ -768,6 +779,8 @@ MACHINE_CONFIG_START(sms_state::sms3_paln)
 	MCFG_SEGA315_5246_IS_PAL(true)
 	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+
+	m_has_bios_full = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::sms1_paln)
@@ -805,6 +818,9 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+
+	m_has_bios_full = true;
+	m_has_pwr_led = true;
 MACHINE_CONFIG_END
 
 
@@ -836,6 +852,8 @@ MACHINE_CONFIG_START(sms_state::sms3_br)
 	MCFG_SEGA315_5246_IS_PAL(false) // PAL-M has same line count of NTSC
 	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+
+	m_has_bios_full = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::sms1_br)
@@ -874,6 +892,9 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+
+	m_has_bios_full = true;
+	m_has_pwr_led = true;
 MACHINE_CONFIG_END
 
 
@@ -885,6 +906,9 @@ MACHINE_CONFIG_START(sms_state::sms2_kr)
 	MCFG_DEVICE_REMOVE("slot")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
+
+	// Despite having a Japanese cartridge slot, this version is detected as Export region.
+	m_has_jpn_sms_cart_slot = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::sms1_kr)
@@ -905,6 +929,11 @@ MACHINE_CONFIG_START(sms_state::sms1_kr)
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
 	MCFG_SEGA315_5124_CSYNC_CB(WRITELINE(*this, sms_state, sms_csync_callback))
+
+	m_has_bios_full = false;
+	m_has_bios_2000 = true;
+	m_ioctrl_region_is_japan = true;
+	m_has_jpn_sms_cart_slot = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::smsj)
@@ -916,6 +945,8 @@ MACHINE_CONFIG_START(sms_state::smsj)
 	// if this output gain is changed, the gain set when unmute the output need
 	// to be changed too, probably along the gain set for the Mark III FM Unit.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	m_is_smsj = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::sg1000m3)
@@ -939,6 +970,10 @@ MACHINE_CONFIG_START(sms_state::sg1000m3)
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
 	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
+
+	m_has_bios_full = false;
+	m_is_mark_iii = true;
+	m_has_jpn_sms_cart_slot = true;
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sms_state::gamegear)
@@ -948,9 +983,6 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	MCFG_DEVICE_IO_MAP(gg_io)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
-	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -984,6 +1016,15 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(WRITELINE(*this, sms_state, gg_ext_th_input))
 	// only for GG-TV mod (may be simulated with a driver modified with SMS screen settings)
 	//MCFG_GG_EXT_PORT_PIXEL_HANDLER(READ32(*this, sms_state, sms_pixel_color))
+
+	m_is_gamegear = true;
+	m_has_bios_0400 = true;
+	m_has_pwr_led = true;
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(sms_state::gamegeaj)
+	gamegear(config);
+	m_ioctrl_region_is_japan = true;
 MACHINE_CONFIG_END
 
 
@@ -1234,22 +1275,22 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY    FULLNAME                              FLAGS */
-CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sms_state,      init_sg1000m3, "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
-CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms_state,      init_sms1,     "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
-CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms_state,      init_sms1,     "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
-CONS( 1986, smssdisp, sms,      0,      sms_sdisp, smssdisp, smssdisp_state, init_smssdisp, "Sega",    "Master System Store Display Unit",   MACHINE_SUPPORTS_SAVE )
-CONS( 1987, smsj,     sms,      0,      smsj,      smsj,     sms_state,      init_smsj,     "Sega",    "Master System (Japan)",              MACHINE_SUPPORTS_SAVE )
-CONS( 1990, sms,      0,        0,      sms2_ntsc, sms,      sms_state,      init_sms,      "Sega",    "Master System II",                   MACHINE_SUPPORTS_SAVE )
-CONS( 1990, smspal,   sms,      0,      sms2_pal,  sms,      sms_state,      init_sms,      "Sega",    "Master System II (PAL)",             MACHINE_SUPPORTS_SAVE )
-CONS( 1989, sms1krfm, sms,      0,      smsj,      smsj,     sms_state,      init_smsj,     "Samsung", "Gam*Boy I (Korea) (FM)",             MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms1kr,   sms,      0,      sms1_kr,   smsj,     sms_state,      init_sms1kr,   "Samsung", "Gam*Boy I (Korea)",                  MACHINE_SUPPORTS_SAVE )
-CONS( 1991, smskr,    sms,      0,      sms2_kr,   sms,      sms_state,      init_smskr,    "Samsung", "Gam*Boy II (Korea)",                 MACHINE_SUPPORTS_SAVE )
-CONS( 1989, sms1br,   sms,      0,      sms1_br,   sms1,     sms_state,      init_sms1,     "Tec Toy", "Master System I (Brazil)",           MACHINE_SUPPORTS_SAVE )
-CONS( 1991, sms2br,   sms,      0,      sms1_br,   sms1,     sms_state,      init_sms1,     "Tec Toy", "Master System II (Brazil)",          MACHINE_SUPPORTS_SAVE )
-CONS( 1992, smsbr,    sms,      0,      sms3_br,   sms,      sms_state,      init_sms,      "Tec Toy", "Master System III Compact (Brazil)", MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms1paln, sms,      0,      sms1_paln, sms1,     sms_state,      init_sms1,     "Tec Toy", "Master System I (PAL-N)",            MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms2paln, sms,      0,      sms1_paln, sms1,     sms_state,      init_sms1,     "Tec Toy", "Master System II (PAL-N)",           MACHINE_SUPPORTS_SAVE )
-CONS( 19??, smspaln,  sms,      0,      sms3_paln, sms,      sms_state,      init_sms,      "Tec Toy", "Master System III Compact (PAL-N)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sms_state,      empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
+CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms_state,      empty_init,    "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
+CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms_state,      empty_init,    "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
+CONS( 1986, smssdisp, sms,      0,      sms_sdisp, smssdisp, smssdisp_state, empty_init,    "Sega",    "Master System Store Display Unit",   MACHINE_SUPPORTS_SAVE )
+CONS( 1987, smsj,     sms,      0,      smsj,      smsj,     sms_state,      empty_init,    "Sega",    "Master System (Japan)",              MACHINE_SUPPORTS_SAVE )
+CONS( 1990, sms,      0,        0,      sms2_ntsc, sms,      sms_state,      empty_init,    "Sega",    "Master System II",                   MACHINE_SUPPORTS_SAVE )
+CONS( 1990, smspal,   sms,      0,      sms2_pal,  sms,      sms_state,      empty_init,    "Sega",    "Master System II (PAL)",             MACHINE_SUPPORTS_SAVE )
+CONS( 1989, sms1krfm, sms,      0,      smsj,      smsj,     sms_state,      empty_init,    "Samsung", "Gam*Boy I (Korea) (FM)",             MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms1kr,   sms,      0,      sms1_kr,   smsj,     sms_state,      empty_init,    "Samsung", "Gam*Boy I (Korea)",                  MACHINE_SUPPORTS_SAVE )
+CONS( 1991, smskr,    sms,      0,      sms2_kr,   sms,      sms_state,      empty_init,    "Samsung", "Gam*Boy II (Korea)",                 MACHINE_SUPPORTS_SAVE )
+CONS( 1989, sms1br,   sms,      0,      sms1_br,   sms1,     sms_state,      empty_init,    "Tec Toy", "Master System I (Brazil)",           MACHINE_SUPPORTS_SAVE )
+CONS( 1991, sms2br,   sms,      0,      sms1_br,   sms1,     sms_state,      empty_init,    "Tec Toy", "Master System II (Brazil)",          MACHINE_SUPPORTS_SAVE )
+CONS( 1992, smsbr,    sms,      0,      sms3_br,   sms,      sms_state,      empty_init,    "Tec Toy", "Master System III Compact (Brazil)", MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms1paln, sms,      0,      sms1_paln, sms1,     sms_state,      empty_init,    "Tec Toy", "Master System I (PAL-N)",            MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms2paln, sms,      0,      sms1_paln, sms1,     sms_state,      empty_init,    "Tec Toy", "Master System II (PAL-N)",           MACHINE_SUPPORTS_SAVE )
+CONS( 19??, smspaln,  sms,      0,      sms3_paln, sms,      sms_state,      empty_init,    "Tec Toy", "Master System III Compact (PAL-N)",  MACHINE_SUPPORTS_SAVE )
 
-CONS( 1991, gamegear, 0,        sms,    gamegear,  gg,       sms_state,      init_gamegear, "Sega",    "Game Gear (Europe/America)",         MACHINE_SUPPORTS_SAVE )
-CONS( 1990, gamegeaj, gamegear, 0,      gamegear,  gg,       sms_state,      init_gamegeaj, "Sega",    "Game Gear (Japan)",                  MACHINE_SUPPORTS_SAVE )
+CONS( 1991, gamegear, 0,        sms,    gamegear,  gg,       sms_state,      empty_init,    "Sega",    "Game Gear (Europe/America)",         MACHINE_SUPPORTS_SAVE )
+CONS( 1990, gamegeaj, gamegear, 0,      gamegeaj,  gg,       sms_state,      empty_init,    "Sega",    "Game Gear (Japan)",                  MACHINE_SUPPORTS_SAVE )

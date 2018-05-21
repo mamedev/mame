@@ -195,7 +195,7 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( exedexes )
+static GFXDECODE_START( gfx_exedexes )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           64*4, 64 ) /* 32x32 Tiles */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       2*64*4, 16 ) /* 16x16 Tiles */
@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exedexes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exedexes)
 
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)

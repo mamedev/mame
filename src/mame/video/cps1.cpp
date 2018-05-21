@@ -1551,6 +1551,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2amf",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 }, // probably wrong but this set is not completely dumped anyway
 	{"sf2amf2",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2level",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m2",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m3",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
@@ -1854,9 +1855,9 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
-				output().set_led_value(0, data & 0x02);
-				output().set_led_value(1, data & 0x04);
-				output().set_led_value(2, data & 0x08);
+				m_led_cboard[0] = BIT(data, 1);
+				m_led_cboard[1] = BIT(data, 2);
+				m_led_cboard[2] = BIT(data, 3);
 			}
 			else    // kod, captcomm, knights
 			{

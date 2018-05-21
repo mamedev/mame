@@ -495,7 +495,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( dassault )
+static GFXDECODE_START( gfx_dassault )
 	/* "gfx1" is copied to "gfx2" at runtime */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0,  32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0,  32 )    /* Tiles 16x16 */
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dassault)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dassault)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 

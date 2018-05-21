@@ -428,7 +428,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( supdrapo )
+static GFXDECODE_START( gfx_supdrapo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
 
@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supdrapo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supdrapo)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(supdrapo_state, supdrapo)
 

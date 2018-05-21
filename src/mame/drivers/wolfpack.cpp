@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {
 	int scanline = param;
 
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	scanline += 64;
 
@@ -43,6 +43,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 
 void wolfpack_state::machine_start()
 {
+	m_led.resolve();
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 }
 
@@ -117,7 +118,7 @@ WRITE8_MEMBER(wolfpack_state::attract_w)
 
 WRITE8_MEMBER(wolfpack_state::credit_w)
 {
-	output().set_led_value(0, !(data & 1));
+	m_led = BIT(~data, 0);
 }
 
 
@@ -297,7 +298,7 @@ static const gfx_layout torpedo_layout =
 };
 
 
-static GFXDECODE_START( wolfpack )
+static GFXDECODE_START( gfx_wolfpack )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, ship_layout, 6, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, pt_layout, 0, 1 )
@@ -322,7 +323,7 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wolfpack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wolfpack)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)

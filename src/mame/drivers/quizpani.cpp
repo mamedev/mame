@@ -188,7 +188,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( quizpani )
+static GFXDECODE_START( gfx_quizpani )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0x100, 16 ) /* Background */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x000, 16 ) /* Text */
 GFXDECODE_END
@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpani)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizpani)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

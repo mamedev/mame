@@ -259,7 +259,7 @@ static const gfx_layout thoop2_tilelayout_16 =
 };
 
 
-static GFXDECODE_START( thoop2 )
+static GFXDECODE_START( gfx_thoop2 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout, 0,        64 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout_16, 0, 64 )
 GFXDECODE_END
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(thoop2_state::thoop2)
 	MCFG_SCREEN_UPDATE_DRIVER(thoop2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thoop2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thoop2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

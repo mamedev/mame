@@ -1388,7 +1388,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( jalmah )
+static GFXDECODE_START( gfx_jalmah )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x300, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1396,7 +1396,7 @@ static GFXDECODE_START( jalmah )
 GFXDECODE_END
 
 /*different color offsets*/
-static GFXDECODE_START( urashima )
+static GFXDECODE_START( gfx_urashima )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1431,7 +1431,7 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 
 	//M50747 MCU
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jalmah)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1457,7 +1457,7 @@ MACHINE_CONFIG_START(jalmah_state::urashima)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(urashima)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", urashima)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_urashima)
 
 	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
 	MCFG_SCREEN_MODIFY("screen")

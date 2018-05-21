@@ -260,7 +260,7 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 	{
 		m_ics->reset();
 		m_soundcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_soundcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	else
 	{
@@ -283,7 +283,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
 		m_soundlatch->write(space, 0, data);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -477,7 +477,7 @@ static const gfx_layout pgm32_charlayout =
 		32*160
 };
 
-GFXDECODE_START( pgm )
+GFXDECODE_START( gfx_pgm )
 	GFXDECODE_REVERSEBITS( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
 	GFXDECODE_REVERSEBITS( "tiles", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
 GFXDECODE_END
@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm_state, screen_vblank_pgm))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgm)
 	MCFG_PALETTE_ADD("palette", 0x1200/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

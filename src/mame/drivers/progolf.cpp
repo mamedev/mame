@@ -381,7 +381,7 @@ static const gfx_layout charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( progolf )
+static GFXDECODE_START( gfx_progolf )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 ) /* sprites */
 GFXDECODE_END
 
@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", progolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_progolf)
 	MCFG_PALETTE_ADD("palette", 32*3)
 	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
 

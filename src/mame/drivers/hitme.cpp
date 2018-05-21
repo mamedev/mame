@@ -274,7 +274,7 @@ static const gfx_layout hitme_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( hitme )
+static GFXDECODE_START( gfx_hitme )
 	GFXDECODE_ENTRY( "gfx1", 0, hitme_charlayout, 0, 2  )
 GFXDECODE_END
 
@@ -290,7 +290,7 @@ static const gfx_layout barricad_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( barricad )
+static GFXDECODE_START( gfx_barricad )
 	GFXDECODE_ENTRY( "gfx1", 0, barricad_charlayout,   0, 1  )
 GFXDECODE_END
 
@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(hitme_state::hitme)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitme)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitme)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(hitme_state::barricad)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", barricad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_barricad)
 
 	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
 MACHINE_CONFIG_END

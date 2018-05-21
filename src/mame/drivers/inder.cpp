@@ -1146,7 +1146,7 @@ WRITE8_MEMBER( inder_state::sn_w )
 WRITE8_MEMBER( inder_state::sndcmd_lapbylap_w )
 {
 	m_sndcmd = data;
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( inder_state::sndcmd_w )

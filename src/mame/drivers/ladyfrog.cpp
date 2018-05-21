@@ -82,7 +82,7 @@ WRITE8_MEMBER(ladyfrog_state::sound_cpu_reset_w)
 TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_pending_nmi = 1;
 }
@@ -103,7 +103,7 @@ WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_pending_nmi = 0;
 	}
 }
@@ -262,7 +262,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( ladyfrog )
+static GFXDECODE_START( gfx_ladyfrog )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladyfrog)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladyfrog)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

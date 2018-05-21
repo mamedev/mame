@@ -616,12 +616,12 @@ static const gfx_layout tile_layout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( twin16 )
+static GFXDECODE_START( gfx_twin16 )
 	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
 	GFXDECODE_RAM(  "zipram", 0, tile_layout, 512, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( fround )
+static GFXDECODE_START( gfx_fround )
 	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 512, 16 )
 GFXDECODE_END
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(twin16_state::twin16)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twin16)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(fround_state::fround)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fround)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fround)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

@@ -37,7 +37,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
@@ -119,7 +119,7 @@ READ8_MEMBER( univac_state::ram_r )
 	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effects_disabled())
 	{
 		LOGPARITY("parity check failed offset = %04X\n", offset);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	return m_p_videoram[offset];
 }
@@ -300,7 +300,7 @@ static const gfx_layout c10_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( c10 )
+static GFXDECODE_START( gfx_c10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c10_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

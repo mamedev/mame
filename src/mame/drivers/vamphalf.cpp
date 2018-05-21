@@ -1033,7 +1033,7 @@ static const gfx_layout sprites_layout =
 	16*16*8,
 };
 
-static GFXDECODE_START( vamphalf )
+static GFXDECODE_START( gfx_vamphalf )
 	GFXDECODE_ENTRY( "gfx", 0, sprites_layout, 0, 0x80 )
 GFXDECODE_END
 
@@ -1059,7 +1059,7 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vamphalf)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
@@ -1237,7 +1237,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vamphalf)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

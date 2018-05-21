@@ -605,7 +605,7 @@ static const gfx_layout charlayout8_tasman =
 	8*64
 };
 
-static GFXDECODE_START( tasman )
+static GFXDECODE_START( gfx_tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
 GFXDECODE_END
 
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K055673_PALETTE("palette")
 
 #if CUSTOM_DRAW
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
 #endif
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)

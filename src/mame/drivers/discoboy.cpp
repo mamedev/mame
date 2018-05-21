@@ -423,7 +423,7 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8
 };
 
-static GFXDECODE_START( discoboy )
+static GFXDECODE_START( gfx_discoboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x000, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0x000, 128 )
 GFXDECODE_END
@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	MCFG_SCREEN_UPDATE_DRIVER(discoboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", discoboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_discoboy)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

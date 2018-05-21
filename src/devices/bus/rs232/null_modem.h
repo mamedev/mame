@@ -5,6 +5,7 @@
 
 #include "rs232.h"
 #include "imagedev/bitbngr.h"
+#include "diserial.h"
 
 class null_modem_device : public device_t,
 	public device_serial_interface,

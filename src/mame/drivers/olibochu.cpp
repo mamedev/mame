@@ -433,7 +433,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( olibochu )
+static GFXDECODE_START( gfx_olibochu )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 64 )
 GFXDECODE_END
@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", olibochu)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_olibochu)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(olibochu_state, olibochu)
 

@@ -70,7 +70,7 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x40);
 
 	if (ioport("IN0")->read() & 0x40)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_nmi_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
@@ -283,7 +283,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( ultratnk )
+static GFXDECODE_START( gfx_ultratnk )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 5 )
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 5 )
 GFXDECODE_END
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ultratnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ultratnk)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)

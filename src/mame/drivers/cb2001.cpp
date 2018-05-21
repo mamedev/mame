@@ -786,7 +786,7 @@ static const gfx_layout cb2001_layout32 =
 	32*32
 };
 
-static GFXDECODE_START( cb2001 )
+static GFXDECODE_START( gfx_cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout,   0x0, 32 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
@@ -837,7 +837,7 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb2001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb2001)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

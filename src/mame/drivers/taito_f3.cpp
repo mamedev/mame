@@ -406,7 +406,7 @@ static const gfx_layout tile_layout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( taito_f3 )
+static GFXDECODE_START( gfx_taito_f3 )
 	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(taito_f3_state::f3)
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_f3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_f3)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
@@ -551,7 +551,7 @@ static const gfx_layout bubsympb_tile_layout =
 };
 
 
-static GFXDECODE_START( bubsympb )
+static GFXDECODE_START( gfx_bubsympb )
 	GFXDECODE_ENTRY( nullptr,           0x000000, charlayout,          0,  64 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, bubsympb_tile_layout, 0, 512 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, bubsympb_sprite_layout, 4096, 256 ) /* Sprites area */
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bubsympb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bubsympb)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)

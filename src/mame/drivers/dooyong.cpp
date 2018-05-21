@@ -1369,21 +1369,21 @@ const gfx_layout rshark_spritelayout =
 	128*8
 };
 
-GFXDECODE_START( lastday )
+GFXDECODE_START( gfx_lastday )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16+64 )
 GFXDECODE_END
 
-GFXDECODE_START( flytiger )
+GFXDECODE_START( gfx_flytiger )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 32+64 )
 GFXDECODE_END
 
-GFXDECODE_START( bluehawk )
+GFXDECODE_START( gfx_bluehawk )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16 )
@@ -1391,14 +1391,14 @@ GFXDECODE_START( bluehawk )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,           0, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( primella )
+GFXDECODE_START( gfx_primella )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	/* no sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         768, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( rshark )
+GFXDECODE_START( gfx_rshark )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
@@ -1407,7 +1407,7 @@ GFXDECODE_START( rshark )
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,      1024, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( popbingo )
+GFXDECODE_START( gfx_popbingo )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0,  1 )
@@ -1498,7 +1498,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1551,7 +1551,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1589,7 +1589,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1627,7 +1627,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bluehawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bluehawk)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
@@ -1667,7 +1667,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flytiger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flytiger)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
@@ -1703,7 +1703,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_primella)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", primella)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_primella)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 1, "gfx2", -0x4000)
@@ -1753,7 +1753,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rshark)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1805,7 +1805,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popbingo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

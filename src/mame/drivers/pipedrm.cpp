@@ -529,14 +529,14 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( pipedrm )
+static GFXDECODE_START( gfx_pipedrm )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, splayout, 1024, 32 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( hatris )
+static GFXDECODE_START( gfx_hatris )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 GFXDECODE_END
@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_pipedrm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipedrm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pipedrm)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hatris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hatris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

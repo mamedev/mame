@@ -254,7 +254,7 @@ static const gfx_layout p7_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( pasopia )
+static GFXDECODE_START( gfx_pasopia )
 	GFXDECODE_ENTRY( "chargen", 0x0000, p7_chars_8x8, 0, 4 )
 GFXDECODE_END
 
@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */

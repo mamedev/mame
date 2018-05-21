@@ -9,7 +9,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/tiki100/exp.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
@@ -63,7 +63,8 @@ public:
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
 		m_rome(1),
-		m_vire(1)
+		m_vire(1),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -149,6 +150,8 @@ protected:
 
 	// serial state
 	bool m_st;
+
+	output_finder<3> m_led;
 };
 
 #endif // MAME_INCLUDES_TIKI100_H

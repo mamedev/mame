@@ -230,7 +230,7 @@ static const gfx_layout gumbo2_layout =
 	4*16
 };
 
-static GFXDECODE_START( gumbo )
+static GFXDECODE_START( gfx_gumbo )
 	GFXDECODE_ENTRY( "gfx1", 0, gumbo_layout,   0x0, 2  ) /* bg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, gumbo2_layout,  0x0, 2  ) /* fg tiles */
 GFXDECODE_END
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(gumbo_state::gumbo)
 	MCFG_DEVICE_PROGRAM_MAP(gumbo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gumbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gumbo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

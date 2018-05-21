@@ -280,7 +280,7 @@ static const gfx_layout fp6000_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( fp6000 )
+static GFXDECODE_START( gfx_fp6000 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, fp6000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(fp6000_state::fp6000)
 
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp6000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp6000)
 
 MACHINE_CONFIG_END
 

@@ -131,8 +131,8 @@ template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, ty
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
 	constexpr u32 NATIVE_BYTES = 1 << Width;
 	constexpr u32 NATIVE_BITS = 8 * NATIVE_BYTES;
-	constexpr u32 NATIVE_MASK = NATIVE_BYTES - 1;
 	constexpr u32 NATIVE_STEP = AddrShift >= 0 ? NATIVE_BYTES << iabs(AddrShift) : NATIVE_BYTES >> iabs(AddrShift);
+	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 
 	// equal to native size and aligned; simple pass-through to the native reader
 	if (NATIVE_BYTES == TARGET_BYTES && (Aligned || (address & NATIVE_MASK) == 0))
@@ -264,8 +264,8 @@ template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, ty
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
 	constexpr u32 NATIVE_BYTES = 1 << Width;
 	constexpr u32 NATIVE_BITS = 8 * NATIVE_BYTES;
-	constexpr u32 NATIVE_MASK = NATIVE_BYTES - 1;
 	constexpr u32 NATIVE_STEP = AddrShift >= 0 ? NATIVE_BYTES << iabs(AddrShift) : NATIVE_BYTES >> iabs(AddrShift);
+	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 
 	// equal to native size and aligned; simple pass-through to the native writer
 	if (NATIVE_BYTES == TARGET_BYTES && (Aligned || (address & NATIVE_MASK) == 0))
@@ -388,7 +388,7 @@ template<int Width, int AddrShift, int Endian> class memory_access_cache
 	friend class address_table;
 	using NativeType = typename handler_entry_size<Width>::uX;
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
-	static constexpr u32 NATIVE_MASK = NATIVE_BYTES - 1;
+	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 
 public:
 	using cache_update_delegate = delegate<offs_t (memory_access_cache<Width, AddrShift, Endian> &, offs_t)>;

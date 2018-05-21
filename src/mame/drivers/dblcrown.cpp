@@ -530,7 +530,7 @@ static const gfx_layout char_16x16_layout =
 };
 
 
-static GFXDECODE_START( dblcrown )
+static GFXDECODE_START( gfx_dblcrown )
 #ifdef DEBUG_VRAM
 	GFXDECODE_ENTRY( "vram", 0, char_8x8_layout, 0, 0x10 )
 #endif
@@ -619,7 +619,7 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblcrown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblcrown)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
