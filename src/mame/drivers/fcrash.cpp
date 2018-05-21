@@ -3100,6 +3100,57 @@ ROM_START( slampic )
 	ROM_LOAD( "mb_qa.5k",   0x00000, 0x20000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
 ROM_END
 
+ROM_START( slampic2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	// ROM_LOAD16_BYTE( "5.bin",      0x000000, 0x80000,  CRC(7dba63cd) SHA1(222e781ffc40c5c23f5789c0682f549f00beeb8d) )
+	// ROM_LOAD16_BYTE( "3.bin",      0x000001, 0x80000,  CRC(d86671f3) SHA1(d95fae27b0f4d3688f1c2229c9d3780724a870a8) )
+	// ROM_LOAD16_BYTE( "4.bin",      0x100000, 0x80000,  CRC(d14d0e42) SHA1(b60c44193b247dc4856bd36d69cbbe9dcb2d21a7) )
+	// ROM_LOAD16_BYTE( "2.bin",      0x100001, 0x80000,  CRC(38063cd8) SHA1(e647433414ff4fdc0b2c4c7036b8995a95289efa) )
+	ROM_LOAD16_BYTE( "4.bin",      0x000000, 0x80000,  CRC(105cfefd) SHA1(83a34bc83782ae04be1665a91b44625d24f99466) )
+	ROM_LOAD16_BYTE( "2.bin",      0x000001, 0x80000,  CRC(6026c95e) SHA1(8503587941ad14a757ad337dc36591fedcddaa41) )
+	ROM_LOAD16_BYTE( "3.bin",      0x100000, 0x80000,  CRC(0effa84a) SHA1(03342bd4cb1de8652bab874c11cb1ecb69a339c7) )
+	ROM_LOAD16_BYTE( "1.bin",      0x100001, 0x80000,  CRC(8fcb683a) SHA1(4648656bed010a0c27748df4a78c73c5cae07442) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	// ROMX_LOAD( "9.bin",    0x000000, 0x40000, CRC(dc140351) SHA1(0e69e1c8ded85ba26eb8236449d38ead0243ae78), ROM_SKIP(7) )
+	// ROM_CONTINUE(          0x000004, 0x40000)
+	// ROMX_LOAD( "8.bin",    0x000001, 0x40000, CRC(9ae88035) SHA1(3329e9582ca052940e115e759bb3d96f4a9c87fa), ROM_SKIP(7) )
+	// ROM_CONTINUE(          0x000005, 0x40000)
+	ROMX_LOAD( "rom7.bin", 0x000000, 0x40000, CRC(b5669ad3) SHA1(ceb3d2a6d6c1443a40d37c8f2ba5f3cf03315908), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000004, 0x40000)
+	ROMX_LOAD( "rom8.bin", 0x000001, 0x40000, CRC(f07a6085) SHA1(68795a0f5151a45f053059bc2fe4a622d5e10d8a), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000005, 0x40000)
+	ROMX_LOAD( "7.bin",    0x000002, 0x40000, CRC(5321f759) SHA1(7538a6587cf1077921b938070185e0a0ce5ca922), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000006, 0x40000)
+	ROMX_LOAD( "6.bin",    0x000003, 0x40000, CRC(c8eb5f76) SHA1(a361d2d2dfe71789736666b744ae5f1e4bf7e1b2), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x000007, 0x40000)
+	ROMX_LOAD( "17.bin",   0x200000, 0x40000, CRC(21652214) SHA1(039335251f6553c4f36e2d33e8b43fb5726e833e), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200004, 0x40000)
+	ROMX_LOAD( "16.bin",   0x200001, 0x40000, CRC(d49d2eb0) SHA1(1af01575340730166975be93bae438e2b0492f98), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200005, 0x40000)
+	ROMX_LOAD( "15.bin",   0x200002, 0x40000, CRC(0d98bfd6) SHA1(c11fbf555880a933a4cbf6faa517f59f8443304f), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200006, 0x40000)
+	ROMX_LOAD( "14.bin",   0x200003, 0x40000, CRC(807284f1) SHA1(c747c3eaade31c2633fb0a0682dbea900bf2b092), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x200007, 0x40000)
+	ROMX_LOAD( "13.bin",   0x400000, 0x40000, CRC(293579c5) SHA1(9adafe29664b20834365b339f7ae379cdb9ee138), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400004, 0x40000)
+	ROMX_LOAD( "12.bin",   0x400001, 0x40000, CRC(c3727ce7) SHA1(c4abc2c59152c59a45f85393e9525505bc2c9e6e), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400005, 0x40000)
+	ROMX_LOAD( "11.bin",   0x400002, 0x40000, CRC(2919883b) SHA1(44ad979daae673c77b3157d2b352797d4ad0ec24), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400006, 0x40000)
+	ROMX_LOAD( "10.bin",   0x400003, 0x40000, CRC(f538e620) SHA1(354cd0548b067dfc8782bbe13b0a9c2083dbd290), ROM_SKIP(7) )
+	ROM_CONTINUE(          0x400007, 0x40000)
+
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* PIC16c57 - protected, dump isn't valid */
+	ROM_LOAD( "pic16c57-xt-p.bin", 0x00000, 0x2000, BAD_DUMP CRC(aeae5ccc) SHA1(553afb68f7bf130cdf34e24512f72b4ecef1576f) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
+	ROM_LOAD( "18.bin",   0x00000, 0x80000, CRC(73a0c11c) SHA1(a66e1a964313e21c4436200d36c598dcb277cd34) )
+
+	ROM_REGION( 0x20000, "user1", 0 ) // not in the dump, but needed for protection
+	ROM_LOAD( "mb_qa.5k",   0x00000, 0x20000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
+ROM_END
+
 // ************************************************************************* VARTHB
 
 WRITE16_MEMBER(cps_state::varthb_layer_w)
@@ -3231,6 +3282,7 @@ GAME( 1992, sf2b2,     sf2,      sf2b,      sf2mdt,   cps_state, init_sf2mdtb,  
 GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
 GAME( 1993, slampic,   slammast, slampic,   slammast, cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
+GAME( 1993, slampic2,  slammast, slampic,   slammast, cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999, sgyxz,     wof,      sgyxz,     sgyxz,    cps_state, init_cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 GAME( 1999, wofabl,    wof,      wofabl,    wofabl,   cps_state, init_wofabl,   ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy gfx glitches - 921005 - Sangokushi 2
