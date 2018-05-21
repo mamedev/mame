@@ -40,10 +40,11 @@ public:
 		, m_irq_source(0)
 		, m_irq_scanline_start(0)
 		, m_irq_scanline_end(0)
-		, m_coin_unlock(false)
+		, m_coin2_lock_cnt(3)
 	{
 	}
 
+	void init_common();
 	void init_banbam();
 	void init_pettanp();
 
@@ -73,6 +74,8 @@ protected:
 	DECLARE_READ8_MEMBER(banbam_protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update_markham(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -109,7 +112,7 @@ private:
 	uint8_t m_irq_scanline_start;
 	uint8_t m_irq_scanline_end;
 
-	bool m_coin_unlock;
+	uint8_t m_coin2_lock_cnt;
 };
 
 #endif // MAME_INCLUDES_MARKHAM_H
