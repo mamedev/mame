@@ -9,7 +9,7 @@ QTY     Type    clock   position    function
 1x  u6295       u98     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
 1x  HA17358         u101    Dual Operational Amplifier - sound
 1x  TDA2003         u104    Audio Amplifier - sound
-1x  oscillator  12.000MHz   osc1
+1x  oscillator  24.000MHz   osc1
 ROMs
 QTY     Type    position    status
 2x  M27C1001    2,3     dumped
