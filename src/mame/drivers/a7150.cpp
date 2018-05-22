@@ -61,7 +61,6 @@ public:
 		, m_gfxcpu(*this, "gfxcpu")
 		, m_ctc(*this, Z80CTC_TAG)
 		, m_rs232(*this, "rs232")
-		, m_loopback(*this, "loopback")
 		, m_video_ram(*this, "video_ram")
 		, m_video_bankdev(*this, "video_bankdev")
 		, m_palette(*this, "palette")
@@ -101,7 +100,6 @@ public:
 	required_device<z80_device> m_gfxcpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<rs232_port_device> m_rs232;
-	required_device<rs232_port_device> m_loopback;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
@@ -155,7 +153,7 @@ WRITE_LINE_MEMBER(a7150_state::ifss_loopback_w)
 WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
 {
 	if (m_ifss_loopback)
-		m_loopback->write_txd(state);
+		m_uart8251->write_rxd(state);
 	else
 		m_rs232->write_txd(state);
 }
@@ -163,7 +161,7 @@ WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
 WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
 {
 	if (m_ifss_loopback)
-		m_loopback->write_dtr(state);
+		m_uart8251->write_dsr(state);
 	else
 		m_rs232->write_dtr(state);
 }
@@ -507,12 +505,6 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
-
-	// temporarily enabled by ACT
-	MCFG_DEVICE_ADD("loopback", RS232_PORT, default_rs232_devices, "loopback")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
 
 	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic8259", pic8259_device, ir5_w))
