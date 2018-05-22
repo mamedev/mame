@@ -14,24 +14,20 @@ MACHINE_CONFIG_START(voodoo_pci_device::device_add_mconfig)
 				MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
 				MCFG_VOODOO_FBMEM(4)
 				MCFG_VOODOO_TMUMEM(1, 0)
-				MCFG_VOODOO_SCREEN_TAG("screen")
 			break;
 		case TYPE_VOODOO_2:
 				MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
 				MCFG_VOODOO_FBMEM(4)
 				MCFG_VOODOO_TMUMEM(1, 0)
-				MCFG_VOODOO_SCREEN_TAG("screen")
 			break;
 		case TYPE_VOODOO_BANSHEE:
 				MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
 				MCFG_VOODOO_FBMEM(16)
-				MCFG_VOODOO_SCREEN_TAG("screen")
 			break;
 		//case TYPE_VOODOO_3
 		default:
 				MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
 				MCFG_VOODOO_FBMEM(16)
-				MCFG_VOODOO_SCREEN_TAG("screen")
 			break;}
 MACHINE_CONFIG_END
 
@@ -67,18 +63,14 @@ void voodoo_pci_device::io_map(address_map &map)
 
 voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, VOODOO_PCI, tag, owner, clock),
-		m_voodoo(*this, "voodoo"), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
+	  m_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
 {
-}
-
-void voodoo_pci_device::set_cpu_tag(const char *_cpu_tag)
-{
-	m_cpu_tag = _cpu_tag;
 }
 
 void voodoo_pci_device::device_start()
 {
-	m_voodoo->set_cpu_tag(m_cpu_tag);
+	m_voodoo->set_cpu_tag(m_cpu);
+	m_voodoo->set_screen_tag(m_screen);
 	m_voodoo->set_fbmem(m_fbmem);
 	m_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
 	switch (m_type) {

@@ -10,10 +10,11 @@
 #include "machine/pci.h"
 #include "voodoo.h"
 
-#define MCFG_VOODOO_PCI_ADD(_tag,  _type, _cpu_tag) \
+#define MCFG_VOODOO_PCI_ADD(_tag,  _type, _cpu_tag, _screen_tag)	\
 	voodoo_pci_device::set_type(_type); \
 	MCFG_PCI_DEVICE_ADD(_tag, VOODOO_PCI, 0, 0, 0, 0) \
-	downcast<voodoo_pci_device *>(device)->set_cpu_tag(_cpu_tag);
+	downcast<voodoo_pci_device *>(device)->set_cpu_tag(_cpu_tag); \
+	downcast<voodoo_pci_device *>(device)->set_screen_tag(_screen_tag);
 
 #define MCFG_VOODOO_PCI_FBMEM(_value) \
 	downcast<voodoo_pci_device *>(device)->set_fbmem(_value);
@@ -31,7 +32,8 @@ public:
 	virtual void config_map(address_map &map) override;
 
 	void postload(void);
-	void set_cpu_tag(const char *tag);
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
 	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
@@ -46,9 +48,10 @@ protected:
 
 private:
 	required_device<voodoo_device> m_voodoo;
+	optional_device<cpu_device> m_cpu;
+	optional_device<screen_device> m_screen;
 	static int m_type; // FIXME: all voodoo have to be the same?  really?
 	int m_fbmem, m_tmumem0, m_tmumem1;
-	const char *m_cpu_tag;
 
 	uint32_t m_pcictrl_reg[0x20];
 	void voodoo_reg_map(address_map &map);

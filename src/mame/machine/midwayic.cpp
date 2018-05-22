@@ -662,8 +662,8 @@ midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const 
 	m_fifo_out(0),
 	m_fifo_bytes(0),
 	m_fifo_force_buffer_empty_pc(0),
-	m_cage(*this, "cage"),
-	m_dcs(*this, "dcs")
+	m_cage(*this, ":cage"),
+	m_dcs(*this, ":dcs")
 {
 	memset(m_fifo,0,sizeof(m_fifo));
 	memset(m_reg,0,sizeof(m_reg));

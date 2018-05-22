@@ -1468,8 +1468,8 @@ public:
 
 	void set_fbmem(int value) { m_fbmem = value; }
 	void set_tmumem(int value1, int value2) { m_tmumem0 = value1; m_tmumem1 = value2; }
-	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
-	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_stall_callback(Object &&cb)  { return m_stall.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pciint_callback(Object &&cb) { return m_pciint.set_callback(std::forward<Object>(cb)); }
