@@ -2250,7 +2250,6 @@ void cps_state::video_start()
 	/* Put in some const */
 	m_scroll_size    = 0x4000;  /* scroll1, scroll2, scroll3 */
 	m_obj_size       = 0x0800;
-	m_cps2_obj_size  = 0x2000;
 	m_other_size     = 0x0800;
 	m_palette_align  = 0x0400;  /* minimum alignment is a single palette page (512 colors). Verified on pcb. */
 	m_palette_size   = cps1_palette_entries * 32; /* Size of palette RAM */
@@ -2326,6 +2325,7 @@ void cps2_state::video_start()
 {
 	cps_state::video_start();
 
+	m_cps2_obj_size = 0x2000;
 	m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
 
 	memset(m_objram1, 0, m_cps2_obj_size);
