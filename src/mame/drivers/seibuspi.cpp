@@ -2387,6 +2387,37 @@ ROM_START( batlball )
 	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
 ROM_END
 
+ROM_START( batlballo ) // Board has a low serial number 000014 and PCB date is 95.10.02
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("seibu_1a.211", 0x100000, 0x40000, CRC(90340e8c) SHA1(303d3c5ffc1a64e1e4aa614105119d9d7768f516) )
+	ROM_LOAD32_BYTE("seibu_2a.212", 0x100001, 0x40000, CRC(db655d3e) SHA1(bfd873e0d0daf3759778c76fe72fcf96e84250a4) )
+	ROM_LOAD32_BYTE("seibu_3a.210", 0x100002, 0x40000, CRC(659a54a2) SHA1(a6c024e42b104a6198829f0f75baaa294fe9de6c) )
+	ROM_LOAD32_BYTE("seibu_4a.029", 0x100003, 0x40000, CRC(51183421) SHA1(d97da1693e429cb7a061f08274070eb3e6966ec0) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_WORD("seibu_6.413", 0x000000, 0x20000, CRC(338556f9) SHA1(dfab6e1562dd9c373aa094a3791ecd4cd3c9b6f5) )
+	ROM_LOAD24_BYTE("seibu_5.48",  0x000002, 0x10000, CRC(6ccfb72e) SHA1(825b917ecd8495de23d55d2d2902d9d7c54ce4ed) )
+
+	ROM_REGION( 0x300000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
+	ROM_LOAD24_BYTE("fb_bg-1p.410", 0x000002, 0x100000, CRC(b46e774e) SHA1(00b6c1d0b0ea37f4354acab543b270c0bf45896d) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("fb_obj-1.322", 0x000000, 0x400000, CRC(29f86f68) SHA1(1afe809ce00a25f8b27543e4188edc3e3e604951) )
+	ROM_LOAD("fb_obj-2.324", 0x400000, 0x400000, CRC(c9e3130b) SHA1(12b5d5363142e8efb3b7fc44289c0afffa5011c6) )
+	ROM_LOAD("fb_obj-3.323", 0x800000, 0x400000, CRC(f6c3bc49) SHA1(d0eb9c6aa3954d94e3a442a48e0fe6cc279f5513) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
+	ROM_CONTINUE(                    0x400000, 0x080000 )
+	ROM_LOAD32_BYTE("seibu_7.216",   0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
+ROM_END
+
 ROM_START( batlballa )
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
 	ROM_LOAD32_BYTE("senkyua1.bin", 0x100000, 0x40000, CRC(ec3c4d4d) SHA1(6c57b8fbb77ce1615850842d06c054e88e240eef) )
@@ -3999,9 +4030,10 @@ ROM_END
 /*****************************************************************************/
 
 /* SPI */
-GAME( 1995, senkyu,     0,        spi,     spi_3button, seibuspi_state, init_senkyu,   ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, senkyua,    senkyu,   spi,     spi_3button, seibuspi_state, init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlball,   senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, senkyu,     0,        spi,     spi_3button, seibuspi_state, init_senkyu,   ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, senkyua,    senkyu,   spi,     spi_3button, seibuspi_state, init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlball,   senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlballo,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, batlballu,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Fabtek license)",        "Battle Balls (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, batlballa,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, batlballe,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
