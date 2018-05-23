@@ -10,12 +10,6 @@
 #include "machine/pci.h"
 #include "voodoo.h"
 
-#define MCFG_VOODOO_PCI_ADD(_tag,  _type, _cpu_tag, _screen_tag)	\
-	MCFG_PCI_DEVICE_ADD(_tag, VOODOO_PCI, 0, 0, 0, 0) \
-	downcast<voodoo_pci_device &>(*device).set_type(_type); \
-	downcast<voodoo_pci_device &>(*device).set_cpu_tag(_cpu_tag); \
-	downcast<voodoo_pci_device &>(*device).set_screen_tag(_screen_tag);
-
 #define MCFG_VOODOO_PCI_FBMEM(_value) \
 	downcast<voodoo_pci_device &>(*device).set_fbmem(_value);
 
@@ -24,6 +18,15 @@
 
 class voodoo_pci_device : public pci_device {
 public:
+	template <typename T, typename U>
+	voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int type, T &&cpu_tag, U &&screen_tag)
+		: voodoo_pci_device(mconfig, tag, owner, clock)
+	{
+		set_type(type);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_screen_tag(std::forward<U>(screen_tag));
+	}
+
 	voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
