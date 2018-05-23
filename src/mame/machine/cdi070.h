@@ -146,7 +146,7 @@ public:
 	// construction/destruction
 	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu_tag(const char *tag) { m_maincpu.set_tag(tag); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	// external callbacks
 	void uart_rx(uint8_t data);

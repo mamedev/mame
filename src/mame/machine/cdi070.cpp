@@ -856,7 +856,6 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 
 WRITE16_MEMBER( cdi68070_device::periphs_w )
 {
-	/*
 	switch(offset)
 	{
 		// Interrupts: 80001001
@@ -1162,7 +1161,6 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 			verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			break;
 	}
-	*/
 }
 
 #if ENABLE_UART_PRINTING
