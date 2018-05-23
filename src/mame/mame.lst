@@ -13503,6 +13503,9 @@ gcbr                            // (c) 2002 Nintendo
 gamekin3                        //
 gameking                        //
 
+@source:gamemasters.cpp
+gmsshoot                        // (c) 1989 GameMasters
+
 @source:gameplan.cpp
 challeng                        // (c) 1981 Centuri
 kaos                            // (c) 1981
