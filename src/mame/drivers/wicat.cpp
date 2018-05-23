@@ -761,14 +761,14 @@ WRITE_LINE_MEMBER(wicat_state::crtc_cb)
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	uint8_t romdata = m_chargen->base()[((charcode << 4) | linecount) + 1];
+	uint8_t romdata = m_chargen->base()[(charcode << 4) | linecount];
 	const pen_t *pen = m_palette->pens();
 
 	for (int i = 0; i < 8; i++)
 	{
 		int color = (romdata >> (7-i)) & 0x01;
 
-		if(vsp || linecount > 9)
+		if(vsp)
 			color = 0;
 
 		bitmap.pix32(y, x + i) = pen[color];
@@ -866,7 +866,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart5",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart5",mc2661_device,cts_w))
 
-	MCFG_DEVICE_ADD("ledlatch", LS259, 0)
+	MCFG_DEVICE_ADD("ledlatch", LS259, 0) // U19 on I/O board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, adir_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wicat_state, bdir_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // 0 = on, 1 = off
