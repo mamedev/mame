@@ -329,7 +329,8 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		if ((m_status & ST_VE) && m_scanline < m_vrtc_scanline)
 		{
 			int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
-			bool end_of_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
+			bool end_of_row = false;
+			bool blank_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
 			int fifo_idx = 0;
 			m_hlgt = (m_stored_attr & FAC_H) ? 1 : 0;
 			m_vsp = (m_stored_attr & FAC_B) ? 1 : 0;
@@ -443,7 +444,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					}
 				}
 
-				if (end_of_row || m_end_of_screen)
+				if (blank_row || end_of_row || m_end_of_screen)
 				{
 					vsp = 1;
 				}
