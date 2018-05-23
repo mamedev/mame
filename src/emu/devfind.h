@@ -303,8 +303,7 @@ public:
 	/// \brief Set search tag
 	///
 	/// Allows search tag to be changed after construction.  Note that
-	/// this must be done before resolution time to take effect unless
-	/// handled in the specialization.
+	/// this must be done before resolution time to take effect.
 	/// \param [in] finder Object finder to take the search base and tag
 	///   from.
 	void set_tag(finder_base const &finder)
@@ -473,15 +472,6 @@ public:
 	/// object.  Asserts that the target object has been found.
 	/// \return Pointer to target object if found, or nullptr otherwise.
 	virtual ObjectClass *operator->() const { assert(m_target); return m_target; }
-
-	/// \brief Set search tag
-	///
-	/// Allows search tag to be changed after construction.
-	/// \param [in] finder Object finder to take the search base and tag
-	///   from.
-	void set_tag(object_finder_base const &finder) { finder_base::set_tag(finder); m_target = finder.m_target; }
-
-	using finder_base::set_tag;
 
 protected:
 	/// \brief Designated constructor

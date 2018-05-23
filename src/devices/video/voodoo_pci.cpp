@@ -69,8 +69,10 @@ voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *
 
 void voodoo_pci_device::device_start()
 {
-	m_voodoo->set_cpu_tag(m_cpu);
-	m_voodoo->set_screen_tag(m_screen);
+	if (m_cpu)
+		m_voodoo->set_cpu(*m_cpu);
+	if (m_screen)
+		m_voodoo->set_screen(*m_screen);
 	m_voodoo->set_fbmem(m_fbmem);
 	m_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
 	switch (m_type) {

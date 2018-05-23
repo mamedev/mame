@@ -180,36 +180,36 @@ bits(7:4) and bit(24)), X, and Y:
 struct voodoo_device::poly_extra_data
 {
 	voodoo_device * device;
-	raster_info *       info;                   /* pointer to rasterizer information */
+	raster_info *       info;                   // pointer to rasterizer information
 
-	int16_t               ax, ay;                 /* vertex A x,y (12.4) */
-	int32_t               startr, startg, startb, starta; /* starting R,G,B,A (12.12) */
-	int32_t               startz;                 /* starting Z (20.12) */
-	int64_t               startw;                 /* starting W (16.32) */
-	int32_t               drdx, dgdx, dbdx, dadx; /* delta R,G,B,A per X */
-	int32_t               dzdx;                   /* delta Z per X */
-	int64_t               dwdx;                   /* delta W per X */
-	int32_t               drdy, dgdy, dbdy, dady; /* delta R,G,B,A per Y */
-	int32_t               dzdy;                   /* delta Z per Y */
-	int64_t               dwdy;                   /* delta W per Y */
+	int16_t             ax, ay;                 // vertex A x,y (12.4)
+	int32_t             startr, startg, startb, starta; // starting R,G,B,A (12.12)
+	int32_t             startz;                 // starting Z (20.12)
+	int64_t             startw;                 // starting W (16.32)
+	int32_t             drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
+	int32_t             dzdx;                   // delta Z per X
+	int64_t             dwdx;                   // delta W per X
+	int32_t             drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
+	int32_t             dzdy;                   // delta Z per Y
+	int64_t             dwdy;                   // delta W per Y
 
-	int64_t               starts0, startt0;       /* starting S,T (14.18) */
-	int64_t               startw0;                /* starting W (2.30) */
-	int64_t               ds0dx, dt0dx;           /* delta S,T per X */
-	int64_t               dw0dx;                  /* delta W per X */
-	int64_t               ds0dy, dt0dy;           /* delta S,T per Y */
-	int64_t               dw0dy;                  /* delta W per Y */
-	int32_t               lodbase0;               /* used during rasterization */
+	int64_t             starts0, startt0;       // starting S,T (14.18)
+	int64_t             startw0;                // starting W (2.30)
+	int64_t             ds0dx, dt0dx;           // delta S,T per X
+	int64_t             dw0dx;                  // delta W per X
+	int64_t             ds0dy, dt0dy;           // delta S,T per Y
+	int64_t             dw0dy;                  // delta W per Y
+	int32_t             lodbase0;               // used during rasterization
 
-	int64_t               starts1, startt1;       /* starting S,T (14.18) */
-	int64_t               startw1;                /* starting W (2.30) */
-	int64_t               ds1dx, dt1dx;           /* delta S,T per X */
-	int64_t               dw1dx;                  /* delta W per X */
-	int64_t               ds1dy, dt1dy;           /* delta S,T per Y */
-	int64_t               dw1dy;                  /* delta W per Y */
-	int32_t               lodbase1;               /* used during rasterization */
+	int64_t             starts1, startt1;       // starting S,T (14.18)
+	int64_t             startw1;                // starting W (2.30)
+	int64_t             ds1dx, dt1dx;           // delta S,T per X
+	int64_t             dw1dx;                  // delta W per X
+	int64_t             ds1dy, dt1dy;           // delta S,T per Y
+	int64_t             dw1dy;                  // delta W per Y
+	int32_t             lodbase1;               // used during rasterization
 
-	uint16_t              dither[16];             /* dither matrix, for fastfill */
+	uint16_t            dither[16];             // dither matrix, for fastfill
 };
 
 
@@ -5039,8 +5039,28 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
     device start callback
 -------------------------------------------------*/
 
+void voodoo_device::device_resolve_objects()
+{
+	if (!m_screen)
+		m_screen = m_screen_finder;
+	else if (m_screen_finder)
+		throw emu_fatalerror("%s: screen set by both configuration and direct reference (%s and %s)\n", tag(), m_screen_finder->tag(), m_screen->tag());
+	else if (m_screen_finder.finder_tag() != finder_base::DUMMY_TAG)
+		throw emu_fatalerror("%s: configured screen %s not found\n", tag(), m_screen_finder.finder_tag());
+
+	if (!m_cpu)
+		m_cpu = m_cpu_finder;
+	else if (m_cpu_finder)
+		throw emu_fatalerror("%s: CPU set by both configuration and direct reference (%s and %s)\n", tag(), m_cpu_finder->tag(), m_cpu->tag());
+	else if (m_cpu_finder.finder_tag() != finder_base::DUMMY_TAG)
+		throw emu_fatalerror("%s: configured CPU %s not found\n", tag(), m_cpu_finder.finder_tag());
+}
+
 void voodoo_device::device_start()
 {
+	if (!m_screen || !m_cpu)
+		throw device_missing_dependencies();
+
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
 	uint32_t tmumem0, tmumem1;
@@ -5865,8 +5885,10 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	, m_vblank(*this)
 	, m_stall(*this)
 	, m_pciint(*this)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_screen_finder(*this, finder_base::DUMMY_TAG)
+	, m_cpu_finder(*this, finder_base::DUMMY_TAG)
+	, m_screen(nullptr)
+	, m_cpu(nullptr)
 	, vd_type(vdt)
 {
 }
