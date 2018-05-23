@@ -11,16 +11,16 @@
 #include "voodoo.h"
 
 #define MCFG_VOODOO_PCI_ADD(_tag,  _type, _cpu_tag, _screen_tag)	\
-	voodoo_pci_device::set_type(_type); \
 	MCFG_PCI_DEVICE_ADD(_tag, VOODOO_PCI, 0, 0, 0, 0) \
-	downcast<voodoo_pci_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<voodoo_pci_device *>(device)->set_screen_tag(_screen_tag);
+	downcast<voodoo_pci_device &>(*device).set_type(_type); \
+	downcast<voodoo_pci_device &>(*device).set_cpu_tag(_cpu_tag); \
+	downcast<voodoo_pci_device &>(*device).set_screen_tag(_screen_tag);
 
 #define MCFG_VOODOO_PCI_FBMEM(_value) \
-	downcast<voodoo_pci_device *>(device)->set_fbmem(_value);
+	downcast<voodoo_pci_device &>(*device).set_fbmem(_value);
 
 #define MCFG_VOODOO_PCI_TMUMEM(_value1, _value2) \
-	downcast<voodoo_pci_device *>(device)->set_tmumem(_value1, _value2);
+	downcast<voodoo_pci_device &>(*device).set_tmumem(_value1, _value2);
 
 class voodoo_pci_device : public pci_device {
 public:
@@ -34,9 +34,9 @@ public:
 	void postload(void);
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	static void set_type(const int type) {m_type = type;}
-	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
-	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
+	void set_type(int type) {m_type = type;}
+	void set_fbmem(int fbmem) {m_fbmem = fbmem;}
+	void set_tmumem(int tmumem0, int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
 
 	DECLARE_READ32_MEMBER(vga_r);
 	DECLARE_WRITE32_MEMBER(vga_w);
@@ -50,7 +50,7 @@ private:
 	required_device<voodoo_device> m_voodoo;
 	optional_device<cpu_device> m_cpu;
 	optional_device<screen_device> m_screen;
-	static int m_type; // FIXME: all voodoo have to be the same?  really?
+	int m_type;
 	int m_fbmem, m_tmumem0, m_tmumem1;
 
 	uint32_t m_pcictrl_reg[0x20];

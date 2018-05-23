@@ -6,8 +6,6 @@
 #include "screen.h"
 
 
-int voodoo_pci_device::m_type = 0;
-
 MACHINE_CONFIG_START(voodoo_pci_device::device_add_mconfig)
 	switch (m_type) {
 		case TYPE_VOODOO_1:
