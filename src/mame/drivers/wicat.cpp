@@ -22,6 +22,7 @@ Wicat - various systems.
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
@@ -67,7 +68,8 @@ public:
 	DECLARE_WRITE16_MEMBER(invalid_w);
 	DECLARE_READ16_MEMBER(memmap_r);
 	DECLARE_WRITE16_MEMBER(memmap_w);
-	DECLARE_WRITE16_MEMBER(parallel_led_w);
+	DECLARE_WRITE_LINE_MEMBER(adir_w);
+	DECLARE_WRITE_LINE_MEMBER(bdir_w);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(video_r);
@@ -179,7 +181,7 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0xf00030, 0xf00037).rw(m_uart6, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00040, 0xf0005f).rw(this, FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
 	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
-	map(0xf000d0, 0xf000d1).w(this, FUNC(wicat_state::parallel_led_w));
+	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
 	map(0xf00180, 0xf0018f).rw(this, FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
 	map(0xf00190, 0xf0019f).rw(this, FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
 	map(0xf00f00, 0xf00fff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
@@ -390,16 +392,14 @@ void wicat_state::send_key(uint8_t val)
 	m_kb_serial_timer->adjust(attotime::zero,0,attotime::from_hz(1200));
 }
 
-WRITE16_MEMBER( wicat_state::parallel_led_w )
+WRITE_LINE_MEMBER(wicat_state::adir_w)
 {
-	// bit 0 - parallel port A direction (0 = input)
-	// bit 1 - parallel port B direction (0 = input)
-	output().set_value("led1",data & 0x0400);
-	output().set_value("led2",data & 0x0800);
-	output().set_value("led3",data & 0x1000);
-	output().set_value("led4",data & 0x2000);
-	output().set_value("led5",data & 0x4000);
-	output().set_value("led6",data & 0x8000);
+	// parallel port A direction (0 = input, 1 = output)
+}
+
+WRITE_LINE_MEMBER(wicat_state::bdir_w)
+{
+	// parallel port B direction (0 = input, 1 = output)
 }
 
 WRITE8_MEMBER( wicat_state::via_a_w )
@@ -865,6 +865,16 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_RS232_DCD_HANDLER(WRITELINE("uart5",mc2661_device,dcd_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart5",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart5",mc2661_device,cts_w))
+
+	MCFG_DEVICE_ADD("ledlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, adir_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wicat_state, bdir_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // 0 = on, 1 = off
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led4")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led5")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led6")) MCFG_DEVCB_INVERT
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("videocpu",Z8002,XTAL(8'000'000)/2)  // AMD AMZ8002DC
