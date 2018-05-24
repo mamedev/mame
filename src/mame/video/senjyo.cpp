@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
-			bitswap<3>(((code & 0xe0) >> 5), 0, 2, 1),
+			bitswap<3>(((code & 0xe0) >> 5), 1, 0, 2),
 			0);
 }
 
