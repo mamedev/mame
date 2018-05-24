@@ -14,7 +14,7 @@
     Jumping Break                   (c) 1999 F2 System
     Poosho Poosho                   (c) 1999 F2 System
     New Cross Pang                  (c) 1999 F2 System
-	World Adventure                 (c) 1999 F2 System + Logic
+    World Adventure                 (c) 1999 F2 System + Logic
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0, 2.9 and 1.05)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
@@ -641,25 +641,25 @@ void vamphalf_state::jmpbreak_io(address_map &map)
 void vamphalf_state::worldadv_io(address_map &map)
 {
 	map(0x180, 0x183).w(this, FUNC(vamphalf_state::eeprom_w));
-	map(0x780, 0x783).r(this, FUNC(vamphalf_state::eeprom_r));
-	map(0x640, 0x641).noprw(); // return 0, when oki chip is read / written
-	map(0x643, 0x643).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x280, 0x283).portr("P1_P2");
 	map(0x340, 0x343).portr("SYSTEM");
+	map(0x640, 0x641).noprw(); // return 0, when oki chip is read / written
+	map(0x643, 0x643).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700, 0x703).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
 	map(0x704, 0x707).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
+	map(0x780, 0x783).r(this, FUNC(vamphalf_state::eeprom_r));
 }
 
 void vamphalf_state::mrdig_io(address_map &map)
 {
-	map(0x500, 0x503).portr("P1_P2");
-	map(0x3c0, 0x3c3).w(this, FUNC(vamphalf_state::eeprom_w));
-	map(0x180, 0x183).r(this, FUNC(vamphalf_state::eeprom_r));
 	map(0x080, 0x081).noprw(); // return 0, when oki chip is read / written
 	map(0x083, 0x083).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x280, 0x283).portr("SYSTEM");
 	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
 	map(0x0c4, 0x0c7).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
+	map(0x180, 0x183).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x280, 0x283).portr("SYSTEM");
+	map(0x3c0, 0x3c3).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x500, 0x503).portr("P1_P2");
 }
 
 void vamphalf_state::aoh_map(address_map &map)
@@ -1474,9 +1474,6 @@ ROM_END
 Super Lup Lup Puzzle / Lup Lup Puzzle
 Omega System, 1999
 
-PCB Layout
-----------
-
 F-E1-16-001
 |----------------------------------------------|
 |       M6295       VROM1    N341256           |
@@ -1796,7 +1793,7 @@ F-E1-16-002
 |                      |          ||          ||
 |                      +----------++----------+|
 |             GAL1                             |
-| 93C46          DRAM1     ROM1* ROML00  ROMU00|
+| 93C46          DRAM1     ROM1  ROML00  ROMU00|
 |P1 P2   50MHz   E1-16T    ROM2  ROML01  ROMU01|
 |                                              |
 +----------------------------------------------+
@@ -1817,9 +1814,8 @@ VR1 - Volume adjust pot
 
 ROMs:
     ROML00/01, ROMU00/01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
-    VROM1                - TMS 27C020 2MBit DIP32 EPROM
-    ROM1                 - ST M27C4001 4MBit DIP32 EPROM
-    ROM2                 - ST M27C4001 4MBit DIP32 EPROM
+    VROM1                - AMIC A278308 2MBit DIP32 EPROM
+    ROM1/2               - ST M27C4001 4MBit DIP32 EPROM
 
 Measured Clocks:
   E1-16T  @ 50MHz
@@ -1913,9 +1909,6 @@ ROM_END
 Cool Minigame Collection
 SemiCom, 1999
 
-PCB Layout
-----------
-
 F-E1-16-008
 |-------------------------------------------------------|
 |UPC1241            YM3012   VROM1                      |
@@ -1940,12 +1933,28 @@ F-E1-16-008
 |RESET  TEST          50MHz              PAL            |
 |-------------------------------------------------------|
 
+Also known to be found on the F-E1-16-010 PCB
+
+Notes:
+CPU: Hyperstone E1-16T @ 50.000MHz
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as BS902/KA51
+
+ROMs:
+    ROML00 & ROMH00 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML01 & ROMH01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML02 & ROMH02 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML03 & ROMH03 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1           - MX 27C2000 2MBit DIP32 EPROM
+    ROM1            - MX 27C4000 4MBit DIP32 EPROM
+    ROM2            - MX 27C4000 4MBit DIP32 EPROM
 */
 
 ROM_START( coolmini )
 	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "cm-rom1.040", 0x00000, 0x80000, CRC(9688fa98) SHA1(d5ebeb1407980072f689c3b3a5161263c7082e9a) )
-	ROM_LOAD( "cm-rom2.040", 0x80000, 0x80000, CRC(9d588fef) SHA1(7b6b0ba074c7fa0aecda2b55f411557b015522b6) )
+	ROM_LOAD( "cm-rom1", 0x00000, 0x80000, CRC(9688fa98) SHA1(d5ebeb1407980072f689c3b3a5161263c7082e9a) )
+	ROM_LOAD( "cm-rom2", 0x80000, 0x80000, CRC(9d588fef) SHA1(7b6b0ba074c7fa0aecda2b55f411557b015522b6) )
 
 	ROM_REGION( 0x1000000, "gfx", 0 )  /* 16x16x8 Sprites */
 	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(4b141f31) SHA1(cf4885789b0df67d00f9f3659c445248c4e72446) )
@@ -1958,7 +1967,7 @@ ROM_START( coolmini )
 	ROM_LOAD32_WORD( "romu03", 0xc00002, 0x200000, CRC(273d5654) SHA1(0ae3d1c4c4862a8642dbebd7c955b29df29c4938) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
-	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(fcc28081) SHA1(44031df0ee28ca49df12bcb73c83299fac205e21) )
+	ROM_LOAD( "cm-vrom1", 0x00000, 0x40000, CRC(fcc28081) SHA1(44031df0ee28ca49df12bcb73c83299fac205e21) )
 ROM_END
 
 ROM_START( coolminii )
@@ -1984,9 +1993,6 @@ ROM_END
 
 Date Quiz Go Go Episode 2
 SemiCom, 2000
-
-PCB Layout
-----------
 
 F-E1-16-010
 +-----------------------------------------------+
@@ -2056,9 +2062,6 @@ ROM_END
 
 Diet Family
 SemiCom, 2001
-
-PCB Layout
-----------
 
 F-E1-16-010
 +-----------------------------------------------+
@@ -2130,9 +2133,6 @@ ROM_END
 
 Toy Land Adventure
 SemiCom, 2001
-
-PCB Layout
-----------
 
 F-E1-16-010
 +-----------------------------------------------+
@@ -2254,7 +2254,7 @@ S2 is the reset button
 ROMH & ROML are all MX 29F1610MC-16 flash roms
 u15A is a MX 29F1610MC-16 flash rom
 u7 is a ST 27c1001
-ROM1 & ROM2 are both ST 27c4000D
+ROM1 & ROM2 are both ST 27C4000D
 
 */
 
@@ -2340,9 +2340,6 @@ ROM_END
 
 Mission Craft
 Sun, 2000
-
-PCB Layout
-----------
 
 SUN2000
 |---------------------------------------------|
@@ -2436,10 +2433,6 @@ ROM_END
 
 Yori Jori Kuk Kuk
 
-
-PCB Layout
-----------
-
 GOLDEN BELL-002
 +----------------------------------------------+
 |                  CON6* CON7*                 |
@@ -2532,7 +2525,6 @@ ROM_END
 Final Godori (c) SemiCom
 
 SEMICOM-003a
-
 +---------------------------------------------+
 |                     +------+                |
 |            YM3012   |  U7  |                |
@@ -2797,6 +2789,63 @@ ROM_END
 Boong-Ga Boong-Ga (Spank'em!)
 Taff System, 2001
 
+TAFF SYSTEM
++-----------------------------------------------+
+|     VR1               VROM2                   |
+|               YM3012  VROM1  L04*L09* U04*U09*|
+|               YM2151  M6295  L03 L08* U03 U08*|
+|               CRAM1          L02 L07  U02 U07 |
+|               CRAM2          L01 L06  U01 U06 |
+|               MEM1L          L00 L05  U00 U05 |
+|J              MEM1U                           |
+|A              MEM3  +----------++----------+  |
+|M                    |          ||          |  |
+|M              MEM2  |Quicklogic||Quicklogic|  |
+|A                    | QL2003-  || QL2003-  |  |
+|               MEM7  | XPL84C   || XPL84C   |  |
+|                     |          ||          |  |
+|               MEM6  +----------++----------+  |
+|           M3     93C46        GAL1     280MHz |
+|           M2                                  |
+|CN2        M1  P1   DRAM1  E1-16T  ROM0  ROM2* |
+|CN3  AL00 AL01 P2          50MHz   ROM1  ROM3* |
++-----------------------------------------------+
+
+NOTE: All L0x & H0x are silkscreened on the PCB as ROML0x & ROMH0x
+
+Notes:
+CPU - Hyperstone E1-16T @ 50.000MHz
+
+DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
+MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
+GAL1  - GAL22V10B
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151
+
+ P1 - Reset push button
+ P2 - Setup push button
+VR1 - Volume adjust pot
+ M1 - 4-Pin header silkscreened MOTOR1
+ M2 - 4-Pin header silkscreened MOTOR2
+ M3 - 4-Pin header silkscreened MOTOR3
+CN2 - 4-Pin Header
+CN3 - 2-Pin Header
+AL00 - 10-Pin Header
+AL01 - 10-Pin Header
+
+ROMs:
+    ROML00/ROMH00 & ROML05/ROMH05 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML01/ROMH01 & ROML06/ROMH06 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML02/ROMH02 & ROML07/ROMH07 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML03/ROMH03                 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+  * ROML08/ROMH08                 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+  * ROML04/ROMH04 & ROML09/ROMH09 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1/VROM2                   - ST M27C4001 4MBit DIP32 EPROM
+    ROM0/ROM1                     - ST M27C4001 4MBit DIP32 EPROM
+  * ROM2/ROM3                     - Unpopulated space for DIP32 EPROM (up to 4MBit)
+ 
 */
 
 ROM_START( boonggab )
