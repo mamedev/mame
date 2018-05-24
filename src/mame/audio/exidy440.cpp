@@ -46,6 +46,7 @@ DEFINE_DEVICE_TYPE(EXIDY440, exidy440_sound_device, "exidy440_sound", "Exidy 440
 exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXIDY440, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_audiocpu(*this, "^audiocpu"),
 		m_sound_command(0),
 		m_sound_command_ack(0),
 		m_mixer_buffer_left(nullptr),
@@ -210,7 +211,7 @@ void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, st
 READ8_MEMBER( exidy440_sound_device::sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
+	m_audiocpu->set_input_line(1, CLEAR_LINE);
 	m_sound_command_ack = 1;
 
 	return m_sound_command;
@@ -221,7 +222,7 @@ void exidy440_sound_device::exidy440_sound_command(uint8_t param)
 {
 	m_sound_command = param;
 	m_sound_command_ack = 0;
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 
@@ -265,7 +266,7 @@ WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
 
 WRITE8_MEMBER( exidy440_sound_device::sound_interrupt_clear_w )
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 
