@@ -7,6 +7,7 @@
     driver by Angelo Salese
 
     TODO:
+	- move sound bios ROMs into pc9801_26 / pc9801_86 devices
     - proper 8251 uart hook-up on keyboard
     - SASI/SCSI support;
     - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
@@ -648,7 +649,7 @@ void pc9801_state::pc9801_map(address_map &map)
 {
 	map(0xa0000, 0xa3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
 	map(0xa8000, 0xbffff).rw(this, FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
-	map(0xcc000, 0xcdfff).rom().region("sound_bios", 0); //sound BIOS
+	map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
 	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
 	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
 	map(0xe8000, 0xfffff).rom().region("ipl", 0);
@@ -782,9 +783,10 @@ WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
 	if(offset == 0x00)
 	{
 		uint8_t por;
-		/* reset POR bit, TODO: is there any other way? */
-		por = machine().device<i8255_device>("ppi8255_sys")->read(space, 2) & ~0x20;
-		machine().device<i8255_device>("ppi8255_sys")->write(space, 2,por);
+		/* reset POR bit */
+		// TODO: is there any other way that doesn't involve direct r/w of ppi address?
+		por = m_ppi_sys->read(space, 2) & ~0x20;
+		m_ppi_sys->write(space, 2, por);
 		m_maincpu->set_input_line(INPUT_LINE_A20, CLEAR_LINE);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
@@ -1403,7 +1405,7 @@ void pc9801_state::pc9821_map(address_map &map)
 	map(0x000a0000, 0x000a3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
 	map(0x000a4000, 0x000a4fff).rw(this, FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
 	map(0x000a8000, 0x000bffff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram_r), FUNC(pc9801_state::pc9821_grcg_gvram_w));
-	map(0x000cc000, 0x000cdfff).rom().region("sound_bios", 0); //sound BIOS
+	map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
 	//map(0x000d8000, 0x000d9fff).rom().region("ide",0)
 	map(0x000da000, 0x000dbfff).ram(); // ide ram
 	map(0x000e0000, 0x000e7fff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram0_r), FUNC(pc9801_state::pc9821_grcg_gvram0_w));
@@ -2764,7 +2766,7 @@ ROM_START( pc9821 )
 	ROM_FILL(0x27ffe, 1, 0x92)
 	ROM_FILL(0x27fff, 1, 0xd7)
 
-	ROM_REGION( 0x10000, "sound_bios", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 ) // this is a -26 bios!
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )

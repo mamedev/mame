@@ -1212,6 +1212,8 @@ int32_t aica_device::UpdateSlot(AICA_SLOT *slot)
 				StopSlot(slot,0);
 			}
 			break;
+		// TODO: causes an hang in Border Down/Metal Slug 6/Karous etc.
+		//       for mslug6 culprit RAM address is 0x13880 ARM side (a flag that should be zeroed somehow) 
 		case 1: //normal loop
 			if(*addr[addr_select]>=chanlea)
 			{
