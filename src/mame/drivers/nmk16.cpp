@@ -377,6 +377,29 @@ void nmk16_state::manybloc_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }
 
+void nmk16_tomagic_state::tomagic_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
+	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
+	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
+	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
+	map(0x0f0000, 0x0fffff).ram().share("mainram");
+}
+
+
+void nmk16_tomagic_state::tomagic_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+}
+
 void nmk16_state::tharrier_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -1392,6 +1415,81 @@ static INPUT_PORTS_START( manybloc )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x4000, "Better" )
 	PORT_DIPSETTING(      0x8000, "Best" )
+INPUT_PORTS_END
+
+// wrong
+static INPUT_PORTS_START( tomagic )
+	PORT_START("IN0")   /* 0x080000 */
+	PORT_BIT( 0x7fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 
+
+	PORT_START("IN1")   /* 0x080002 */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) 
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) 
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN2 )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -4684,6 +4782,43 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 MACHINE_CONFIG_END
 
 
+// non-nmk board, clearly cloned hw tho, all clocks need checking.
+MACHINE_CONFIG_START(nmk16_tomagic_state::tomagic)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* 12? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tomagic_map)
+	NMK_HACKY_INTERRUPT_TIMING
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4) /* 3 Mhz? */
+	MCFG_DEVICE_PROGRAM_MAP(tomagic_sound_map)
+
+	/* video hardware */
+	NMK_HACKY_SCREEN_HIRES
+	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 12000000/8) // K-666 (YM3812) 1.5Mhz? */
+	//MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 12000000/4, okim6295_device::PIN7_LOW) 
+	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
 uint8_t nmk16_state::decode_byte(uint8_t src, const uint8_t *bitp)
 {
 	uint8_t ret, i;
@@ -4932,6 +5067,15 @@ void nmk16_state::init_vandykeb()
 	m_okibank[0]->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x08001e, 0x08001f);
+}
+
+void nmk16_tomagic_state::init_tomagic()
+{
+	// rearrange data so that we can use standard decode
+	uint8_t *rom = memregion("sprites")->base();
+	int size = memregion("sprites")->bytes();
+	for (int i = 0; i < size; i++)
+		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 }
 
 
@@ -6874,6 +7018,32 @@ ROM_START( manybloc )
 	ROM_LOAD( "u120.bpr",    0x0320, 0x0100, CRC(576c5984) SHA1(6e9b7f30de0d91cb766a62abc5888ec9af085a27) ) /* unknown */
 ROM_END
 
+ROM_START( tomagic )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 */
+	ROM_LOAD16_BYTE( "4.bin", 0x00000, 0x40000, CRC(5055664a) SHA1(d078bd5ab30aedb760bf0a0237484fb56a51d759) )
+	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x40000, CRC(3731ecbb) SHA1(25814bd78902cc341cc9d6b19d0a6f837cd802c6) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 */
+	ROM_LOAD( "2.bin",      0x00000, 0x20000, CRC(10359b6a) SHA1(ce59750d2fa57049c424c62e0cbefc604e224e78) )
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "9.bin", 0x000000, 0x20000, CRC(fcceb24b) SHA1(49e3162c34dfa2ef54ffe190ba91bff73cebe12b) )
+
+	ROM_REGION( 0x40000, "bgtile", 0 )
+	ROM_LOAD( "10.bin", 0x000000, 0x40000, CRC(6d5ee72a) SHA1(f90746cb5bbd87213dece062b7efd59d8fd56d84) )
+
+	ROM_REGION( 0x200000, "sprites", 0 ) /* 16x16 sprite tiles */
+	ROM_LOAD16_BYTE( "7.bin", 0x100001, 0x80000, CRC(0a297c78) SHA1(effe1ee2ab64cb9fbeae0d168346168245942034) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100000, 0x80000, CRC(88ef65e0) SHA1(20b50ffe6a9a3c17f7c2cbf90461fafa7a7bcf8d) )
+	ROM_LOAD16_BYTE( "8.bin", 0x000001, 0x80000, CRC(1708d3fb) SHA1(415b6a5079fced0306213953e6124ad4fecc680b) )
+	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(83ae90ba) SHA1(84b0779d18dabcb6086880433b1c4620dcc722cb) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )    /* OKIM6295 samples */
+	ROM_LOAD( "1.bin",  0x00000, 0x40000, CRC(02b042e3) SHA1(05fca0f83292be49cef457633aba36fed3dc0114) )
+
+	// & undumped PROMs?
+ROM_END
+
 /***************************************************************************
 
                                     Stagger I
@@ -8050,3 +8220,6 @@ GAME( 2001, firehawkv,  spec2k,   firehawk,     firehawkv,    nmk16_state, empty
 
 // bee-oh board - different display / interrupt timing to others?
 GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_tharrier,        ROT270, "Bee-Oh",                            "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+
+// clone board, different sound / bg hardware, but similar memory maps, same tx layer, sprites etc.
+GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // there are many gambling related strings in the ROM, and an alt version is called Lucky Ball, possibly that one is a gambling title and this isn't?
