@@ -1944,6 +1944,10 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
+	MCFG_DEVICE_MODIFY("cmptimer_main")
+	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("soundcpu2", INPUT_LINE_NMI))
+
 	MCFG_DEVICE_MODIFY("iochip_0")
 	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))
 	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
