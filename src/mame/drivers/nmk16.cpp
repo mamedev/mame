@@ -414,8 +414,8 @@ void nmk16_tomagic_state::tomagic_map(address_map &map)
 	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
 	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
-	map(0x094001, 0x094001).w("oki1", FUNC(okim6295_device::write));
-	map(0x094003, 0x094003).r("oki1", FUNC(okim6295_device::read));
+	map(0x094001, 0x094001).w(m_oki[0], FUNC(okim6295_device::write));
+	map(0x094003, 0x094003).r(m_oki[0], FUNC(okim6295_device::read));
 	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }
