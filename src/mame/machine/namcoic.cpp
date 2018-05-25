@@ -881,7 +881,7 @@ void namcos2_shared_state::c169_roz_get_info(tile_data &tileinfo, int tile_index
 		case NAMCONB2_OUTFOXIES:
 			bank = nth_byte16(&m_c169_roz_bank[which * 8 / 2], (tile >> 11) & 0x7);
 			tile = (tile & 0x7ff) | (bank << 11);
-			mangle = (bitswap<7>(tile & 0x50, 4, 5, 6, 3, 2, 1, 0)) | (tile & ~0x50);
+			mangle = bitswap<19>(tile & 0x7ffff, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 4, 5, 6, 3, 2, 1, 0);
 			break;
 
 		case NAMCOS2_LUCKY_AND_WILD:
