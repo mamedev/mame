@@ -888,9 +888,10 @@ void namcos2_shared_state::c169_roz_get_info(tile_data &tileinfo, int tile_index
 			mangle = bitswap<11>(tile & 0x31ff, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			switch ((tile >> 9) & 7)
 			{
-				case 0x00: mangle |= 0x1c00; break;
+				case 0x00: mangle += 0x1c00; break; // Plus, NOT OR
 				case 0x01: mangle |= 0x0800; break;
 				case 0x02: mangle |= 0x0000; break;
+				default: break;
 			}
 			break;
 
