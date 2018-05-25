@@ -71,8 +71,20 @@ MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-// RAM
+// to load a different bios for slots:
+// -cbusX pc9801_86,bios=N
 ROM_START( pc9801_86 )
+	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	// following roms are unchecked and of dubious quality
+	// we currently mark bios names based off where they originally belonged to, lacking of a better info
+	// supposedly these are -86 roms according to eikanwa2 sound card detection,
+	// loading a -26 rom in a -86 environment causes an hang there.
+	ROM_SYSTEM_BIOS( 0,  "86rx",    "nec86rx" )
+	ROMX_LOAD( "sound_rx.rom",    0x0000, 0x4000, BAD_DUMP CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1,  "86mu",    "nec86mu" )
+	ROMX_LOAD( "sound_486mu.rom", 0x0000, 0x4000, BAD_DUMP CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c), ROM_BIOS(2) )
+
+	// RAM
 	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
 ROM_END
 
@@ -170,6 +182,12 @@ void pc9801_86_device::install_device(offs_t start, offs_t end, read8_delegate r
 
 void pc9801_86_device::device_start()
 {
+	m_bus->program_space().install_rom(0xcc000,0xcffff,memregion(this->subtag("sound_bios").c_str())->base());
+	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
+	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
+	install_device(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+								   write8_delegate([this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
+
 	m_dac_timer = timer_alloc();
 	save_item(NAME(m_count));
 	save_item(NAME(m_queue));
@@ -184,11 +202,9 @@ void pc9801_86_device::device_start()
 void pc9801_86_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
-	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opn_r), this), write8_delegate(FUNC(pc9801_86_device::opn_w), this) );
-	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
-	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
-	install_device(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
-								   write8_delegate([this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
+	m_bus->io_space().unmap_readwrite(0x0088, 0x008f, 0x100);
+	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opna_r), this), write8_delegate(FUNC(pc9801_86_device::opna_w), this) );
+
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
 	m_fmirq = m_pcmirq = m_init = false;
@@ -205,7 +221,7 @@ void pc9801_86_device::device_reset()
 //**************************************************************************
 
 
-READ8_MEMBER(pc9801_86_device::opn_r)
+READ8_MEMBER(pc9801_86_device::opna_r)
 {
 	if((offset & 1) == 0)
 		return m_opna->read(space, offset >> 1);
@@ -216,7 +232,7 @@ READ8_MEMBER(pc9801_86_device::opn_r)
 	}
 }
 
-WRITE8_MEMBER(pc9801_86_device::opn_w)
+WRITE8_MEMBER(pc9801_86_device::opna_w)
 {
 	if((offset & 1) == 0)
 		m_opna->write(space, offset >> 1,data);

@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opn_r);
-	DECLARE_WRITE8_MEMBER(opn_w);
+	DECLARE_READ8_MEMBER(opna_r);
+	DECLARE_WRITE8_MEMBER(opna_w);
 	DECLARE_READ8_MEMBER(id_r);
 	DECLARE_WRITE8_MEMBER(mask_w);
 	DECLARE_READ8_MEMBER(pcm_r);
