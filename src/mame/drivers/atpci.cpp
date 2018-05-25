@@ -79,7 +79,7 @@ static void isa_internal_devices(device_slot_interface &device)
 
 static void pci_devices(device_slot_interface &device)
 {
-	device.option_add_internal("i82439tx", I82439TX);
+	device.option_add_internal("i82439tx", I82439TX_LEGACY);
 	device.option_add_internal("i82371ab", I82371AB);
 	device.option_add_internal("i82371sb", I82371SB);
 }

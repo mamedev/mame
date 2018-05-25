@@ -119,8 +119,8 @@ class iteagle_state : public driver_device
 {
 public:
 	iteagle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{}
 
 	required_device<mips3_device> m_maincpu;
@@ -164,31 +164,31 @@ void iteagle_state::machine_reset()
 MACHINE_CONFIG_START(iteagle_state::iteagle)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", VR4310LE, 166666666)
+	MCFG_DEVICE_ADD(m_maincpu, VR4310LE, 166666666)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(66666667)
 
-	MCFG_PCI_ROOT_ADD(                ":pci")
-	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
+	MCFG_DEVICE_ADD(PCI_ID_NILE, VRC4373, 0, m_maincpu)
 	MCFG_VRC4373_SET_RAM(0x00800000)
 	MCFG_VRC4373_SET_SIMM0(0x02000000)
-	MCFG_ITEAGLE_PERIPH_ADD(          PCI_ID_PERIPH)
-	MCFG_IDE_PCI_ADD(                 PCI_ID_IDE, 0x1080C693, 0x00, 0x0)
-	MCFG_IDE_PCI_IRQ_ADD(             ":maincpu", MIPS3_IRQ2)
+	MCFG_DEVICE_ADD(                  PCI_ID_PERIPH, ITEAGLE_PERIPH, 0)
+	MCFG_DEVICE_ADD(                  PCI_ID_IDE, IDE_PCI, 0, 0x1080C693, 0x00, 0x0)
+	MCFG_IDE_PCI_IRQ_HANDLER(         INPUTLINE(m_maincpu, MIPS3_IRQ2))
 
-	MCFG_ITEAGLE_FPGA_ADD(            PCI_ID_FPGA, ":maincpu", MIPS3_IRQ1, MIPS3_IRQ4)
-	MCFG_ES1373_ADD(                  PCI_ID_SOUND)
+	MCFG_DEVICE_ADD(                  PCI_ID_FPGA, ITEAGLE_FPGA, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4)
+	MCFG_DEVICE_ADD(                  PCI_ID_SOUND, ES1373, 0)
 	MCFG_SOUND_ROUTE(0, PCI_ID_SOUND":lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, PCI_ID_SOUND":rspeaker", 1.0)
-	MCFG_ES1373_IRQ_ADD(              ":maincpu", MIPS3_IRQ3)
+	MCFG_ES1373_IRQ_HANDLER(          INPUTLINE(m_maincpu, MIPS3_IRQ3))
 
 	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_3_PCI, 0, m_maincpu, "screen")
 	MCFG_VOODOO_PCI_FBMEM(16)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(PCI_ID_FPGA, iteagle_fpga_device, vblank_update))
 
-	MCFG_ITEAGLE_EEPROM_ADD(          PCI_ID_EEPROM)
+	MCFG_DEVICE_ADD(                  PCI_ID_EEPROM, ITEAGLE_EEPROM, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

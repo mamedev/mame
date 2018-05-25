@@ -1723,9 +1723,9 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_MIPS3_SYSTEM_CLOCK(vegas_state::SYSTEM_CLOCK)
 
 	// PCI Bus Devices
-	MCFG_PCI_ROOT_ADD(":pci")
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 
-	MCFG_VRC5074_ADD(PCI_ID_NILE, ":maincpu")
+	MCFG_DEVICE_ADD(PCI_ID_NILE, VRC5074, 0, m_maincpu)
 	MCFG_VRC5074_SET_SDRAM(0, 0x00800000)
 	MCFG_VRC5074_SET_CS(2, vegas_state::vegas_cs2_map)
 	MCFG_VRC5074_SET_CS(3, vegas_state::vegas_cs3_map)
@@ -1734,7 +1734,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_VRC5074_SET_CS(6, vegas_state::vegas_cs6_map)
 	MCFG_VRC5074_SET_CS(7, vegas_state::vegas_cs7_map)
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x05, 0x0)
+	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x10950646, 0x05, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(WRITELINE(PCI_ID_NILE, vrc5074_device, pci_intr_d))
 	//MCFG_IDE_PCI_SET_PIF(0x8f)
 

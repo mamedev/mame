@@ -135,8 +135,8 @@ MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I82371SB_ISA, tag, owner, clock),
+i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, I82371SB_ISA, tag, owner, clock),
 	m_smi_callback(*this),
 	m_boot_state_hook(*this),
 	m_maincpu(*this, ":maincpu"),
@@ -149,6 +149,7 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const ch
 	m_speaker(*this, "speaker"),
 	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
+	set_ids(0x80867000, 0x03, 0x060100, 0x00000000);
 }
 
 void i82371sb_isa_device::device_start()
