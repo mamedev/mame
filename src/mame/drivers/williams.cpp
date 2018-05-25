@@ -1472,11 +1472,13 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 240
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1649,7 +1651,6 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 	MCFG_DEVICE_PROGRAM_MAP(blaster_map)
 
 	MCFG_MACHINE_START_OVERRIDE(blaster_state,blaster)
-	MCFG_MACHINE_RESET_OVERRIDE(blaster_state,blaster)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(blaster_state,blaster)
@@ -1737,8 +1738,11 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 254
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

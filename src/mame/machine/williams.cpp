@@ -20,33 +20,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 {
 	int scanline = param;
 
+	// must not fire at line 256
+	if (scanline == 256)
+		return;
+
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	m_pia_1->cb1_w(scanline & 0x20);
-
-	/* set a timer for the next update */
-	scanline += 0x20;
-	if (scanline >= 256) scanline = 0;
-	timer.adjust(m_screen->time_until_pos(scanline), scanline);
-}
-
-
-TIMER_CALLBACK_MEMBER(williams_state::williams_count240_off_callback)
-{
-	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	m_pia_1->ca1_w(0);
+	m_pia_1->cb1_w(BIT(scanline, 5));
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 {
-	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	m_pia_1->ca1_w(1);
+	int scanline = param;
 
-	/* set a timer to turn it off once the scanline counter resets */
-	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),this));
-
-	/* set a timer for next frame */
-	timer.adjust(m_screen->time_until_pos(240));
+	// the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13
+	m_pia_1->ca1_w(scanline >= 240 ? 1 : 0);
 }
 
 
@@ -123,27 +111,9 @@ MACHINE_START_MEMBER(williams_state,williams_common)
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,williams_common)
-{
-	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(m_screen->time_until_pos(0));
-
-	/* also set a timer to go off on scanline 240 */
-	timer_device *l240_timer = machine().device<timer_device>("240_timer");
-	l240_timer->adjust(m_screen->time_until_pos(240));
-}
-
-
 MACHINE_START_MEMBER(williams_state,williams)
 {
 	MACHINE_START_CALL_MEMBER(williams_common);
-}
-
-
-MACHINE_RESET_MEMBER(williams_state,williams)
-{
-	MACHINE_RESET_CALL_MEMBER(williams_common);
 }
 
 
@@ -157,35 +127,21 @@ MACHINE_RESET_MEMBER(williams_state,williams)
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
 {
 	int scanline = param;
+	if (scanline == 256)
+		return;
 
-	/* the IRQ signal comes into CB1, and is set to VA11 */
-	m_pia_0->cb1_w(scanline & 0x20);
-	m_pia_1->ca1_w(scanline & 0x20);
-
-	/* set a timer for the next update */
-	scanline += 0x20;
-	if (scanline >= 256) scanline = 0;
-	timer.adjust(m_screen->time_until_pos(scanline), scanline);
-}
-
-
-TIMER_CALLBACK_MEMBER(williams2_state::williams2_endscreen_off_callback)
-{
-	/* the /ENDSCREEN signal comes into CA1 */
-	m_pia_0->ca1_w(1);
+	// the IRQ signal comes into CB1, and is set to VA11
+	m_pia_0->cb1_w(BIT(scanline, 5));
+	m_pia_1->ca1_w(BIT(scanline, 5));
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
 {
-	/* the /ENDSCREEN signal comes into CA1 */
-	m_pia_0->ca1_w(0);
+	int scanline = param;
 
-	/* set a timer to turn it off once the scanline counter resets */
-	machine().scheduler().timer_set(m_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams2_state::williams2_endscreen_off_callback),this));
-
-	/* set a timer for next frame */
-	timer.adjust(m_screen->time_until_pos(254));
+	// the /ENDSCREEN signal comes into CA1
+	m_pia_0->ca1_w(scanline >= 254 ? 0 : 1);
 }
 
 
@@ -207,18 +163,8 @@ MACHINE_START_MEMBER(williams2_state,williams2)
 
 MACHINE_RESET_MEMBER(williams2_state,williams2)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* make sure our banking is reset */
-	williams2_bank_select_w(space, 0, 0);
-
-	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(m_screen->time_until_pos(0));
-
-	/* also set a timer to go off on scanline 254 */
-	timer_device *l254_timer = machine().device<timer_device>("254_timer");
-	l254_timer->adjust(m_screen->time_until_pos(254));
+	williams2_bank_select_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -433,11 +379,7 @@ MACHINE_START_MEMBER(williams_state,defender)
 
 MACHINE_RESET_MEMBER(williams_state,defender)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	MACHINE_RESET_CALL_MEMBER(williams_common);
-
-	defender_bank_select_w(space, 0, 0);
+	defender_bank_select_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -507,12 +449,6 @@ MACHINE_START_MEMBER(blaster_state,blaster)
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_rom_bank));
-}
-
-
-MACHINE_RESET_MEMBER(blaster_state,blaster)
-{
-	MACHINE_RESET_CALL_MEMBER(williams_common);
 }
 
 

@@ -175,8 +175,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				(m_callback)(*this, m_ptr, param);
 			break;
 
-
-		// scanline timers have to do some additiona bookkeeping
+		// scanline timers have to do some additional bookkeeping
 		case TIMER_TYPE_SCANLINE:
 		{
 			// by default, we fire at the first position
