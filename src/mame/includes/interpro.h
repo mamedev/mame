@@ -171,8 +171,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	TIMER_CALLBACK_MEMBER(reset_timer) { m_maincpu->resume(SUSPEND_REASON_RESET); }
-
 	output_finder<> m_led;
 	emu_timer *m_reset_timer;
 
