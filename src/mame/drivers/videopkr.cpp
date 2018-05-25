@@ -311,7 +311,55 @@ public:
 		, m_dac(*this, "dac")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_digits(*this, "digit%u", 0U)
+		, m_lamp(*this, "lamp%u", 0U)
 		{ }
+
+	DECLARE_READ8_MEMBER(videopkr_io_r);
+	DECLARE_WRITE8_MEMBER(videopkr_io_w);
+	DECLARE_READ8_MEMBER(videopkr_p1_data_r);
+	DECLARE_READ8_MEMBER(videopkr_p2_data_r);
+	DECLARE_WRITE8_MEMBER(videopkr_p1_data_w);
+	DECLARE_WRITE8_MEMBER(videopkr_p2_data_w);
+	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
+	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	DECLARE_READ8_MEMBER(sound_io_r);
+	DECLARE_WRITE8_MEMBER(sound_io_w);
+	DECLARE_READ8_MEMBER(sound_p2_r);
+	DECLARE_WRITE8_MEMBER(sound_p2_w);
+	DECLARE_READ8_MEMBER(baby_sound_p0_r);
+	DECLARE_WRITE8_MEMBER(baby_sound_p0_w);
+	DECLARE_READ8_MEMBER(baby_sound_p1_r);
+	DECLARE_WRITE8_MEMBER(baby_sound_p1_w);
+	DECLARE_READ8_MEMBER(baby_sound_p2_r);
+	DECLARE_WRITE8_MEMBER(baby_sound_p2_w);
+	DECLARE_READ8_MEMBER(baby_sound_p3_r);
+	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_PALETTE_INIT(videopkr);
+	DECLARE_VIDEO_START(vidadcba);
+	DECLARE_PALETTE_INIT(babypkr);
+	DECLARE_PALETTE_INIT(fortune1);
+	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
+	void count_7dig(unsigned long data, uint8_t index);
+	void babypkr(machine_config &config);
+	void videodad(machine_config &config);
+	void videopkr(machine_config &config);
+	void fortune1(machine_config &config);
+	void blckjack(machine_config &config);
+	void bpoker(machine_config &config);
+	void i8039_io_port(address_map &map);
+	void i8039_map(address_map &map);
+	void i8039_sound_mem(address_map &map);
+	void i8039_sound_port(address_map &map);
+	void i8051_sound_mem(address_map &map);
+	void i8051_sound_port(address_map &map);
+	void i8751_io_port(address_map &map);
+	void i8751_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	uint8_t m_data_ram[0x100];
 	uint8_t m_video_ram[0x0400];
@@ -347,55 +395,12 @@ public:
 	uint8_t m_sbp2;
 	uint8_t m_sbp3;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_READ8_MEMBER(videopkr_io_r);
-	DECLARE_WRITE8_MEMBER(videopkr_io_w);
-	DECLARE_READ8_MEMBER(videopkr_p1_data_r);
-	DECLARE_READ8_MEMBER(videopkr_p2_data_r);
-	DECLARE_WRITE8_MEMBER(videopkr_p1_data_w);
-	DECLARE_WRITE8_MEMBER(videopkr_p2_data_w);
-	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(sound_io_r);
-	DECLARE_WRITE8_MEMBER(sound_io_w);
-	DECLARE_READ8_MEMBER(sound_p2_r);
-	DECLARE_WRITE8_MEMBER(sound_p2_w);
-	DECLARE_READ8_MEMBER(baby_sound_p0_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p0_w);
-	DECLARE_READ8_MEMBER(baby_sound_p1_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p1_w);
-	DECLARE_READ8_MEMBER(baby_sound_p2_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p2_w);
-	DECLARE_READ8_MEMBER(baby_sound_p3_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(videopkr);
-	DECLARE_VIDEO_START(vidadcba);
-	DECLARE_PALETTE_INIT(babypkr);
-	DECLARE_PALETTE_INIT(fortune1);
-	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
-	void count_7dig(unsigned long data, uint8_t index);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<28> m_digits;
-	void babypkr(machine_config &config);
-	void videodad(machine_config &config);
-	void videopkr(machine_config &config);
-	void fortune1(machine_config &config);
-	void blckjack(machine_config &config);
-	void bpoker(machine_config &config);
-	void i8039_io_port(address_map &map);
-	void i8039_map(address_map &map);
-	void i8039_sound_mem(address_map &map);
-	void i8039_sound_port(address_map &map);
-	void i8051_sound_mem(address_map &map);
-	void i8051_sound_port(address_map &map);
-	void i8751_io_port(address_map &map);
-	void i8751_map(address_map &map);
+	output_finder<14> m_lamp;
 };
 
 
@@ -690,14 +695,14 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 
 		case 0xef:  /* Port 2.4 */
 		{
-			output().set_lamp_value(0, (data & 1));           /* L_1 */
-			output().set_lamp_value(1, ((data >> 1)& 1));     /* L_2 */
-			output().set_lamp_value(2, ((data >> 2) & 1));    /* L_3 */
-			output().set_lamp_value(3, ((data >> 3) & 1));    /* L_4 */
-			output().set_lamp_value(4, ((data >> 4) & 1));    /* Coin */
-			output().set_lamp_value(5, ((data >> 5) & 1));    /* Hopper_1 */
-			output().set_lamp_value(6, ((data >> 6) & 1));    /* Hopper_2 */
-			output().set_lamp_value(7, ((data >> 7) & 1));    /* Diverter */
+			m_lamp[0] = BIT(data, 0);    /* L_1 */
+			m_lamp[1] = BIT(data, 1);    /* L_2 */
+			m_lamp[2] = BIT(data, 2);    /* L_3 */
+			m_lamp[3] = BIT(data, 3);    /* L_4 */
+			m_lamp[4] = BIT(data, 4);    /* Coin */
+			m_lamp[5] = BIT(data, 5);    /* Hopper_1 */
+			m_lamp[6] = BIT(data, 6);    /* Hopper_2 */
+			m_lamp[7] = BIT(data, 7);    /* Diverter */
 			m_p24_data = data;
 			m_hp_1 = (~m_p24_data >> 6) & 1;
 			m_hp_2 = (~m_p24_data >> 5) & 1;
@@ -727,12 +732,12 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 {
 	m_p1 = data;
 
-	output().set_lamp_value(8, (data & 1));           /* Aux_0 - Jackpot mech. counter (Baby Games)*/
-	output().set_lamp_value(9, ((data >> 1) & 1));    /* Aux_1 - */
-	output().set_lamp_value(10, ((data >> 2) & 1));   /* Aux_2 - */
-	output().set_lamp_value(11, ((data >> 3) & 1));   /* Aux_3 - */
-	output().set_lamp_value(12, ((data >> 4) & 1));   /* Aux_4 - Bell */
-	output().set_lamp_value(13, ((data >> 5) & 1));   /* Aux_5 - /CIO */
+	m_lamp[8] = BIT(data, 0);    /* Aux_0 - Jackpot mech. counter (Baby Games)*/
+	m_lamp[9] = BIT(data, 1);    /* Aux_1 - */
+	m_lamp[10] = BIT(data, 2);   /* Aux_2 - */
+	m_lamp[11] = BIT(data, 3);   /* Aux_3 - */
+	m_lamp[12] = BIT(data, 4);   /* Aux_4 - Bell */
+	m_lamp[13] = BIT(data, 5);   /* Aux_5 - /CIO */
 
 	m_jckp = m_p1 & 1;
 
@@ -1245,6 +1250,7 @@ GFXDECODE_END
 void videopkr_state::machine_start()
 {
 	m_digits.resolve();
+	m_lamp.resolve();
 	m_vp_sound_p2 = 0xff;   /* default P2 latch value */
 	m_sound_latch = 0xff;   /* default sound data latch value */
 	m_p24_data = 0xff;

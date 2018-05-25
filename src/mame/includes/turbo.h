@@ -41,6 +41,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_digits(*this, "digit%u", 0U)
+		, m_lamp(*this, "lamp")
 	{ }
 
 private:
@@ -67,9 +68,10 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	output_finder<32> m_digits;
+	output_finder<> m_lamp;
 
 	std::unique_ptr<uint8_t[]>     m_buckrog_bitmap_ram;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override { m_digits.resolve(); m_lamp.resolve(); }
 
 	/* machine states */
 	uint8_t       m_i8279_scanlines;

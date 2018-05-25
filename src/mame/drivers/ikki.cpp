@@ -10,6 +10,7 @@ Ikki (c) 1985 Sun Electronics
 
 TODO:
 - understand proper CPU communications and irq firing;
+- merge with markham.cpp
 - timings
 
 *****************************************************************************/
@@ -20,6 +21,18 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "speaker.h"
+
+#define MASTER_CLOCK (20_MHz_XTAL)
+#define PIXEL_CLOCK  (MASTER_CLOCK/4) // guess
+#define CPU_CLOCK    (8_MHz_XTAL)
+
+/* also a guess */
+#define HTOTAL       (320)
+#define HBEND        (8)
+#define HBSTART      (248)
+#define VTOTAL       (262)
+#define VBEND        (16)
+#define VBSTART      (240)
 
 
 /*************************************
@@ -243,24 +256,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 MACHINE_CONFIG_START(ikki_state::ikki)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("sub", Z80,8000000/2) /* 4.000MHz */
+	MCFG_DEVICE_ADD("sub", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8+3*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -272,10 +281,10 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, 8000000/4)
+	MCFG_DEVICE_ADD("sn1", SN76496, CPU_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DEVICE_ADD("sn2", SN76496, 8000000/2)
+	MCFG_DEVICE_ADD("sn2", SN76496, CPU_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

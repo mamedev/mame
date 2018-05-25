@@ -211,6 +211,7 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 	device_t(mconfig, TRS80M2_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8021_TAG),
 	m_y(*this, "Y%u", 0),
+	m_led(*this, "led%u", 0U),
 	m_write_clock(*this),
 	m_busy(1),
 	m_data(1),
@@ -225,6 +226,7 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 
 void trs80m2_keyboard_device::device_start()
 {
+	m_led.resolve();
 	// resolve callbacks
 	m_write_clock.resolve_safe();
 
@@ -321,8 +323,8 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
 		m_clk = clk;
 	}
 
-	machine().output().set_led_value(LED_0, BIT(data, 2));
-	machine().output().set_led_value(LED_1, BIT(data, 4));
+	m_led[LED_0] = BIT(data, 2);
+	m_led[LED_1] = BIT(data, 4);
 }
 
 

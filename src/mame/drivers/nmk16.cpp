@@ -400,6 +400,41 @@ void nmk16_state::manybloc_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }
 
+void nmk16_tomagic_state::tomagic_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x08000a, 0x08000b).portr("DSW2");
+	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
+	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
+	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
+	map(0x094001, 0x094001).w("oki1", FUNC(okim6295_device::write));
+	map(0x094003, 0x094003).r("oki1", FUNC(okim6295_device::read));
+	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
+	map(0x0f0000, 0x0fffff).ram().share("mainram");
+}
+
+void nmk16_tomagic_state::tomagic_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xc000, 0xdfff).ram();
+}
+
+void nmk16_tomagic_state::tomagic_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(nmk16_state::macross2_sound_bank_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
 void nmk16_state::tharrier_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -426,8 +461,8 @@ void nmk16_state::tharrier_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xf000, 0xf000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0xf400, 0xf400).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xf500, 0xf500).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf400, 0xf400).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf500, 0xf500).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf600, 0xf600).w(this, FUNC(nmk16_state::tharrier_oki6295_bankswitch_w<0>));
 	map(0xf700, 0xf700).w(this, FUNC(nmk16_state::tharrier_oki6295_bankswitch_w<1>));
 }
@@ -993,7 +1028,7 @@ void nmk16_state::ssmissin_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9000, 0x9000).w(this, FUNC(nmk16_state::ssmissin_soundbank_w));
-	map(0x9800, 0x9800).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x9800, 0x9800).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -1121,8 +1156,8 @@ void nmk16_state::raphero_sound_mem_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("audiobank");
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xc800, 0xc800).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc808, 0xc808).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc800, 0xc800).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc808, 0xc808).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc810, 0xc817).w("nmk112", FUNC(nmk112_device::okibank_w));
 	map(0xd000, 0xd000).w(this, FUNC(nmk16_state::macross2_sound_bank_w));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));    // main cpu
@@ -1143,8 +1178,8 @@ void nmk16_state::macross2_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x80, 0x80).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x88, 0x88).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x80, 0x80).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x88, 0x88).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
 }
 
@@ -1156,8 +1191,8 @@ void nmk16_state::bjtwin_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x080015, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
-	map(0x084001, 0x084001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x084011, 0x084011).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x084001, 0x084001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x084011, 0x084011).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x084020, 0x08402f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094001, 0x094001).w(this, FUNC(nmk16_state::nmk_tilebank_w));
@@ -1398,6 +1433,91 @@ static INPUT_PORTS_START( manybloc )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x4000, "Better" )
 	PORT_DIPSETTING(      0x8000, "Best" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tomagic )
+	PORT_START("IN0")   // $080000.w
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1   )
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_START1  )
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START2  )
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")   // $080002.w
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -4670,6 +4790,43 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 MACHINE_CONFIG_END
 
 
+// non-nmk board, clearly cloned hw tho, all clocks need checking.
+MACHINE_CONFIG_START(nmk16_tomagic_state::tomagic)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* 12? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tomagic_map)
+	NMK_HACKY_INTERRUPT_TIMING
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4) /* 3 Mhz? */
+	MCFG_DEVICE_PROGRAM_MAP(tomagic_sound_map)
+	MCFG_DEVICE_IO_MAP(tomagic_sound_io_map)
+
+	/* video hardware */
+	NMK_HACKY_SCREEN_HIRES
+	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 12000000/4) // K-666 (YM3812) 3Mhz? */
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 12000000/4, okim6295_device::PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
 uint8_t nmk16_state::decode_byte(uint8_t src, const uint8_t *bitp)
 {
 	uint8_t ret, i;
@@ -4930,6 +5087,17 @@ void nmk16_state::init_vandykeb()
 	m_maincpu->space(AS_PROGRAM).nop_write(0x08001e, 0x08001f);
 }
 
+void nmk16_tomagic_state::init_tomagic()
+{
+	// rearrange data so that we can use standard decode
+	uint8_t *rom = memregion("sprites")->base();
+	int size = memregion("sprites")->bytes();
+	for (int i = 0; i < size; i++)
+		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
+
+	init_banked_audiocpu();
+}
+
 
 /***************************************************************************
 
@@ -5021,9 +5189,9 @@ void nmk16_state::firehawk_map(address_map &map)
 WRITE8_MEMBER(nmk16_state::spec2k_oki1_banking_w)
 {
 	if(data == 0xfe)
-		m_oki2->set_rom_bank(0);
+		m_oki[1]->set_rom_bank(0);
 	else if(data == 0xff)
-		m_oki2->set_rom_bank(1);
+		m_oki[1]->set_rom_bank(1);
 }
 
 void nmk16_state::afega_sound_cpu(address_map &map)
@@ -5034,7 +5202,7 @@ void nmk16_state::afega_sound_cpu(address_map &map)
 	map(0xf000, 0xf7ff).ram();                                 // RAM
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));                 // From Main CPU
 	map(0xf808, 0xf809).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   // YM2151
-	map(0xf80a, 0xf80a).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));      // M6295
+	map(0xf80a, 0xf80a).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));      // M6295
 }
 
 void nmk16_state::firehawk_sound_cpu(address_map &map)
@@ -5044,14 +5212,14 @@ void nmk16_state::firehawk_sound_cpu(address_map &map)
 	map(0xf800, 0xffff).ram(); // not used, only tested
 	map(0xfff0, 0xfff0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xfff2, 0xfff2).w(this, FUNC(nmk16_state::spec2k_oki1_banking_w));
-	map(0xfff8, 0xfff8).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xfffa, 0xfffa).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfff8, 0xfff8).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfffa, 0xfffa).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 
 WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
 {
-	m_oki1->set_rom_bank(data & 3);
+	m_oki[0]->set_rom_bank(data & 3);
 
 	if (data & (~3))
 		logerror("%s: invalid oki bank %02x\n", machine().describe_context(), data);
@@ -5064,7 +5232,7 @@ void nmk16_state::twinactn_sound_cpu(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9000, 0x9000).w(this, FUNC(nmk16_state::twinactn_oki_bank_w));
-	map(0x9800, 0x9800).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x9800, 0x9800).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));     // From Main CPU
 }
 
@@ -6870,6 +7038,32 @@ ROM_START( manybloc )
 	ROM_LOAD( "u120.bpr",    0x0320, 0x0100, CRC(576c5984) SHA1(6e9b7f30de0d91cb766a62abc5888ec9af085a27) ) /* unknown */
 ROM_END
 
+ROM_START( tomagic )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 */
+	ROM_LOAD16_BYTE( "4.bin", 0x00000, 0x40000, CRC(5055664a) SHA1(d078bd5ab30aedb760bf0a0237484fb56a51d759) )
+	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x40000, CRC(3731ecbb) SHA1(25814bd78902cc341cc9d6b19d0a6f837cd802c6) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 */
+	ROM_LOAD( "2.bin",      0x00000, 0x20000, CRC(10359b6a) SHA1(ce59750d2fa57049c424c62e0cbefc604e224e78) )
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "9.bin", 0x000000, 0x20000, CRC(fcceb24b) SHA1(49e3162c34dfa2ef54ffe190ba91bff73cebe12b) )
+
+	ROM_REGION( 0x40000, "bgtile", 0 )
+	ROM_LOAD( "10.bin", 0x000000, 0x40000, CRC(6d5ee72a) SHA1(f90746cb5bbd87213dece062b7efd59d8fd56d84) )
+
+	ROM_REGION( 0x200000, "sprites", 0 ) /* 16x16 sprite tiles */
+	ROM_LOAD16_BYTE( "7.bin", 0x100001, 0x80000, CRC(0a297c78) SHA1(effe1ee2ab64cb9fbeae0d168346168245942034) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100000, 0x80000, CRC(88ef65e0) SHA1(20b50ffe6a9a3c17f7c2cbf90461fafa7a7bcf8d) )
+	ROM_LOAD16_BYTE( "8.bin", 0x000001, 0x80000, CRC(1708d3fb) SHA1(415b6a5079fced0306213953e6124ad4fecc680b) )
+	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(83ae90ba) SHA1(84b0779d18dabcb6086880433b1c4620dcc722cb) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )    /* OKIM6295 samples */
+	ROM_LOAD( "1.bin",  0x00000, 0x40000, CRC(02b042e3) SHA1(05fca0f83292be49cef457633aba36fed3dc0114) )
+
+	// & undumped PROMs?
+ROM_END
+
 /***************************************************************************
 
                                     Stagger I
@@ -8046,3 +8240,6 @@ GAME( 2001, firehawkv,  spec2k,   firehawk,     firehawkv,    nmk16_state, empty
 
 // bee-oh board - different display / interrupt timing to others?
 GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_tharrier,        ROT270, "Bee-Oh",                            "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+
+// clone board, different sound / bg hardware, but similar memory maps, same tx layer, sprites etc.
+GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", MACHINE_NOT_WORKING ) // there are many gambling related strings in the ROM, and an alt version is called Lucky Ball, possibly that one is a gambling title and this isn't?

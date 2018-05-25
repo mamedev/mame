@@ -1406,8 +1406,8 @@ struct render_t
 class namcos23_state : public driver_device
 {
 public:
-	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	namcos23_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_adc(*this, "subcpu:adc"),
@@ -1430,82 +1430,16 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC.%u", 0)
+		m_adc_ports(*this, "ADC.%u", 0),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	required_device<mips3_device> m_maincpu;
-	required_device<h83002_device> m_subcpu;
-	required_device<h8_adc_device> m_adc;
-	optional_device<h83334_device> m_iocpu;
-	required_device<rtc4543_device> m_rtc;
-	required_device<namco_settings_device> m_settings;
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_shared_ram;
-	required_shared_ptr<uint32_t> m_gammaram;
-	required_shared_ptr<uint32_t> m_charram;
-	required_shared_ptr<uint32_t> m_textram;
-	optional_shared_ptr<uint32_t> m_czattr;
-	optional_device<cpu_device> m_gmen_sh2;
-	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_ioport m_lightx;
-	optional_ioport m_lighty;
-	required_ioport m_p1;
-	required_ioport m_p2;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_ioport_array<4> m_adc_ports;
-
-	c404_t m_c404;
-	c361_t m_c361;
-	c417_t m_c417;
-	c412_t m_c412;
-	c421_t m_c421;
-	c422_t m_c422;
 	render_t m_render;
-
-	tilemap_t *m_bgtilemap;
-	uint8_t m_jvssense;
-	int32_t m_has_jvsio;
-	uint32_t m_main_irqcause;
-	bool m_ctl_vbl_active;
-	uint8_t m_ctl_led;
-	uint16_t m_ctl_inp_buffer[2];
-	bool m_subcpu_running;
-	uint32_t m_c435_address;
-	uint32_t m_c435_size;
-	const uint32_t *m_ptrom;
 	const uint16_t *m_tmlrom;
 	const uint8_t *m_tmhrom;
 	const uint8_t *m_texrom;
 	uint32_t m_tileid_mask;
 	uint32_t m_tile_mask;
-	uint32_t m_ptrom_limit;
-
-	int m_vblank_count;
-
-// It may only be 128
-// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
-// That fits pretty much anywhere, including inside a IC
-// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
-
-// Matrices are stored in signed 2.14 fixed point
-// Vectors are stored in signed 10.14 fixed point
-
-	int16_t m_matrices[256][9];
-	int32_t m_vectors[256][3];
-	int32_t m_light_vector[3];
-	uint16_t m_scaling;
-	int32_t m_spv[3];
-	int16_t m_spm[3];
-
-	uint16_t m_c435_buffer[256];
-	int m_c435_buffer_pos;
-
-	uint8_t m_sub_porta;
-	uint8_t m_sub_portb;
-	uint8_t m_tssio_port_4;
 
 	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
@@ -1560,8 +1494,6 @@ public:
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
 	DECLARE_MACHINE_RESET(gmen);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
@@ -1613,6 +1545,79 @@ public:
 	void s23iobrdiomap(address_map &map);
 	void s23iobrdmap(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<mips3_device> m_maincpu;
+	required_device<h83002_device> m_subcpu;
+	required_device<h8_adc_device> m_adc;
+	optional_device<h83334_device> m_iocpu;
+	required_device<rtc4543_device> m_rtc;
+	required_device<namco_settings_device> m_settings;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_shared_ram;
+	required_shared_ptr<uint32_t> m_gammaram;
+	required_shared_ptr<uint32_t> m_charram;
+	required_shared_ptr<uint32_t> m_textram;
+	optional_shared_ptr<uint32_t> m_czattr;
+	optional_device<cpu_device> m_gmen_sh2;
+	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_ioport m_lightx;
+	optional_ioport m_lighty;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_ioport_array<4> m_adc_ports;
+
+	c404_t m_c404;
+	c361_t m_c361;
+	c417_t m_c417;
+	c412_t m_c412;
+	c421_t m_c421;
+	c422_t m_c422;
+
+	tilemap_t *m_bgtilemap;
+	uint8_t m_jvssense;
+	int32_t m_has_jvsio;
+	uint32_t m_main_irqcause;
+	bool m_ctl_vbl_active;
+	uint8_t m_ctl_led;
+	uint16_t m_ctl_inp_buffer[2];
+	bool m_subcpu_running;
+	uint32_t m_c435_address;
+	uint32_t m_c435_size;
+	const uint32_t *m_ptrom;
+	uint32_t m_ptrom_limit;
+
+	int m_vblank_count;
+
+// It may only be 128
+// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
+// That fits pretty much anywhere, including inside a IC
+// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
+
+// Matrices are stored in signed 2.14 fixed point
+// Vectors are stored in signed 10.14 fixed point
+
+	int16_t m_matrices[256][9];
+	int32_t m_vectors[256][3];
+	int32_t m_light_vector[3];
+	uint16_t m_scaling;
+	int32_t m_spv[3];
+	int16_t m_spm[3];
+
+	uint16_t m_c435_buffer[256];
+	int m_c435_buffer_pos;
+
+	uint8_t m_sub_porta;
+	uint8_t m_sub_portb;
+	uint8_t m_tssio_port_4;
+	output_finder<8> m_lamp;
 };
 
 
@@ -2792,7 +2797,7 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 		if(m_ctl_led != (data & 0xff)) {
 			m_ctl_led = data & 0xff;
 			for(int i = 0; i < 8; i++)
-				output().set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
+				m_lamp[i] = BIT(data, 7 - i);
 		}
 		break;
 
@@ -3467,6 +3472,8 @@ INPUT_PORTS_END
 
 void namcos23_state::machine_start()
 {
+	m_lamp.resolve();
+
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 

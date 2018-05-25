@@ -28,43 +28,44 @@ class segas16b_state : public sega_16bit_common_base
 public:
 	// construction/destruction
 	segas16b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_mapper(*this, "mapper"),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_mcu(*this, "mcu"),
-			m_ym2151(*this, "ym2151"),
-			m_ym2413(*this, "ym2413"),
-			m_upd7759(*this, "upd"),
-			m_multiplier(*this, "multiplier"),
-			m_cmptimer_1(*this, "cmptimer_1"),
-			m_cmptimer_2(*this, "cmptimer_2"),
-			m_nvram(*this, "nvram"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_soundlatch(*this, "soundlatch"),
-			m_cxdio(*this, "cxdio"),
-			m_upd4701a(*this, {"upd4701a1", "upd4701a2"}),
-			m_workram(*this, "workram"),
-			m_romboard(ROM_BOARD_INVALID),
-			m_tilemap_type(segaic16_video_device::TILEMAP_16B),
-			m_disable_screen_blanking(false),
-			m_i8751_initial_config(nullptr),
-			m_atomicp_sound_divisor(0),
-			m_atomicp_sound_count(0),
-			m_hwc_input_value(0),
-			m_hwc_monitor(*this, "MONITOR"),
-			m_hwc_left(*this, "LEFT"),
-			m_hwc_right(*this, "RIGHT"),
-			m_mj_input_num(0),
-			m_mj_last_val(0),
-			m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"}),
-			m_spritepalbase(0x400),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
-			m_decrypted_opcodes(*this, "decrypted_opcodes"),
-			m_bootleg_scroll(*this, "bootleg_scroll"),
-			m_bootleg_page(*this, "bootleg_page")
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_mapper(*this, "mapper")
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_mcu(*this, "mcu")
+		, m_ym2151(*this, "ym2151")
+		, m_ym2413(*this, "ym2413")
+		, m_upd7759(*this, "upd")
+		, m_multiplier(*this, "multiplier")
+		, m_cmptimer_1(*this, "cmptimer_1")
+		, m_cmptimer_2(*this, "cmptimer_2")
+		, m_nvram(*this, "nvram")
+		, m_sprites(*this, "sprites")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_soundlatch(*this, "soundlatch")
+		, m_cxdio(*this, "cxdio")
+		, m_upd4701a(*this, {"upd4701a1", "upd4701a2"})
+		, m_workram(*this, "workram")
+		, m_romboard(ROM_BOARD_INVALID)
+		, m_tilemap_type(segaic16_video_device::TILEMAP_16B)
+		, m_disable_screen_blanking(false)
+		, m_i8751_initial_config(nullptr)
+		, m_atomicp_sound_divisor(0)
+		, m_atomicp_sound_count(0)
+		, m_hwc_input_value(0)
+		, m_hwc_monitor(*this, "MONITOR")
+		, m_hwc_left(*this, "LEFT")
+		, m_hwc_right(*this, "RIGHT")
+		, m_mj_input_num(0)
+		, m_mj_last_val(0)
+		, m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
+		, m_spritepalbase(0x400)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_bootleg_scroll(*this, "bootleg_scroll")
+		, m_bootleg_page(*this, "bootleg_page")
+		, m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	// memory mapping
@@ -197,6 +198,7 @@ protected:
 
 	// device overrides
 	virtual void video_start() override;
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -222,7 +224,7 @@ protected:
 	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
 	DECLARE_WRITE16_MEMBER( sjryuko_custom_io_w );
 
-	protected:
+protected:
 	// devices
 	optional_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
@@ -270,8 +272,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	optional_shared_ptr<uint16_t> m_bootleg_scroll;
 	optional_shared_ptr<uint16_t> m_bootleg_page;
-
-
+	output_finder<2> m_lamp;
 };
 
 class afighter_16b_analog_state : public segas16b_state

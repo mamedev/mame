@@ -130,6 +130,9 @@ TODO:
 	MCFG_DEVICE_ADD(_tag, MACHINE_CDI68070, 0)
 #define MCFG_CDI68070_REPLACE(_tag) \
 	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDI68070, 0)
+#define MCFG_CDI68070_CPU_TAG(_tag) \
+	downcast<cdi68070_device &>(*device).set_cpu_tag(_tag);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -142,6 +145,8 @@ class cdi68070_device : public device_t
 public:
 	// construction/destruction
 	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	// external callbacks
 	void uart_rx(uint8_t data);
@@ -270,6 +275,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	required_device<cpu_device> m_maincpu;
 
 	void uart_rx_check();
 	void uart_tx_check();

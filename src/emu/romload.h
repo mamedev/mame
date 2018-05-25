@@ -508,7 +508,7 @@ private:
 	void process_rom_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device, bool from_list);
 	chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
 	void process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag);
-	void normalize_flags_for_device(running_machine &machine, const char *rgntag, u8 &width, endianness_t &endian);
+	void normalize_flags_for_device(const char *rgntag, u8 &width, endianness_t &endian);
 	void process_region_list();
 
 

@@ -622,9 +622,9 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	*/
 
 	// lamps
-	output().set_led_value(1, !BIT(data, 5));
-	output().set_led_value(2, !BIT(data, 6));
-	output().set_led_value(3, !BIT(data, 7));
+	m_lamps[0] = BIT(~data, 5);
+	m_lamps[1] = BIT(~data, 6);
+	m_lamps[2] = BIT(~data, 7);
 
 	// end or identify
 	m_gpib->eoi_w(!BIT(data, 4));
@@ -958,6 +958,8 @@ WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
 
 void tek4051_state::machine_start()
 {
+	m_lamps.resolve();
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM

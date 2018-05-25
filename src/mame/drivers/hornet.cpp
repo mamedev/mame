@@ -344,10 +344,11 @@ public:
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
 		m_k037122_1(*this, "k037122_1"),
-		m_k037122_2(*this, "k037122_2" ),
+		m_k037122_2(*this, "k037122_2"),
 		m_adc12138(*this, "adc12138"),
 		m_konppc(*this, "konppc"),
 		m_lan_eeprom(*this, "lan_eeprom"),
+		m_voodoo(*this, "voodoo%u", 0U),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -378,6 +379,7 @@ public:
 	required_device<adc12138_device> m_adc12138;
 	required_device<konppc_device> m_konppc;
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
+	optional_device_array<voodoo_device, 2> m_voodoo;
 	required_ioport m_in0, m_in1, m_in2, m_dsw;
 	optional_ioport m_eepromout, m_analog1, m_analog2;
 	optional_region_ptr<uint8_t> m_user3_ptr;
@@ -431,8 +433,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(hornet_2board);
-	uint32_t screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 	int jvs_encode_data(uint8_t *in, int length);
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
@@ -498,11 +500,9 @@ WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_1)
 {
 }
 
-uint32_t hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hornet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	voodoo_device* voodoo = (voodoo_device*)machine().device("voodoo0");
-
-	voodoo->voodoo_update(bitmap, cliprect);
+	m_voodoo[0]->voodoo_update(bitmap, cliprect);
 
 	m_k037122_1->tile_draw(screen, bitmap, cliprect);
 
@@ -511,24 +511,11 @@ uint32_t hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-uint32_t hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hornet_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (strcmp(screen.tag(), ":lscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
-		voodoo->voodoo_update(bitmap, cliprect);
+	m_voodoo[1]->voodoo_update(bitmap, cliprect);
 
-		/* TODO: tilemaps per screen */
-		m_k037122_1->tile_draw(screen, bitmap, cliprect);
-	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
-		voodoo->voodoo_update(bitmap, cliprect);
-
-		/* TODO: tilemaps per screen */
-		m_k037122_2->tile_draw(screen, bitmap, cliprect);
-	}
+	m_k037122_2->tile_draw(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -1055,7 +1042,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
@@ -1126,13 +1113,13 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet_2board)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet_2board)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_rscreen)
 
 	MCFG_DEVICE_REMOVE("konppc")
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)

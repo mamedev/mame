@@ -80,7 +80,6 @@ public:
 	void init_lottofun();
 	void init_alienaru();
 	void init_defndjeu();
-	void init_spdball();
 	void init_splat();
 	void init_joust();
 	void init_alienar();
@@ -127,7 +126,6 @@ public:
 	void defender(machine_config &config);
 	void sinistar(machine_config &config);
 	void lottofun(machine_config &config);
-	void spdball(machine_config &config);
 	void williams(machine_config &config);
 	void williams_muxed(machine_config &config);
 	void jin(machine_config &config);
@@ -139,6 +137,22 @@ public:
 	void williams_map(address_map &map);
 };
 
+class spdball_state : public williams_state
+{
+public:
+	spdball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: williams_state(mconfig, type, tag)
+		, m_pia_3(*this, "pia_3")
+	{
+	}
+
+	void driver_init() override;
+
+	void spdball(machine_config &config);
+
+protected:
+	required_device<pia6821_device> m_pia_3;
+};
 
 class blaster_state : public williams_state
 {

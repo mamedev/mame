@@ -70,8 +70,8 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	m_segaic16vid->set_display_enable(data & 0x10);
 
 	// bits 2 & 3: control the lamps
-	output().set_led_value(1, data & 0x08);
-	output().set_led_value(0, data & 0x04);
+	m_lamp[1] = BIT(data, 3);
+	m_lamp[0] = BIT(data, 2);
 
 	// bits 0 & 1: update coin counters
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);

@@ -12,33 +12,30 @@
 class nmk16_state : public driver_device, protected seibu_sound_common
 {
 public:
-	nmk16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nmk16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
+		m_oki(*this, "oki%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_nmk004(*this, "nmk004"),
 		m_soundlatch(*this, "soundlatch"),
-		m_nmk_bgvideoram(*this, "nmk_bgvideoram%u", 0),
+		m_nmk_bgvideoram(*this, "nmk_bgvideoram%u", 0U),
 		m_nmk_txvideoram(*this, "nmk_txvideoram"),
 		m_mainram(*this, "mainram"),
 		m_gunnail_scrollram(*this, "scrollram"),
 		m_spriteram(*this, "spriteram"),
 		m_gunnail_scrollramy(*this, "scrollramy"),
-		m_afega_scroll(*this, "afega_scroll_%u", 0),
+		m_afega_scroll(*this, "afega_scroll_%u", 0U),
 		m_tilemap_rom(*this, "tilerom"),
 		m_audiobank(*this, "audiobank"),
-		m_okibank(*this, "okibank%u", 1),
-		m_sprdma_base(0x8000)
-	{}
+		m_okibank(*this, "okibank%u", 1U),
+		m_sprdma_base(0x8000) { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki1;
-	optional_device<okim6295_device> m_oki2;
+	optional_device_array<okim6295_device, 2> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<nmk004_device> m_nmk004;
@@ -236,4 +233,20 @@ public:
 	void twinactn_sound_cpu(address_map &map);
 	void vandyke_map(address_map &map);
 	void vandykeb_map(address_map &map);
+};
+
+class nmk16_tomagic_state : public nmk16_state
+{
+public:
+	nmk16_tomagic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nmk16_state(mconfig, type, tag)
+	{}
+
+	void tomagic(machine_config &config);
+	void init_tomagic();
+
+private:
+	void tomagic_map(address_map &map);
+	void tomagic_sound_map(address_map &map);
+	void tomagic_sound_io_map(address_map &map);
 };

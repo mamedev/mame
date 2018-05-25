@@ -81,6 +81,7 @@ private:
 	required_device<i8051_device> m_maincpu;
 	required_ioport_array<16> m_y;
 	devcb_write_line m_txd_handler;
+	output_finder<6> m_led;
 
 	uint8_t m_keylatch;
 	int m_rxd;

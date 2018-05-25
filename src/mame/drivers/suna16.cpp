@@ -59,10 +59,10 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x01);
-		output().set_led_value(1, data & 0x02);
-		output().set_led_value(2, data & 0x04);
-		output().set_led_value(3, data & 0x08);
+		m_led[0] = BIT(data, 0);
+		m_led[1] = BIT(data, 1);
+		m_led[2] = BIT(data, 2);
+		m_led[3] = BIT(data, 3);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
 	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
@@ -74,8 +74,8 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		output().set_led_value(0, data & 0x02);
-		output().set_led_value(1, data & 0x04);
+		m_led[0] = BIT(data, 1);
+		m_led[1] = BIT(data, 2);
 	}
 	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
@@ -309,6 +309,8 @@ void suna16_state::bestbest_sound_map(address_map &map)
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
+	m_led.resolve();
+
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
@@ -399,6 +401,8 @@ void suna16_state::uballoon_pcm_1_io_map(address_map &map)
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+
+	m_led.resolve();
 
 	save_item(NAME(m_prot));
 }

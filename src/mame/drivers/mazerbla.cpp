@@ -123,37 +123,15 @@ class mazerbla_state : public driver_device
 {
 public:
 	mazerbla_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_vcu(*this,"vcu"),
-		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch")
-		{ }
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<mb_vcu_device> m_vcu;
-	required_device<screen_device> m_screen;
-	optional_device<generic_latch_8_device> m_soundlatch;
-
-	uint8_t m_port02_status;
-	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
-
-	double m_weights_r[2];
-	double m_weights_g[3];
-	double m_weights_b[3];
-
-	/* misc */
-	uint8_t m_ls670_0[4];
-	uint8_t m_ls670_1[4];
-
-	uint8_t m_zpu_int_vector;
-
-	uint8_t m_bcd_7445;
-
-	uint8_t m_vsb_ls273;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_vcu(*this,"vcu")
+		, m_screen(*this, "screen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_led(*this, "led%u", 0U)
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
 	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
@@ -173,9 +151,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
 	void init_mazerbla();
 	void init_greatgun();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mazerbla);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -194,6 +169,37 @@ public:
 	void mazerbla_cpu3_map(address_map &map);
 	void mazerbla_io_map(address_map &map);
 	void mazerbla_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<mb_vcu_device> m_vcu;
+	required_device<screen_device> m_screen;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	output_finder<3> m_led;
+	output_finder<2> m_lamp;
+
+	uint8_t m_port02_status;
+	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
+
+	double m_weights_r[2];
+	double m_weights_g[3];
+	double m_weights_b[3];
+
+	/* misc */
+	uint8_t m_ls670_0[4];
+	uint8_t m_ls670_1[4];
+
+	uint8_t m_zpu_int_vector;
+
+	uint8_t m_bcd_7445;
+
+	uint8_t m_vsb_ls273;
 };
 
 
@@ -396,7 +402,7 @@ WRITE8_MEMBER(mazerbla_state::zpu_led_w)
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	output().set_led_value(0, offset & 1);
+	m_led[0] = BIT(offset, 0);
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
@@ -404,8 +410,8 @@ WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*output().set_led_value(0, (data & 0x10) >> 4);*/
-	/*output().set_led_value(1, (data & 0x20) >> 4);*/
+	/*m_lamp[0] = BIT(data, 4);*/
+	/*m_lamp[1] = BIT(data, 5);*/
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
@@ -417,13 +423,13 @@ WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
 WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 {
 	/* bit 7 - led on */
-	output().set_led_value(2, BIT(data, 7));
+	m_led[2] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
 {
 	/* bit 0, bit 1 - led on */
-	output().set_led_value(1, BIT(data, 0));
+	m_led[1] = BIT(data, 0);
 }
 
 
@@ -438,7 +444,7 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	m_vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	output().set_led_value(1, BIT(data, 5));
+	m_led[1] = BIT(data, 5);
 }
 
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
@@ -921,6 +927,9 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
+	m_led.resolve();
+	m_lamp.resolve();
+
 	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_port02_status));

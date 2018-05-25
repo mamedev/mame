@@ -1277,7 +1277,6 @@ DIP switches are not verified
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "sound/flt_vol.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1306,8 +1305,8 @@ WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	output().set_lamp_value(0, (m_cpua_ctrl & 0x20) ? 1 : 0);
-	output().set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
+	m_lamp[0] = BIT(m_cpua_ctrl, 5);
+	m_lamp[1] = BIT(m_cpua_ctrl, 6);
 }
 
 WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
@@ -1655,8 +1654,7 @@ READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 /**** sound pan control ****/
 WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
 {
-	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
-	dynamic_cast<filter_volume_device*>(machine().device(fltname[offset & 3]))->flt_volume_set_volume(data / 255.0f);
+	m_filter[offset & 3]->flt_volume_set_volume(data / 255.0f);
 }
 
 
@@ -3166,6 +3164,12 @@ MACHINE_START_MEMBER(taitoz_state,taitoz)
 	MACHINE_START_CALL_MEMBER(bshark);
 }
 
+MACHINE_START_MEMBER(taitoz_state,chasehq)
+{
+	m_lamp.resolve();
+	MACHINE_START_CALL_MEMBER(taitoz);
+}
+
 MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 {
 	m_cpua_ctrl = 0xff;
@@ -3264,7 +3268,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_DEVICE_PROGRAM_MAP(chq_cpub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,chasehq)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)

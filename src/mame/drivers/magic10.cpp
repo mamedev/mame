@@ -110,25 +110,18 @@
 class magic10_state : public driver_device
 {
 public:
-	magic10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	magic10_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_layer0_videoram(*this, "layer0_videoram"),
 		m_layer1_videoram(*this, "layer1_videoram"),
 		m_layer2_videoram(*this, "layer2_videoram"),
 		m_vregs(*this, "vregs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
-	tilemap_t *m_layer0_tilemap;
-	tilemap_t *m_layer1_tilemap;
-	tilemap_t *m_layer2_tilemap;
-	required_shared_ptr<uint16_t> m_layer0_videoram;
-	required_shared_ptr<uint16_t> m_layer1_videoram;
-	required_shared_ptr<uint16_t> m_layer2_videoram;
-	int m_layer2_offset[2];
-	required_shared_ptr<uint16_t> m_vregs;
-	uint16_t m_magic102_ret;
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
@@ -145,11 +138,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
-	virtual void video_start() override;
 	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void magic102(machine_config &config);
 	void magic10a(machine_config &config);
 	void magic10(machine_config &config);
@@ -160,6 +149,24 @@ public:
 	void magic10_map(address_map &map);
 	void magic10a_map(address_map &map);
 	void sgsafari_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+
+	tilemap_t *m_layer0_tilemap;
+	tilemap_t *m_layer1_tilemap;
+	tilemap_t *m_layer2_tilemap;
+	required_shared_ptr<uint16_t> m_layer0_videoram;
+	required_shared_ptr<uint16_t> m_layer1_videoram;
+	required_shared_ptr<uint16_t> m_layer2_videoram;
+	int m_layer2_offset[2];
+	required_shared_ptr<uint16_t> m_vregs;
+	uint16_t m_magic102_ret;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<9> m_lamp;
 };
 
 
@@ -300,14 +307,14 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 
 //  popmessage("lamps: %02X", data);
 
-	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
-	output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
-	output().set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
-	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	output().set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
-	output().set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
-	output().set_lamp_value(7, (data >> 6) & 1);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
-	output().set_lamp_value(8, (data >> 8) & 1);      /* Lamp 8 - PAYOUT/SUPERGAME */
+	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
+	m_lamp[2] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
+	m_lamp[3] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
+	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamp[5] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
+	m_lamp[6] = BIT(data, 5);      /* Lamp 6 - START  */
+	m_lamp[7] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
+	m_lamp[8] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x400);
 }

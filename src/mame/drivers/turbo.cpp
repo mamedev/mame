@@ -299,7 +299,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
 	/* bit 4 = FLIP (not really flip, just offset) */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	output().set_led_value(0, data & 0x04);
+	m_lamp = BIT(data, 2);
 	m_subroc3d_flip = (data >> 4) & 1;
 }
 
@@ -346,7 +346,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
 	m_buckrog_obch = data & 0x07;
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	output().set_led_value(0, data & 0x40);
+	m_lamp = BIT(data, 6);
 }
 
 
@@ -416,7 +416,7 @@ WRITE_LINE_MEMBER(turbo_state::coin_meter_2_w)
 
 WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
 {
-	machine().output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 

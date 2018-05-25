@@ -150,8 +150,8 @@
 class miniboy7_state : public driver_device
 {
 public:
-	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram_a(*this, "videoram_a"),
 		m_colorram_a(*this, "colorram_a"),
 		m_videoram_b(*this, "videoram_b"),
@@ -163,8 +163,27 @@ public:
 		m_dsw2(*this, "DSW2"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
+	DECLARE_WRITE8_MEMBER(ay_pa_w);
+	DECLARE_WRITE8_MEMBER(ay_pb_w);
+	DECLARE_READ8_MEMBER(pia_pb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+
+	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_PALETTE_INIT(miniboy7);
+
+	void miniboy7(machine_config &config);
+	void miniboy7_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_reset() override;
+
+private:
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;
 	required_shared_ptr<uint8_t> m_videoram_b;
@@ -177,21 +196,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<5> m_lamp;
 
-	DECLARE_WRITE8_MEMBER(ay_pa_w);
-	DECLARE_WRITE8_MEMBER(ay_pb_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-
-	void machine_reset() override;
-
-	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
-	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(miniboy7);
-
-	void miniboy7(machine_config &config);
-	void miniboy7_map(address_map &map);
-private:
 	uint8_t m_ay_pb;
 	int m_gpri;
 };
@@ -308,11 +314,11 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 
 	data = data ^ 0xff;
 
-//    output().set_lamp_value(0, (data) & 1);         // [----x]
-//    output().set_lamp_value(1, (data >> 1) & 1);    // [---x-]
-//    output().set_lamp_value(2, (data >> 2) & 1);    // [--x--]
-//    output().set_lamp_value(3, (data >> 3) & 1);    // [-x---]
-//    output().set_lamp_value(4, (data >> 4) & 1);    // [x----]
+//    m_lamp[0] = BIT(data, 0);    // [----x]
+//    m_lamp[1] = BIT(data, 1);    // [---x-]
+//    m_lamp[2] = BIT(data, 2);    // [--x--]
+//    m_lamp[3] = BIT(data, 3);    // [-x---]
+//    m_lamp[4] = BIT(data, 4);    // [x----]
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 

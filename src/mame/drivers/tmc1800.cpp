@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -598,7 +598,7 @@ WRITE_LINE_MEMBER( nano_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -636,12 +636,12 @@ void osc1000b_state::machine_reset()
 
 void tmc2000_state::machine_start()
 {
-	uint16_t addr;
+	m_led.resolve();
 
 	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
 
 	// randomize color RAM contents
-	for (addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
+	for (uint16_t addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
 		m_colorram[addr] = machine().rand() & 0xff;
 	}
@@ -677,6 +677,8 @@ void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 void nano_state::machine_start()
 {
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }

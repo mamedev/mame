@@ -365,6 +365,7 @@ ac1sstrka                       //
 ac1sstrkb                       //
 ac1taklv                        // Take It Or Leave It (Ace)
 ac1totb                         // Top Of The Bill (Ace)
+ac1unk                          // ???
 ac1xpres                        // Xpress (Pcp)
 
 @source:acesp.cpp
@@ -10124,6 +10125,7 @@ kod                             // 05/08/1991 (c) 1991 (World)
 kodj                            // 05/08/1991 (c) 1991 (Japan)
 kodja                           // 05/08/1991 (c) 1991 (Japan)
 kodr1                           // 11/07/1991 (c) 1991 (World)
+kodr2                           // 31/07/1991 (c) 1991 (World)
 kodu                            // 10/09/1991 (c) 1991 (USA)
 lostwrld                        // 7/1988 (c) 1988 (Japan)
 lostwrldo                       // 7/1988 (c) 1988 (Japan)
@@ -13501,6 +13503,9 @@ gcbr                            // (c) 2002 Nintendo
 @source:gameking.cpp
 gamekin3                        //
 gameking                        //
+
+@source:gamemasters.cpp
+gmsshoot                        // (c) 1989 GameMasters
 
 @source:gameplan.cpp
 challeng                        // (c) 1981 Centuri
@@ -17946,6 +17951,7 @@ ataxxj                          // (c) 1990 Leland
 brutforc                        // (c) 1991 Leland
 indyheat                        // (c) 1991 Leland
 wsf                             // (c) 1990 Leland
+wsf3                            // (c) 1990 Leland
 
 @source:lemmings.cpp
 lemmings                        // prototype (c) 1991 Data East USA (US)
@@ -18555,6 +18561,10 @@ masao                           // bootleg
 
 @source:markham.cpp
 markham                         // TVG14 (c) 1983 Sun Electronics
+banbam                          // TVG16 (c) 1984 Sun Electronics
+guiness                         // TVG15 (c) 1984 Sun Electronics
+pettanp                         // TVG16 (c) 1984 Sun Electronics (Japan)
+strnskil                        // TVG15 (c) 1984 Sun Electronics
 
 @source:marywu.cpp
 marywu                          //
@@ -30149,6 +30159,7 @@ tdragon3h
 tdragonb                        // bootleg
 tharrier                        // UPL-89053 (c) 1989 UPL
 tharrieru                       // UPL-89053 (c) 1989 UPL + American Sammy license
+tomagic                         //
 twinactn                        // (c) 1995 - bootleg of US AFF Mustang
 vandyke                         // UPL-90064 (c) UPL
 vandykeb                        // bootleg
@@ -34267,6 +34278,7 @@ emjtrapz                        // (c) 2001 Seibu Kaihatsu / CATS
 batlball                        // (c) 1995 Seibu Kaihatsu (Tuning License)
 batlballa                       // (c) 1995 Seibu Kaihatsu (Metrotainment License)
 batlballe                       // (c) 1995 Seibu Kaihatsu (Metrotainment License)
+batlballo                       // (c) 1995 Seibu Kaihatsu (Tuning License)
 batlballu                       // (c) 1995 Seibu Kaihatsu (Fabtek license)
 ejanhs                          // (c) 1996 Seibu Kaihatsu
 ejsakura                        // (c) 1999 Seibu Kaihatsu
@@ -35617,12 +35629,6 @@ stratos                         // Kasparov Stratos Chess Computer
 
 @source:strkzn.cpp
 strkzn                          // (c) 1994 Purple Star
-
-@source:strnskil.cpp
-banbam                          // TVG16 (c) 1984 Sun Electronics
-guiness                         // TVG15 (c) 1984 Sun Electronics
-pettanp                         // TVG16 (c) 1984 Sun Electronics (Japan)
-strnskil                        // TVG15 (c) 1984 Sun Electronics
 
 @source:studio2.cpp
 apollo80                        //
@@ -37796,6 +37802,7 @@ mrdig                           // (c) 2000 Sun
 mrkicker                        // (c) 2001 Semicom
 mrkickera                       // (c) 2001 Semicom
 newxpang                        // (c) 1999 F2 System
+worldadv                        // (c) 1999 F2 System
 puzlbang                        // (c) 1999 Omega System
 puzlbanga                       // (c) 1999 Omega System
 suplup                          // (c) 1999 Omega System

@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 	m_cti->aoe_w(state);
 
 	// set Q led status
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	// tape out
 	m_cassette->output(state ? -1.0 : +1.0);
@@ -264,6 +264,8 @@ WRITE8_MEMBER( tmc2000e_state::dma_w )
 
 void tmc2000e_state::machine_start()
 {
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_cdp1864_efx));
 	save_item(NAME(m_keylatch));

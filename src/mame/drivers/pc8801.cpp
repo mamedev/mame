@@ -308,6 +308,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_screen(*this, "screen"),
 			m_fdccpu(*this, "fdccpu"),
+			m_fdc(*this, "upd765"),
+			m_fdd(*this, "upd765:%u", 0U),
 			m_pic(*this, I8214_TAG),
 			m_rtc(*this, UPD1990A_TAG),
 			m_cassette(*this, "cassette"),
@@ -316,10 +318,22 @@ public:
 			m_opn(*this, "opn"),
 			m_palette(*this, "palette")
 	{ }
+	void pc8801mc(machine_config &config);
+	void pc8801fh(machine_config &config);
+	void pc8801(machine_config &config);
+	void pc8801ma(machine_config &config);
+protected:
 
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_fdccpu;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_fdd;
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
 	required_device<cassette_image_device> m_cassette;
@@ -474,20 +488,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pc8801);
-	void pc8801mc(machine_config &config);
-	void pc8801fh(machine_config &config);
-	void pc8801(machine_config &config);
-	void pc8801ma(machine_config &config);
 	void pc8801_io(address_map &map);
 	void pc8801_mem(address_map &map);
 	void pc8801fdc_io(address_map &map);
 	void pc8801fdc_mem(address_map &map);
-protected:
-
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-public:
 	DECLARE_MACHINE_RESET(pc8801_clock_speed);
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
@@ -1881,20 +1885,20 @@ void pc8801_state::pc8801fdc_mem(address_map &map)
 TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
 {
 	//printf("0\n");
-	machine().device<upd765a_device>("upd765")->tc_w(false);
+	m_fdc->tc_w(false);
 }
 
 WRITE8_MEMBER(pc8801_state::upd765_mc_w)
 {
-	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!(data & 1));
-	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
+	m_fdd[0]->get_device()->mon_w(!(data & 1));
+	m_fdd[1]->get_device()->mon_w(!(data & 2));
 }
 
 READ8_MEMBER(pc8801_state::upd765_tc_r)
 {
 	//printf("%04x 1\n",m_fdccpu->pc());
 
-	machine().device<upd765a_device>("upd765")->tc_w(true);
+	m_fdc->tc_w(true);
 	//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
 	//OTOH, 50 seems more than enough for the new upd...
 	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
@@ -1910,10 +1914,10 @@ WRITE8_MEMBER(pc8801_state::fdc_irq_vector_w)
 WRITE8_MEMBER(pc8801_state::fdc_drive_mode_w)
 {
 	logerror("FDC drive mode %02x\n", data);
-	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(data & 0x01 ? 360 : 300);
-	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+	m_fdd[0]->get_device()->set_rpm(data & 0x01 ? 360 : 300);
+	m_fdd[1]->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 
-	machine().device<upd765a_device>("upd765")->set_rate(data & 0x20 ? 500000 : 250000);
+	m_fdc->set_rate(data & 0x20 ? 500000 : 250000);
 }
 
 void pc8801_state::pc8801fdc_io(address_map &map)
@@ -2403,9 +2407,9 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 void pc8801_state::machine_start()
 {
-	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
-	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
-	machine().device<upd765a_device>("upd765")->set_rate(250000);
+	m_fdd[0]->get_device()->set_rpm(300);
+	m_fdd[1]->get_device()->set_rpm(300);
+	m_fdc->set_rate(250000);
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);

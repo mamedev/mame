@@ -154,7 +154,7 @@ READ_LINE_MEMBER( elf2_state::ef4_r )
 
 WRITE_LINE_MEMBER( elf2_state::q_w )
 {
-	output().set_led_value(0, state);
+	m_led = state ? 1 : 0;
 }
 
 READ8_MEMBER( elf2_state::dma_r )
@@ -201,6 +201,8 @@ WRITE_LINE_MEMBER( elf2_state::da_w )
 void elf2_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	m_led.resolve();
 
 	/* initialize LED displays */
 	m_7segs.resolve();

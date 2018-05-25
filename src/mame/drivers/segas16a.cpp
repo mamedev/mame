@@ -184,8 +184,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	// bits 2 & 3: control the lamps, allowing for overrides
 	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
 		m_lamp_changed_w(m_video_control ^ data, data);
-	output().set_led_value(1, data & 0x08);
-	output().set_led_value(0, data & 0x04);
+	m_lamp[1] = BIT(data, 3);
+	m_lamp[0] = BIT(data, 2);
 
 	m_video_control = data;
 

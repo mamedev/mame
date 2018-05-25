@@ -3659,9 +3659,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/shangha3.cpp",
 	MAME_DIR .. "src/mame/includes/shangha3.h",
 	MAME_DIR .. "src/mame/video/shangha3.cpp",
-	MAME_DIR .. "src/mame/drivers/strnskil.cpp",
-	MAME_DIR .. "src/mame/includes/strnskil.h",
-	MAME_DIR .. "src/mame/video/strnskil.cpp",
 	MAME_DIR .. "src/mame/drivers/tonton.cpp",
 }
 
@@ -4585,6 +4582,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/galaxi.cpp",
 	MAME_DIR .. "src/mame/drivers/galgame.cpp",
 	MAME_DIR .. "src/mame/drivers/gamecstl.cpp",
+	MAME_DIR .. "src/mame/drivers/gamemasters.cpp",
 	MAME_DIR .. "src/mame/drivers/gammagic.cpp",
 	MAME_DIR .. "src/mame/drivers/gamtor.cpp",
 	MAME_DIR .. "src/mame/drivers/gei.cpp",

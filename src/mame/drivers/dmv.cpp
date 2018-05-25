@@ -69,36 +69,9 @@ public:
 		, m_slot6(*this, "slot6")
 		, m_slot7(*this, "slot7")
 		, m_slot7a(*this, "slot7a")
+		, m_led(*this, "led%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<upd7220_device> m_hgdc;
-	required_device<am9517a_device> m_dmac;
-	required_device<pit8253_device> m_pit;
-	required_device<i8272a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<dmv_keyboard_device> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<uint16_t> m_video_ram;
-	required_device<palette_device> m_palette;
-	required_memory_region m_ram;
-	required_memory_region m_bootrom;
-	required_memory_region m_chargen;
-
-	required_device<dmvcart_slot_device> m_slot1;
-	required_device<dmvcart_slot_device> m_slot2;
-	required_device<dmvcart_slot_device> m_slot2a;
-	required_device<dmvcart_slot_device> m_slot3;
-	required_device<dmvcart_slot_device> m_slot4;
-	required_device<dmvcart_slot_device> m_slot5;
-	required_device<dmvcart_slot_device> m_slot6;
-	required_device<dmvcart_slot_device> m_slot7;
-	required_device<dmvcart_slot_device> m_slot7a;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void update_halt_line();
 
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -168,6 +141,43 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void dmv(machine_config &config);
+	void dmv_io(address_map &map);
+	void dmv_mem(address_map &map);
+	void upd7220_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<upd7220_device> m_hgdc;
+	required_device<am9517a_device> m_dmac;
+	required_device<pit8253_device> m_pit;
+	required_device<i8272a_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<dmv_keyboard_device> m_keyboard;
+	required_device<speaker_sound_device> m_speaker;
+	required_shared_ptr<uint16_t> m_video_ram;
+	required_device<palette_device> m_palette;
+	required_memory_region m_ram;
+	required_memory_region m_bootrom;
+	required_memory_region m_chargen;
+
+	required_device<dmvcart_slot_device> m_slot1;
+	required_device<dmvcart_slot_device> m_slot2;
+	required_device<dmvcart_slot_device> m_slot2a;
+	required_device<dmvcart_slot_device> m_slot3;
+	required_device<dmvcart_slot_device> m_slot4;
+	required_device<dmvcart_slot_device> m_slot5;
+	required_device<dmvcart_slot_device> m_slot6;
+	required_device<dmvcart_slot_device> m_slot7;
+	required_device<dmvcart_slot_device> m_slot7a;
+	output_finder<9> m_led;
+
 	bool        m_ramoutdis;
 	int         m_switch16;
 	int         m_thold7;
@@ -180,10 +190,6 @@ public:
 	int         m_floppy_motor;
 	int         m_busint[8];
 	int         m_irqs[8];
-	void dmv(machine_config &config);
-	void dmv_io(address_map &map);
-	void dmv_mem(address_map &map);
-	void upd7220_map(address_map &map);
 };
 
 WRITE8_MEMBER(dmv_state::tc_set_w)
@@ -214,7 +220,7 @@ WRITE8_MEMBER(dmv_state::leds_w)
 	*/
 
 	for(int i=0; i<8; i++)
-		output().set_led_value(8-i, BIT(data, i));
+		m_led[8-i] = BIT(data, i);
 }
 
 READ8_MEMBER(dmv_state::ramsel_r)
@@ -618,6 +624,7 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
+	m_led.resolve();
 }
 
 void dmv_state::machine_reset()

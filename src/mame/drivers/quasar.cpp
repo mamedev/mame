@@ -281,7 +281,7 @@ INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 
 MACHINE_START_MEMBER(quasar_state,quasar)
 {
-	MACHINE_START_CALL_MEMBER(cvs);
+	cvs_state::machine_start();
 
 	/* register state save */
 	save_item(NAME(m_effectcontrol));
@@ -291,7 +291,7 @@ MACHINE_START_MEMBER(quasar_state,quasar)
 
 MACHINE_RESET_MEMBER(quasar_state,quasar)
 {
-	MACHINE_RESET_CALL_MEMBER(cvs);
+	cvs_state::machine_reset();
 
 	m_effectcontrol = 0;
 	m_page = 0;

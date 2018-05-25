@@ -11,8 +11,8 @@
 class suna8_state : public driver_device
 {
 public:
-	suna8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	suna8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_hardhead_ip(*this, "hardhead_ip"),
 		m_spriteram(*this, "spriteram"),
@@ -29,40 +29,9 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank1d(*this, "bank1d"),
 		m_prot_opcode_toggle(0),
-		m_remap_sound(0)
-		{ }
-
-	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_hardhead_ip;
-	optional_shared_ptr<uint8_t> m_spriteram;
-	optional_shared_ptr<uint8_t> m_wram;
-	optional_shared_ptr<uint8_t> m_banked_paletteram;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
-	optional_memory_bank m_bank0d;
-	required_memory_bank m_bank1;
-	optional_memory_bank m_bank1d;
-
-	uint8_t m_rombank;
-	uint8_t m_rombank_latch;
-	uint8_t m_spritebank;
-	uint8_t m_palettebank;
-	uint8_t m_paletteram_enab;
-	uint8_t m_prot2;
-	uint8_t m_prot2_prev;
-
-	uint8_t m_protection_val;
-	uint8_t m_nmi_enable;
-	uint8_t m_spritebank_latch;
-	uint8_t m_write_disable;
-	uint8_t m_prot_opcode_toggle;
-	uint8_t m_remap_sound;
-	uint8_t* m_decrypt;
+		m_remap_sound(0),
+		m_led(*this, "led%u", 0U)
+	{ }
 
 	enum GFXBANK_TYPE_T
 	{
@@ -70,23 +39,6 @@ public:
 		GFXBANK_TYPE_BRICKZN,
 		GFXBANK_TYPE_STARFIGH
 	}   m_gfxbank_type;
-	uint8_t m_gfxbank;
-
-	bool m_has_text; // has text sprites (older games)
-
-	// samples
-	std::unique_ptr<int16_t[]> m_samplebuf;
-	int m_sample, m_play;
-	int m_numsamples;
-
-#if TILEMAPS
-	tilemap_t *m_bg_tilemap;
-	int m_tiles;
-	int m_trombank;
-	int m_page;
-
-	TILE_GET_INFO_MEMBER(get_tile_info);
-#endif
 
 	DECLARE_READ8_MEMBER(hardhead_protection_r);
 	DECLARE_WRITE8_MEMBER(hardhead_protection_w);
@@ -202,4 +154,58 @@ public:
 	void rranger_sound_map(address_map &map);
 	void sparkman_map(address_map &map);
 	void starfigh_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+
+	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_hardhead_ip;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_wram;
+	optional_shared_ptr<uint8_t> m_banked_paletteram;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	optional_memory_bank m_bank0d;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank1d;
+
+	uint8_t m_rombank;
+	uint8_t m_rombank_latch;
+	uint8_t m_spritebank;
+	uint8_t m_palettebank;
+	uint8_t m_paletteram_enab;
+	uint8_t m_prot2;
+	uint8_t m_prot2_prev;
+
+	uint8_t m_protection_val;
+	uint8_t m_nmi_enable;
+	uint8_t m_spritebank_latch;
+	uint8_t m_write_disable;
+	uint8_t m_prot_opcode_toggle;
+	uint8_t m_remap_sound;
+	uint8_t* m_decrypt;
+
+	uint8_t m_gfxbank;
+
+	bool m_has_text; // has text sprites (older games)
+
+	// samples
+	std::unique_ptr<int16_t[]> m_samplebuf;
+	int m_sample, m_play;
+	int m_numsamples;
+
+#if TILEMAPS
+	tilemap_t *m_bg_tilemap;
+	int m_tiles;
+	int m_trombank;
+	int m_page;
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+#endif
+	output_finder<2> m_led;
 };

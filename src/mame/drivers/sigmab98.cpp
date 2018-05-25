@@ -149,47 +149,9 @@ public:
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram"),
 		m_vregs(*this, "vregs"),
-		m_vtable(*this, "vtable")
+		m_vtable(*this, "vtable"),
+		m_led(*this, "led%u", 0U)
 	{ }
-
-	// Required devices
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
-	// Optional devices
-	optional_device<buffered_spriteram8_device> m_buffered_spriteram;   // not on sammymdl?
-	optional_device<nvram_device> m_nvramdev; // battery backed RAM (should be required, but dashhero breaks with it)
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<ticket_dispenser_device> m_hopper;
-	optional_device<ticket_dispenser_device> m_hopper_small;
-	optional_device<ticket_dispenser_device> m_hopper_large;
-	// Shared pointers
-	required_shared_ptr<uint8_t> m_nvram;
-	optional_shared_ptr<uint8_t> m_spriteram; // optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<uint8_t> m_vregs;     // optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<uint8_t> m_vtable;    // optional as some games allocate it themselves (due to banking)
-
-	std::vector<uint8_t> m_paletteram;
-
-	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
-	bool new_sprite_chip; // KY-10510 has a slightly different sprite format than KY-3211
-
-	uint8_t m_reg;
-	uint8_t m_rombank;
-	uint8_t m_reg2;
-	uint8_t m_rambank;
-
-	uint8_t m_vblank_vector;
-	uint8_t m_timer0_vector;
-	uint8_t m_timer1_vector;
-
-	uint8_t m_c0;
-	uint8_t m_c4;
-	uint8_t m_c6;
-	uint8_t m_c8;
-	uint8_t m_vblank;
-	uint8_t m_out[3];
 
 	DECLARE_WRITE8_MEMBER(gegege_regs_w);
 	DECLARE_READ8_MEMBER(gegege_regs_r);
@@ -284,7 +246,6 @@ public:
 	DECLARE_MACHINE_RESET(sigmab98);
 	DECLARE_MACHINE_RESET(sammymdl);
 
-	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
@@ -318,6 +279,50 @@ public:
 	void pyenaget_io(address_map &map);
 	void tdoboon_io(address_map &map);
 	void tdoboon_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+	virtual void video_start() override;
+
+	// Required devices
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	// Optional devices
+	optional_device<buffered_spriteram8_device> m_buffered_spriteram;   // not on sammymdl?
+	optional_device<nvram_device> m_nvramdev; // battery backed RAM (should be required, but dashhero breaks with it)
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_hopper_small;
+	optional_device<ticket_dispenser_device> m_hopper_large;
+	// Shared pointers
+	required_shared_ptr<uint8_t> m_nvram;
+	optional_shared_ptr<uint8_t> m_spriteram; // optional as some games allocate it themselves (due to banking)
+	optional_shared_ptr<uint8_t> m_vregs;     // optional as some games allocate it themselves (due to banking)
+	optional_shared_ptr<uint8_t> m_vtable;    // optional as some games allocate it themselves (due to banking)
+	output_finder<8> m_led;
+
+	std::vector<uint8_t> m_paletteram;
+
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
+	bool new_sprite_chip; // KY-10510 has a slightly different sprite format than KY-3211
+
+	uint8_t m_reg;
+	uint8_t m_rombank;
+	uint8_t m_reg2;
+	uint8_t m_rambank;
+
+	uint8_t m_vblank_vector;
+	uint8_t m_timer0_vector;
+	uint8_t m_timer1_vector;
+
+	uint8_t m_c0;
+	uint8_t m_c4;
+	uint8_t m_c6;
+	uint8_t m_c8;
+	uint8_t m_vblank;
+	uint8_t m_out[3];
 };
 
 
@@ -959,7 +964,7 @@ WRITE8_MEMBER(sigmab98_state::eeprom_w)
 // 10 led?
 WRITE8_MEMBER(sigmab98_state::c4_w)
 {
-	output().set_led_value(0, (data & 0x10));
+	m_led[0] = BIT(data, 4);
 
 	m_c4 = data;
 	show_outputs();
@@ -980,8 +985,8 @@ WRITE8_MEMBER(sigmab98_state::c6_w)
 	if ((data & 0x08) && !(m_c6 & 0x08))
 		m_buffered_spriteram->copy();
 
-	output().set_led_value(1,   data  & 0x10);
-	output().set_led_value(2,   data  & 0x20);
+	m_led[1] = BIT(data, 4);
+	m_led[2] = BIT(data, 5);
 
 	m_c6 = data;
 	show_outputs();
@@ -1202,10 +1207,10 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c6_w)
 //  machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04); // medal in
 	machine().bookkeeping().coin_counter_w(3, data & 0x08); // medal out
-	output().set_led_value(0,                 data & 0x10); // button led
-//  output().set_led_value(1,                 data & 0x20); // (unused button led)
-//  output().set_led_value(2,                 data & 0x40); // (unused button led)
-//  output().set_led_value(3,                 data & 0x80); // (unused button led)
+	m_led[0] = BIT(data, 4); // button led
+//  m_led[1] = BIT(data, 5); // (unused button led)
+//  m_led[2] = BIT(data, 6); // (unused button led)
+//  m_led[3] = BIT(data, 7); // (unused button led)
 
 	m_c6 = data;
 	show_outputs();
@@ -1446,7 +1451,7 @@ READ8_MEMBER(sigmab98_state::sammymdl_leds_r)
 }
 WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 {
-	output().set_led_value(0,    data & 0x01);   // button
+	m_led[0] = BIT(data, 0);   // button
 
 	m_out[1] = data;
 	show_3_outputs();
@@ -1778,10 +1783,10 @@ void sigmab98_state::gocowboy_map(address_map &map)
 
 WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
 {
-	output().set_led_value(0,    data & 0x01);   // button
-	output().set_led_value(1,    data & 0x02);   // coin lockout? (after coining up, but not for service coin)
-	output().set_led_value(2,    data & 0x04);   // ? long after a prize is not collected
-	output().set_led_value(3,    data & 0x08);   // ? "don't forget the large prizes"
+	m_led[0] = BIT(data, 0);   // button
+	m_led[1] = BIT(data, 1);   // coin lockout? (after coining up, but not for service coin)
+	m_led[2] = BIT(data, 2);   // ? long after a prize is not collected
+	m_led[3] = BIT(data, 3);   // ? "don't forget the large prizes"
 
 	// 10 hopper enable?
 	// 20 hopper motor on (active low)?
@@ -2006,14 +2011,14 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 {
 	// All used
-	output().set_led_value(0,    data & 0x01);
-	output().set_led_value(1,    data & 0x02);
-	output().set_led_value(2,    data & 0x04);
-	output().set_led_value(3,    data & 0x08);
-	output().set_led_value(4,    data & 0x10);
-	output().set_led_value(5,    data & 0x20);
-	output().set_led_value(6,    data & 0x40);
-	output().set_led_value(7,    data & 0x80);
+	m_led[0] = BIT(data, 0);
+	m_led[1] = BIT(data, 1);
+	m_led[2] = BIT(data, 2);
+	m_led[3] = BIT(data, 3);
+	m_led[4] = BIT(data, 4);
+	m_led[5] = BIT(data, 5);
+	m_led[6] = BIT(data, 6);
+	m_led[7] = BIT(data, 7);
 
 	m_out[1] = data;
 	show_3_outputs();

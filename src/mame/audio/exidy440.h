@@ -62,6 +62,7 @@ private:
 		int16_t data[1];
 	};
 
+	required_device<cpu_device> m_audiocpu;
 
 	// internal state
 	uint8_t m_sound_command;

@@ -14,6 +14,12 @@
    Status: Front tilemap should be complete, sprites are mostly correct, controls
    should be fine.
 
+   Known Issues:
+   - CRTC and video registers needs syncronization with current video draw state, it's very noticeable if for example scroll values are in very different states between screens.
+   - Current draw state could be improved optimization-wise (for example by supporting it in the core in some way).
+   - sprite palettes are not entirely right (fixed?)
+   - sound volume mixing, handtune with set_gain() with m_k054539 devices.
+     Also notice that "volume" in sound options is for k054539_1 (SFX)
 
    Change Log:
 
@@ -26,11 +32,6 @@
 
    video\konamiic.c
      - missing sprites and priority
-
-   Known Issues:
-     - CRTC and video registers needs syncronization with current video draw state, it's very noticeable if for example scroll values are in very different states between screens.
-     - Current draw state could be improved optimization-wise (for example by supporting it in the core in some way).
-     - sprite palettes are not entirely right
 
 
 *************************************************************************/
@@ -49,7 +50,7 @@
 
 
 
-READ16_MEMBER(rungun_state::rng_sysregs_r)
+READ16_MEMBER(rungun_state::sysregs_r)
 {
 	uint16_t data = 0;
 
@@ -85,7 +86,7 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 	return m_sysreg[offset];
 }
 
-WRITE16_MEMBER(rungun_state::rng_sysregs_w)
+WRITE16_MEMBER(rungun_state::sysregs_w)
 {
 	COMBINE_DATA(m_sysreg + offset);
 
@@ -108,6 +109,9 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 				membank("spriteram_bank")->set_entry((data & 0x80) >> 7);
 				m_video_mux_bank = ((data & 0x80) >> 7) ^ 1;
 				ioport("EEPROMOUT")->write(data, 0xff);
+				
+				machine().bookkeeping().coin_counter_w(0, data & 0x08);
+				machine().bookkeeping().coin_counter_w(1, data & 0x10);
 			}
 			if (ACCESSING_BITS_8_15)
 			{
@@ -148,7 +152,7 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
-READ8_MEMBER(rungun_state::rng_53936_rom_r)
+READ8_MEMBER(rungun_state::k53936_rom_r)
 {
 	// TODO: odd addresses returns ...?
 	uint32_t rom_addr = offset;
@@ -181,8 +185,8 @@ void rungun_state::rungun_map(address_map &map)
 	map(0x000000, 0x2fffff).rom();                                         // main program + data
 	map(0x300000, 0x3007ff).rw(this, FUNC(rungun_state::palette_read), FUNC(rungun_state::palette_write));
 	map(0x380000, 0x39ffff).ram();                                         // work RAM
-	map(0x400000, 0x43ffff).r(this, FUNC(rungun_state::rng_53936_rom_r)).umask16(0x00ff);               // '936 ROM readback window
-	map(0x480000, 0x48001f).rw(this, FUNC(rungun_state::rng_sysregs_r), FUNC(rungun_state::rng_sysregs_w)).share("sysreg");
+	map(0x400000, 0x43ffff).r(this, FUNC(rungun_state::k53936_rom_r)).umask16(0x00ff);               // '936 ROM readback window
+	map(0x480000, 0x48001f).rw(this, FUNC(rungun_state::sysregs_r), FUNC(rungun_state::sysregs_w)).share("sysreg");
 	map(0x4c0000, 0x4c001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                        // CCU (for scanline and vblank polling)
 	map(0x540000, 0x540001).w(this, FUNC(rungun_state::sound_irq_w));
 	map(0x580000, 0x58001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
@@ -191,9 +195,9 @@ void rungun_state::rungun_map(address_map &map)
 	map(0x600000, 0x601fff).bankrw("spriteram_bank");                                                // OBJ RAM
 	map(0x640000, 0x640007).w(m_k055673, FUNC(k055673_device::k053246_word_w));                      // '246A registers
 	map(0x680000, 0x68001f).w(m_k053936, FUNC(k053936_device::ctrl_w));          // '936 registers
-	map(0x6c0000, 0x6cffff).rw(this, FUNC(rungun_state::rng_psac2_videoram_r), FUNC(rungun_state::rng_psac2_videoram_w)); // PSAC2 ('936) RAM (34v + 35v)
+	map(0x6c0000, 0x6cffff).rw(this, FUNC(rungun_state::psac2_videoram_r), FUNC(rungun_state::psac2_videoram_w)); // PSAC2 ('936) RAM (34v + 35v)
 	map(0x700000, 0x7007ff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));          // PSAC "Line RAM"
-	map(0x740000, 0x741fff).rw(this, FUNC(rungun_state::rng_ttl_ram_r), FUNC(rungun_state::rng_ttl_ram_w));     // text plane RAM
+	map(0x740000, 0x741fff).rw(this, FUNC(rungun_state::ttl_ram_r), FUNC(rungun_state::ttl_ram_w));     // text plane RAM
 	map(0x7c0000, 0x7c0001).nopw();                                    // watchdog
 }
 
@@ -252,7 +256,7 @@ void rungun_state::rungun_sound_map(address_map &map)
 }
 
 
-void rungun_state::rungun_k054539_map(address_map &map)
+void rungun_state::k054539_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("k054539", 0);
 }
@@ -379,6 +383,7 @@ void rungun_state::machine_start()
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
 	//save_item(NAME(m_ttl_vram));
+	
 }
 
 void rungun_state::machine_reset()
@@ -448,16 +453,18 @@ MACHINE_CONFIG_START(rungun_state::rng)
 
 	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
+	// SFX
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, rungun_k054539_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, rungun_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
+	// BGM, volumes handtuned to make SFXs heardable (still not 100% right tho)
 	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, rungun_k054539_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.

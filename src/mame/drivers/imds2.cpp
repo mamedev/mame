@@ -525,7 +525,7 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 	if (lten) {
 		pixels = ~0;
 	} else if (vsp != 0 || (linecount & 8) != 0) {
-		pixels = 0;
+		pixels = 0; // VSP is gated with LC3
 	} else {
 		// See [2], pg 58 for the very peculiar way of generating character images
 		// Here each half-pixel is translated into a full pixel

@@ -13,7 +13,7 @@
 
     The 99/2 was equipped with a TMS9995, the same CPU as used in the envisioned
     flag ship 99/8 and later in the Geneve 9640. In the 99/2 it is clocked
-    at 5.35 MHz. Also, the CPU has on-chip RAM, unlike the version in the 99/8.
+    at 10.7 MHz. Also, the CPU has on-chip RAM, unlike the version in the 99/8.
 
     At many places, the tight price constraint shows up.
     - 2 or 4 KiB of RAM
@@ -25,8 +25,8 @@
 
     Main board
     ----------
-    1 CPU @ 5.35 MHz
-    2 RAM circuits
+    1 CPU @ 10.7 MHz (contrary to specs which state 5.35 MHz)
+    2 RAM circuits   (4 KiB instead of 2 KiB in specs)
     3 or 4 EPROMs
     1 TAL-004 custom gate array as the video controller
     1 TAL-004 custom gate array as the I/O controller
@@ -35,7 +35,7 @@
     Connectors
     ----------
     - Built-in RF modulator, switch allows for setting the channel to VHF 3 or 4
-    - Cassette connector (compatible to 99/4A), one unit only
+    - Two jacks for cassette input and output, no motor control
     - Hexbus connector
     - System expansion slot for cartridges (ROM or RAM), 60 pins, on the back
 
@@ -52,7 +52,9 @@
     design, only 2 KiB RAM were planned, and the included ROM was 24 KiB.
     Later, the 2 KiB were obviously expanded to 4 KiB, while the ROM remained
     the same in size. This can be proved here, since the console crashes with
-    less than 4 KiB by an unmapped memory access.
+    less than 4 KiB by an unmapped memory access. Also, the CPU is not clocked
+    by 5.35 MHz as specified, but by the undivided 10.7 MHz; this was proved
+    by running test programs on the real consoles.
 
     The next version showed an additional 8 KiB of ROM. Possibly in order
     to avoid taking away too much address space, two EPROMs are mapped to the
@@ -67,7 +69,8 @@
     systems like the CC-40 and the TI-74. The TI-99/2 also offers a Hexbus
     interface so that any kind of Hexbus device can be connected, like, for
     example, the HX5102 floppy drive, a Wafertape drive, or the RS232 serial
-    interface.
+    interface. The 24K version seems to have no proper Hexbus support for
+    floppy drives; it always starts the cassette I/O instead.
 
     The address space layout looks like this:
 
@@ -110,6 +113,8 @@
     - HOLD is asserted in every scanline when characters are drawn that are
       not the "Blank End of line" (BEOL). Once encountered, the remaining
       scanline remains blank.
+    - During cassette transfer, the screen is blanked using the VIDENA line.
+      This is expected and not a bug.
     - When a frame has been completed, the INT4 interrupt of the 9995 is
       triggered as a vblank interrupt.
     - All CRU operations are handled by the second gate array. Unfortunately,
@@ -162,23 +167,21 @@
 */
 
 #include "emu.h"
+#include "bus/ti99/ti99defs.h"
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9995.h"
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 
-#define TI_VDC_TAG         "vdc"
-#define TI_SCREEN_TAG      "screen"
+#define TI992_SCREEN_TAG      "screen"
 #define TI992_ROM          "rom_region"
 #define TI992_RAM_TAG      "ram_region"
+#define TI992_IO_TAG       "io"
 
 #define LOG_WARN           (1U<<1)   // Warnings
-#define LOG_HEXBUS         (1U<<2)   // Hexbus operation
-#define LOG_KEYBOARD       (1U<<3)   // Keyboard operation
-#define LOG_SIGNALS        (1U<<4)   // Signals like HOLD/HOLDA
-#define LOG_CRU            (1U<<5)   // CRU activities
-#define LOG_BANK           (1U<<6)   // Change ROM banks
+#define LOG_CRU            (1U<<2)   // CRU activities
+#define LOG_SIGNALS        (1U<<3)   // Signals like HOLD/HOLDA
 
 // Minimum log should be config and warnings
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
@@ -191,28 +194,21 @@ public:
 	ti99_2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_videoctrl(*this, "vdc"),
-		m_cassette(*this, "cassette"),
+		m_videoctrl(*this, TI992_VDC_TAG),
+		m_io992(*this, TI992_IO_TAG),
+		m_cassette(*this, TI_CASSETTE),
 		m_ram(*this, TI992_RAM_TAG),
-		m_have_banked_ROM(true),
 		m_otherbank(false),
-		m_keyRow(0),
 		m_rom(nullptr),
 		m_ram_start(0xf000),
 		m_first_ram_page(0)
 		{ }
-
 
 	DECLARE_MACHINE_START( ti99_224 );
 	DECLARE_MACHINE_START( ti99_232 );
 	DECLARE_MACHINE_RESET( ti99_2 );
 
 	DECLARE_WRITE8_MEMBER(intflag_write);
-
-	DECLARE_READ8_MEMBER(read_e00x);
-	DECLARE_READ8_MEMBER(read_e80x);
-	DECLARE_WRITE8_MEMBER(write_e00x);
-	DECLARE_WRITE8_MEMBER(write_e80x);
 
 	DECLARE_READ8_MEMBER(mem_read);
 	DECLARE_WRITE8_MEMBER(mem_write);
@@ -221,6 +217,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(holda);
 	DECLARE_WRITE_LINE_MEMBER(interrupt);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
+
+	DECLARE_WRITE_LINE_MEMBER( rombank_set );
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -232,12 +230,12 @@ public:
 private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<bus::ti99::internal::video992_device> m_videoctrl;
+	required_device<bus::ti99::internal::io992_device>    m_io992;
+
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 
-	bool m_have_banked_ROM;
 	bool m_otherbank;
-	int m_keyRow;
 
 	uint8_t*   m_rom;
 	int m_ram_start;
@@ -249,7 +247,6 @@ MACHINE_START_MEMBER(ti99_2_state, ti99_224)
 	m_rom = memregion(TI992_ROM)->base();
 	m_ram_start = 0xf000 - m_ram->default_size();
 	m_first_ram_page = m_ram_start >> 12;
-	m_have_banked_ROM = false;
 }
 
 MACHINE_START_MEMBER(ti99_2_state, ti99_232)
@@ -257,7 +254,6 @@ MACHINE_START_MEMBER(ti99_2_state, ti99_232)
 	m_rom = memregion(TI992_ROM)->base();
 	m_ram_start = 0xf000 - m_ram->default_size();
 	m_first_ram_page = m_ram_start >> 12;
-	m_have_banked_ROM = true;
 }
 
 MACHINE_RESET_MEMBER(ti99_2_state, ti99_2)
@@ -266,9 +262,14 @@ MACHINE_RESET_MEMBER(ti99_2_state, ti99_2)
 
 	// Configure CPU to insert 1 wait state for each external memory access
 	// by lowering the READY line on reset
-	// TODO: Check with specs
+	// This has been verified with the real machine, running test loops.
 	m_maincpu->ready_line(CLEAR_LINE);
 	m_maincpu->reset_line(ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER( ti99_2_state::rombank_set )
+{
+	m_otherbank = (state==ASSERT_LINE);
 }
 
 /*
@@ -291,107 +292,12 @@ void ti99_2_state::memmap(address_map &map)
 */
 void ti99_2_state::crumap(address_map &map)
 {
+	map(0x0000, 0x0fff).r(m_io992, FUNC(bus::ti99::internal::io992_device::cruread));
+	map(0x0000, 0x7fff).w(m_io992, FUNC(bus::ti99::internal::io992_device::cruwrite));
+
 	// Mirror of CPU-internal flags (1ee0-1efe). Don't read. Write is OK.
 	map(0x01ee, 0x01ef).nopr();
-	map(0x0f70, 0x0F7F).w(this, FUNC(ti99_2_state::intflag_write));
-
-	// CRU E000-E7fE: Keyboard
-	//  Read: 0000 1110 0*** **** (mirror 007f)
-	// Write: 0111 00** **** *XXX (mirror 03f8)
-	map(0x0e00, 0x0e00).mirror(0x007f).r(this, FUNC(ti99_2_state::read_e00x));
-	map(0x7000, 0x7007).mirror(0x03f8).w(this, FUNC(ti99_2_state::write_e00x));
-
-	// CRU E800-EFFE: Hexbus and other functions
-	//  Read: 0000 1110 1*** **** (mirror 007f)
-	// Write: 0111 01** **** *XXX (mirror 03f8)
-	map(0x0e80, 0x0e80).mirror(0x007f).r(this, FUNC(ti99_2_state::read_e80x));
-	map(0x7400, 0x7407).mirror(0x03f8).w(this, FUNC(ti99_2_state::write_e80x));
-}
-
-
-/*
-    Select the current keyboard row. Also, bit 0 is used to switch the
-    ROM bank. Suppose that means we won't be able to read the keyboard
-    when processing that ROM area.
-*/
-WRITE8_MEMBER(ti99_2_state::write_e00x)
-{
-	// logerror("offset=%d, data=%d\n", offset, data);
-	switch (offset)
-	{
-	case 0:
-		if (m_have_banked_ROM)
-		{
-			LOGMASKED(LOG_BANK, "set bank = %d\n", data);
-			m_otherbank = (data==1);
-		}
-		// no break
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-		if (data == 0) m_keyRow = offset;
-		break;
-	case 6:
-		LOGMASKED(LOG_WARN, "Unmapped CRU write to address e00c\n");
-		break;
-	case 7:
-		LOGMASKED(LOG_CRU, "VIDENA = %d\n", data);
-		m_videoctrl->videna(data);
-		break;
-	}
-}
-
-WRITE8_MEMBER(ti99_2_state::write_e80x)
-{
-	switch (offset)
-	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		LOGMASKED(LOG_CRU, "Hexbus I/O (%d) = %d\n", offset, data);
-		break;
-	case 4:
-		LOGMASKED(LOG_CRU, "Hexbus HSK = %d\n", data);
-		break;
-	case 5:
-		LOGMASKED(LOG_CRU, "Hexbus BAV = %d\n", data);
-		break;
-	case 6:
-		LOGMASKED(LOG_CRU, "Hexbus inhibit = %d\n", data);
-		break;
-	case 7:
-		LOGMASKED(LOG_CRU, "Cassette output = %d\n", data);
-		cassette_output((data==1)? ASSERT_LINE : CLEAR_LINE);
-		break;
-	}
-}
-
-/* read keys in the current row */
-READ8_MEMBER(ti99_2_state::read_e00x)
-{
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
-	return ioport(keynames[m_keyRow])->read();
-}
-
-READ8_MEMBER(ti99_2_state::read_e80x)
-{
-	uint8_t value = 0;
-	if (m_cassette->input() > 0)
-	{
-		value |= 0x80;
-	}
-	return value;
-}
-
-/*
-    Tape output. See also ti99_4x.cpp where this is taken from.
-*/
-WRITE_LINE_MEMBER( ti99_2_state::cassette_output )
-{
-	m_cassette->output(state==ASSERT_LINE? +1 : -1);
+	map(0x0f70, 0x0f7f).w(this, FUNC(ti99_2_state::intflag_write));
 }
 
 /*
@@ -508,88 +414,17 @@ WRITE_LINE_MEMBER(ti99_2_state::holda)
 	LOGMASKED(LOG_SIGNALS, "HOLDA: %d\n", state);
 }
 
-/*
-    54-key keyboard
-*/
-static INPUT_PORTS_START(ti99_2)
-
-	PORT_START("LINE0")    /* col 0 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 ! DEL") PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @ INS") PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $ CLEAR") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 % BEGIN") PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ^ PROC'D") PORT_CODE(KEYCODE_6)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 & AID") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 * REDO") PORT_CODE(KEYCODE_8)
-
-	PORT_START("LINE1")    /* col 1 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q Q") PORT_CODE(KEYCODE_Q)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w W ~") PORT_CODE(KEYCODE_W)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e E (UP)") PORT_CODE(KEYCODE_E)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r R [") PORT_CODE(KEYCODE_R)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t T ]") PORT_CODE(KEYCODE_T)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y Y") PORT_CODE(KEYCODE_Y)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i I ?") PORT_CODE(KEYCODE_I)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 ( BACK") PORT_CODE(KEYCODE_9)
-
-	PORT_START("LINE2")    /* col 2 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a A") PORT_CODE(KEYCODE_A)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s S (LEFT)") PORT_CODE(KEYCODE_S)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d D (RIGHT)") PORT_CODE(KEYCODE_D)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f F {") PORT_CODE(KEYCODE_F)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h H") PORT_CODE(KEYCODE_H)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u U _") PORT_CODE(KEYCODE_U)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o O '") PORT_CODE(KEYCODE_O)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0)
-
-	PORT_START("LINE3")    /* col 3 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z Z \\") PORT_CODE(KEYCODE_Z)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x X (DOWN)") PORT_CODE(KEYCODE_X)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c C `") PORT_CODE(KEYCODE_C)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g G }") PORT_CODE(KEYCODE_G)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j J") PORT_CODE(KEYCODE_J)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k K") PORT_CODE(KEYCODE_K)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p P \"") PORT_CODE(KEYCODE_P)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= + QUIT") PORT_CODE(KEYCODE_EQUALS)
-
-	PORT_START("LINE4")    /* col 4 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT/*KEYCODE_CAPSLOCK*/)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v V") PORT_CODE(KEYCODE_V)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n N") PORT_CODE(KEYCODE_N)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l L") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ -") PORT_CODE(KEYCODE_SLASH)
-
-	PORT_START("LINE5")    /* col 5 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b B") PORT_CODE(KEYCODE_B)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m M") PORT_CODE(KEYCODE_M)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_LALT)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-
-	PORT_START("LINE6")    /* col 6 */
-		PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("LINE7")    /* col 7 */
-		PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
-
-INPUT_PORTS_END
-
 MACHINE_CONFIG_START(ti99_2_state::ti99_224)
 	ti99_2(config);
 	// Video hardware
-	MCFG_DEVICE_ADD( TI_VDC_TAG, VIDEO99224, XTAL(10'738'635) )
+	MCFG_DEVICE_ADD( TI992_VDC_TAG, VIDEO99224, XTAL(10'738'635) )
 	MCFG_VIDEO992_MEM_ACCESS_CB( READ8( *this, ti99_2_state, mem_read ) )
 	MCFG_VIDEO992_HOLD_CB( WRITELINE( *this, ti99_2_state, hold ) )
 	MCFG_VIDEO992_INT_CB( WRITELINE( *this, ti99_2_state, interrupt ) )
-	MCFG_VIDEO992_SCREEN_ADD( TI_SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TI_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
+	MCFG_VIDEO992_SCREEN_ADD( TI992_SCREEN_TAG )
+	MCFG_SCREEN_UPDATE_DEVICE( TI992_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
+	// I/O interface circuit
+	MCFG_DEVICE_ADD(TI992_IO_TAG, IO99224, 0)
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_224 )
 MACHINE_CONFIG_END
@@ -597,12 +432,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ti99_2_state::ti99_232)
 	ti99_2(config);
 	// Video hardware
-	MCFG_DEVICE_ADD( TI_VDC_TAG, VIDEO99232, XTAL(10'738'635) )
+	MCFG_DEVICE_ADD( TI992_VDC_TAG, VIDEO99232, XTAL(10'738'635) )
 	MCFG_VIDEO992_MEM_ACCESS_CB( READ8( *this, ti99_2_state, mem_read ) )
 	MCFG_VIDEO992_HOLD_CB( WRITELINE( *this, ti99_2_state, hold ) )
 	MCFG_VIDEO992_INT_CB( WRITELINE( *this, ti99_2_state, interrupt ) )
-	MCFG_VIDEO992_SCREEN_ADD( TI_SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TI_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
+	MCFG_VIDEO992_SCREEN_ADD( TI992_SCREEN_TAG )
+	MCFG_SCREEN_UPDATE_DEVICE( TI992_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
+
+	// I/O interface circuit
+	MCFG_DEVICE_ADD(TI992_IO_TAG, IO99232, 0)
+	MCFG_SET_ROMBANK_HANDLER(WRITELINE(*this, ti99_2_state, rombank_set) )
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_232 )
 
@@ -610,8 +449,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// TMS9995, standard variant
-	// There is a divider by 2 for the clock rate
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635) / 2, memmap, crumap)
+	// Documents state that there is a divider by 2 for the clock rate
+	// Experiments with real consoles proved them wrong.
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), memmap, crumap)
 	MCFG_TMS9995_HOLDA_HANDLER( WRITELINE(*this, ti99_2_state, holda) )
 
 	// RAM 4 KiB
@@ -627,6 +467,9 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// Cassette drives
 	// There is no route from the cassette to some audio output, so we don't hear it.
 	MCFG_CASSETTE_ADD( "cassette" )
+
+	// Hexbus
+	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
 
 MACHINE_CONFIG_END
 
@@ -652,5 +495,5 @@ ROM_START(ti99_232)
 ROM_END
 
 //      YEAR    NAME      PARENT    COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY              FULLNAME                               FLAGS
-COMP(   1983,   ti99_224, 0,        0,      ti99_224, ti99_2, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (24 KiB ROM)" , MACHINE_NO_SOUND_HW )
-COMP(   1983,   ti99_232, ti99_224, 0,      ti99_232, ti99_2, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (32 KiB ROM)" , MACHINE_NO_SOUND_HW )
+COMP(   1983,   ti99_224, 0,        0,      ti99_224, 0, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (24 KiB ROM)" , MACHINE_NO_SOUND_HW )
+COMP(   1983,   ti99_232, 0,         0,      ti99_232, 0, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (32 KiB ROM)" , MACHINE_NO_SOUND_HW )

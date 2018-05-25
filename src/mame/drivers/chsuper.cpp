@@ -36,14 +36,34 @@ class chsuper_state : public driver_device
 {
 public:
 	chsuper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
 	DECLARE_WRITE8_MEMBER(chsuper_outporta_w);
 	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void chsuper(machine_config &config);
+	void chsuper_portmap(address_map &map);
+	void chsuper_prg_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void init_chsuper3();
+	void init_chmpnum();
+	void init_chsuper2();
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override { m_lamp.resolve(); }
+	//virtual void machine_reset();
+
+	virtual void video_start() override;
+
 
 	int m_tilexor;
 	uint8_t m_blacklamp;
@@ -53,22 +73,7 @@ public:
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void chsuper(machine_config &config);
-	void chsuper_portmap(address_map &map);
-	void chsuper_prg_map(address_map &map);
-	void ramdac_map(address_map &map);
-protected:
-	// driver_device overrides
-	//virtual void machine_start();
-	//virtual void machine_reset();
-
-	virtual void video_start() override;
-public:
-	void init_chsuper3();
-	void init_chmpnum();
-	void init_chsuper2();
+	output_finder<7> m_lamp;
 };
 
 
@@ -152,11 +157,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
-	output().set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
+	m_lamp[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
 	machine().bookkeeping().coin_counter_w(1, data & 0x04);  // Payout / Ticket Out pulse
-	output().set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
+	m_lamp[1] = BIT(data, 3);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
-	output().set_lamp_value(5, (data >> 5) & 1);  // BET lamp
+	m_lamp[5] = BIT(data, 5);  // BET lamp
 	// D6: ticket motor...
 	// D7: unused...
 
@@ -167,11 +172,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output().set_lamp_value(2, 1);            // HOLD 3 ON
+		m_lamp[2] = 1;            // HOLD 3 ON
 	}
 	else
 	{
-		output().set_lamp_value(2, 0);            // otherwise HOLD 3 OFF
+		m_lamp[2] = 0;            // otherwise HOLD 3 OFF
 	}
 }
 
@@ -179,11 +184,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
-	output().set_lamp_value(3, (data >> 2) & 1);  // Hold 4 / High (Alta) lamp.
+	m_lamp[3] = BIT(data, 2);  // Hold 4 / High (Alta) lamp.
 	// D3: unused...
 	// D4: unused...
-	output().set_lamp_value(4, (data >> 5) & 1);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
-	output().set_lamp_value(6, (data >> 6) & 1);  // Start / Gamble (Raddoppio) lamp.
+	m_lamp[4] = BIT(data, 5);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
+	m_lamp[6] = BIT(data, 6);  // Start / Gamble (Raddoppio) lamp.
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
@@ -193,11 +198,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output().set_lamp_value(2, 1);    // Hold 3 ON
+		m_lamp[2] = 1;    // Hold 3 ON
 	}
 	else
 	{
-		output().set_lamp_value(2, 0);    // Hold 3 OFF
+		m_lamp[2] = 0;    // Hold 3 OFF
 	}
 }
 

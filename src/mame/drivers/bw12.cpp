@@ -129,7 +129,7 @@ void bw12_state::ls259_w(int address, int data)
 		break;
 
 	case 4: /* CAP LOCK */
-		output().set_led_value(0, data);
+		m_led = data ? 1 : 0;
 		break;
 
 	case 5: /* MOTOR 0 */
@@ -479,6 +479,8 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 void bw12_state::machine_start()
 {
+	m_led.resolve();
+
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());

@@ -49,7 +49,9 @@ public:
 		m_palette(*this, "palette"),
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram") { }
+		m_fg_color_ram(*this, "fg_color_ram"),
+		m_led(*this, "led%u", 0U)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -62,6 +64,8 @@ public:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
+
+	output_finder<7> m_led;
 
 	// common
 	int m_nmi_ack;
@@ -185,7 +189,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin out mech
 
-	output().set_led_value(6, data & 0x40);   // led for coin out / hopper active
+	m_led[6] = BIT(data, 6);   // led for coin out / hopper active
 
 	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -198,8 +202,8 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(spoker_state::video_and_leds_w)
 {
-	output().set_led_value(4, data & 0x01); // start?
-	output().set_led_value(5, data & 0x04); // l_bet?
+	m_led[4] = BIT(data, 0); // start?
+	m_led[5] = BIT(data, 2); // l_bet?
 
 	m_video_enable = data & 0x40;
 	m_hopper = (~data)& 0x80;
@@ -210,10 +214,10 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 
 WRITE8_MEMBER(spoker_state::leds_w)
 {
-	output().set_led_value(0, data & 0x01);  // stop_1
-	output().set_led_value(1, data & 0x02);  // stop_2
-	output().set_led_value(2, data & 0x04);  // stop_3
-	output().set_led_value(3, data & 0x08);  // stop
+	m_led[0] = BIT(data, 0);  // stop_1
+	m_led[1] = BIT(data, 1);  // stop_2
+	m_led[2] = BIT(data, 2);  // stop_3
+	m_led[3] = BIT(data, 3);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -578,6 +582,8 @@ GFXDECODE_END
 
 void spoker_state::machine_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_nmi_ack));
 	save_item(NAME(m_out));
 	save_item(NAME(m_video_enable));

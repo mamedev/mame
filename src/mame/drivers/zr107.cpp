@@ -287,15 +287,13 @@ uint32_t zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	m_k001604->draw_back_layer(bitmap, cliprect);
-
 	m_k001005->draw(bitmap, cliprect);
-
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
+	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -340,7 +338,7 @@ uint32_t zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &b
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
+	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 

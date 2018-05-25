@@ -266,9 +266,6 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
-	if(linecount == 8)
-		gfx = 0;
-
 	if (vsp)
 		gfx = 0;
 

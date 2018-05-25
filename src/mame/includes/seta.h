@@ -64,6 +64,7 @@ public:
 		m_vctrl(*this,"vctrl_%u", 0),
 		m_paletteram(*this,"paletteram%u", 1),
 		m_subbank(*this,"subbank"),
+		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -94,6 +95,8 @@ public:
 	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
 
 	optional_memory_bank m_subbank;
+
+	output_finder<48> m_leds;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -202,6 +205,7 @@ public:
 	DECLARE_PALETTE_INIT(gundhara);
 	DECLARE_PALETTE_INIT(jjsquawk);
 	DECLARE_MACHINE_START(keroppi);
+	DECLARE_MACHINE_START(magspeed);
 	DECLARE_VIDEO_START(oisipuzl_2_layers);
 	uint32_t screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -360,6 +364,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(spritectrl_w);
 
+	DECLARE_MACHINE_START(setaroul);
 	DECLARE_MACHINE_RESET(setaroul);
 
 	DECLARE_VIDEO_START(setaroul_1_layer);

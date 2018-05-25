@@ -925,8 +925,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(cvs_state,cvs)
+
+void cvs_state::machine_start()
 {
+	m_lamps.resolve();
+
 	/* allocate memory */
 	if (m_gfxdecode->gfx(1) != nullptr)
 		m_gfxdecode->gfx(1)->set_source(m_character_ram);
@@ -949,7 +952,7 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 	save_item(NAME(m_stars_scroll));
 }
 
-MACHINE_RESET_MEMBER(cvs_state,cvs)
+void cvs_state::machine_reset()
 {
 	m_character_banking_mode = 0;
 	m_character_ram_page_start = 0;
@@ -983,9 +986,6 @@ MACHINE_CONFIG_START(cvs_state::cvs)
 	/* romclk is much more probable, 393 Hz results in timing issues */
 	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
 	MCFG_S2650_SENSE_INPUT(READLINE("tms", tms5110_device, romclk_hack_r))
-
-	MCFG_MACHINE_START_OVERRIDE(cvs_state,cvs)
-	MCFG_MACHINE_RESET_OVERRIDE(cvs_state,cvs)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
