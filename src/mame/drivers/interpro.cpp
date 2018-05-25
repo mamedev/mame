@@ -254,8 +254,6 @@ void interpro_state::machine_start()
 	save_item(NAME(m_sreg_ctrl2));
 
 	save_item(NAME(m_sreg_ctrl3));
-
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_state::reset_timer), this));
 }
 
 void interpro_state::machine_reset()
@@ -264,10 +262,6 @@ void interpro_state::machine_reset()
 	m_sreg_error = 0;
 	m_sreg_status = 0x400;
 	m_sreg_ctrl1 = CTRL1_FLOPLOW;
-
-	// suspend the main cpu long enough for the keyboard to boot
-	m_maincpu->suspend(SUSPEND_REASON_RESET, false);
-	m_reset_timer->adjust(attotime::from_msec(750));
 }
 
 void interpro_state::init_common()
@@ -609,7 +603,7 @@ MACHINE_CONFIG_START(interpro_state::interpro_scc2)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
 	MCFG_Z80SCC_OUT_WREQB_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial0))
 
-	MCFG_INTERPRO_KEYBOARD_PORT_ADD(INTERPRO_KEYBOARD_PORT_TAG, interpro_keyboard_devices, "hle_en_us")
+	MCFG_INTERPRO_KEYBOARD_PORT_ADD(INTERPRO_KEYBOARD_PORT_TAG, interpro_keyboard_devices, "lle_en_us")
 	MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(WRITELINE(INTERPRO_SCC2_TAG, z80scc_device, rxa_w))
 
 	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT0_TAG, RS232_PORT, default_rs232_devices, nullptr)
@@ -1182,10 +1176,9 @@ ROM_START(ip6700)
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
-	// FIXME: use 2800 eprom until we have a 6700 dump
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro 6700 EPROM")
-	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, BAD_DUMP CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
+	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1198,10 +1191,9 @@ ROM_START(ip6800)
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
-	// FIXME: use 2800 eprom until we have a 6800 dump
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro 6800 EPROM")
-	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, BAD_DUMP CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
+	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
