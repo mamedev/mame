@@ -1979,7 +1979,7 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 //  PC-9801-26 + PC-9801-86 (?)
 //  PC-9801-86 + Chibi-Oto
 	device.option_add("pc9801_118", PC9801_118);
-//  Speak Board
+	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
 //  Spark Board
 //  AMD-98 (AmuseMent boarD)
 	device.option_add("pc9801_amd98", PC9801_AMD98);
