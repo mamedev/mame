@@ -379,25 +379,36 @@ void nmk16_state::manybloc_map(address_map &map)
 
 void nmk16_tomagic_state::tomagic_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x080000, 0x080001).portr("IN0");
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
 	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
+	map(0x094001, 0x094001).w("oki1", FUNC(okim6295_device::write));
+	map(0x094003, 0x094003).r("oki1", FUNC(okim6295_device::read));
 	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }
 
-
 void nmk16_tomagic_state::tomagic_sound_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0x8000, 0xbfff).bankr("audiobank");
 	map(0xc000, 0xdfff).ram();
+}
+
+void nmk16_tomagic_state::tomagic_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(nmk16_state::macross2_sound_bank_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 void nmk16_state::tharrier_map(address_map &map)
@@ -1417,29 +1428,35 @@ static INPUT_PORTS_START( manybloc )
 	PORT_DIPSETTING(      0x8000, "Best" )
 INPUT_PORTS_END
 
-// wrong
 static INPUT_PORTS_START( tomagic )
 	PORT_START("IN0")   /* 0x080000 */
-	PORT_BIT( 0x7fff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN0:1") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN0:2") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN0:3") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN0:5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN0:6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN0:7") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")   /* 0x080002 */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) 
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) 
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:0") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:1") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:2") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:3") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:6") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:7") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:8") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:9") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:10") PORT_CODE(KEYCODE_C) 
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:11") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:14") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("IN1:15") PORT_CODE(KEYCODE_N)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -4792,6 +4809,7 @@ MACHINE_CONFIG_START(nmk16_tomagic_state::tomagic)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4) /* 3 Mhz? */
 	MCFG_DEVICE_PROGRAM_MAP(tomagic_sound_map)
+	MCFG_DEVICE_IO_MAP(tomagic_sound_io_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
@@ -4807,14 +4825,13 @@ MACHINE_CONFIG_START(nmk16_tomagic_state::tomagic)
 	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 12000000/8) // K-666 (YM3812) 1.5Mhz? */
-	//MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 12000000/4) // K-666 (YM3812) 3Mhz? */
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 12000000/4, okim6295_device::PIN7_LOW) 
-	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 12000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -5076,6 +5093,8 @@ void nmk16_tomagic_state::init_tomagic()
 	int size = memregion("sprites")->bytes();
 	for (int i = 0; i < size; i++)
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
+
+	init_banked_audiocpu();
 }
 
 
@@ -8222,4 +8241,4 @@ GAME( 2001, firehawkv,  spec2k,   firehawk,     firehawkv,    nmk16_state, empty
 GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_tharrier,        ROT270, "Bee-Oh",                            "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // clone board, different sound / bg hardware, but similar memory maps, same tx layer, sprites etc.
-GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // there are many gambling related strings in the ROM, and an alt version is called Lucky Ball, possibly that one is a gambling title and this isn't?
+GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", MACHINE_NOT_WORKING ) // there are many gambling related strings in the ROM, and an alt version is called Lucky Ball, possibly that one is a gambling title and this isn't?

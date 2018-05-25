@@ -268,4 +268,5 @@ public:
 private:
 	void tomagic_map(address_map &map);
 	void tomagic_sound_map(address_map &map);
+	void tomagic_sound_io_map(address_map &map);
 };
