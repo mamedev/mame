@@ -7053,8 +7053,8 @@ ROM_START( tomagic )
 	ROM_REGION( 0x20000, "fgtile", 0 )
 	ROM_LOAD( "9.bin", 0x000000, 0x20000, CRC(fcceb24b) SHA1(49e3162c34dfa2ef54ffe190ba91bff73cebe12b) )
 
-	ROM_REGION( 0x40000, "bgtile", 0 )
-	ROM_LOAD( "10.bin", 0x000000, 0x40000, CRC(6d5ee72a) SHA1(f90746cb5bbd87213dece062b7efd59d8fd56d84) )
+	ROM_REGION( 0x80000, "bgtile", 0 )
+	ROM_LOAD( "10.bin", 0x040000, 0x40000, BAD_DUMP CRC(6d5ee72a) SHA1(f90746cb5bbd87213dece062b7efd59d8fd56d84) ) // half size
 
 	ROM_REGION( 0x200000, "sprites", 0 ) /* 16x16 sprite tiles */
 	ROM_LOAD16_BYTE( "7.bin", 0x100001, 0x80000, CRC(0a297c78) SHA1(effe1ee2ab64cb9fbeae0d168346168245942034) )
