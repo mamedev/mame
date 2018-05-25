@@ -100,10 +100,12 @@
 #include "machine/315_5296.h"
 #include "machine/315_5649.h"
 #include "machine/model1io.h"
+#include "machine/model1io2.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
 
+#include "model1io2.lh"
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 READ32_MEMBER(model2_state::timers_r)
@@ -1319,12 +1321,6 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
-	// intercept reads for the lightgun ports
-	// needs to be done because the vcop ioboard isn't emulated
-	// can be removed once that's done (837-11130 + 837-11131)
-	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::lightgun_data_r)).umask32(0x00ff00ff);
-	map(0x01c00110, 0x01c00110).r(this, FUNC(model2o_state::lightgun_offscreen_r));
-
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 }
 
@@ -2597,9 +2593,22 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2o_state::vcop)
 	model2o(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_IN2_CB(IOPORT("IN2"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
+	MCFG_DEVICE_REMOVE("ioboard")
+
+	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
+	MCFG_DEVICE_BIOS("epr17181");
+	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
+	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN0"))
+	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN1"))
+	MCFG_MODEL1IO2_IN2_CB(IOPORT("IN2"))
+	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
+	MCFG_MODEL1IO2_LIGHTGUN_P1X_TAG("P1_X")
+	MCFG_MODEL1IO2_LIGHTGUN_P1Y_TAG("P1_Y")
+	MCFG_MODEL1IO2_LIGHTGUN_P2X_TAG("P2_X")
+	MCFG_MODEL1IO2_LIGHTGUN_P2Y_TAG("P2_Y")
+
+	MCFG_DEFAULT_LAYOUT(layout_model1io2)
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
