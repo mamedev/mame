@@ -867,62 +867,41 @@ READ16_MEMBER( namcos2_shared_state::c355_obj_ram_r )
  */
 void namcos2_shared_state::c169_roz_get_info(tile_data &tileinfo, int tile_index, int which)
 {
-	uint16_t tile = m_c169_roz_videoram[tile_index];
+	uint16_t tile = m_c169_roz_videoram[tile_index] & 0x3fff; // cap mask offset
 	int bank, mangle;
 
 	switch (m_gametype)
 	{
 		case NAMCONB2_MACH_BREAKERS:
 			bank = nth_byte16(&m_c169_roz_bank[which * 8 / 2], (tile >> 11) & 0x7);
-			tile = (tile & 0x7ff) | (bank * 0x800);
+			tile = (tile & 0x7ff) | (bank << 11);
 			mangle = tile;
 			break;
 
 		case NAMCONB2_OUTFOXIES:
 			bank = nth_byte16(&m_c169_roz_bank[which * 8 / 2], (tile >> 11) & 0x7);
-			tile = (tile & 0x7ff) | (bank * 0x800);
-			mangle = tile & ~0x50;
-			if (tile & 0x10) mangle |= 0x40;
-			if (tile & 0x40) mangle |= 0x10;
+			tile = (tile & 0x7ff) | (bank << 11);
+			mangle = (bitswap<7>(tile & 0x50, 4, 5, 6, 3, 2, 1, 0)) | (tile & ~0x50);
 			break;
 
 		case NAMCOS2_LUCKY_AND_WILD:
-			mangle = tile & 0x01ff;
-			tile &= 0x3fff;
-			switch (tile >> 9)
+			mangle = bitswap<11>(tile & 0x31ff, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			switch ((tile >> 9) & 7)
 			{
 				case 0x00: mangle |= 0x1c00; break;
 				case 0x01: mangle |= 0x0800; break;
 				case 0x02: mangle |= 0x0000; break;
-
-				case 0x08: mangle |= 0x1e00; break;
-				case 0x09: mangle |= 0x0a00; break;
-				case 0x0a: mangle |= 0x0200; break;
-
-				case 0x10: mangle |= 0x2000; break;
-				case 0x11: mangle |= 0x0c00; break;
-				case 0x12: mangle |= 0x0400; break;
-
-				case 0x18: mangle |= 0x2200; break;
-				case 0x19: mangle |= 0x0e00; break;
-				case 0x1a: mangle |= 0x0600; break;
 			}
 			break;
 
 		case NAMCOS2_METAL_HAWK:
-			mangle = tile & 0x01ff;
-			if (tile & 0x1000) mangle |= 0x0200;
-			if (tile & 0x0200) mangle |= 0x0400;
-			if (tile & 0x0400) mangle |= 0x0800;
-			if (tile & 0x0800) mangle |= 0x1000;
-			tile &= 0x3fff; // cap mask offset
+			mangle = bitswap<13>(tile & 0x1fff, 11, 10, 9, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			break;
 
 		default:
 		case NAMCOFL_SPEED_RACER:
 		case NAMCOFL_FINAL_LAP_R:
 			mangle = tile;
-			tile &= 0x3fff; // cap mask offset
 			break;
 	}
 	SET_TILE_INFO_MEMBER(m_c169_roz_gfxbank, mangle, 0/*color*/, 0/*flag*/);
@@ -941,12 +920,7 @@ TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info1 )
 
 TILEMAP_MAPPER_MEMBER( namcos2_shared_state::c169_roz_mapper )
 {
-	if (col >= 128)
-	{
-		col %= 128;
-		row += 256;
-	}
-	return row * 128 + col;
+	return ((col & 0x80) << 8) | ((row & 0xff) << 7) | (col & 0x7f);
 }
 
 void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion)
