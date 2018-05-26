@@ -188,6 +188,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
+	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
 	template<int Bank> DECLARE_READ16_MEMBER(cyclwarr_videoram_r);
 	template<int Bank> DECLARE_WRITE16_MEMBER(cyclwarr_videoram_w);
 
