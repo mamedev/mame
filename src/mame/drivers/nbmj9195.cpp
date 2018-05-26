@@ -3491,6 +3491,36 @@ ROM_START( shabdama )
 		DISK_IMAGE_READONLY( "shabdama", 0, NO_DUMP )
 ROM_END
 
+// PCB pics are rather blurry, might better fit in another driver
+ROM_START( ldquiz4 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 27512
+	ROM_LOAD( "1.e3", 0x00000,  0x10000, CRC(49255f66) SHA1(bdd01987331c2aadea7f588d39c48c70cd43fc71) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 27512
+	ROM_LOAD( "3.e7", 0x00000,  0x10000, CRC(b033eb6a) SHA1(2c11b2b998117f68a1fbbd110d3f67ab472e133d) )
+	ROM_LOAD( "2.e6", 0x10000,  0x10000, CRC(6c83cad6) SHA1(c38f60fb4fdbda76ea3459644bf491cc305a7ae6) )
+
+	ROM_REGION( 0x120000, "gfx1", 0 ) // 27010
+	ROM_LOAD( "4.k1",   0x000000, 0x20000, CRC(9cdf8114) SHA1(99e6b9bb43c6df320fdb1ea8599967b707f7f18d) )
+	ROM_LOAD( "5.k2",   0x020000, 0x20000, CRC(7746a909) SHA1(c69a45159d15e8897a5999e57b519ed6fc0d9812) )
+	ROM_LOAD( "6.k3",   0x040000, 0x20000, CRC(3b3e63ad) SHA1(92898ade77ad267978a469b03c9113f4e5a47288) )
+	ROM_LOAD( "7.k4",   0x060000, 0x20000, CRC(cdcaae32) SHA1(bfc07524a9859592bf7c6397fd80570b4e5e15fc) )
+	ROM_LOAD( "8.k5",   0x080000, 0x20000, CRC(c08b90e6) SHA1(add35812ea98ac44299b7f165efeee268aa57132) )
+	ROM_LOAD( "9.k6",   0x0a0000, 0x20000, CRC(72c1a283) SHA1(8dbfc5892d719033dff82c70f13c1d7c63173240) )
+	ROM_LOAD( "10.k8",  0x0c0000, 0x20000, CRC(c7437125) SHA1(55b161ce2432d04531ed0afab973f892b571ef88) )
+	ROM_LOAD( "11.k9",  0x0e0000, 0x20000, CRC(6feeab93) SHA1(d77325c1eecb677c48d11bf8d5f73b238f2896e6) )
+	ROM_LOAD( "12.k10", 0x100000, 0x20000, CRC(c7f9bf98) SHA1(103b78b0e126ea4249982bf114010f57e5ffa70a) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "pal16l8.0", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.1", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.2", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.3", 0x600, 0x104, NO_DUMP )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "ldquiz4", 0, NO_DUMP )
+ROM_END
+
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR, COMPANY, FULLNAME, FLAGS
 GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, koinomp,  0,        koinomp,  koinomp,  nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -3527,3 +3557,5 @@ GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195_state, init_nbmj919
 GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, init_nbmj9195, ROT0,    "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, shabdama, 0,        shabdama, mjuraden, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "LD Mahjong #4 Shabon-Dama", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1992, ldquiz4,  0,        shabdama, mjuraden, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "LD Quiz 4 - Kotaemon Gachi (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
