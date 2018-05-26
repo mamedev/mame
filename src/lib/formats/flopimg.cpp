@@ -1684,6 +1684,10 @@ void floppy_image_format_t::generate_track_from_bitstream(int track, int head, c
 	std::vector<uint32_t> &dest = image->get_buffer(track, head, subtrack);
 	dest.clear();
 
+	// If the bitstream has an odd number of inversions, one needs to be added.
+	// Put in in the middle of the half window after the center inversion, where
+	// any fdc ignores it.
+
 	int inversions = 0;
 	for(int i=0; i != track_size; i++)
 		if(trackbuf[i >> 3] & (0x80 >> (i & 7)))
