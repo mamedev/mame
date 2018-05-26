@@ -27,7 +27,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "pc9801_26")
 
-WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
+WRITE_LINE_MEMBER(pc9801_26_device::sound_irq)
 {
 	/* TODO: seems to die very often */
 	m_bus->int_w<5>(state);
@@ -41,11 +41,11 @@ WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
 MACHINE_CONFIG_START(pc9801_26_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc9801_26_device, pc9801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_snd_device, opn_porta_r))
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc9801_26_device, sound_irq))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_26_device, opn_porta_r))
 	//MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc9801_state, opn_portb_r))
 	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, pc9801_state, opn_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_snd_device, opn_portb_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_26_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

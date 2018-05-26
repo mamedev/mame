@@ -46,7 +46,7 @@ private:
 
 	uint8_t m_joy_sel;
 
-	DECLARE_WRITE_LINE_MEMBER(pc9801_sound_irq);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };
 
 

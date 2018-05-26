@@ -17,9 +17,9 @@ class pc9801_snd_device : public device_t
 public:
 	pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_WRITE8_MEMBER(opn_portb_w);
-protected:
 
 private:
 	uint8_t m_joy_sel;
