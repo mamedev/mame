@@ -42,6 +42,7 @@ private:
 
 WRITE8_MEMBER(gamemasters_state::output_1100)
 {
+	// IRQ ack?
 	logerror("%s: Writing %02X to 1100\n", machine().describe_context(), data);
 }
 
@@ -63,7 +64,7 @@ WRITE8_MEMBER(gamemasters_state::output_1540)
 void gamemasters_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x1100, 0x1100).w(this, FUNC(gamemasters_state::output_1300));
+	map(0x1100, 0x1100).w(this, FUNC(gamemasters_state::output_1100));
 	map(0x1300, 0x1300).w(this, FUNC(gamemasters_state::output_1300));
 	map(0x1400, 0x1400).portr("IN0");
 	map(0x1500, 0x1500).portr("IN1");
