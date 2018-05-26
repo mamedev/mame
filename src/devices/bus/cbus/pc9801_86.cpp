@@ -3,24 +3,24 @@
 /***************************************************************************
 
     NEC PC-9801-86 sound card
-	NEC PC-9801-SpeakBoard sound card
+    NEC PC-9801-SpeakBoard sound card
 
     Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
     additional DAC port
-	SpeakBoard sound card seems to be derived design from -86, with an additional 
-	OPNA mapped at 0x58*
+    SpeakBoard sound card seems to be derived design from -86, with an additional
+    OPNA mapped at 0x58*
 
     TODO:
     - joystick code should be shared between -26, -86 and -118
     - Test all pcm modes
     - Make volume work
     - Recording
-	- actual stereo sound routing (currently routes to ALL_OUTPUTS)
-	- SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
-	  "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM"
-	  Sounds like a sound core flaw since OPNA requires a rom region in any case;
-	- SpeakBoard: sounds horrible, due of the MAME mixing (same as Sega 32X, needs user to lower individual channel volumes);
-	- verify sound irq;
+    - actual stereo sound routing (currently routes to ALL_OUTPUTS)
+    - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
+      "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM"
+      Sounds like a sound core flaw since OPNA requires a rom region in any case;
+    - SpeakBoard: sounds horrible, due of the MAME mixing (same as Sega 32X, needs user to lower individual channel volumes);
+    - verify sound irq;
 
 ***************************************************************************/
 
@@ -136,7 +136,7 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type ty
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_86_device(mconfig, PC9801_86, tag, owner, clock)
 {
-	
+
 }
 
 
@@ -399,7 +399,7 @@ MACHINE_CONFIG_END
 void pc9801_speakboard_device::device_start()
 {
 	pc9801_86_device::device_start();
-	
+
 	m_bus->install_io(0x0588, 0x058f, read8_delegate(FUNC(pc9801_speakboard_device::opna_slave_r), this), write8_delegate(FUNC(pc9801_speakboard_device::opna_slave_w), this) );
 }
 

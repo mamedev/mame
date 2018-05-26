@@ -95,7 +95,7 @@ public:
 	optional_memory_region      m_romboard_region;
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_mainram2;
-	
+
 	optional_memory_bank m_maingfxbank;
 	optional_memory_bank m_gpugfxbank;
 	optional_memory_bank m_mainsndbank;

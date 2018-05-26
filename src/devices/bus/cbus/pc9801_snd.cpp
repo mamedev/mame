@@ -2,8 +2,8 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-    NEC PC-9801 
-	common functions for CBUS sound boards -26, -86, -118
+    NEC PC-9801
+    common functions for CBUS sound boards -26, -86, -118
 
 ***************************************************************************/
 

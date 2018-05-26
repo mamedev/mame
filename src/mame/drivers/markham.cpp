@@ -202,11 +202,11 @@ void markham_state::strnskil_master_map(address_map &map)
 
 // void markham_state::banbam_master_map(address_map &map)
 // {
-//	/* TODO: uncomment when ready */
-// 	strnskil_master_map(map);
-//	map(0xd806, 0xd806).r(this, FUNC(markham_state::mcu_r)); /* mcu data read */
-//	map(0xd80d, 0xd80d).w(this, FUNC(markham_state::mcu_w)); /* mcu data write */
-//	map(0xd80c, 0xd80c).w(this, FUNC(markham_state::mcu_reset)); /* mcu reset? */
+//  /* TODO: uncomment when ready */
+//  strnskil_master_map(map);
+//  map(0xd806, 0xd806).r(this, FUNC(markham_state::mcu_r)); /* mcu data read */
+//  map(0xd80d, 0xd80d).w(this, FUNC(markham_state::mcu_w)); /* mcu data write */
+//  map(0xd80c, 0xd80c).w(this, FUNC(markham_state::mcu_reset)); /* mcu reset? */
 // }
 
 void markham_state::markham_slave_map(address_map &map)

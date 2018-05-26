@@ -8219,10 +8219,10 @@ ROM_END
 /* B-Board 90629B-3 */
 ROM_START( kodr2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "kde_30.11e", 0x00000, 0x20000, CRC(f8dc4ce3) SHA1(3efc4ffd61b399235f27c97ffb6d556000d59b33) )	/* different CRC from kodr1, pcb verified */
-	ROM_LOAD16_BYTE( "kde_37.11f", 0x00001, 0x20000, CRC(d1276c1c) SHA1(1f70972eb5b854ef58c6d0eaccda6e12611cf763) )	/* different CRC from kodr1, pcb verified */
-	ROM_LOAD16_BYTE( "kde_31.12e", 0x40000, 0x20000, CRC(309debd8) SHA1(96aa498fe04c1b8f76dab1c0ab074eedd48053fa) )	/* different CRC from kodr1, pcb verified */
-	ROM_LOAD16_BYTE( "kde_38.12f", 0x40001, 0x20000, CRC(76cd5738) SHA1(cb81f8db8400c9972f05ace38530f040fb66f93e) )	/* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kde_30.11e", 0x00000, 0x20000, CRC(f8dc4ce3) SHA1(3efc4ffd61b399235f27c97ffb6d556000d59b33) ) /* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kde_37.11f", 0x00001, 0x20000, CRC(d1276c1c) SHA1(1f70972eb5b854ef58c6d0eaccda6e12611cf763) ) /* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kde_31.12e", 0x40000, 0x20000, CRC(309debd8) SHA1(96aa498fe04c1b8f76dab1c0ab074eedd48053fa) ) /* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kde_38.12f", 0x40001, 0x20000, CRC(76cd5738) SHA1(cb81f8db8400c9972f05ace38530f040fb66f93e) ) /* different CRC from kodr1, pcb verified */
 	ROM_LOAD16_BYTE( "kd_28.9e",   0x80000, 0x20000, CRC(9367bcd9) SHA1(8243b4b9bb9756f3fa726717e19a166cb2f5b50a) )
 	ROM_LOAD16_BYTE( "kd_35.9f",   0x80001, 0x20000, CRC(4ca6a48a) SHA1(9d440ecd8d2d0e293fecf64ca3915252b94e7aef) )
 	ROM_LOAD16_BYTE( "kd_29.10e",  0xc0000, 0x20000, CRC(0360fa72) SHA1(274769c8717a874397cf37369e3ef80a682d9ef2) )

@@ -45,10 +45,10 @@ enum attention_mask
 enum reg0_mask
 {
 /*
-	0x08,
-	0x10, // mouse button interrupt?
-	0x20,
-	0x40,
+    0x08,
+    0x10, // mouse button interrupt?
+    0x20,
+    0x40,
 */
 	SCC_INT = 0x80, // serial controller
 	VBLANK = 0x1000, // vertical blank?

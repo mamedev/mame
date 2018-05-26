@@ -7,8 +7,8 @@
     Legacy sound card for PC-98xx family, composed by a single YM2203
 
     TODO:
-	- verify sound irq;
-	
+    - verify sound irq;
+
 ***************************************************************************/
 
 #include "emu.h"

@@ -163,18 +163,18 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		switch (cur_pri)
 		{
 			// gumdam swamp monster l2
-			case 0: pri_mask = -256; break; 
+			case 0: pri_mask = -256; break;
 			// (players and football goal, should go above sidelines but behind portraits when there's a goal)
 			case 1: pri_mask = 0xfff0; break;
 			// masking effect for gundam l2 monster
-			case 2: pri_mask = -4; break; 
+			case 2: pri_mask = -4; break;
 			// cupsoc (radar dots)
-			case 3: pri_mask = 0x0000; break; 
+			case 3: pri_mask = 0x0000; break;
 			// gundam level 2/3 player
 			case 4: pri_mask = -32; break;
 			//case 5: pri_mask = 0; break;
 			// insert coin in gundam
-			case 6: pri_mask = 0; break; 
+			case 6: pri_mask = 0; break;
 			//case 7: pri_mask = 0; break;
 
 			default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
@@ -292,16 +292,16 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
 	}
 
-	if (!(m_layer_disable&0x0001)) 
+	if (!(m_layer_disable&0x0001))
 		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 1);
-	
-	if (!(m_layer_disable&0x0002)) 
+
+	if (!(m_layer_disable&0x0002))
 		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 2);
-	
-	if (!(m_layer_disable&0x0004)) 
+
+	if (!(m_layer_disable&0x0004))
 		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 4);
-	
-	if (!(m_layer_disable&0x0008)) 
+
+	if (!(m_layer_disable&0x0008))
 		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 8);
 
 	if (!(m_layer_disable&0x0010))

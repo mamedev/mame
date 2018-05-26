@@ -180,14 +180,14 @@ static void pk8020_floppies(device_slot_interface &device)
 /*
  * interrupts
  *
- * 0	external devices
- * 1	uart rx ready
- * 2	uart tx ready
- * 3	lan
- * 4	vblank
- * 5	timer ch2
- * 6	printer
- * 7	floppy
+ * 0    external devices
+ * 1    uart rx ready
+ * 2    uart tx ready
+ * 3    lan
+ * 4    vblank
+ * 5    timer ch2
+ * 6    printer
+ * 7    floppy
  */
 /* Machine driver */
 MACHINE_CONFIG_START(pk8020_state::pk8020)

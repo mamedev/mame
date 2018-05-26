@@ -7,7 +7,7 @@
     driver by Angelo Salese
 
     TODO:
-	- move sound bios ROMs into pc9801_26 / pc9801_86 devices
+    - move sound bios ROMs into pc9801_26 / pc9801_86 devices
     - proper 8251 uart hook-up on keyboard
     - SASI/SCSI support;
     - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
@@ -649,7 +649,7 @@ void pc9801_state::pc9801_map(address_map &map)
 {
 	map(0xa0000, 0xa3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
 	map(0xa8000, 0xbffff).rw(this, FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
-//	map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
+//  map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
 	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
 	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
 	map(0xe8000, 0xfffff).rom().region("ipl", 0);
@@ -1405,8 +1405,8 @@ void pc9801_state::pc9821_map(address_map &map)
 	map(0x000a0000, 0x000a3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
 	map(0x000a4000, 0x000a4fff).rw(this, FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
 	map(0x000a8000, 0x000bffff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram_r), FUNC(pc9801_state::pc9821_grcg_gvram_w));
-//	map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
-//	map(0x000d8000, 0x000d9fff).rom().region("ide",0)
+//  map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
+//  map(0x000d8000, 0x000d9fff).rom().region("ide",0)
 	map(0x000da000, 0x000dbfff).ram(); // ide ram
 	map(0x000e0000, 0x000e7fff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram0_r), FUNC(pc9801_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
@@ -2680,21 +2680,21 @@ TODO: doesn't boot, missing roms?
 
 ROM_START( pc9801vm )
 	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
-//	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, BAD_DUMP CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
-//	ROM_LOAD( "bios_vm.rom", 0x18000, 0x18000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
+//  ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, BAD_DUMP CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
+//  ROM_LOAD( "bios_vm.rom", 0x18000, 0x18000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
 	// bios
-    ROM_LOAD16_BYTE( "cpu_board_1a_23128e.bin",   0x10001, 0x4000, CRC(9965c914) SHA1(1ed318b774340bd532ef02ac02f39a012354dbf8) )
-    ROM_LOAD16_BYTE( "cpu_board_4a_d23128ec.bin", 0x10000, 0x4000, CRC(e7c24a70) SHA1(cc9584b8e56b391f103e9d559d397d0bc6d00b35) )
+	ROM_LOAD16_BYTE( "cpu_board_1a_23128e.bin",   0x10001, 0x4000, CRC(9965c914) SHA1(1ed318b774340bd532ef02ac02f39a012354dbf8) )
+	ROM_LOAD16_BYTE( "cpu_board_4a_d23128ec.bin", 0x10000, 0x4000, CRC(e7c24a70) SHA1(cc9584b8e56b391f103e9d559d397d0bc6d00b35) )
 	// itf
-    ROM_LOAD16_BYTE( "cpu_board_2a_d23c256ec.bin", 0x18001, 0x8000, CRC(3874970d) SHA1(e50ec5ae38f00dbfd156288dd42c7f2a2bf8bc35) )
-    ROM_LOAD16_BYTE( "cpu_board_3a_23c256e.bin",   0x18000, 0x8000, CRC(4128276e) SHA1(32acb7eee779a31838a17ce51b05a9a987af4099) )
+	ROM_LOAD16_BYTE( "cpu_board_2a_d23c256ec.bin", 0x18001, 0x8000, CRC(3874970d) SHA1(e50ec5ae38f00dbfd156288dd42c7f2a2bf8bc35) )
+	ROM_LOAD16_BYTE( "cpu_board_3a_23c256e.bin",   0x18000, 0x8000, CRC(4128276e) SHA1(32acb7eee779a31838a17ce51b05a9a987af4099) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-//	ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+//  ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 	// TODO: it invertes X pixel order and loads 8x8 charset bank in interleaved form, needs mods in own driver_init
-    ROM_LOAD( "main_board_12f_d2364ec.bin", 0x000000, 0x002000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
+	ROM_LOAD( "main_board_12f_d2364ec.bin", 0x000000, 0x002000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
 	// contains some 8x16 chars
-    ROM_LOAD( "main_board_8h_d23256ac.bin", 0x002000, 0x008000, CRC(62a32ba6) SHA1(cdab480ae0dad9d128e52afb15e6c0b2b122cc3f) )
+	ROM_LOAD( "main_board_8h_d23256ac.bin", 0x002000, 0x008000, CRC(62a32ba6) SHA1(cdab480ae0dad9d128e52afb15e6c0b2b122cc3f) )
 
 	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
 	// on main board, uPD23100 type roms
@@ -2705,7 +2705,7 @@ ROM_START( pc9801vm )
 	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 
-//	LOAD_KANJI_ROMS
+//  LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
 ROM_END
 

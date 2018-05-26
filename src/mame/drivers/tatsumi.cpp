@@ -27,7 +27,7 @@
     changes the size at runtime.
     Big Fight/Cyclewarriors - misc graphics problems.
     Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
-    
+
     reference of bigfight : https://youtu.be/aUUoUCr6yhk
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
@@ -1028,7 +1028,7 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-//	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -1088,7 +1088,7 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-//	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

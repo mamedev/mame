@@ -109,7 +109,7 @@ WRITE16_MEMBER(rungun_state::sysregs_w)
 				membank("spriteram_bank")->set_entry((data & 0x80) >> 7);
 				m_video_mux_bank = ((data & 0x80) >> 7) ^ 1;
 				ioport("EEPROMOUT")->write(data, 0xff);
-				
+
 				machine().bookkeeping().coin_counter_w(0, data & 0x08);
 				machine().bookkeeping().coin_counter_w(1, data & 0x10);
 			}
@@ -383,7 +383,7 @@ void rungun_state::machine_start()
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
 	//save_item(NAME(m_ttl_vram));
-	
+
 }
 
 void rungun_state::machine_reset()

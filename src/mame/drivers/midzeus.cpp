@@ -91,7 +91,7 @@ public:
 protected:
 	virtual void machine_start() override
 	{
-		MACHINE_START_CALL_MEMBER(midzeus);		
+		MACHINE_START_CALL_MEMBER(midzeus);
 		m_led.resolve();
 		m_lamp.resolve();
 	}

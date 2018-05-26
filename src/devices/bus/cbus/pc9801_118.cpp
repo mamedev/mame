@@ -8,7 +8,7 @@
 
     TODO:
     - preliminary, presumably needs CS-4231 too
-	- verify sound irq;
+    - verify sound irq;
 
 ***************************************************************************/
 

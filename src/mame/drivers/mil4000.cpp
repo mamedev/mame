@@ -151,7 +151,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
-	
+
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;

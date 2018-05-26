@@ -921,9 +921,9 @@ ROM_END
 ***************************************************************************/
 
 // 1995
-         GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
+		 GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
-         GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
+		 GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
 /* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )

@@ -26,7 +26,7 @@ public:
 		m_master_videoram(*this, "master_videoram"),
 		m_slave_videoram(*this, "slave_videoram"),
 		m_dial(*this, "DIAL%u", 0U),
-		m_input(*this, "P%u", 1U)	{ }
+		m_input(*this, "P%u", 1U)   { }
 
 	void exterm(machine_config &config);
 

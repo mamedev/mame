@@ -2,8 +2,8 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-    NEC PC-9801 
-	common functions for CBUS sound boards -26, -86, -118
+    NEC PC-9801
+    common functions for CBUS sound boards -26, -86, -118
 
 ***************************************************************************/
 
@@ -13,7 +13,7 @@
 #pragma once
 
 class pc9801_snd_device : public device_t
-{ 
+{
 public:
 	pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

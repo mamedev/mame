@@ -223,28 +223,28 @@ WRITE8_MEMBER(polydev_state::fdc_inv_w)
 uint32_t poly_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/*
-		PA0     Not used. Connected to CA2.
-		PA1  (  Mix colour  0) Blue   1) Green  0) Red    1) No
-		PA2  (  Graphics 1  0)        0)        1)        1) Mix
-		PA3     1 = Enable Teletext 1 screen
-		PA4     1 = 480 Graphics mode. 0 = 240 Graphics mode.
-		PA5     1 = Enable Graphics 1 screen or 480 Graphics screen.
-		PA6     1 = Mix Mode 0 = Priority mode
-		PA7     Must be 0. Connected to PA7 and timer G3.
+	    PA0     Not used. Connected to CA2.
+	    PA1  (  Mix colour  0) Blue   1) Green  0) Red    1) No
+	    PA2  (  Graphics 1  0)        0)        1)        1) Mix
+	    PA3     1 = Enable Teletext 1 screen
+	    PA4     1 = 480 Graphics mode. 0 = 240 Graphics mode.
+	    PA5     1 = Enable Graphics 1 screen or 480 Graphics screen.
+	    PA6     1 = Mix Mode 0 = Priority mode
+	    PA7     Must be 0. Connected to PA7 and timer G3.
 
-		PB0     1 = Enable Teletext 2 screen.
-		PB1     1 = Enable Graphics 2 (must be 0 for 480 Graphics)
-		PB2  (  Mix colour  0) Blue    1) Green  0) Red    1) No
-		PB3  (  Graphics 2  0)         0)        1)        1) Mix
-		PB4     1 = Enable Red Background
-		PB5     1 = Enable Green Background
-		PB6     1 = Enable Blue Background
-		PB7     Not used.
+	    PB0     1 = Enable Teletext 2 screen.
+	    PB1     1 = Enable Graphics 2 (must be 0 for 480 Graphics)
+	    PB2  (  Mix colour  0) Blue    1) Green  0) Red    1) No
+	    PB3  (  Graphics 2  0)         0)        1)        1) Mix
+	    PB4     1 = Enable Red Background
+	    PB5     1 = Enable Green Background
+	    PB6     1 = Enable Blue Background
+	    PB7     Not used.
 
-		CA1     Connected to PA7 and timer G3. Must be 0.
-		CA2     Not used. Connected to PA0.
-		CB1     Not used.
-		CB2     Not used.
+	    CA1     Connected to PA7 and timer G3. Must be 0.
+	    CA2     Not used. Connected to PA0.
+	    CB1     Not used.
+	    CB2     Not used.
 	*/
 
 	/* Enable Teletext 1 screen */

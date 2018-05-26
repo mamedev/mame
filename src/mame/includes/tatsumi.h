@@ -213,7 +213,7 @@ private:
 	required_shared_ptr<uint16_t> m_cyclwarr_cpub_ram;
 	required_shared_ptr_array<uint16_t, 2> m_cyclwarr_videoram;
 	required_region_ptr<uint8_t> m_cyclwarr_tileclut;
-	
+
 	std::vector<uint8_t> m_mask;
 	tilemap_t *m_layer[4];
 

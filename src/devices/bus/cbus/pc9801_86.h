@@ -51,7 +51,7 @@ protected:
 	void pc9801_86_config(machine_config &config);
 
 	required_device<pc9801_slot_device> m_bus;
-	
+
 private:
 	int queue_count();
 	uint8_t queue_pop();
@@ -81,7 +81,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	
+
 private:
 	required_device<ym2608_device>  m_opna_slave;
 };

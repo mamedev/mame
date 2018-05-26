@@ -1029,14 +1029,14 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	}
 
 	bitmap.fill(m_palette->pen(0), cliprect);
-	
+
 	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80,false);
 	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80,false);
 	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40,true);
 	update_cluts(8192, 4096, 8192);
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
 	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80,false);
-	
+
 	return 0;
 }
 

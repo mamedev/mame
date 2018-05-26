@@ -82,7 +82,7 @@ lstfile:close()
 
 local sorted = {}
 local sindex = {}
-local comments = "" 
+local comments = ""
 
 for num, entry in pairs(entries) do
 	if not entry.name then
