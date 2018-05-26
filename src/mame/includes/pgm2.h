@@ -29,8 +29,8 @@ struct kov3_module_key
 class pgm2_state : public driver_device
 {
 public:
-	pgm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pgm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_lineram(*this, "lineram"),
@@ -43,8 +43,7 @@ public:
 		m_bgscroll(*this, "bgscroll"),
 		m_fgscroll(*this, "fgscroll"),
 		m_vidmode(*this, "vidmode"),
-		m_gfxdecode2(*this, "gfxdecode2"),
-		m_gfxdecode3(*this, "gfxdecode3"),
+		m_gfxdecode(*this, "gfxdecode%u", 2U),
 		m_arm_aic(*this, "arm_aic"),
 		m_sprites_mask(*this, "sprites_mask"),
 		m_sprites_colour(*this, "sprites_colour"),
@@ -52,8 +51,8 @@ public:
 		m_bg_palette(*this, "bg_palette"),
 		m_tx_palette(*this, "tx_palette"),
 		m_mcu_timer(*this, "mcu_timer"),
-		m_memcard(*this, "memcard_p%u", 1U)
-	{ }
+		m_maindata(*this, "maindata"),
+		m_memcard(*this, "memcard_p%u", 1U) { }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
 	DECLARE_READ32_MEMBER(rtc_r);
@@ -100,10 +99,8 @@ public:
 
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
-	DECLARE_WRITE_LINE_MEMBER(irq);
 
-	INTERRUPT_GEN_MEMBER(igs_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt2);
+	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
 
 	void pgm2_ramrom(machine_config &config);
 	void pgm2_lores(machine_config &config);
@@ -128,27 +125,23 @@ private:
 
 	std::unique_ptr<uint32_t[]>     m_spritebufferram; // buffered spriteram
 
-	bitmap_ind16 m_sprite_bitmap;
-
 	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse);
-	void draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal);
-	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int repeats, int &realxdraw, int realdraw_inc, int palette_inc);
-	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int xrepeats);
-	void draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram);
-	void copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-
-	uint32_t m_sprites_mask_mask;
-	uint32_t m_sprites_colour_mask;
+	void draw_sprite_pixel(uint32_t* dst, uint8_t* dstpri, const rectangle &cliprect, const pen_t *pen, int palette_offset, int realx, int realy, int pri);
+	void draw_sprite_chunk(uint32_t* dst, uint8_t* dstpri, const rectangle &cliprect, const pen_t *pen,
+	                       int &palette_offset, int x, int realy, int sizex, int xdraw, int pri, uint32_t maskdata, uint32_t zoomx_bits, int repeats, int &realxdraw, int realdraw_inc, int palette_inc);
+	void draw_sprite_line(bitmap_rgb32 &bitmap, bitmap_ind8 &primap, const rectangle &cliprect, const pen_t *pen,
+	                       int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pri, int zoomybit, int zoomx_bits, int xrepeats);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, const uint32_t* spriteram);
 
 	void common_encryption_init();
-	uint8_t m_encryption_table[0x100];
+	std::unique_ptr<uint8_t[]> m_encryption_table;
 	int m_has_decrypted;    // so we only do it once.
 	int m_has_decrypted_kov3_module;
 	uint32_t m_spritekey;
 	uint32_t m_realspritekey;
 	int m_sprite_predecrypted;
 
-	uint8_t m_shareram[0x100];
+	std::unique_ptr<uint8_t[]> m_shareram;
 	uint16_t m_share_bank;
 	uint32_t m_mcu_regs[8];
 	uint32_t m_mcu_result0;
@@ -171,7 +164,7 @@ private:
 	void postload();
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<igs036_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_lineram;
 	required_shared_ptr<uint32_t> m_sp_zoom;
@@ -183,8 +176,7 @@ private:
 	required_shared_ptr<uint32_t> m_bgscroll;
 	required_shared_ptr<uint32_t> m_fgscroll;
 	required_shared_ptr<uint32_t> m_vidmode;
-	required_device<gfxdecode_device> m_gfxdecode2;
-	required_device<gfxdecode_device> m_gfxdecode3;
+	required_device_array<gfxdecode_device, 2> m_gfxdecode;
 	required_device<arm_aic_device> m_arm_aic;
 	required_region_ptr<uint8_t> m_sprites_mask;
 	required_region_ptr<uint8_t> m_sprites_colour;
@@ -192,6 +184,8 @@ private:
 	required_device<palette_device> m_bg_palette;
 	required_device<palette_device> m_tx_palette;
 	required_device<timer_device> m_mcu_timer;
+
+	required_memory_region m_maindata;
 
 	optional_device_array<pgm2_memcard_device, 4> m_memcard;
 };

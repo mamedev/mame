@@ -8,9 +8,6 @@
 
 DECLARE_DEVICE_TYPE(ARM_AIC, arm_aic_device)
 
-#define MCFG_ARM_AIC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ARM_AIC, 0)
-
 #define MCFG_IRQ_LINE_CB(_devcb) \
 	devcb = &downcast<arm_aic_device &>(*device).set_line_callback(DEVCB_##_devcb);
 
@@ -18,7 +15,7 @@ class arm_aic_device : public device_t
 {
 public:
 	// construction/destruction
-	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) :
 		device_t(mconfig, ARM_AIC, tag, owner, clock),
 		m_irq_out(*this)
 	{

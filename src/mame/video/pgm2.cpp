@@ -2,32 +2,37 @@
 // copyright-holders:David Haywood
 
 #include "includes/pgm2.h"
+#include <algorithm>
 
-inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal)
+inline void pgm2_state::draw_sprite_pixel(uint32_t* dst, uint8_t* dstpri, const rectangle &cliprect, const pen_t *pen, int palette_offset, int realx, int realy, int pri)
 {
 	if (cliprect.contains(realx, realy))
 	{
 		uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
-		uint16_t pendat = pix + (pal * 0x40);
-		uint16_t* dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
-		dstptr_bitmap[realx] = pendat;
+		if ((!(dstpri[realx] & 2)) || (!pri)) // sprite is 1/3, bg is 2
+		{
+			uint32_t pendat = pen[pix];
+			dst[realx] = pendat;
+		}
+		dstpri[realx] |= 1;
 	}
 }
 
-inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int repeats, int &realxdraw, int realdraw_inc, int palette_inc)
+inline void pgm2_state::draw_sprite_chunk(uint32_t* dst, uint8_t* dstpri, const rectangle &cliprect, const pen_t *pen,
+                                          int &palette_offset, int x, int realy, int sizex, int xdraw, int pri, uint32_t maskdata, uint32_t zoomx_bits, int repeats, int &realxdraw, int realdraw_inc, int palette_inc)
 {
 	for (int xchunk = 0; xchunk < 32; xchunk++)
 	{
 		int pix, xzoombit;
 		if (palette_inc == -1)
 		{
-			pix = (maskdata >> xchunk) & 1;
-			xzoombit = (zoomx_bits >> xchunk) & 1;
+			pix = BIT(maskdata, xchunk);
+			xzoombit = BIT(zoomx_bits, xchunk);
 		}
 		else
 		{
-			pix = (maskdata >> (31 - xchunk)) & 1;
-			xzoombit = (zoomx_bits >> (31 - xchunk)) & 1;
+			pix = BIT(maskdata, 31 - xchunk);
+			xzoombit = BIT(zoomx_bits, 31 - xchunk);
 		}
 
 		if (pix)
@@ -37,26 +42,26 @@ inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palett
 				// draw it the base number of times
 				for (int i = 0; i < repeats; i++)
 				{
-					draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
+					draw_sprite_pixel(dst, dstpri, cliprect, pen, palette_offset, x + realxdraw, realy, pri);
 					realxdraw += realdraw_inc;
 				}
 
 				// draw it again if zoom bit is set
 				if (xzoombit)
 				{
-					draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
+					draw_sprite_pixel(dst, dstpri, cliprect, pen, palette_offset, x + realxdraw, realy, pri);
 					realxdraw += realdraw_inc;
 				}
 
 				palette_offset += palette_inc;
-				palette_offset &= m_sprites_colour_mask;
+				palette_offset &= m_sprites_colour.mask();
 			}
 			else // shrink
 			{
-				if (xzoombit) draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
+				if (xzoombit) draw_sprite_pixel(dst, dstpri, cliprect, pen, palette_offset, x + realxdraw, realy, pri);
 
 				palette_offset += palette_inc;
-				palette_offset &= m_sprites_colour_mask;
+				palette_offset &= m_sprites_colour.mask();
 
 				if (xzoombit) realxdraw += realdraw_inc;
 
@@ -82,7 +87,6 @@ inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palett
 			}
 		}
 	}
-
 }
 
 inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse)
@@ -98,12 +102,17 @@ inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata
 		palette_offset-=bits;
 	}
 
-	palette_offset &= m_sprites_colour_mask;
-
+	palette_offset &= m_sprites_colour.mask();
 }
 
-inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int xrepeats)
+inline void pgm2_state::draw_sprite_line(bitmap_rgb32 &bitmap, bitmap_ind8 &primap, const rectangle &cliprect, const pen_t *pen, int &mask_offset,
+                                         int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pri, int zoomybit, int zoomx_bits, int xrepeats)
 {
+	if ((realy < cliprect.min_y) && (realy > cliprect.max_y))
+		return;
+
+	uint32_t *dst = &bitmap.pix32(realy);
+	uint8_t *dstpri = &primap.pix8(realy);
 	int realxdraw = 0;
 
 	if (flipx ^ reverse)
@@ -127,20 +136,19 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_of
 			mask_offset += 4;
 		}
 
-
-		mask_offset &= m_sprites_mask_mask;
+		mask_offset &= m_sprites_mask.mask();
 
 		if (zoomybit)
 		{
 			if (!flipx)
 			{
-				if (!reverse) draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, xrepeats, realxdraw, 1, 1);
-				else draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, xrepeats, realxdraw, -1, -1);
+				if (!reverse) draw_sprite_chunk(dst, dstpri, cliprect, pen, palette_offset, x, realy, sizex, xdraw, pri, maskdata, zoomx_bits, xrepeats, realxdraw, 1, 1);
+				else draw_sprite_chunk(dst, dstpri, cliprect, pen, palette_offset, x, realy, sizex, xdraw, pri, maskdata, zoomx_bits, xrepeats, realxdraw, -1, -1);
 			}
 			else
 			{
-				if (!reverse) draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, xrepeats, realxdraw, -1, 1);
-				else draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, xrepeats, realxdraw, 1, -1);
+				if (!reverse) draw_sprite_chunk(dst, dstpri, cliprect, pen, palette_offset, x, realy, sizex, xdraw, pri, maskdata, zoomx_bits, xrepeats, realxdraw, -1, 1);
+				else draw_sprite_chunk(dst, dstpri, cliprect, pen, palette_offset, x, realy, sizex, xdraw, pri, maskdata, zoomx_bits, xrepeats, realxdraw, 1, -1);
 
 			}
 		}
@@ -148,15 +156,15 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_of
 	}
 }
 
-void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram)
+void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, const uint32_t* spriteram)
 {
-	m_sprite_bitmap.fill(0x8000, cliprect);
+	//printf("frame\n");
 
 	int endoflist = -1;
 
 	//printf("frame\n");
 
-	for (int i = 0; i < 0x2000 / 4; i += 4)
+	for (int i = 0; i < m_sp_videoram.bytes() / 4; i += 4)
 	{
 		if (spriteram[i + 2] & 0x80000000)
 		{
@@ -213,17 +221,17 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			if (reverse)
 				mask_offset -= 2;
 
-			mask_offset &= m_sprites_mask_mask;
-			palette_offset &= m_sprites_colour_mask;
-
-			pal |= (pri << 6); // encode priority with the palette for manual mixing later
+			mask_offset &= m_sprites_mask.mask();
+			palette_offset &= m_sprites_colour.mask();
 
 			int realy = y;
+
+			const pen_t *pen = &m_sp_palette->pens()[pal << 6]; // 6 bpp
 
 			int sourceline = 0;
 			for (int ydraw = 0; ydraw < sizey; sourceline++)
 			{
-				int zoomy_bit = (zoomy_bits >> (sourceline & 0x1f)) & 1;
+				int zoomy_bit = BIT(zoomy_bits, sourceline & 0x1f);
 
 				// store these for when we need to draw a line twice
 				uint32_t pre_palette_offset = palette_offset;
@@ -236,7 +244,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 						// draw it the base number of times
 						palette_offset = pre_palette_offset;
 						mask_offset = pre_mask_offset;
-						draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, xrepeats);
+						draw_sprite_line(bitmap, primap, cliprect, pen, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pri, 1, zoomx_bits, xrepeats);
 						realy++;
 					}
 
@@ -244,7 +252,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 					{
 						palette_offset = pre_palette_offset;
 						mask_offset = pre_mask_offset;
-						draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, xrepeats);
+						draw_sprite_line(bitmap, primap, cliprect, pen, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pri, 1, zoomx_bits, xrepeats);
 						realy++;
 					}
 
@@ -252,7 +260,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 				}
 				else // shrink
 				{
-					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, xrepeats);
+					draw_sprite_line(bitmap, primap, cliprect, pen, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pri, 1, zoomx_bits, xrepeats);
 
 					if (zoomy_bit)
 					{
@@ -262,33 +270,6 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 				}
 			}
 		}
-	}
-}
-
-void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
-{
-	pri <<= 12;
-
-	const pen_t *paldata = m_sp_palette->pens();
-	uint16_t* srcptr_bitmap;
-	uint32_t* dstptr_bitmap;
-
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		srcptr_bitmap = &m_sprite_bitmap.pix16(y);
-		dstptr_bitmap = &bitmap.pix32(y);
-
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			uint16_t pix = srcptr_bitmap[x];
-
-			if (pix != 0x8000)
-			{
-				if ((pix&0x1000) == pri)
-					dstptr_bitmap[x] = paldata[pix & 0xfff];
-			}
-		}
-
 	}
 }
 
@@ -318,13 +299,11 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bit
 
 	bitmap.fill(paldata[0], cliprect); // are there any places bg pen is showing so we know what it should be?
 
-	draw_sprites(screen, cliprect, m_spritebufferram.get());
+	screen.priority().fill(0, cliprect);
 
-	copy_sprites_from_bitmap(screen, bitmap, cliprect, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	copy_sprites_from_bitmap(screen, bitmap, cliprect, 0);
+	draw_sprites(screen, bitmap, cliprect, screen.priority(), m_spritebufferram.get());
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -335,7 +314,8 @@ WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spritebufferram.get(), m_sp_videoram, 0x2000);
+		std::copy_n(&m_sp_videoram[0], m_sp_videoram.bytes()/4, &m_spritebufferram[0]);
+		m_arm_aic->set_irq(12, ASSERT_LINE);
 	}
 }
 
@@ -371,20 +351,16 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_bg_tile_info)
 
 void pgm2_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 96, 64); // 0x6000 bytes
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 96, 64); // 0x6000 bytes
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_rows(32 * 32);
 
-	m_spritebufferram = make_unique_clear<uint32_t[]>(0x2000 / 4);
+	int ramsize = m_sp_videoram.bytes() / 4;
+	m_spritebufferram = make_unique_clear<uint32_t[]>(ramsize);
 
-	m_screen->register_screen_bitmap(m_sprite_bitmap);
-
-	save_pointer(NAME(m_spritebufferram.get()), 0x2000 / 4);
-
-	m_sprites_mask_mask = memregion("sprites_mask")->bytes() - 1;
-	m_sprites_colour_mask = memregion("sprites_colour")->bytes() - 1;
+	save_pointer(NAME(m_spritebufferram.get()), ramsize);
 }
 
