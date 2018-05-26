@@ -1701,6 +1701,7 @@ void floppy_image_format_t::generate_track_from_bitstream(int track, int head, c
 			dest.push_back(cbit | (count+2));
 			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 			if(need_flux) {
+				need_flux = false;
 				dest.push_back(cbit | 1);
 				cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 				count = 1;
