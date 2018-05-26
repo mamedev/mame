@@ -210,7 +210,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_leds2;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<mc6845_device> m_crtc;
+	optional_device<mc6845_device> m_crtc;
 	output_finder<17> m_led;
 };
 

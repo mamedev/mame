@@ -85,6 +85,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
 			m_fdc(*this, WD1772_TAG),
+			m_floppy(*this, WD1772_TAG ":%u", 0U),
 			m_mfp(*this, MC68901_TAG),
 			m_acia0(*this, MC6850_0_TAG),
 			m_acia1(*this, MC6850_1_TAG),
@@ -128,6 +129,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc68901_device> m_mfp;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
@@ -324,8 +326,6 @@ public:
 	emu_timer *m_shifter_timer;
 
 	bitmap_rgb32 m_bitmap;
-
-	floppy_image_device *floppy_devices[2];
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	IRQ_CALLBACK_MEMBER(atarist_int_ack);
