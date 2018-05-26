@@ -17733,6 +17733,7 @@ hypbbc2pk                       // 1999 - Hyper Bishi Bashi Champ - 2 Player (GX
 hyperbbc                        // 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
 hyperbbca                       // 1998 - Hyper Bishi Bashi (GQ876 VER. AAA)
 hyperbbck                       // 1998 - Hyper Bishi Bashi (GE876 VER. KAA)
+jppyex98                        // 1998 - Jikkyou Powerful Pro Yakyuu EX '98 (GC811 VER. JAA)
 konam80a                        // 1998 - Konami 80's AC Special (GC826 VER. AAA)
 konam80j                        // 1998 - Konami 80's Gallery (GC826 VER. JAA)
 konam80k                        // 1998 - Konami 80's AC Special (GC826 VER. KAA)
@@ -32166,6 +32167,7 @@ pooyans                         // GX320 (c) 1982 Stern
 popeye                          // (c) 1982
 popeyehs
 popeyebl                        // bootleg
+popeyehsb
 popeyeb2                        // bootleg
 popeyeb3                        // bootleg
 popeyef                         // (c) 1982
@@ -32173,6 +32175,7 @@ popeyeu                         // (c) 1982
 popeyej                         //
 popeyejo                        //
 skyskipr                        // (c) 1981
+skyskipp
 
 @source:popobear.cpp
 popobear                        // (c) 2000 BMC
