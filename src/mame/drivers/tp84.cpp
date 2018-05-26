@@ -72,7 +72,6 @@ C004      76489 #4 trigger
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/flt_rc.h"
 #include "sound/sn76496.h"
 
 #include "speaker.h"
@@ -146,23 +145,23 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	C = 0;
 	if (offset & 0x008) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;    /* 470000pF = 0.47uF */
-	downcast<filter_rc_device*>(machine().device("filter1"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
+	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
 	if (offset & 0x020) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x040) C += 470000;    /* 470000pF = 0.47uF */
-		//  dynamic_cast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(,1000,2200,1000,C);
+	//  m_filter[1]->filter_rc_set_RC(,1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;    /* 470000pF = 0.47uF */
-	downcast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
+	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;    /* 470000pF = 0.47uF */
-	downcast<filter_rc_device*>(machine().device("filter3"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
+	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
 WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)

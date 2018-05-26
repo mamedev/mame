@@ -755,8 +755,8 @@ WRITE8_MEMBER(norautp_state::vram_data_w)
 	m_np_vram[m_np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
-//  i8255a_pc7_w(machine().device("ppi8255_2"), 0);
-//  i8255a_pc7_w(machine().device("ppi8255_2"), 1);
+//  m_ppi8255_2->set_pc_bit(7, 0);
+//  m_ppi8255_2->set_pc_bit(7, 1);
 
 }
 

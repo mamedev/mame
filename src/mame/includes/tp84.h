@@ -1,5 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+
+#ifndef MAME_INCLUDES_TP84
+#define MAME_INCLUDES_TP84
+
+#pragma once
+
+#include "sound/flt_rc.h"
 #include "screen.h"
 
 class tp84_state : public driver_device
@@ -20,7 +27,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_filter(*this, "filter%u", 1U) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -36,6 +44,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device_array<filter_rc_device, 3> m_filter;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	bool m_flipscreen_x;
@@ -70,3 +79,5 @@ public:
 	void tp84_cpu1_map(address_map &map);
 	void tp84b_cpu1_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TP84

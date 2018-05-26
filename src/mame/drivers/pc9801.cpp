@@ -2357,9 +2357,9 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	MCFG_DEVICE_ADD("ppi8255_fdd", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
-	MCFG_I8255_IN_PORTB_CB(CONSTANT(0xff)) //upd765_status_r(machine().device("upd765_2dd"),space, 0);
-	MCFG_I8255_IN_PORTC_CB(CONSTANT(0xff)) //upd765_data_r(machine().device("upd765_2dd"),space, 0);
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc9801_state, ppi_fdd_portc_w)) //upd765_data_w(machine().device("upd765_2dd"),space, 0,data);
+	MCFG_I8255_IN_PORTB_CB(CONSTANT(0xff))
+	MCFG_I8255_IN_PORTC_CB(CONSTANT(0xff))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc9801_state, ppi_fdd_portc_w))
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
