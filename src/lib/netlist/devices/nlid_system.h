@@ -130,7 +130,7 @@ namespace netlist
 				unsigned long pati[32];
 				for (int pI = 0; pI < 32; pI++)
 				{
-				    pati[pI] = 0;
+					pati[pI] = 0;
 				}
 				m_size = static_cast<std::uint8_t>(pat.size());
 				unsigned long total = 0;

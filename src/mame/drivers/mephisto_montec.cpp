@@ -138,7 +138,7 @@ WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
 	for(int i=0; i<4; i++)
 		for(int j=0; j<4; j++)
 			if (BIT(data, i))
-				m_high_leds[(i << 2) | j] = BIT(data, 4 + j);
+				m_high_leds[(i << 2) | j] = BIT(~data, 4 + j);
 }
 
 

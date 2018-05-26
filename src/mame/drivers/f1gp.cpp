@@ -196,7 +196,7 @@ void f1gp_state::f1gpb_cpu2_map(address_map &map)
 }
 
 static INPUT_PORTS_START( f1gp )
-	PORT_START("INPUTS") 
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( f1gp )
 
 	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5)
-	
+
 	PORT_START("DSW1")
 	// listed as "unused" in manual, actually enables free play
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )      PORT_DIPLOCATION("SW1:1")
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( f1gp )
 	// listed as "Unused" in manual, it selects between joystick or steering wheel
 	PORT_DIPNAME( 0x8000, 0x8000, "Input Method" )      PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x8000, "Joystick" )
-	// TODO: doesn't work in-game, reads from $fff002 ingame too but doesn't have an effect, 
+	// TODO: doesn't work in-game, reads from $fff002 ingame too but doesn't have an effect,
 	//       maybe outputs threshold to $fff000 or it's not supposed to be enabled like the manual claims.
 	PORT_DIPSETTING(      0x0000, "Steering Wheel" )
 
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Taiwan ) )
 	/* all other values are invalid */
-	
+
 	PORT_START("JOY_TYPE")
 	PORT_CONFNAME( 0x01, 0x01, "Joystick Type" )
 	PORT_CONFSETTING(    0x01, "2-Way" )

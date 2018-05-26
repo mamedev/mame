@@ -647,7 +647,7 @@ WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 
 	/* a large number of signals are reset when this happens */
 	m_soundcomm->reset();
-	machine().device("ymsnd")->reset();
+	m_ym2151->reset();
 	if (m_tms5220.found())
 	{
 		m_tms5220->reset(); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.

@@ -75,6 +75,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void midearth(machine_config &config);
+	void atari_s1(machine_config &config);
+	void atarians(machine_config &config);
+protected:
 	DECLARE_READ8_MEMBER(m1080_r);
 	DECLARE_WRITE8_MEMBER(m1080_w);
 	DECLARE_READ8_MEMBER(m1084_r);
@@ -90,9 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(midearth_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	void midearth(machine_config &config);
-	void atari_s1(machine_config &config);
-	void atarians(machine_config &config);
 	void atari_s1_map(address_map &map);
 	void atarians_map(address_map &map);
 	void midearth_map(address_map &map);

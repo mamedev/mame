@@ -188,6 +188,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
+	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
 	template<int Bank> DECLARE_READ16_MEMBER(cyclwarr_videoram_r);
 	template<int Bank> DECLARE_WRITE16_MEMBER(cyclwarr_videoram_w);
 
@@ -212,7 +213,7 @@ private:
 	required_shared_ptr<uint16_t> m_cyclwarr_cpub_ram;
 	required_shared_ptr_array<uint16_t, 2> m_cyclwarr_videoram;
 	required_region_ptr<uint8_t> m_cyclwarr_tileclut;
-	
+
 	std::vector<uint8_t> m_mask;
 	tilemap_t *m_layer[4];
 
@@ -223,5 +224,5 @@ private:
 	uint16_t m_bigfight_last_bank;
 
 	void tile_expand();
-	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset);
+	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool rowscroll_enable);
 };

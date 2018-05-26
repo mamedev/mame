@@ -322,8 +322,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 	m_mb->m_pit8253->write_gate2(BIT(data, 0));
 	m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
 	m_port_b_data = data;
-// device_t *cvsd = machine().device("cvsd");
-//  hc55516_digit_w(cvsd, data);
+//  m_cvsd->digit_w(data);
 }
 
 /*Floppy Disk Controller 765 device*/

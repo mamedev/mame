@@ -30,6 +30,7 @@ public:
 		m_pixelram(*this, "pixelram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_ym(*this, "ymsnd"),
 		m_hd63484(*this, "hd63484"),
 		m_tc0180vcu(*this, "tc0180vcu"),
 		m_tc0640fio(*this, "tc0640fio"),
@@ -157,7 +158,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_ym;
+	required_device<device_t> m_ym;
 	optional_device<hd63484_device> m_hd63484;
 	required_device<tc0180vcu_device> m_tc0180vcu;
 	optional_device<tc0640fio_device> m_tc0640fio;

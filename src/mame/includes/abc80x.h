@@ -59,11 +59,11 @@
 #define Z80SIO_TAG          "z80sio"
 #define Z80DART_TAG         "z80dart"
 #define DISCRETE_TAG        "discrete"
-#define CASSETTE_TAG		"cassette"
+#define CASSETTE_TAG        "cassette"
 #define RS232_A_TAG         "rs232a"
 #define RS232_B_TAG         "rs232b"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
-#define TIMER_CTC_TAG		"timer_ctc"
+#define TIMER_CTC_TAG       "timer_ctc"
 #define TIMER_CASSETTE_TAG  "timer_cass"
 
 

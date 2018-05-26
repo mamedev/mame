@@ -296,7 +296,7 @@ void clipper_device::execute_run()
 
 		// FIXME: some instructions take longer (significantly) than one cycle
 		// and also the timings are often slower for the C100 and C300
-		m_icount--;
+		m_icount -= 4;
 	}
 }
 

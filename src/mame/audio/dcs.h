@@ -128,6 +128,12 @@ public:
 	void dsio_io_map(address_map &map);
 	void dsio_program_map(address_map &map);
 	void dsio_rambank_map(address_map &map);
+
+	uint8_t get_rev() { return m_rev; } // TODO(RH): This can be done better, and shouldn't be necessary.
+	cpu_device *get_cpu() { return m_cpu; } // TODO(RH): Same.
+
+	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
+
 protected:
 	// construction/destruction
 	dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev);
@@ -137,8 +143,6 @@ protected:
 	virtual void device_reset() override;
 	void add_mconfig_dcs(machine_config &config);
 
-	// Formerly DCS1=1 DCS1P5=15 DCS2=2 DSIO=3 DENV=4
-	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
 	static constexpr const char *const denver_regname[4] =
 	{ "SDRC_ROM", "SDRC_IO", "RAM_PAGE", "VER/FIFO_RESET" };
 

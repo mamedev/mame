@@ -277,6 +277,7 @@ public:
 		m_k001604(*this, "k001604"),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
+		m_voodoo(*this, "voodoo%u", 0U),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -303,6 +304,7 @@ public:
 	required_device<k001604_device> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
+	required_device_array<voodoo_device, 2> m_voodoo;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
@@ -335,7 +337,8 @@ public:
 	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void lanc2_init();
 	void thrilld(machine_config &config);
@@ -365,32 +368,32 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_1)
 }
 
 
-uint32_t nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nwktr_state::screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if (strcmp(screen.tag(), ":lscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
+	m_voodoo[0]->voodoo_update(bitmap, cliprect);
 
-		voodoo->voodoo_update(bitmap, cliprect);
+	const rectangle &visarea = screen.visible_area();
+	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
 
-		const rectangle &visarea = screen.visible_area();
-		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
-		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
-	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
+	return 0;
+}
 
-		voodoo->voodoo_update(bitmap, cliprect);
+uint32_t nwktr_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->pen(0), cliprect);
 
-		const rectangle &visarea = screen.visible_area();
-		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+	m_voodoo[1]->voodoo_update(bitmap, cliprect);
 
-		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
-	}
+	const rectangle &visarea = screen.visible_area();
+	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+
+	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -871,13 +874,13 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
+	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_lscreen)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
+	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_rscreen)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
@@ -919,8 +922,8 @@ MACHINE_CONFIG_END
 
 void nwktr_state::init_nwktr()
 {
-	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
+	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
+	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
 
 	m_sharc0_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
 	m_sharc1_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);

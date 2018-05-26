@@ -915,7 +915,7 @@ WRITE32_MEMBER(interpro_ioga_device::timer0_w)
 
 	// restart the timer
 	//if (m_prescaler & 0xffff)
-	//	m_timer0->adjust(attotime::zero, 0, attotime::from_ticks(m_prescaler & 0xffff, 60_Hz_XTAL));
+	//  m_timer0->adjust(attotime::zero, 0, attotime::from_ticks(m_prescaler & 0xffff, 60_Hz_XTAL));
 	//else
 		m_timer0->adjust(attotime::zero, 0, attotime::from_hz(60_Hz_XTAL));
 }

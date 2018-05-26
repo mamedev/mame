@@ -15,11 +15,11 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(I82439TX, i82439tx_device, "i82439tx", "Intel 82439TX")
+DEFINE_DEVICE_TYPE(I82439TX_LEGACY, i82439tx_device, "i82439tx_legacy", "Intel 82439TX")
 
 
-i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: northbridge_device(mconfig, I82439TX, tag, owner, clock),
+i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	northbridge_device(mconfig, I82439TX_LEGACY, tag, owner, clock),
 	pci_device_interface(mconfig, *this),
 	m_cpu_tag(nullptr),
 	m_region_tag(nullptr),

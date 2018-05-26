@@ -55,7 +55,7 @@ void dc_common_device::maple_w(const uint32_t *data, uint32_t in_size)
 		break;
 	}
 }
- 
+
 /*******************************
  *
  * Dreamcast Controller
@@ -140,7 +140,7 @@ void dc_keyboard_device::fixed_status(uint32_t *dest)
 	dest[1] = 0x00201000; // 1st function
 	dest[2] = 0x00000008; // No 2nd function (doc returns 8 here tho?)
 	dest[3] = 0x00000000; // No 3rd function
-	dest[4] = region; 
+	dest[4] = region;
 	copy_with_spaces(((uint8_t *)dest) + 18, model, 30);
 	copy_with_spaces(((uint8_t *)dest) + 48, license, 60);
 	dest[27] = electric_current;

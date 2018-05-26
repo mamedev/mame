@@ -81,8 +81,10 @@ public:
 	// configuration access
 	template<int I, class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_callback[I].set_callback(std::forward<Object>(cb)); }
 
+	address_space &program_space() const { return m_cpu->space(AS_PROGRAM); }
 	address_space &io_space() const { return m_cpu->space(AS_IO); }
 	template<int I> void int_w(bool state) { m_int_callback[I](state); }
+	void install_io(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 protected:
 	// device-level overrides

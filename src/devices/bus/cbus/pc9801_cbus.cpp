@@ -94,3 +94,22 @@ void pc9801_slot_device::device_start()
 {
 //  m_card = dynamic_cast<device_pc9801_slot_card_interface *>(get_card_device());
 }
+
+void pc9801_slot_device::install_io(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+{
+	int buswidth = this->io_space().data_width();
+	switch(buswidth)
+	{
+		case 8:
+			this->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
+			break;
+		case 16:
+			this->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
+			break;
+		case 32:
+			this->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			break;
+		default:
+			fatalerror("PC-9801-26: Bus width %d not supported\n", buswidth);
+	}
+}

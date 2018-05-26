@@ -1311,7 +1311,7 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 void mappy_state::machine_start()
 {
 	m_leds.resolve();
-	
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));

@@ -253,7 +253,7 @@ void edge1_device_base::map_dynamic(address_map &map)
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write((offset >> 2) | (offset & 0x3), data); });
 
 	//map(0x02028200, 0x0202827f).lr32("idprom",
-	//	[this](address_space &space, offs_t offset, u8 mem_mask) { return memregion("idprom")->as_u32(offset); });
+	//  [this](address_space &space, offs_t offset, u8 mem_mask) { return memregion("idprom")->as_u32(offset); });
 
 	map(0x02410000, 0x0241000f).m("ramdac", FUNC(bt458_device::map)).umask32(0x000000ff);
 
@@ -321,7 +321,7 @@ void edge2plus_framebuffer_device_base::map_dynamic(address_map &map)
 	[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
 
-	map(0x01000000, 0x01ffffff).lrw8("vram", 
+	map(0x01000000, 0x01ffffff).lrw8("vram",
 		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read(offset); },
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write(offset, data); });
 
@@ -383,7 +383,7 @@ ROM_END
 * "9 planes (1 for highlights) of double-buffered graphics, 256 colours from 16.7 million"
 * 1024x1024x10x2 == 2621440 bytes == 2560KiB == 2.5MiB
 * FIXME: diag reports 128KiB static ram, 1MiB video ram, 4 screens, 1 user, z-buffer absent
-* 
+*
 */
 MACHINE_CONFIG_START(mpcb828_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)

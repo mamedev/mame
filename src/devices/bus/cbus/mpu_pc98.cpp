@@ -71,8 +71,7 @@ void mpu_pc98_device::map(address_map &map)
 
 void mpu_pc98_device::device_start()
 {
-	address_space &iospace = m_bus->io_space();
-	iospace.install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map);
+	m_bus->io_space().install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map);
 }
 
 //-------------------------------------------------

@@ -74,6 +74,7 @@ public:
 		, m_leds2(*this, "leds2")
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -209,6 +210,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_leds2;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	optional_device<mc6845_device> m_crtc;
 	output_finder<17> m_leds;
 };
 
@@ -774,8 +776,8 @@ void blitz68k_state::bankrob_map(address_map &map)
 	map(0x400005, 0x400005).rw(this, FUNC(blitz68k_state::bankrob_mcu1_r), FUNC(blitz68k_state::bankrob_mcu1_w));
 	map(0x400006, 0x400006).rw(this, FUNC(blitz68k_state::bankrob_mcu2_r), FUNC(blitz68k_state::bankrob_mcu2_w));
 
-	map(0x800000, 0x800000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
-	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x800000, 0x800000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
+	map(0x800002, 0x800002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 // bankroba:
@@ -918,28 +920,25 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 // CRTC
 READ8_MEMBER(blitz68k_state::crtc_r)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		return mc6845->register_r(space, 0);
+		return m_crtc->register_r(space, 0);
 	else
-		return mc6845->status_r(space, 0);
+		return m_crtc->status_r(space, 0);
 }
 
 WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		mc6845->register_w(space, 0, data);
+		m_crtc->register_w(space, 0, data);
 	else
-		mc6845->address_w(space, 0, data);
+		m_crtc->address_w(space, 0, data);
 }
 
 WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 {
-	device_t *device = machine().device("crtc");
 	// 8fe0006: 0->1
 	if (ACCESSING_BITS_8_15 && (data & 0x0100))
-		downcast<mc6845_device *>(device)->assert_light_pen_input();
+		m_crtc->assert_light_pen_input();
 	// 8fe0007: 1->0 (MCU irq?)
 }
 
@@ -1182,8 +1181,8 @@ void blitz68k_state::dualgame_map(address_map &map)
 	map(0x400005, 0x400005).rw(this, FUNC(blitz68k_state::dualgame_mcu1_r), FUNC(blitz68k_state::dualgame_mcu1_w));
 	map(0x400006, 0x400006).rw(this, FUNC(blitz68k_state::dualgame_mcu2_r), FUNC(blitz68k_state::dualgame_mcu2_w));
 
-	map(0x800000, 0x800000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x800000, 0x800000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x800002, 0x800002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 /*************************************************************************************************************
@@ -1325,8 +1324,8 @@ void blitz68k_state::maxidbl_map(address_map &map)
 	map(0x500005, 0x500005).rw(this, FUNC(blitz68k_state::maxidbl_mcu1_r), FUNC(blitz68k_state::maxidbl_mcu1_w));
 	map(0x500006, 0x500006).rw(this, FUNC(blitz68k_state::maxidbl_mcu2_r), FUNC(blitz68k_state::maxidbl_mcu2_w));
 
-	map(0x600000, 0x600000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
-	map(0x600002, 0x600002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x600000, 0x600000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
+	map(0x600002, 0x600002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 
@@ -1711,7 +1710,7 @@ void blitz68k_state::ramdac_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(blitz68k_state::ilpag)
-	MCFG_DEVICE_ADD("maincpu", M68000, 11059200 )  // ?
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 11059200 )  // ?
 	MCFG_DEVICE_PROGRAM_MAP(ilpag_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
 
@@ -1724,7 +1723,7 @@ MACHINE_CONFIG_START(blitz68k_state::ilpag)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 
@@ -1779,7 +1778,7 @@ MACHINE_CONFIG_START(blitz68k_state::steaser)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blitz68k_state::cjffruit)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'118'400)/2)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2)
 	MCFG_DEVICE_PROGRAM_MAP(cjffruit_map)
 
 	// MC68HC705C8P (Sound MCU)
@@ -1793,13 +1792,13 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
+	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq1))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1807,7 +1806,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankrob)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(11'059'200))
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
 	MCFG_DEVICE_PROGRAM_MAP(bankrob_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
@@ -1825,13 +1824,13 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1839,7 +1838,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankroba)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(11'059'200) )
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
 	MCFG_DEVICE_PROGRAM_MAP(bankroba_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
@@ -1855,13 +1854,13 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq5))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1869,7 +1868,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::deucesw2)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'118'400) / 2)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(deucesw2_map)
 	// irq 2 reads from MCUs
 
@@ -1884,13 +1883,13 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
+	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1898,7 +1897,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::dualgame)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(11'059'200) )
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
 	MCFG_DEVICE_PROGRAM_MAP(dualgame_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
 
@@ -1915,13 +1914,13 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1929,7 +1928,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::hermit)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'118'400)/2 )
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2 )
 	MCFG_DEVICE_PROGRAM_MAP(hermit_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
 
@@ -1944,13 +1943,13 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(22'118'400)/8)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq1))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1958,7 +1957,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::maxidbl)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(11'059'200))
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
 	MCFG_DEVICE_PROGRAM_MAP(maxidbl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
@@ -1978,13 +1977,13 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	SPEAKER(config, "mono").front_center();

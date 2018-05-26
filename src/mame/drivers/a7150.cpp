@@ -22,6 +22,7 @@
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
+#include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -29,6 +30,7 @@
 #include "machine/bankdev.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 
@@ -58,6 +60,7 @@ public:
 		, m_pic8259(*this, "pic8259")
 		, m_gfxcpu(*this, "gfxcpu")
 		, m_ctc(*this, Z80CTC_TAG)
+		, m_rs232(*this, "rs232")
 		, m_video_ram(*this, "video_ram")
 		, m_video_bankdev(*this, "video_bankdev")
 		, m_palette(*this, "palette")
@@ -72,14 +75,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a7150_tmr2_w);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 
+	DECLARE_WRITE_LINE_MEMBER(ifss_write_txd);
+	DECLARE_WRITE_LINE_MEMBER(ifss_write_dtr);
+
 	DECLARE_READ8_MEMBER(kgs_host_r);
 	DECLARE_WRITE8_MEMBER(kgs_host_w);
 	DECLARE_WRITE_LINE_MEMBER(kgs_iml_w);
+	DECLARE_WRITE_LINE_MEMBER(ifss_loopback_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	void kgs_memory_remap();
 
 	bool m_kgs_msel, m_kgs_iml;
 	uint8_t m_kgs_datao, m_kgs_datai, m_kgs_ctrl;
+	bool m_ifss_loopback;
 
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
@@ -91,6 +99,7 @@ public:
 
 	required_device<z80_device> m_gfxcpu;
 	required_device<z80ctc_device> m_ctc;
+	required_device<rs232_port_device> m_rs232;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
@@ -136,15 +145,33 @@ WRITE_LINE_MEMBER(a7150_state::a7150_tmr2_w)
 	m_uart8251->write_txc(state);
 }
 
+WRITE_LINE_MEMBER(a7150_state::ifss_loopback_w)
+{
+	m_ifss_loopback = !state;
+}
+
+WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
+{
+	if (m_ifss_loopback)
+		m_uart8251->write_rxd(state);
+	else
+		m_rs232->write_txd(state);
+}
+
+WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
+{
+	if (m_ifss_loopback)
+		m_uart8251->write_dsr(state);
+	else
+		m_rs232->write_dtr(state);
+}
+
 WRITE8_MEMBER(a7150_state::ppi_c_w)
 {
 	// b0 -- INTR(B)
 	// b1 -- /OBF(B)
 	// m_centronics->write_ack(BIT(data, 2));
 	// m_centronics->write_strobe(BIT(data, 3));
-	// b4 -- serial loopback?
-	// b6
-	// b7
 }
 
 #define KGS_ST_OBF  0x01
@@ -411,6 +438,7 @@ void a7150_state::machine_reset()
 	m_kgs_ctrl = 3;
 	m_kgs_datao = m_kgs_datai = 0;
 	m_kgs_iml = m_kgs_msel = 0;
+	m_ifss_loopback = false;
 	kgs_memory_remap();
 }
 
@@ -439,6 +467,14 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_DEVICE_PROGRAM_MAP(a7150_mem)
 	MCFG_DEVICE_IO_MAP(a7150_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
+	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
+
+	MCFG_DEVICE_ADD("i8087", I8087, XTAL(9'832'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(a7150_mem)
+	MCFG_I8087_DATA_WIDTH(16)
+	MCFG_I8087_INT_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
@@ -457,14 +493,14 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, a7150_state, a7150_tmr2_w))
 
 	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, a7150_state, ifss_write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, a7150_state, ifss_write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, a7150_state, ifss_loopback_w))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
 
 	// IFSS port on processor card -- keyboard runs at 28800 8N2
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard") // "loopback" allows ACT to pass
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
@@ -486,13 +522,19 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 1230750)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(Z80CTC_TAG, z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/3)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, 4800)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, XTAL(16'000'000)/4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
@@ -502,13 +544,13 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 //  MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(*this, a7150_state, kgs_ifss_loopback_w))
 
 	// V.24 port (graphics tablet)
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "loopback")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
 
 	// IFSS (current loop) port (keyboard)
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, "loopback")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxb_w))
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

@@ -34,9 +34,10 @@ void iteagle_fpga_device::ram_map(address_map &map)
 }
 
 iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock),
-		m_rtc(*this, "eagle2_rtc"), m_e1_nvram(*this, "eagle1_bram"), m_scc1(*this, AM85C30_TAG), m_version(0), m_seq_init(0)
+	: pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock)
+	, m_rtc(*this, "eagle2_rtc"), m_e1_nvram(*this, "eagle1_bram"), m_scc1(*this, AM85C30_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_cpu(*this, finder_base::DUMMY_TAG), m_version(0), m_seq_init(0)
 {
+	set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
 }
 
 MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
@@ -63,8 +64,6 @@ MACHINE_CONFIG_END
 
 void iteagle_fpga_device::device_start()
 {
-	m_screen = downcast<screen_device *>(machine().device("screen"));
-
 	// RTC M48T02
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
 
@@ -104,7 +103,6 @@ void iteagle_fpga_device::device_start()
 void iteagle_fpga_device::device_reset()
 {
 	remap_cb();
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	memset(m_fpga_regs, 0, sizeof(m_fpga_regs));
 	m_seq = m_seq_init;
 	m_seq_rem1 = 0;
@@ -471,7 +469,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 //*************************************
 //*  AM85c30 serial controller
 //*************************************
-void iteagle_am85c30::reset(void)
+void iteagle_am85c30::reset()
 {
 	memset(m_rr_regs, 0, 0x10 * 2);
 	memset(m_wr_regs, 0, 0x10 * 2);
@@ -656,9 +654,11 @@ MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock),
-		m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom")
+	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock)
+	, m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom")
 {
+	set_ids(0x80861229, 0x02, 0x020000, 0x00);
+
 	// When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
 	// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB
 	// 0x5 = Serial Num + top byte of 0x4
@@ -777,9 +777,10 @@ void iteagle_periph_device::ctrl_map(address_map &map)
 }
 
 iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ITEAGLE_PERIPH, tag, owner, clock),
-	m_rtc(*this, "eagle1_rtc")
+	: pci_device(mconfig, ITEAGLE_PERIPH, tag, owner, clock)
+	, m_rtc(*this, "eagle1_rtc")
 {
+	set_ids(0x1080c693, 0x00, 0x060100, 0x00);
 }
 
 void iteagle_periph_device::device_start()

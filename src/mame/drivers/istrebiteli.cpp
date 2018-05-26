@@ -145,6 +145,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spr_xy_w);
 	DECLARE_WRITE8_MEMBER(tileram_w);
+	DECLARE_WRITE8_MEMBER(moto_tileram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
@@ -171,6 +172,9 @@ public:
 	void istreb(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+	void motogonki(machine_config &config);
+	void moto_io_map(address_map &map);
+	void moto_mem_map(address_map &map);
 };
 
 void istrebiteli_state::machine_start()
@@ -256,6 +260,12 @@ WRITE8_MEMBER(istrebiteli_state::tileram_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
+WRITE8_MEMBER(istrebiteli_state::moto_tileram_w)
+{
+	m_tileram[offset] = data ^ 0xff;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
 READ8_MEMBER(istrebiteli_state::ppi0_r)
 {
 	return m_ppi0->read(space, offset ^ 3) ^ 0xff;
@@ -306,6 +316,12 @@ void istrebiteli_state::mem_map(address_map &map)
 	map(0x1000, 0x13ff).ram();
 }
 
+void istrebiteli_state::moto_mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
+
 void istrebiteli_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -314,6 +330,16 @@ void istrebiteli_state::io_map(address_map &map)
 	map(0xc0, 0xc3).rw(this, FUNC(istrebiteli_state::ppi0_r), FUNC(istrebiteli_state::ppi0_w));
 	map(0xc4, 0xc7).rw(this, FUNC(istrebiteli_state::ppi1_r), FUNC(istrebiteli_state::ppi1_w));
 	map(0xc8, 0xcf).w(this, FUNC(istrebiteli_state::spr_xy_w));
+}
+
+void istrebiteli_state::moto_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x30, 0x37).w(this, FUNC(istrebiteli_state::spr_xy_w));
+	map(0x38, 0x3b).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3c, 0x3f).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x4f).w(this, FUNC(istrebiteli_state::moto_tileram_w));
 }
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
@@ -373,6 +399,38 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, istrebiteli_state,coin_inc, nullptr)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( moto )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) // unknown
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	//PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
+	//PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, istrebiteli_state,coin_inc, nullptr)
@@ -450,6 +508,17 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(istrebiteli_state::motogonki)
+	istreb(config);
+
+	MCFG_DEVICE_MODIFY(I8080_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(moto_mem_map)
+	MCFG_DEVICE_IO_MAP(moto_io_map)
+
+	MCFG_DEVICE_MODIFY("ppi1")
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+MACHINE_CONFIG_END
+
 ROM_START( istreb )
 	ROM_REGION( 0x1000, I8080_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "002-ia12.bin",   0x000, 0x200, CRC(de0bce75) SHA1(ca284e8220d0d55c1a4dd3e951b53404f40fc873) )
@@ -471,4 +540,25 @@ ROM_START( istreb )
 	ROM_LOAD( "003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-GAME( 198?, istreb, 0, istreb, istreb, istrebiteli_state, empty_init, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+// hardware is similar to Istrebiteli, but RAM location and IO is different
+ROM_START( motogonki )
+	ROM_REGION( 0x2000, I8080_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "005_mb3.b2",   0x000, 0x2000, CRC(4dd35ed6) SHA1(6a0ee9e370634e501b6ee15a9747a491b745a205) )
+
+	ROM_REGION( 0x200, "chars", 0 )
+	ROM_LOAD( "003_ig8.g8", 0x000, 0x200, CRC(9af1e9de) SHA1(4bc89bc0c1f229ca3ebee983ae2fb3910d8ca599) )
+
+	ROM_REGION( 0x1000, "sprite", 0 ) // gfx layout is not correct
+	ROM_LOAD( "006_b1.b1",  0x000, 0x200, CRC(ae9820fb) SHA1(7727d20e314aee670ba36ca6ea7ca5a4da0fc1cd) )
+	ROM_LOAD( "006_02.b5",  0x200, 0x200, CRC(e5c17daf) SHA1(1b6ffeba7dd98da11e5eb953280dd53f0f77fa7f) )
+	ROM_LOAD( "006_03.b7",  0x400, 0x200, CRC(e1731d8d) SHA1(744fd768754a65a66bfcdb1959b4d6796bff4fcb) )
+	ROM_LOAD( "006_05.b3",  0x600, 0x100, CRC(7dc4f9c9) SHA1(8a40f9f021b1662b1c638c7fdcefead1687ca4f1) )
+	ROM_LOAD( "006_01.d3",  0x700, 0x100, CRC(b53b83c9) SHA1(8f9733c827cc9aacc7c182585dcbc5da01357468) )
+	ROM_LOAD( "006_04.w13", 0x800, 0x100, CRC(6d6441f6) SHA1(999356e5b31a03c667d6cb975210e058e340509e) )
+
+	ROM_REGION(0x200, "soundrom", 0)
+	ROM_LOAD( "003_iw3.w3", 0x000, 0x200, CRC(814854ba) SHA1(2cbfd60df01f00d7659393efa58547de660bf201) )
+ROM_END
+
+GAME( 198?, istreb,    0, istreb,    istreb, istrebiteli_state, empty_init, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 198?, motogonki, 0, motogonki, moto,   istrebiteli_state, empty_init, ROT0, "Terminal", "Motogonki", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

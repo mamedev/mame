@@ -194,17 +194,6 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 }
 
 static INPUT_PORTS_START( cdi )
-	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
-
 	PORT_START("DEBUG")
 	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -235,17 +224,6 @@ static INPUT_PORTS_START( cdi )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
-	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
-
 	PORT_START("DEBUG")
 	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -311,9 +289,6 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 	memset(m_slave_io_regs, 0, 0x20);
 
 	m_maincpu->reset();
-
-	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
@@ -323,9 +298,6 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
 	memcpy(dst, src, 0x8);
 
 	m_maincpu->reset();
-
-	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
 MACHINE_RESET_MEMBER( cdi_state, quizard1 )
@@ -801,6 +773,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	MCFG_DEFAULT_LAYOUT(layout_cdi)
 
 	MCFG_CDI68070_ADD("scc68070")
+	MCFG_CDI68070_CPU_TAG("maincpu")
+
 	MCFG_CDICDIC_ADD("cdic")
 	MCFG_CDISLAVE_ADD("slave_hle")
 
@@ -850,6 +824,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
 	MCFG_CDI68070_ADD("scc68070")
+	MCFG_CDI68070_CPU_TAG("maincpu")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
@@ -905,6 +880,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
 	MCFG_CDI68070_ADD("scc68070")
+	MCFG_CDI68070_CPU_TAG("maincpu")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */

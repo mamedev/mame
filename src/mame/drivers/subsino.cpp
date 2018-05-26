@@ -964,7 +964,7 @@ WRITE8_MEMBER(subsino_state::out_c_w)
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 		m_reel_tilemap[reel]->mark_all_dirty();
-//	popmessage("data %02x\n",data);
+//  popmessage("data %02x\n",data);
 }
 
 void subsino_state::tisub_map(address_map &map)
