@@ -1259,9 +1259,6 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 
 VIDEO_START_MEMBER(sms_state,sms1)
 {
-	m_left_lcd = machine().device("left_lcd");
-	m_right_lcd = machine().device("right_lcd");
-
 	m_main_scr->register_screen_bitmap(m_prevleft_bitmap);
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
 	save_item(NAME(m_prevleft_bitmap));
@@ -1316,81 +1313,65 @@ WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
 	}
 }
 
-
 uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t sscope = 0;
-	uint8_t sscope_binocular_hack;
-	uint8_t occluded_view = 0;
+	m_vdp->screen_update(screen, bitmap, cliprect);
+	return 0;
+}
 
-	if (&screen != m_main_scr)
-	{
-		sscope = m_port_scope->read();
-		if (!sscope)
-		{
-			// without SegaScope, both LCDs for glasses go black
-			occluded_view = 1;
-		}
-		else if (&screen == m_left_lcd)
-		{
-			// with SegaScope, state 0 = left screen OFF, right screen ON
-			if (!(m_frame_sscope_state & 0x01))
-				occluded_view = 1;
-		}
-		else // it's right LCD
-		{
-			// with SegaScope, state 1 = left screen ON, right screen OFF
-			if (m_frame_sscope_state & 0x01)
-				occluded_view = 1;
-		}
-	}
+uint32_t sms_state::screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t sscope = m_port_scope->read();
 
-	if (!occluded_view)
+	// without SegaScope, both LCDs for glasses go black
+	// with SegaScope, state 0 = left screen OFF, right screen ON
+	if (sscope && BIT(m_frame_sscope_state, 0))
 	{
 		m_vdp->screen_update(screen, bitmap, cliprect);
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// save a copy of current bitmap for the binocular hack
-		if (sscope)
-		{
-			sscope_binocular_hack = m_port_scope_binocular->read();
-
-			if (&screen == m_left_lcd)
-			{
-				if (sscope_binocular_hack & 0x01)
-					copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-			}
-			else // it's right LCD
-			{
-				if (sscope_binocular_hack & 0x02)
-					copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-			}
-		}
+		if (BIT(m_port_scope_binocular->read(), 0))
+			copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// use the copied bitmap for the binocular hack
-		if (sscope)
+		if (sscope && BIT(m_port_scope_binocular->read(), 0))
 		{
-			sscope_binocular_hack = m_port_scope_binocular->read();
+			copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
+			return 0;
+		}
+		bitmap.fill(rgb_t::black(), cliprect);
+	}
 
-			if (&screen == m_left_lcd)
-			{
-				if (sscope_binocular_hack & 0x01)
-				{
-					copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
-					return 0;
-				}
-			}
-			else // it's right LCD
-			{
-				if (sscope_binocular_hack & 0x02)
-				{
-					copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
-					return 0;
-				}
-			}
+	return 0;
+}
+
+uint32_t sms_state::screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t sscope = m_port_scope->read();
+
+	// without SegaScope, both LCDs for glasses go black
+	// with SegaScope, state 1 = left screen ON, right screen OFF
+	if (sscope && !BIT(m_frame_sscope_state, 0))
+	{
+		m_vdp->screen_update(screen, bitmap, cliprect);
+
+		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
+		// save a copy of current bitmap for the binocular hack
+		if (BIT(m_port_scope_binocular->read(), 1))
+			copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+	}
+	else
+	{
+		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
+		// use the copied bitmap for the binocular hack
+		if (sscope && BIT(m_port_scope_binocular->read(), 1))
+		{
+			copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
+			return 0;
 		}
 		bitmap.fill(rgb_t::black(), cliprect);
 	}
