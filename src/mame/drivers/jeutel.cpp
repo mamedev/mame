@@ -40,17 +40,20 @@ public:
 	{ }
 
 	void init_jeutel();
+	void jeutel(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
 	DECLARE_WRITE8_MEMBER(ppi0b_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void jeutel(machine_config &config);
 	void jeutel_cpu2(address_map &map);
 	void jeutel_cpu3(address_map &map);
 	void jeutel_cpu3_io(address_map &map);
 	void jeutel_map(address_map &map);
+
 private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
