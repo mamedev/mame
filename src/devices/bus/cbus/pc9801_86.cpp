@@ -16,7 +16,10 @@
     - Make volume work
     - Recording
 	- actual stereo sound routing (currently routes to ALL_OUTPUTS)
-	- SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?;
+	- SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
+	  "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM"
+	  Sounds like a sound core flaw since OPNA requires a rom region in any case;
+	- SpeakBoard: sounds horrible, due of the MAME mixing (same as Sega 32X, needs user to lower individual channel volumes);
 	- verify sound irq;
 
 ***************************************************************************/
