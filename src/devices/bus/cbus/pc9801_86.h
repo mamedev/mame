@@ -47,15 +47,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void pc9801_86_config(machine_config &config);
 
+	required_device<pc9801_slot_device> m_bus;
+	
 private:
 	int queue_count();
 	uint8_t queue_pop();
 
-	required_device<pc9801_slot_device> m_bus;
 
 	uint8_t m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;

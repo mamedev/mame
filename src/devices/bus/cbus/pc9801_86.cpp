@@ -153,32 +153,13 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_86_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
-{
-	int buswidth = m_bus->io_space().data_width();
-	switch(buswidth)
-	{
-		case 8:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 16:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
-			break;
-		case 32:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			break;
-		default:
-			fatalerror("PC-9801-86: Bus width %d not supported\n", buswidth);
-	}
-}
-
 
 void pc9801_86_device::device_start()
 {
 	m_bus->program_space().install_rom(0xcc000,0xcffff,memregion(this->subtag("sound_bios").c_str())->base());
-	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
-	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
-	install_device(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+	m_bus->install_io(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
+	m_bus->install_io(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
+	m_bus->install_io(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
 								   write8_delegate([this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
 
 	m_dac_timer = timer_alloc();
@@ -196,7 +177,7 @@ void pc9801_86_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
 	m_bus->io_space().unmap_readwrite(0x0088, 0x008f, 0x100);
-	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opna_r), this), write8_delegate(FUNC(pc9801_86_device::opna_w), this) );
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opna_r), this), write8_delegate(FUNC(pc9801_86_device::opna_w), this) );
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
@@ -419,7 +400,7 @@ void pc9801_speakboard_device::device_start()
 {
 	pc9801_86_device::device_start();
 	
-	install_device(0x0588, 0x058f, read8_delegate(FUNC(pc9801_speakboard_device::opna_slave_r), this), write8_delegate(FUNC(pc9801_speakboard_device::opna_slave_w), this) );
+	m_bus->install_io(0x0588, 0x058f, read8_delegate(FUNC(pc9801_speakboard_device::opna_slave_r), this), write8_delegate(FUNC(pc9801_speakboard_device::opna_slave_w), this) );
 }
 
 void pc9801_speakboard_device::device_reset()

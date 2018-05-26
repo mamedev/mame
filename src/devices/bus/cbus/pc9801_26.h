@@ -39,7 +39,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 private:
 	required_device<pc9801_slot_device> m_bus;

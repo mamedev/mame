@@ -109,28 +109,12 @@ void pc9801_118_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_118_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
-{
-	int buswidth = m_bus->io_space().data_width();
-	switch(buswidth)
-	{
-		case 8:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 16:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
-			break;
-		case 32:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			break;
-		default:
-			fatalerror("PC-9801-118: Bus width %d not supported\n", buswidth);
-	}
-}
-
 
 void pc9801_118_device::device_start()
 {
+	m_bus->install_io(0xa460, 0xa463, read8_delegate(FUNC(pc9801_118_device::id_r), this), write8_delegate(FUNC(pc9801_118_device::ext_w), this) );
+
+	save_item(NAME(m_ext_reg));
 }
 
 
@@ -141,8 +125,8 @@ void pc9801_118_device::device_start()
 void pc9801_118_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPN3_DSW")->read() & 1) << 8;
-	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_118_device::opn3_r), this), write8_delegate(FUNC(pc9801_118_device::opn3_w), this) );
-	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_118_device::id_r), this), write8_delegate(FUNC(pc9801_118_device::ext_w), this) );
+	m_bus->io_space().unmap_readwrite(0x0088, 0x008b, 0x100);
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_118_device::opn3_r), this), write8_delegate(FUNC(pc9801_118_device::opn3_w), this) );
 	m_ext_reg = 1; // TODO: enabled or disabled?
 }
 
