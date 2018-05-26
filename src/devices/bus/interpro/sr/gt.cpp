@@ -57,7 +57,6 @@
 #define LOG_LINE    (1U << 1)
 #define LOG_BLIT    (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_LINE | LOG_BLIT)
 //#define VERBOSE (LOG_GENERAL | LOG_LINE)
 
 #include "logmacro.h"
@@ -155,6 +154,7 @@ void single_gt_device_base::map(address_map &map)
 {
 	gt_device_base::map(map);
 	map(0x00000080, 0x0000008f).m("ramdac0", FUNC(bt459_device::map)).umask32(0x000000ff);
+	map(0x00000090, 0x0000009f).nopw(); // second (missing) ramdac
 
 	map(0x00400000, 0x005fffff).rw(this, FUNC(single_gt_device_base::buffer_r), FUNC(single_gt_device_base::buffer_w));
 }
@@ -421,7 +421,7 @@ void gt_device_base::device_start()
 
 WRITE32_MEMBER(gt_device_base::control_w)
 {
-	//	LOG("control_w 0x%08x\n", data);
+	//  LOG("control_w 0x%08x\n", data);
 	if (data & GFX_BSGA_RST)
 	{
 		// set graphics busy and schedule a reset
@@ -538,8 +538,8 @@ WRITE32_MEMBER(gt_device_base::bsga_xin1yin1_w)
 	m_bsga_xin1 = (m_bsga_xin1 & ~(mem_mask >> 0)) | ((data & mem_mask) >> 0);
 	m_bsga_yin1 = (m_bsga_yin1 & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
 
-	logerror("xin = %04x\n", m_bsga_xin1);
-	logerror("yin = %04x\n", m_bsga_yin1);
+	LOG("xin = %04x\n", m_bsga_xin1);
+	LOG("yin = %04x\n", m_bsga_yin1);
 
 	LOG("bsga_xin1yin1_w data 0x%08x mem_mask 0x%08x xin1 0x%04x yin1 0x%04x\n", data, mem_mask, m_bsga_xin1, m_bsga_yin1);
 
@@ -908,8 +908,8 @@ TIMER_CALLBACK_MEMBER(gt_device_base::line)
 {
 	// draw a clipped line
 
-	// FIXME: fix clipping to use >= min and < max (don't subtract 1)
-	kuzmin_clip(m_bsga_xin1, m_bsga_yin1, m_bsga_xin2, m_bsga_yin2, m_bsga_xmin, m_bsga_ymin, m_bsga_xmax - 1, m_bsga_ymax - 1);
+	// FIXME: fix clipping to use >= min and < max
+	kuzmin_clip(m_bsga_xin1, m_bsga_yin1, m_bsga_xin2, m_bsga_yin2, m_bsga_xmin, m_bsga_ymin, m_bsga_xmax, m_bsga_ymax);
 
 	// point #2 becomes point #1
 	m_bsga_xin1 = m_bsga_xin2;
@@ -1046,7 +1046,7 @@ u32 single_gt_device_base::screen_update0(screen_device &screen, bitmap_rgb32 &b
 {
 	const gt_t &gt = m_gt[0];
 
-	gt.ramdac->screen_update(screen, bitmap, cliprect, 
+	gt.ramdac->screen_update(screen, bitmap, cliprect,
 		(m_control & GFX_SCREEN0_DISP_BUF1) ? &gt.buffer[GT_BUFFER_SIZE] : &gt.buffer[0]);
 
 	return 0;
@@ -1056,7 +1056,7 @@ u32 dual_gt_device_base::screen_update0(screen_device &screen, bitmap_rgb32 &bit
 {
 	const gt_t &gt = m_gt[0];
 
-	gt.ramdac->screen_update(screen, bitmap, cliprect, 
+	gt.ramdac->screen_update(screen, bitmap, cliprect,
 		(m_control & GFX_SCREEN0_DISP_BUF1) ? &gt.buffer[GT_BUFFER_SIZE] : &gt.buffer[0]);
 
 	return 0;
@@ -1066,7 +1066,7 @@ u32 dual_gt_device_base::screen_update1(screen_device &screen, bitmap_rgb32 &bit
 {
 	const gt_t &gt = m_gt[1];
 
-	gt.ramdac->screen_update(screen, bitmap, cliprect, 
+	gt.ramdac->screen_update(screen, bitmap, cliprect,
 		(m_control & GFX_SCREEN1_DISP_BUF1) ? &gt.buffer[GT_BUFFER_SIZE] : &gt.buffer[0]);
 
 	return 0;

@@ -1494,7 +1494,7 @@ void pgm2_state::init_kov3_100()
 void pgm2_state::init_kof98umh()
 {
 	common_encryption_init();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::kof98umh_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::kof98umh_speedup_r),this));
 }
 
 

@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(pc9801_26_r);
-	DECLARE_WRITE8_MEMBER(pc9801_26_w);
+	DECLARE_READ8_MEMBER(opn_r);
+	DECLARE_WRITE8_MEMBER(opn_w);
 
 protected:
 	// device-level overrides
@@ -38,6 +38,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 private:

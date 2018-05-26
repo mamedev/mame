@@ -1042,6 +1042,7 @@ segas18.cpp
 segas24.cpp
 segas32.cpp
 segasp.cpp
+segattl.cpp
 segaufo.cpp
 segaxbd.cpp
 segaybd.cpp

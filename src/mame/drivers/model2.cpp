@@ -100,10 +100,12 @@
 #include "machine/315_5296.h"
 #include "machine/315_5649.h"
 #include "machine/model1io.h"
+#include "machine/model1io2.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
 
+#include "model1io2.lh"
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 READ32_MEMBER(model2_state::timers_r)
@@ -1319,12 +1321,6 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
-	// intercept reads for the lightgun ports
-	// needs to be done because the vcop ioboard isn't emulated
-	// can be removed once that's done (837-11130 + 837-11131)
-	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::lightgun_data_r)).umask32(0x00ff00ff);
-	map(0x01c00110, 0x01c00110).r(this, FUNC(model2o_state::lightgun_offscreen_r));
-
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 }
 
@@ -1816,11 +1812,11 @@ static INPUT_PORTS_START( vcop )
 	PORT_INCLUDE(ioboard_dipswitches)
 
 	PORT_MODIFY("ioboard:dsw1")
-	PORT_DIPNAME(0x80, 0x80, "Reloading")       PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(   0x80, "Normal")
+	PORT_DIPNAME(0x01, 0x01, "Reloading")       PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(   0x01, "Normal")
 	PORT_DIPSETTING(   0x00, "Auto Reload")
-	PORT_DIPNAME(0x40, 0x40, "Enemy Character") PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(   0x40, "Normal")
+	PORT_DIPNAME(0x02, 0x02, "Enemy Character") PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(   0x02, "Normal")
 	PORT_DIPSETTING(   0x00, "Robot")
 INPUT_PORTS_END
 
@@ -2597,9 +2593,22 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2o_state::vcop)
 	model2o(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_IN2_CB(IOPORT("IN2"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
+	MCFG_DEVICE_REMOVE("ioboard")
+
+	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
+	MCFG_DEVICE_BIOS("epr17181");
+	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
+	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN0"))
+	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN1"))
+	MCFG_MODEL1IO2_IN2_CB(IOPORT("IN2"))
+	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
+	MCFG_MODEL1IO2_LIGHTGUN_P1X_TAG("P1_X")
+	MCFG_MODEL1IO2_LIGHTGUN_P1Y_TAG("P1_Y")
+	MCFG_MODEL1IO2_LIGHTGUN_P2X_TAG("P2_X")
+	MCFG_MODEL1IO2_LIGHTGUN_P2Y_TAG("P2_Y")
+
+	MCFG_DEFAULT_LAYOUT(layout_model1io2)
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -6413,9 +6422,6 @@ ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
 	ROM_LOAD32_WORD( "mpr-17158.25", 0x000000, 0x200000, CRC(1108d1ec) SHA1(e95d4166bd4b26c5f21b85821b410f53045f4309) )
 	ROM_LOAD32_WORD( "mpr-17157.24", 0x000002, 0x200000, CRC(cf31e33d) SHA1(0cb62d4f28b5ad8a7e4c82b0ca8aea3037b05455) )
 
-	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
-	ROM_LOAD32_WORD( "epr-17181.6", 0x000000, 0x010000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede) )
-
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17170.7", 0x000000, 0x020000, CRC(06a38ae2) SHA1(a2c3d14d9266449ebfc6d976a956e0a8a602cfb0) )
 	ROM_LOAD16_WORD_SWAP( "epr-17171.8", 0x020000, 0x020000, CRC(b5e436f8) SHA1(1da3cb52d64f52d03a8de9954afffbc6e1549a5b) )
@@ -6455,9 +6461,6 @@ ROM_START( vcopa ) /* Virtua Cop Revision A, Model 2 */
 	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-17158.25", 0x000000, 0x200000, CRC(1108d1ec) SHA1(e95d4166bd4b26c5f21b85821b410f53045f4309) )
 	ROM_LOAD32_WORD( "mpr-17157.24", 0x000002, 0x200000, CRC(cf31e33d) SHA1(0cb62d4f28b5ad8a7e4c82b0ca8aea3037b05455) )
-
-	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
-	ROM_LOAD32_WORD( "epr-17181.6", 0x000000, 0x010000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede) )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17170.7", 0x000000, 0x020000, CRC(06a38ae2) SHA1(a2c3d14d9266449ebfc6d976a956e0a8a602cfb0) )

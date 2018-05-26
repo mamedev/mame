@@ -601,11 +601,11 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 
 	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_left)
 
 	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_right)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 

@@ -25,8 +25,8 @@
 	Debug mode:
 
 	You can attach a terminal to SIO channel B. Attach it to the
-	MAME slot option 'ioboard:debug'. You need to set the dip
-	switch to 'Debug Console' and hold board button 0 at startup.
+	MAME slot option 'ioboard:cn8'. You need to enable both JP3
+	and JP4 jumpers and hold board button 0 at startup.
 
 	Default	settings are 9600-8-N-1. It will output "RS".
 	You can then enter the following commands:
@@ -71,7 +71,7 @@ void model1io2_device::mem_map(address_map &map)
 	map(0x8000, 0x800f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
 	map(0x8040, 0x8040).portr("board");
 	map(0x8080, 0x8080).portr("dsw1");
-	map(0x8100, 0x8100).rw(this, FUNC(model1io2_device::fpga_r), FUNC(model1io2_device::fpga_w));
+	map(0x8100, 0x810f).rw(this, FUNC(model1io2_device::fpga_r), FUNC(model1io2_device::fpga_w));
 //	map(0x8180, 0x8183).nopr(); // displayed as 4 byte values in the diagnostic screen
 //	map(0x81a0, 0x81af).nopw(); // the (reserved) test in the diagnostic screen sets these
 	map(0x8200, 0x8203).mirror(0x04).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::address_w));
@@ -90,16 +90,14 @@ static INPUT_PORTS_START( model1io2 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Board 1") // on reset: port 4 does parameter display
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Board 2") // button 2 and 3 adjust the baud rate in debug
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Board 3") // mode when active at reset (9600, 4800, 2400, 1200)
-	PORT_DIPNAME(0x30, 0x30, "Mode") // jumpers on board?
-	PORT_DIPSETTING(   0x00, "Debug Console")
-	PORT_DIPSETTING(   0x10, "Normal 2")
-	PORT_DIPSETTING(   0x20, "Normal 1")
-	PORT_DIPSETTING(   0x30, "Normal 0") // default: no sio rx int (wingwar)
-//  might be mapped like this:
-//	PORT_DIPUNKNOWN(0x10, 0x10) // MODE (or ROM_EMU?)
-//	PORT_DIPUNKNOWN(0x20, 0x20) // GA_INT
+	PORT_DIPNAME(0x10, 0x10, "ROM_EMU") // JP4
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_DIPSETTING(   0x10, DEF_STR(Off))
+	PORT_DIPNAME(0x20, 0x20, "MODE") // JP3
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_DIPSETTING(   0x20, DEF_STR(Off))
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // eeprom nc
 INPUT_PORTS_END
 
 ioport_constructor model1io2_device::device_input_ports() const
@@ -143,17 +141,31 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	// SIO channel a baud rate adjusted by dsw1 1+2: 38400, 19200, 9600, 4800
 	MCFG_TMPZ84C015_ZC2_CB(WRITELINE("iocpu", tmpz84c015_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("iocpu", tmpz84c015_device, txca_w))
-	MCFG_TMPZ84C015_ZC3_CB(WRITELINE("iocpu", tmpz84c015_device, rxtxcb_w))
+	MCFG_TMPZ84C015_ZC3_CB(WRITELINE("iocpu", tmpz84c015_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("iocpu", tmpz84c015_device, txcb_w))
 
-	MCFG_TMPZ84C015_OUT_TXDB_CB(WRITELINE("debug", rs232_port_device, write_txd))
+	MCFG_TMPZ84C015_OUT_TXDA_CB(WRITELINE("cn7", rs232_port_device, write_txd))
+	MCFG_TMPZ84C015_OUT_RTSA_CB(WRITELINE("cn7", rs232_port_device, write_rts))
+	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE("cn7", rs232_port_device, write_dtr))
+
+	MCFG_TMPZ84C015_OUT_TXDB_CB(WRITELINE("cn8", rs232_port_device, write_txd))
+	MCFG_TMPZ84C015_OUT_RTSB_CB(WRITELINE("cn8", rs232_port_device, write_rts))
+	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE("cn8", rs232_port_device, write_dtr))
 
 	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("dsw2"))
 	MCFG_TMPZ84C015_IN_PB_CB(IOPORT("dsw3"))
 
-	MCFG_DEVICE_ADD("debug", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, rxb_w))
+	MCFG_DEVICE_ADD("cn7", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("iocpu", tmpz84c015_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, dcda_w))
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0)
+	MCFG_DEVICE_ADD("cn8", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("iocpu", tmpz84c015_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, dcdb_w))
+
+	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 32_MHz_XTAL)
 	MCFG_315_5338A_READ_CB(READ8(*this, model1io2_device, io_r))
 	MCFG_315_5338A_WRITE_CB(WRITE8(*this, model1io2_device, io_w))
 	MCFG_315_5338A_IN_PA_CB(READ8(*this, model1io2_device, io_pa_r))
@@ -167,7 +179,9 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // 93C45
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+
+	MCFG_DEVICE_ADD("adc", MSM6253, 32_MHz_XTAL / 16 / 4)
 	MCFG_MSM6253_IN0_ANALOG_READ(model1io2_device, analog0_r)
 	MCFG_MSM6253_IN1_ANALOG_READ(model1io2_device, analog1_r)
 	MCFG_MSM6253_IN2_ANALOG_READ(model1io2_device, analog2_r)
@@ -202,15 +216,18 @@ MACHINE_CONFIG_END
 model1io2_device::model1io2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_MODEL1IO2, tag, owner, clock),
 	m_eeprom(*this, "eeprom"),
+	m_watchdog(*this, "watchdog"),
 	m_lcd(*this, "lcd"),
 	m_led_comm_err(*this, "led_comm_err"),
+	m_lightgun_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
 	m_read_cb(*this), m_write_cb(*this),
 	m_in_cb{ {*this}, {*this}, {*this} },
 	m_drive_read_cb(*this), m_drive_write_cb(*this),
 	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_output_cb(*this),
 	m_secondary_controls(false),
-	m_lcd_data(0)
+	m_lcd_data(0),
+	m_fpga_counter(0)
 {
 }
 
@@ -240,6 +257,16 @@ void model1io2_device::device_start()
 	// register for save states
 	save_item(NAME(m_secondary_controls));
 	save_item(NAME(m_lcd_data));
+	save_item(NAME(m_fpga_counter));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void model1io2_device::device_reset()
+{
+	m_fpga_counter = 0;
 }
 
 
@@ -301,56 +328,46 @@ WRITE8_MEMBER( model1io2_device::io_pd_w )
 
 READ8_MEMBER( model1io2_device::io_pe_r )
 {
+	// cn6
 	return m_drive_read_cb(0);
 }
 
 WRITE8_MEMBER( model1io2_device::io_pe_w )
 {
+	// cn6
 	m_lcd_data = data;
 	m_drive_write_cb(data);
 }
 
 WRITE8_MEMBER( model1io2_device::io_pf_w )
 {
-	// 7-------  not used?
+	// 7-------  eeprom pe
 	// -6------  eeprom di
 	// --5-----  eeprom clk
 	// ---4----  eeprom cs
-	// ----3---  unknown
-	// -----2--  lcd e
-	// ------1-  lcd rw
-	// -------0  lcd rs
+	// ----3---  cn6 enabled
+	// -----2--  cn6 lcd e
+	// ------1-  cn6 lcd rw
+	// -------0  cn6 lcd rs
 
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(BIT(data, 6));
 	m_eeprom->cs_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 
-	if (BIT(data, 2) == 1 && BIT(data, 1) == 0)
+	if (BIT(data, 3) == 0 && BIT(data, 2) == 1 && BIT(data, 1) == 0)
 		m_lcd->write(space, BIT(data, 0), m_lcd_data);
 }
 
 WRITE8_MEMBER( model1io2_device::io_pg_w )
 {
-	// 7-------  unknown (input related?)
+	// 7-------  watchdog
 	// -6------  control panel switch
 	// --5-----  comm_err led
-	// ---4----  unknown
-	// ----32--  not used?
-	// ------1-  unknown (sio channel a related)
-	// -------0  interrupt processing (1 while in the int routine)
+	// ---43210  test points (0 = interrupt, 1 = sio a)
 
+	m_watchdog->write_line_ck(BIT(data, 7));
 	m_secondary_controls = BIT(data, 6);
 	m_led_comm_err = BIT(~data, 5);
-}
-
-READ8_MEMBER( model1io2_device::fpga_r )
-{
-	return 0x80;
-}
-
-WRITE8_MEMBER( model1io2_device::fpga_w )
-{
-	// fpga data uploaded here (vcop)
 }
 
 ioport_value model1io2_device::analog0_r()
@@ -371,4 +388,60 @@ ioport_value model1io2_device::analog2_r()
 ioport_value model1io2_device::analog3_r()
 {
 	return m_secondary_controls ? m_an_cb[7](0) : m_an_cb[3](0);
+}
+
+
+//**************************************************************************
+//  FGPA (Virtua Cop)
+//**************************************************************************
+
+READ8_MEMBER( model1io2_device::fpga_r )
+{
+	// fpga upload not finished yet?
+	if (m_fpga_counter < 0x1400)
+		return 0x80;
+
+	// lightgun coordinates
+	if (offset < 8)
+		return m_lightgun_ports[offset >> 1].read_safe(0) >> (8 * (offset & 1));
+
+	// lightgun off-screen detect
+	else if (offset == 8)
+	{
+		// 5 percent border size
+		const float BORDER_SIZE = 0.05f;
+
+		// calculate width depending on min/max port value
+		const int BORDER_P1X = (m_lightgun_ports[1]->field(0x3ff)->maxval() - m_lightgun_ports[1]->field(0x3ff)->minval()) * BORDER_SIZE;
+		const int BORDER_P1Y = (m_lightgun_ports[0]->field(0x3ff)->maxval() - m_lightgun_ports[0]->field(0x3ff)->minval()) * BORDER_SIZE;
+		const int BORDER_P2X = (m_lightgun_ports[3]->field(0x3ff)->maxval() - m_lightgun_ports[3]->field(0x3ff)->minval()) * BORDER_SIZE;
+		const int BORDER_P2Y = (m_lightgun_ports[2]->field(0x3ff)->maxval() - m_lightgun_ports[2]->field(0x3ff)->minval()) * BORDER_SIZE;
+
+		uint8_t data = 0xfc;
+
+		const uint16_t P1X = m_lightgun_ports[1].read_safe(0);
+		const uint16_t P1Y = m_lightgun_ports[0].read_safe(0);
+		const uint16_t P2X = m_lightgun_ports[3].read_safe(0);
+		const uint16_t P2Y = m_lightgun_ports[2].read_safe(0);
+
+		// border hit test for player 1 and 2
+		if (P1X <= (m_lightgun_ports[1]->field(0x3ff)->minval() + BORDER_P1X)) data |= 1;
+		if (P1X >= (m_lightgun_ports[1]->field(0x3ff)->maxval() - BORDER_P1X)) data |= 1;
+		if (P1Y <= (m_lightgun_ports[0]->field(0x3ff)->minval() + BORDER_P1Y)) data |= 1;
+		if (P1Y >= (m_lightgun_ports[0]->field(0x3ff)->maxval() - BORDER_P1Y)) data |= 1;
+		if (P2X <= (m_lightgun_ports[3]->field(0x3ff)->minval() + BORDER_P2X)) data |= 2;
+		if (P2X >= (m_lightgun_ports[3]->field(0x3ff)->maxval() - BORDER_P2X)) data |= 2;
+		if (P2Y <= (m_lightgun_ports[2]->field(0x3ff)->minval() + BORDER_P2Y)) data |= 2;
+		if (P2Y >= (m_lightgun_ports[2]->field(0x3ff)->maxval() - BORDER_P2Y)) data |= 2;
+
+		return data;
+	}
+
+	return 0xff;
+}
+
+WRITE8_MEMBER( model1io2_device::fpga_w )
+{
+	// fpga data uploaded here (vcop)
+	m_fpga_counter++;
 }

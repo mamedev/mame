@@ -89,11 +89,8 @@ public:
 	DECLARE_MACHINE_RESET(defender);
 	DECLARE_VIDEO_START(williams);
 	DECLARE_MACHINE_START(williams);
-	DECLARE_MACHINE_RESET(williams);
 	DECLARE_MACHINE_START(williams_common);
-	DECLARE_MACHINE_RESET(williams_common);
 	uint32_t screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(williams_count240_off_callback);
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_count240_callback);
@@ -184,7 +181,6 @@ public:
 
 	void init_blaster();
 	DECLARE_MACHINE_START(blaster);
-	DECLARE_MACHINE_RESET(blaster);
 	DECLARE_VIDEO_START(blaster);
 	uint32_t screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -225,7 +221,6 @@ public:
 	DECLARE_WRITE8_MEMBER(williams2_xscroll_low_w);
 	DECLARE_WRITE8_MEMBER(williams2_xscroll_high_w);
 	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
-	TIMER_CALLBACK_MEMBER(williams2_endscreen_off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_endscreen_callback);
 	TIMER_CALLBACK_MEMBER(williams2_deferred_snd_cmd_w);

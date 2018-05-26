@@ -26,13 +26,18 @@ class pc9801_86_device : public device_t
 public:
 	// construction/destruction
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opn_r);
-	DECLARE_WRITE8_MEMBER(opn_w);
+	DECLARE_READ8_MEMBER(opna_r);
+	DECLARE_WRITE8_MEMBER(opna_w);
 	DECLARE_READ8_MEMBER(id_r);
 	DECLARE_WRITE8_MEMBER(mask_w);
 	DECLARE_READ8_MEMBER(pcm_r);
 	DECLARE_WRITE8_MEMBER(pcm_w);
+
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	DECLARE_READ8_MEMBER(opn_porta_r);
+	DECLARE_WRITE8_MEMBER(opn_portb_w);
 
 protected:
 	// device-level overrides
@@ -45,6 +50,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void pc9801_86_config(machine_config &config);
 
 private:
 	int queue_count();
@@ -60,21 +66,33 @@ private:
 	required_device<dac_word_interface> m_rdac;
 	std::vector<uint8_t> m_queue;
 	emu_timer *m_dac_timer;
+};
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_portb_w);
+class pc9801_speakboard_device : public pc9801_86_device
+{
+public:
+	// construction/destruction
+	pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER(opna_slave_r);
+	DECLARE_WRITE8_MEMBER(opna_slave_w);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	
+private:
+	required_device<ym2608_device>  m_opna_slave;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_86, pc9801_86_device)
+DECLARE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device)
 
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 
 
