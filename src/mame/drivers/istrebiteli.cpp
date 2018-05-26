@@ -144,6 +144,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spr0_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spr_xy_w);
+	DECLARE_WRITE8_MEMBER(moto_spr_xy_w);
 	DECLARE_WRITE8_MEMBER(tileram_w);
 	DECLARE_WRITE8_MEMBER(moto_tileram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
@@ -310,6 +311,11 @@ WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 	m_spr_xy[offset ^ 7] = data;
 }
 
+WRITE8_MEMBER(istrebiteli_state::moto_spr_xy_w)
+{
+	m_spr_xy[offset] = data ^ 0xff;
+}
+
 void istrebiteli_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
@@ -319,7 +325,7 @@ void istrebiteli_state::mem_map(address_map &map)
 void istrebiteli_state::moto_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x23ff).ram();
+	map(0x2000, 0x23ff).ram(); // KR537RU8 16Kbit SRAM, only half used ?
 }
 
 void istrebiteli_state::io_map(address_map &map)
@@ -336,7 +342,7 @@ void istrebiteli_state::moto_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x30, 0x37).w(this, FUNC(istrebiteli_state::spr_xy_w));
+	map(0x30, 0x37).w(this, FUNC(istrebiteli_state::moto_spr_xy_w));
 	map(0x38, 0x3b).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3c, 0x3f).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x4f).w(this, FUNC(istrebiteli_state::moto_tileram_w));
@@ -406,34 +412,23 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( moto )
 	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) // l/r
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  // l/r
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)	  // speed 30
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  // speed 80
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        // speed 120
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        // ??
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        // ??
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4)	      // brake or collision ?
+	//PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
 
 	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) // unknown
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)  // coin, TODO check why it is locked
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON5) // brake or collision ?
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen") // guess, seems unused
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
-	//PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
-	//PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
-
-	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, istrebiteli_state,coin_inc, nullptr)
 INPUT_PORTS_END
 
 static const gfx_layout char_layout =
@@ -511,7 +506,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(istrebiteli_state::motogonki)
 	istreb(config);
 
-	MCFG_DEVICE_MODIFY(I8080_TAG)
+	MCFG_DEVICE_REPLACE(I8080_TAG, I8080, XTAL(15'700'000) / 9)       // KR580VM80A
 	MCFG_DEVICE_PROGRAM_MAP(moto_mem_map)
 	MCFG_DEVICE_IO_MAP(moto_io_map)
 
@@ -540,7 +535,8 @@ ROM_START( istreb )
 	ROM_LOAD( "003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-// hardware is similar to Istrebiteli, but RAM location and IO is different
+// hardware is similar to Istrebiteli, but bigger ROM, RAM location moved, CPU A/D buses is not inverted unlike Istrebiteli PCB
+// test mode: PPI1 port A bits 1,6,7 must be active low (currently left+btn3+btn4), then insert coin (press start)
 ROM_START( motogonki )
 	ROM_REGION( 0x2000, I8080_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "005_mb3.b2",   0x000, 0x2000, CRC(4dd35ed6) SHA1(6a0ee9e370634e501b6ee15a9747a491b745a205) )
