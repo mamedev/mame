@@ -35,7 +35,7 @@ public:
 		, m_tms5220(*this, "tms")
 		, m_rombank(*this, "rombank%u", 1U)
 		, m_slapstic(*this, "slapstic")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void init_ssprint();
@@ -95,7 +95,7 @@ private:
 	int32_t           m_spin_pos;                 /* track fake position of spinner */
 	uint32_t          m_spin_center_count;
 
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	DECLARE_WRITE16_MEMBER(int0_ack_w);
 	DECLARE_WRITE16_MEMBER(int1_ack_w);

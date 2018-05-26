@@ -216,7 +216,7 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 	m_floppy0(*this, I8048_TAG":0"),
 	m_floppy1(*this, I8048_TAG":1"),
 	m_gcr_rom(*this, "gcr"),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_da(0),
 	m_da0(0),
 	m_da1(0),
@@ -261,7 +261,7 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 
 void victor_9000_fdc_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// resolve callbacks
 	m_irq_cb.resolve_safe();
@@ -895,10 +895,10 @@ WRITE8_MEMBER( victor_9000_fdc_device::via6_pa_w )
 	*/
 
 	// LED, drive A
-	m_led[LED_A] = BIT(data, 0);
+	m_leds[LED_A] = BIT(data, 0);
 
 	// LED, drive B
-	m_led[LED_B] = BIT(data, 2);
+	m_leds[LED_B] = BIT(data, 2);
 
 	bool sync = false;
 

@@ -112,10 +112,10 @@
 
 WRITE8_MEMBER(victory_state::lamp_control_w)
 {
-	m_lamp[0] = BIT(data, 7);
-	m_lamp[1] = BIT(data, 6);
-	m_lamp[2] = BIT(data, 5);
-	m_lamp[3] = BIT(data, 4);
+	m_lamps[0] = BIT(data, 7);
+	m_lamps[1] = BIT(data, 6);
+	m_lamps[2] = BIT(data, 5);
+	m_lamps[3] = BIT(data, 4);
 }
 
 

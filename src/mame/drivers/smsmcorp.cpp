@@ -231,7 +231,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -263,7 +263,7 @@ protected:
 	uint8_t m_vid_regs[7];
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	output_finder<10> m_lamp;
+	output_finder<10> m_lamps;
 };
 
 
@@ -415,20 +415,20 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
-	m_lamp[0] = BIT(~data, 7); /* Display Light 1 */
-	m_lamp[1] = BIT(~data, 6); /* Display Light 2 */
-	m_lamp[2] = BIT(~data, 5); /* Display Light 3 */
-	m_lamp[3] = BIT(~data, 4); /* Display Light 4 */
-	m_lamp[4] = BIT(~data, 3); /* Display Light 5 */
-	m_lamp[5] = BIT(~data, 2); /* Bet Light */
-	m_lamp[6] = BIT(~data, 1); /* Deal Light */
-	m_lamp[7] = BIT(~data, 0); /* Draw Light */
+	m_lamps[0] = BIT(~data, 7); /* Display Light 1 */
+	m_lamps[1] = BIT(~data, 6); /* Display Light 2 */
+	m_lamps[2] = BIT(~data, 5); /* Display Light 3 */
+	m_lamps[3] = BIT(~data, 4); /* Display Light 4 */
+	m_lamps[4] = BIT(~data, 3); /* Display Light 5 */
+	m_lamps[5] = BIT(~data, 2); /* Bet Light */
+	m_lamps[6] = BIT(~data, 1); /* Deal Light */
+	m_lamps[7] = BIT(~data, 0); /* Draw Light */
 }
 
 WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 {
-	m_lamp[8] = BIT(~data, 7); /* Stand Light */
-	m_lamp[9] = BIT(~data, 6); /* Cancel Light */
+	m_lamps[8] = BIT(~data, 7); /* Stand Light */
+	m_lamps[9] = BIT(~data, 6); /* Cancel Light */
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data,1));
 	machine().bookkeeping().coin_lockout_w(0, BIT(data,5));
@@ -530,7 +530,7 @@ void smsmfg_state::sub_map(address_map &map)
 
 void smsmfg_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	membank("bank1")->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
 
 	save_item(NAME(m_communication_port_status));
@@ -539,7 +539,7 @@ void smsmfg_state::machine_start()
 
 MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));
 }

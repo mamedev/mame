@@ -172,7 +172,7 @@ public:
 		, m_protection1(*this, "protection1")
 		, m_protection2(*this, "protection2")
 		, m_soundlatch(*this, "soundlatch")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void set_blitter_irq(write_line_delegate &&handler) { m_blitter_irq_handler = std::move(handler); }
@@ -481,7 +481,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_protection1;
 	optional_shared_ptr<uint16_t> m_protection2;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
 
 	/* blitter (TODO: merge with the dynax.h, where possible) */
@@ -2389,7 +2389,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_blitter_irq)
 
 void ddenlovr_state::mmpanic_update_leds()
 {
-	m_led[0] = m_mmpanic_leds;
+	m_leds[0] = m_mmpanic_leds;
 }
 
 /* leds 1-8 */
@@ -2412,7 +2412,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_lockout_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);
 		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
-		m_led[1] = BIT(~data, 2);
+		m_leds[1] = BIT(~data, 2);
 	}
 }
 
@@ -3899,7 +3899,7 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 {
 	m_prot_val = data;
 
-	m_led[0] = BIT(data, 0);  // led? 1 in-game, 0 in service mode / while booting
+	m_leds[0] = BIT(data, 0);  // led? 1 in-game, 0 in service mode / while booting
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // coin-out
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // coin-in
@@ -9576,7 +9576,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));

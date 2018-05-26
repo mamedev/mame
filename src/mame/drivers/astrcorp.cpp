@@ -60,7 +60,7 @@ public:
 		m_hopper(*this, "hopper"),
 		m_ticket(*this, "ticket"),
 		m_spriteram(*this, "spriteram"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	// devices
@@ -106,7 +106,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	output_finder<7> m_lamp;
+	output_finder<7> m_lamps;
 };
 
 /***************************************************************************
@@ -246,17 +246,17 @@ WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0,    (data & 0x0004));   // coin counter
-		m_lamp[0] = BIT(data, 3);   // you win
+		m_lamps[0] = BIT(data, 3);   // you win
 		if ((data & 0x0010)) machine().bookkeeping().increment_dispensed_tickets(1); // coin out
-		m_lamp[1] = BIT(data, 5);   // coin/hopper jam
+		m_lamps[1] = BIT(data, 5);   // coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		m_lamp[2] = BIT(data, 8);   // bet
-		m_lamp[3] = BIT(data, 11);   // start
-		m_lamp[4] = BIT(data, 12);   // ? select/choose
-		m_lamp[5] = BIT(data, 13);   // ? select/choose
-		m_lamp[6] = BIT(data, 15);   // look
+		m_lamps[2] = BIT(data, 8);   // bet
+		m_lamps[3] = BIT(data, 11);   // start
+		m_lamps[4] = BIT(data, 12);   // ? select/choose
+		m_lamps[5] = BIT(data, 13);   // ? select/choose
+		m_lamps[6] = BIT(data, 15);   // look
 	}
 //  popmessage("%04X",data);
 }
@@ -286,18 +286,18 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));   // key out |
 		m_hopper->motor_w(BIT(data, 3));                           // hopper motor?
 		//                                  BIT(data, 4)           // hopper?
-		m_lamp[0] = BIT(data, 5);                   // error lamp (coin/hopper jam: "call attendant")
+		m_lamps[0] = BIT(data, 5);                   // error lamp (coin/hopper jam: "call attendant")
 		m_ticket->motor_w(BIT(data, 7));                           // ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// lamps:
-		m_lamp[1] = BIT(data, 8);    // select
-		m_lamp[2] = BIT(data, 10);   // take
-		m_lamp[3] = BIT(data, 11);   // bet
-		m_lamp[4] = BIT(data, 12);   // start
-		m_lamp[5] = BIT(data, 14);   // win / test
-		m_lamp[6] = BIT(data, 15);   // ticket?
+		m_lamps[1] = BIT(data, 8);    // select
+		m_lamps[2] = BIT(data, 10);   // take
+		m_lamps[3] = BIT(data, 11);   // bet
+		m_lamps[4] = BIT(data, 12);   // start
+		m_lamps[5] = BIT(data, 14);   // win / test
+		m_lamps[6] = BIT(data, 15);   // ticket?
 	}
 
 //  popmessage("%04X",data);
@@ -503,7 +503,7 @@ static const uint16_t showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x00
 
 void astrocorp_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 

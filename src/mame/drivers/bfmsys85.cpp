@@ -84,7 +84,7 @@ public:
 		m_reel3(*this, "reel3"),
 		m_acia6850_0(*this, "acia6850_0"),
 		m_meters(*this, "meters"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
@@ -140,7 +140,7 @@ protected:
 	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 };
 
 #define MASTER_CLOCK    (XTAL(4'000'000))
@@ -319,7 +319,7 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 
 	for (int i = 0; i < 8; i++ )
 	{
-		m_lamp[off] = BIT(data, i);
+		m_lamps[off] = BIT(data, i);
 		off++;
 	}
 }
@@ -355,7 +355,7 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 void bfmsys85_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////

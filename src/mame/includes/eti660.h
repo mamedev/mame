@@ -36,7 +36,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_special(*this, "SPECIAL")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER( pia_r );
@@ -65,7 +65,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<4> m_io_keyboard;
 	required_ioport m_special;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

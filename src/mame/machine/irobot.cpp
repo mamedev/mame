@@ -140,8 +140,8 @@ WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 			membank("bank1")->set_base(&RAM[0x1A000]);
 			break;
 	}
-	m_led[0] = BIT(data, 4);
-	m_led[1] = BIT(data, 5);
+	m_leds[0] = BIT(data, 4);
+	m_leds[1] = BIT(data, 5);
 }
 
 TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)

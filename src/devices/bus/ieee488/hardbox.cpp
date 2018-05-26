@@ -257,9 +257,9 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 	*/
 
-	m_led[LED_A] = BIT(~data, 0);
-	m_led[LED_B] = BIT(~data, 1);
-	m_led[LED_READY] = BIT(~data, 2);
+	m_leds[LED_A] = BIT(~data, 0);
+	m_leds[LED_B] = BIT(~data, 1);
+	m_leds[LED_READY] = BIT(~data, 2);
 }
 
 
@@ -344,7 +344,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)
 	, m_hdc(*this, CORVUS_HDC_TAG)
-	, m_led(*this, "led%u", 0U)
+	, m_leds(*this, "led%u", 0U)
 	, m_ifc(0)
 {
 }
@@ -356,7 +356,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 
 void hardbox_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 

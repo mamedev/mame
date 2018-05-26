@@ -269,13 +269,13 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 	*/
 
 	// activity led 1
-	m_led[LED_ACT1] = BIT(data, 3);
+	m_leds[LED_ACT1] = BIT(data, 3);
 
 	// activity led 0
-	m_led[LED_ACT0] = BIT(data, 4);
+	m_leds[LED_ACT0] = BIT(data, 4);
 
 	// error led
-	m_led[LED_ERR] = BIT(data, 5);
+	m_leds[LED_ERR] = BIT(data, 5);
 }
 
 static void c8280_floppies(device_slot_interface &device)
@@ -387,7 +387,7 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 	m_floppy1(*this, WD1797_TAG ":1"),
 	m_address(*this, "ADDRESS"),
 	m_floppy(nullptr),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_rfdo(1),
 	m_daco(1),
 	m_atna(1), m_ifc(0), m_fk5(0)
@@ -401,7 +401,7 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// state saving
 	save_item(NAME(m_rfdo));

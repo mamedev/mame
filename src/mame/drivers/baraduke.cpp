@@ -154,8 +154,8 @@ READ8_MEMBER(baraduke_state::inputport_r)
 
 WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
 {
-	m_lamp[0] = BIT(data, 3);
-	m_lamp[1] = BIT(data, 4);
+	m_lamps[0] = BIT(data, 3);
+	m_lamps[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
@@ -374,7 +374,7 @@ GFXDECODE_END
 
 void baraduke_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 

@@ -231,7 +231,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_READ8_MEMBER(mixport_r);
@@ -249,7 +249,7 @@ public:
 	void main_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	uint8_t m_output[8];
@@ -258,7 +258,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<10> m_lamp;
+	output_finder<9> m_lamps;
 };
 
 
@@ -356,8 +356,8 @@ READ8_MEMBER(mgames_state::mixport_r)
 
 WRITE8_MEMBER(mgames_state::outport0_w)
 {
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - BET */
-	m_lamp[5] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - BET */
+	m_lamps[4] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
 
 	m_output[0] = data;
 	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -377,8 +377,8 @@ WRITE8_MEMBER(mgames_state::outport0_w)
 
 WRITE8_MEMBER(mgames_state::outport1_w)
 {
-	m_lamp[2] = BIT(data, 0);      /* Lamp 2 - DEAL */
-	m_lamp[6] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
+	m_lamps[1] = BIT(data, 0);      /* Lamp 2 - DEAL */
+	m_lamps[5] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
 
 	m_output[1] = data;
 	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -398,8 +398,8 @@ WRITE8_MEMBER(mgames_state::outport1_w)
 
 WRITE8_MEMBER(mgames_state::outport2_w)
 {
-	m_lamp[3] = BIT(data, 0);      /* Lamp 3 - CANCEL */
-	m_lamp[7] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
+	m_lamps[2] = BIT(data, 0);      /* Lamp 3 - CANCEL */
+	m_lamps[6] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
 
 	m_output[2] = data;
 	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -419,8 +419,8 @@ WRITE8_MEMBER(mgames_state::outport2_w)
 
 WRITE8_MEMBER(mgames_state::outport3_w)
 {
-	m_lamp[4] = BIT(data, 0);      /* Lamp 4 - STAND */
-	m_lamp[8] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
+	m_lamps[3] = BIT(data, 0);      /* Lamp 4 - STAND */
+	m_lamps[7] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
 
 	m_output[3] = data;
 	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -440,7 +440,7 @@ WRITE8_MEMBER(mgames_state::outport3_w)
 
 WRITE8_MEMBER(mgames_state::outport4_w)
 {
-	m_lamp[9] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
+	m_lamps[8] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
 
 	m_output[4] = data;
 	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);

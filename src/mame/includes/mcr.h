@@ -140,7 +140,7 @@ public:
 		mcr_state(mconfig, type, tag),
 		m_coin_in_timer(*this, "coinin"),
 		m_hopper_timer(*this, "hopper"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ip0_r);
@@ -159,7 +159,7 @@ public:
 	void mcr_90009_dp(machine_config &config);
 
 protected:
-	virtual void machine_start() override { mcr_state::machine_start(); m_lamp.resolve(); }
+	virtual void machine_start() override { mcr_state::machine_start(); m_lamps.resolve(); }
 
 private:
 	uint8_t m_coin_status;
@@ -167,7 +167,7 @@ private:
 
 	required_device<timer_device> m_coin_in_timer;
 	required_device<timer_device> m_hopper_timer;
-	output_finder<14> m_lamp;
+	output_finder<14> m_lamps;
 };
 
 class mcr_nflfoot_state : public mcr_state
