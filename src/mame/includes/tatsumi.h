@@ -224,5 +224,5 @@ private:
 	uint16_t m_bigfight_last_bank;
 
 	void tile_expand();
-	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset);
+	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool rowscroll_enable);
 };
