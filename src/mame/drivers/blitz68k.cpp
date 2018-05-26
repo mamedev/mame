@@ -74,6 +74,7 @@ public:
 		, m_leds2(*this, "leds2")
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
 		, m_led(*this, "led%u", 0U)
 	{ }
 
@@ -209,6 +210,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_leds2;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_device<mc6845_device> m_crtc;
 	output_finder<17> m_led;
 };
 
@@ -918,28 +920,25 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 // CRTC
 READ8_MEMBER(blitz68k_state::crtc_r)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		return mc6845->register_r(space, 0);
+		return m_crtc->register_r(space, 0);
 	else
-		return mc6845->status_r(space, 0);
+		return m_crtc->status_r(space, 0);
 }
 
 WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		mc6845->register_w(space, 0, data);
+		m_crtc->register_w(space, 0, data);
 	else
-		mc6845->address_w(space, 0, data);
+		m_crtc->address_w(space, 0, data);
 }
 
 WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 {
-	device_t *device = machine().device("crtc");
 	// 8fe0006: 0->1
 	if (ACCESSING_BITS_8_15 && (data & 0x0100))
-		downcast<mc6845_device *>(device)->assert_light_pen_input();
+		m_crtc->assert_light_pen_input();
 	// 8fe0007: 1->0 (MCU irq?)
 }
 
