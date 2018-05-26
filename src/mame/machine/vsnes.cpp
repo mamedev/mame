@@ -184,7 +184,7 @@ void vsnes_state::v_set_videorom_bank(  int start, int count, int vrom_start_ban
 
 MACHINE_START_MEMBER(vsnes_state,vsnes)
 {
-	address_space &ppu1_space = machine().device("ppu1")->memory().space(AS_PROGRAM);
+	address_space &ppu1_space = m_ppu1->space(AS_PROGRAM);
 	int i;
 
 	/* establish nametable ram */
@@ -248,12 +248,12 @@ MACHINE_START_MEMBER(vsnes_state,vsdual)
 	m_nt_page[1][2] = m_nt_ram[1].get() + 0x800;
 	m_nt_page[1][3] = m_nt_ram[1].get() + 0xc00;
 
-	machine().device("ppu1")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
-	machine().device("ppu2")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt1_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt1_w),this));
+	m_ppu1->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
+	m_ppu2->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt1_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt1_w),this));
 	// read only!
-	machine().device("ppu1")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank2");
+	m_ppu1->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank2");
 	// read only!
-	machine().device("ppu2")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank3");
+	m_ppu2->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank3");
 	membank("bank2")->configure_entries(0, m_vrom_size[0] / 0x2000, m_vrom[0], 0x2000);
 	membank("bank3")->configure_entries(0, m_vrom_size[1] / 0x2000, m_vrom[1], 0x2000);
 	membank("bank2")->set_entry(0);
