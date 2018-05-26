@@ -436,9 +436,9 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 {
 	m_hack_self_test_is_second_read = false; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	machine().device<x2212_device>("x2212")->recall(0);
-	machine().device<x2212_device>("x2212")->recall(1);
-	machine().device<x2212_device>("x2212")->recall(0); // nvram recall
+	m_nvram->recall(0);
+	m_nvram->recall(1);
+	m_nvram->recall(0); // nvram recall
 	m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	m_duart->reset(); // reset the DUART

@@ -44,8 +44,6 @@ private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2203_device>  m_opn;
 
-	uint8_t m_joy_sel;
-
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };
 
