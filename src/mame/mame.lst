@@ -34201,6 +34201,9 @@ segasp                          //
 tetgiano                        //
 tetgiant                        //
 
+@source:segattl.cpp
+fonz                            //
+
 @source:segaufo.cpp
 newufo                          //
 newufo_nfl                      //
