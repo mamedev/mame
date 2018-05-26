@@ -13,7 +13,7 @@ Template for skeleton device
 
 #include "bus/cbus/pc9801_cbus.h"
 #include "sound/2203intf.h"
-
+#include "pc9801_snd.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,7 +21,7 @@ Template for skeleton device
 
 // ======================> pc9801_26_device
 
-class pc9801_26_device : public device_t
+class pc9801_26_device : public pc9801_snd_device
 {
 public:
 	// construction/destruction
@@ -48,8 +48,6 @@ private:
 	uint8_t m_joy_sel;
 
 	DECLARE_WRITE_LINE_MEMBER(pc9801_sound_irq);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_portb_w);
 };
 
 

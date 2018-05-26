@@ -16,7 +16,8 @@
     - Make volume work
     - Recording
 	- actual stereo sound routing (currently routes to ALL_OUTPUTS)
-	- SpeakBoard: no idea about software that uses this;
+	- SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?;
+	- verify sound irq;
 
 ***************************************************************************/
 
@@ -33,17 +34,6 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "pc9801_86")
-
-
-READ8_MEMBER(pc9801_86_device::opn_porta_r)
-{
-	if(m_joy_sel & 0x80)
-		return ioport(m_joy_sel & 0x40 ? "OPNA_PA2" : "OPNA_PA1")->read();
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(pc9801_86_device::opn_portb_w){ m_joy_sel = data; }
 
 WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 {
@@ -63,12 +53,13 @@ MACHINE_CONFIG_START(pc9801_86_device::pc9801_86_config)
 	MCFG_DEVICE_ADD("opna", YM2608, 7.987_MHz_XTAL)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc9801_86_device, sound_irq))
 	MCFG_AY8910_OUTPUT_TYPE(0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_86_device, opn_porta_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_snd_device, opn_porta_r))
 	//MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc9801_state, opn_portb_r))
 	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, pc9801_state, opn_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_86_device, opn_portb_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_snd_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
 	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // burr brown pcm61p
 	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // burr brown pcm61p
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -108,23 +99,7 @@ const tiny_rom_entry *pc9801_86_device::device_rom_region() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pc9801_86 )
-	PORT_START("OPNA_PA1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Down")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Left")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Right")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("OPNA_PA2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Down")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Left")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Right")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( pc9801_joy_port )
 
 	PORT_START("OPNA_DSW")
 	PORT_CONFNAME( 0x01, 0x01, "PC-9801-86: Port Base" )
@@ -146,7 +121,7 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
+	: pc9801_snd_device(mconfig, type, tag, owner, clock),
 		m_bus(*this, DEVICE_SELF_OWNER),
 		m_opna(*this, "opna"),
 		m_ldac(*this, "ldac"),
@@ -419,7 +394,7 @@ const tiny_rom_entry *pc9801_speakboard_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc9801_86_device - constructor
+//  pc9801_speakboard_device - constructor
 //-------------------------------------------------
 
 pc9801_speakboard_device::pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

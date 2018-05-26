@@ -14,6 +14,7 @@
 #include "bus/cbus/pc9801_cbus.h"
 #include "sound/2608intf.h"
 #include "sound/dac.h"
+#include "pc9801_snd.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,7 +22,7 @@
 
 // ======================> pc9801_86_device
 
-class pc9801_86_device : public device_t
+class pc9801_86_device : public pc9801_snd_device
 {
 public:
 	// construction/destruction
@@ -36,8 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pcm_w);
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_portb_w);
 
 protected:
 	// device-level overrides
@@ -58,7 +57,7 @@ private:
 
 	required_device<pc9801_slot_device> m_bus;
 
-	uint8_t m_joy_sel, m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
+	uint8_t m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;
 	bool m_pcmirq, m_fmirq, m_pcm_clk, m_init;
 	required_device<ym2608_device>  m_opna;
