@@ -230,11 +230,14 @@ void exidy440_state::exidy440_update_firq()
 }
 
 
-INTERRUPT_GEN_MEMBER(exidy440_state::exidy440_vblank_interrupt)
+WRITE_LINE_MEMBER(exidy440_state::vblank_interrupt_w)
 {
 	/* set the FIRQ line on a VBLANK */
-	m_firq_vblank = 1;
-	exidy440_update_firq();
+	if (state)
+	{
+		m_firq_vblank = 1;
+		exidy440_update_firq();
+	}
 }
 
 
@@ -465,6 +468,8 @@ MACHINE_CONFIG_START(exidy440_state::exidy440_video)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(exidy440_state, screen_update_exidy440)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, exidy440_state, vblank_interrupt_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("440audio", exidy440_sound_device, sound_interrupt_w))
 MACHINE_CONFIG_END
 
 
