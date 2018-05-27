@@ -29,8 +29,8 @@
 class namconb1_state : public namcos2_shared_state
 {
 public:
-	namconb1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
+	namconb1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_shared_state(mconfig, type, tag),
 		m_c116(*this, "c116"),
 		m_eeprom(*this, "eeprom"),
 		m_p1(*this, "P1"),
@@ -104,7 +104,8 @@ public:
 	void init_gslgr94u();
 	DECLARE_MACHINE_RESET(namconb);
 	DECLARE_VIDEO_START(namconb1);
-	DECLARE_VIDEO_START(namconb2);
+	DECLARE_VIDEO_START(machbrkr);
+	DECLARE_VIDEO_START(outfxies);
 	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ);
 	uint32_t screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -115,11 +116,17 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 
 	int NB1objcode2tile(int code);
-	int NB2objcode2tile(int code);
+	int NB2objcode2tile_machbrkr(int code);
+	int NB2objcode2tile_outfxies(int code);
 	void NB1TilemapCB(uint16_t code, int *tile, int *mask);
-	void NB2TilemapCB(uint16_t code, int *tile, int *mask);
+	void NB2TilemapCB_machbrkr(uint16_t code, int *tile, int *mask);
+	void NB2TilemapCB_outfxies(uint16_t code, int *tile, int *mask);
+	void NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask);
+	void NB2RozCB_outfxies(uint16_t code, int *tile, int *mask);
 	void namconb1(machine_config &config);
 	void namconb2(machine_config &config);
+	void machbrkr(machine_config &config);
+	void outfxies(machine_config &config);
 	void namcoc75_am(address_map &map);
 	void namcoc75_io(address_map &map);
 	void namconb1_am(address_map &map);

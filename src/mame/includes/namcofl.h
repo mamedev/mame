@@ -23,8 +23,8 @@
 class namcofl_state : public namcos2_shared_state
 {
 public:
-	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
+	namcofl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_shared_state(mconfig, type, tag),
 		m_c116(*this,"c116"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
@@ -84,6 +84,7 @@ public:
 	void common_init();
 	int FLobjcode2tile(int code);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
+	void RozCB(uint16_t code, int *tile, int *mask, int which);
 	void namcofl(machine_config &config);
 	void namcoc75_am(address_map &map);
 	void namcoc75_io(address_map &map);

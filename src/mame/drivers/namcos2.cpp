@@ -44,6 +44,10 @@ known issues:
     Bubble Trouble (Golly Ghost II)
     - no artwork
 
+	Metal Hawk
+	- tilemap issues
+	- ROZ wraparound isn't implemented
+
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
 number of custom ASICs to perform graphics operations, there is no
@@ -1577,19 +1581,9 @@ static const gfx_layout chr_layout = {
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64 },
-	8*64
-};
-
-static const gfx_layout roz_layout = {
-	8,8,
-	0x10000,
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
 	8*64
 };
 
@@ -1621,33 +1615,44 @@ static const gfx_layout luckywld_roz_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	{ 0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,8*16) },
 	16*128
 };
 
 static const gfx_layout metlhawk_sprite_layout = {
 	32,32,
-	0x1000, /* number of sprites */
+	RGN_FRAC(1,1), /* number of sprites */
 	8, /* bits per pixel */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248 },
-	{ 0, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096, 4352, 4608, 4864, 5120, 5376, 5632, 5888, 6144, 6400, 6656, 6912, 7168, 7424, 7680, 7936 },
+	{ STEP8(0,1) },
+	{ STEP32(0,8) },
+	{ STEP32(0,8*32) },
+	32*32*8
+};
+
+static const gfx_layout metlhawk_sprite_layout_swapped = {
+	32,32,
+	RGN_FRAC(1,1), /* number of sprites */
+	8, /* bits per pixel */
+	{ STEP8(0,1) },
+	{ STEP32(0,8*32) },
+	{ STEP32(0,8) },
 	32*32*8
 };
 
 static GFXDECODE_START( gfx_metlhawk )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, metlhawk_sprite_layout,   0*256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0x000000, luckywld_roz_layout,      0*256, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x000000, chr_layout,              16*256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, metlhawk_sprite_layout,         0*256, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0x000000, luckywld_roz_layout,            0*256, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x000000, chr_layout,                    16*256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, metlhawk_sprite_layout_swapped, 0*256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_namcos2 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, obj_layout,  0*256, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x200000, obj_layout,  0*256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, chr_layout, 16*256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0x000000, roz_layout,  0*256, 16  )
+	GFXDECODE_ENTRY( "gfx3", 0x000000, chr_layout,  0*256, 16  )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_finallap )
@@ -1918,6 +1923,13 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+MACHINE_CONFIG_END
+
+// finalap2 has different mangle
+MACHINE_CONFIG_START(namcos2_state::finalap2)
+	finallap(config);
+
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finalap2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::sgunner)
@@ -3905,7 +3917,7 @@ ROM_START( metlhawk )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD32_BYTE( "mhobj-4.5c", 0x000000, 0x40000, CRC(e3590e1a) SHA1(9afffa54a63e676f5d78a01c76ca50cd795dd6e9) )
 	ROM_LOAD32_BYTE( "mhobj-5.5a", 0x000001, 0x40000, CRC(b85c0d07) SHA1(e1ae542c0e884ef454ba57ecdfd007b85f2dc59d) )
 	ROM_LOAD32_BYTE( "mhobj-6.6c", 0x000002, 0x40000, CRC(90c4523d) SHA1(c6f84da3187ebb747445b1b7499acf5adc0f39d8) )
@@ -3976,7 +3988,7 @@ ROM_START( metlhawkj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD32_BYTE( "mhobj-4.5c", 0x000000, 0x40000, CRC(e3590e1a) SHA1(9afffa54a63e676f5d78a01c76ca50cd795dd6e9) )
 	ROM_LOAD32_BYTE( "mhobj-5.5a", 0x000001, 0x40000, CRC(b85c0d07) SHA1(e1ae542c0e884ef454ba57ecdfd007b85f2dc59d) )
 	ROM_LOAD32_BYTE( "mhobj-6.6c", 0x000002, 0x40000, CRC(90c4523d) SHA1(c6f84da3187ebb747445b1b7499acf5adc0f39d8) )
@@ -5735,7 +5747,8 @@ void namcos2_state::init_metlhawk()
 {
 	/* unscramble sprites */
 	uint8_t *data = memregion("gfx1")->base();
-	for (int i=0; i<0x200000; i+=32*32)
+	int size = memregion("gfx1")->bytes();
+	for (int i=0; i<size; i+=32*32)
 	{
 		for (int j=0; j<32*32; j+=32*4)
 		{
@@ -5772,18 +5785,6 @@ void namcos2_state::init_metlhawk()
 					data[a+l+32] = data[a+l+32*3];
 					data[a+l+32*3] = v;
 				} /* next l */
-			} /* next k */
-		} /* next j */
-	} /* next i */
-
-	/* 90 degrees prepare a turned character */
-	for (int i=0; i<0x200000; i+=32*32)
-	{
-		for (int j=0; j<32; j++)
-		{
-			for (int k=0; k<32; k++)
-			{
-				data[0x200000+i+j*32+k] = data[i+j+k*32];
 			} /* next k */
 		} /* next j */
 	} /* next i */
@@ -5875,16 +5876,7 @@ void namcos2_state::init_luckywld()
 	for( i=0; i<32*0x4000; i++ )
 	{ /* unscramble gfx mask */
 		int code = pData[i];
-		int out = 0;
-		if( code&0x01 ) out |= 0x80;
-		if( code&0x02 ) out |= 0x40;
-		if( code&0x04 ) out |= 0x20;
-		if( code&0x08 ) out |= 0x10;
-		if( code&0x10 ) out |= 0x08;
-		if( code&0x20 ) out |= 0x04;
-		if( code&0x40 ) out |= 0x02;
-		if( code&0x80 ) out |= 0x01;
-		pData[i] = out;
+		pData[i] = bitswap<8>(code, 0, 1, 2, 3, 4, 5, 6, 7);
 	}
 	m_gametype = NAMCOS2_LUCKY_AND_WILD;
 }
@@ -5904,8 +5896,8 @@ GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assau
 GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj,      ROT90, "Namco", "Assault (Japan)", 0 )
 GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state, init_assaultp_hack, ROT90, "Namco", "Assault Plus (Japan)", 0)
 
-GAME(  1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", 0)
-GAME(  1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", 0)
+GAME(  1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME(  1988, ordyne,     0,        base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (World)", 0 )
 GAME(  1988, ordyneje,   ordyne,   base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", 0 )

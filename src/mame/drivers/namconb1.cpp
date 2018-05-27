@@ -1049,10 +1049,10 @@ static GFXDECODE_START( gfx_namconb1 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
 GFXDECODE_END /* gfxdecodeinfo */
 
-static GFXDECODE_START( gfx_2 )
+static GFXDECODE_START( gfx_namconb2 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
-	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION, 0, roz_layout,      0x1800, 0x08 )
+	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION,     0, roz_layout,  0x1800, 0x08 )
 GFXDECODE_END /* gfxdecodeinfo2 */
 
 
@@ -1134,7 +1134,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namconb2)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
@@ -1150,6 +1150,18 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(namconb1_state::machbrkr)
+	namconb2(config);
+
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,machbrkr)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(namconb1_state::outfxies)
+	namconb2(config);
+
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,outfxies)
 MACHINE_CONFIG_END
 
 
@@ -2004,7 +2016,7 @@ GAME( 1996, sws96,    0,        namconb1, namconb1, namconb1_state, init_sws96, 
 GAME( 1997, sws97,    0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, outfxies, 0,        namconb2, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj,outfxies, namconb2, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj,machbrkr, namconb2, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies, 0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr, 0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1995, machbrkrj,machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )

@@ -16,20 +16,15 @@ void namcos2_shared_state::c123_tilemap_invalidate(void)
 	}
 } /* namco_tilemap_invalidate */
 
-inline void namcos2_shared_state::namcoic_get_tile_info(tile_data &tileinfo,int tile_index,uint16_t *vram)
+template<int Offset>
+TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info )
 {
+	const uint16_t *vram = &m_c123_TilemapInfo.videoram[Offset];
 	int tile, mask;
 	m_c123_TilemapInfo.cb( vram[tile_index], &tile, &mask );
 	tileinfo.mask_data = m_c123_TilemapInfo.maskBaseAddr+mask*8;
 	SET_TILE_INFO_MEMBER(m_c123_TilemapInfo.gfxbank,tile,0,0);
 } /* get_tile_info */
-
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info0 ) { namcoic_get_tile_info(tileinfo,tile_index,&m_c123_TilemapInfo.videoram[0x0000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info1 ) { namcoic_get_tile_info(tileinfo,tile_index,&m_c123_TilemapInfo.videoram[0x1000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info2 ) { namcoic_get_tile_info(tileinfo,tile_index,&m_c123_TilemapInfo.videoram[0x2000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info3 ) { namcoic_get_tile_info(tileinfo,tile_index,&m_c123_TilemapInfo.videoram[0x3000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info4 ) { namcoic_get_tile_info(tileinfo,tile_index,&m_c123_TilemapInfo.videoram[0x4008]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info5 ) { namcoic_get_tile_info(tileinfo,tile_index,&m_c123_TilemapInfo.videoram[0x4408]); }
 
 void namcos2_shared_state::c123_tilemap_init( int gfxbank, void *maskBaseAddr, c123_tilemap_delegate tilemap_cb )
 {
@@ -39,14 +34,14 @@ void namcos2_shared_state::c123_tilemap_init( int gfxbank, void *maskBaseAddr, c
 	m_c123_TilemapInfo.videoram = std::make_unique<uint16_t[]>( 0x10000 );
 
 		/* four scrolling tilemaps */
-		m_c123_TilemapInfo.tmap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		m_c123_TilemapInfo.tmap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		m_c123_TilemapInfo.tmap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		m_c123_TilemapInfo.tmap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		m_c123_TilemapInfo.tmap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x0000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		m_c123_TilemapInfo.tmap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x1000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		m_c123_TilemapInfo.tmap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x2000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		m_c123_TilemapInfo.tmap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x3000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 		/* two non-scrolling tilemaps */
-		m_c123_TilemapInfo.tmap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-		m_c123_TilemapInfo.tmap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+		m_c123_TilemapInfo.tmap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x4008>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+		m_c123_TilemapInfo.tmap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x4408>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
 		/* define offsets for scrolling */
 		for( int i = 0; i < 4; i++ )
@@ -436,7 +431,6 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 	 *  x--------------- unknown
 	 */
 	const uint16_t *pSource = m_spriteram;
-	rectangle rect;
 	int loop;
 	if( pri==0 )
 	{
@@ -470,13 +464,13 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 			int sy = (0x1ff-(ypos&0x01ff))-0x50+0x02;
 			int flipx = flags&2;
 			int flipy = flags&4;
-			int scalex = (sizex<<16)/(bBigSprite?0x20:0x10);
+			int scalex = (sizex<<16)/(0x20);//(sizex<<16)/(bBigSprite?0x20:0x10); correct formula?
 			int scaley = (sizey<<16)/(bBigSprite?0x20:0x10);
 
-			if( (flags&0x01) )
-			{ /* swap xy */
-				sprn |= 0x800;
-			}
+			/* swap xy */
+			int rgn = (flags&0x01) ? 3 : 0;
+
+			gfx_element *gfx = m_gfxdecode->gfx(rgn);
 
 			if( bBigSprite )
 			{
@@ -488,33 +482,16 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 				{
 					sy += (0x20-sizey)/0xC;
 				}
+				gfx->set_source_clip(0, 32, 0, 32);
 			}
+			else
+				gfx->set_source_clip((tile&0x0001) ? 16 : 0, 16, (tile&0x0002) ? 16 : 0, 16);
 
-			/* Set the clipping rect to mask off the other portion of the sprite */
-			rect.set(sx, sx+(sizex-1), sy, sy+(sizey-1));
-			rect &= cliprect;
-
-			if( !bBigSprite )
-			{
-				sizex = 16;
-				sizey = 16;
-				scalex = 1<<16;
-				scaley = 1<<16;
-
-				sx -= (tile&1)?16:0;
-				sy -= (tile&2)?16:0;
-
-				rect.set(sx, sx+(sizex-1), sy, sy+(sizey-1));
-				rect.min_x += (tile&1)?16:0;
-				rect.max_x += (tile&1)?16:0;
-				rect.min_y += (tile&2)?16:0;
-				rect.max_y += (tile&2)?16:0;
-			}
 			zdrawgfxzoom(
 				screen,
 				bitmap,
-				rect,
-				m_gfxdecode->gfx(0),
+				cliprect,
+				gfx,
 				sprn, color,
 				flipx,flipy,
 				sx,sy,
@@ -865,58 +842,13 @@ READ16_MEMBER( namcos2_shared_state::c355_obj_ram_r )
 /**
  * Graphics ROM addressing varies across games.
  */
-void namcos2_shared_state::c169_roz_get_info(tile_data &tileinfo, int tile_index, int which)
+template<int Which>
+TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info )
 {
-	uint16_t tile = m_c169_roz_videoram[tile_index] & 0x3fff; // cap mask offset
-	int bank, mangle;
-
-	switch (m_gametype)
-	{
-		case NAMCONB2_MACH_BREAKERS:
-			bank = nth_byte16(&m_c169_roz_bank[which * 8 / 2], (tile >> 11) & 0x7);
-			tile = (tile & 0x7ff) | (bank << 11);
-			mangle = tile;
-			break;
-
-		case NAMCONB2_OUTFOXIES:
-			bank = nth_byte16(&m_c169_roz_bank[which * 8 / 2], (tile >> 11) & 0x7);
-			tile = (tile & 0x7ff) | (bank << 11);
-			mangle = bitswap<19>(tile & 0x7ffff, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 4, 5, 6, 3, 2, 1, 0);
-			break;
-
-		case NAMCOS2_LUCKY_AND_WILD:
-			mangle = bitswap<11>(tile & 0x31ff, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-			switch ((tile >> 9) & 7)
-			{
-				case 0x00: mangle += 0x1c00; break; // Plus, NOT OR
-				case 0x01: mangle |= 0x0800; break;
-				case 0x02: mangle |= 0x0000; break;
-				default: break;
-			}
-			break;
-
-		case NAMCOS2_METAL_HAWK:
-			mangle = bitswap<13>(tile & 0x1fff, 11, 10, 9, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-			break;
-
-		default:
-		case NAMCOFL_SPEED_RACER:
-		case NAMCOFL_FINAL_LAP_R:
-			mangle = tile;
-			break;
-	}
-	SET_TILE_INFO_MEMBER(m_c169_roz_gfxbank, mangle, 0/*color*/, 0/*flag*/);
+	int tile, mask;
+	m_c169_cb( m_c169_roz_videoram[tile_index] & 0x3fff, &tile, &mask, Which );
 	tileinfo.mask_data = m_c169_roz_mask + 32*tile;
-}
-
-TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info0 )
-{
-	c169_roz_get_info(tileinfo, tile_index, 0);
-}
-
-TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info1 )
-{
-	c169_roz_get_info(tileinfo, tile_index, 1);
+	SET_TILE_INFO_MEMBER(m_c169_roz_gfxbank, tile, 0/*color*/, 0/*flag*/);
 }
 
 TILEMAP_MAPPER_MEMBER( namcos2_shared_state::c169_roz_mapper )
@@ -924,19 +856,20 @@ TILEMAP_MAPPER_MEMBER( namcos2_shared_state::c169_roz_mapper )
 	return ((col & 0x80) << 8) | ((row & 0xff) << 7) | (col & 0x7f);
 }
 
-void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion)
+void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion, c169_tilemap_delegate tilemap_cb)
 {
 	m_c169_roz_gfxbank = gfxbank;
 	m_c169_roz_mask = memregion(maskregion)->base();
+	m_c169_cb = tilemap_cb;
 
 	m_c169_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info0), this),
+			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info<0>), this),
 			tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
 			16,16,
 			256,256);
 
 	m_c169_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info1), this),
+			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info<1>), this),
 			tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
 			16,16,
 			256,256);
@@ -1088,7 +1021,7 @@ void namcos2_shared_state::c169_roz_draw(screen_device &screen, bitmap_ind16 &bi
 			// second ROZ layer is configured to use per-scanline registers
 			if (which == special && mode == 0x8000)
 			{
-				for (int line = 0; line < 224; line++)
+				for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 					c169_roz_draw_scanline(screen, bitmap, line, which, pri, cliprect);
 			}
 			else
