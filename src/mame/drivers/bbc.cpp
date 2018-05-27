@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(bbc_state::bbcbp)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_WD1770_ADD("wd1770", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1414,7 +1414,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* fdc */
-	MCFG_WD1770_ADD("wd1770", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1613,7 +1613,7 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770")
 
-	MCFG_WD1772_ADD("wd1772", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 

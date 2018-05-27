@@ -539,12 +539,12 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 MACHINE_CONFIG_START(sbrain_state::sbrain)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sbrain_mem)
 	MCFG_DEVICE_IO_MAP(sbrain_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
 	MCFG_DEVICE_IO_MAP(sbrain_subio)
 
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	//MCFG_DEVICE_ADD("crtc", DP8350, XTAL(10'920'000))
+	//MCFG_DEVICE_ADD("crtc", DP8350, 10.92_MHz_XTAL)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -581,13 +581,13 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // BR1941L
+	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL) // BR1941L
 	MCFG_COM8116_FR_HANDLER(WRITELINE("uart0", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart0", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
 
-	MCFG_FD1791_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("fdc", FD1791, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

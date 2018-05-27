@@ -616,11 +616,11 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 #endif
 
 MACHINE_CONFIG_START(esq5505_state::vfx)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("maincpu", M68000, 10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(vfx_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, 10_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -642,11 +642,11 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, 10_MHz_XTAL / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("otis", ES5505, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("otis", ES5505, 10_MHz_XTAL)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
@@ -687,20 +687,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::vfxsd)
 	vfx(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
 MACHINE_CONFIG_START(esq5505_state::vfx32)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 30.4761_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, 10_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -722,11 +722,11 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, 30.4761_MHz_XTAL / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("otis", ES5505, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("otis", ES5505, 30.4761_MHz_XTAL / 2)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
 	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 

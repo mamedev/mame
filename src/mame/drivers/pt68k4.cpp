@@ -404,14 +404,14 @@ void pt68k4_isa8_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(16'000'000)/2)    // 68k2 came in 8, 10, and 12 MHz versions
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, 16_MHz_XTAL / 2)    // 68k2 came in 8, 10, and 12 MHz versions
 	MCFG_DEVICE_PROGRAM_MAP(pt68k2_mem)
 
-	MCFG_DEVICE_ADD("duart1", MC68681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart1", MC68681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, pt68k4_state, duart1_irq))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, pt68k4_state, duart1_out))
 
-	MCFG_DEVICE_ADD("duart2", MC68681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart2", MC68681, 3.6864_MHz_XTAL)
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, pt68k4_state, keyboard_clock_w))
@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
-	MCFG_WD1772_ADD(WDFDC_TAG, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_ADD(WDFDC_TAG, WD1772, 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":0", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":1", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 

@@ -121,7 +121,7 @@ public:
 
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */
-#define PIXEL_CLOCK XTAL(4'433'619)
+#define PIXEL_CLOCK 4.433619_MHz_XTAL
 
 
 MC6845_UPDATE_ROW( m20_state::update_row )
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_FD1797_ADD("fd1797", 1000000)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("i8259", pic8259_device, ir0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)

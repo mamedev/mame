@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),896,0,300,262,0,200)
+	MCFG_SCREEN_RAW_PARAMS(14.318181_MHz_XTAL, 896, 0, 300, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DEVICE(VID_MC6845_NAME, mc6845_device, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mbc55x_state, screen_vblank_mbc55x))
 
@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portc_w))
 
-	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, XTAL(14'318'181)/8)
+	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc55x_state, crtc_update_row)
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	MCFG_FD1793_ADD(FDC_TAG, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(FDC_TAG, FD1793, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)

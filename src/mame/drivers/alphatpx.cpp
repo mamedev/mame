@@ -1205,13 +1205,13 @@ void alphatp_12_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(6'000'000))
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(alphatp2_mem)
 	MCFG_DEVICE_IO_MAP(alphatp2_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
+	MCFG_DEVICE_ADD("kbdmcu", I8041, 12.8544_MHz_XTAL / 2)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_12_state, kbd_matrix_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_matrix_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_12_state, kbd_port2_r))
@@ -1226,12 +1226,12 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'854'400), 824, 0, 640, 312, 0, 288)
+	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
 	MCFG_SCREEN_UPDATE_DRIVER(alphatp_12_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("crtc", CRT5027, XTAL(12'854'400) / 8)
+	MCFG_DEVICE_ADD("crtc", CRT5027, 12.8544_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 	MCFG_TMS9927_HSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
@@ -1245,9 +1245,9 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	// XTAL(4'915'200) serial clock
+	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcirq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcdrq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_12_state, fdchld_w))
@@ -1287,13 +1287,13 @@ void alphatp_34_state::machine_reset()
 	m_88_da = m_85_da = m_88_started = false;
 }
 MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(6'000'000))
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(alphatp3_mem)
 	MCFG_DEVICE_IO_MAP(alphatp3_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
+	MCFG_DEVICE_ADD("kbdmcu", I8041, 12.8544_MHz_XTAL /2)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_34_state, kbd_matrix_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_matrix_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_34_state, kbd_port2_r))
@@ -1308,12 +1308,12 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'854'400), 824, 0, 640, 312, 0, 288)
+	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
 	MCFG_SCREEN_UPDATE_DRIVER(alphatp_34_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, XTAL(12'854'400) / 8)
+	MCFG_DEVICE_ADD("crtc", CRT5037, 12.8544_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -1326,9 +1326,9 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	// XTAL(4'915'200) serial clock
+	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcirq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcdrq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_34_state, fdchld_w))

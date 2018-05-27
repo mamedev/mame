@@ -55,7 +55,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bml3bus_mp1802_device::device_add_mconfig)
-	MCFG_MB8866_ADD("fdc", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("fdc", MB8866, 1_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bml3bus_mp1802_device, bml3_wd17xx_intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mp1802_floppies, "dd", floppy_image_device::default_floppy_formats)

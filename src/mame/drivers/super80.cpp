@@ -226,7 +226,7 @@ ToDo:
 #include "super80.lh"
 
 
-#define MASTER_CLOCK    (XTAL(12'000'000))
+#define MASTER_CLOCK    (12_MHz_XTAL)
 #define PIXEL_CLOCK (MASTER_CLOCK/2)
 #define HTOTAL      (384)
 #define HBEND       (0)
@@ -865,7 +865,7 @@ MACHINE_CONFIG_START(super80_state::super80r)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super80_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super80_state, io_write_byte))
 
-	MCFG_WD2793_ADD("fdc", XTAL(2'000'000))
+	MCFG_DEVICE_ADD("fdc", WD2793, 2_MHz_XTAL)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

@@ -135,7 +135,7 @@ MACHINE_CONFIG_START(orion_state::orion128)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)

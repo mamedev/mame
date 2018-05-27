@@ -505,7 +505,7 @@ void mycom_state::init_mycom()
 
 MACHINE_CONFIG_START(mycom_state::mycom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu",Z80, 10_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(mycom_map)
 	MCFG_DEVICE_IO_MAP(mycom_io)
 
@@ -545,13 +545,15 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(10'000'000) / 4)
+	MCFG_DEVICE_ADD("sn1", SN76489, 10_MHz_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */
-	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_FD1771_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+
+	MCFG_CASSETTE_ADD("cassette")
+
+	MCFG_DEVICE_ADD("fdc", FD1771, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)

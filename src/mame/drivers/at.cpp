@@ -435,7 +435,7 @@ static void pci_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(12'000'000)/2 /*6000000*/)
+	MCFG_DEVICE_ADD("maincpu", I80286, 12_MHz_XTAL / 2 /*6000000*/)
 	MCFG_DEVICE_PROGRAM_MAP(at16_map)
 	MCFG_DEVICE_IO_MAP(at16_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -461,13 +461,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::ibm5170a)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/2)
+	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ews286)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/2) // Exact crystal needs to be verified, 8 MHz according to specification
+	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 2) // Exact crystal needs to be verified, 8 MHz according to specification
 
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K) // From pictures but also with a 3.5" as second floppy
@@ -495,7 +495,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_vrom_fix_state::ibmps1)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(10'000'000))
+	MCFG_DEVICE_CLOCK(10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(at16l_map)
 	MCFG_DEVICE_IO_MAP(ps1_16_io)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -611,7 +611,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::pc30iii)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
+	MCFG_DEVICE_CLOCK(6000000) // should be 24_MHz_XTAL / 2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be ATI EGA Wonder 800+
 MACHINE_CONFIG_END
@@ -620,18 +620,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::pc40iii)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
+	MCFG_DEVICE_CLOCK(6000000) // should be 24_MHz_XTAL / 2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megapc_state::megapc)
-	MCFG_DEVICE_ADD("maincpu", I386SX, XTAL(50'000'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", I386SX, 50_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(megapc_map)
 	MCFG_DEVICE_IO_MAP(megapc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
-	MCFG_WD7600_ADD("wd7600",XTAL(50'000'000) / 2, ":maincpu", ":isa", ":bios", ":keybc")
+	MCFG_WD7600_ADD("wd7600", 50_MHz_XTAL / 2, ":maincpu", ":isa", ":bios", ":keybc")
 	MCFG_WD7600_HOLD(WRITELINE(*this, megapc_state, wd7600_hold));
 	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
 	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	// ISA cards
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, 12_MHz_XTAL)
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE("wd7600", wd7600_device, kbrst_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE("wd7600", wd7600_device, gatea20_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("wd7600", wd7600_device, irq01_w))
@@ -788,7 +788,7 @@ MACHINE_CONFIG_END
 // Compaq Portable III
 MACHINE_CONFIG_START(at_state::comportiii)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, 48_MHz_XTAL/4 /*12000000*/)
+	MCFG_DEVICE_ADD("maincpu", I80286, 48_MHz_XTAL / 4 /*12000000*/)
 	MCFG_DEVICE_PROGRAM_MAP(at16_map)
 	MCFG_DEVICE_IO_MAP(at16_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -818,7 +818,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::comportii)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(48_MHz_XTAL/6)
+	MCFG_DEVICE_CLOCK(48_MHz_XTAL / 6)
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_360K)
 	MCFG_DEVICE_MODIFY("isa4")

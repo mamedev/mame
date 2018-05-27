@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_PIT8253_CLK2(1228800)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259_1", pic8259_device, ir1_w))
 
-	MCFG_FD1797_ADD("fd1797", 2000000)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259_2", pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, altos8600_state, fddrq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)

@@ -42,9 +42,9 @@ public:
 };
 
 
-#define X1_MAIN_CLOCK XTAL(16'000'000)
-#define VDP_CLOCK  XTAL(42'954'545)
-#define MCU_CLOCK  XTAL(6'000'000)
+#define X1_MAIN_CLOCK 16_MHz_XTAL
+#define VDP_CLOCK  42.954545_MHz_XTAL
+#define MCU_CLOCK  6_MHz_XTAL
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
-	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	MCFG_DEVICE_ADD("fdc", MB8877, MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 

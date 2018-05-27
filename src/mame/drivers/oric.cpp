@@ -776,13 +776,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(oric_state::oric)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/12)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12_MHz_XTAL / 12)
 	MCFG_DEVICE_PROGRAM_MAP(oric_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
+	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL / 2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, oric_state, vblank_w))
 
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(oric_state::oric)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
+	MCFG_DEVICE_ADD("ay8912", AY8912, 12_MHz_XTAL / 12)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, oric_state, psg_a_w))
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape_timer", oric_state, update_tape, attotime::from_hz(4800))
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522", VIA6522, XTAL(12'000'000)/12 )
+	MCFG_DEVICE_ADD("via6522", VIA6522, 12_MHz_XTAL / 12)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, oric_state, via_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, oric_state, via_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, oric_state, via_ca2_w))
@@ -841,11 +841,11 @@ MACHINE_CONFIG_START(telestrat_state::telstrat)
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, telestrat_state, acia_irq_w))
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522_2", VIA6522, XTAL(12'000'000)/12 )
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, 12_MHz_XTAL / 12)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, telestrat_state, via2_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, telestrat_state, via2_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, telestrat_state, via2_ca2_w))
@@ -853,7 +853,7 @@ MACHINE_CONFIG_START(telestrat_state::telstrat)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, telestrat_state, via2_irq_w))
 
 	/* microdisc */
-	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
+	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, telestrat_state, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, telestrat_state, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, telestrat_state, fdc_hld_w))

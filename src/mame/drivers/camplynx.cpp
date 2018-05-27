@@ -855,7 +855,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx_common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(camplynx_state::lynx_disk)
-	MCFG_FD1793_ADD("fdc", 24_MHz_XTAL / 24)
+	MCFG_DEVICE_ADD("fdc", FD1793, 24_MHz_XTAL / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
@@ -887,7 +887,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'000'000) / 8 )
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12_MHz_XTAL / 8 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)

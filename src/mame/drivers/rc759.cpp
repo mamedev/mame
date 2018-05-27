@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, rc759_state, ppi_portc_w))
 
 	// rtc
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir3_w))
 
 	// video
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("snd", SN76489A, XTAL(20'000'000) / 10)
+	MCFG_DEVICE_ADD("snd", SN76489A, 20_MHz_XTAL / 10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// internal centronics
@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 
 	// floppy disk controller
-	MCFG_WD2797_ADD("fdc", 1000000)
+	MCFG_DEVICE_ADD("fdc", WD2797, 1000000)
 //  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir0_w))
 //  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
 

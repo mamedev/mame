@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(polydev_state::polydev)
 	poly(config);
 
 	/* fdc */
-	MCFG_FD1771_ADD("fdc", 12.0_MHz_XTAL / 12)
+	MCFG_DEVICE_ADD("fdc", FD1771, 12.0_MHz_XTAL / 12)
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, polydev_state, motor_w))
 	MCFG_WD_FDC_FORCE_READY
 

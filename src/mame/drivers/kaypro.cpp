@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("serial", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
 
-	MCFG_FD1793_ADD("fdc", 20_MHz_XTAL / 20)
+	MCFG_DEVICE_ADD("fdc", FD1793, 20_MHz_XTAL / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_COM8116_FT_HANDLER(WRITELINE("sio_2", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_2", z80sio_device, txca_w))
 
-	MCFG_FD1793_ADD("fdc", 16_MHz_XTAL / 16)
+	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY

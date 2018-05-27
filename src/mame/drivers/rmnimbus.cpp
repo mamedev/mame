@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(4'433'619)*2,650,0,640,260,0,250)
+	MCFG_SCREEN_RAW_PARAMS(4.433619_MHz_XTAL * 2,650,0,640,260,0,250)
 	MCFG_SCREEN_UPDATE_DRIVER(rmnimbus_state, screen_update_nimbus)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
@@ -132,7 +132,7 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Backing storage */
-	MCFG_WD2793_ADD(FDC_TAG, 1000000)
+	MCFG_DEVICE_ADD(FDC_TAG, WD2793, 1000000)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, rmnimbus_state,nimbus_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, rmnimbus_state,nimbus_fdc_drq_w))

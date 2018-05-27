@@ -47,7 +47,7 @@ void cumana_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(electron_cumana_device::device_add_mconfig)
 	/* fdc */
-	MCFG_FD1793_ADD("fdc", 16_MHz_XTAL / 16) // TODO: Not known whether DRQ and INTRQ are connected
+	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16) // TODO: Not known whether DRQ and INTRQ are connected
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", cumana_floppies, "525qd", electron_cumana_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", cumana_floppies, nullptr, electron_cumana_device::floppy_formats)
