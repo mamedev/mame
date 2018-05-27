@@ -546,6 +546,7 @@ void tatsumi_state::draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect
 
 		lines = src1[2];
 		y_offset = src1[0]&0xf8;
+		
 		lines -= y_offset;
 
 		render_x = x << 16;
@@ -1027,7 +1028,7 @@ if (0) {
 
 uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	update_cluts(1024, 0, 2048);
+	update_cluts(1024, 0, 2048+2048);
 
 	m_tx_layer->set_scrollx(0,24);
 

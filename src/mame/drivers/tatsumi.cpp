@@ -30,8 +30,6 @@
       game uses different sized tilemaps - these are probably software
       controlled rather than hardwired, but I don't think either game
       changes the size at runtime.
-	- Apache 3 (Kana): wrong colors for most sprites in city stage (buildings/trees), 
-	  checkable in attract mode;
 	- Split these games into individual drivers, write new devices for video routines.
     - Dip switches
 	- Deviceify HD6445 (superset of 6845)
@@ -853,7 +851,7 @@ static const gfx_layout roundup5_vramlayout =
 };
 
 static GFXDECODE_START( gfx_apache3 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    1024, 128)
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    1024, 256)
 	GFXDECODE_ENTRY( "text",    0, gfx_8x8x3_planar, 768,  16)
 GFXDECODE_END
 
