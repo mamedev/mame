@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(mpcb828_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("ramdac", BT458, 83'020'800)
 
-	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("scc", SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, mpcb828_device, scc_irq))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
 
@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(mpcb849_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("ramdac", BT458, 0) // unconfirmed clock
 
-	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("scc", SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, mpcb849_device, scc_irq))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
 
@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(msmt094_device::device_add_mconfig)
 	//MCFG_DEVICE_ADD("dsp3", TMS32030, 40_MHz_XTAL)
 
 	// FIXME: actually Z0853006VSC
-	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("scc", SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, msmt094_device, scc_irq))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
 

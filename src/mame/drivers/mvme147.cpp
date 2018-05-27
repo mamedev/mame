@@ -184,7 +184,7 @@
 #endif
 
 /* from documentataion: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
-#define BAUDGEN_CLOCK XTAL(5'000'000)
+#define BAUDGEN_CLOCK 5_MHz_XTAL
 #define SCC_CLOCK (BAUDGEN_CLOCK) /* This gives prompt at the RS232 terminal device (9600) */
 
 class mvme147_state : public driver_device
@@ -650,24 +650,24 @@ static void mvme147_vme_cards(device_slot_interface &device)
  */
 MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68030, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP (mvme147_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mvme147_mem)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, mvme147_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, mvme147_vme_cards, nullptr)
 
 	MCFG_M48T02_ADD("m48t18") /* t08 differs only in accepted voltage levels compared to t18 */
 
 	/* Terminal Port config */
-	MCFG_SCC85C30_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("scc", SCC85C30, SCC_CLOCK)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232trm", rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232trm", rs232_port_device, write_dtr))
 	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232trm", rs232_port_device, write_rts))
 
-	MCFG_DEVICE_ADD ("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc85c30_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc85c30_device, ctsa_w))
 
-	MCFG_SCC85C30_ADD("scc2", SCC_CLOCK, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("scc2", SCC85C30, SCC_CLOCK)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
