@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_DEVICE_ADD ("aciaremt", ACIA6850, 0)
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200))
+	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(WRITELINE (*this, force68k_state, write_f1_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (*this, force68k_state, write_f3_clock))
 	MCFG_MC14411_F5_CB(WRITELINE (*this, force68k_state, write_f5_clock))
