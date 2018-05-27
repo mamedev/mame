@@ -119,17 +119,21 @@ READ8_MEMBER(markham_state::banbam_protection_r)
 			break;
 		case 0x40:
 			// palette/gfx select
-			arg = prot_rom[0x7C5 + (arg * 4)]; break;
+			arg = prot_rom[0x7C5 + (arg * 4)];
+			break;
 		case 0x60:
 			// enemy wave timer trigger
 			// randomized for now
-			arg = machine().rand(); break;
+			arg = machine().rand();
+			break;
 		case 0x70:
 			// ??
-			arg++; break;
+			arg++;
+			break;
 		case 0xb0:
 			// ??
-			arg = arg + 3; break;
+			arg = arg + 3;
+			break;
 		default:
 			logerror("unknown command %02x, argument is %02x \n", comm, arg);
 			arg = 0;
