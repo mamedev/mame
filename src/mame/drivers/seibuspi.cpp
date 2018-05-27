@@ -2967,6 +2967,38 @@ ROM_START( rdftu )
 	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
 ROM_END
 
+ROM_START( rdftua ) // This set uses SXX2C ROM SUB4 cart. Identical with rdftadi / rdftam / rdftjb sets except prog rom 1
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("seibu_1.211",    0x000000, 0x80000, CRC(ddbadc30) SHA1(d419847db8b7f4ca6f161bfa309314eafeea8b40) )
+	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
+	ROM_LOAD24_BYTE("seibu_7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+
+	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("gun_dogs_bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("gun_dogs_bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("gun_dogs_bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("gun_dogs_bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
+
+	ROM_REGION( 0xc00000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("gun_dogs_obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("gun_dogs_obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("gun_dogs_obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_WORD("raiden-f_pcm2.u0217", 0x000000, 0x100000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
+	ROM_CONTINUE(                          0x400000, 0x100000 )
+	/* SOUND1 socket is unpopulated */
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
+ROM_END
+
 ROM_START( rdftj )
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
 	ROM_LOAD32_BYTE("gd_1.211", 0x000000, 0x80000, CRC(f6b2cbdc) SHA1(040c4ff961c8be388c8279b06b777d528c2acc1b) )
@@ -4086,10 +4118,11 @@ GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, init_vip
 GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, init_ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftja,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftjb,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftja,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earliest)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftjb,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftua,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftam,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftadi,    rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftau,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Australia)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
