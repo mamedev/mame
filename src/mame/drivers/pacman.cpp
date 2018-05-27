@@ -5876,7 +5876,7 @@ ROM_START( eyesb )
 	ROM_LOAD( "11.bin",          0x1800, 0x0800, CRC(aaa7a537) SHA1(571d981ed2aad62d7c7f2798e9084228d45523d4) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "7051.bin",        0x0000, 0x0020, BAD_DUMP CRC(0dad2ccb) SHA1(f42c5ee7084e5702b5b0c8c1d86b0a41a6e1821d) ) // 3x bytes bad
+	ROM_LOAD( "7051.bin",        0x0000, 0x0020, CRC(2c3cc909) SHA1(32d68d4cfdf9f3e7351353428d268c763e809c63) ) // fixed 3x bytes with inverse second half
 	ROM_LOAD( "7051-3.bin",      0x0020, 0x0100, CRC(d8d78829) SHA1(19820d1651423210083a087fb70ebea73ad34951) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
