@@ -64,7 +64,7 @@
 #define SH_FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
 /* SR shift values */
-#define T_SHIFT	0
+#define T_SHIFT 0
 #define S_SHIFT 1
 #define I_SHIFT 4
 #define Q_SHIFT 8

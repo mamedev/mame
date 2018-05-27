@@ -31,7 +31,6 @@ Known to exist but not dumped:
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
-#include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
 #include "crusnusa.lh"
@@ -69,9 +68,6 @@ void midvunit_state::machine_reset()
 
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
-
-	m_timer[0] = machine().device<timer_device>("timer0");
-	m_timer[1] = machine().device<timer_device>("timer1");
 }
 
 
@@ -83,10 +79,7 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
 
-	m_timer[0] = machine().device<timer_device>("timer0");
-	m_timer[1] = machine().device<timer_device>("timer1");
-
-	machine().device("ata")->reset();
+	m_ata->reset();
 }
 
 
@@ -1878,7 +1871,7 @@ void midvunit_state::init_wargods()
 	default_nvram[0x12] = default_nvram[0x32] = 0xaf;
 	default_nvram[0x17] = default_nvram[0x37] = 0xd8;
 	default_nvram[0x18] = default_nvram[0x38] = 0xe7;
-	machine().device<midway_ioasic_device>("ioasic")->set_default_nvram(default_nvram);
+	m_midway_ioasic->set_default_nvram(default_nvram);
 
 	/* speedups */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));

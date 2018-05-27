@@ -72,8 +72,8 @@ public:
 	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midzeus_state(mconfig, type, tag)
 		, m_zeus(*this, "zeus2")
-		, m_led(*this, "led%u", 0U)
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
@@ -91,15 +91,15 @@ public:
 protected:
 	virtual void machine_start() override
 	{
-		MACHINE_START_CALL_MEMBER(midzeus);		
-		m_led.resolve();
-		m_lamp.resolve();
+		MACHINE_START_CALL_MEMBER(midzeus);
+		m_leds.resolve();
+		m_lamps.resolve();
 	}
 
 private:
 	required_device<zeus2_device> m_zeus;
-	output_finder<32> m_led;
-	output_finder<8> m_lamp;
+	output_finder<32> m_leds;
+	output_finder<8> m_lamps;
 };
 
 
@@ -448,7 +448,7 @@ WRITE32_MEMBER(midzeus2_state::crusnexo_leds_w)
 
 		case 1: /* controls lamps */
 			for (bit = 0; bit < 8; bit++)
-				m_lamp[bit] = BIT(data, bit);
+				m_lamps[bit] = BIT(data, bit);
 			break;
 
 		case 2: /* sets state of selected LEDs */
@@ -462,7 +462,7 @@ WRITE32_MEMBER(midzeus2_state::crusnexo_leds_w)
 			for (bit = 0; bit < 3; bit++)
 				if ((crusnexo_leds_select & (1 << bit)) == 0)
 					for (led = 0; led < 8; led++)
-						m_led[bit * 8 + led] = BIT(~data, led);
+						m_leds[bit * 8 + led] = BIT(~data, led);
 			break;
 
 		case 3: /* selects which set of LEDs we are addressing */

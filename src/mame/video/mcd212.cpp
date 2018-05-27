@@ -1520,6 +1520,7 @@ void mcd212_device::device_reset()
 mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MACHINE_MCD212, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, m_lcd(*this, ":lcd")
 {
 }
 
@@ -1632,9 +1633,8 @@ void mcd212_device::ab_init()
 void cdi_state::video_start()
 {
 	m_mcd212->ab_init();
-
-	screen_device *screen = downcast<screen_device *>(machine().device("lcd"));
-	screen->register_screen_bitmap(m_lcdbitmap);
+	if (m_lcd)
+		m_lcd->register_screen_bitmap(m_lcdbitmap);
 }
 
 uint32_t cdi_state::screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

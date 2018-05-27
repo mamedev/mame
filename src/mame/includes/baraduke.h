@@ -15,7 +15,7 @@ public:
 		m_cus30(*this, "namco"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(inputport_select_w);
@@ -67,5 +67,5 @@ protected:
 	int m_xscroll[2];
 	int m_yscroll[2];
 	int m_copy_sprites;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 };

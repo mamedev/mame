@@ -71,6 +71,7 @@ VIDEO_START_MEMBER(markham_state, strnskil)
 	save_item(NAME(m_irq_source));
 	save_item(NAME(m_irq_scanline_start));
 	save_item(NAME(m_irq_scanline_end));
+	save_item(NAME(m_scroll_ctrl));
 }
 
 void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )

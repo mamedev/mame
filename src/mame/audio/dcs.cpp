@@ -1379,7 +1379,7 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
-		logerror("%08X: Starting DSIO CPU\n", machine().device<cpu_device>("maincpu")->pc());
+		logerror("%s: Starting DSIO CPU\n", machine().describe_context());
 		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	// Restore internal/external mapping
@@ -1631,10 +1631,6 @@ void dcs_audio_device::ack_w()
 
 uint16_t dcs_audio_device::data_r()
 {
-	// If the cpu is reading empty data it is probably polling so eat some cyles
-	if IS_OUTPUT_EMPTY()
-		machine().device<cpu_device>("maincpu")->eat_cycles(4444);
-
 	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
 	if (m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 0);
@@ -1681,7 +1677,7 @@ READ16_MEMBER( dcs_audio_device::output_control_r )
 int dcs_audio_device::data2_r()
 {
 	if (LOG_DCS_IO)
-		logerror("%08X dcs:data2_r = %04X\n", machine().device<cpu_device>("maincpu")->pc(), m_output_control);
+		logerror("%s: dcs:data2_r = %04X\n", machine().describe_context(), m_output_control);
 
 	return m_output_control;
 }

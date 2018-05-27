@@ -18,10 +18,8 @@
 
 PALETTE_INIT_MEMBER(exterm_state, exterm)
 {
-	int i;
-
 	/* initialize 555 RGB lookup */
-	for (i = 0; i < 32768; i++)
+	for (int i = 0; i < 32768; i++)
 		palette.set_pen_color(i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 }
 
@@ -72,7 +70,6 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(exterm_state::scanline_update)
 	tms340x0_device::display_params fgparams;
 	int coladdr = params->coladdr;
 	int fgcoladdr = 0;
-	int x;
 
 	/* get parameters for the slave CPU */
 	m_slave->get_display_params(&fgparams);
@@ -85,7 +82,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(exterm_state::scanline_update)
 	}
 
 	/* copy the non-blanked portions of this scanline */
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t bgdata, fgdata = 0;
 

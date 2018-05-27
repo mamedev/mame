@@ -131,7 +131,7 @@ public:
 		, m_io_mouse0(*this, "MOUSE0")
 		, m_io_mouse1(*this, "MOUSE1")
 		, m_io_key(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5"})
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 1U)
 		, m_psg_b(0)
 		, m_rtc_latch(0)
 		, m_kanji_latch(0)
@@ -417,6 +417,7 @@ public:
 	void hx10s(machine_config &config);
 	void piopx7uk(machine_config &config);
 	void hc5(machine_config &config);
+	void dgnmsx(machine_config &config);
 	void fdpc200(machine_config &config);
 	void hx22(machine_config &config);
 	void fs1300(machine_config &config);
@@ -498,7 +499,7 @@ private:
 	required_ioport m_io_mouse0;
 	required_ioport m_io_mouse1;
 	required_ioport_array<6> m_io_key;
-	output_finder<3> m_led;
+	output_finder<2> m_leds;
 
 	/* PSG */
 	int m_psg_b;

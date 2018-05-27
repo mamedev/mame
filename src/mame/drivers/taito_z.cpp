@@ -1305,8 +1305,8 @@ WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	m_lamp[0] = BIT(m_cpua_ctrl, 5);
-	m_lamp[1] = BIT(m_cpua_ctrl, 6);
+	m_lamps[0] = BIT(m_cpua_ctrl, 5);
+	m_lamps[1] = BIT(m_cpua_ctrl, 6);
 }
 
 WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
@@ -3166,7 +3166,7 @@ MACHINE_START_MEMBER(taitoz_state,taitoz)
 
 MACHINE_START_MEMBER(taitoz_state,chasehq)
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	MACHINE_START_CALL_MEMBER(taitoz);
 }
 

@@ -128,7 +128,7 @@ public:
 		m_upd7759(*this, "upd"),
 		m_vfd0(*this, "vfd0"),
 		m_meters(*this, "meters"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void init_toppoker();
@@ -176,7 +176,7 @@ protected:
 
 	void save_state();
 
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
@@ -215,7 +215,7 @@ private:
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_device> m_vfd0;
 	required_device<meters_device> m_meters;
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 };
 
 #define VFD_RESET  0x20
@@ -472,8 +472,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 			for ( int i = 0; i < 8; i++ )
 			{
-				m_lamp[BFM_strcnv[offset  ]] = BIT(m_mux1_datalo, i);
-				m_lamp[BFM_strcnv[offset+8]] = BIT(m_mux1_datahi, i);
+				m_lamps[BFM_strcnv[offset  ]] = BIT(m_mux1_datalo, i);
+				m_lamps[BFM_strcnv[offset+8]] = BIT(m_mux1_datahi, i);
 				offset++;
 			}
 
@@ -541,8 +541,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 			for ( int i = 0; i < 8; i++ )
 			{
-				m_lamp[BFM_strcnv[offset  ]] = BIT(m_mux2_datalo, i);
-				m_lamp[BFM_strcnv[offset+8]] = BIT(m_mux2_datahi, i);
+				m_lamps[BFM_strcnv[offset  ]] = BIT(m_mux2_datalo, i);
+				m_lamps[BFM_strcnv[offset+8]] = BIT(m_mux2_datahi, i);
 				offset++;
 			}
 		}

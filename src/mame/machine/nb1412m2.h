@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER( command_w );
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( data_r );
-	
+
 	DECLARE_WRITE8_MEMBER( rom_address_w );
 	DECLARE_READ8_MEMBER( rom_decrypt_r );
 	DECLARE_WRITE8_MEMBER( rom_op_w );
@@ -60,8 +60,8 @@ public:
 	void nb1412m2_map(address_map &map);
 protected:
 	// device-level overrides
-//	virtual void device_validity_check(validity_checker &valid) const override;
-//	virtual void device_add_mconfig(machine_config &config) override;
+//  virtual void device_validity_check(validity_checker &valid) const override;
+//  virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

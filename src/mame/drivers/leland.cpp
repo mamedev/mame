@@ -2678,25 +2678,68 @@ ROM_END
 For World Soccer Finals, the label format is:
 ------------------------
 |(C)1990 Leland Corp.  | -> Copyright & Manufacturer
-|P/N E-302-30022-03    | -> Part number with revision
+|P/N E-302-30022-04    | -> Part number with revision
 |WORLD SOCCER     U64  | -> Game name & ROM PCB location
 ------------------------
 */
 ROM_START( wsf )
+	ROM_REGION( 0x50000, "master", 0 )
+	ROM_LOAD( "e-302-30022-04.u64",  0x00000, 0x20000, CRC(533cc90f) SHA1(44cec1093819dc1eb5c4ed48ac8a666d9601a870) )
+	ROM_RELOAD(                      0x10000, 0x20000 )
+	ROM_LOAD( "e-302-30023-04.u65",  0x30000, 0x20000, CRC(763c6c1b) SHA1(4f0ef31b7ec4b060dac28ebb1dc663f9328c9f97) )
+
+	ROM_REGION( 0x100000, "slave", 0 )
+	ROM_LOAD( "e-302-30001-01.u151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
+	ROM_LOAD( "e-302-30002-01.u152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
+	ROM_LOAD( "e-302-30003-01.u153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
+	ROM_LOAD( "e-302-30004-01.u154",  0x60000, 0x20000, CRC(b8b3d59c) SHA1(9ba6e25bb5132c556557a0395ce1d982c0853426) )
+	ROM_LOAD( "e-302-30005-01.u155",  0x80000, 0x20000, CRC(505724b9) SHA1(f8a29e3e7f0a146f2daf67883de12533b2ed7341) )
+	ROM_LOAD( "e-302-30006-01.u156",  0xa0000, 0x20000, CRC(c86b5c4d) SHA1(f04d8fc1e8f872f406fcad69ff71ed695f42797a) )
+	ROM_LOAD( "e-302-30007-01.u157",  0xc0000, 0x20000, CRC(451321ae) SHA1(da82f0bba4341b087136afa17767b64389a0f8f4) )
+	ROM_LOAD( "e-302-30008-01.u158",  0xe0000, 0x20000, CRC(4d23836f) SHA1(7b5b9419774e7537e69017c4c44a0601b6e93714) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "e-302-30017-02.u3",  0x20001, 0x20000, CRC(b1d578e1) SHA1(861d597c403b5b385395383dc70eac7a8496c11e) )
+	ROM_LOAD16_BYTE( "e-302-30020-02.u6",  0x20000, 0x20000, CRC(919a62ee) SHA1(ec8110e77d5bd88c39582dc3804fa6982306ed40) )
+	ROM_LOAD16_BYTE( "e-302-30018-02.u4",  0x60001, 0x20000, CRC(d24947ee) SHA1(e40913d4b16d49357e6b9a306b4cfd5091a15ded) )
+	ROM_RELOAD(                            0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "e-302-30019-02.u5",  0x60000, 0x20000, CRC(d846f292) SHA1(97ede713aada8f9b7d4afd0a7f7b71a98c4fd15d) )
+	ROM_RELOAD(                            0xc0000, 0x20000 )
+
+	ROM_REGION( 0x60000, "bg_gfx", 0 )
+	ROM_LOAD( "e-302-30011-03.u145",  0x00000, 0x10000, CRC(6d1c1f19) SHA1(8291a09efab00af2b24cd03f413c152e5e191a5d) )
+	ROM_LOAD( "e-302-30012-03.u146",  0x10000, 0x10000, CRC(6b69bc9e) SHA1(0cc72edd40c997b583b3300136b6d5c7f774ae0a) )
+	ROM_LOAD( "e-302-30013-03.u147",  0x20000, 0x10000, CRC(e1b1e36f) SHA1(4c4040b4dd36a81a6d2affb1e0e07f8d13477205) )
+	ROM_LOAD( "e-302-30014-02.u148",  0x30000, 0x10000, CRC(4a5e7d2b) SHA1(c2d0f60dd1923ea0672a145f72159d71d86e1440) )
+	ROM_LOAD( "e-302-30015-02.u149",  0x40000, 0x10000, CRC(b30c4ff3) SHA1(8bd709bd277584fc32983424873097300eb791c6) )
+	ROM_LOAD( "e-302-30016-02.u150",  0x50000, 0x10000, CRC(3bc8efac) SHA1(78451b935fba519603db0de2e2d06e83b3d4353a) )
+
+	ROM_REGION( 0x20000, "xrom", 0 ) /* X-ROM (data used by main processor) */
+	ROM_LOAD( "e-302-30009-01.u68",  0x00000, 0x10000, CRC(f2fbfc15) SHA1(712cfa7b11135b1f568f38cc478ef5a3330d0608) )
+	ROM_LOAD( "e-302-30010-01.u69",  0x10000, 0x10000, CRC(b4ed2d3b) SHA1(61c9d86b63cf000187a105c6eed967fecb2f3c1c) )
+
+	ROM_REGION( 0x20000, "dac", 0 ) /* externally clocked DAC data */
+	ROM_LOAD( "e-302-30021-02.u8",   0x00000, 0x20000, CRC(a8f97be4) SHA1(738a2ec96a923ef3b3c62425365d4455ba200119) )
+
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-wsf.bin", 0x0000, 0x0100, CRC(5bd0633d) SHA1(4917a0b0be82dc1bd4cfdb5bfb509f0472f1014f) )
+ROM_END
+
+ROM_START( wsf3 )
 	ROM_REGION( 0x50000, "master", 0 )
 	ROM_LOAD( "e-302-30022-03.u64",  0x00000, 0x20000, CRC(2e7faa96) SHA1(d43915a433133eca650fabece61a4a65642b39f6) )
 	ROM_RELOAD(                      0x10000, 0x20000 )
 	ROM_LOAD( "e-302-30023-03.u65",  0x30000, 0x20000, CRC(7146328f) SHA1(390b98a2cd54a981eb4fafba700ff2fa1e379a32) )
 
 	ROM_REGION( 0x100000, "slave", 0 )
-	ROM_LOAD( "e-302-30001-01.151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
-	ROM_LOAD( "e-302-30002-01.152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
-	ROM_LOAD( "e-302-30003-01.153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
-	ROM_LOAD( "e-302-30004-01.154",  0x60000, 0x20000, CRC(b8b3d59c) SHA1(9ba6e25bb5132c556557a0395ce1d982c0853426) )
-	ROM_LOAD( "e-302-30005-01.155",  0x80000, 0x20000, CRC(505724b9) SHA1(f8a29e3e7f0a146f2daf67883de12533b2ed7341) )
-	ROM_LOAD( "e-302-30006-01.156",  0xa0000, 0x20000, CRC(c86b5c4d) SHA1(f04d8fc1e8f872f406fcad69ff71ed695f42797a) )
-	ROM_LOAD( "e-302-30007-01.157",  0xc0000, 0x20000, CRC(451321ae) SHA1(da82f0bba4341b087136afa17767b64389a0f8f4) )
-	ROM_LOAD( "e-302-30008-01.158",  0xe0000, 0x20000, CRC(4d23836f) SHA1(7b5b9419774e7537e69017c4c44a0601b6e93714) )
+	ROM_LOAD( "e-302-30001-01.u151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
+	ROM_LOAD( "e-302-30002-01.u152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
+	ROM_LOAD( "e-302-30003-01.u153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
+	ROM_LOAD( "e-302-30004-01.u154",  0x60000, 0x20000, CRC(b8b3d59c) SHA1(9ba6e25bb5132c556557a0395ce1d982c0853426) )
+	ROM_LOAD( "e-302-30005-01.u155",  0x80000, 0x20000, CRC(505724b9) SHA1(f8a29e3e7f0a146f2daf67883de12533b2ed7341) )
+	ROM_LOAD( "e-302-30006-01.u156",  0xa0000, 0x20000, CRC(c86b5c4d) SHA1(f04d8fc1e8f872f406fcad69ff71ed695f42797a) )
+	ROM_LOAD( "e-302-30007-01.u157",  0xc0000, 0x20000, CRC(451321ae) SHA1(da82f0bba4341b087136afa17767b64389a0f8f4) )
+	ROM_LOAD( "e-302-30008-01.u158",  0xe0000, 0x20000, CRC(4d23836f) SHA1(7b5b9419774e7537e69017c4c44a0601b6e93714) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "e-302-30017-01.u3",  0x20001, 0x20000, CRC(39ec13c1) SHA1(4067da05cbaf205ab7cc14a3370220ad98b394cd) )
@@ -2707,12 +2750,12 @@ ROM_START( wsf )
 	ROM_RELOAD(                            0xc0000, 0x20000 )
 
 	ROM_REGION( 0x60000, "bg_gfx", 0 )
-	ROM_LOAD( "e-302-30011-02.145",  0x00000, 0x10000, CRC(6153569b) SHA1(b6a106c8b87a9a3f01eff3854d0c1f2c4a64fd94) )
-	ROM_LOAD( "e-302-30012-02.146",  0x10000, 0x10000, CRC(52d65e21) SHA1(25f63aa29dc7e7673043e1f43e357a5232a1be9e) )
-	ROM_LOAD( "e-302-30013-02.147",  0x20000, 0x10000, CRC(b3afda12) SHA1(52bf780c642f0092114aeb994e6571c034f198a0) )
-	ROM_LOAD( "e-302-30014-02.148",  0x30000, 0x10000, CRC(624e6c64) SHA1(02240adcf4433543c8f7ad8904c34400f25409cc) )
-	ROM_LOAD( "e-302-30015-01.149",  0x40000, 0x10000, CRC(5d9064f2) SHA1(7a68a379aa6a6cd0518e8a4107b2e646f5700c2b) )
-	ROM_LOAD( "e-302-30016-01.150",  0x50000, 0x10000, CRC(d76389cd) SHA1(2b7e6cd662ffde177b110ad0ed2e42fe4ccf811f) )
+	ROM_LOAD( "e-302-30011-02.u145",  0x00000, 0x10000, CRC(6153569b) SHA1(b6a106c8b87a9a3f01eff3854d0c1f2c4a64fd94) )
+	ROM_LOAD( "e-302-30012-02.u146",  0x10000, 0x10000, CRC(52d65e21) SHA1(25f63aa29dc7e7673043e1f43e357a5232a1be9e) )
+	ROM_LOAD( "e-302-30013-02.u147",  0x20000, 0x10000, CRC(b3afda12) SHA1(52bf780c642f0092114aeb994e6571c034f198a0) )
+	ROM_LOAD( "e-302-30014-01.u148",  0x30000, 0x10000, CRC(624e6c64) SHA1(02240adcf4433543c8f7ad8904c34400f25409cc) )
+	ROM_LOAD( "e-302-30015-01.u149",  0x40000, 0x10000, CRC(5d9064f2) SHA1(7a68a379aa6a6cd0518e8a4107b2e646f5700c2b) )
+	ROM_LOAD( "e-302-30016-01.u150",  0x50000, 0x10000, CRC(d76389cd) SHA1(2b7e6cd662ffde177b110ad0ed2e42fe4ccf811f) )
 
 	ROM_REGION( 0x20000, "xrom", 0 ) /* X-ROM (data used by main processor) */
 	ROM_LOAD( "e-302-30009-01.u68",  0x00000, 0x10000, CRC(f2fbfc15) SHA1(712cfa7b11135b1f568f38cc478ef5a3330d0608) )
@@ -3340,7 +3383,8 @@ GAME( 1990, ataxx,      0,        ataxx,    ataxx,      ataxx_state,  init_ataxx
 GAME( 1990, ataxxa,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
 GAME( 1990, ataxxe,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
 GAME( 1990, ataxxj,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
-GAME( 1990, wsf,        0,        wsf,      wsf,        ataxx_state,  init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
+GAME( 1990, wsf,        0,        wsf,      wsf,        ataxx_state,  init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 4)", 0 )
+GAME( 1990, wsf3,       wsf,      wsf,      wsf,        ataxx_state,  init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
 GAME( 1991, indyheat,   0,        wsf,      indyheat,   ataxx_state,  init_indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
 GAME( 1991, brutforc,   0,        wsf,      brutforc,   ataxx_state,  init_brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
 GAME( 1991, asylum,     0,        wsf,      brutforc,   ataxx_state,  init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )

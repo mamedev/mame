@@ -42,7 +42,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_pokey(*this, "pokey%u", 1U),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void init_irobot();
@@ -50,7 +50,7 @@ public:
 	void irobot(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void irobot_map(address_map &map);
@@ -119,7 +119,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<pokey_device, 4> m_pokey;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };
 
 #endif // MAME_INCLUDES_IROBOT_H

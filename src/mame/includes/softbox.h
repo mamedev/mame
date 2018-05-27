@@ -31,7 +31,7 @@ public:
 		, m_dbrg(*this, COM8116_TAG)
 		, m_ieee(*this, IEEE488_TAG)
 		, m_hdc(*this, CORVUS_HDC_TAG)
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	// device_ieee488_interface overrides
@@ -67,7 +67,7 @@ protected:
 	required_device<com8116_device> m_dbrg;
 	required_device<ieee488_device> m_ieee;
 	required_device<corvus_hdc_device> m_hdc;
-	output_finder<3> m_led;
+	output_finder<3> m_leds;
 };
 
 #endif

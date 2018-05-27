@@ -53,8 +53,8 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	/*
 	if (~m_cpu_control & 0x08)
 	{
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	    m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	    m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	*/
 

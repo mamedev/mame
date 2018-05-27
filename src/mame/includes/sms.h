@@ -58,6 +58,8 @@ public:
 		m_led_pwr(*this, "led_pwr"),
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
+		m_left_lcd(*this, "left_lcd"),
+		m_right_lcd(*this, "right_lcd"),
 		m_is_gamegear(false),
 		m_is_smsj(false),
 		m_is_mark_iii(false),
@@ -117,6 +119,8 @@ public:
 
 	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sms1);
@@ -187,8 +191,8 @@ protected:
 	uint8_t *m_BIOS;
 
 	// for 3D glass binocular hack
-	device_t *m_left_lcd;
-	device_t *m_right_lcd;
+	optional_device<screen_device> m_left_lcd;
+	optional_device<screen_device> m_right_lcd;
 	bitmap_rgb32 m_prevleft_bitmap;
 	bitmap_rgb32 m_prevright_bitmap;
 

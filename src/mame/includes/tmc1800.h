@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_TMC1800_H
 #define MAME_INCLUDES_TMC1800_H
+
+#pragma once
 
 
 #include "cpu/cosmac/cosmac.h"
@@ -121,7 +121,7 @@ public:
 		, m_cti(*this, CDP1864_TAG)
 		, m_colorram(*this, "color_ram")
 		, m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
-		, m_led(*this, "led%u", 0U)
+		, m_led(*this, "led1")
 	{ }
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
@@ -150,7 +150,7 @@ protected:
 	required_device<cdp1864_device> m_cti;
 	optional_shared_ptr<uint8_t> m_colorram;
 	required_ioport_array<8> m_key_row;
-	output_finder<2> m_led;
+	output_finder<> m_led;
 
 	// memory
 	int m_rac;
@@ -172,7 +172,7 @@ public:
 		, m_ny0(*this, "NY0")
 		, m_ny1(*this, "NY1")
 		, m_monitor(*this, "MONITOR")
-		, m_led(*this, "led%u", 0U)
+		, m_led(*this, "led1")
 	{ }
 
 	enum
@@ -203,7 +203,7 @@ protected:
 	required_ioport m_ny0;
 	required_ioport m_ny1;
 	required_ioport m_monitor;
-	output_finder<2> m_led;
+	output_finder<> m_led;
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
 };

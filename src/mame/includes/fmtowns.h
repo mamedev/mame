@@ -147,7 +147,7 @@ class towns_state : public driver_device
 	required_device<rs232_port_device> m_rs232;
 	required_device<screen_device> m_screen;
 	required_device<msm58321_device> m_rtc;
-	
+
 	required_memory_bank m_bank_cb000_r;
 	required_memory_bank m_bank_cb000_w;
 	required_memory_bank m_bank_f8000_r;

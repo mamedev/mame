@@ -305,13 +305,13 @@ WRITE8_MEMBER( d9060_device_base::riot1_pb_w )
 	*/
 
 	// ready led
-	m_led[LED_READY] = BIT(data, 4);
+	m_leds[LED_READY] = BIT(data, 4);
 
 	// power led
-	m_led[LED_POWER] = BIT(data, 5);
+	m_leds[LED_POWER] = BIT(data, 5);
 
 	// error led
-	m_led[LED_ERROR] = !BIT(data, 5);
+	m_leds[LED_ERROR] = !BIT(data, 5);
 }
 
 
@@ -486,7 +486,7 @@ d9060_device_base::d9060_device_base(const machine_config &mconfig, device_type 
 	, m_sasibus(*this, SASIBUS_TAG)
 	, m_sasi_data_out(*this, "sasi_data_out")
 	, m_address(*this, "ADDRESS")
-	, m_led(*this, "led%u", 0U)
+	, m_leds(*this, "led%u", 0U)
 	, m_rfdo(1)
 	, m_daco(1)
 	, m_atna(1)
@@ -524,7 +524,7 @@ d9090_device::d9090_device(const machine_config &mconfig, const char *tag, devic
 
 void d9060_device_base::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// state saving
 	save_item(NAME(m_rfdo));

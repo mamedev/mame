@@ -71,7 +71,7 @@ public:
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
 		, m_led(*this, "led")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
@@ -129,7 +129,7 @@ protected:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	output_finder<> m_led;
-	output_finder<7> m_lamp;
+	output_finder<6> m_lamps;
 
 	int m_exp_bank;
 	tilemap_t *m_fg_tilemap;
@@ -279,7 +279,7 @@ uint32_t jackie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void jackie_state::machine_start()
 {
 	m_led.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_exp_bank));
 	// save_item(NAME(m_irq_enable)); //always 1?
@@ -362,12 +362,12 @@ WRITE8_MEMBER(jackie_state::lamps_w)
     ---- -x--  Hold5 lamp.
     ---- ---x  Start lamp.
 */
-	m_lamp[1] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
-	m_lamp[2] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
-	m_lamp[3] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
-	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamp[5] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
-	m_lamp[6] = BIT(data, 0);           /* Lamp 6 - START */
+	m_lamps[0] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
+	m_lamps[2] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 0);           /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 

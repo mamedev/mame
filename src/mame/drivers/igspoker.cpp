@@ -92,7 +92,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_led(*this, "led0")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_READ8_MEMBER(igs_irqack_r);
@@ -137,7 +137,7 @@ public:
 	void number10_io_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); m_lamp.resolve(); }
+	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -149,7 +149,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	output_finder<> m_led;
-	output_finder<7> m_lamp;
+	output_finder<6> m_lamps;
 	int m_nmi_enable;
 	int m_bg_enable;
 	int m_hopper;
@@ -311,12 +311,12 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
     ---x ----  Hold5 lamp.
     xx-- ----  one pulse once bet amount allows start.
 */
-	m_lamp[1] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
-	m_lamp[2] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
-	m_lamp[3] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
-	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamp[5] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
-	m_lamp[6] = BIT(data, 0);      /* Lamp 6 - START */
+	m_lamps[0] = BIT(data, 1);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 5);      /* Lamp 2 - HOLD 2  */
+	m_lamps[2] = BIT(data, 4);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 2);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 0);      /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 

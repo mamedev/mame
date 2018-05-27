@@ -32,7 +32,7 @@ public:
 		m_palette(*this, "palette"),
 		m_speaker1(*this, "speaker1"),
 		m_speaker2(*this, "speaker2"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	INTERRUPT_GEN_MEMBER(nmi_handler);
@@ -60,7 +60,7 @@ public:
 	void polyplay_mem_zrepp(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -79,7 +79,7 @@ protected:
 	uint8_t m_flipflop2;
 	required_device<speaker_sound_device> m_speaker1;
 	required_device<speaker_sound_device> m_speaker2;
-	output_finder<5> m_lamp;
+	output_finder<4> m_lamps;
 };
 
 #endif // MAME_INCLUDES_POLYPLAY_H

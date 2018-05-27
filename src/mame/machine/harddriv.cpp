@@ -37,7 +37,7 @@
 
 void harddriv_state::device_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	//atarigen_state::machine_start();
 
 	/* predetermine memory regions */
@@ -416,11 +416,11 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 			break;
 		case 2: /* LC1 */
 			// used for seat locking on harddriv
-			m_lamp[1] = data;
+			m_lamps[0] = data;
 			break;
 		case 3: /* LC2 */
 			// used for "abort" button lamp
-			m_lamp[2] = data;
+			m_lamps[1] = data;
 			break;
 		case 4: /* ZP1 */
 			m_m68k_zp1 = data;

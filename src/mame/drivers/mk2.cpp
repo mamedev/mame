@@ -69,7 +69,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_miot(*this, "miot")
 		, m_digits(*this, "digit%u", 0U)
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(mk2_read_a);
@@ -88,7 +88,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6530_device> m_miot;
 	output_finder<6> m_digits;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 };
 
 
@@ -135,10 +135,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
 	for (i=0; i<4; i++)
 		m_digits[i] = m_led_data[i];
 
-	m_led[0] = BIT(m_led_data[4], 3);
-	m_led[1] = BIT(m_led_data[4], 5);
-	m_led[2] = BIT(m_led_data[4], 4);
-	m_led[3] = BIT(~m_led_data[4], 4);
+	m_leds[0] = BIT(m_led_data[4], 3);
+	m_leds[1] = BIT(m_led_data[4], 5);
+	m_leds[2] = BIT(m_led_data[4], 4);
+	m_leds[3] = BIT(~m_led_data[4], 4);
 
 	m_led_data[0] = m_led_data[1] = m_led_data[2] = m_led_data[3] = m_led_data[4] = 0;
 }
@@ -146,7 +146,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
 void mk2_state::machine_start()
 {
 	m_digits.resolve();
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 READ8_MEMBER( mk2_state::mk2_read_a )

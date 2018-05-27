@@ -5223,7 +5223,7 @@ void royalmah_state::init_janptr96()
 
 	m_janptr96_nvram = std::make_unique<uint8_t[]>(0x1000 * 9);
 	membank("bank3")->set_base(m_janptr96_nvram.get());
-	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
+	subdevice<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
 	membank("rambank")->configure_entries(0, 8, m_janptr96_nvram.get() + 0x1000, 0x1000);
 }
 

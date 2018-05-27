@@ -592,7 +592,7 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 	switch (offset & 0x300000)
 	{
 		case 0x000000:
-		case 0x100000: 
+		case 0x100000:
 		case 0x200000: return m_sndflash[offset >> 20]->read(offset & 0xfffff) | m_sndflash[offset >> 20]->read((offset & 0xfffff) | 1) << 16;
 
 		default:

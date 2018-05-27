@@ -397,7 +397,7 @@ public:
 		m_sensor(*this, "SENSOR"),
 		m_encoder(*this, "ENCODER"),
 		m_gunmania_id(*this, "gunmania_id"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	double m_pad_position[ 6 ];
@@ -527,7 +527,7 @@ public:
 	void konami573a_map(address_map &map);
 	void konami573d_map(address_map &map);
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void driver_start() override;
 
 	required_ioport m_analog0;
@@ -601,7 +601,7 @@ private:
 	optional_ioport m_sensor;
 	optional_ioport m_encoder;
 	optional_device<ds2401_device> m_gunmania_id;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 };
 
 void ATTR_PRINTF( 3,4 )  ksys573_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1177,11 +1177,11 @@ WRITE8_MEMBER( ksys573_state::ddr_output_callback )
 		break;
 
 	case 17:
-		m_lamp[0] = data ? 0 : 1; // start 1
+		m_lamps[0] = data ? 0 : 1; // start 1
 		break;
 
 	case 18:
-		m_lamp[1] = data ? 0 : 1; // start 2
+		m_lamps[1] = data ? 0 : 1; // start 2
 		break;
 
 	case 20:
@@ -1233,12 +1233,12 @@ WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b6 )
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b5 )
 {
-	m_lamp[0] = state ? 1 : 0; // start left
+	m_lamps[0] = state ? 1 : 0; // start left
 }
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b4 )
 {
-	m_lamp[1] = state ? 1 : 0; // start right
+	m_lamps[1] = state ? 1 : 0; // start right
 }
 
 /* ddr solo */
@@ -1275,7 +1275,7 @@ WRITE8_MEMBER( ksys573_state::ddrsolo_output_callback )
 		break;
 
 	case 20:
-		m_lamp[0] = data ? 0 : 1; // start
+		m_lamps[0] = data ? 0 : 1; // start
 		break;
 
 	case 21:
@@ -1344,7 +1344,7 @@ WRITE8_MEMBER( ksys573_state::drmn_output_callback )
 
 	case 13: // drmn2+
 	case 21: // drmn
-		m_lamp[0] = data ? 1 : 0; // start
+		m_lamps[0] = data ? 1 : 0; // start
 		break;
 
 	case 14: // drmn2+
@@ -1494,7 +1494,7 @@ WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b0 )
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b1 )
 {
-	m_lamp[1] = state ? 1 : 0; // start 1p
+	m_lamps[1] = state ? 1 : 0; // start 1p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b2 )
@@ -1509,7 +1509,7 @@ WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b3 )
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b4 )
 {
-	m_lamp[0] = state ? 1 : 0; // start 2p
+	m_lamps[0] = state ? 1 : 0; // start 2p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b5 )
@@ -1723,7 +1723,7 @@ WRITE8_MEMBER( ksys573_state::mamboagg_output_callback )
 
 WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b3 )
 {
-	m_lamp[0] = state ? 1 : 0; // start 1p
+	m_lamps[0] = state ? 1 : 0; // start 1p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b4 )
@@ -4627,6 +4627,16 @@ ROM_START( hypbbc2pk )
 	DISK_IMAGE_READONLY( "908a02", 0, BAD_DUMP SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
 ROM_END
 
+ROM_START( jppyex98 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gc811ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(e0f93270) SHA1(02a110bf692d5d1aa15e66132e3c4f60aa3f0f3c) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "811jaa02", 0, BAD_DUMP SHA1(e9580172d58b38841f643651ae0bcaf24fd5f118) )
+ROM_END
+
 ROM_START( konam80a )
 	SYS573_BIOS_A
 
@@ -4905,6 +4915,7 @@ GAME( 1998, darkhleg,  sys573,   konami573x, konami573, ksys573_state, empty_ini
 GAME( 1998, fbaitbc,   sys573,   fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - A Bass Challenge (GE765 VER. UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, bassangl,  fbaitbc,  fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Bass Angler (GE765 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, powyakex,  sys573,   konami573x, konami573, ksys573_state, empty_init,    ROT0,  "Konami", "Jikkyou Powerful Pro Yakyuu EX (GX802 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, jppyex98,  sys573,   konami573x, konami573, ksys573_state, empty_init,    ROT0,  "Konami", "Jikkyou Powerful Pro Yakyuu EX '98 (GC811 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, konam80s,  sys573,   konami573x, konami573, ksys573_state, empty_init,    ROT90, "Konami", "Konami 80's AC Special (GC826 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, konam80u,  konam80s, konami573x, konami573, ksys573_state, empty_init,    ROT90, "Konami", "Konami 80's AC Special (GC826 VER. UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, konam80j,  konam80s, konami573x, konami573, ksys573_state, empty_init,    ROT90, "Konami", "Konami 80's Gallery (GC826 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

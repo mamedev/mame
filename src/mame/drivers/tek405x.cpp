@@ -622,9 +622,9 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	*/
 
 	// lamps
-	m_lamp[1] = BIT(~data, 5);
-	m_lamp[2] = BIT(~data, 6);
-	m_lamp[3] = BIT(~data, 7);
+	m_lamps[0] = BIT(~data, 5);
+	m_lamps[1] = BIT(~data, 6);
+	m_lamps[2] = BIT(~data, 7);
 
 	// end or identify
 	m_gpib->eoi_w(!BIT(data, 4));
@@ -958,7 +958,7 @@ WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
 
 void tek4051_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

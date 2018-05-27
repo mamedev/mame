@@ -69,7 +69,7 @@ public:
 		, m_slot6(*this, "slot6")
 		, m_slot7(*this, "slot7")
 		, m_slot7a(*this, "slot7a")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 1U)
 	{ }
 
 	void update_halt_line();
@@ -176,7 +176,7 @@ private:
 	required_device<dmvcart_slot_device> m_slot6;
 	required_device<dmvcart_slot_device> m_slot7;
 	required_device<dmvcart_slot_device> m_slot7a;
-	output_finder<9> m_led;
+	output_finder<8> m_leds;
 
 	bool        m_ramoutdis;
 	int         m_switch16;
@@ -220,7 +220,7 @@ WRITE8_MEMBER(dmv_state::leds_w)
 	*/
 
 	for(int i=0; i<8; i++)
-		m_led[8-i] = BIT(data, i);
+		m_leds[7-i] = BIT(data, i);
 }
 
 READ8_MEMBER(dmv_state::ramsel_r)
@@ -624,7 +624,7 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 void dmv_state::machine_reset()

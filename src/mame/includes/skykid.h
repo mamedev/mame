@@ -16,7 +16,7 @@ public:
 		, m_cus30(*this, "namco")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(inputport_select_w);
@@ -60,7 +60,7 @@ protected:
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	uint8_t m_priority;

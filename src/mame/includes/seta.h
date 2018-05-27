@@ -65,7 +65,7 @@ public:
 		m_paletteram(*this,"paletteram%u", 1U),
 		m_subbank(*this,"subbank"),
 		m_gun_recoil(*this,"Player%u_Gun_Recoil", 1U),
-		m_leds(*this,"led%u", 0U),
+		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 

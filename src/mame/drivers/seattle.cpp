@@ -278,6 +278,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
+		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
 		m_io_analog(*this, "AN%u", 0),
@@ -289,6 +290,7 @@ public:
 	required_device<mips3_device> m_maincpu;
 	optional_device<atari_cage_seattle_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;
+	required_device<screen_device> m_screen;
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
@@ -451,12 +453,12 @@ void seattle_state::machine_reset()
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs") != nullptr)
+	if (m_dcs != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-	else if (machine().device("cage") != nullptr)
+	else if (m_cage != nullptr)
 	{
 		m_cage->control_w(0);
 		m_cage->control_w(3);
@@ -1871,13 +1873,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(seattle_state::seattle_common)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_ADD(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 
 	// PCI Bus Devices
-	MCFG_PCI_ROOT_ADD(":pci")
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 
 	MCFG_GT64010_ADD(PCI_ID_GALILEO, ":maincpu", SYSTEM_CLOCK, GALILEO_IRQ_NUM)
 	MCFG_GT64XXX_SET_CS(0, seattle_state::seattle_cs0_map)
@@ -1886,11 +1888,11 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x100b0002, 0x01, 0x0)
-	MCFG_IDE_PCI_IRQ_ADD(":maincpu", IDE_IRQ_NUM)
+	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x100b0002, 0x01, 0x0)
+	MCFG_IDE_PCI_IRQ_HANDLER(INPUTLINE(m_maincpu, IDE_IRQ_NUM))
 	MCFG_IDE_PCI_SET_LEGACY_TOP(0x0a0)
 
-	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
+	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, m_screen)
 	MCFG_VOODOO_PCI_FBMEM(2)
 	MCFG_VOODOO_PCI_TMUMEM(4, 0)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
@@ -1901,7 +1903,7 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
@@ -1912,7 +1914,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::phoenixsa)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
+	MCFG_DEVICE_REPLACE(m_maincpu, R4700LE, SYSTEM_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1925,7 +1927,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::seattle150)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1941,7 +1943,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::seattle200)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1956,7 +1958,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::flagstaff)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)

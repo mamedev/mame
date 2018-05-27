@@ -295,9 +295,9 @@ WRITE8_MEMBER( softbox_state::ppi1_pc_w )
 
 	*/
 
-	m_led[LED_A] = BIT(~data, 0);
-	m_led[LED_B] = BIT(~data, 1);
-	m_led[LED_READY] = BIT(~data, 2);
+	m_leds[LED_A] = BIT(~data, 0);
+	m_leds[LED_B] = BIT(~data, 1);
+	m_leds[LED_READY] = BIT(~data, 2);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -321,7 +321,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void softbox_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 
