@@ -120,8 +120,8 @@ private:
 	uint8_t m_coin2_lock_cnt;
 
 	/* banbam protection simulation */
-	uint8_t m_packet_write_pos;
 	uint8_t m_packet_buffer[2];
+	uint8_t m_packet_write_pos;
 	bool m_packet_reset;
 };
 
