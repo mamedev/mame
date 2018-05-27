@@ -5871,12 +5871,12 @@ ROM_START( eyesb )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "9.bin",           0x0000, 0x0800, CRC(342c0653) SHA1(d07e3d4528b72e54a1b5dbed009cce765a5a086f) )
-	ROM_LOAD( "11.bin",          0x0800, 0x0800, CRC(aaa7a537) SHA1(571d981ed2aad62d7c7f2798e9084228d45523d4) )
+	ROM_LOAD( "12.bin",          0x0800, 0x0800, CRC(99af4b30) SHA1(6a0939ff2fa7ae39a960dd4d9f9b7c01f57647c5) )
 	ROM_LOAD( "10.bin",          0x1000, 0x0800, CRC(b247b82c) SHA1(8c10a8ef5e79b0b5fefad6eb77bfa68a0ca18035) )
-	ROM_LOAD( "12.bin",          0x1800, 0x0800, CRC(99af4b30) SHA1(6a0939ff2fa7ae39a960dd4d9f9b7c01f57647c5) )
+	ROM_LOAD( "11.bin",          0x1800, 0x0800, CRC(aaa7a537) SHA1(571d981ed2aad62d7c7f2798e9084228d45523d4) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "7051.bin",        0x0000, 0x0020, CRC(0dad2ccb) SHA1(f42c5ee7084e5702b5b0c8c1d86b0a41a6e1821d) )
+	ROM_LOAD( "7051.bin",        0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // bad dump, taken from parent
 	ROM_LOAD( "7051-3.bin",      0x0020, 0x0100, CRC(d8d78829) SHA1(19820d1651423210083a087fb70ebea73ad34951) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
