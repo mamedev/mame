@@ -762,8 +762,8 @@ CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)p
 
 WRITE8_MEMBER(galaga_state::out_0)
 {
-	m_led[1] = BIT(data, 0);
-	m_led[0] = BIT(data, 1);
+	m_leds[1] = BIT(data, 0);
+	m_leds[0] = BIT(data, 1);
 	machine().bookkeeping().coin_counter_w(1,~data & 4);
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
@@ -812,7 +812,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 
 void galaga_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
 	save_item(NAME(m_main_irq_mask));

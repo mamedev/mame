@@ -22,7 +22,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_spriteram(*this, "spriteram"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void foodf(machine_config &config);
@@ -53,7 +53,7 @@ private:
 	uint8_t           m_playfield_flip;
 
 	required_shared_ptr<uint16_t> m_spriteram;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };
 
 #endif // MAME_INCLUDES_FOODF_H

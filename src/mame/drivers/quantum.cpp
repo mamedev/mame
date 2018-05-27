@@ -67,13 +67,13 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_avg(*this, "avg"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void quantum(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_1_r);
@@ -83,7 +83,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };
 
 
@@ -133,8 +133,8 @@ WRITE16_MEMBER(quantum_state::led_w)
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		m_led[0] = BIT(data, 4);
-		m_led[1] = BIT(data, 5);
+		m_leds[0] = BIT(data, 4);
+		m_leds[1] = BIT(data, 5);
 
 		/* bits 6 and 7 flip screen */
 		m_avg->set_flip_x (data & 0x40);

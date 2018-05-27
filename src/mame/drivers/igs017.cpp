@@ -456,7 +456,7 @@ WRITE8_MEMBER(igs_incdec_device::dec_w)
 
 READ8_MEMBER(igs_incdec_device::val_r)
 {
-	uint8_t res =	(BIT(m_val, 0) << 7) |
+	uint8_t res =   (BIT(m_val, 0) << 7) |
 					(BIT(m_val, 3) << 5) |
 					(BIT(m_val, 2) << 4) |
 					(BIT(m_val, 1) << 2) ;

@@ -1289,7 +1289,7 @@ void spg2xx_cart_state::machine_start()
 
 void spg2xx_game_state::machine_start()
 {
-        memset(m_video_regs, 0, 0x100 * sizeof(m_video_regs[0]));
+		memset(m_video_regs, 0, 0x100 * sizeof(m_video_regs[0]));
 	memset(m_io_regs, 0, 0x200 * sizeof(m_io_regs[0]));
 	m_current_bank = 0;
 

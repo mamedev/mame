@@ -4,45 +4,45 @@
 
     Sega Model 1 I/O Board (Advanced)
 
-	Used by:
-	- Wing War (R360) (837-10859)
-	- NetMerc (837-11659)
-	- Virtua Cop (837-11130 with 837-11131)
+    Used by:
+    - Wing War (R360) (837-10859)
+    - NetMerc (837-11659)
+    - Virtua Cop (837-11130 with 837-11131)
 
-	Diagnostic LCD:
+    Diagnostic LCD:
 
-	It's possible to attach a small LCD to the board and enable a
-	diagnostic mode. To try this in MAME, enable the 'Diagnostic'
-	view, then map keys to I/O board buttons. Hold button 0 and
-	press F3 to reset. The main screen will display 'I/O board error'
-	but the LCD at the bottom is now active. Control it with board
-	buttons 0 (up), 1 (down) and 2 (select).
+    It's possible to attach a small LCD to the board and enable a
+    diagnostic mode. To try this in MAME, enable the 'Diagnostic'
+    view, then map keys to I/O board buttons. Hold button 0 and
+    press F3 to reset. The main screen will display 'I/O board error'
+    but the LCD at the bottom is now active. Control it with board
+    buttons 0 (up), 1 (down) and 2 (select).
 
-	It's also possible to show some debug values while the game is
-	running. To do this, hold board button '1' and push reset. Use
-	buttons 0 and 1 to scroll the screen.
+    It's also possible to show some debug values while the game is
+    running. To do this, hold board button '1' and push reset. Use
+    buttons 0 and 1 to scroll the screen.
 
-	Debug mode:
+    Debug mode:
 
-	You can attach a terminal to SIO channel B. Attach it to the
-	MAME slot option 'ioboard:cn8'. You need to enable both JP3
-	and JP4 jumpers and hold board button 0 at startup.
+    You can attach a terminal to SIO channel B. Attach it to the
+    MAME slot option 'ioboard:cn8'. You need to enable both JP3
+    and JP4 jumpers and hold board button 0 at startup.
 
-	Default	settings are 9600-8-N-1. It will output "RS".
-	You can then enter the following commands:
+    Default settings are 9600-8-N-1. It will output "RS".
+    You can then enter the following commands:
 
-	- DT[word1][word2]: Returns word2 bytes from location word1
-	- GO: ?
-	- IN[byte1]: Return value from I/O port byte1
-	- LH: ?
-	- OP[byte1][byte2]: Write value byte2 to I/O port byte1
-	- T: Nothing
-	- XR: Return 26 bytes starting at location ff07
-	- XM[26 bytes]: Write 26 bytes to location starting at ff07
-	- ZP[word1][word2]: ff03=word1, ff05=word2
-	- VR: Return id string
+    - DT[word1][word2]: Returns word2 bytes from location word1
+    - GO: ?
+    - IN[byte1]: Return value from I/O port byte1
+    - LH: ?
+    - OP[byte1][byte2]: Write value byte2 to I/O port byte1
+    - T: Nothing
+    - XR: Return 26 bytes starting at location ff07
+    - XM[26 bytes]: Write 26 bytes to location starting at ff07
+    - ZP[word1][word2]: ff03=word1, ff05=word2
+    - VR: Return id string
 
-	NMI is related to the debug mode, not hooked up.
+    NMI is related to the debug mode, not hooked up.
 
 ***************************************************************************/
 
@@ -72,10 +72,10 @@ void model1io2_device::mem_map(address_map &map)
 	map(0x8040, 0x8040).portr("board");
 	map(0x8080, 0x8080).portr("dsw1");
 	map(0x8100, 0x810f).rw(this, FUNC(model1io2_device::fpga_r), FUNC(model1io2_device::fpga_w));
-//	map(0x8180, 0x8183).nopr(); // displayed as 4 byte values in the diagnostic screen
-//	map(0x81a0, 0x81af).nopw(); // the (reserved) test in the diagnostic screen sets these
+//  map(0x8180, 0x8183).nopr(); // displayed as 4 byte values in the diagnostic screen
+//  map(0x81a0, 0x81af).nopw(); // the (reserved) test in the diagnostic screen sets these
 	map(0x8200, 0x8203).mirror(0x04).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::address_w));
-//	map(0x8400, 0x8400) // jumps here when debug mode is set and board button 0 is not active on reset
+//  map(0x8400, 0x8400) // jumps here when debug mode is set and board button 0 is not active on reset
 	map(0xe000, 0xefff).ram(); // backup ram
 	map(0xf000, 0xffff).ram();
 }

@@ -61,6 +61,9 @@ public:
 		, m_p_vram(*this, "vram")
 	{ }
 
+	void unior(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
@@ -75,9 +78,9 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	void unior(machine_config &config);
 	void unior_io(address_map &map);
 	void unior_mem(address_map &map);
+
 private:
 	uint8_t m_4c;
 	uint8_t m_4e;

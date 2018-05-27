@@ -642,7 +642,7 @@ void segas32_upd7725_state::device_start()
 void segas32_cd_state::device_start()
 {
 	common_start(0);
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 void sega_multi32_state::device_start()
@@ -2444,13 +2444,13 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 WRITE8_MEMBER(segas32_cd_state::lamps1_w)
 {
 	for (int i = 0; i < 8; i++)
-		m_lamp[i] = BIT(data, i);
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 {
 	for (int i = 0; i < 8; i++)
-		m_lamp[8 + i] = BIT(data, i);
+		m_lamps[8 + i] = BIT(data, i);
 }
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
@@ -2508,7 +2508,7 @@ DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
-	, m_lamp(*this, "lamp%u", 0U)
+	, m_lamps(*this, "lamp%u", 0U)
 {
 }
 

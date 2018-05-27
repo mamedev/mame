@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
+	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_pcjr:palette", gfx_pcjr)

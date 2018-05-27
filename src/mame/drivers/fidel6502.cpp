@@ -20,7 +20,7 @@
       the addressbus at read or write accesses.
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
-	- PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
+    - PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
 
 ******************************************************************************
 

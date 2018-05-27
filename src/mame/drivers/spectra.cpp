@@ -57,14 +57,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void spectra(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
-	void spectra(machine_config &config);
 	void spectra_map(address_map &map);
+
 private:
 	uint8_t m_porta;
 	uint8_t m_portb;

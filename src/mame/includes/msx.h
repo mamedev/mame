@@ -417,6 +417,7 @@ public:
 	void hx10s(machine_config &config);
 	void piopx7uk(machine_config &config);
 	void hc5(machine_config &config);
+	void dgnmsx(machine_config &config);
 	void fdpc200(machine_config &config);
 	void hx22(machine_config &config);
 	void fs1300(machine_config &config);

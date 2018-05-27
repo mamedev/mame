@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200)) // crystal needs verification but is the likely one
+	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200)) // crystal needs verification but is the likely one
 	MCFG_MC14411_F1_CB(WRITELINE (*this, proteus3_state, write_f1_clock))
 	MCFG_MC14411_F2_CB(WRITELINE (*this, proteus3_state, write_f2_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (*this, proteus3_state, write_f3_clock))

@@ -61,7 +61,7 @@
 ** - cpc50a/cpc50b/cpc51: Boot to a black screen, is this correct?
 ** - mbh2: speed controller not implemented
 ** - mbh70: Verify firmware operation
-** - kmc5000: Floppy supprt broken
+** - kmc5000: Floppy support broken
 ** - mlg3: rs232c not emulated
 ** - perfect1: Firmware broken
 ** - mpc2500f: Fix keyboard layout?
@@ -194,7 +194,7 @@ National CF-3000 - MSX1 - cf3000
 National CF-3300 - MSX1 - cf3300
 National FS-1300 - MSX1 - fs1300
 National FS-4000 - MSX1 - fs4000
-Matioanl FS-4000 (alt) - MSX1 - fs4000a
+National FS-4000 (alt) - MSX1 - fs4000a
 National FS-4500 - MSX2 - fs4500
 National FS-4600 - MSX2 - fs4600
 National FS-4700 - MSX2 - fs4700
@@ -442,7 +442,7 @@ Notes:
    IC40              - TA75559P
    Q1                - 10687.5
    Q2                - 3579545
-   CN1               - Cassette connecter
+   CN1               - Cassette connector
    CN2               - RF connector
    CN3               - Audio connector
    CN4               - Video connector
@@ -507,8 +507,8 @@ Yamaha YIS-503IIR (Russian) - MSX1 - y503iir
 Yamaha YIS-503IIR (Estonian) - MSX1 - y503iir2
 Yamaha YIS-503M - MSX1 - yis503m
 Yamaha YIS-503IIIR - MSX2 - y503iiir
-Yamaha YIS-503IIIR Estonion - MSX2 - y503iiire
-Ymaha YIS604 - MSX2 - yis60464
+Yamaha YIS-503IIIR Estonian - MSX2 - y503iiire
+Yamaha YIS604 - MSX2 - yis60464
 Yamaha YIS604-128 - MSX2 - yis604
 Yamaha YIS805-128 - MSX2 - y805128
 Yamaha YIS805-128R2 - MSX2 - y805128r2
@@ -2052,6 +2052,28 @@ MACHINE_CONFIG_START(msx_state::cpc51)
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 0, 4)  /* 64KB RAM */
+
+	msx1_cartlist(config);
+MACHINE_CONFIG_END
+
+/* MSX - Dragon MSX-64 */
+
+ROM_START(dgnmsx)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("uk1msx048.ic37", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
+	ROM_LOAD("uk2msx058.ic6",  0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
+ROM_END
+
+MACHINE_CONFIG_START(msx_state::dgnmsx)
+	msx_pal(config);
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+
+	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 0, 4)  /* 64KB RAM */
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
 	msx1_cartlist(config);
 MACHINE_CONFIG_END
@@ -8520,6 +8542,7 @@ COMP(1985, dpc200e,    0,        0,     dpc200e,    msx,      msx_state, empty_i
 COMP(1983, cpc50a,     cpc51,    0,     cpc50a,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50A (Korea) (MSX1)", 0)
 COMP(1983, cpc50b,     cpc51,    0,     cpc50b,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50B (Korea) (MSX1)", 0)
 COMP(1986, cpc51,      0,        0,     cpc51,      msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-51 (Korea) (MSX1)", 0)
+COMP(1985, dgnmsx,     0,        0,     dgnmsx,     msx,      msx_state, empty_init, "Eurohard S.A.", "Dragon MSX-64 (MSX1)", 0)
 COMP(1983, fdpc200,    0,        0,     fdpc200,    msx,      msx_state, empty_init, "Fenner", "DPC-200 (Italy) (MSX1)", 0)
 COMP(1984, fpc500,     0,        0,     fpc500,     msx,      msx_state, empty_init, "Fenner", "FPC-500 (Italy) (MSX1)", 0)
 COMP(1986, fspc800,    0,        0,     fspc800,    msx,      msx_state, empty_init, "Fenner", "SPC-800 (Italy) (MSX1)", 0)

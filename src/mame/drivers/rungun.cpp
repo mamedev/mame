@@ -109,7 +109,7 @@ WRITE16_MEMBER(rungun_state::sysregs_w)
 				membank("spriteram_bank")->set_entry((data & 0x80) >> 7);
 				m_video_mux_bank = ((data & 0x80) >> 7) ^ 1;
 				ioport("EEPROMOUT")->write(data, 0xff);
-				
+
 				machine().bookkeeping().coin_counter_w(0, data & 0x08);
 				machine().bookkeeping().coin_counter_w(1, data & 0x10);
 			}
@@ -383,7 +383,7 @@ void rungun_state::machine_start()
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
 	//save_item(NAME(m_ttl_vram));
-	
+
 }
 
 void rungun_state::machine_reset()
@@ -454,14 +454,14 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	// SFX
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADD("k054539_1", K054539, 18.432_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, rungun_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	// BGM, volumes handtuned to make SFXs heardable (still not 100% right tho)
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
+	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
+	MCFG_DEVICE_ADD("k054539_2", K054539, 18.432_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)

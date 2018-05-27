@@ -33,7 +33,7 @@ public:
 		m_light0_y(*this, "LIGHT0_Y"),
 		m_light1_x(*this, "LIGHT1_X"),
 		m_light1_y(*this, "LIGHT1_Y"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(ripribit_control_w);
@@ -53,7 +53,7 @@ public:
 	void gameroom(machine_config &config);
 	void lethalj_map(address_map &map);
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void video_start() override;
 
@@ -65,7 +65,7 @@ protected:
 	optional_ioport m_light0_y;
 	optional_ioport m_light1_x;
 	optional_ioport m_light1_y;
-	output_finder<3> m_lamp;
+	output_finder<3> m_lamps;
 
 	emu_timer *m_gen_ext1_int_timer;
 	uint16_t m_blitter_data[8];

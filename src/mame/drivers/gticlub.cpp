@@ -922,7 +922,7 @@ uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb3
 	draw_7segment_led(bitmap, 3, 3, m_gticlub_led_reg[0]);
 	draw_7segment_led(bitmap, 9, 3, m_gticlub_led_reg[1]);
 
-	//machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
+	//m_dsp->set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
@@ -1001,8 +1001,7 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_K001604_ROZ_OFFSET(0)
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k001005", K001005, 0)
-	MCFG_K001005_TEXEL_CHIP("k001006_1")
+	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
 
 	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
 	MCFG_K001006_GFX_REGION("gfx1")

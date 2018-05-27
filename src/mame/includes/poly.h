@@ -66,7 +66,7 @@ public:
 		, m_adlc(*this, "mc6854")
 		, m_ptm(*this, "ptm")
 		, m_irqs(*this, "irqs")
-//		, m_kr2376(*this, "kr2376")
+//      , m_kr2376(*this, "kr2376")
 		, m_kbd(*this, "X%u", 0)
 		, m_modifiers(*this, "MODIFIERS")
 		, m_speaker(*this, "speaker")

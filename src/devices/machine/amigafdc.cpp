@@ -442,7 +442,7 @@ void amiga_fdc_device::setup_leds()
 		machine().output().set_value("drive_2_led", drive == 2);
 		machine().output().set_value("drive_3_led", drive == 3);
 
-		m_leds[0] = drive == 0 ? 1 : 0;	// update internal drive led
+		m_leds[0] = drive == 0 ? 1 : 0; // update internal drive led
 		m_leds[1] = drive == 1 ? 1 : 0;  // update external drive led
 	}
 }

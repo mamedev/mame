@@ -52,7 +52,7 @@ public:
 		, m_generic_paletteram_8(*this, "paletteram")
 		, m_track_x(*this, "TRACKX")
 		, m_track_y(*this, "TRACKY")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void qbert_knocker(uint8_t knock);
@@ -133,7 +133,7 @@ protected:
 
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;
-	output_finder<3> m_led;  // only used by reactor
+	output_finder<3> m_leds;  // only used by reactor
 
 	uint8_t m_knocker_prev;
 	uint8_t m_joystick_select;

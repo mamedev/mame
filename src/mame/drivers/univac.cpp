@@ -74,6 +74,9 @@ public:
 		, m_framecnt(0)
 	{ }
 
+	void uts20(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -86,10 +89,8 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void uts20(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;

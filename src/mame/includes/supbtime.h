@@ -2,7 +2,7 @@
 // copyright-holders: Bryan McPhail, David Haywood, Dirk Best
 /***************************************************************************
 
-	Super Burger Time
+    Super Burger Time
 
 ***************************************************************************/
 

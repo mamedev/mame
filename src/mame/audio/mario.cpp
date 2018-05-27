@@ -405,7 +405,7 @@ DISCRETE_SOUND_END
 void mario_state::set_ea(int ea)
 {
 	//printf("ea: %d\n", ea);
-	//machine().device("audiocpu")->execute().set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
+	//m_audiocpu->set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_eabank != nullptr)
 		membank(m_eabank)->set_entry(ea);
 }

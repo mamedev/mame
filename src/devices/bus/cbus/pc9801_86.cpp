@@ -3,20 +3,24 @@
 /***************************************************************************
 
     NEC PC-9801-86 sound card
-	NEC PC-9801-SpeakBoard sound card
+    NEC PC-9801-SpeakBoard sound card
 
     Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
     additional DAC port
-	SpeakBoard sound card seems to be derived design from -86, with an additional 
-	OPNA mapped at 0x58*
+    SpeakBoard sound card seems to be derived design from -86, with an additional
+    OPNA mapped at 0x58*
 
     TODO:
     - joystick code should be shared between -26, -86 and -118
     - Test all pcm modes
     - Make volume work
     - Recording
-	- actual stereo sound routing (currently routes to ALL_OUTPUTS)
-	- SpeakBoard: no idea about software that uses this;
+    - actual stereo sound routing (currently routes to ALL_OUTPUTS)
+    - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
+      "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM"
+      Sounds like a sound core flaw since OPNA requires a rom region in any case;
+    - SpeakBoard: sounds horrible, due of the MAME mixing (same as Sega 32X, needs user to lower individual channel volumes);
+    - verify sound irq;
 
 ***************************************************************************/
 
@@ -33,17 +37,6 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "pc9801_86")
-
-
-READ8_MEMBER(pc9801_86_device::opn_porta_r)
-{
-	if(m_joy_sel & 0x80)
-		return ioport(m_joy_sel & 0x40 ? "OPNA_PA2" : "OPNA_PA1")->read();
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(pc9801_86_device::opn_portb_w){ m_joy_sel = data; }
 
 WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 {
@@ -69,6 +62,7 @@ MACHINE_CONFIG_START(pc9801_86_device::pc9801_86_config)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_86_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
 	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // burr brown pcm61p
 	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // burr brown pcm61p
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -108,23 +102,7 @@ const tiny_rom_entry *pc9801_86_device::device_rom_region() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pc9801_86 )
-	PORT_START("OPNA_PA1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Down")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Left")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Right")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("OPNA_PA2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Down")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Left")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Right")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( pc9801_joy_port )
 
 	PORT_START("OPNA_DSW")
 	PORT_CONFNAME( 0x01, 0x01, "PC-9801-86: Port Base" )
@@ -146,7 +124,7 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
+	: pc9801_snd_device(mconfig, type, tag, owner, clock),
 		m_bus(*this, DEVICE_SELF_OWNER),
 		m_opna(*this, "opna"),
 		m_ldac(*this, "ldac"),
@@ -158,7 +136,7 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type ty
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_86_device(mconfig, PC9801_86, tag, owner, clock)
 {
-	
+
 }
 
 
@@ -175,32 +153,13 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_86_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
-{
-	int buswidth = m_bus->io_space().data_width();
-	switch(buswidth)
-	{
-		case 8:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 16:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
-			break;
-		case 32:
-			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			break;
-		default:
-			fatalerror("PC-9801-86: Bus width %d not supported\n", buswidth);
-	}
-}
-
 
 void pc9801_86_device::device_start()
 {
 	m_bus->program_space().install_rom(0xcc000,0xcffff,memregion(this->subtag("sound_bios").c_str())->base());
-	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
-	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
-	install_device(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+	m_bus->install_io(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
+	m_bus->install_io(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
+	m_bus->install_io(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
 								   write8_delegate([this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
 
 	m_dac_timer = timer_alloc();
@@ -218,7 +177,7 @@ void pc9801_86_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
 	m_bus->io_space().unmap_readwrite(0x0088, 0x008f, 0x100);
-	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opna_r), this), write8_delegate(FUNC(pc9801_86_device::opna_w), this) );
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opna_r), this), write8_delegate(FUNC(pc9801_86_device::opna_w), this) );
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
@@ -419,7 +378,7 @@ const tiny_rom_entry *pc9801_speakboard_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc9801_86_device - constructor
+//  pc9801_speakboard_device - constructor
 //-------------------------------------------------
 
 pc9801_speakboard_device::pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -440,8 +399,8 @@ MACHINE_CONFIG_END
 void pc9801_speakboard_device::device_start()
 {
 	pc9801_86_device::device_start();
-	
-	install_device(0x0588, 0x058f, read8_delegate(FUNC(pc9801_speakboard_device::opna_slave_r), this), write8_delegate(FUNC(pc9801_speakboard_device::opna_slave_w), this) );
+
+	m_bus->install_io(0x0588, 0x058f, read8_delegate(FUNC(pc9801_speakboard_device::opna_slave_r), this), write8_delegate(FUNC(pc9801_speakboard_device::opna_slave_w), this) );
 }
 
 void pc9801_speakboard_device::device_reset()

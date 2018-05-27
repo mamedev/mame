@@ -1305,6 +1305,7 @@ apple2e                         // Jan 1983 Apple //e
 apple2ee                        // Mar 1985 Apple //e Enhanced
 apple2eeuk                      // Mar 1985 Apple //e Enhanced (UK)
 apple2eefr                      // Mar 1985 Apple //e Enhanced (France)
+apple2ees                       // Mar 1985 Apple //e Enhanced (Spain)
 apple2ep                        // Jan 1987 Apple //e Platinum
 apple2euk                       // Jan 1983 Apple //e (UK)
 las128e2                        // ??? Laser 128 EX2
@@ -11158,8 +11159,8 @@ deadang                         // (c) 1988 Seibu Kaihatsu
 ghunter                         // (c) 1988 Seibu Kaihatsu
 ghunters                        // (c) 1988 Seibu Kaihatsu + Segasa/Sonic license
 leadang                         // (c) 1988 Seibu Kaihatsu
-popnrun							// (c) 1987 Seibu Kaihatsu + Yukai Tsukai
-popnruna						// (c) 1987 Seibu Kaihatsu + Yukai Tsukai
+popnrun                         // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
+popnruna                        // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
 
 @source:dec0.cpp
 automat                         // bootleg
@@ -15567,6 +15568,7 @@ istellar                        // (c) 1983 Funai / Gakken
 
 @source:istrebiteli.cpp
 istreb                          //
+motogonki                       //
 
 @source:iteagle.cpp
 bbh2sp                          //
@@ -17732,6 +17734,7 @@ hypbbc2pk                       // 1999 - Hyper Bishi Bashi Champ - 2 Player (GX
 hyperbbc                        // 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
 hyperbbca                       // 1998 - Hyper Bishi Bashi (GQ876 VER. AAA)
 hyperbbck                       // 1998 - Hyper Bishi Bashi (GE876 VER. KAA)
+jppyex98                        // 1998 - Jikkyou Powerful Pro Yakyuu EX '98 (GC811 VER. JAA)
 konam80a                        // 1998 - Konami 80's AC Special (GC826 VER. AAA)
 konam80j                        // 1998 - Konami 80's Gallery (GC826 VER. JAA)
 konam80k                        // 1998 - Konami 80's AC Special (GC826 VER. KAA)
@@ -28126,6 +28129,7 @@ cx5m128                         //
 cx5m2                           //
 cx7m                            // 1986 MSX2
 cx7m128                         // 1986 MSX2
+dgnmsx                          // 1985 MSX
 dpc100                          // 1984 MSX Korea
 dpc180                          // 1984 MSX Korea
 dpc200                          // 1984 MSX Korea
@@ -34316,6 +34320,7 @@ rdftja                          // (c) 1996 Seibu Kaihatsu
 rdftjb                          // (c) 1996 Seibu Kaihatsu
 rdfts                           // (c) 1996 Seibu Kaihatsu (Explorer System Corp.)
 rdftu                           // (c) 1996 Seibu Kaihatsu (Fabtek license)
+rdftua                          // (c) 1996 Seibu Kaihatsu (Fabtek license)
 rfjet                           // (c) 1998 Seibu Kaihatsu (Tuning License)
 rfjet2kc                        // (c) 2000 Seibu Kaihatsu
 rfjeta                          // (c) 1998 Seibu Kaihatsu (Dream Island license)
@@ -34334,6 +34339,7 @@ viprp1k                         // (c) 1995 Seibu Kaihatsu (Dream Island license
 viprp1oj                        // (c) 1995 Seibu Kaihatsu
 viprp1ot                        // (c) 1995 Seibu Kaihatsu (Tuning License)
 viprp1s                         // (c) 1995 Seibu Kaihatsu
+viprp1t                         // (c) 1995 Seibu Kaihatsu (Tuning License)
 viprp1u                         // (c) 1995 Seibu Kaihatsu (Fabtek license)
 viprp1ua                        // (c) 1995 Seibu Kaihatsu (Fabtek license)
 

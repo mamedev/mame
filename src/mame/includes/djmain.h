@@ -19,7 +19,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_turntable(*this, {"TT1", "TT2"})
 		, m_sndram(*this, "sndram")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{
 	}
 
@@ -80,7 +80,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_ioport_array<2> m_turntable;
 	required_shared_ptr<uint8_t> m_sndram;
-	output_finder<3> m_led;
+	output_finder<3> m_leds;
 
 	int m_sndram_bank;
 	int m_turntable_select;

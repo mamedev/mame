@@ -141,8 +141,8 @@ Notes:
 
     TODO:
 
-	- abc802 video is all black
-	- abc850 is broken
+    - abc802 video is all black
+    - abc850 is broken
     - cassette
 
 */
@@ -266,13 +266,13 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 		vr = 1;
 	}
 /*
-	if (!m1l && (offset < 0x7800)
-	{
-		TODO 0..30k read from videoram if fetch opcode from 7800-7fff
-		romd = 1;
-		hre = 1;
-		mux = 0;
-	}
+    if (!m1l && (offset < 0x7800)
+    {
+        TODO 0..30k read from videoram if fetch opcode from 7800-7fff
+        romd = 1;
+        hre = 1;
+        mux = 0;
+    }
 */
 	size_t videoram_mask = m_ram->size() - 0x8001;
 

@@ -73,8 +73,8 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	m_lamp[0] = BIT(data, 2);
-	m_lamp[1] = BIT(data, 3);
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
 
 	/* bit 4 = relay (???) */
 
@@ -285,7 +285,7 @@ GFXDECODE_END
 void bladestl_state::machine_start()
 {
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_last_track));

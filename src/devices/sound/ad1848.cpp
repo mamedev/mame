@@ -93,14 +93,14 @@ WRITE8_MEMBER(ad1848_device::write)
 			switch(m_addr)
 			{
 				case 8:
-					if(m_mce)
+					if(!m_mce)
 						return;
 					m_regs.dform &= 0x7f;
 					break;
 				case 9:
 				{
 					m_play = (data & 1) ? true : false;
-					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? XTAL(24'576'000) : XTAL(16'934'400))
+					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
 							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
 					m_timer->adjust(rate, 0 , rate);
 					m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);

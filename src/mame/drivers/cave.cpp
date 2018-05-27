@@ -700,10 +700,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 {
 	COMBINE_DATA(&m_leds[0]);
 
-	m_led[0] = BIT(data, 15);
-	m_led[1] = BIT(data, 14);
-	m_led[2] = BIT(data, 12);    // square button
-	m_led[3] = BIT(data, 11);    // round  button
+	m_led_outputs[0] = BIT(data, 15);
+	m_led_outputs[1] = BIT(data, 14);
+	m_led_outputs[2] = BIT(data, 12);    // square button
+	m_led_outputs[3] = BIT(data, 11);    // round  button
 //  machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);   // coin lockouts?
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
 
@@ -711,10 +711,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 //  machine().bookkeeping().coin_counter_w(1, data & 0x0020);
 	machine().bookkeeping().coin_counter_w(0, data & 0x0010);
 
-	m_led[5] = BIT(data, 3);
-	m_led[6] = BIT(data, 2);
-	m_led[7] = BIT(data, 1);
-	m_led[8] = BIT(data, 0);
+	m_led_outputs[5] = BIT(data, 3);
+	m_led_outputs[6] = BIT(data, 2);
+	m_led_outputs[7] = BIT(data, 1);
+	m_led_outputs[8] = BIT(data, 0);
 
 	show_leds();
 }
@@ -907,17 +907,17 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 
-		m_led[0] = BIT(data, 4);
-		m_led[1] = BIT(data, 5);
-		m_led[2] = BIT(data, 6);
-		m_led[3] = BIT(data, 7);
+		m_led_outputs[0] = BIT(data, 4);
+		m_led_outputs[1] = BIT(data, 5);
+		m_led_outputs[2] = BIT(data, 6);
+		m_led_outputs[3] = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		m_led[4] = BIT(data, 8);
-		m_led[5] = BIT(data, 9);
-		m_led[6] = BIT(data, 10);    // not tested in service mode
-		m_led[7] = BIT(data, 11);    // not tested in service mode
+		m_led_outputs[4] = BIT(data, 8);
+		m_led_outputs[5] = BIT(data, 9);
+		m_led_outputs[6] = BIT(data, 10);    // not tested in service mode
+		m_led_outputs[7] = BIT(data, 11);    // not tested in service mode
 
 		m_oki[0]->set_rom_bank((data & 0x8000) >> 15);
 	}
@@ -1133,14 +1133,14 @@ WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_led[0] = BIT(data, 0); // suru
-		m_led[1] = BIT(data, 1); // shinai
-		m_led[2] = BIT(data, 2); // payout
-		m_led[3] = BIT(data, 3); // go
-		m_led[4] = BIT(data, 4); // 1 bet
-		m_led[5] = BIT(data, 5); // medal
+		m_led_outputs[0] = BIT(data, 0); // suru
+		m_led_outputs[1] = BIT(data, 1); // shinai
+		m_led_outputs[2] = BIT(data, 2); // payout
+		m_led_outputs[3] = BIT(data, 3); // go
+		m_led_outputs[4] = BIT(data, 4); // 1 bet
+		m_led_outputs[5] = BIT(data, 5); // medal
 		m_hopper = BIT(data, 6);  // hopper
-		m_led[6] = BIT(data, 7); // 3 bet
+		m_led_outputs[6] = BIT(data, 7); // 3 bet
 	}
 
 //  popmessage("led %04X", data);
@@ -1179,12 +1179,12 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_led[0] = data & 0x0001; // pac-man
-		m_led[1] = data & 0x0002; // ms. pac-man
-		m_led[2] = data & 0x0004; // payout
-		m_led[3] = data & 0x0008; // start
-		m_led[4] = data & 0x0010; // bet
-		m_led[5] = data & 0x0020; // medal
+		m_led_outputs[0] = data & 0x0001; // pac-man
+		m_led_outputs[1] = data & 0x0002; // ms. pac-man
+		m_led_outputs[2] = data & 0x0004; // payout
+		m_led_outputs[3] = data & 0x0008; // start
+		m_led_outputs[4] = data & 0x0010; // bet
+		m_led_outputs[5] = data & 0x0020; // medal
 		m_hopper = data & 0x0040;  // hopper
 	}
 
@@ -2064,7 +2064,7 @@ GFXDECODE_END
 
 void cave_state::machine_start()
 {
-	m_led.resolve();
+	m_led_outputs.resolve();
 	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::cave_vblank_end), this));
 
 	save_item(NAME(m_soundbuf_wptr));

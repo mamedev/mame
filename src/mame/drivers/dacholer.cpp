@@ -55,7 +55,7 @@ public:
 		, m_bgvideoram(*this, "bgvideoram")
 		, m_fgvideoram(*this, "fgvideoram")
 		, m_spriteram(*this, "spriteram")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
@@ -106,7 +106,7 @@ private:
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -231,8 +231,8 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	m_led[0] = BIT(data, 2);
-	m_led[1] = BIT(data, 3);
+	m_leds[0] = BIT(data, 2);
+	m_leds[1] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
@@ -604,7 +604,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 
 void dacholer_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_msm_data));

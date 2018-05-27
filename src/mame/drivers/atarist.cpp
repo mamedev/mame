@@ -1701,9 +1701,9 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	// drive select
 	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
-		floppy = floppy_devices[0];
+		floppy = m_floppy[0]->get_device();
 	else if(!BIT(data, 2))
-		floppy = floppy_devices[1];
+		floppy = m_floppy[1]->get_device();
 
 	// side select
 	if(floppy)
@@ -1745,9 +1745,9 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	// drive select
 	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
-		floppy = floppy_devices[0];
+		floppy = m_floppy[0]->get_device();
 	else if(!BIT(data, 2))
-		floppy = floppy_devices[1];
+		floppy = m_floppy[1]->get_device();
 
 	// side select
 	if(floppy)
@@ -1907,15 +1907,6 @@ void st_state::machine_start()
 
 	// register for state saving
 	state_save();
-
-	static const char *names[] = { WD1772_TAG ":0", WD1772_TAG ":1" };
-	for(int i=0; i != 2; i++) {
-		floppy_connector *con = machine().device<floppy_connector>(names[i]);
-		if(con)
-			floppy_devices[i] = con->get_device();
-		else
-			floppy_devices[i] = nullptr;
-	}
 
 	/// TODO: get callbacks to trigger these.
 	m_mfp->i0_w(1);

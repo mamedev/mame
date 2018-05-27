@@ -62,8 +62,8 @@ READ8_MEMBER(skykid_state::inputport_r)
 
 WRITE8_MEMBER(skykid_state::skykid_led_w)
 {
-	m_led[0] = BIT(data, 3);
-	m_led[1] = BIT(data, 4);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_subreset_w)
@@ -95,7 +95,7 @@ WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
 
 void skykid_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);

@@ -420,7 +420,7 @@ void tandy1000_state::machine_start()
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
 			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this), 0xffff);
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
 READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
@@ -651,7 +651,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	downcast<t1000_mb_device &>(*device).set_cputag("maincpu");
 
 	/* video hardware */
-	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
+	MCFG_DEVICE_ADD("pcvideo_t1000", PCVIDEO_T1000, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 

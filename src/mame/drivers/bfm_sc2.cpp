@@ -205,7 +205,7 @@ public:
 		, m_rombank1(*this, "bank1")
 		, m_ym2413(*this, "ymsnd")
 		, m_meters(*this, "meters")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{
 		for (auto &elem : m_lamps_old)
 			elem = 0;
@@ -322,7 +322,7 @@ private:
 	int m_e2data_to_read;
 	uint8_t m_codec_data[256];
 	uint8_t m_lamps_old[0x20];
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 };
 
 
@@ -710,7 +710,7 @@ WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
 		int newbit = BIT(data, i);
 
 		if (oldbit != newbit)
-			m_lamp[off + i] = newbit;
+			m_lamps[off + i] = newbit;
 	}
 
 	m_lamps_old[offset] = data;
@@ -2270,7 +2270,7 @@ MACHINE_CONFIG_END
 
 void bfm_sc2_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
 	if (e2ram != nullptr)
 		e2ram->set_base(m_e2ram, sizeof(m_e2ram));

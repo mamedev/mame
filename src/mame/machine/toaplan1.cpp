@@ -172,7 +172,7 @@ void toaplan1_state::toaplan1_reset_sound()
 	/* Reset the secondary CPU and sound chip */
 	/* rallybik, truxton, hellfire, demonwld write to a port to cause a reset */
 	/* zerowing, fireshrk, outzone, vimana use a RESET instruction instead */
-	machine().device("ymsnd")->reset();
+	m_ymsnd->reset();
 	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 

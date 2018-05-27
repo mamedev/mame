@@ -406,7 +406,7 @@ void cojag_devices(device_slot_interface &device)
  *  Machine init
  *
  *************************************/
- 
+
 void jaguar_state::machine_start()
 {
 	/* configure banks for gfx/sound ROMs */
@@ -446,7 +446,7 @@ void jaguar_state::machine_reset()
 			m_butch_cmd_size = 1;
 		}
 	}
-	
+
 	/* reset banks for gfx/sound ROMs */
 	if (m_romboard_region != nullptr)
 	{
@@ -1341,7 +1341,7 @@ void jaguar_state::jaguarcd_map(address_map &map)
  *  Main CPU memory handlers
  *
  *************************************/
- 
+
 void jaguar_state::r3000_map(address_map &map)
 {
 	map(0x04000000, 0x047fffff).ram().share("sharedram");

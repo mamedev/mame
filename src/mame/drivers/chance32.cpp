@@ -37,7 +37,7 @@ public:
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
@@ -77,7 +77,7 @@ protected:
 	uint8_t mux_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<13> m_lamp;
+	output_finder<13> m_lamps;
 };
 
 
@@ -179,13 +179,13 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	if (data & 1)   // bit 0 is the mux selector.
 
 	{
-		m_lamp[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
-		m_lamp[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
-		m_lamp[2] = BIT(data, 3);  /* Lamp 2 - Hold 5 */
-		m_lamp[3] = BIT(data, 4);  /* Lamp 3 - Hold 4 */
-		m_lamp[4] = BIT(data, 5);  /* Lamp 4 - Hold 3 */
-		m_lamp[5] = BIT(data, 6);  /* Lamp 5 - Hold 2 */
-		m_lamp[6] = BIT(data, 7);  /* Lamp 6 - Hold 1 */
+		m_lamps[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
+		m_lamps[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
+		m_lamps[2] = BIT(data, 3);  /* Lamp 2 - Hold 5 */
+		m_lamps[3] = BIT(data, 4);  /* Lamp 3 - Hold 4 */
+		m_lamps[4] = BIT(data, 5);  /* Lamp 4 - Hold 3 */
+		m_lamps[5] = BIT(data, 6);  /* Lamp 5 - Hold 2 */
+		m_lamps[6] = BIT(data, 7);  /* Lamp 6 - Hold 1 */
 
 		logerror("Lamps A: %02x\n", data);
 	}
@@ -193,12 +193,12 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	else
 	{
 		// bit 1 is unknown...
-		m_lamp[7] = BIT(data, 2);  /* Lamp 7 - Fever! */
-		m_lamp[8] = BIT(data, 3);  /* Lamp 8 - Cancel */
-		m_lamp[9] = BIT(data, 4);  /* Lamp 9 - D-Up / Take */
-		m_lamp[10] = BIT(data, 5); /* Lamp 10 - Take / D-Up */
-		m_lamp[11] = BIT(data, 6); /* Lamp 11 - Deal */
-		m_lamp[12] = BIT(data, 7); /* Lamp 12 - Bet */
+		m_lamps[7] = BIT(data, 2);  /* Lamp 7 - Fever! */
+		m_lamps[8] = BIT(data, 3);  /* Lamp 8 - Cancel */
+		m_lamps[9] = BIT(data, 4);  /* Lamp 9 - D-Up / Take */
+		m_lamps[10] = BIT(data, 5); /* Lamp 10 - Take / D-Up */
+		m_lamps[11] = BIT(data, 6); /* Lamp 11 - Deal */
+		m_lamps[12] = BIT(data, 7); /* Lamp 12 - Bet */
 
 		logerror("Lamps B: %02x\n", data);
 	}
@@ -448,7 +448,7 @@ GFXDECODE_END
 
 void chance32_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 void chance32_state::machine_reset()

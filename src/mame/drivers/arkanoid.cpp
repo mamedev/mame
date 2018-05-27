@@ -2126,14 +2126,14 @@ void arkanoid_state::init_block2()
 	{
 		// combine these into a single swap..
 		int srctile = bitswap<16>(tile,15,14,13,12,
-						               11,10, 9, 8,
-						                7, 5, 6, 3,
-						                1, 2, 4, 0);
+									   11,10, 9, 8,
+										7, 5, 6, 3,
+										1, 2, 4, 0);
 
 		srctile = bitswap<16>(srctile,15,14,13,12,
-						              11, 9,10, 5,
-						               7, 6, 8, 4,
-						               3, 2, 1, 0);
+									  11, 9,10, 5,
+									   7, 6, 8, 4,
+									   3, 2, 1, 0);
 
 		srctile = srctile ^ 0xd4;
 

@@ -69,16 +69,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
 WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 {
 	/* BIT0 => START1 LAMP */
-	m_led[0] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 0);
 
 	/* BIT1 => START2 LAMP */
-	m_led[1]= BIT(~data, 1);
+	m_leds[1]= BIT(~data, 1);
 
 	/* BIT2 => FLASH       */
 	m_flash = data & 0x04;
 
 	/* BIT3 => TRACK LAMP  */
-	m_led[3] = BIT(~data, 3);
+	m_leds[3] = BIT(~data, 3);
 
 	/* BIT4 => ATTRACT     */
 	m_discrete->write(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
@@ -86,7 +86,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	machine().bookkeeping().coin_lockout_w(1, !(data & 0x10));
 
 	/* BIT5 => START3 LAMP */
-	m_led[2] = BIT(~data, 5);
+	m_leds[2] = BIT(~data, 5);
 
 	/* BIT6 => UNUSED      */
 
@@ -98,7 +98,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 WRITE8_MEMBER(firetrk_state::superbug_output_w)
 {
 	/* BIT0 => START LAMP */
-	m_led[0] = BIT(offset, 0);
+	m_leds[0] = BIT(offset, 0);
 
 	/* BIT1 => ATTRACT    */
 	m_discrete->write(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
@@ -109,17 +109,17 @@ WRITE8_MEMBER(firetrk_state::superbug_output_w)
 	m_flash = offset & 0x04;
 
 	/* BIT3 => TRACK LAMP */
-	m_led[1] = BIT(offset, 3);
+	m_leds[1] = BIT(offset, 3);
 }
 
 
 WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 {
 	/* BIT0 => START LAMP    */
-	m_led[0] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 0);
 
 	/* BIT1 => TRACK LAMP    */
-	m_led[1] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 1);
 
 	/* BIT2 => ATTRACT       */
 	m_discrete->write(space, MONTECAR_ATTRACT_INV, data & 0x04);

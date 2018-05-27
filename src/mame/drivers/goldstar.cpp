@@ -303,28 +303,28 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
 */
-	m_lamp[0] = BIT(data, 0);
-	m_lamp[1] = BIT(data, 1);
-	m_lamp[2] = BIT(data, 2);
-	m_lamp[3] = BIT(data, 3);
-	m_lamp[4] = BIT(data, 4);
-	m_lamp[5] = BIT(data, 5);
-	m_lamp[6] = BIT(data, 6);
-	m_lamp[7] = BIT(data, 7);
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
+	m_lamps[2] = BIT(data, 2);
+	m_lamps[3] = BIT(data, 3);
+	m_lamps[4] = BIT(data, 4);
+	m_lamps[5] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 
 //  popmessage("p1 lamps: %02X", data);
 }
 
 WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 {
-	m_lamp[8 + 0] = BIT(data, 0);
-	m_lamp[8 + 1] = BIT(data, 1);
-	m_lamp[8 + 2] = BIT(data, 2);
-	m_lamp[8 + 3] = BIT(data, 3);
-	m_lamp[8 + 4] = BIT(data, 4);
-	m_lamp[8 + 5] = BIT(data, 5);
-	m_lamp[8 + 6] = BIT(data, 6);
-	m_lamp[8 + 7] = BIT(data, 7);
+	m_lamps[8 + 0] = BIT(data, 0);
+	m_lamps[8 + 1] = BIT(data, 1);
+	m_lamps[8 + 2] = BIT(data, 2);
+	m_lamps[8 + 3] = BIT(data, 3);
+	m_lamps[8 + 4] = BIT(data, 4);
+	m_lamps[8 + 5] = BIT(data, 5);
+	m_lamps[8 + 6] = BIT(data, 6);
+	m_lamps[8 + 7] = BIT(data, 7);
 
 //  popmessage("p2 lamps: %02X", data);
 }
@@ -1203,12 +1203,12 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 	if (!m_vblank_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_lamp[0] = BIT(data, 0);  /* Bet-A / Stop 2 */
-	m_lamp[1] = BIT(data, 1);  /* Start / Stop All */
-	m_lamp[2] = BIT(data, 2);  /* Info / Small / Stop 3 */
-	m_lamp[3] = BIT(data, 3);  /* Big */
-	m_lamp[4] = BIT(data, 4);  /* Bet-B / D-Up */
-	m_lamp[5] = BIT(data, 5);  /* Take / Stop 1 */
+	m_lamps[0] = BIT(data, 0);  /* Bet-A / Stop 2 */
+	m_lamps[1] = BIT(data, 1);  /* Start / Stop All */
+	m_lamps[2] = BIT(data, 2);  /* Info / Small / Stop 3 */
+	m_lamps[3] = BIT(data, 3);  /* Big */
+	m_lamps[4] = BIT(data, 4);  /* Bet-B / D-Up */
+	m_lamps[5] = BIT(data, 5);  /* Take / Stop 1 */
 }
 
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)

@@ -544,15 +544,15 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_led[0] = BIT(data, 8);    // 3 buttons
-		m_led[1] = BIT(data, 9);
-		m_led[2] = BIT(data, 10);
+		m_leds[0] = BIT(data, 8);    // 3 buttons
+		m_leds[1] = BIT(data, 9);
+		m_leds[2] = BIT(data, 10);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_led[3] = BIT(data, 4);
-		m_led[4] = BIT(data, 5);
+		m_leds[3] = BIT(data, 4);
+		m_leds[4] = BIT(data, 5);
 	}
 }
 
@@ -647,10 +647,10 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_led[0] = BIT(data, 8);
-		m_led[1] = BIT(data, 12);
-		m_led[2] = BIT(data, 13);
-		m_led[3] = BIT(data, 14);
+		m_leds[0] = BIT(data, 8);
+		m_leds[1] = BIT(data, 12);
+		m_leds[2] = BIT(data, 13);
+		m_leds[3] = BIT(data, 14);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -694,9 +694,9 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
-		m_led[0] = BIT(data, 8);    // decide
+		m_leds[0] = BIT(data, 8);    // decide
 		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
-		m_led[1] = BIT(data, 13);    // select
+		m_leds[1] = BIT(data, 13);    // select
 
 		int power = (data & 0x1000);
 		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
