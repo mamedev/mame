@@ -89,11 +89,11 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
-{	
+{
 	int tile=m_cyclwarr_videoram[Bank][(tile_index+0x400)&0x7fff];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)|(bank<<10),((tile>>12)&0xf) | m_cyclwarr_color_bank,0);
-	// TODO: enables transparent pen on sideways	
+	// TODO: enables transparent pen on sideways
 	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
 }
 
@@ -135,7 +135,7 @@ void cyclwarr_state::tile_expand()
 			c0base += gx0->rowbytes();
 		}
 	}
-	
+
 	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(256);
 }
@@ -170,7 +170,7 @@ VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)
 	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_cyclwarr_road<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
 	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
 	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
-	
+
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 }
 
@@ -921,14 +921,14 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		int y_base = rowscroll_enable ? y : 0;
 		int src_x = scrollx[y_base] + xscroll_offset;
 		int src_y = scrolly[y_base] + yscroll_offset;
-		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an 
+		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
 		// additional tile color bank and per scanline.
 		if(is_road == true && scrolly[y_base] & 0x8000)
 		{
 			m_cyclwarr_color_bank = (scrolly[y_base] >> 13) & 3;
 			src->mark_all_dirty();
 		}
-		
+
 		src->set_scrollx(0,src_x);
 		src->set_scrolly(0,src_y);
 		src->draw(screen, bitmap, clip, 0, 0);
@@ -1048,14 +1048,14 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	}
 
 	bitmap.fill(m_palette->pen(0), cliprect);
-	
+
 	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80,false, false);
 	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80,false, false);
 	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40,true, true);
 	update_cluts(8192, 4096, 8192);
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
 	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80,false, false);
-	
+
 	return 0;
 }
 
