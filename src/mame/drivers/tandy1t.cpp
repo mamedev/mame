@@ -651,7 +651,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	downcast<t1000_mb_device &>(*device).set_cputag("maincpu");
 
 	/* video hardware */
-	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
+	MCFG_DEVICE_ADD("pcvideo_t1000", PCVIDEO_T1000, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 

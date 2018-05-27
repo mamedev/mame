@@ -327,6 +327,6 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 		}
 		pos+=recordLen;
 	}
-	machine().device("uart")->reset();
+	m_uart->reset();
 	return image_init_result::PASS;
 }

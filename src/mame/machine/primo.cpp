@@ -229,12 +229,12 @@ void primo_state::init_primo64()
 
 *******************************************************************************/
 
-void primo_state::primo_common_machine_init ()
+void primo_state::primo_common_machine_init()
 {
-	if (ioport("MEMORY_EXPANSION")->read())
+	if (m_mem_exp_port->read())
 		m_port_FD = 0x00;
 	primo_update_memory();
-	machine().device("maincpu")->set_clock_scale(ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
+	m_maincpu->set_clock_scale(m_clock_port->read() ? 1.5 : 1.0);
 }
 
 void primo_state::machine_start()

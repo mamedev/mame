@@ -147,8 +147,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PCVIDEO_PCJR, pcvideo_pcjr_device)
 
-#define MCFG_PCVIDEO_PCJR_ADD(_tag) \
-		MCFG_DEVICE_ADD(_tag, PCVIDEO_PCJR, 0)
-
-
 #endif // MAME_VIDEO_PC_T1T_H
