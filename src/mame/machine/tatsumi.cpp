@@ -265,7 +265,9 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 	/* Read from 68k RAM */
 	if ((m_control_word&0x1f)==0x18)
 	{
+		#ifdef UNUSED_FUNCTION
 		// hack to make roundup 5 boot
+		// doesn't seem necessary anymore, left for reference
 		if (m_maincpu->pc()==0xec575)
 		{
 			uint8_t *dst = m_mainregion->base();
@@ -279,6 +281,7 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 			dst[BYTE_XOR_LE(0xfc524)]=0x46;
 			dst[BYTE_XOR_LE(0xfc525)]=0x46;
 		}
+		#endif
 
 		return m_68k_ram[offset & 0x1fff];
 	}

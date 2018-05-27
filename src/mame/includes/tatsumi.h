@@ -152,6 +152,7 @@ public:
 	void roundup5_68000_map(address_map &map);
 	void roundup5_v30_map(address_map &map);
 	void roundup5_z80_map(address_map &map);
+	
 private:
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 

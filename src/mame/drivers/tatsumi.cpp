@@ -11,23 +11,32 @@
     a similar sprite chip (TZB215 on Apache 3, TZB315 on others).  Other
     graphics (road, sky, bg/fg layers) all differ between games.
 
-    Todo:
-        Sprite rotation
-        Finish road layer (Round Up 5)
-        Implement road layer (Apache 3, Cycle Warriors)
-        BG layer(s) (Cycle Warriors)
-        BG layer (Round Up 5) - May be driven by missing VRAM data
-        Round Up 5 always boots with a coin inserted
-        Round Up 5 doesn't survive a reset
-        Dip switches
-        Various other things..
-    Combine Big Fight & CycleWarriors video routines - currently each
-    game uses different sized tilemaps - these are probably software
-    controlled rather than hardwired, but I don't think either game
-    changes the size at runtime.
-    Big Fight/Cyclewarriors - misc graphics problems.
-    Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
+    TODO:
+    - Sprite rotation
+    - Round Up 5: Finish road layer.
+	  Tunnel sections are borderline unplayable, plus slopes are ugly to watch.
+    - Apache 3: road layer, has twelve rotation registers!
+    - Cycle Warriors: transparent road layer on sidelines, wrong mask_data?
+    - Missing BG layer (Round Up 5) - banked VRAM data from somewhere!?
+    - Round Up 5: always boots with a coin inserted
+    - (fixed) Round Up 5 doesn't survive a reset 
+    - (fixed?) Cycle Warriors: test mode text does not appear as it needs a -256 Y 
+	  scroll offset from somewhere. 
+	- Cycle Warriors: sometimes it draws garbage on character select or even hangs
+	  depending on where player coins up, most likely caused by miscommunication with sub CPU?
+	- Cycle Warriors: ranking screen is completely wrong;
+    - Cycle Warriors: ugly orange color on character select and briefing screens, layer disable?
+    - Combine Big Fight & CycleWarriors video routines - currently each
+      game uses different sized tilemaps - these are probably software
+      controlled rather than hardwired, but I don't think either game
+      changes the size at runtime.
+	- Apache 3 (Kana): wrong colors for most sprites in city stage (buildings/trees), 
+	  checkable in attract mode;
+	- Split these games into individual drivers, write new devices for video routines.
+    - Dip switches
+    - Various other things..
 
+	
     reference of bigfight : https://youtu.be/aUUoUCr6yhk
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
@@ -1494,7 +1503,7 @@ void cyclwarr_state::init_cyclwarr()
 /* ** 1987  grayout    - Gray Out (not dumped yet) */
 GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS, layout_roundup5 )
+GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_roundup5 )
 GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & B CPU code
 GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev B & A CPU code
 GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )

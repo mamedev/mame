@@ -1009,7 +1009,7 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
-//  draw_ground(machine(), bitmap, cliprect);
+//  draw_ground(bitmap, cliprect);
 	draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
