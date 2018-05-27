@@ -147,7 +147,7 @@ WRITE16_MEMBER(roundup5_state::roundup_v30_z80_w)
 
 
 WRITE16_MEMBER(roundup5_state::roundup5_control_w)
-{
+{	
 	COMBINE_DATA(&m_control_word);
 
 	if (m_control_word & 0x10)
@@ -173,6 +173,9 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 
 	    0x0040  :   Z80 rom (lower half) mapped to 0x10000
 	    0x0060  :   Z80 rom (upper half) mapped to 0x10000
+        
+		0x0080  :   enabled when showing map screen after a play 
+		            (switches video priority between text layer and sprites)
 
 	    0x0100  :   watchdog.
 

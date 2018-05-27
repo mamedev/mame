@@ -1059,8 +1059,16 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_road(bitmap,cliprect,screen.priority());
-	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
-	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
+	if(m_control_word & 0x80) // enabled on map screen after a play
+	{
+		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
+		draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
+	}
+	else
+	{
+		draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
+		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
+	}
 	return 0;
 }
 
