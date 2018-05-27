@@ -1452,7 +1452,7 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc100_state, nc100_txrdy_callback))
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", TC8521, 32.768_kHz_XTAL)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, nc100_state, nc100_tc8521_alarm_callback))
 MACHINE_CONFIG_END
 
@@ -1497,7 +1497,7 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
-	MCFG_MC146818_ADD( "mc", XTAL(4'194'304) )
+	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

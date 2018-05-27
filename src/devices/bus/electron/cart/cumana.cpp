@@ -54,7 +54,7 @@ MACHINE_CONFIG_START(electron_cumana_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* rtc */
-	MCFG_MC146818_ADD("rtc", 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 MACHINE_CONFIG_END
 
 //**************************************************************************

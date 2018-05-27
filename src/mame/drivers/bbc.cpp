@@ -1349,7 +1349,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* rtc and cmos */
-	MCFG_MC146818_ADD( "rtc", 32.768_kHz_XTAL )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")

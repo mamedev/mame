@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
-	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);

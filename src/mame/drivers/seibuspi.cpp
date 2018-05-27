@@ -1863,19 +1863,22 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, XTAL(50'000'000)/2) // AMD or Intel 386DX, 25MHz
+	MCFG_DEVICE_ADD("maincpu", I386, 50_MHz_XTAL / 2) // AMD or Intel 386DX, 25MHz
 	MCFG_DEVICE_PROGRAM_MAP(spi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/4) // Z84C0008PEC, 7.159MHz
+	MCFG_DEVICE_ADD("audiocpu", Z80, 28.636363_MHz_XTAL / 4) // Z84C0008PEC, 7.159MHz
 	MCFG_DEVICE_PROGRAM_MAP(spi_soundmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
-	MCFG_DS2404_ADD("ds2404", 1995, 1, 1)
+	MCFG_DEVICE_ADD("ds2404", DS2404, 32.768_kHz_XTAL)
+	MCFG_DS2404_REF_YEAR(1995)
+	MCFG_DS2404_REF_MONTH(1)
+	MCFG_DS2404_REF_DAY(1)
 
 	MCFG_INTEL_E28F008SA_ADD("soundflash1") // Sharp LH28F008 on newer mainboard revision
 	MCFG_INTEL_E28F008SA_ADD("soundflash2") // "
@@ -1902,7 +1905,7 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymf", YMF271, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymf", YMF271, 16.9344_MHz_XTAL)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
 	MCFG_DEVICE_ADDRESS_MAP(0, spi_ymf271_map)
 
@@ -1958,7 +1961,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2e)
 	MCFG_DEVICE_REMOVE("rspeaker")
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_REPLACE("ymf", YMF271, XTAL(16'934'400))
+	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.9344_MHz_XTAL)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1984,13 +1987,13 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2g) // clocks differ, but otherwise same
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
-	MCFG_DEVICE_CLOCK(XTAL(28'636'363))
+	MCFG_DEVICE_CLOCK(28.636363_MHz_XTAL)
 
 	MCFG_DEVICE_MODIFY("audiocpu") // Z84C0004PCS, 4.9152MHz
-	MCFG_DEVICE_CLOCK(XTAL(4'915'200))
+	MCFG_DEVICE_CLOCK(4.9512_MHz_XTAL)
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ymf", YMF271, XTAL(16'384'000)) // 16.384MHz(!)
+	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.384_MHz_XTAL) // 16.384MHz(!)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2002,7 +2005,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seibuspi_state::sys386i)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, XTAL(40'000'000)) // AMD 386DX, 40MHz
+	MCFG_DEVICE_ADD("maincpu", I386, 40_MHz_XTAL) // AMD 386DX, 40MHz
 	MCFG_DEVICE_PROGRAM_MAP(sys386i_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
@@ -2027,10 +2030,10 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'636'363)/20, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(28'636'363)/20, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

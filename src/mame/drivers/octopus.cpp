@@ -940,7 +940,8 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, octopus_state,rtc_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, octopus_state,cntl_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, octopus_state,gpo_w))
-	MCFG_MC146818_ADD("rtc", XTAL(32'768))
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic_slave",pic8259_device, ir2_w)) MCFG_DEVCB_INVERT
 
 	// Keyboard UART

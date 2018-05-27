@@ -874,7 +874,9 @@ MACHINE_CONFIG_START(rastersp_state::rastersp)
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD("tms_timer1", rastersp_state, tms_timer1)
 	MCFG_TIMER_DRIVER_ADD("tms_tx_timer", rastersp_state, tms_tx_timer)
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
