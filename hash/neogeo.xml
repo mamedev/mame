@@ -8229,7 +8229,7 @@
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
-			<!-- revision 2000.4.1 -->
+			<!-- revision Mar/17/2000 1:36 (from SMA rom) -->
 			<feature name="slot" value="sma_mslug3a" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
 				<rom loadflag="load16_word_swap" name="white.neo-sma" offset="0x0c0000" size="0x040000" crc="c60d29b2" sha1="1647260ccbda833b35005608ef1fdc82fba02f04" />
