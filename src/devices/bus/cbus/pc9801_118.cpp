@@ -7,7 +7,7 @@
     YMF288 + some extra ports
 
     TODO:
-    - preliminary, presumably needs CS-4231 too
+    - preliminary, presumably needs CS-4231 too, it's an extended clone of the already emulated AD1848 used on the Windows Sound System
     - verify sound irq;
 
 ***************************************************************************/
