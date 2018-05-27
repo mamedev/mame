@@ -52,17 +52,25 @@ public:
 	DECLARE_WRITE16_MEMBER(text_w);
 	DECLARE_READ16_MEMBER(tatsumi_v30_68000_r);
 	DECLARE_WRITE16_MEMBER(tatsumi_v30_68000_w);
+	DECLARE_READ16_MEMBER(tatsumi_sprite_control_r);
 	DECLARE_WRITE16_MEMBER(tatsumi_sprite_control_w);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	INTERRUPT_GEN_MEMBER(v30_interrupt);
 	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
 	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
+	DECLARE_WRITE8_MEMBER(hd6445_crt_w);
+
 	void tatsumi_reset();
 	template<class _BitmapClass> void draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
 	template<class _BitmapClass> inline void roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, const rectangle &clip,
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only );
 	void update_cluts(int fake_palette_offset, int object_base, int length);
+	
+protected:
+	uint8_t m_hd6445_reg[64];
+private:
+	uint8_t m_hd6445_address;
 };
 
 class apache3_state : public tatsumi_state
@@ -142,7 +150,6 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_e0000_w);
 	DECLARE_READ16_MEMBER(roundup5_vram_r);
 	DECLARE_WRITE16_MEMBER(roundup5_vram_w);
-	DECLARE_WRITE16_MEMBER(roundup5_crt_w);
 
 	void init_roundup5();
 	DECLARE_VIDEO_START(roundup5);
@@ -166,8 +173,6 @@ private:
 	required_shared_ptr<uint16_t> m_roundup_l_ram;
 
 	std::unique_ptr<uint16_t[]> m_roundup5_vram;
-	uint8_t m_roundupt_crt_selected_reg;
-	uint8_t m_roundupt_crt_reg[64];
 };
 
 class cyclwarr_state : public tatsumi_state
@@ -190,6 +195,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
+	DECLARE_WRITE16_MEMBER(output_w);
 	template<int Bank> DECLARE_READ16_MEMBER(cyclwarr_videoram_r);
 	template<int Bank> DECLARE_WRITE16_MEMBER(cyclwarr_videoram_w);
 

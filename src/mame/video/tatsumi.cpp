@@ -7,6 +7,11 @@
 
 /******************************************************************************/
 
+READ16_MEMBER(tatsumi_state::tatsumi_sprite_control_r)
+{
+	return m_sprite_control_ram[offset];
+}
+
 WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
 {
 	COMBINE_DATA(&m_sprite_control_ram[offset]);
@@ -56,14 +61,33 @@ WRITE16_MEMBER(tatsumi_state::text_w)
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(roundup5_state::roundup5_crt_w)
+// TODO: move into device
+WRITE8_MEMBER(tatsumi_state::hd6445_crt_w)
 {
-	if (offset==0 && ACCESSING_BITS_0_7)
-		m_roundupt_crt_selected_reg=data&0x3f;
-	if (offset==1 && ACCESSING_BITS_0_7) {
-		m_roundupt_crt_reg[m_roundupt_crt_selected_reg]=data;
-//      if (m_roundupt_crt_selected_reg!=0xa && m_roundupt_crt_selected_reg!=0xb && m_roundupt_crt_selected_reg!=29)
-//      logerror("%s:  Crt write %02x %02x\n",m_maincpu->pc(),m_roundupt_crt_selected_reg,data);
+	if (offset==0)
+		m_hd6445_address = data & 0x3f;
+	if (offset==1) 
+	{
+		m_hd6445_reg[m_hd6445_address] = data;
+		
+		static const char *regnames[40] =
+		{ 
+			"Horizontal Total Characters", "Horizontal Displayed Characters", "Horizontal Sync Position",   "Sync Width",
+			"Vertical Total Rows",         "Vertical Total Adjust",           "Vertical Displayed Rows",    "Vertical Sync Position",
+			"Interlace Mode and Skew",     "Max Raster Address",              "Cursor 1 Start",             "Cursor 1 End",
+            "Screen 1 Start Address (H)",  "Screen 1 Start Address (L)",      "Cursor 1 Address (H)",       "Cursor 1 Address (L)",
+			"Light Pen (H) (RO)",          "Light Pen (L) (RO)",              "Screen 2 Start Position",    "Screen 2 Start Address (H)",
+			"Screen 2 Start Address (L)",  "Screen 3 Start Position",         "Screen 3 Start Address (H)", "Screen 3 Start Address (L)",
+			"Screen 4 Start Position",     "Screen 4 Start Address (H)",      "Screen 4 Start Address (L)", "Vertical Sync Position Adjust",
+			"Light Pen Raster (RO)",       "Smooth Scrolling",                "Control 1",                  "Control 2",
+			"Control 3",                   "Memory Width Offset",             "Cursor 2 Start",             "Cursor 2 End",
+			"Cursor 2 Address (H)",        "Cursor 2 Address (L)",            "Cursor 1 Width",             "Cursor 2 Width"
+		};
+		
+		if(m_hd6445_address < 40)
+			logerror("HD6445: register %s [%02x R%d] set %02x\n",regnames[m_hd6445_address],m_hd6445_address,m_hd6445_address,data);
+		else
+			logerror("HD6445: illegal register access [%02x R%d] set %02x\n",m_hd6445_address,m_hd6445_address,data);
 	}
 }
 
@@ -1019,11 +1043,15 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 {
 //  uint16_t bg_x_scroll=m_roundup5_unknown1[0];
 //  uint16_t bg_y_scroll=m_roundup5_unknown2[0];
-
+	int tx_start_addr;
+	
+	tx_start_addr = (m_hd6445_reg[0xc] << 8) | (m_hd6445_reg[0xd]);
+	tx_start_addr &= 0x3fff;
+	
 	update_cluts(1024, 512, 4096);
-
+	
 	m_tx_layer->set_scrollx(0,24);
-	m_tx_layer->set_scrolly(0,0); //(((m_roundupt_crt_reg[0xe]<<8)|m_roundupt_crt_reg[0xf])>>5) + 96);
+	m_tx_layer->set_scrolly(0,(tx_start_addr >> 4) | m_hd6445_reg[0x1d]);
 
 	bitmap.fill(m_palette->pen(384), cliprect); // todo
 	screen.priority().fill(0, cliprect);
