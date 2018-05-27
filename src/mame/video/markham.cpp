@@ -136,7 +136,7 @@ uint32_t markham_state::screen_update_markham(screen_device &screen, bitmap_ind1
 
 uint32_t markham_state::screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *scroll_data = memregion("scroll_prom")->base();
+	const uint8_t *scroll_data = (const uint8_t *)memregion("scroll_prom")->base();
 
 	int row;
 

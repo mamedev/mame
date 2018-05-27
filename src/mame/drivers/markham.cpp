@@ -10,23 +10,17 @@
     TODO:
     - needs merging with ikki.cpp
     - look up schematics for all games
-    - MB8841 data might be good! same hash as arabian, unsure if dumped twice
-    or just copied from arabian. hookup looks to be very(?) different compared
-    to arabian though
-    - fix banbam/pettanp simulated comms or hopefully hook up MCU ports and
-    at least get something out of the existing dump
+    - hook up actual SUN 8212 and figure out ROM mode communications
 
     Notes:
     Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212.
     Its internal ROM has been imaged, manually typed, and decoded as sun-8212.ic3.
     Pettan Pyuu is a clone of Banbam although with different levels / play fields.
 
-    Protection currently fails on both Pettan Pyuu and Banbam if you play either
-    game to Round 11. When you get there, the music still plays but all you see is
-    "ERR-43" in red text at the bottom left of the screen and the game is no longer
-    playable.  Also, in some earlier rounds you notice the background graphics are
-    also not producing logical playfields as bits of graphics are in different
-    locations.
+    The MCU controls:
+      - general protection startup
+      - the time between when enemies spawn
+      - graphics selection for playfields
 
 *****************************************************************************/
 
@@ -57,7 +51,7 @@ WRITE8_MEMBER(markham_state::coin_output_w)
 	// plain, flat out weird stuff needed to prevent phantom coins
 	// likely an activation mechanism to test individual chute behavior?
 	// this can't be boolean wise, because banbam triggers this three times
-	if (m_coin2_lock_cnt == 0)
+	if (!m_coin2_lock_cnt)
 	{
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	}
@@ -70,7 +64,7 @@ WRITE8_MEMBER(markham_state::coin_output_w)
 template<int Bit>
 WRITE8_MEMBER(markham_state::flipscreen_w)
 {
-	/* Strength & Skill hardware only */
+	// Strength & Skill hardware only
 	m_scroll_ctrl = data >> 5;
 
 	if (flip_screen() != (BIT(data, Bit)))
@@ -84,8 +78,7 @@ WRITE8_MEMBER(markham_state::flipscreen_w)
 
 READ8_MEMBER(markham_state::strnskil_d800_r)
 {
-	/* bit0: interrupt type?, bit1: CPU2 busack? */
-
+	// bit0: interrupt type?, bit1: CPU2 busack?
 	return (m_irq_source);
 }
 
@@ -105,45 +98,81 @@ TIMER_DEVICE_CALLBACK_MEMBER(markham_state::strnskil_scanline)
 
 READ8_MEMBER(markham_state::banbam_protection_r)
 {
-	int res;
+	const uint8_t *prot_rom = (const uint8_t *)memregion("mcu_rom")->base();
 
-	switch (m_maincpu->pc())
+	const uint8_t init = m_packet_buffer[0] & 0x0f;
+	uint8_t comm = m_packet_buffer[1] & 0xf0;
+	uint8_t arg = m_packet_buffer[1] & 0x0f;
+
+	if (m_packet_reset)
 	{
-		case 0x6094:    res = 0xa5; break;
-		case 0x6118:    res = 0x20; break; /* bits 0-3 unknown */
-		case 0x6199:    res = 0x30; break; /* bits 0-3 unknown */
-		case 0x61f5:    res = 0x60 | (machine().rand() & 0x0f); break; /* bits 0-3 unknown */
-		case 0x6255:    res = 0x77; break;
-		case 0x62a8:    res = 0xb4; break;
-		default:        res = 0xff; break;
+		// returning m_packet_buffer[0] breaks demo
+		return 0xa5;
 	}
-
-	logerror("%04x: protection_r -> %02x\n", m_maincpu->pc(), res);
-	return res;
+	else if (init == 0x08 || init == 0x05)
+	{
+		switch (comm)
+		{
+		case 0x30:
+			// palette/gfx select
+			arg = prot_rom[0x799 + (arg * 4)];
+			break;
+		case 0x40:
+			// palette/gfx select
+			arg = prot_rom[0x7C5 + (arg * 4)];
+			break;
+		case 0x60:
+			// enemy wave timer trigger
+			// randomized for now
+			arg = machine().rand();
+			break;
+		case 0x70:
+			// ??
+			arg++;
+			break;
+		case 0xb0:
+			// ??
+			arg = arg + 3;
+			break;
+		default:
+			logerror("unknown command %02x, argument is %02x \n", comm, arg);
+			arg = 0;
+		}
+		arg &= 0x0f;
+	}
+	else
+	{
+		comm = 0xf0;
+		arg = 0x0f;
+	}
+	return comm | arg;
 }
 
-READ8_MEMBER(markham_state::pettanp_protection_r)
+WRITE8_MEMBER(markham_state::banbam_protection_w)
 {
-	int res;
-
-	switch (m_maincpu->pc())
+	if (m_packet_write_pos)
 	{
-		case 0x6066:    res = 0xa5; break;
-		case 0x60dc:    res = 0x20; break; /* bits 0-3 unknown */
-		case 0x615d:    res = 0x30; break; /* bits 0-3 unknown */
-		case 0x61b9:    res = 0x60 | (machine().rand() & 0x0f); break; /* bits 0-3 unknown */
-		case 0x6219:    res = 0x77; break;
-		case 0x626c:    res = 0xb4; break;
-		default:        res = 0xff; break;
+		m_packet_reset = false;
+	}
+	else
+	{
+		m_packet_reset = true;
 	}
 
-	logerror("%04x: protection_r -> %02x\n", m_maincpu->pc(), res);
-	return res;
+	m_packet_buffer[m_packet_write_pos] = data;
+	m_packet_write_pos++;
+
+	if (m_packet_write_pos > 1)
+	{
+		m_packet_write_pos = 0;
+	}
+	logerror("packet buffer is: %02x %02x, status: %s \n", m_packet_buffer[0], m_packet_buffer[1], m_packet_reset ? "reset" : "active" );
 }
 
-WRITE8_MEMBER(markham_state::protection_w)
+WRITE8_MEMBER(markham_state::mcu_reset_w)
 {
-	logerror("%04x: protection_w %02x\n", m_maincpu->pc(), data);
+	// clear or assert?
+	logerror("reset = %02x \n", data);
 }
 
 /****************************************************************************/
@@ -200,14 +229,13 @@ void markham_state::strnskil_master_map(address_map &map)
 	map(0xd80a, 0xd80b).writeonly().share("xscroll");
 }
 
-// void markham_state::banbam_master_map(address_map &map)
-// {
-//  /* TODO: uncomment when ready */
-//  strnskil_master_map(map);
-//  map(0xd806, 0xd806).r(this, FUNC(markham_state::mcu_r)); /* mcu data read */
-//  map(0xd80d, 0xd80d).w(this, FUNC(markham_state::mcu_w)); /* mcu data write */
-//  map(0xd80c, 0xd80c).w(this, FUNC(markham_state::mcu_reset)); /* mcu reset? */
-// }
+void markham_state::banbam_master_map(address_map &map)
+{
+	strnskil_master_map(map);
+	map(0xd806, 0xd806).r(this, FUNC(markham_state::banbam_protection_r)); /* mcu data read */
+	map(0xd80d, 0xd80d).w(this, FUNC(markham_state::banbam_protection_w)); /* mcu data write */
+	map(0xd80c, 0xd80c).w(this, FUNC(markham_state::mcu_reset_w)); /* mcu reset? */
+}
 
 void markham_state::markham_slave_map(address_map &map)
 {
@@ -577,10 +605,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(markham_state::banbam)
 
 	strnskil(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(banbam_master_map)
+
 	MCFG_DEVICE_ADD("mcu", MB8841, CPU_CLOCK/2) /* 4.000MHz */
 	// MCFG_MB88XX_READ_K_CB(READ8(*this, markham_state, mcu_portk_r))
-	// MCFG_MB88XX_READ_R0_CB(READ8(*this, markham_state, mcu_portr0_r))
-	// MCFG_MB88XX_WRITE_R0_CB(WRITE8(*this, markham_state, mcu_portr0_w))
+	// MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, markham_state, mcu_port_o_w))
+	// MCFG_MB88XX_WRITE_P_CB(WRITE8(*this, markham_state, mcu_port_p_w))
+	// MCFG_MB88XX_READ_R0_CB(READ8(*this, markham_state, mcu_port_r0_r))
+	// MCFG_MB88XX_WRITE_R0_CB(WRITE8(*this, markham_state, mcu_port_r0_w))
+	// MCFG_MB88XX_READ_R1_CB(READ8(*this, markham_state, mcu_port_r1_r))
+	// MCFG_MB88XX_WRITE_R1_CB(WRITE8(*this, markham_state, mcu_port_r1_w))
+	// MCFG_MB88XX_READ_R2_CB(READ8(*this, markham_state, mcu_port_r2_r))
+	// MCFG_MB88XX_WRITE_R2_CB(WRITE8(*this, markham_state, mcu_port_r2_w))
+	// MCFG_MB88XX_READ_R3_CB(READ8(*this, markham_state, mcu_port_r3_r))
+	// MCFG_MB88XX_WRITE_R3_CB(WRITE8(*this, markham_state, mcu_port_r3_w))
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
@@ -711,11 +750,11 @@ ROM_START( banbam )
 	ROM_REGION( 0x0100, "scroll_prom", 0 ) /* scroll control PROM */
 	ROM_LOAD( "16-6.59",         0x0000, 0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
 
-	ROM_REGION( 0x2000, "prot_data", 0 ) /* protection, data used with Fujitsu MB8841 4-Bit MCU */
+	ROM_REGION( 0x2000, "mcu_rom", 0 ) /* protection, data used with Fujitsu MB8841 4-Bit MCU */
 	ROM_LOAD( "ban-rom12.ic2",   0x0000, 0x2000, CRC(044bb2f6) SHA1(829b2152740061e0506c7504885d8404fb8fe360) )
 
 	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
-	ROM_LOAD( "sun-8212.ic3",    0x000,  0x800,  BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
+	ROM_LOAD( "sun-8212.ic3",    0x000,  0x800,  CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
 ROM_START( pettanp )
@@ -749,7 +788,7 @@ ROM_START( pettanp )
 	ROM_REGION( 0x0100, "scroll_prom", 0 ) /* scroll control PROM */
 	ROM_LOAD( "16-6.59",      0x0000, 0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
 
-	ROM_REGION( 0x1000, "prot_data", 0 ) /* protection data used with Fujitsu MB8841 4-Bit MCU */
+	ROM_REGION( 0x1000, "mcu_rom", 0 ) /* protection data used with Fujitsu MB8841 4-Bit MCU */
 	ROM_LOAD( "tvg12-16.2",   0x0000, 0x1000, CRC(3abc6ba8) SHA1(15e0b0f9d068f6094e2be4f4f1dea0ff6e85686b) )
 
 	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
@@ -759,33 +798,30 @@ ROM_END
 void markham_state::machine_start()
 {
 	save_item(NAME(m_coin2_lock_cnt));
+
+	/* banbam specific */
+	save_item(NAME(m_packet_buffer));
+	save_item(NAME(m_packet_reset));
+	save_item(NAME(m_packet_write_pos));
 }
 
 void markham_state::machine_reset()
 {
 	/* prevent phantom coins again */
 	m_coin2_lock_cnt = 3;
-}
 
-void markham_state::init_banbam()
-{
-	/* Fujitsu MB8841 4-Bit MCU comms */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(markham_state::banbam_protection_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(markham_state::protection_w), this));
-}
-
-void markham_state::init_pettanp()
-{
-	/* Fujitsu MB8841 4-Bit MCU comms */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(markham_state::pettanp_protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(markham_state::protection_w),this));
+	/* banbam specific */
+	m_packet_write_pos = 0;
+	m_packet_reset = true;
 }
 
 /* Markham hardware */
-GAME( 1983, markham,  0,        markham,  markham,  markham_state, empty_init,   ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, markham,  0,        markham,  markham,  markham_state, empty_init, ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )
 
 /* Strength & Skill hardware */
-GAME( 1984, strnskil, 0,        strnskil, strnskil, markham_state, empty_init,   ROT0, "Sun Electronics", "Strength & Skill", MACHINE_SUPPORTS_SAVE)
-GAME( 1984, guiness,  strnskil, strnskil, strnskil, markham_state, empty_init,   ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE)
-GAME( 1984, banbam,   0,        banbam,   banbam,   markham_state, init_banbam,  ROT0, "Sun Electronics", "BanBam", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)
-GAME( 1984, pettanp,  banbam,   strnskil, banbam,   markham_state, init_pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)
+GAME( 1984, strnskil, 0,        strnskil, strnskil, markham_state, empty_init, ROT0, "Sun Electronics", "Strength & Skill", MACHINE_SUPPORTS_SAVE)
+GAME( 1984, guiness,  strnskil, strnskil, strnskil, markham_state, empty_init, ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE)
+
+/* Strength & Skill hardware with SUN 8212 MCU */
+GAME( 1984, banbam,   0,        banbam,   banbam,   markham_state, empty_init, ROT0, "Sun Electronics", "BanBam", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)
+GAME( 1984, pettanp,  banbam,   banbam,   banbam,   markham_state, empty_init, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)
