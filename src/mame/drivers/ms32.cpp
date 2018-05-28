@@ -1709,7 +1709,7 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Z0840008PSC, Clock unverified; it's possibly higher than 4MHz
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
 	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
