@@ -2416,7 +2416,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

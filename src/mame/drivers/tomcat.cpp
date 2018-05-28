@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_M48T02_ADD( "m48t02" )
+	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)

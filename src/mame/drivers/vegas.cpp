@@ -1744,7 +1744,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
 
-	MCFG_M48T37_ADD(m_timekeeper)
+	MCFG_DEVICE_ADD(m_timekeeper, M48T37, 0)
 	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, vegas_state, watchdog_reset))
 	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, vegas_state, watchdog_irq))
 

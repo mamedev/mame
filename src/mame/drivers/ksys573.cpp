@@ -2132,7 +2132,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
 	MCFG_DEVICE_ADD( "adc0834", ADC0834, 0 )
 	MCFG_ADC083X_INPUT_CB( ksys573_state, analogue_inputs_callback )

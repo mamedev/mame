@@ -1812,7 +1812,7 @@ MACHINE_CONFIG_START(itech32_state::tourny)
 
 	/* basic machine hardware */
 
-	MCFG_M48T02_ADD( "m48t02"  )
+	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 MACHINE_CONFIG_END
 
 

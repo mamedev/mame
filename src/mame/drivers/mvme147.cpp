@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(mvme147_state::mvme147)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD("vme", 1, mvme147_vme_cards, nullptr)
 
-	MCFG_M48T02_ADD("m48t18") /* t08 differs only in accepted voltage levels compared to t18 */
+	MCFG_DEVICE_ADD("m48t18", M48T02, 0) /* t08 differs only in accepted voltage levels compared to t18 */
 
 	/* Terminal Port config */
 	MCFG_DEVICE_ADD("scc", SCC85C30, SCC_CLOCK)

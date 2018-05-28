@@ -3804,7 +3804,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -3872,7 +3872,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END

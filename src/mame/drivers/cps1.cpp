@@ -3448,7 +3448,7 @@ MACHINE_CONFIG_START(cps_state::ganbare)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, ganbare_interrupt, "screen", 0, 1) // need to investigate more
 
-	MCFG_M48T35_ADD("m48t35")
+	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::qsound)

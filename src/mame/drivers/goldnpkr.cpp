@@ -4717,7 +4717,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, blitz_state, mcu_portb_w))
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, blitz_state, mcu_portc_w))
 
-	MCFG_M48T02_ADD("timekpr")
+	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))

@@ -431,10 +431,11 @@ MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_dcs_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
-	MCFG_WPC_LAMP_ADD("lamp")
-	MCFG_WPC_OUT_ADD("out", 3)
-	MCFG_WPC_SHIFT_ADD("shift")
-	MCFG_WPC_DMD_ADD("dmd", WRITELINE(*this, wpc_dcs_state, scanline_irq))
+	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
+	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)
+	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
+	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
+	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_dcs_state, scanline_irq))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)

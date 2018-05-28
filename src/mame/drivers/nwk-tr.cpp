@@ -844,7 +844,7 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
 	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
 	MCFG_ADC1213X_IPT_CONVERT_CB(nwktr_state, adc12138_input_callback)

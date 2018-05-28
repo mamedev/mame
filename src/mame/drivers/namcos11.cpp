@@ -627,13 +627,13 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", 25401600, 288)
+	MCFG_DEVICE_ADD("c352", C352, 25401600, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_AT28C16_ADD( "at28c16", nullptr )
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::coh100)

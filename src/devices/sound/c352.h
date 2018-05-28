@@ -7,18 +7,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C352_ADD(tag, clock, setting) \
-	MCFG_DEVICE_ADD((tag), C352, (clock)) \
-	MCFG_C352_DIVIDER(setting)
-
-#define MCFG_C352_DIVIDER(setting) \
-	downcast<c352_device &>(*device).set_divider((setting));
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -30,10 +18,15 @@ class c352_device : public device_t,
 {
 public:
 	// construction/destruction
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int divider)
+		: c352_device(mconfig, tag, owner, clock)
+	{
+		set_divider(divider);
+	}
+
 	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// inline configuration helpers
-	void set_divider(int setting) { m_divider = setting; }
+	void set_divider(int divider) { m_divider = divider; }
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);

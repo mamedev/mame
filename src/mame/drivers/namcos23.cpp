@@ -3627,7 +3627,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
@@ -3694,7 +3694,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3774,7 +3774,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)

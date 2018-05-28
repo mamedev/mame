@@ -94,7 +94,7 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_MC68901_TX_CLOCK(9600)
 	MCFG_MC68901_OUT_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_M48T02_ADD("timekpr")
+	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
