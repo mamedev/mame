@@ -458,14 +458,14 @@ void atari_cage_device::update_control_lines()
 
 READ32_MEMBER( atari_cage_device::cage_from_main_r )
 {
+	uint16_t from_main = m_soundlatch[1]->read(space, 0);
 	if (LOG_COMM)
-		logerror("%s CAGE read command = %04X\n", machine().describe_context(), m_soundlatch[1]->read(space, 0));
+		logerror("%s CAGE read command = %04X\n", machine().describe_context(), from_main);
 
 	update_control_lines();
-	if (LOG_COMM)
-		m_soundlatch[1]->acknowledge_w(space, 0, 0);
+	m_soundlatch[1]->acknowledge_w(space, 0, 0);
 
-	return m_soundlatch[1]->read(space, 0);
+	return from_main;
 }
 
 
@@ -627,9 +627,7 @@ MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("cage", TMS3203X_IRQ0))
-#if (LOG_COMM)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-#endif
 
 #if (DAC_BUFFER_CHANNELS == 4)
 	MCFG_DEVICE_ADD("dac1", DMADAC)
