@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(amstrad_pc_state::ppc640)
 	MCFG_DEVICE_REMOVE("isa1")
 	MCFG_DEVICE_REMOVE("isa2")
 
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_pc_state::ppc512)
@@ -652,10 +652,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR   NAME     PARENT    COMPAT  MACHINE  INPUT  STATE              INIT  COMPANY     FULLNAME */
-COMP(  1987,  ppc512,  ibm5150,  0,      ppc512,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
-COMP(  1987,  ppc640,  ibm5150,  0,      ppc640,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
-COMP(  1988,  pc20,    ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
-COMP(  1988,  pc200,   ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
-COMP(  1988,  pc2086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
-COMP(  1990,  pc3086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  CLASS             INIT        COMPANY         FULLNAME */
+COMP( 1987, ppc512, ibm5150, 0,      ppc512,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
+COMP( 1987, ppc640, ibm5150, 0,      ppc640,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
+COMP( 1988, pc20,   ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
+COMP( 1988, pc200,  ibm5150, 0,      pc200,   pc200, amstrad_pc_state, empty_init, "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
+COMP( 1988, pc2086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
+COMP( 1990, pc3086, ibm5150, 0,      pc2086,  pc200, amstrad_pc_state, empty_init, "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )

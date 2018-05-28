@@ -76,10 +76,10 @@ public:
 	//roldfrog and funystrp specific
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
-	DECLARE_DRIVER_INIT(splash10);
-	DECLARE_DRIVER_INIT(roldfrog);
-	DECLARE_DRIVER_INIT(splash);
-	DECLARE_DRIVER_INIT(rebus);
+	void init_splash10();
+	void init_roldfrog();
+	void init_splash();
+	void init_rebus();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(splash);
 	DECLARE_MACHINE_START(roldfrog);
@@ -130,7 +130,7 @@ public:
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
-	DECLARE_DRIVER_INIT(funystrp);
+	void init_funystrp();
 
 	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

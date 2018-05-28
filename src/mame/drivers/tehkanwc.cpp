@@ -158,7 +158,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -166,7 +166,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_RESET:
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		break;
 	default:
 		assert_always(false, "Unknown id in tehkanwc_state::device_timer");
@@ -658,7 +658,7 @@ static const gfx_layout tilelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( tehkanwc )
+static GFXDECODE_START( gfx_tehkanwc )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Colors 0 - 255 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256,  8 ) /* Colors 256 - 383 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   512, 16 ) /* Colors 512 - 767 */
@@ -694,13 +694,13 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tehkanwc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tehkanwc)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwcb)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(tehkanwc_state,teedoff)
+void tehkanwc_state::init_teedoff()
 {
 	/* Patch to avoid the game jumping in shared memory */
 
@@ -977,9 +977,9 @@ ROM_END
 
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
-GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
-GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, teedoff,  ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, init_teedoff, ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )

@@ -46,6 +46,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_scsp(*this, "scsp"),
+		m_timers(*this, "timer%u", 0U),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_copro_data(*this, "copro_data"),
@@ -73,14 +74,14 @@ public:
 
 
 	/* Public for access by GAME() */
-	DECLARE_DRIVER_INIT(overrev);
-	DECLARE_DRIVER_INIT(pltkids);
-	DECLARE_DRIVER_INIT(rchase2);
-	DECLARE_DRIVER_INIT(manxttdx);
-	DECLARE_DRIVER_INIT(doa);
-	DECLARE_DRIVER_INIT(zerogun);
-	DECLARE_DRIVER_INIT(sgt24h);
-	DECLARE_DRIVER_INIT(srallyc);
+	void init_overrev();
+	void init_pltkids();
+	void init_rchase2();
+	void init_manxttdx();
+	void init_doa();
+	void init_zerogun();
+	void init_sgt24h();
+	void init_srallyc();
 
 protected:
 	required_shared_ptr<uint32_t> m_workram;
@@ -102,6 +103,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<scsp_device> m_scsp;
+	required_device_array<timer_device, 4> m_timers;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 	optional_memory_region m_copro_data;
@@ -113,7 +115,6 @@ protected:
 	uint32_t m_timervals[4];
 	uint32_t m_timerorig[4];
 	int m_timerrun[4];
-	timer_device *m_timers[4];
 	int m_ctrlmode;
 	uint16_t m_cmd_data;
 	uint8_t m_driveio_comm_data;

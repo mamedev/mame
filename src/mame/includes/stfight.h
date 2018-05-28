@@ -36,9 +36,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
-	DECLARE_DRIVER_INIT(stfight);
-	DECLARE_DRIVER_INIT(empcity);
-	DECLARE_DRIVER_INIT(cshooter);
+	void init_stfight();
+	void init_empcity();
+	void init_cshooter();
 
 	DECLARE_WRITE8_MEMBER(stfight_io_w);
 	DECLARE_READ8_MEMBER(stfight_coin_r);

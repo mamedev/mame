@@ -33,7 +33,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL(4'028'000)
+#define MASTER_CLOCK 4.028_MHz_XTAL
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
 #define mc6845_h_display        (m_crtc_vreg[1])
@@ -1041,14 +1041,14 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// floppy controller
-	MCFG_MB8876_ADD("fdc", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("fdc", MB8876, 1_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_drq_w))
 
@@ -1060,7 +1060,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1086,5 +1086,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY  FULLNAME   FLAGS
-COMP( 1983, smc777,  0,       0,      smc777,   smc777, smc777_state, 0,    "Sony",  "SMC-777", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1983, smc777, 0,      0,      smc777,  smc777, smc777_state, empty_init, "Sony",  "SMC-777", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

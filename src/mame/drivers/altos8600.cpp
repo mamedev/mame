@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_PIT8253_CLK2(1228800)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259_1", pic8259_device, ir1_w))
 
-	MCFG_FD1797_ADD("fd1797", 2000000)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259_2", pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, altos8600_state, fddrq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
@@ -813,4 +813,4 @@ ROM_START(altos8600)
 	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-COMP(1981, altos8600, 0, 0, altos8600, 0, altos8600_state, 0, "Altos Computer Systems", "ACS8600", MACHINE_NO_SOUND_HW)
+COMP( 1981, altos8600, 0, 0, altos8600, 0, altos8600_state, empty_init, "Altos Computer Systems", "ACS8600", MACHINE_NO_SOUND_HW)

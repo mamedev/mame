@@ -72,10 +72,10 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-	DECLARE_DRIVER_INIT(shtstar);
-	DECLARE_DRIVER_INIT(cheesech);
-	DECLARE_DRIVER_INIT(ultennis);
-	DECLARE_DRIVER_INIT(stonebal);
+	void init_shtstar();
+	void init_cheesech();
+	void init_ultennis();
+	void init_stonebal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

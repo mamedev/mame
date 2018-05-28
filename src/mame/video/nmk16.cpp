@@ -634,7 +634,7 @@ int nmk16_state::nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap
 
 		if (m_bg_tilemap[1] && m_bg_tilemap[2] && m_bg_tilemap[3])
 		{
-			int tilemap_bank_select = (m_gunnail_scrollram[0]&0x3000)>>12;
+			int tilemap_bank_select = (xscroll&0x3000)>>12;
 			bg_tilemap = m_bg_tilemap[tilemap_bank_select];
 		}
 

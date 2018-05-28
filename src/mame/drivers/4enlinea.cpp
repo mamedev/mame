@@ -485,7 +485,7 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
 {
 	if(m_irq_count == 0)
 	{
-		//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		//device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, SND_AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN-P2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN-P1"))
@@ -560,5 +560,5 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE    INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
-GAME( 1991, 4enlinea,  0,       _4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME           FLAGS  */
+GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )

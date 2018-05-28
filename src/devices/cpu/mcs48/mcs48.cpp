@@ -361,7 +361,7 @@ uint8_t mcs48_cpu_device::opcode_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -374,7 +374,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -1078,7 +1078,7 @@ void mcs48_cpu_device::device_start()
 	m_ea = (m_int_rom_size ? 0 : 1);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = (m_feature_mask & EXT_BUS_FEATURE) != 0 ? &space(AS_IO) : nullptr;
 

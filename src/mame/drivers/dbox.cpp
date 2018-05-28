@@ -448,7 +448,7 @@ class dbox_state : public driver_device
 
 	virtual void machine_reset() override;
 	virtual void machine_start () override;
-	DECLARE_DRIVER_INIT(dbox);
+	void init_dbox();
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_LATCH8_WRITE_4(WRITELINE("display", sda5708_device, reset_w))
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(dbox_state, dbox)
+void dbox_state::init_dbox()
 {
 }
 
@@ -649,4 +649,4 @@ ROM_START( dbox )
 	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
 ROM_END
 
-COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

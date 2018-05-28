@@ -125,9 +125,8 @@ MACHINE_CONFIG_START(orion_state::orion128)
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rko_cassette_formats)
@@ -136,7 +135,7 @@ MACHINE_CONFIG_START(orion_state::orion128)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
@@ -199,13 +198,11 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
-	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("ay8912", AY8912, 1773400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -216,7 +213,7 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
@@ -277,11 +274,9 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("ay8912", AY8912, 1773400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -292,7 +287,7 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
@@ -377,11 +372,11 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE        INIT  COMPANY      FULLNAME                                  FLAGS
-COMP( 1990, orion128,    0,         0,      orion128,   radio86, orion_state, 0,    "<unknown>", "Orion 128",                              0 )
-COMP( 1990, orionms,     orion128,  0,      orion128ms, ms7007,  orion_state, 0,    "<unknown>", "Orion 128 (MS7007)",                     0 )
-COMP( 1990, orionz80,    orion128,  0,      orionz80,   radio86, orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II",                0 )
-COMP( 1990, orionide,    orion128,  0,      orionz80,   radio86, orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II + IDE",          0 )
-COMP( 1990, orionzms,    orion128,  0,      orionz80ms, ms7007,  orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       0 )
-COMP( 1990, orionidm,    orion128,  0,      orionz80ms, ms7007,  orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", 0 )
-COMP( 1994, orionpro,    orion128,  0,      orionpro,   radio86, orion_state, 0,    "<unknown>", "Orion Pro",                              0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT    CLASS        INIT        COMPANY      FULLNAME                                  FLAGS
+COMP( 1990, orion128, 0,        0,      orion128,   radio86, orion_state, empty_init, "<unknown>", "Orion 128",                              0 )
+COMP( 1990, orionms,  orion128, 0,      orion128ms, ms7007,  orion_state, empty_init, "<unknown>", "Orion 128 (MS7007)",                     0 )
+COMP( 1990, orionz80, orion128, 0,      orionz80,   radio86, orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II",                0 )
+COMP( 1990, orionide, orion128, 0,      orionz80,   radio86, orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE",          0 )
+COMP( 1990, orionzms, orion128, 0,      orionz80ms, ms7007,  orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       0 )
+COMP( 1990, orionidm, orion128, 0,      orionz80ms, ms7007,  orion_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", 0 )
+COMP( 1994, orionpro, orion128, 0,      orionpro,   radio86, orion_state, empty_init, "<unknown>", "Orion Pro",                              0 )

@@ -190,7 +190,7 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 		floppy->mon_w(0);
 
 	// switch video modes
-	m_crtc->set_clock(m_video_mode ? XTAL(15'000'000) / 10 : XTAL(15'000'000) / 16);
+	m_crtc->set_clock(15_MHz_XTAL / (m_video_mode ? 10 : 16));
 	m_crtc->set_hpixels_per_column(m_video_mode ? 10 : 16);
 
 	// PB7 Centronics transceiver direction. 0 = output, 1 = input
@@ -357,14 +357,14 @@ void apricot_state::apricot_io(address_map &map)
 
 MACHINE_CONFIG_START(apricot_state::apricot)
 	// main cpu
-	MCFG_DEVICE_ADD("ic91", I8086, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_ADD("ic91", I8086, 15_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(apricot_mem)
 	MCFG_DEVICE_IO_MAP(apricot_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ic31", pic8259_device, inta_cb)
 	MCFG_I8086_LOCK_HANDLER(WRITELINE(*this, apricot_state, i8086_lock_w))
 
 	// i/o cpu
-	MCFG_DEVICE_ADD("ic71", I8089, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_ADD("ic71", I8089, 15_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(apricot_mem)
 	MCFG_DEVICE_IO_MAP(apricot_io)
 	MCFG_I8089_DATA_WIDTH(16)
@@ -384,15 +384,15 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("ic30", HD6845, "screen", XTAL(15'000'000) / 10)
+	MCFG_MC6845_ADD("ic30", HD6845, "screen", 15_MHz_XTAL / 10)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(apricot_state, crtc_update_row)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, apricot_state, apricot_hd6845_de))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("ic7", SN76489, XTAL(4'000'000) / 2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ic7", SN76489, 4_MHz_XTAL / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// devices
@@ -407,11 +407,11 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("ic91", 0))
 
 	MCFG_DEVICE_ADD("ic16", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(4'000'000) / 16)
+	MCFG_PIT8253_CLK0(4_MHz_XTAL / 16)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("ic31", pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK1(XTAL(4'000'000) / 2)
+	MCFG_PIT8253_CLK1(4_MHz_XTAL / 2)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("ic14", ttl153_device, i0a_w))
-	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2)
+	MCFG_PIT8253_CLK2(4_MHz_XTAL / 2)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("ic14", ttl153_device, i0b_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ic14", ttl153_device, i2a_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ic14", ttl153_device, i2b_w))
@@ -420,10 +420,10 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_TTL153_ZA_CB(WRITELINE("ic15", z80sio_device, rxca_w))
 	MCFG_TTL153_ZB_CB(WRITELINE("ic15", z80sio_device, txca_w))
 
-	MCFG_CLOCK_ADD("ic15_rxtxcb", XTAL(4'000'000) / 16)
+	MCFG_CLOCK_ADD("ic15_rxtxcb", 4_MHz_XTAL / 16)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ic15", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("ic15", Z80SIO, XTAL(15'000'000) / 6)
+	MCFG_DEVICE_ADD("ic15", Z80SIO, 15_MHz_XTAL / 6)
 	MCFG_Z80SIO_CPU("ic91")
 	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// floppy
-	MCFG_WD2797_ADD("ic68", XTAL(4'000'000) / 2)
+	MCFG_DEVICE_ADD("ic68", WD2797, 4_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, apricot_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)
@@ -500,6 +500,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME      FLAGS
-COMP( 1983, apricot,   0,       0,      apricot,   0,     apricot_state, 0,    "ACT",   "Apricot PC", 0 )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     apricot_state, 0,    "ACT",   "Apricot Xi", 0 )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT        COMPANY  FULLNAME      FLAGS
+COMP( 1983, apricot,   0,       0,      apricot,   0,     apricot_state, empty_init, "ACT",   "Apricot PC", 0 )
+COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     apricot_state, empty_init, "ACT",   "Apricot Xi", 0 )

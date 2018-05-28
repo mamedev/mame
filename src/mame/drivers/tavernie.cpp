@@ -295,14 +295,13 @@ void tavernie_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", MC6809, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(cpu09_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -315,7 +314,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 4_MHz_XTAL / 4)
 	// all i/o lines connect to the 40-pin expansion connector
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_O2_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -369,7 +368,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tavernie_state, pa_ivg_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE("beeper", beep_device, set_state))
 
-	MCFG_FD1795_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", FD1795, 8_MHz_XTAL / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
@@ -394,6 +393,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS           INIT  COMPANY         FULLNAME                      FLAGS
-COMP( 1982, cpu09,  0,      0,       cpu09,   cpu09,   tavernie_state, 0,    "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )
-COMP( 1983, ivg09,  cpu09,  0,       ivg09,   ivg09,   tavernie_state, 0,    "C. Tavernier", "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY         FULLNAME                      FLAGS
+COMP( 1982, cpu09, 0,      0,      cpu09,   cpu09, tavernie_state, empty_init, "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )
+COMP( 1983, ivg09, cpu09,  0,      ivg09,   ivg09, tavernie_state, empty_init, "C. Tavernier", "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )

@@ -95,14 +95,12 @@ i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *ta
 	: i8086_cpu_device(mconfig, I8088, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
-	m_fetch_xor = 0;
 }
 
 i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_cpu_device(mconfig, I8086, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
-	m_fetch_xor = BYTE_XOR_LE(0);
 }
 
 i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
@@ -139,7 +137,7 @@ device_memory_interface::space_config_vector i8086_cpu_device::memory_space_conf
 uint8_t i8086_cpu_device::fetch()
 {
 	uint8_t data;
-	data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
+	data = m_or8(update_pc());
 	m_ip++;
 	return data;
 }
@@ -201,13 +199,21 @@ void i8086_cpu_device::execute_run()
 				{
 					interrupt(I8086_NMI_INT_VECTOR);
 					m_pending_irq &= ~NMI_IRQ;
+					m_halt = false;
 				}
 				else if ( m_IF )
 				{
 					/* the actual vector is retrieved after pushing flags */
 					/* and clearing the IF */
 					interrupt(-1);
+					m_halt = false;
 				}
+			}
+
+			if(m_halt)
+			{
+				m_icount = 0;
+				return;
 			}
 
 			/* Trap should allow one instruction to be executed.
@@ -462,8 +468,14 @@ void i8086_common_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_direct = m_program->direct<0>();
-	m_direct_opcodes = m_opcodes->direct<0>();
+
+	if(m_opcodes->data_width() == 8) {
+		auto cache = m_opcodes->cache<0, 0, ENDIANNESS_LITTLE>();
+		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	} else {
+		auto cache = m_opcodes->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	}
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));

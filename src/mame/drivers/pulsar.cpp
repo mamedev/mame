@@ -38,7 +38,7 @@ X - Test off-board memory banks
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dart.h"
 #include "machine/msm5832.h"
 #include "machine/i8255.h"
@@ -59,7 +59,7 @@ public:
 		, m_rtc(*this, "rtc")
 		{ }
 
-	DECLARE_DRIVER_INIT(pulsar);
+	void init_pulsar();
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(baud_w);
@@ -198,7 +198,7 @@ MACHINE_RESET_MEMBER( pulsar_state, pulsar )
 	m_rtc->cs_w(1); // always enabled
 }
 
-DRIVER_INIT_MEMBER( pulsar_state, pulsar )
+void pulsar_state::init_pulsar()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -213,7 +213,7 @@ DRIVER_INIT_MEMBER( pulsar_state, pulsar )
 
 MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(pulsar_mem)
 	MCFG_DEVICE_IO_MAP(pulsar_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
@@ -226,9 +226,9 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))
 
-	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("dart", Z80DART, 4_MHz_XTAL)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -239,14 +239,14 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("dart", z80dart_device, ctsa_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800))
+	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL)
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
 	MCFG_COM8116_FR_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE("dart", z80dart_device, txcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxcb_w))
 
-	MCFG_FD1797_ADD("fdc", XTAL(4'000'000) / 2)
+	MCFG_DEVICE_ADD("fdc", FD1797, 4_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
@@ -264,5 +264,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT     COMPANY   FULLNAME            FLAGS
-COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY   FULLNAME            FLAGS
+COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar, pulsar_state, init_pulsar, "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW )

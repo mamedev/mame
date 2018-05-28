@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ym3812", YM3812, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", bebox_state::floppy_formats)
 
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 
 	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)
@@ -271,6 +271,6 @@ ROM_START(bebox2)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-/*    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT   STATE           INIT     COMPANY    FULLNAME */
-COMP( 1995,  bebox,    0,      0,      bebox,    bebox,  bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-66",  MACHINE_NOT_WORKING )
-COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox,  bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-133", MACHINE_NOT_WORKING )
+/*    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME */
+COMP( 1995,  bebox,  0,      0,      bebox,   bebox, bebox_state, init_bebox, "Be Inc", "BeBox Dual603-66",  MACHINE_NOT_WORKING )
+COMP( 1996,  bebox2, bebox,  0,      bebox2,  bebox, bebox_state, init_bebox, "Be Inc", "BeBox Dual603-133", MACHINE_NOT_WORKING )

@@ -73,6 +73,7 @@ private:
 	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
 	required_ioport m_address;
+	output_finder<3> m_leds;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

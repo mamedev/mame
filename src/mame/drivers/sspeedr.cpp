@@ -184,7 +184,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sspeedr )
+static GFXDECODE_START( gfx_sspeedr )
 	GFXDECODE_ENTRY( "gfx1", 0, car_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 0, 1 )
 GFXDECODE_END
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sspeedr_state, screen_vblank_sspeedr))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sspeedr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sspeedr)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(sspeedr_state, sspeedr)
 
@@ -234,4 +234,4 @@ ROM_START( sspeedr )
 ROM_END
 
 
-GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, 0, ROT270, "Midway", "Super Speed Race", MACHINE_NO_SOUND, layout_sspeedr )
+GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Midway", "Super Speed Race", MACHINE_NO_SOUND, layout_sspeedr )

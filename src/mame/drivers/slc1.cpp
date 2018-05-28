@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(slc1_state::slc1)
 	MCFG_DEFAULT_LAYOUT(layout_slc1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -299,5 +299,5 @@ ROM_START(slc1)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT  STATE          INIT  COMPANY                   FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1,  slc1_state,    0,    "Dr. Dieter Scheuschner", "SLC-1" , 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME */
+COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dr. Dieter Scheuschner", "SLC-1" , 0 )

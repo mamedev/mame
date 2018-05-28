@@ -917,7 +917,8 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -973,7 +974,8 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -1011,7 +1013,7 @@ void md_base_state::megadriv_init_common()
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
 }
 
-DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
+void md_base_state::init_megadriv_c2()
 {
 	megadriv_init_common();
 
@@ -1025,7 +1027,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 
 
 
-DRIVER_INIT_MEMBER(md_base_state, megadriv)
+void md_base_state::init_megadriv()
 {
 	megadriv_init_common();
 
@@ -1038,7 +1040,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadriv)
 	m_version_hi_nibble = 0xa0; // Export NTSC no-SCD
 }
 
-DRIVER_INIT_MEMBER(md_base_state, megadrij)
+void md_base_state::init_megadrij()
 {
 	megadriv_init_common();
 
@@ -1051,7 +1053,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrij)
 	m_version_hi_nibble = 0x20; // JPN NTSC no-SCD
 }
 
-DRIVER_INIT_MEMBER(md_base_state, megadrie)
+void md_base_state::init_megadrie()
 {
 	megadriv_init_common();
 
@@ -1067,7 +1069,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 WRITE_LINE_MEMBER(md_base_state::screen_vblank_megadriv)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// rising edge
 	if (state)

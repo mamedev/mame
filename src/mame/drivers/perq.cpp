@@ -42,4 +42,4 @@ ROM_START( perq )
 	ROM_LOAD( "rsh00.rom",     0x0000, 0x0400, CRC(815d92bf) SHA1(b87bdea13de391e5615c474ba96af4b28b7f8f38) )
 ROM_END
 
-COMP( 1979, perq, 0, 0, perq, perq, perq_state, 0, "Three Rivers Company Corporation", "PERQ 1A", MACHINE_IS_SKELETON )
+COMP( 1979, perq, 0, 0, perq, perq, perq_state, empty_init, "Three Rivers Company Corporation", "PERQ 1A", MACHINE_IS_SKELETON )

@@ -213,7 +213,7 @@ public:
 	floppy_image_device *m_floppy;
 
 	mc6845_device *m_mc6845;
-	DECLARE_DRIVER_INIT(z100);
+	void init_z100();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -673,7 +673,7 @@ static void z100_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_ADD("maincpu", I8088, 14.318181_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(z100_mem)
 	MCFG_DEVICE_IO_MAP(z100_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(14'318'181)/8)    /* unknown clock, hand tuned to get ~50/~60 fps */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 14.318181_MHz_XTAL / 8)    /* unknown clock, hand tuned to get ~50/~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(z100_state::z100)
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_FD1797_ADD("z207_fdc", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("z207_fdc", FD1797, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
@@ -728,7 +728,7 @@ ROM_START( z100 )
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(z100_state,z100)
+void z100_state::init_z100()
 {
 	uint8_t *ROM = memregion("ipl")->base();
 
@@ -741,5 +741,5 @@ DRIVER_INIT_MEMBER(z100_state,z100)
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME  FLAGS
-COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, z100, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT       COMPANY   FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, init_z100, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

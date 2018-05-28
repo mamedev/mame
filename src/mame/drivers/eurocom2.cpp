@@ -434,11 +434,11 @@ static void eurocom_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(eurocom2_state::eurocom2)
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
+	MCFG_DEVICE_ADD("maincpu", MC6809, 10.7172_MHz_XTAL / 2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	MCFG_DEVICE_PROGRAM_MAP(eurocom2_map)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'717'200), VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
+	MCFG_SCREEN_RAW_PARAMS(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")
@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 	MCFG_RS232_RXD_HANDLER(WRITELINE ("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE ("acia", acia6850_device, write_cts))
 
-	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)/2)
+	MCFG_DEVICE_ADD("fdc", FD1793, 2_MHz_XTAL / 2)
 //  MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -525,6 +525,6 @@ ROM_START(waveterm)
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME         FLAGS
-COMP( 1981, eurocom2, 0,        0,      eurocom2, eurocom2, eurocom2_state, 0,    "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON )
-COMP( 1982, waveterm, eurocom2, 0,      waveterm, waveterm, waveterm_state, 0,    "PPG",   "Waveterm A",    MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME         FLAGS
+COMP( 1981, eurocom2, 0,        0,      eurocom2, eurocom2, eurocom2_state, empty_init, "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON )
+COMP( 1982, waveterm, eurocom2, 0,      waveterm, waveterm, waveterm_state, empty_init, "PPG",   "Waveterm A",    MACHINE_IS_SKELETON )

@@ -17,7 +17,7 @@
 #include "imagedev/flopdrv.h"
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(partner_state,partner)
+void partner_state::init_partner()
 {
 	m_tape_value = 0x80;
 }
@@ -332,8 +332,6 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap + 0x400 * (gpa * 2 + hlgt);
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if(linecount == 8)
-		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}

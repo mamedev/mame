@@ -328,7 +328,7 @@ static const gfx_layout duet16_charlayout =
 	8*16                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START(duet16)
+static GFXDECODE_START(gfx_duet16)
 	GFXDECODE_ENTRY( "char", 0x0000, duet16_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "chrpal", duet16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "chrpal", gfx_duet16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -451,4 +451,4 @@ ROM_START(duet16)
 	ROM_LOAD("duet16_key_8741ak001b_z.bin", 0x000, 0x400, CRC(d23ee68d) SHA1(3b6a86fe2a304823c5385cd673f9580a35199dac))
 ROM_END
 
-COMP(1983, duet16, 0, 0, duet16, 0, duet16_state, 0, "Panafacom (Panasonic/Fujitsu)", "Duet-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, duet16, 0, 0, duet16, 0, duet16_state, empty_init, "Panafacom (Panasonic/Fujitsu)", "Duet-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_DEVICE_ADD ("aciaremt", ACIA6850, 0)
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200))
+	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(WRITELINE (*this, force68k_state, write_f1_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (*this, force68k_state, write_f3_clock))
 	MCFG_MC14411_F5_CB(WRITELINE (*this, force68k_state, write_f5_clock))
@@ -725,10 +725,10 @@ ROM_END
 #endif
 
 /* Driver */
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT     CLASS            INIT  COMPANY                  FULLNAME          FLAGS */
-COMP( 1983, fccpu1,   0,      0,      fccpu1,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
-//COMP( 1989, fccpu6,   0,      0,      fccpu6,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6va, 0,      0,      fccpu6va,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */
+COMP( 1983, fccpu1,   0,      0,      fccpu1,   force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
+//COMP( 1989, fccpu6,   0,      0,      fccpu6,   force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,  force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,  force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6va, 0,      0,      fccpu6va, force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb, force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )

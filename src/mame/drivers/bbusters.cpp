@@ -258,7 +258,7 @@ WRITE16_MEMBER(bbusters_state::sound_cpu_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data&0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -633,7 +633,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( bbusters )
+static GFXDECODE_START( gfx_bbusters )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 )
@@ -641,7 +641,7 @@ static GFXDECODE_START( bbusters )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  1024+256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( mechatt )
+static GFXDECODE_START( gfx_mechatt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 )
@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bbusters)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bbusters)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -685,7 +685,8 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -717,7 +718,7 @@ MACHINE_CONFIG_START(bbusters_state::mechatt)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mechatt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mechatt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -726,7 +727,8 @@ MACHINE_CONFIG_START(bbusters_state::mechatt)
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1166,13 +1168,13 @@ ROM_END
 /******************************************************************************/
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
-GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (World)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 3)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mechatt,    0,        mechatt,  mechatt,  bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechatt,    0,        mechatt,  mechatt,  bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )

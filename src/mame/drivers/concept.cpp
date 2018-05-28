@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(concept_state::concept)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -316,5 +316,5 @@ ROM_START( concept )
 	ROM_LOAD16_BYTE( "mb20l.bin",    0x000001, 0x001000, CRC(b4b59de9) SHA1(3e8b8b5950b5359203c054f94af1fc5b8f0495b9) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY           FULLNAME */
-COMP( 1982, concept,  0,        0,      concept,  concept, concept_state, 0,    "Corvus Systems", "Concept" , 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME */
+COMP( 1982, concept, 0,      0,      concept, concept, concept_state, empty_init, "Corvus Systems", "Concept" , 0 )

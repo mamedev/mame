@@ -45,7 +45,7 @@ public:
 		m_subcpu(*this,"sub"),
 		m_seta001(*this, "spritegen"),
 		m_x1(*this, "x1snd"),
-		m_soundlatch(*this, "soundlatch%u", 1),
+		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_upd4701(*this, "upd4701"),
 		m_buttonmux(*this, "buttonmux"),
 		m_adc(*this, "adc"),
@@ -56,14 +56,16 @@ public:
 		m_p2(*this, "P2"),
 		m_coins(*this, "COINS"),
 		m_extra_port(*this, "EXTRA"),
-		m_track_x(*this, "TRACK%u_X", 1),
-		m_track_y(*this, "TRACK%u_Y", 1),
+		m_track_x(*this, "TRACK%u_X", 1U),
+		m_track_y(*this, "TRACK%u_Y", 1U),
 		m_sharedram(*this,"sharedram"),
 		m_vregs(*this,"vregs"),
-		m_vram(*this,"vram_%u", 0),
-		m_vctrl(*this,"vctrl_%u", 0),
-		m_paletteram(*this,"paletteram%u", 1),
+		m_vram(*this,"vram_%u", 0U),
+		m_vctrl(*this,"vctrl_%u", 0U),
+		m_paletteram(*this,"paletteram%u", 1U),
 		m_subbank(*this,"subbank"),
+		m_gun_recoil(*this,"Player%u_Gun_Recoil", 1U),
+		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -95,11 +97,15 @@ public:
 
 	optional_memory_bank m_subbank;
 
+	output_finder<2> m_gun_recoil;
+	output_finder<48> m_leds;
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	int m_tiles_offset;
-	tilemap_t *m_tilemap[2][2]; // Max 2 Layers, 2 Tilemap banks for each layers
+	tilemap_t *m_tilemap[2]; // Max 2 Layers
+	int m_rambank[2]; // 2 Tilemap banks for each layers
 	int m_tilemaps_flip;
 	int m_samples_bank;
 	int m_color_mode_shift;
@@ -173,20 +179,20 @@ public:
 	DECLARE_READ8_MEMBER(dsw1_r);
 	DECLARE_READ8_MEMBER(dsw2_r);
 	DECLARE_READ16_MEMBER(extra_r);
-	DECLARE_DRIVER_INIT(bank6502);
-	DECLARE_DRIVER_INIT(downtown);
-	DECLARE_DRIVER_INIT(rezon);
-	DECLARE_DRIVER_INIT(twineagl);
-	DECLARE_DRIVER_INIT(crazyfgt);
-	DECLARE_DRIVER_INIT(metafox);
-	DECLARE_DRIVER_INIT(arbalest);
-	DECLARE_DRIVER_INIT(wiggie);
-	DECLARE_DRIVER_INIT(blandia);
-	DECLARE_DRIVER_INIT(kiwame);
-	DECLARE_DRIVER_INIT(eightfrc);
-	DECLARE_DRIVER_INIT(pairlove);
-	template<int Offset> TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
-	template<int Layer, int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
+	void init_bank6502();
+	void init_downtown();
+	void init_rezon();
+	void init_twineagl();
+	void init_crazyfgt();
+	void init_metafox();
+	void init_arbalest();
+	void init_wiggie();
+	void init_blandia();
+	void init_kiwame();
+	void init_eightfrc();
+	void init_pairlove();
+	TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(seta_no_layers);
 	DECLARE_VIDEO_START(kyustrkr_no_layers);
 	DECLARE_VIDEO_START(twineagl_1_layer);
@@ -202,6 +208,8 @@ public:
 	DECLARE_PALETTE_INIT(gundhara);
 	DECLARE_PALETTE_INIT(jjsquawk);
 	DECLARE_MACHINE_START(keroppi);
+	DECLARE_MACHINE_START(zombraid);
+	DECLARE_MACHINE_START(magspeed);
 	DECLARE_VIDEO_START(oisipuzl_2_layers);
 	uint32_t screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -360,6 +368,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(spritectrl_w);
 
+	DECLARE_MACHINE_START(setaroul);
 	DECLARE_MACHINE_RESET(setaroul);
 
 	DECLARE_VIDEO_START(setaroul_1_layer);
@@ -398,6 +407,11 @@ public:
 		m_dsw1(*this, "DSW1"),
 		m_dsw2_3(*this, "DSW2_3"),
 		m_cabinet(*this, "CABINET"),
+		m_out_cancel(*this, "cancel%u", 1U),
+		m_out_payout(*this, "payout%u", 1U),
+		m_out_start(*this, "start%u", 1U),
+		m_out_help(*this, "help"),
+		m_out_itstart(*this, "start"),
 		m_mux(0),
 		m_out(0)
 	{ }
@@ -414,6 +428,8 @@ public:
 
 	DECLARE_READ16_MEMBER(trackball_r);
 
+	DECLARE_MACHINE_START(jockeyc);
+	DECLARE_MACHINE_START(inttoote);
 	DECLARE_VIDEO_START(jockeyc_1_layer);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -421,7 +437,7 @@ public:
 	DECLARE_WRITE16_MEMBER(inttoote_mux_w);
 	DECLARE_WRITE16_MEMBER(inttoote_out_w);
 	DECLARE_READ16_MEMBER(inttoote_700000_r);
-	DECLARE_DRIVER_INIT(inttoote);
+	void init_inttoote();
 	void inttoote(machine_config &config);
 	void jockeyc(machine_config &config);
 	void inttoote_map(address_map &map);
@@ -434,6 +450,12 @@ private:
 	required_ioport_array<5> m_key1, m_key2;
 	required_ioport m_dsw1, m_dsw2_3;
 	optional_ioport m_cabinet;
+
+	output_finder<2> m_out_cancel;
+	output_finder<2> m_out_payout;
+	output_finder<2> m_out_start;
+	output_finder<> m_out_help;
+	output_finder<> m_out_itstart;
 
 	uint16_t m_mux;
 	uint16_t m_out;

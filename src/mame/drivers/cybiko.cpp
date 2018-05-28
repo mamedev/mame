@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_HD66421_ADD("hd66421")
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	// machine
@@ -539,7 +539,7 @@ ROM_END
 // DRIVERS  //
 //////////////
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE         INIT        COMPANY       FULLNAME                FLAGS */
-COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V1)",  MACHINE_IMPERFECT_SOUND )
-COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V2)",  MACHINE_IMPERFECT_SOUND )
-COMP( 2001, cybikoxt,   cybikov1,   0,      cybikoxt,   cybikoxt, cybiko_state, cybikoxt,   "Cybiko Inc", "Cybiko Xtreme",        MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT           COMPANY       FULLNAME               FLAGS */
+COMP( 2000, cybikov1, 0,        0,      cybikov1, cybiko,   cybiko_state, init_cybiko,   "Cybiko Inc", "Cybiko Classic (V1)", MACHINE_IMPERFECT_SOUND )
+COMP( 2000, cybikov2, cybikov1, 0,      cybikov2, cybiko,   cybiko_state, init_cybiko,   "Cybiko Inc", "Cybiko Classic (V2)", MACHINE_IMPERFECT_SOUND )
+COMP( 2001, cybikoxt, cybikov1, 0,      cybikoxt, cybikoxt, cybiko_state, init_cybikoxt, "Cybiko Inc", "Cybiko Xtreme",       MACHINE_IMPERFECT_SOUND )

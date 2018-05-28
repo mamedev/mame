@@ -230,10 +230,10 @@ private:
 	uint16_t m_analog_values[8];
 
 public:
-	DECLARE_DRIVER_INIT(eps);
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(sq1);
-	DECLARE_DRIVER_INIT(denib);
+	void init_eps();
+	void init_common();
+	void init_sq1();
+	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
@@ -616,11 +616,11 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 #endif
 
 MACHINE_CONFIG_START(esq5505_state::vfx)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("maincpu", M68000, 10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(vfx_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, 10_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -639,13 +639,14 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, 10_MHz_XTAL / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("otis", ES5505, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("otis", ES5505, 10_MHz_XTAL)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -671,7 +672,7 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
@@ -686,20 +687,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::vfxsd)
 	vfx(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
 MACHINE_CONFIG_START(esq5505_state::vfx32)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 30.4761_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, 10_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -718,13 +719,14 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, 30.4761_MHz_XTAL / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("otis", ES5505, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("otis", ES5505, 30.4761_MHz_XTAL / 2)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -739,7 +741,7 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
 	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -982,7 +984,7 @@ ROM_START( eps16p )
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esq5505_state,common)
+void esq5505_state::init_common()
 {
 	m_system_type = GENERIC;
 	m_duart_io = 0;
@@ -996,28 +998,28 @@ DRIVER_INIT_MEMBER(esq5505_state,common)
 	}
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,eps)
+void esq5505_state::init_eps()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_system_type = EPS;
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,sq1)
+void esq5505_state::init_sq1()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_system_type = SQ1;
 #if KEYBOARD_HACK
 	shift = 60;
 #endif
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,denib)
+void esq5505_state::init_denib()
 {
 	uint8_t *pNibbles = (uint8_t *)memregion("nibbles")->base();
 	uint8_t *pBS0L = (uint8_t *)memregion("waverom")->base();
 	uint8_t *pBS0H = pBS0L + 0x100000;
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	// create the 12 bit samples by patching in the nibbles from the nibble ROM
 	// low nibbles go with the lower ROM, high nibbles with the upper ROM
@@ -1031,12 +1033,12 @@ DRIVER_INIT_MEMBER(esq5505_state,denib)
 	}
 }
 
-CONS( 1988, eps,   0,   0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,   0,   0, vfx,   vfx, esq5505_state, denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1989, vfxsd, 0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, eps16p,eps, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,   0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, sq1,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1990, sqrack,sq1, 0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sq2,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sd132, sd1, 0, vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sq2,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sd132,  sd1, 0, vfx32, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD

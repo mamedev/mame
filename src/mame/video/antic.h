@@ -50,7 +50,7 @@ public:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void set_gtia_tag(const char *tag) { m_gtia_tag = tag; }
+	void set_gtia_tag(const char *tag) { m_gtia.set_tag(tag); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -113,8 +113,7 @@ private:
 	};
 
 
-	const char *m_gtia_tag;
-	gtia_device  *m_gtia;
+	required_device<gtia_device> m_gtia;
 	required_device<cpu_device> m_maincpu;
 	optional_ioport m_djoy_b;
 	optional_ioport m_artifacts;

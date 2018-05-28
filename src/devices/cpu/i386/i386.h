@@ -60,6 +60,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 40; }
 	virtual uint32_t execute_input_lines() const override { return 32; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -216,7 +217,9 @@ protected:
 
 	uint8_t m_irq_state;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u8 (offs_t)> m_pr8;
+	std::function<u16 (offs_t)> m_pr16;
+	std::function<u32 (offs_t)> m_pr32;
 	address_space *m_io;
 	uint32_t m_a20_mask;
 
@@ -1473,6 +1476,7 @@ public:
 protected:
 	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;

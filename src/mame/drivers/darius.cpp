@@ -450,7 +450,7 @@ void darius_state::darius_sound2_map(address_map &map)
 WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 {
 	if (m_nmi_enable)
-		m_adpcm->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_adpcm->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(darius_state::adpcm_command_read)
@@ -648,7 +648,7 @@ static const gfx_layout char2layout =
 	16*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( darius )
+static GFXDECODE_START( gfx_darius )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 128 )  /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )  /* scr tiles */
 	GFXDECODE_ENTRY( "gfx3", 0, char2layout,  0, 128 )  /* top layer scr tiles */
@@ -727,7 +727,7 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darius)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darius)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
@@ -764,7 +764,8 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
@@ -1112,8 +1113,8 @@ ROM_START( dariuse )
 ROM_END
 
 
-GAME( 1986, darius,   0,        darius,   darius,  darius_state, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusu,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusj,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuso,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuse,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darius,  0,       darius,  darius,  darius_state, empty_init, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusu, darius,  darius,  dariusu, darius_state, empty_init, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusj, darius,  darius,  dariusj, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuso, darius,  darius,  dariusj, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuse, darius,  darius,  dariusu, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )

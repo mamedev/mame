@@ -43,8 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SAMCOUPE_XTAL_X1  XTAL(24'000'000)
-#define SAMCOUPE_XTAL_X2  XTAL(4'433'619)
+#define SAMCOUPE_XTAL_X1  24_MHz_XTAL
+#define SAMCOUPE_XTAL_X2  4.433619_MHz_XTAL
 
 
 /***************************************************************************
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
 
-	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL(32'768))
+	MCFG_DEVICE_ADD("sambus_clock", MSM6242, 32.768_kHz_XTAL)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
@@ -555,13 +555,13 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 
-	MCFG_WD1772_ADD("wd1772", SAMCOUPE_XTAL_X1/3)
+	MCFG_DEVICE_ADD("wd1772", WD1772, SAMCOUPE_XTAL_X1/3)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SAA1099_ADD("saa1099", SAMCOUPE_XTAL_X1/3) /* 8 MHz */
@@ -620,5 +620,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                        FULLNAME     FLAGS
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME     FLAGS
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", 0 )

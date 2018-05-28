@@ -691,13 +691,14 @@ DISCRETE_SOUND_END
 WRITE_LINE_MEMBER(copsnrob_state::one_start_w)
 {
 	/* One Start */
-	m_led = !state;
+	m_leds[0] = state ? 0 :1;
 }
 
 
 MACHINE_CONFIG_START(copsnrob_state::copsnrob_audio)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, copsnrob_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

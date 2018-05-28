@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(ufombs_state::ufombs)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, ufombs_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(ssfball_state::ssfball)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, ssfball_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -627,7 +627,7 @@ MACHINE_CONFIG_START(bmsoccer_state::bmsoccer)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -734,7 +734,7 @@ MACHINE_CONFIG_START(bmsafari_state::bmsafari)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -885,7 +885,7 @@ MACHINE_CONFIG_START(splasfgt_state::splasfgt)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, splasfgt_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -989,7 +989,7 @@ MACHINE_CONFIG_START(bcclimbr_state::bcclimbr)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_START(tactix_state::tactix)
 	MCFG_DEFAULT_LAYOUT(layout_tactix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1206,7 +1206,7 @@ MACHINE_CONFIG_START(invspace_state::invspace)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1317,7 +1317,7 @@ MACHINE_CONFIG_START(efball_state::efball)
 	MCFG_DEFAULT_LAYOUT(layout_efball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1422,7 +1422,7 @@ MACHINE_CONFIG_START(galaxy2_state::galaxy2)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1541,7 +1541,7 @@ MACHINE_CONFIG_START(astrocmd_state::astrocmd)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1637,7 +1637,7 @@ MACHINE_CONFIG_START(edracula_state::edracula)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1817,7 +1817,7 @@ MACHINE_CONFIG_START(mvbfree_state::mvbfree)
 	MCFG_DEFAULT_LAYOUT(layout_mvbfree)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1932,7 +1932,7 @@ MACHINE_CONFIG_START(grobot9_state::grobot9)
 	MCFG_DEFAULT_LAYOUT(layout_grobot9)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2030,7 +2030,7 @@ MACHINE_CONFIG_START(tccombat_state::tccombat)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2188,7 +2188,7 @@ MACHINE_CONFIG_START(tmtennis_state::tmtennis)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2297,7 +2297,7 @@ MACHINE_CONFIG_START(tmpacman_state::tmpacman)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2400,7 +2400,7 @@ MACHINE_CONFIG_START(tmscramb_state::tmscramb)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2499,7 +2499,7 @@ MACHINE_CONFIG_START(tcaveman_state::tcaveman)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2632,7 +2632,7 @@ MACHINE_CONFIG_START(alnchase_state::alnchase)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2838,37 +2838,37 @@ ROM_END
 
 
 
-//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME                      FLAGS
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino",    "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino",    "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino",    "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino",    "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino",    "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino",    "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai",     "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, empty_init, "Epoch",      "Invader From Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   empty_init, "Epoch",      "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch",      "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch",      "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch",      "Astro Command", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch",      "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel",     "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego",       "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  0, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, empty_init, "Tomy",       "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy",       "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, empty_init, "Tomy",       "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, empty_init, "Tomy",       "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_init, "Tomy",       "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy",       "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

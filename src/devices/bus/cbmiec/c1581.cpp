@@ -171,10 +171,10 @@ WRITE8_MEMBER( c1581_device::cia_pa_w )
 	m_floppy->mon_w(BIT(data, 2));
 
 	// power led
-	machine().output().set_led_value(LED_POWER, BIT(data, 5));
+	m_leds[LED_POWER] = BIT(data, 5);
 
 	// activity led
-	machine().output().set_led_value(LED_ACT, BIT(data, 6));
+	m_leds[LED_ACT] = BIT(data, 6);
 }
 
 READ8_MEMBER( c1581_device::cia_pb_r )
@@ -268,10 +268,10 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1581_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/8)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 8)
 	MCFG_DEVICE_PROGRAM_MAP(c1581_mem)
 
-	MCFG_DEVICE_ADD(M8520_TAG, MOS8520, XTAL(16'000'000)/8)
+	MCFG_DEVICE_ADD(M8520_TAG, MOS8520, 16_MHz_XTAL / 8)
 	MCFG_MOS6526_IRQ_CALLBACK(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1581_device, cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1581_device, sp_w))
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(c1581_device::device_add_mconfig)
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c1581_device, cia_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1581_device, cia_pb_w))
 
-	MCFG_WD1772_ADD(WD1772_TAG, XTAL(16'000'000)/2)
+	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -326,6 +326,7 @@ c1581_device::c1581_device(const machine_config &mconfig, device_type type, cons
 		m_fdc(*this, WD1772_TAG),
 		m_floppy(*this, WD1772_TAG":0:35dd"),
 		m_address(*this, "ADDRESS"),
+		m_leds(*this, "led%u", 0U),
 		m_data_out(0),
 		m_atn_ack(0),
 		m_fast_ser_dir(0),
@@ -354,6 +355,8 @@ c1563_device::c1563_device(const machine_config &mconfig, const char *tag, devic
 
 void c1581_device::device_start()
 {
+	m_leds.resolve();
+
 	// state saving
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_atn_ack));

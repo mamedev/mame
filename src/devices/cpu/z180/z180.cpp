@@ -2016,9 +2016,9 @@ void z180_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_odirect = m_oprogram->direct<0>();
+	m_ocache = m_oprogram->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_iospace = &space(AS_IO);
 
 	/* set up the state table */

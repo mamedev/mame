@@ -188,7 +188,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( galastrm )
+static GFXDECODE_START( gfx_galastrm )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout, 0, 4096 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,       0, 4096 )
 GFXDECODE_END
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 	MCFG_SCREEN_UPDATE_DRIVER(galastrm_state, screen_update_galastrm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galastrm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galastrm)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
@@ -291,4 +291,4 @@ ROM_START( galastrm )
 ROM_END
 
 
-GAME( 1992, galastrm, 0, galastrm, galastrm, galastrm_state, 0, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, galastrm, 0, galastrm, galastrm, galastrm_state, empty_init, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS )

@@ -94,7 +94,7 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_MC68901_TX_CLOCK(9600)
 	MCFG_MC68901_OUT_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_M48T02_ADD("timekpr")
+	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
@@ -111,4 +111,4 @@ ROM_START( harriet )
 	ROM_LOAD16_BYTE("harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28))
 ROM_END
 
-COMP( 1990, harriet,  0,  0, harriet,  harriet, harriet_state,  0,    "Quantel",      "Harriet", MACHINE_IS_SKELETON )
+COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_IS_SKELETON )

@@ -118,7 +118,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /****************************************************************************/
@@ -397,7 +397,7 @@ static const gfx_layout layout_spr =
 	16*16*4
 };
 
-static GFXDECODE_START( himesiki )
+static GFXDECODE_START( gfx_himesiki )
 	GFXDECODE_ENTRY( "bgtiles",   0, layout_bg, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_spr, 0x200, 16 )
 	GFXDECODE_ENTRY( "spr_p103a", 0, layout_p103a, 0x200, 16 )
@@ -457,13 +457,13 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_himesiki)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -567,8 +567,8 @@ ROM_START( androidp )
 ROM_END
 
 
-GAME( 1989, himesiki, 0,         himesiki, himesiki,  himesiki_state, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, himesiki,  0,        himesiki, himesiki,  himesiki_state, empty_init, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // the game changed significantly between these 2 versions, it is possible the later build was actually released
-GAME( 1987, androidp,  0,          himesiki, androidp,  himesiki_state, 0, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE ) // shows 1987 copyright after staff list during ending
-GAME( 198?, androidpo, androidp,   himesiki, androidpo, himesiki_state, 0, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, androidp,  0,        himesiki, androidp,  himesiki_state, empty_init, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE ) // shows 1987 copyright after staff list during ending
+GAME( 198?, androidpo, androidp, himesiki, androidpo, himesiki_state, empty_init, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )

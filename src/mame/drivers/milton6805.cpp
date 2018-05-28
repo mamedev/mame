@@ -127,7 +127,7 @@ MACHINE_CONFIG_START(milton_state::milton)
 	MCFG_DEVICE_ADD("grom4", TMC0430, 3120000 / 8)
 	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x2000, 1);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("sp0250", SP0250, 3120000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -147,4 +147,4 @@ ROM_START( milton )
 	ROM_LOAD("miltongrom4.bin", 0x2000, 0x1800, CRC(9ac929f7) SHA1(1a27d56fc49eb4e58ea3b5c58d7fbedc5a751592) )
 ROM_END
 
-CONS( 1980, milton,  0,  0, milton, milton, milton_state,  0, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )
+CONS( 1980, milton, 0, 0, milton, milton, milton_state, empty_init, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )

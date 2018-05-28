@@ -12,6 +12,7 @@
 /*----------- driver state -----------*/
 
 class n64_rdp;
+class n64_periphs;
 
 class n64_state : public driver_device
 {
@@ -24,6 +25,7 @@ public:
 		, m_rdram(*this, "rdram")
 		, m_rsp_imem(*this, "rsp_imem")
 		, m_rsp_dmem(*this, "rsp_dmem")
+		, m_rcp_periphs(*this, "rcp")
 	{
 	}
 
@@ -50,6 +52,8 @@ protected:
 	required_shared_ptr<uint32_t> m_rdram;
 	required_shared_ptr<uint32_t> m_rsp_imem;
 	required_shared_ptr<uint32_t> m_rsp_dmem;
+
+	required_device<n64_periphs> m_rcp_periphs;
 
 	/* video-related */
 	n64_rdp *m_rdp;

@@ -129,4 +129,4 @@ ROM_START( v102 )
 	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
 ROM_END
 
-COMP( 1984, v102, 0, 0, v102, v102, v102_state, 0, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )
+COMP( 1984, v102, 0, 0, v102, v102, v102_state, empty_init, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )

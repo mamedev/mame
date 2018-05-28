@@ -441,7 +441,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 	}
 
 	/* first look for a tag match */
-	result = m_machine.device(param);
+	result = m_machine.root_device().subdevice(param);
 	if (result)
 		return true;
 
@@ -2044,13 +2044,13 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 					switch (width)
 					{
 					case 8:
-						util::stream_format(output, " %016X", space->read_qword(i+j));
+						util::stream_format(output, " %016X", space->read_qword_unaligned(i+j));
 						break;
 					case 4:
-						util::stream_format(output, " %08X", space->read_dword(i+j));
+						util::stream_format(output, " %08X", space->read_dword_unaligned(i+j));
 						break;
 					case 2:
-						util::stream_format(output, " %04X", space->read_word(i+j));
+						util::stream_format(output, " %04X", space->read_word_unaligned(i+j));
 						break;
 					case 1:
 						util::stream_format(output, " %02X", space->read_byte(i+j));
@@ -2079,13 +2079,13 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 					switch (width)
 					{
 					case 8:
-						data = space->read_qword(i+j);
+						data = space->read_qword_unaligned(i+j);
 						break;
 					case 4:
-						data = space->read_dword(i+j);
+						data = space->read_dword_unaligned(i+j);
 						break;
 					case 2:
-						data = space->read_word(i+j);
+						data = space->read_word_unaligned(i+j);
 						break;
 					case 1:
 						data = space->read_byte(i+j);

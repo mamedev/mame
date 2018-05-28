@@ -138,7 +138,7 @@ public:
 	DECLARE_READ64_MEMBER ( unk1_r );
 	DECLARE_READ64_MEMBER ( unk2_r );
 
-	DECLARE_DRIVER_INIT(pippin);
+	void init_pippin();
 	void pippin(machine_config &config);
 	void pippin_mem(address_map &map);
 private:

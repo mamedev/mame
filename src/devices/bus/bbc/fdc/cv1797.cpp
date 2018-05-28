@@ -53,7 +53,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_cv1797_device::device_add_mconfig)
-	MCFG_FD1797_ADD("fd1797", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_cv1797_device, motor_w))

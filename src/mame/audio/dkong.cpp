@@ -1352,7 +1352,7 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE("ls259.6h", latch8_device, bit5_q_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE("ls259.6h", latch8_device, bit4_q_r))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("discrete", DISCRETE, dkong2b_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1425,7 +1425,7 @@ MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE("ls259.6h", latch8_device, bit5_q_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE("ls259.6h", latch8_device, bit4_q_r))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, dkongjr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1444,5 +1444,5 @@ MACHINE_CONFIG_START(dkong_state::dkong3_audio)
 	MCFG_LATCH8_ADD( "latch2")
 	MCFG_LATCH8_ADD( "latch3")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END

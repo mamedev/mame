@@ -1379,7 +1379,7 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
-		logerror("%08X: Starting DSIO CPU\n", machine().device<cpu_device>("maincpu")->pc());
+		logerror("%s: Starting DSIO CPU\n", machine().describe_context());
 		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	// Restore internal/external mapping
@@ -1631,10 +1631,6 @@ void dcs_audio_device::ack_w()
 
 uint16_t dcs_audio_device::data_r()
 {
-	// If the cpu is reading empty data it is probably polling so eat some cyles
-	if IS_OUTPUT_EMPTY()
-		machine().device<cpu_device>("maincpu")->eat_cycles(4444);
-
 	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
 	if (m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 0);
@@ -1681,7 +1677,7 @@ READ16_MEMBER( dcs_audio_device::output_control_r )
 int dcs_audio_device::data2_r()
 {
 	if (LOG_DCS_IO)
-		logerror("%08X dcs:data2_r = %04X\n", machine().device<cpu_device>("maincpu")->pc(), m_output_control);
+		logerror("%s: dcs:data2_r = %04X\n", machine().describe_context(), m_output_control);
 
 	return m_output_control;
 }
@@ -1875,7 +1871,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 			if ((data & 0x0200) && !(m_rev == REV_DSIO || m_rev == REV_DENV))
 			{
 				logerror("%s Rebooting DCS due to SYSCONTROL write = %04X\n", machine().describe_context(), data);
-				m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+				m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				dcs_boot();
 				m_control_regs[SYSCONTROL_REG] = 0;
 			}
@@ -2480,7 +2476,7 @@ MACHINE_CONFIG_START(dcs_audio_device::add_mconfig_dcs )
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("dac", DMADAC) // AD-1851 16bit mono
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2585,7 +2581,8 @@ MACHINE_CONFIG_START(dcs2_audio_device::add_mconfig_dcs2 )
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("dcs_hle_timer", DEVICE_SELF, dcs_audio_device, transfer_watchdog_callback)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -2665,7 +2662,8 @@ MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("dcs_sport0_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // roadburn needs this to pass harware test
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -2706,7 +2704,8 @@ MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("dcs_sport0_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // Atlantis driver waits for sport0 rx interrupts
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

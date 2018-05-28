@@ -1016,13 +1016,13 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1121,13 +1121,13 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1278,10 +1278,10 @@ ROM_START( sun3_e )
 	ROM_LOAD( "sun3-e-idprom.bin", 0x000000, 0x000020, CRC(d1a92116) SHA1(4836f3188f2c3dd5ba49ab66e0b55caa6b1b1791) )
 ROM_END
 
-//    YEAR  NAME       PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME                    FLAGS
-COMP( 198?, sun3_50,   0,      0,       sun3_50,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/50",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Model 25
-COMP( 1988, sun3_60,   0,      0,       sun3_60,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/60",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ferrari
-COMP( 198?, sun3_110,  0,      0,       sun3,      sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/110",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
-COMP( 1985, sun3_150,  0,      0,       sun3,      sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/75/140/150/160/180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // AKA Carrera
-COMP( 198?, sun3_260,  0,      0,       sun3200,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/260/280",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
-COMP( 198?, sun3_e,    0,      0,       sun3e,     sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/E",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Polaris
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                    FLAGS
+COMP( 198?, sun3_50,  0,      0,      sun3_50, sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/50",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Model 25
+COMP( 1988, sun3_60,  0,      0,      sun3_60, sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/60",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ferrari
+COMP( 198?, sun3_110, 0,      0,      sun3,    sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/110",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
+COMP( 1985, sun3_150, 0,      0,      sun3,    sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/75/140/150/160/180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // AKA Carrera
+COMP( 198?, sun3_260, 0,      0,      sun3200, sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/260/280",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
+COMP( 198?, sun3_e,   0,      0,      sun3e,   sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/E",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Polaris

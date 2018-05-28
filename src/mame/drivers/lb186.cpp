@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_DEVICE_PROGRAM_MAP(lb186_map)
 	MCFG_DEVICE_IO_MAP(lb186_io)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int0_w))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_WD1772_ADD("fdc", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int2_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
@@ -175,4 +175,4 @@ ROM_START( lb186 )
 	ROM_LOAD16_BYTE("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6))
 ROM_END
 
-COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )
+COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, empty_init, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )

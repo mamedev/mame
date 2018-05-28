@@ -321,19 +321,19 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(luxor_55_10828_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000)/2)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(luxor_55_10828_mem)
 	MCFG_DEVICE_IO_MAP(luxor_55_10828_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(4'000'000)/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 4_MHz_XTAL / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, luxor_55_10828_device, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, luxor_55_10828_device, pio_pa_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, luxor_55_10828_device, pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, luxor_55_10828_device, pio_pb_w))
 
-	MCFG_MB8876_ADD(MB8876_TAG, XTAL(4'000'000)/4)
+	MCFG_DEVICE_ADD(MB8876_TAG, MB8876, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_drq_w))
 

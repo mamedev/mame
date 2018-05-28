@@ -909,7 +909,7 @@ void amstrad_centronics_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	/* Machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
 	MCFG_DEVICE_IO_MAP(amstrad_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
@@ -927,7 +927,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(16'000'000), 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
+	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15)
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -936,7 +936,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
 
-	MCFG_MC6845_ADD("mc6845", HD6845, nullptr, XTAL(16'000'000) / 16)
+	MCFG_MC6845_ADD("mc6845", HD6845, nullptr, 16_MHz_XTAL / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_de_changed))
@@ -947,10 +947,9 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("ay", AY8912, XTAL(16'000'000) / 16)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay", AY8912, 16_MHz_XTAL / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1038,7 +1037,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	/* Machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(40'000'000) / 10)
+	MCFG_DEVICE_ADD("maincpu", Z80, 40_MHz_XTAL / 10)
 	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
 	MCFG_DEVICE_IO_MAP(amstrad_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
@@ -1056,7 +1055,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( ( XTAL(40'000'000) * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
+	MCFG_SCREEN_RAW_PARAMS((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15)
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1065,7 +1064,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, XTAL(40'000'000) / 40)
+	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, 40_MHz_XTAL / 40)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_plus_de_changed))
@@ -1075,10 +1074,9 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("ay", AY8912, XTAL(40'000'000) / 40)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay", AY8912, 40_MHz_XTAL / 40)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1117,7 +1115,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::gx4000)
 	/* Machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(40'000'000) / 10)
+	MCFG_DEVICE_ADD("maincpu", Z80, 40_MHz_XTAL / 10)
 	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
 	MCFG_DEVICE_IO_MAP(amstrad_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
@@ -1135,7 +1133,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( ( XTAL(40'000'000) * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
+	MCFG_SCREEN_RAW_PARAMS((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15)
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1144,7 +1142,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, XTAL(40'000'000) / 40)
+	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, 40_MHz_XTAL / 40)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_plus_de_changed))
@@ -1154,8 +1152,8 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("ay", AY8912, XTAL(40'000'000) / 40)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay", AY8912, 40_MHz_XTAL / 40)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1172,14 +1170,15 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 
-	MCFG_DEVICE_REPLACE("ay", AY8912, XTAL(16'000'000) / 16)
+	MCFG_DEVICE_REPLACE("ay", AY8912, 16_MHz_XTAL / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,aleste)
-	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
 	MCFG_DEVICE_REMOVE("upd765")
 	MCFG_I8272A_ADD("upd765", true)
@@ -1324,15 +1323,15 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE          INIT  COMPANY                FULLNAME                                     FLAGS */
-COMP( 1984, cpc464,    0,        0,      cpc464,   cpc464,    amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464",                            0 )
-COMP( 1985, cpc664,    cpc464,   0,      cpc664,   cpc664,    amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC664",                            0 )
-COMP( 1985, cpc6128,   cpc464,   0,      cpc6128,  cpc6128,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128",                           0 )
-COMP( 1985, cpc6128f,  cpc464,   0,      cpc6128,  cpc6128f,  amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s,  cpc464,   0,      cpc6128,  cpc6128s,  amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
-COMP( 1985, cpc6128sp, cpc464,   0,      cpc6128,  cpc6128sp, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (Spain)",                   0 )
-COMP( 1990, cpc464p,   0,        0,      cpcplus,  plus,      amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464+",                           0 )
-COMP( 1990, cpc6128p,  0,        0,      cpcplus,  plus,      amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128+",                          0 )
-CONS( 1990, gx4000,    0,        0,      gx4000,   gx4000,    amstrad_state, 0,    "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,    cpc464,   0,      kccomp,   kccomp,    amstrad_state, 0,    "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,   cpc464,   0,      aleste,   aleste,    amstrad_state, 0,    "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT      CLASS          INIT        COMPANY                FULLNAME                                     FLAGS */
+COMP( 1984, cpc464,    0,      0,      cpc464,  cpc464,    amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC464",                            0 )
+COMP( 1985, cpc664,    cpc464, 0,      cpc664,  cpc664,    amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC664",                            0 )
+COMP( 1985, cpc6128,   cpc464, 0,      cpc6128, cpc6128,   amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128",                           0 )
+COMP( 1985, cpc6128f,  cpc464, 0,      cpc6128, cpc6128f,  amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
+COMP( 1985, cpc6128s,  cpc464, 0,      cpc6128, cpc6128s,  amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
+COMP( 1985, cpc6128sp, cpc464, 0,      cpc6128, cpc6128sp, amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128 (Spain)",                   0 )
+COMP( 1990, cpc464p,   0,      0,      cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC464+",                           0 )
+COMP( 1990, cpc6128p,  0,      0,      cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc",         "Amstrad CPC6128+",                          0 )
+CONS( 1990, gx4000,    0,      0,      gx4000,  gx4000,    amstrad_state, empty_init, "Amstrad plc",         "Amstrad GX4000",                            0 )
+COMP( 1989, kccomp,    cpc464, 0,      kccomp,  kccomp,    amstrad_state, empty_init, "VEB Mikroelektronik", "KC Compact",                                0 )
+COMP( 1993, al520ex,   cpc464, 0,      aleste,  aleste,    amstrad_state, empty_init, "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

@@ -81,7 +81,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
 
-	DECLARE_DRIVER_INIT(osborne1);
+	void init_osborne1();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

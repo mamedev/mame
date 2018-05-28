@@ -48,7 +48,7 @@ public:
 	{ }
 
 	void backfire(machine_config &config);
-	DECLARE_DRIVER_INIT(backfire);
+	void init_backfire();
 
 private:
 	DECLARE_READ32_MEMBER(control2_r);
@@ -372,7 +372,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( backfire )
+static GFXDECODE_START( gfx_backfire )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 128 )   /* Characters 8x8 */
@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", backfire)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_backfire)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -503,7 +503,8 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 28000000 / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -667,7 +668,7 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(backfire_state,backfire)
+void backfire_state::init_backfire()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
@@ -677,5 +678,5 @@ DRIVER_INIT_MEMBER(backfire_state,backfire)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32_delegate(FUNC(backfire_state::backfire_speedup_r), this));
 }
 
-GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, backfire, ROT0, "Data East Corporation", "Backfire! (set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play
+GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 #define MCFG_MC68681_IRQ_CALLBACK(_cb) \
 	devcb = &downcast<duart_base_device &>(*device).set_irq_cb(DEVCB_##_cb);
@@ -26,18 +27,11 @@
 	downcast<duart_base_device &>(*device).set_clocks(_a, _b, _c, _d);
 
 // SC28C94 specific callbacks
-#define MCFG_SC28C94_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, SC28C94, _clock)
-
 #define MCFG_SC28C94_C_TX_CALLBACK(_cb) \
 	devcb = &downcast<sc28c94_device &>(*device).set_c_tx_cb(DEVCB_##_cb);
 
 #define MCFG_SC28C94_D_TX_CALLBACK(_cb) \
 	devcb = &downcast<sc28c94_device &>(*device).set_d_tx_cb(DEVCB_##_cb);
-
-// MC68340SERIAL specific callbacks
-#define MCFG_MC68340DUART_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, MC68340_DUART, _clock)
 
 #define MC68681_RX_FIFO_SIZE                3
 

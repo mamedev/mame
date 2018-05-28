@@ -100,5 +100,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS        INIT  COMPANY                FULLNAME  FLAGS
-COMP( 198?, pm68k, 0,      0,      pm68k,  pm68k,  pm68k_state, 0,    "Callan Data Systems", "PM68K",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  CLASS        INIT        COMPANY                FULLNAME  FLAGS
+COMP( 198?, pm68k, 0,      0,      pm68k,  pm68k, pm68k_state, empty_init, "Callan Data Systems", "PM68K",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

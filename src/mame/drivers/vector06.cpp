@@ -180,9 +180,8 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(vector06_state, vector06)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -200,7 +199,7 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_KR1818VG93_ADD("wd1793", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("wd1793", KR1818VG93, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)
@@ -271,8 +270,8 @@ ROM_START( krista2 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME       FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 06c",  0)
-COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
-COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
-COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME       FLAGS */
+COMP( 1987, vector06, 0,        0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 06c",  0)
+COMP( 1987, vec1200,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
+COMP( 1987, pk6128c,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
+COMP( 1987, krista2,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)

@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -489,5 +489,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY         FULLNAME  FLAGS
-COMP( 198?, iq151, 0,      0,      iq151,   iq151, iq151_state, 0,     "ZPA Novy Bor", "IQ-151", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY         FULLNAME  FLAGS
+COMP( 198?, iq151, 0,      0,      iq151,   iq151, iq151_state, empty_init, "ZPA Novy Bor", "IQ-151", 0 )

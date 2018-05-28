@@ -157,7 +157,7 @@ static const gfx_layout v6809_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( v6809 )
+static GFXDECODE_START( gfx_v6809 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -280,7 +280,7 @@ static void v6809_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(v6809_state::v6809)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(16'000'000) / 4) // divided by 4 again internally
+	MCFG_DEVICE_ADD("maincpu", MC6809, 16_MHz_XTAL / 4) // divided by 4 again internally
 	MCFG_DEVICE_PROGRAM_MAP(v6809_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
@@ -292,15 +292,15 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(16'000'000) / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 16_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 16_MHz_XTAL / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
 	MCFG_PTM6840_O1_CB(WRITELINE(*this, v6809_state, speaker_w))
 	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_MB8876_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("fdc", MB8876, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
@@ -363,5 +363,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT   COMPANY     FULLNAME      FLAGS
-COMP( 1982, v6809,  0,      0,       v6809,     v6809, v6809_state,   0,     "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1982, v6809, 0,      0,      v6809,   v6809, v6809_state, empty_init, "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )

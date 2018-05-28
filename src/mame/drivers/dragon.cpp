@@ -189,7 +189,7 @@ static void dragon_alpha_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(14'218'000) / 16)
+	MCFG_DEVICE_CLOCK(14.218_MHz_XTAL / 16)
 
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", MC6809E, DERIVED_CLOCK(1, 1))
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL(14'218'000), MAINCPU_TAG, AS_PROGRAM)
+	MCFG_SAM6883_ADD(SAM_TAG, 14.218_MHz_XTAL, MAINCPU_TAG, AS_PROGRAM)
 	MCFG_SAM6883_RES_CALLBACK(READ8(*this, dragon_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
 
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, dragon_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, dragon_state, field_sync))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(SAM_TAG, sam6883_device, display_read))
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(dragon64_state::dragon64)
 
 	// acia
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dragon_flex_list", "dragon_flex")
@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(d64plus_state::d64plus)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// crtc
-	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", XTAL(14'218'000)/4/2)
+	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", 14.218_MHz_XTAL / 4 / 2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(d64plus_state, crtc_update_row)
@@ -327,10 +327,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 
 	// acia
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 
 	// floppy
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_drq_w))
 
@@ -364,7 +364,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	dragon64(config);
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(14'318'181) / 4)
+	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 4)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
@@ -444,13 +444,13 @@ ROM_END
 #define rom_dragon64h rom_dragon64
 #define rom_tanodr64h rom_tanodr64
 
-//    YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT    COMPANY                          FULLNAME                       FLAGS
-COMP( 1982,    dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       0,      "Dragon Data Ltd",               "Dragon 32",                   0 )
-COMP( 1983,    dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64",                   0 )
-COMP( 19??,    dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64 (HD6309E CPU)",                   MACHINE_UNOFFICIAL )
-COMP( 1985,    dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Eurohard S.A.",                 "Dragon 200",                  0 )
-COMP( 1985,    dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   0,      "Eurohard S.A.",                 "Dragon 200-E",                MACHINE_NOT_WORKING )
-COMP( 1985,    d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      0,      "Dragon Data Ltd / Compusense",  "Dragon 64 Plus",              0 )
-COMP( 1983,    tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       0 )
-COMP( 19??,    tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC; HD6309E CPU)",       MACHINE_UNOFFICIAL )
-COMP( 1984,    dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, 0,      "Dragon Data Ltd",               "Dragon Professional (Alpha)", 0 )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY                         FULLNAME                       FLAGS
+COMP( 1982, dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       empty_init, "Dragon Data Ltd",              "Dragon 32",                   0 )
+COMP( 1983, dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64",                   0 )
+COMP( 19??, dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64 (HD6309E CPU)",     MACHINE_UNOFFICIAL )
+COMP( 1985, dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Eurohard S.A.",                "Dragon 200",                  0 )
+COMP( 1985, dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   empty_init, "Eurohard S.A.",                "Dragon 200-E",                MACHINE_NOT_WORKING )
+COMP( 1985, d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      empty_init, "Dragon Data Ltd / Compusense", "Dragon 64 Plus",              0 )
+COMP( 1983, tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC)",       0 )
+COMP( 19??, tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC; HD6309E CPU)",       MACHINE_UNOFFICIAL )
+COMP( 1984, dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, empty_init, "Dragon Data Ltd",              "Dragon Professional (Alpha)", 0 )

@@ -412,7 +412,7 @@ MACHINE_CONFIG_START(m62_audio_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(irem_sound_portmap)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay_45m", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(m52_soundc_audio_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(m52_small_sound_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay_45m", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(m52_large_audio_device::device_add_mconfig)  /* 10 yard fig
 	MCFG_DEVICE_IO_MAP(irem_sound_portmap)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay_45m", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)

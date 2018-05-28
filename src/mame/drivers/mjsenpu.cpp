@@ -93,7 +93,7 @@ public:
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);
 
-	DECLARE_DRIVER_INIT(mjsenpu);
+	void init_mjsenpu();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -522,7 +522,7 @@ READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
 
 
 
-DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
+void mjsenpu_state::init_mjsenpu()
 {
 /*
 0000ADAE: LDHU.D L42, L38, $0
@@ -539,4 +539,4 @@ DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
 }
 
 
-GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )
+GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, init_mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )

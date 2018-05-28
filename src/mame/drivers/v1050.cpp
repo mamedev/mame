@@ -1100,7 +1100,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))
 
-	MCFG_MB8877_ADD(MB8877_TAG, 16_MHz_XTAL/16)
+	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL/16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -1153,5 +1153,5 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE         INIT    COMPANY                  FULLNAME       FLAGS
-COMP( 1983, v1050,  0,      0,      v1050,  v1050, v1050_state,  0,      "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                  FULLNAME       FLAGS
+COMP( 1983, v1050, 0,      0,      v1050,   v1050, v1050_state, empty_init, "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

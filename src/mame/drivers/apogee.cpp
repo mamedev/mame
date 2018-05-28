@@ -179,8 +179,6 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap + (gpa & 1) * 0x400;
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if(linecount == 8)
-		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}
@@ -209,7 +207,7 @@ static const gfx_layout apogee_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apogee )
+static GFXDECODE_START( gfx_apogee )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apogee_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -249,13 +247,12 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apogee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apogee)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(apogee_state,radio86)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -285,5 +282,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT   COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY      FULLNAME        FLAGS
-COMP( 1989, apogee, radio86, 0,      apogee,    apogee, apogee_state, radio86, "Zavod BRA", "Apogee BK-01", 0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT          COMPANY      FULLNAME        FLAGS
+COMP( 1989, apogee, radio86, 0,      apogee,  apogee, apogee_state, init_radio86, "Zavod BRA", "Apogee BK-01", 0 )

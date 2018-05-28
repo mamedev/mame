@@ -154,7 +154,7 @@ READ_LINE_MEMBER( elf2_state::ef4_r )
 
 WRITE_LINE_MEMBER( elf2_state::q_w )
 {
-	output().set_led_value(0, state);
+	m_led = state ? 1 : 0;
 }
 
 READ8_MEMBER( elf2_state::dma_r )
@@ -201,6 +201,8 @@ WRITE_LINE_MEMBER( elf2_state::da_w )
 void elf2_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	m_led.resolve();
 
 	/* initialize LED displays */
 	m_7segs.resolve();
@@ -288,5 +290,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT    COMPANY         FULLNAME    FLAGS
-COMP( 1978, elf2,   0,      0,      elf2,   elf2, elf2_state, 0,      "Netronics",    "Elf II",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1978, elf2, 0,      0,      elf2,    elf2,  elf2_state, empty_init, "Netronics", "Elf II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

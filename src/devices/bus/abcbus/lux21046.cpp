@@ -291,12 +291,12 @@ static const z80_daisy_config z80_daisy_chain[] =
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(luxor_55_21046_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_DEVICE_PROGRAM_MAP(luxor_55_21046_mem)
 	MCFG_DEVICE_IO_MAP(luxor_55_21046_io)
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 16_MHz_XTAL / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(*this, luxor_55_21046_device, dma_int_w))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, luxor_55_21046_device, memory_read_byte))
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(luxor_55_21046_device::device_add_mconfig)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, luxor_55_21046_device, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, luxor_55_21046_device, io_write_byte))
 
-	MCFG_FD1793_ADD(SAB1793_TAG, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(SAB1793_TAG, FD1793, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_21046_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 MACHINE_CONFIG_END
@@ -1052,14 +1052,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	// density select
 	m_fdc->dden_w(BIT(data, 1));
 
-	if (BIT(data, 2))
-	{
-		m_fdc->set_unscaled_clock(XTAL(16'000'000)/16);
-	}
-	else
-	{
-		m_fdc->set_unscaled_clock(XTAL(16'000'000)/8);
-	}
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / (BIT(data, 2) ? 16 : 8));
 }
 
 

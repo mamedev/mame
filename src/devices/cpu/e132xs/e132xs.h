@@ -185,8 +185,6 @@ protected:
 		uint32_t  delay_slot;
 		uint32_t  delay_slot_taken;
 
-		uint32_t  opcodexor;
-
 		int32_t   intblock;
 
 		uint32_t  arg0;
@@ -305,7 +303,8 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_io_config;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u16 (offs_t)> m_pr16;
+	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_io;
 
 	uint16_t  m_op;           // opcode

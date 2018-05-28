@@ -311,6 +311,8 @@ void device_a2bus_card_interface::interface_validity_check(validity_checker &val
 
 void device_a2bus_card_interface::interface_pre_start()
 {
+	device_slot_card_interface::interface_pre_start();
+
 	if (!m_a2bus)
 	{
 		m_a2bus = m_a2bus_finder;

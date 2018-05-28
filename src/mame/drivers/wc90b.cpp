@@ -307,7 +307,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( wc90b )
+static GFXDECODE_START( gfx_wc90b )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       0x100, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x02000, tilelayout,       0x200, 0x10 )
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 	if(m_toggle)
 	{
 		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
@@ -377,13 +377,13 @@ MACHINE_CONFIG_START(wc90b_state::wc90b)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wc90b)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -537,6 +537,6 @@ ROM_START( twcup90ba )
 ROM_END
 
 
-GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -66,7 +66,7 @@ MACHINE_CONFIG_START(km035_device::device_add_mconfig)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, km035_device, t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, km035_device, t1_r))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(KM035_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

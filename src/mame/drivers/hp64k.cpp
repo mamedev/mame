@@ -1406,9 +1406,10 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc" , i8275_device , screen_update)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(720 , 390)
+	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 390-1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_FD1791_ADD("fdc" , XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp64k_state , hp64k_flp_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, hp64k_state , hp64k_flp_drq_w))
@@ -1434,7 +1435,7 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hp64k_state , hp64k_floppy1_rdy));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper" , BEEP , 2500)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 
@@ -1496,5 +1497,5 @@ ROM_START(hp64k)
 	ROM_LOAD("1816_1496_82s191.bin" , 0 , 0x800 , CRC(32a52664) SHA1(8b2a49a32510103ff424e8481d5ed9887f609f2f))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT     INIT              COMPANY       FULLNAME */
-COMP( 1979, hp64k,     0,        0,     hp64k,  hp64k,    hp64k_state, 0, "HP",      "HP 64000" , 0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME */
+COMP( 1979, hp64k, 0,      0,      hp64k,   hp64k, hp64k_state, empty_init, "HP",    "HP 64000" , 0)

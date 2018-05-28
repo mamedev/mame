@@ -158,7 +158,6 @@ if (VIDEOS["EF9340_1"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/ef9340_1.cpp",
 		MAME_DIR .. "src/devices/video/ef9340_1.h",
-		MAME_DIR .. "src/devices/video/ef9341_chargen.h",
 	}
 end
 
@@ -1067,5 +1066,16 @@ if (VIDEOS["BT45X"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/bt45x.cpp",
 		MAME_DIR .. "src/devices/video/bt45x.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/topcat.h,VIDEOS["TOPCAT"] = true
+--------------------------------------------------
+if (VIDEOS["TOPCAT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/topcat.cpp",
+		MAME_DIR .. "src/devices/video/topcat.h",
 	}
 end

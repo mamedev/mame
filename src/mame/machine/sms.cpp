@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 	if (pause_pressed)
 	{
 		if (!m_paused)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 		m_paused = 1;
 	}
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 
 			// Power LED blinks while Rapid Fire is enabled.
 			// It switches between on/off at each 2048 C-Sync pulses.
-			if ((m_csync_counter & 0x7ff) == 0)
+			if ((m_csync_counter & 0x7ff) == 0 && m_has_pwr_led)
 			{
 				m_led_pwr = !m_led_pwr;
 			}
@@ -306,7 +306,8 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 			{
 				m_rapid_read_state = 0x00;
 				// Power LED remains lit again
-				output().set_led_value(0, 1);
+				if (m_has_pwr_led)
+					m_led_pwr = 1;
 			}
 		}
 	}
@@ -999,9 +1000,9 @@ void sms_state::setup_bios()
 	if (m_BIOS == nullptr || m_BIOS[0] == 0x00)
 	{
 		m_BIOS = nullptr;
-		m_has_bios_0400 = 0;
-		m_has_bios_2000 = 0;
-		m_has_bios_full = 0;
+		m_has_bios_0400 = false;
+		m_has_bios_2000 = false;
+		m_has_bios_full = false;
 	}
 
 	if (m_BIOS)
@@ -1023,9 +1024,14 @@ void sms_state::setup_bios()
 	}
 }
 
-MACHINE_START_MEMBER(sms_state,sms)
+void sms_state::machine_start()
 {
-	m_led_pwr.resolve();
+	// turn on the Power LED
+	if (m_has_pwr_led)
+	{
+		m_led_pwr.resolve();
+		m_led_pwr = 1;
+	}
 
 	char str[7];
 
@@ -1119,7 +1125,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		m_cartslot->save_ram();
 }
 
-MACHINE_RESET_MEMBER(sms_state,sms)
+void sms_state::machine_reset()
 {
 	if (m_is_smsj)
 	{
@@ -1134,7 +1140,8 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 		m_rapid_last_dc = 0xff;
 		m_rapid_last_dd = 0xff;
 		// Power LED remains lit again
-		output().set_led_value(0, 1);
+		if (m_has_pwr_led)
+			m_led_pwr = 1;
 	}
 
 	if (!m_is_mark_iii)
@@ -1249,88 +1256,9 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 	}
 }
 
-DRIVER_INIT_MEMBER(sms_state,sg1000m3)
-{
-	m_is_mark_iii = 1;
-	m_has_jpn_sms_cart_slot = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,sms)
-{
-	m_has_bios_full = 1;
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,sms1)
-{
-	m_has_bios_full = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,smsj)
-{
-	m_is_smsj = 1;
-	m_has_bios_2000 = 1;
-	m_ioctrl_region_is_japan = 1;
-	m_has_jpn_sms_cart_slot = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,sms1kr)
-{
-	m_has_bios_2000 = 1;
-	m_ioctrl_region_is_japan = 1;
-	m_has_jpn_sms_cart_slot = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,smskr)
-{
-	m_has_bios_full = 1;
-	// Despite having a Japanese cartridge slot, this version is detected as Export region.
-	m_has_jpn_sms_cart_slot = 1;
-}
-
-
-DRIVER_INIT_MEMBER(smssdisp_state,smssdisp)
-{
-	m_is_sdisp = 1;
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,gamegear)
-{
-	m_is_gamegear = 1;
-	m_has_bios_0400 = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,gamegeaj)
-{
-	m_is_gamegear = 1;
-	m_has_bios_0400 = 1;
-	m_ioctrl_region_is_japan = 1;
-	// turn on the Power LED
-	output().set_led_value(0, 1);
-}
-
 
 VIDEO_START_MEMBER(sms_state,sms1)
 {
-	m_left_lcd = machine().device("left_lcd");
-	m_right_lcd = machine().device("right_lcd");
-
 	m_main_scr->register_screen_bitmap(m_prevleft_bitmap);
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
 	save_item(NAME(m_prevleft_bitmap));
@@ -1385,81 +1313,65 @@ WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
 	}
 }
 
-
 uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t sscope = 0;
-	uint8_t sscope_binocular_hack;
-	uint8_t occluded_view = 0;
+	m_vdp->screen_update(screen, bitmap, cliprect);
+	return 0;
+}
 
-	if (&screen != m_main_scr)
-	{
-		sscope = m_port_scope->read();
-		if (!sscope)
-		{
-			// without SegaScope, both LCDs for glasses go black
-			occluded_view = 1;
-		}
-		else if (&screen == m_left_lcd)
-		{
-			// with SegaScope, state 0 = left screen OFF, right screen ON
-			if (!(m_frame_sscope_state & 0x01))
-				occluded_view = 1;
-		}
-		else // it's right LCD
-		{
-			// with SegaScope, state 1 = left screen ON, right screen OFF
-			if (m_frame_sscope_state & 0x01)
-				occluded_view = 1;
-		}
-	}
+uint32_t sms_state::screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t sscope = m_port_scope->read();
 
-	if (!occluded_view)
+	// without SegaScope, both LCDs for glasses go black
+	// with SegaScope, state 0 = left screen OFF, right screen ON
+	if (sscope && BIT(m_frame_sscope_state, 0))
 	{
 		m_vdp->screen_update(screen, bitmap, cliprect);
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// save a copy of current bitmap for the binocular hack
-		if (sscope)
-		{
-			sscope_binocular_hack = m_port_scope_binocular->read();
-
-			if (&screen == m_left_lcd)
-			{
-				if (sscope_binocular_hack & 0x01)
-					copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-			}
-			else // it's right LCD
-			{
-				if (sscope_binocular_hack & 0x02)
-					copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-			}
-		}
+		if (BIT(m_port_scope_binocular->read(), 0))
+			copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// use the copied bitmap for the binocular hack
-		if (sscope)
+		if (sscope && BIT(m_port_scope_binocular->read(), 0))
 		{
-			sscope_binocular_hack = m_port_scope_binocular->read();
+			copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
+			return 0;
+		}
+		bitmap.fill(rgb_t::black(), cliprect);
+	}
 
-			if (&screen == m_left_lcd)
-			{
-				if (sscope_binocular_hack & 0x01)
-				{
-					copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
-					return 0;
-				}
-			}
-			else // it's right LCD
-			{
-				if (sscope_binocular_hack & 0x02)
-				{
-					copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
-					return 0;
-				}
-			}
+	return 0;
+}
+
+uint32_t sms_state::screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t sscope = m_port_scope->read();
+
+	// without SegaScope, both LCDs for glasses go black
+	// with SegaScope, state 1 = left screen ON, right screen OFF
+	if (sscope && !BIT(m_frame_sscope_state, 0))
+	{
+		m_vdp->screen_update(screen, bitmap, cliprect);
+
+		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
+		// save a copy of current bitmap for the binocular hack
+		if (BIT(m_port_scope_binocular->read(), 1))
+			copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+	}
+	else
+	{
+		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
+		// use the copied bitmap for the binocular hack
+		if (sscope && BIT(m_port_scope_binocular->read(), 1))
+		{
+			copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
+			return 0;
 		}
 		bitmap.fill(rgb_t::black(), cliprect);
 	}

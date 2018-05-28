@@ -53,7 +53,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(mc1502_fdc_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
@@ -116,7 +116,7 @@ void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
 }
 
 /*
- * Accesses to this port block (halt the CPU until DRQ, INTRQ or MOTOR ON)
+ * Accessing this port halts the CPU via READY line until DRQ, INTRQ or MOTOR ON
  */
 uint8_t mc1502_fdc_device::mc1502_wd17xx_drq_r()
 {

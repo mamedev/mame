@@ -465,7 +465,7 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( gluck2 )
+static GFXDECODE_START( gfx_gluck2 )
 	GFXDECODE_ENTRY( "gfx", 0x0000, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx", 0x0800, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, tilelayout, 0, 16 )
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gluck2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gluck2)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))
@@ -550,5 +550,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE         INIT   ROT    COMPANY          FULLNAME       FLAGS...
-GAME( 1992, gluck2,   0,      gluck2,   gluck2,   gluck2_state, 0,     ROT0, "Yung Yu / CYE", "Good Luck II", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME       FLAGS...
+GAME( 1992, gluck2, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II", MACHINE_SUPPORTS_SAVE )

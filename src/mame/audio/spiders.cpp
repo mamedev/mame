@@ -178,9 +178,8 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(spiders_state::spiders_audio_command_w)
 {
-	pia6821_device *pia = downcast<pia6821_device *>(machine().device("pia4"));
-	pia->porta_w(data & 0xf8);
-	pia->ca1_w(data & 0x80 ? 1 : 0);
+	m_pia[3]->porta_w(data & 0xf8);
+	m_pia[3]->ca1_w(data & 0x80 ? 1 : 0);
 }
 
 
@@ -207,7 +206,7 @@ WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
 
 MACHINE_CONFIG_START(spiders_state::spiders_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("discrete", DISCRETE, spiders_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

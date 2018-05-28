@@ -62,12 +62,12 @@ class acrnsys1_state : public driver_device
 {
 public:
 	acrnsys1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ttl74145(*this, "ic8_7445"),
-		m_cass(*this, "cassette"),
-		m_display(*this, "digit%u", 0U),
-		m_digit(0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ttl74145(*this, "ic8_7445")
+		, m_cass(*this, "cassette")
+		, m_display(*this, "digit%u", 0U)
+		, m_digit(0)
 	{ }
 
 	void acrnsys1(machine_config &config);
@@ -267,15 +267,14 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
+	MCFG_DEVICE_ADD("maincpu", M6502, 1.008_MHz_XTAL)  /* 1.008 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(acrnsys1_map)
 
 	MCFG_DEFAULT_LAYOUT(layout_acrnsys1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("b1", INS8154, 0)
@@ -303,5 +302,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS
+COMP( 1979, acrnsys1, 0,      0,      acrnsys1, acrnsys1, acrnsys1_state, empty_init, "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )

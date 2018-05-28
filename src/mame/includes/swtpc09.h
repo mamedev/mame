@@ -91,10 +91,10 @@ public:
 	DECLARE_READ8_MEMBER(main_r);
 	DECLARE_WRITE8_MEMBER(main_w);
 
-	DECLARE_DRIVER_INIT( swtpc09 );
-	DECLARE_DRIVER_INIT( swtpc09i );
-	DECLARE_DRIVER_INIT( swtpc09u );
-	DECLARE_DRIVER_INIT( swtpc09d3 );
+	void init_swtpc09();
+	void init_swtpc09i();
+	void init_swtpc09u();
+	void init_swtpc09d3();
 
 	DECLARE_READ8_MEMBER ( m6844_r );
 	DECLARE_WRITE8_MEMBER ( m6844_w );

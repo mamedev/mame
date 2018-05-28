@@ -486,7 +486,7 @@
 #define DMA_CTRL        (0)
 #define DMA_ADDR        (1)
 #define DMA_BYTE_COUNT  (2)
-#define DMA_XTAL        (XTAL(25'000'000))
+#define DMA_XTAL        (25_MHz_XTAL)
 
 namespace
 {
@@ -583,9 +583,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( scc1_int );
 	DECLARE_WRITE_LINE_MEMBER( scc2_int );
 
-	DECLARE_DRIVER_INIT(sun4);
-	DECLARE_DRIVER_INIT(sun4c);
-	DECLARE_DRIVER_INIT(ss2);
+	void init_sun4();
+	void init_sun4c();
+	void init_ss2();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -1918,7 +1918,7 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_RAM_DEFAULT_SIZE("16M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_MK48T12_ADD(TIMEKEEPER_TAG)
+	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
 
 	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
@@ -1938,7 +1938,7 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
 	// Keyboard/mouse
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
@@ -1946,7 +1946,7 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc2_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
@@ -1983,7 +1983,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_RAM_DEFAULT_SIZE("16M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_MK48T12_ADD(TIMEKEEPER_TAG)
+	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
 
 	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
@@ -2003,7 +2003,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
 	// Keyboard/mouse
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
@@ -2011,7 +2011,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc2_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
@@ -2293,19 +2293,19 @@ ROM_START( sun_s20 )
 	ROMX_LOAD( "ss10-20_v2.25r.rom", 0x0000, 0x80000, CRC(105ba132) SHA1(58530e88369d1d26ab11475c7884205f2299d255), ROM_BIOS(2))
 ROM_END
 
-DRIVER_INIT_MEMBER(sun4_state, sun4)
+void sun4_state::init_sun4()
 {
 	m_arch = ARCH_SUN4;
 }
 
-DRIVER_INIT_MEMBER(sun4_state, sun4c)
+void sun4_state::init_sun4c()
 {
 	m_ctx_mask = 0x7;
 	m_pmeg_mask = 0x7f;
 	m_arch = ARCH_SUN4C;
 }
 
-DRIVER_INIT_MEMBER(sun4_state, ss2)
+void sun4_state::init_ss2()
 {
 	m_ctx_mask = 0xf;
 	m_pmeg_mask = 0xff;
@@ -2314,20 +2314,20 @@ DRIVER_INIT_MEMBER(sun4_state, ss2)
 
 /* Drivers */
 
-//    YEAR  NAME       PARENT    COMPAT   MACHINE    INPUT  STATE       INIT   COMPANY             FULLNAME                       FLAGS
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                       FLAGS
 // sun4
-COMP( 198?, sun4_110,  0,        0,       sun4,      sun4,  sun4_state, sun4,  "Sun Microsystems", "Sun 4/110",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1987, sun4_300,  0,        0,       sun4,      sun4,  sun4_state, sun4,  "Sun Microsystems", "Sun 4/3x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, sun4_400,  0,        0,       sun4,      sun4,  sun4_state, sun4,  "Sun Microsystems", "Sun 4/4x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, sun4_110, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  "Sun Microsystems", "Sun 4/110",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, sun4_300, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  "Sun Microsystems", "Sun 4/3x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, sun4_400, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  "Sun Microsystems", "Sun 4/4x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4c
-COMP( 1990, sun4_40,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1991, sun4_50,   sun4_300, 0,       sun4c,     sun4,  sun4_state, ss2,   "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 199?, sun4_20,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1989, sun4_60,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, sun4_65,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, sun4_75,   sun4_300, 0,       sun4c,     sun4,  sun4_state, ss2,   "Sun Microsystems", "SPARCstation 2 (Sun 4/75)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_40,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, sun4_50,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 199?, sun4_20,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, sun4_60,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_65,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_75,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation 2 (Sun 4/75)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4m (using the SPARC "reference MMU", probably will go to a separate driver)
-COMP( 1992, sun_s10,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 10 (Sun S10)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, sun_s20,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 20",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, sun_s10,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 10 (Sun S10)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, sun_s20,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 20",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -443,7 +443,7 @@ static const gfx_layout charlayout =
 	128*8
 };
 
-static GFXDECODE_START( shangha3 )
+static GFXDECODE_START( gfx_shangha3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )
 GFXDECODE_END
 
@@ -466,14 +466,14 @@ MACHINE_CONFIG_START(shangha3_state::shangha3)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, 48_MHz_XTAL/32) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -507,14 +507,14 @@ MACHINE_CONFIG_START(shangha3_state::heberpop)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -551,14 +551,14 @@ MACHINE_CONFIG_START(shangha3_state::blocken)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -732,14 +732,14 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(shangha3_state,shangha3)
+void shangha3_state::init_shangha3()
 {
 	m_do_shadows = 1;
 
 	save_item(NAME(m_prot_count));
 }
 
-DRIVER_INIT_MEMBER(shangha3_state,heberpop)
+void shangha3_state::init_heberpop()
 {
 	m_do_shadows = 0;
 
@@ -747,9 +747,9 @@ DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 	m_audiocpu->set_input_line_vector(0, 0xff);  /* RST 38h */
 }
 
-GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3u,  shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3up, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3j,  shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, heberpop,   0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blocken,    0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3u,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3up, shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3j,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, heberpop,   0,        heberpop, heberpop, shangha3_state, init_heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blocken,    0,        blocken,  blocken,  shangha3_state, init_heberpop, ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

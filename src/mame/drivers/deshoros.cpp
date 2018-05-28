@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(destiny_state::destiny)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 800) // TODO: determine exact frequency thru schematics
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
@@ -317,4 +317,4 @@ ROM_START( destiny )
 	ROM_LOAD( "ag11.18a",  0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
 ROM_END
 
-GAME( 1983, destiny,  0,       destiny,  destiny, destiny_state,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NODEVICE_PRINTER )
+GAME( 1983, destiny, 0, destiny,  destiny, destiny_state, empty_init, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NODEVICE_PRINTER )

@@ -16,7 +16,7 @@ public:
 		, m_tty(*this, "teletype")
 	{ }
 
-	DECLARE_DRIVER_INIT(patinho_feio);
+	void init_patinho_feio();
 
 	DECLARE_WRITE8_MEMBER(decwriter_data_w);
 	void decwriter_kbd_input(u8 data);

@@ -8,7 +8,7 @@
 
 #include "machine/spchrom.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
@@ -66,7 +66,7 @@ public:
 	emu_timer *m_led_refresh_timer;
 	address_space *m_program;
 
-	DECLARE_DRIVER_INIT(mpf1);
+	void init_mpf1();
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
 	void mpf1p(machine_config &config);

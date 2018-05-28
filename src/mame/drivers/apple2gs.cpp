@@ -103,7 +103,7 @@ static const gfx_layout apple2gs_dbltext_layout =
 	8*8         /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apple2gs )
+static GFXDECODE_START( gfx_apple2gs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_text_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_dbltext_layout, 0, 2 )
 GFXDECODE_END
@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apple2gs )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apple2gs )
 
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )
@@ -363,10 +363,11 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple2_state, ay3600_iie_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("a2speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ES5503_ADD("es5503", APPLE2GS_7M)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
@@ -393,7 +394,7 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* SCC */
-	MCFG_SCC85C30_ADD(SCC_TAG, APPLE2GS_14M/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC_TAG, SCC85C30, APPLE2GS_14M/2)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -587,10 +588,10 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
-/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME */
-COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY           FULLNAME */
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )

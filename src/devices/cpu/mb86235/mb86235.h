@@ -85,7 +85,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	direct_read_data<-3> *m_direct;
+	memory_access_cache<3, -3, ENDIANNESS_LITTLE> *m_pcache;
 
 private:
 

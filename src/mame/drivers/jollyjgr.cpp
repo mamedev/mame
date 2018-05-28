@@ -640,7 +640,7 @@ static const gfx_layout jollyjgr_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( jollyjgr )
+static GFXDECODE_START( gfx_jollyjgr )
 	GFXDECODE_ENTRY( "gfx1", 0, jollyjgr_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, jollyjgr_spritelayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, jollyjgr_charlayout,   0, 8 )
@@ -693,13 +693,13 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jollyjgr_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jollyjgr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jollyjgr)
 	MCFG_PALETTE_ADD("palette", 32) // tilemap and sprites
 	MCFG_PALETTE_INIT_OWNER(jollyjgr_state, jollyjgr)
 	MCFG_PALETTE_ADD_3BIT_RGB("bm_palette") // bitmap
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/2) /* 1.7897725MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
@@ -789,5 +789,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider,  fspider,  jollyjgr_state, 0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
-GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, jollyjgr_state, 0, ROT90, "Taito Corporation", "Jolly Jogger",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fspiderb, 0, fspider,  fspider,  jollyjgr_state, empty_init, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
+GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, jollyjgr_state, empty_init, ROT90, "Taito Corporation", "Jolly Jogger",              MACHINE_SUPPORTS_SAVE )

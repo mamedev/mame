@@ -1571,7 +1571,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("8 (PAD)") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9 (PAD)") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") //PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") PORT_CODE(KEYCODE_COMMA_PAD)
 	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(". (PAD)") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("+ (PAD)") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("- (PAD)") PORT_CODE(KEYCODE_MINUS_PAD)
@@ -1856,7 +1856,7 @@ static const gfx_layout mz2500_16_layout =
 };
 
 /* these are just for viewer sake, actually they aren't used in drawing routines */
-static GFXDECODE_START( mz2500 )
+static GFXDECODE_START( gfx_mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
@@ -1936,7 +1936,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 	{
 		mz2500_reset(this, WRAM_RESET);
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	/* bit 2 is speaker */
@@ -2107,7 +2107,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, 32.768_kHz_XTAL)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -2118,7 +2118,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit", pit8253_device, write_clk1))
 
-	MCFG_MB8877_ADD("mb8877a", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
@@ -2129,17 +2129,17 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(21'477'272), 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
+	MCFG_SCREEN_RAW_PARAMS(21'477'272, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2500)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym", YM2203, 2000000) //unknown clock / divider
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mz2500_state, opn_porta_r))  // read A
@@ -2207,5 +2207,5 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,             0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+COMP( 1985, mz2500, 0,      0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, mz2520, mz2500, 0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface

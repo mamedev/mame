@@ -18,7 +18,7 @@
 #include "machine/bfm_sc45_helper.h"
 #include "speaker.h"
 
-DRIVER_INIT_MEMBER(adder5_state,ad5)
+void adder5_state::init_ad5()
 {
 	// sc5 roms always start with SC5
 	uint8_t *src = memregion( "maincpu" )->base();
@@ -85,7 +85,8 @@ MACHINE_CONFIG_START(adder5_state::bfm_ad5)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
 MACHINE_CONFIG_END
 

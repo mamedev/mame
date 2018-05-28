@@ -218,7 +218,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( gunbustr )
+static GFXDECODE_START( gfx_gunbustr )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 256 )
 GFXDECODE_END
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunbustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunbustr)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -384,7 +384,7 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 	return m_ram[0x3acc/4];
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
+void gunbustr_state::init_gunbustr()
 {
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
@@ -392,14 +392,14 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
 	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
+void gunbustr_state::init_gunbustrj()
 {
-	DRIVER_INIT_CALL(gunbustr);
+	init_gunbustr();
 
 	// no coin lockout, perhaps this was a prototype version without proper coin handling?
 	m_coin_lockout = false;
 }
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN )

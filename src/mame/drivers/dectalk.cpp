@@ -436,9 +436,9 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 {
 	m_hack_self_test_is_second_read = false; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	machine().device<x2212_device>("x2212")->recall(0);
-	machine().device<x2212_device>("x2212")->recall(1);
-	machine().device<x2212_device>("x2212")->recall(0); // nvram recall
+	m_nvram->recall(0);
+	m_nvram->recall(1);
+	m_nvram->recall(0); // nvram recall
 	m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	m_duart->reset(); // reset the DUART
@@ -868,11 +868,10 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	m_dac->write(data >> 4);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
-	/*device_t *duart = machine().device("duart");
-	if (machine.input().code_pressed(KEYCODE_F1))
-	    duart_rx_break(duart, 1, 1);
+	/*if (machine.input().code_pressed(KEYCODE_F1))
+	    m_duart->duart_rx_break(1, 1);
 	else
-	    duart_rx_break(duart, 1, 0);*/
+	    m_duart->duart_rx_break(1, 0);*/
 }
 
 MACHINE_CONFIG_START(dectalk_state::dectalk)
@@ -901,7 +900,7 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* video hardware */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -1011,5 +1010,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS */
+COMP( 1984, dectalk, 0,      0,      dectalk, dectalk, dectalk_state, empty_init, "Digital Equipment Corporation", "DECtalk DTC-01", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

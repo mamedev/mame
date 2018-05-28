@@ -38,8 +38,8 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
 
-	DECLARE_DRIVER_INIT(raiders5);
-	DECLARE_DRIVER_INIT(pkunwar);
+	void init_raiders5();
+	void init_pkunwar();
 	DECLARE_VIDEO_START(nova2001);
 	DECLARE_PALETTE_INIT(nova2001);
 	DECLARE_PALETTE_DECODER(BBGGRRII);

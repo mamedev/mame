@@ -64,7 +64,7 @@ public:
 	DECLARE_WRITE16_MEMBER(drgnmst_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_md_videoram_w);
-	DECLARE_DRIVER_INIT(drgnmst);
+	void init_drgnmst();
 	TILE_GET_INFO_MEMBER(get_drgnmst_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_drgnmst_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_drgnmst_md_tile_info);

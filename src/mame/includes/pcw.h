@@ -108,7 +108,7 @@ public:
 	DECLARE_READ8_MEMBER(pcw9512_parallel_r);
 	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
 	void mcu_transmit_serial(uint8_t bit);
-	DECLARE_DRIVER_INIT(pcw);
+	void init_pcw();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

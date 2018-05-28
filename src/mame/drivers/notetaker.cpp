@@ -171,7 +171,7 @@ public:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iop_r);
 	DECLARE_WRITE16_MEMBER(iop_w);
-	DECLARE_DRIVER_INIT(notetakr);
+	void init_notetakr();
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -264,7 +264,7 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 	}
 	m_outfifo_tail_ptr&=0xF;
 	m_dac->write(data);
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((960_kHz_XTAL/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -362,7 +362,7 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	m_FrSel2 = (data&0x0400)?1:0;
 	m_TabletXOn = (data&0x0200)?1:0;
 	m_TabletYOn = (data&0x0100)?1:0;
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((960_kHz_XTAL/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 	/* FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter),
 	divided by 4 (mc14568B with divider 1 pins set to 4), divided by
 	1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
@@ -795,7 +795,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_DEVICE_ADD("iop_cpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	MCFG_DEVICE_ADD("iop_cpu", I8086, 24_MHz_XTAL / 3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
 	MCFG_DEVICE_PROGRAM_MAP(iop_mem)
 	MCFG_DEVICE_IO_MAP(iop_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iop_cpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
-	MCFG_DEVICE_ADD("ep_cpu", I8086, XTAL(15'000'000)/3)
+	MCFG_DEVICE_ADD("ep_cpu", I8086, 15_MHz_XTAL / 3)
 	MCFG_DEVICE_DISABLE() // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
 	MCFG_DEVICE_PROGRAM_MAP(ep_mem)
 	MCFG_DEVICE_IO_MAP(ep_io)
@@ -826,7 +826,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL(36'000'000)/4)/8) // See below
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (36_MHz_XTAL / 4) / 8) // See below
 	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
 	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
 	   means divide by 1; documentation at
@@ -842,26 +842,27 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 
 	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 
 	/* Floppy */
-	MCFG_FD1791_ADD("wd1791", (((XTAL(24'000'000)/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	MCFG_DEVICE_ADD("wd1791", FD1791, (((24_MHz_XTAL/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
 	MCFG_DEVICE_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(notetaker_state,notetakr)
+void notetaker_state::init_notetakr()
 {
 	// descramble the rom; the whole thing is a gigantic scrambled mess either to ease
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits
@@ -869,16 +870,13 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 	// see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf pages 12 and onward
 	uint16_t *romsrc = (uint16_t *)(memregion("iopload")->base());
 	uint16_t *romdst = (uint16_t *)(memregion("iop")->base());
-	uint16_t *temppointer;
-	uint16_t wordtemp;
-	uint16_t addrtemp;
 	// leave the src pointer alone, since we've only used a 0x1000 long address space
 	romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
 	for (int i = 0; i < 0x800; i++)
 	{
-		wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
-		addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
-		temppointer = romdst+(addrtemp&0x7FF);
+		uint16_t wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
+		uint16_t addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
+		uint16_t *temppointer = romdst+(addrtemp&0x7FF);
 		*temppointer = wordtemp;
 		romsrc++;
 	}
@@ -950,6 +948,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE            INIT      COMPANY  FULLNAME     FLAGS
-COMP( 1978, notetakr,  0,      0,      notetakr, notetakr, notetaker_state, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY  FULLNAME     FLAGS
+COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, init_notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
 

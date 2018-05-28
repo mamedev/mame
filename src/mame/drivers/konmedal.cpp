@@ -405,7 +405,8 @@ MACHINE_CONFIG_START(konmedal_state::tsukande)
 	MCFG_K056832_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // 16.9344MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -438,7 +439,7 @@ MACHINE_CONFIG_START(konmedal_state::ddboy)
 	MCFG_K056832_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -566,7 +567,7 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_K051649_ADD("k051649", XTAL(24'000'000) / 12) // divisor unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
@@ -663,8 +664,8 @@ ROM_START( shuriboy )
 	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
 ROM_END
 
-GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
-GAME( 1995, ddboya,  ddboy, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
-GAME( 1993, shuriboy,    0, shuriboy, konmedal,  konmedal_state, 0, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
+GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
+GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
+GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
 

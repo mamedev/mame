@@ -255,7 +255,7 @@ static const gfx_layout dcon_tilelayout =
 	1024
 };
 
-static GFXDECODE_START( dcon )
+static GFXDECODE_START( gfx_dcon )
 	GFXDECODE_ENTRY( "gfx1", 0, dcon_charlayout,    1024+768, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, dcon_tilelayout,    1024+0,   16 )
 	GFXDECODE_ENTRY( "gfx3", 0, dcon_tilelayout,    1024+512, 16 )
@@ -298,12 +298,12 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
@@ -342,12 +342,12 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
@@ -439,5 +439,5 @@ ROM_END
 
 /***************************************************************************/
 
-GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, 0, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, 0, ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, empty_init, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, empty_init, ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

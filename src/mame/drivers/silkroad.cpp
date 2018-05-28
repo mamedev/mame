@@ -270,7 +270,7 @@ static const gfx_layout tiles16x16x6_layout =
 	16*32
 };
 
-static GFXDECODE_START( silkroad )
+static GFXDECODE_START( gfx_silkroad )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
 
@@ -290,12 +290,13 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update_silkroad)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silkroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silkroad)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -394,5 +395,5 @@ ROM_START( silkroada )
 ROM_END
 
 
-GAME( 1999, silkroad,  0,        silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad",               MACHINE_SUPPORTS_SAVE )
-GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size
+GAME( 1999, silkroad,  0,        silkroad, silkroad, silkroad_state, empty_init, ROT0, "Unico", "The Legend of Silkroad",               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, empty_init, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size

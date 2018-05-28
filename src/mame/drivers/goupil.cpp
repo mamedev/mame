@@ -38,7 +38,7 @@
 
 #include "logmacro.h"
 
-#define MAIN_CLOCK           XTAL(4'000'000)
+#define MAIN_CLOCK           4_MHz_XTAL
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 1 Mhz */
 
@@ -562,7 +562,7 @@ MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
+	MCFG_DEVICE_ADD("fd1791", FD1791, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
@@ -606,7 +606,7 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (24*(8+4))-1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(14'318'181)/8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 14.318181_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(goupil_g2_state, crtc_update_row)
@@ -624,7 +624,7 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
+	MCFG_DEVICE_ADD("fd1791", FD1791, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
@@ -690,6 +690,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, goupilg1,   0,   0,      goupil_g1,  goupil_g1,goupil_g1_state,   0,     "SMT", "Goupil G1", MACHINE_NO_SOUND )
-COMP( 1981, goupilg2,   0,   0,      goupil_g2,  goupil_g1,goupil_g2_state,   0,     "SMT", "Goupil G2", MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME     FLAGS */
+COMP( 1979, goupilg1, 0,      0,      goupil_g1, goupil_g1, goupil_g1_state, empty_init, "SMT",   "Goupil G1", MACHINE_NO_SOUND )
+COMP( 1981, goupilg2, 0,      0,      goupil_g2, goupil_g1, goupil_g2_state, empty_init, "SMT",   "Goupil G2", MACHINE_NO_SOUND )

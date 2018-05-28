@@ -771,9 +771,10 @@ attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, in
 {
 	uint32_t next_position;
 	int cells = buf.size();
-	if(index+delta < cells)
+	if(index+delta < cells) {
 		next_position = buf[index+delta] & floppy_image::TIME_MASK;
-	else {
+
+	} else {
 		if((buf[cells-1]^buf[0]) & floppy_image::MG_MASK)
 			delta--;
 		index = index + delta - cells + 1;
@@ -788,14 +789,6 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	// If the drive is still spinning up, pretend that no transitions will come
-	// TODO: Implement a proper spin-up ramp for transition times, also in order
-	// to cover potential copy protection measures that have direct device
-	// access (mz)
-	// MORE TODO: this breaks the tandy2k and pcjr.  needs investigation.
-	//if (ready_counter > 0)
-	//  return attotime::never;
-
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 	uint32_t cells = buf.size();
 	if(cells <= 1)
@@ -809,10 +802,11 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(index == -1)
 		return attotime::never;
 
-	attotime result = get_next_index_time(buf, index, 1,  base);
-	if(result > from_when)
-		return result;
-	return get_next_index_time(buf, index, 2,  base);
+	for(unsigned int i=1;; i++) {
+		attotime result = get_next_index_time(buf, index, i,  base);
+		if(result > from_when)
+			return result;
+	}
 }
 
 void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
@@ -1365,11 +1359,11 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_START(floppy_image_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
-	MCFG_DEVICE_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
-MACHINE_CONFIG_END
+void floppy_image_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, FLOPSPK).front_center();
+	FLOPPYSOUND(config, FLOPSND_TAG, 44100).add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
+}
 
 
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")

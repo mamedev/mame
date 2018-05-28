@@ -23,13 +23,13 @@ public:
 
 	optional_device<cpu_device> m_prot;
 
-	DECLARE_DRIVER_INIT(theglad);
-	DECLARE_DRIVER_INIT(theglada);
-	DECLARE_DRIVER_INIT(svg);
-	DECLARE_DRIVER_INIT(svgpcb);
-	DECLARE_DRIVER_INIT(killbldp);
-	DECLARE_DRIVER_INIT(dmnfrnt);
-	DECLARE_DRIVER_INIT(happy6);
+	void init_theglad();
+	void init_theglada();
+	void init_svg();
+	void init_svgpcb();
+	void init_killbldp();
+	void init_dmnfrnt();
+	void init_happy6();
 	DECLARE_MACHINE_START(pgm_arm_type3);
 	DECLARE_WRITE32_MEMBER( svg_arm7_ram_sel_w );
 	DECLARE_READ32_MEMBER( svg_arm7_shareram_r );
@@ -66,3 +66,4 @@ INPUT_PORTS_EXTERN(theglad);
 INPUT_PORTS_EXTERN(happy6);
 INPUT_PORTS_EXTERN(svg);
 INPUT_PORTS_EXTERN(svgtw);
+INPUT_PORTS_EXTERN(svgpcb);

@@ -1690,7 +1690,8 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1722,4 +1723,4 @@ ROM_START( gp32 )
 #endif
 ROM_END
 
-CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, 0, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, empty_init, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

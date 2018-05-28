@@ -161,7 +161,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( subs )
+static GFXDECODE_START( gfx_subs )
 	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 )    /* playfield graphics */
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 )    /* motion graphics */
 GFXDECODE_END
@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subs)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(subs_state, subs)
@@ -207,7 +207,8 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, subs_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -259,4 +260,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, subs_state, 0, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, subs, 0, subs, subs, subs_state, empty_init, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

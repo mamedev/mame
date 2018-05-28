@@ -57,7 +57,7 @@ public:
 	DECLARE_READ8_MEMBER(pow3000_io_r);
 	DECLARE_WRITE8_MEMBER(zx80_io_w);
 	DECLARE_WRITE8_MEMBER(zx81_io_w);
-	DECLARE_DRIVER_INIT(zx);
+	void init_zx();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zx);

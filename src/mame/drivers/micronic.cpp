@@ -352,7 +352,7 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 
 MACHINE_CONFIG_START(micronic_state::micronic)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(3'579'545))
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(micronic_mem)
 	MCFG_DEVICE_IO_MAP(micronic_io)
 
@@ -369,10 +369,10 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, 4.9152_MHz_XTAL / 2 / 2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", micronic_state, nvram_init)  // base ram
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)  // additional ram banks
 
-	MCFG_MC146818_ADD( MC146818_TAG, XTAL(32'768) )
+	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, micronic_state, mc146818_irq))
 MACHINE_CONFIG_END
 
@@ -399,5 +399,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY            FULLNAME         FLAGS
-COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, 0,    "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME         FLAGS
+COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "ADChips SE3208")
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SE3208, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
+	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_cache(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
 device_memory_interface::space_config_vector se3208_device::memory_space_config() const
@@ -1721,7 +1721,7 @@ void se3208_device::device_reset()
 	m_ER = 0;
 	m_PPC = 0;
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 	m_PC=SE3208_Read32(0);
 	m_SR=0;
 	m_IRQ=CLEAR_LINE;
@@ -1760,7 +1760,7 @@ void se3208_device::execute_run()
 {
 	do
 	{
-		uint16_t Opcode=m_direct->read_word(m_PC, WORD_XOR_LE(0));
+		uint16_t Opcode=m_cache->read_word(m_PC, WORD_XOR_LE(0));
 
 		m_PPC = m_PC;
 		debugger_instruction_hook(m_PC);
@@ -1786,7 +1786,7 @@ void se3208_device::device_start()
 	BuildTable();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	save_item(NAME(m_R));
 	save_item(NAME(m_PC));

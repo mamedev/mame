@@ -30,7 +30,7 @@
 WRITE_LINE_MEMBER(primo_state::vblank_irq)
 {
 	if (state && m_nmi)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /*******************************************************************************
@@ -205,19 +205,19 @@ void primo_state::primo_common_driver_init (primo_state *state)
 	m_port_FD = 0x00;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo32)
+void primo_state::init_primo32()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0x6800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo48)
+void primo_state::init_primo48()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xa800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo64)
+void primo_state::init_primo64()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xe800;
@@ -229,12 +229,12 @@ DRIVER_INIT_MEMBER(primo_state,primo64)
 
 *******************************************************************************/
 
-void primo_state::primo_common_machine_init ()
+void primo_state::primo_common_machine_init()
 {
-	if (ioport("MEMORY_EXPANSION")->read())
+	if (m_mem_exp_port->read())
 		m_port_FD = 0x00;
 	primo_update_memory();
-	machine().device("maincpu")->set_clock_scale(ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
+	m_maincpu->set_clock_scale(m_clock_port->read() ? 1.5 : 1.0);
 }
 
 void primo_state::machine_start()

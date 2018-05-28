@@ -448,7 +448,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sprint8 )
+static GFXDECODE_START( gfx_sprint8 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_1, 0, 18 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_2, 0, 18 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 0, 16 )
@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint8)
 	MCFG_PALETTE_ADD("palette", 36)
 	MCFG_PALETTE_INDIRECT_ENTRIES(18)
 	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
@@ -515,5 +515,5 @@ ROM_START( sprint8a )
 ROM_END
 
 
-GAME( 1977, sprint8,  0,       sprint8, sprint8,  sprint8_state, 0, ROT0, "Atari", "Sprint 8",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, sprint8_state, 0, ROT0, "Atari", "Sprint 8 (play tag & chase)", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, sprint8,  0,       sprint8, sprint8,  sprint8_state, empty_init, ROT0, "Atari", "Sprint 8",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, sprint8_state, empty_init, ROT0, "Atari", "Sprint 8 (play tag & chase)", MACHINE_SUPPORTS_SAVE )

@@ -217,7 +217,7 @@ Interesting memory locations
 TODO :
     - Figure out the ports for the "PayOut" stuff (a006/a00c?);
     - Hook up the OKI M5202;
-	- lagging sprites on witch (especially noticeable when game scrolls up/down)
+    - lagging sprites on witch (especially noticeable when game scrolls up/down)
 */
 
 #include "emu.h"
@@ -289,7 +289,7 @@ void witch_state::video_common_init()
 
 	m_gfx0a_tilemap->set_transparent_pen(0);
 	m_gfx0b_tilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_reg_a002));
@@ -304,7 +304,7 @@ void witch_state::video_start()
 	m_gfx0a_tilemap->set_palette_offset(0x100);
 	m_gfx0b_tilemap->set_palette_offset(0x100);
 	m_gfx1_tilemap->set_palette_offset(0x200);
-	
+
 	has_spr_rom_bank = false;
 }
 
@@ -317,10 +317,10 @@ void keirinou_state::video_start()
 	m_gfx0a_tilemap->set_palette_offset(0x000);
 	m_gfx0b_tilemap->set_palette_offset(0x000);
 	m_gfx1_tilemap->set_palette_offset(0x100);
-	
+
 	save_item(NAME(m_spr_bank));
 	save_item(NAME(m_bg_bank));
-	
+
 	has_spr_rom_bank = true;
 }
 
@@ -336,7 +336,7 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if(sx!=0xF8) {
 			tileno = (m_sprite_ram[i]<<2);
 			tileno+= (has_spr_rom_bank == true ? m_spr_bank : ( m_sprite_ram[i+0x800] & 0x07 )) << 10;
-			
+
 			sy     = m_sprite_ram[i+2];
 			flags  = m_sprite_ram[i+3];
 
@@ -455,13 +455,13 @@ WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 
 	m_spr_bank = BIT(data,7);
 	new_bg_bank = BIT(data,6);
-	
+
 	if(m_bg_bank != new_bg_bank)
 	{
 		m_bg_bank = new_bg_bank;
 		m_gfx1_tilemap->mark_all_dirty();
 	}
-//	m_mainbank->set_entry((data >> 6) & 3);
+//  m_mainbank->set_entry((data >> 6) & 3);
 }
 
 WRITE8_MEMBER(witch_state::write_a006)
@@ -534,7 +534,7 @@ WRITE8_MEMBER(keirinou_state::palette_w)
 	b = ((m_paletteram[offset] & 0xc0)>>6);
 
 	m_palette->set_pen_color(offset, pal3bit(r), pal2bit(g), pal2bit(b));
-	
+
 	// sprite palette uses an indirect table
 	// sprites are only used to draw cyclists, and pens 0x01-0x05 are directly tied to a specific sprite entry.
 	// this probably translates in HW by selecting a specific pen for the lowest bit in GFX roms instead of the typical color entry offset.
@@ -543,7 +543,7 @@ WRITE8_MEMBER(keirinou_state::palette_w)
 	if((offset & 0x1f0) == 0x00)
 	{
 		int i;
-		
+
 		if(offset > 5)
 		{
 			for(i=0;i<0x80;i+=0x10)
@@ -798,7 +798,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( keirinou )
 	PORT_INCLUDE( witch )
-	
+
 	PORT_MODIFY("INPUTS")    /* Inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )     PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_S)
@@ -825,14 +825,14 @@ static INPUT_PORTS_START( keirinou )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Attendant Pay")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("SERVICE")
 	// bit 0: hopper
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("UNK")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel All Bets")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -849,8 +849,8 @@ static INPUT_PORTS_START( keirinou )
 	PORT_DIPSETTING(    0x05, "90%" )
 	PORT_DIPSETTING(    0x04, "95%" )
 	PORT_DIPSETTING(    0x03, "100%" )
-//	PORT_DIPSETTING(    0x01, "80%" )
-//	PORT_DIPSETTING(    0x00, "90%" )
+//  PORT_DIPSETTING(    0x01, "80%" )
+//  PORT_DIPSETTING(    0x00, "90%" )
 	PORT_DIPNAME( 0x08, 0x08, "Double-Up Rate" )
 	PORT_DIPSETTING(    0x08, "90%" )
 	PORT_DIPSETTING(    0x00, "100%" )
@@ -866,7 +866,7 @@ static INPUT_PORTS_START( keirinou )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	
+
 	PORT_MODIFY("YM_PortB")
 	PORT_DIPNAME( 0x01, 0x01, "DSWB" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -892,7 +892,7 @@ static INPUT_PORTS_START( keirinou )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_MODIFY("A004")
 	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -932,12 +932,12 @@ static const gfx_layout tiles8x8_layout =
 	16*8
 };
 
-static GFXDECODE_START( witch )
+static GFXDECODE_START( gfx_witch )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( keirinou )
+static GFXDECODE_START( gfx_keirinou )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x200, 8 )
@@ -986,12 +986,12 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", witch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_witch)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ES8712_ADD("essnd", 0)
 	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))
@@ -1018,15 +1018,15 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_main_map)
-	
+
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x200+0x80)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", keirinou)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
 
-//	MCFG_PALETTE_FORMAT(IIBBGGRR)
+//  MCFG_PALETTE_FORMAT(IIBBGGRR)
 
 	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
@@ -1137,20 +1137,20 @@ ROM_END
 
 ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
+	ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
 
 	ROM_REGION( 0x10000, "sub", ROMREGION_ERASE00 )
-    ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
+	ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
 
 	// rearranged so that it fits available gfx decode
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "a6.a6",        0x0000, 0x4000, CRC(6d59a5e4) SHA1(4580756ee7db4a088ad02cd56f78fd55fef6ec0a) )
 	ROM_CONTINUE(             0x8000, 0x4000 )
-    ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
+	ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
 	ROM_CONTINUE(             0xc000, 0x4000 )
 
 	ROM_REGION( 0x10000, "gfx2", ROMREGION_ERASE00 )
-    ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
+	ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
 	ROM_CONTINUE(             0x8000, 0x04000 )
 	ROM_CONTINUE(             0x4000, 0x04000 )
 	ROM_CONTINUE(             0xc000, 0x04000 )
@@ -1159,7 +1159,7 @@ ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_LOAD( "n82s129an.r8",      0x000000, 0x000100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* N82S129AN BPROM stamped  K  */
 ROM_END
 
-DRIVER_INIT_MEMBER(witch_state,witch)
+void witch_state::init_witch()
 {
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
 	m_mainbank->set_entry(0);
@@ -1167,8 +1167,8 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, 0,     ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witch,    0,     witch,    witch,    witch_state,    witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pbchmp95, witch, witch,    witch,    witch_state,    witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pbchmp95, witch, witch,    witch,    witch_state,    init_witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )

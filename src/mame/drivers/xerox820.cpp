@@ -291,7 +291,7 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 		{
 			m_8n5 = _8n5;
 
-			m_fdc->set_unscaled_clock(m_8n5 ? XTAL(20'000'000)/10 : XTAL(20'000'000)/20);
+			m_fdc->set_unscaled_clock(m_8n5 ? 20_MHz_XTAL / 10 : 20_MHz_XTAL / 20);
 		}
 
 		m_400_460 = !floppy->twosid_r();
@@ -592,11 +592,11 @@ static const gfx_layout xerox820_gfxlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( xerox820 )
+static GFXDECODE_START( gfx_xerox820 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( xerox820ii )
+static GFXDECODE_START( gfx_xerox820ii )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, xerox820_gfxlayout, 0, 1 )
 GFXDECODE_END
@@ -605,7 +605,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(xerox820_state::xerox820)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 20_MHz_XTAL / 8)
 	MCFG_DEVICE_PROGRAM_MAP(xerox820_mem)
 	MCFG_DEVICE_IO_MAP(xerox820_io)
 	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
@@ -613,34 +613,34 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, xerox820_state, kbpio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, xerox820_state, kbpio_pa_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, xerox820_state, kbpio_pb_r))
 
-	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 20_MHz_XTAL / 8)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL(20'000'000)/8))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(20_MHz_XTAL / 8))
 
-	MCFG_FD1771_ADD(FD1771_TAG, XTAL(20'000'000)/20)
+	MCFG_DEVICE_ADD(FD1771_TAG, FD1771, 20_MHz_XTAL / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 20_MHz_XTAL / 8)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
+	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
@@ -674,14 +674,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bigboard_state::bigboard)
 	xerox820(config);
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(xerox820ii_mem)
 	MCFG_DEVICE_IO_MAP(xerox820ii_io)
 	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
@@ -689,27 +689,27 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820ii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820ii)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, 16_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, xerox820_state, kbpio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, xerox820_state, kbpio_pa_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, xerox820_state, kbpio_pb_r))
 
-	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, 16_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(Z80PIO_RD_TAG, Z80PIO, XTAL(20'000'000)/8)
+	MCFG_DEVICE_ADD(Z80PIO_RD_TAG, Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8("sasi_data_in", input_buffer_device, read))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8("sasi_data_out", output_latch_device, write))
@@ -717,19 +717,19 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_Z80PIO_IN_PB_CB(READ8("sasi_ctrl_in", input_buffer_device, read))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, xerox820ii_state, rdpio_pb_w))
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL(16'000'000)/4))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(16_MHz_XTAL / 4))
 
-	MCFG_FD1797_ADD(FD1797_TAG, XTAL(16'000'000)/8)
+	MCFG_DEVICE_ADD(FD1797_TAG, FD1797, 16_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 16_MHz_XTAL / 4)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
+	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
@@ -892,10 +892,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     STATE             INIT  COMPANY                       FULLNAME        FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   0,    "Digital Research Computers", "Big Board",    0 )
-COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   0,    "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   0,    "Scomar",                     "MK-82",        0 )
-COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
-COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
-COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   0,    "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY                       FULLNAME        FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",    0 )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",        0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
+COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
+COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

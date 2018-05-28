@@ -80,7 +80,7 @@ MACHINE_CONFIG_START(v1050_keyboard_device::device_add_mconfig)
 	MCFG_DEVICE_DISABLE() // TODO
 
 	// discrete sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, v1050kb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -108,7 +108,7 @@ INPUT_PORTS_START( v1050_keyboard )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad - DelLn") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9 End") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad , DelWd")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad , DelWd") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad . Wd\xE2\x86\x92") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 
 	PORT_START("Y2")
@@ -290,6 +290,7 @@ v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, cons
 	m_discrete(*this, DISCRETE_TAG),
 	m_y(*this, "Y%u", 0),
 	m_out_tx_handler(*this),
+	m_led(*this, "led0"),
 	m_keylatch(0)
 {
 }
@@ -301,6 +302,7 @@ v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, cons
 
 void v1050_keyboard_device::device_start()
 {
+	m_led.resolve();
 	// state saving
 	save_item(NAME(m_keylatch));
 }
@@ -376,7 +378,7 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 	*/
 
 	// led output
-	machine().output().set_led_value(0, BIT(data, 5));
+	m_led = BIT(data, 5);
 
 	// speaker output
 	m_discrete->write(space, NODE_01, BIT(data, 6));

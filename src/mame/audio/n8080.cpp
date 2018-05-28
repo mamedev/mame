@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(n8080_state::spacefev_sound)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vco_timer", n8080_state, spacefev_vco_voltage_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(n8080_state::sheriff_sound)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, n8080_state, n8080_dac_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(n8080_state::helifire_sound)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac_volume_timer", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("helifire_dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT)

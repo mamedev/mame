@@ -213,7 +213,7 @@ static const gfx_layout charset_8x8 =
 };
 
 
-static GFXDECODE_START( act_f1 )
+static GFXDECODE_START( gfx_act_f1 )
 	GFXDECODE_ENTRY( I8086_TAG, 0x0800, charset_8x8, 0, 1 )
 GFXDECODE_END
 
@@ -586,7 +586,7 @@ static void fp_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(fp_state::fp)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, XTAL(15'000'000)/3)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, 15_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(fp_mem)
 	MCFG_DEVICE_IO_MAP(fp_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_MC6845_UPDATE_ROW_CB(fp_state, update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_DEVICE_ADD(Z80SIO0_TAG, Z80SIO, 2500000)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(I8259A_TAG, pic8259_device, ir4_w))
 
-	MCFG_WD2797_ADD(WD2797_TAG, 2000000)
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq1_w))
 
@@ -701,5 +701,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME                 FLAGS
-COMP( 1984, fp,    0,      0,      fp,      fp,    fp_state, 0,    "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME                 FLAGS
+COMP( 1984, fp,   0,      0,      fp,      fp,    fp_state, empty_init, "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )

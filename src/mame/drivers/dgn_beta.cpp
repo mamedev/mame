@@ -305,7 +305,7 @@ static const gfx_layout dgnbeta_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dgnbeta )
+static GFXDECODE_START( gfx_dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dgnbeta)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dgnbeta)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_b))
 
-	MCFG_WD2797_ADD(FDC_TAG, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 1_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_drq_w))
 
@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(12'288'000) / 16)    //XTAL is guessed
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", 12.288_MHz_XTAL / 16)    //XTAL is guessed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)
@@ -420,5 +420,5 @@ ROM_START(dgnbeta)
 	ROM_LOAD("betachar.rom" ,0x0000 ,0x2000 ,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS           INIT    COMPANY             FULLNAME                  FLAGS
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta, dgn_beta_state, 0,      "Dragon Data Ltd",  "Dragon 128 (Beta)",      MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY            FULLNAME             FLAGS
+COMP( 1984, dgnbeta, 0,      0,      dgnbeta, dgnbeta, dgn_beta_state, empty_init, "Dragon Data Ltd", "Dragon 128 (Beta)", MACHINE_NO_SOUND )

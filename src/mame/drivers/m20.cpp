@@ -121,7 +121,7 @@ public:
 
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */
-#define PIXEL_CLOCK XTAL(4'433'619)
+#define PIXEL_CLOCK 4.433619_MHz_XTAL
 
 
 MC6845_UPDATE_ROW( m20_state::update_row )
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_FD1797_ADD("fd1797", 1000000)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("i8259", pic8259_device, ir0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
@@ -877,6 +877,6 @@ ROM_START(m40)
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT STATE      INIT COMPANY     FULLNAME           FLAGS
-COMP( 1981, m20,   0,      0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1981, m40,   m20,    0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
+COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

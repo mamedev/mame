@@ -248,7 +248,7 @@ static const gfx_layout gfx_layout =
 };
 
 
-static GFXDECODE_START( clpoker )
+static GFXDECODE_START( gfx_clpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_layout,   0x0, 1 )
 GFXDECODE_END
 
@@ -285,10 +285,10 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HM86171
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clpoker)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000) / 8) // AY38910A/P, divider not verified
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
@@ -315,4 +315,4 @@ ROM_START( clpoker )
 ROM_END
 
 
-GAME( 1994, clpoker,  0, clpoker, clpoker, clpoker_state, 0, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM
+GAME( 1994, clpoker, 0, clpoker, clpoker, clpoker_state, empty_init, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM

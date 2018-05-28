@@ -91,7 +91,7 @@ static const char *const pt554_sample_names[] =
 MACHINE_CONFIG_START(nes_bandai_pt554_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(8)

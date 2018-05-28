@@ -12,8 +12,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "cpu/z80/z80daisy_generic.h"
+#include "machine/z80daisy.h"
+#include "machine/z80daisy_generic.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
@@ -41,8 +41,8 @@
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
 
-#define XTAL_X001  XTAL(10'738'635)
-#define XTAL_X002  XTAL(8'000'000)
+#define XTAL_X001  10.738635_MHz_XTAL
+#define XTAL_X002  8_MHz_XTAL
 
 #define IC_I001  "i001"  /* Z8400A */
 #define IC_I030  "i030"  /* AY-3-8910 */
@@ -614,14 +614,14 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL(10'738'635) / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9129, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9129_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(IC_I030, AY8910, XTAL_X002 / 4)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, einstein_state, keyboard_data_read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
 
 	// floppy
-	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
+	MCFG_DEVICE_ADD(IC_I042, WD1770, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
@@ -714,6 +714,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY   FULLNAME          FLAGS
-COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein TC-01", 0 )
-COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME          FLAGS
+COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein TC-01", 0 )
+COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )

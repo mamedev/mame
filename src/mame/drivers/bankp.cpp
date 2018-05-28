@@ -269,7 +269,7 @@ static const gfx_layout charlayout2 =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( bankp )
+static GFXDECODE_START( gfx_bankp )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  32*4, 16 )
 GFXDECODE_END
@@ -290,7 +290,7 @@ void bankp_state::machine_reset()
 INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(bankp_state::bankp)
@@ -308,13 +308,13 @@ MACHINE_CONFIG_START(bankp_state::bankp)
 	MCFG_SCREEN_UPDATE_DRIVER(bankp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bankp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bankp)
 	MCFG_PALETTE_ADD("palette", 32*4+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(bankp_state, bankp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -400,5 +400,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bankp, 0, bankp, bankp, bankp_state, 0, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, combh, 0, bankp, combh, bankp_state, 0, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bankp, 0, bankp, bankp, bankp_state, empty_init, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, combh, 0, bankp, combh, bankp_state, empty_init, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )

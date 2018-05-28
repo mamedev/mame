@@ -172,7 +172,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 		return 0;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	return 0;
 }
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER( pcd_state::nmi_io_w )
 		return;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER( pcd_state::rtc_r )
@@ -497,13 +497,13 @@ static INPUT_PORTS_START(pcx)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pcd_state::pcd)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000))
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(pcd_map)
 	MCFG_DEVICE_IO_MAP(pcd_io)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(*this, pcd_state, i186_timer1_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(*this, pcd_state, irq_callback))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL(16'000'000) / 24)) // adjusted to pass post
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(16_MHz_XTAL / 24)) // adjusted to pass post
 
 	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	// floppy disk controller
-	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -530,15 +530,15 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats)
 
 	// usart
-	MCFG_DEVICE_ADD("usart1", MC2661, XTAL(4'915'200))
+	MCFG_DEVICE_ADD("usart1", MC2661, 4.9152_MHz_XTAL)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("usart2", MC2661, XTAL(4'915'200))
+	MCFG_DEVICE_ADD("usart2", MC2661, 4.9152_MHz_XTAL)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w))
 	//MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
-	MCFG_DEVICE_ADD("usart3", MC2661, XTAL(4'915'200))
+	MCFG_DEVICE_ADD("usart3", MC2661, 4.9152_MHz_XTAL)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -549,12 +549,12 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart3", mc2661_device, rx_w))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// rtc
-	MCFG_MC146818_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic1", pic8259_device, ir7_w))
 	MCFG_MC146818_BINARY(true)
 	MCFG_MC146818_BINARY_YEAR(true)
@@ -620,5 +620,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1984, pcd, 0,   0, pcd, 0,   pcd_state, 0, "Siemens", "PC-D", MACHINE_NOT_WORKING )
-COMP( 1984, pcx, pcd, 0, pcx, pcx, pcd_state, 0, "Siemens", "PC-X", MACHINE_NOT_WORKING )
+COMP( 1984, pcd, 0,   0, pcd, 0,   pcd_state, empty_init, "Siemens", "PC-D", MACHINE_NOT_WORKING )
+COMP( 1984, pcx, pcd, 0, pcx, pcx, pcd_state, empty_init, "Siemens", "PC-X", MACHINE_NOT_WORKING )

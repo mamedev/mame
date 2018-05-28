@@ -604,7 +604,8 @@ MACHINE_CONFIG_START(esq1_state::esq1)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("filters", ESQ1_FILTERS, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -630,7 +631,7 @@ MACHINE_CONFIG_START(esq1_state::sq80)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sq80_map)
 
-	MCFG_WD1772_ADD(WD1772_TAG, 4000000)
+	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 4000000)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( esq1 )
@@ -698,6 +699,6 @@ ROM_START( esqm )
 ROM_END
 
 
-CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-1 Digital Wave Synthesizer", MACHINE_NOT_WORKING )
-CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-M Digital Wave Synthesizer Module", MACHINE_NOT_WORKING )
-CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, 0, "Ensoniq", "SQ-80 Cross Wave Synthesizer", MACHINE_NOT_WORKING )
+CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, empty_init, "Ensoniq", "ESQ-1 Digital Wave Synthesizer", MACHINE_NOT_WORKING )
+CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, empty_init, "Ensoniq", "ESQ-M Digital Wave Synthesizer Module", MACHINE_NOT_WORKING )
+CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, empty_init, "Ensoniq", "SQ-80 Cross Wave Synthesizer", MACHINE_NOT_WORKING )

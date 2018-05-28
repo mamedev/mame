@@ -587,15 +587,15 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(sun3_80_mem)
 
-	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
+	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -634,10 +634,10 @@ MACHINE_CONFIG_START(sun3x_state::sun3_460)
 	MCFG_DEVICE_ADD("maincpu", M68030, 33000000)
 	MCFG_DEVICE_PROGRAM_MAP(sun3_460_mem)
 
-	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
+	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
+	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -698,6 +698,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY             FULLNAME             FLAGS
-COMP( 198?, sun3_80,  0,      0,      sun3_80,   sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/80",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Hydra
-COMP( 198?, sun3_460, 0,      0,      sun3_460,  sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Pegasus
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY             FULLNAME             FLAGS
+COMP( 198?, sun3_80,  0,      0,      sun3_80,  sun3x, sun3x_state, empty_init, "Sun Microsystems", "Sun 3/80",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Hydra
+COMP( 198?, sun3_460, 0,      0,      sun3_460, sun3x, sun3x_state, empty_init, "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Pegasus

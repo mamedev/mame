@@ -547,6 +547,7 @@ void tms9914_device::do_swrst()
 	m_rl_state = FSM_RL_LOCS;
 	m_pp_ppas = false;
 	m_c_state = FSM_C_CIDS;
+	m_gts = false;
 
 	update_int();
 	set_accrq(false);
@@ -847,6 +848,7 @@ void tms9914_device::update_fsm()
 		prev_state = m_c_state;
 		if (controller_reset()) {
 			m_c_state = FSM_C_CIDS;
+			m_gts = false;
 			m_c_dly_timer->reset();
 		} else {
 			switch (m_c_state) {
@@ -863,8 +865,13 @@ void tms9914_device::update_fsm()
 			case FSM_C_CACS:
 				if (m_rpp) {
 					m_c_state = FSM_C_CPWS;
+					m_gts = false;
+				} else if (m_gts && !sh_active()) {
+					m_c_state = FSM_C_CSBS;
+					m_gts = false;
+					// This ensures a BO interrupt is generated if TACS is active
+					m_sh_state = FSM_SH_SIDS;
 				}
-				// gts -> CSBS
 				break;
 
 			case FSM_C_CSBS:
@@ -1246,11 +1253,8 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_GTS:
-		if (m_c_state == FSM_C_CACS && !sh_active()) {
-			m_c_state = FSM_C_CSBS;
-			m_ext_state_change = true;
-			// This ensures a BO interrupt is generated if TACS is active
-			m_sh_state = FSM_SH_SIDS;
+		if (m_c_state == FSM_C_CACS) {
+			m_gts = true;
 			update_fsm();
 		}
 		break;

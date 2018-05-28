@@ -994,7 +994,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_AY51013_AUTO_RDAV(true)
 
 	// Beep
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep" , BEEP , BEEP_FREQUENCY)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 	MCFG_TIMER_DRIVER_ADD("timer_beep" , hp2645_state , timer_beep_exp)
@@ -1029,4 +1029,4 @@ ROM_START(hp2645)
 	ROM_LOAD("1816-1425.bin", 0x0000, 0x400, CRC(69a34fef) SHA1(816929cadd53c2fe42b3ca561c029cb1ccd4ca24))
 ROM_END
 
-COMP(1976 , hp2645 , 0 , 0 , hp2645 , hp2645 , hp2645_state , 0 , "HP" , "HP 2645A" , 0)
+COMP( 1976, hp2645, 0, 0, hp2645, hp2645, hp2645_state, empty_init, "HP", "HP 2645A", 0)

@@ -30,6 +30,7 @@ public:
 		m_pixelram(*this, "pixelram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_ym(*this, "ymsnd"),
 		m_hd63484(*this, "hd63484"),
 		m_tc0180vcu(*this, "tc0180vcu"),
 		m_tc0640fio(*this, "tc0640fio"),
@@ -64,7 +65,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
-	DECLARE_DRIVER_INIT(taito_b);
+	void init_taito_b();
 	DECLARE_VIDEO_START(taitob_color_order0);
 	DECLARE_VIDEO_START(taitob_color_order1);
 	DECLARE_VIDEO_START(taitob_color_order2);
@@ -157,7 +158,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_ym;
+	required_device<device_t> m_ym;
 	optional_device<hd63484_device> m_hd63484;
 	required_device<tc0180vcu_device> m_tc0180vcu;
 	optional_device<tc0640fio_device> m_tc0640fio;

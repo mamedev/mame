@@ -182,7 +182,7 @@ void tranz330_state::tranz330(machine_config &config)
 	config.m_default_layout = &layout_tranz330;
 
 	// sound
-	SPEAKER(config, "mono").standard_mono();
+	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker", 0)
 			.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -194,5 +194,5 @@ ROM_START( tranz330 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT   COMPANY      FULLNAME        FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state,  0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME        FLAGS
+COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state, empty_init, "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )

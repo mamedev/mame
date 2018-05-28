@@ -1096,8 +1096,7 @@ BDIR BC1       |
 /* PSG function selected */
 void mpu4_state::update_ay(device_t *device)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay8913");
-	if (!ay8910) return;
+	if (!m_ay8913) return;
 
 	pia6821_device *pia = downcast<pia6821_device *>(device);
 	if (!pia->cb2_output())
@@ -1115,14 +1114,14 @@ void mpu4_state::update_ay(device_t *device)
 
 		case 0x02:
 			/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-			ay8910->data_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->data_w(generic_space(), 0, m_pia6->a_output());
 			LOG(("AY Chip Write \n"));
 			break;
 
 		case 0x03:
 			/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
 			The register will remain selected until another is chosen.*/
-			ay8910->address_w(generic_space(), 0, m_pia6->a_output());
+			m_ay8913->address_w(generic_space(), 0, m_pia6->a_output());
 			LOG(("AY Chip Select \n"));
 			break;
 
@@ -1423,8 +1422,7 @@ calculate the oscillation frequency in advance. We're running the timer for inte
 purposes, but the frequency calculation is done by plucking the values out as they are written.*/
 WRITE8_MEMBER(mpu4_state::ic3ss_w)
 {
-	device_t *ic3ss = machine().device("ptm_ic3ss");
-	downcast<ptm6840_device *>(ic3ss)->write(offset,data);
+	m_ptm_ic3ss->write(offset,data);
 
 	if (offset == 3)
 	{
@@ -2117,14 +2115,12 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 
 WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
-	ym2413_device *ym2413 = machine().device<ym2413_device>("ym2413");
-	if (ym2413) ym2413->write(space,offset,data);
+	if (m_ym2413) m_ym2413->write(space,offset,data);
 }
 
 READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 {
-//  ym2413_device *ym2413 = machine().device<ym2413_device>("ym2413");
-//  if (ym2413) return ym2413->read(space,offset);
+//  if (m_ym2413) return m_ym2413->read(space,offset);
 	return 0xff;
 }
 
@@ -2137,11 +2133,10 @@ void mpu4_state::mpu4_install_mod4yam_space(address_space &space)
 
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
-	pia6821_device *pia_ic4ss = machine().device<pia6821_device>("pia_ic4ss");
-	ptm6840_device *ptm_ic3ss = machine().device<ptm6840_device>("ptm_ic3ss");
-
+	pia6821_device *pia_ic4ss = subdevice<pia6821_device>("pia_ic4ss");
+	
 	space.install_readwrite_handler(0x0880, 0x0883, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
-	space.install_read_handler(0x08c0, 0x08c7, read8_delegate(FUNC(ptm6840_device::read), ptm_ic3ss));
+	space.install_read_handler(0x08c0, 0x08c7, read8_delegate(FUNC(ptm6840_device::read), (ptm6840_device*)m_ptm_ic3ss));
 	space.install_write_handler(0x08c0, 0x08c7, write8_delegate(FUNC(mpu4_state::ic3ss_w),this));
 }
 
@@ -2298,185 +2293,186 @@ static mpu4_chr_table blsbys_data[8] = {
 //request 36 42 27 42 09 42 27 42 42 09
 //verify  00 04 04 0C 0C 1C 14 2C 5C 2C
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_low_volt_alt)
+void mpu4_state::init_m4_low_volt_alt()
 {
 	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
-	m_low_volt_detect_disable =1;
+	m_low_volt_detect_disable = 1;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_aux1_invert)
+void mpu4_state::init_m4_aux1_invert()
 {
-	m_aux1_invert =1;
+	m_aux1_invert = 1;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_aux2_invert)
+void mpu4_state::init_m4_aux2_invert()
 {
-	m_aux2_invert =1;
+	m_aux2_invert = 1;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_door_invert)
+void mpu4_state::init_m4_door_invert()
 {
-	m_aux2_invert =1;
+	m_aux2_invert = 1;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_small_extender)
+void mpu4_state::init_m4_small_extender()
 {
-	m_lamp_extender=SMALL_CARD;
+	m_lamp_extender = SMALL_CARD;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_large_extender_a)
+void mpu4_state::init_m4_large_extender_a()
 {
-	m_lamp_extender=LARGE_CARD_A;
+	m_lamp_extender = LARGE_CARD_A;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_large_extender_b)
+void mpu4_state::init_m4_large_extender_b()
 {
-	m_lamp_extender=LARGE_CARD_B;
+	m_lamp_extender = LARGE_CARD_B;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_large_extender_c)
+void mpu4_state::init_m4_large_extender_c()
 {
-	m_lamp_extender=LARGE_CARD_C;
+	m_lamp_extender = LARGE_CARD_C;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_hopper_tubes)
+void mpu4_state::init_m4_hopper_tubes()
 {
 	m_hopper = TUBES;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_hopper_duart_a)
+void mpu4_state::init_m4_hopper_duart_a()
 {
 	m_hopper = HOPPER_DUART_A;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_hopper_duart_b)
+void mpu4_state::init_m4_hopper_duart_b()
 {
 	m_hopper = HOPPER_DUART_B;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_hopper_duart_c)
+void mpu4_state::init_m4_hopper_duart_c()
 {
 	m_hopper = HOPPER_DUART_C;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_hopper_nonduart_a)
+void mpu4_state::init_m4_hopper_nonduart_a()
 {
 	m_hopper = HOPPER_NONDUART_A;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_hopper_nonduart_b)
+void mpu4_state::init_m4_hopper_nonduart_b()
 {
 	m_hopper = HOPPER_NONDUART_B;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_led_a)
+void mpu4_state::init_m4_led_a()
 {
 	m_led_extender = CARD_A;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_led_b)
+void mpu4_state::init_m4_led_b()
 {
 	m_led_extender = CARD_B;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_led_c)
+void mpu4_state::init_m4_led_c()
 {
 	m_led_extender = CARD_C;
 }
 
 //TODO: Replace with standard six reels once sets are sorted out - is really six_reel_std
-DRIVER_INIT_MEMBER(mpu4_state,m4altreels)
+void mpu4_state::init_m4altreels()
 {
-	m_reel_mux=SIX_REEL_1TO8;
+	m_reel_mux = SIX_REEL_1TO8;
 	m_reels = 6;
-	DRIVER_INIT_CALL(m4default_banks);
+	init_m4default_banks();
 }
-DRIVER_INIT_MEMBER(mpu4_state,m4default_reels)
+
+void mpu4_state::init_m4default_reels()
 {
-	m_reel_mux=STANDARD_REEL;
+	m_reel_mux = STANDARD_REEL;
 	m_reels = 4;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_five_reel_std)
+void mpu4_state::init_m4_five_reel_std()
 {
-	m_reel_mux=FIVE_REEL_5TO8;
+	m_reel_mux = FIVE_REEL_5TO8;
 	m_reels = 5;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_five_reel_rev)
+void mpu4_state::init_m4_five_reel_rev()
 {
-	m_reel_mux=FIVE_REEL_8TO5;
+	m_reel_mux = FIVE_REEL_8TO5;
 	m_reels = 5;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_five_reel_alt)
+void mpu4_state::init_m4_five_reel_alt()
 {
-	m_reel_mux=FIVE_REEL_3TO6;
+	m_reel_mux = FIVE_REEL_3TO6;
 	m_reels = 5;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_six_reel_std)
+void mpu4_state::init_m4_six_reel_std()
 {
-	m_reel_mux=SIX_REEL_1TO8;
+	m_reel_mux = SIX_REEL_1TO8;
 	m_reels = 6;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_six_reel_alt)
+void mpu4_state::init_m4_six_reel_alt()
 {
-	m_reel_mux=SIX_REEL_5TO8;
+	m_reel_mux = SIX_REEL_5TO8;
 	m_reels = 6;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_seven_reel)
+void mpu4_state::init_m4_seven_reel()
 {
-	m_reel_mux=SEVEN_REEL;
+	m_reel_mux = SEVEN_REEL;
 	m_reels = 7;
 }
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_andycp10c)
+void mpu4_state::init_m4_andycp10c()
 {
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_small_extender);
+	init_m4default();
+	init_m4_small_extender();
 	m_current_chr_table = andycp10c_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m_oldtmr)
+void mpu4_state::init_m_oldtmr()
 {
-	DRIVER_INIT_CALL(m4_six_reel_std);
-	DRIVER_INIT_CALL(m4default_banks);
+	init_m4_six_reel_std();
+	init_m4default_banks();
 
 	m_current_chr_table = oldtmr_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m_ccelbr)
+void mpu4_state::init_m_ccelbr()
 {
-	DRIVER_INIT_CALL(m4default);
+	init_m4default();
 	m_current_chr_table = ccelbr_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4gambal)
+void mpu4_state::init_m4gambal()
 {
-	DRIVER_INIT_CALL(m4default);
+	init_m4default();
 	m_current_chr_table = gmball_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m_grtecp)
+void mpu4_state::init_m_grtecp()
 {
 	m_current_chr_table = grtecp_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m_blsbys)
+void mpu4_state::init_m_blsbys()
 {
-	m_bwb_bank=1;
-	DRIVER_INIT_CALL(m4_five_reel_std);
+	m_bwb_bank = 1;
+	init_m4_five_reel_std();
 	m_bwb_chr_table1 = blsbys_data1;
 	m_current_chr_table = blsbys_data;
-	DRIVER_INIT_CALL(m4default_big);
+	init_m4default_big();
 }
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4default_banks)
+void mpu4_state::init_m4default_banks()
 {
 	//Initialise paging for non-extended ROM space
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2484,52 +2480,50 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_banks)
 	membank("bank1")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4default_alt)
+void mpu4_state::init_m4default_alt()
 {
-	m_reel_mux=STANDARD_REEL;
+	m_reel_mux = STANDARD_REEL;
 	m_reels = 8;
-	DRIVER_INIT_CALL(m4default_banks);
+	init_m4default_banks();
 
 	m_bwb_bank=0;
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4default)
+void mpu4_state::init_m4default()
 {
-	DRIVER_INIT_CALL(m4default_reels);
-	m_bwb_bank=0;
-	m_aux1_invert=0;
-	m_aux2_invert=0;
-	m_door_invert=0;
-	DRIVER_INIT_CALL(m4default_banks);
+	init_m4default_reels();
+	m_bwb_bank = 0;
+	m_aux1_invert = 0;
+	m_aux2_invert = 0;
+	m_door_invert = 0;
+	init_m4default_banks();
 }
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
+void mpu4_state::init_m4default_big()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_aux1_invert=0;
-	m_aux2_invert=0;
-	m_door_invert=0;
+	m_aux1_invert = 0;
+	m_aux2_invert = 0;
+	m_door_invert = 0;
 
-	int size = memregion( "maincpu" )->bytes();
-	if (size<=0x10000)
+	int size = memregion("maincpu")->bytes();
+	if (size <= 0x10000)
 	{
 		printf("Error: Extended banking selected on set <=0x10000 in size, ignoring\n");
-		DRIVER_INIT_CALL(m4default_reels);
-		m_bwb_bank=0;
-		DRIVER_INIT_CALL(m4default_banks);
+		init_m4default_reels();
+		m_bwb_bank = 0;
+		init_m4default_banks();
 	}
 	else
 	{
-		m_bwb_bank=1;
+		m_bwb_bank = 1;
 		space.install_write_handler(0x0858, 0x0858, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
 		space.install_write_handler(0x0878, 0x0878, write8_delegate(FUNC(mpu4_state::bankset_w),this));
 		uint8_t *rom = memregion("maincpu")->base();
 
 		m_numbanks = size / 0x10000;
-
 		m_bank1->configure_entries(0, m_numbanks, &rom[0x01000], 0x10000);
-
 		m_numbanks--;
 
 		// some Bwb games must default to the last bank, does anything not like this
@@ -2554,10 +2548,10 @@ WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 	printf("crystal_sound_w %02x\n",data);
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m_frkstn)
+void mpu4_state::init_m_frkstn()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	DRIVER_INIT_CALL(m4default_big);
+	init_m4default_big();
 	space.install_read_handler(0x0880, 0x0880, read8_delegate(FUNC(mpu4_state::crystal_sound_r),this));
 	space.install_write_handler(0x0881, 0x0881, write8_delegate(FUNC(mpu4_state::crystal_sound_w),this));
 }
@@ -2584,15 +2578,15 @@ static void descramble_crystal( uint8_t* region, int start, int end, uint8_t ext
 }
 
 
-DRIVER_INIT_MEMBER(mpu4_state,crystal)
+void mpu4_state::init_crystal()
 {
-	DRIVER_INIT_CALL(m_frkstn);
+	init_m_frkstn();
 	descramble_crystal(memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,crystali)
+void mpu4_state::init_crystali()
 {
-	DRIVER_INIT_CALL(m_frkstn);
+	init_m_frkstn();
 	descramble_crystal(memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
 }
 
@@ -3097,7 +3091,8 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 
 	mpu4_common(config);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

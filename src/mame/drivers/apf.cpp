@@ -519,13 +519,13 @@ static void apf_cart(device_slot_interface &device)
 MACHINE_CONFIG_START(apf_state::apfm1000)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545) / 4 )  // divided by 4 in external clock circuit
+	MCFG_DEVICE_ADD("maincpu", M6800, 3.579545_MHz_XTAL / 4)  // divided by 4 in external clock circuit
 	MCFG_DEVICE_PROGRAM_MAP(apfm1000_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, 3.579545_MHz_XTAL)
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE("pia0", pia6821_device, cb1_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, apf_state, videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
@@ -533,7 +533,7 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	// other lines not connected
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -562,8 +562,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia1_porta_r))
@@ -575,7 +574,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("apf_cass")
 
-	MCFG_FD1771_ADD("fdc", 1000000) // guess
+	MCFG_DEVICE_ADD("fdc", FD1771, 1000000) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -615,6 +614,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT     COMPAT  MACHINE     INPUT      CLASS       INIT  COMPANY                 FULLNAME */
-COMP( 1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   apf_state,  0,    "APF Electronics Inc.", "APF Imagination Machine", 0 )
-CONS( 1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  apf_state,  0,    "APF Electronics Inc.", "APF M-1000", 0 )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME */
+COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
+CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )

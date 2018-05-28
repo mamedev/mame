@@ -112,22 +112,22 @@ public:
 	DECLARE_WRITE8_MEMBER(twinactn_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
 	DECLARE_WRITE16_MEMBER(nmk16_bioship_x0016_w);
-	DECLARE_DRIVER_INIT(nmk);
-	DECLARE_DRIVER_INIT(tharrier);
-	DECLARE_DRIVER_INIT(vandykeb);
-	DECLARE_DRIVER_INIT(tdragonb);
-	DECLARE_DRIVER_INIT(ssmissin);
-	DECLARE_DRIVER_INIT(hachamf_prot);
-	DECLARE_DRIVER_INIT(redhawk);
-	DECLARE_DRIVER_INIT(tdragon_prot);
-	DECLARE_DRIVER_INIT(bubl2000);
-	DECLARE_DRIVER_INIT(banked_audiocpu);
-	DECLARE_DRIVER_INIT(grdnstrm);
-	DECLARE_DRIVER_INIT(spec2k);
-	DECLARE_DRIVER_INIT(redfoxwp2a);
-	DECLARE_DRIVER_INIT(grdnstrmg);
-	DECLARE_DRIVER_INIT(bjtwin);
-	DECLARE_DRIVER_INIT(atombjt);
+	void init_nmk();
+	void init_tharrier();
+	void init_vandykeb();
+	void init_tdragonb();
+	void init_ssmissin();
+	void init_hachamf_prot();
+	void init_redhawk();
+	void init_tdragon_prot();
+	void init_bubl2000();
+	void init_banked_audiocpu();
+	void init_grdnstrm();
+	void init_spec2k();
+	void init_redfoxwp2a();
+	void init_grdnstrmg();
+	void init_bjtwin();
+	void init_atombjt();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	template<int Bank> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(strahl_get_fg_tile_info);
@@ -253,4 +253,20 @@ public:
 	void twinactn_sound_cpu(address_map &map);
 	void vandyke_map(address_map &map);
 	void vandykeb_map(address_map &map);
+};
+
+class nmk16_tomagic_state : public nmk16_state
+{
+public:
+	nmk16_tomagic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nmk16_state(mconfig, type, tag)
+	{}
+
+	void tomagic(machine_config &config);
+	void init_tomagic();
+
+private:
+	void tomagic_map(address_map &map);
+	void tomagic_sound_map(address_map &map);
+	void tomagic_sound_io_map(address_map &map);
 };

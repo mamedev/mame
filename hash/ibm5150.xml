@@ -1023,6 +1023,24 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="gunship">
+		<description>Gunship</description>
+		<year>1987</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="429.05" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Gunship v429.05 [Microprose] [1987] [5.25DD] [Disk 1 of 2].img" size="368640" crc="74ef4447" sha1="c31b6df82fdb09e68ebae6e19f4aac525c21b948" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Gunship v429.05 [Microprose] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="edcb863f" sha1="3391538e151626280ae59875619dcb9bfafaf1c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hacker">
 		<description>Hacker</description>
 		<year>1985</year>
@@ -9008,8 +9026,9 @@ has been replaced with an all-zero block. -->
 		<year>1991</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
+			<!-- High score file modified -->
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] Pick'n Pile [5.25].img" size="368640" crc="82b72c98" sha1="afc3130b69c4d1e36b1e182020ef058a6c21f046" offset="0"/>
+				<rom name="[PC] Pick'n Pile [5.25].img" size="368640" crc="82b72c98" sha1="afc3130b69c4d1e36b1e182020ef058a6c21f046" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9769,6 +9788,60 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="EGA disk"/>
 			<dataarea name="flop" size = "368640">
 				<rom name="Star Goose (EGA disk) [Logotron] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="97a0ef81" sha1="003161f2ff764acdfeb82983a878e0ef5a2a3f49" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strek5">
+		<description>Star Trek V: The Final Frontier (5.25")</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Level Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 1 of 5].img" size="368640" crc="5f008ffa" sha1="3509e6226bca964eb7efc2549941fe1d15723e3e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 2 of 5].img" size="368640" crc="99d69632" sha1="67e13f98d5f63043987791e821674b1d9c2e5537" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 3 of 5].img" size="368640" crc="3118530c" sha1="a287047840da0fe60f0368380f56e773d5c6c400" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 4 of 5].img" size="368640" crc="2901f94e" sha1="94bfa2d6d9c3d879cc457675745bde8491dcfc74" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [5.25] [Disk 5 of 5].img" size="368640" crc="a3108408" sha1="6f09d3d9bd27ae0a367c57ff06f1ba71b02a7d43" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strek5_35" cloneof="strek5">
+		<description>Star Trek V: The Final Frontier (3.5")</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Level Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [3.5DD] [Disk 1 of 3].img" size="737280" crc="fd3aee07" sha1="bf31b7d7b5fe968324316eaa54a96448fa5a3377" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [3.5DD] [Disk 2 of 3].img" size="737280" crc="69997864" sha1="af8fa9245752ba7273ce12d4f804faf0ddd7c147" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [3.5DD] [Disk 3 of 3].img" size="737280" crc="c2de0c66" sha1="9dfd73c44c828b67f408eb5273b73b42e871964d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

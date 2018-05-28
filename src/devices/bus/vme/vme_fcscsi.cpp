@@ -182,8 +182,8 @@
 
 DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board")
 
-#define CPU_CRYSTAL XTAL(20'000'000) /* Jauch */
-#define PIT_CRYSTAL XTAL(16'000'000) /* Jauch */
+#define CPU_CRYSTAL 20_MHz_XTAL /* Jauch */
+#define PIT_CRYSTAL 16_MHz_XTAL /* Jauch */
 
 void vme_fcscsi1_card_device::fcscsi1_mem(address_map &map)
 {
@@ -230,12 +230,12 @@ ROM_END
 
 MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_DEVICE_PROGRAM_MAP (fcscsi1_mem)
+	MCFG_DEVICE_ADD("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
+	MCFG_DEVICE_PROGRAM_MAP(fcscsi1_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vme_fcscsi1_card_device, maincpu_irq_acknowledge_callback)
 
 	/* FDC  */
-	MCFG_WD1772_ADD("fdc", PIT_CRYSTAL / 2)
+	MCFG_DEVICE_ADD("fdc", WD1772, PIT_CRYSTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(*this, vme_fcscsi1_card_device, fdc_irq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("mc68450", hd63450_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
 
 	/* PIT Parallel Interface and Timer device */
-	MCFG_DEVICE_ADD ("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
+	MCFG_DEVICE_ADD("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
 	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, vme_fcscsi1_card_device, led_w))
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */

@@ -128,11 +128,11 @@ static void adam_fdc_floppies(device_slot_interface &device)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(adam_fdc_mem)
 	MCFG_DEVICE_IO_MAP(adam_fdc_io)
 
-	MCFG_WD2793_ADD(WD2793_TAG, XTAL(4'000'000)/4)
+	MCFG_DEVICE_ADD(WD2793_TAG, WD2793, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6801_TAG, INPUT_LINE_NMI))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)

@@ -174,129 +174,54 @@ class namcos22_state : public driver_device
 {
 public:
 	namcos22_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_master(*this, "master"),
-		m_slave(*this, "slave"),
-		m_mcu(*this, "mcu"),
-		m_iomcu(*this, "iomcu"),
-		m_spriteram(*this, "spriteram"),
-		m_shareram(*this, "shareram"),
-		m_eeprom(*this, "eeprom"),
-		m_pSlaveExternalRAM(*this, "slaveextram"),
-		m_pMasterExternalRAM(*this, "masterextram"),
-		m_paletteram(*this, "paletteram"),
-		m_cgram(*this, "cgram"),
-		m_textram(*this, "textram"),
-		m_polygonram(*this, "polygonram"),
-		m_mixer(*this, "video_mixer"),
-		m_gamma_proms(*this, "gamma_proms"),
-		m_vics_data(*this, "vics_data"),
-		m_vics_control(*this, "vics_control"),
-		m_czattr(*this, "czattr"),
-		m_tilemapattr(*this, "tilemapattr"),
-		m_czram(*this, "czram"),
-		m_motor_timer(*this, "motor_timer"),
-		m_pc_pedal_interrupt(*this, "pc_p_int"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_adc_ports(*this, "ADC.%u", 0),
-		m_p1(*this, "P1"),
-		m_p2(*this, "P2"),
-		m_mcup5a(*this, "MCUP5A"),
-		m_mcup5b(*this, "MCUP5B")
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_czattr(*this, "czattr")
+		, m_czram(*this, "czram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_master(*this, "master")
+		, m_slave(*this, "slave")
+		, m_mcu(*this, "mcu")
+		, m_iomcu(*this, "iomcu")
+		, m_shareram(*this, "shareram")
+		, m_eeprom(*this, "eeprom")
+		, m_pSlaveExternalRAM(*this, "slaveextram")
+		, m_pMasterExternalRAM(*this, "masterextram")
+		, m_paletteram(*this, "paletteram")
+		, m_cgram(*this, "cgram")
+		, m_textram(*this, "textram")
+		, m_polygonram(*this, "polygonram")
+		, m_mixer(*this, "video_mixer")
+		, m_gamma_proms(*this, "gamma_proms")
+		, m_vics_data(*this, "vics_data")
+		, m_vics_control(*this, "vics_control")
+		, m_tilemapattr(*this, "tilemapattr")
+		, m_motor_timer(*this, "motor_timer")
+		, m_pc_pedal_interrupt(*this, "pc_p_int")
+		, m_screen(*this, "screen")
+		, m_adc_ports(*this, "ADC.%u", 0)
+		, m_p1(*this, "P1")
+		, m_p2(*this, "P2")
+		, m_mcup5a(*this, "MCUP5A")
+		, m_mcup5b(*this, "MCUP5B")
+		, m_led(*this, "led")
+		, m_cpuled(*this, "cpuled%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_master;
-	required_device<cpu_device> m_slave;
-	required_device<cpu_device> m_mcu;
-	optional_device<cpu_device> m_iomcu;
 	optional_shared_ptr<uint32_t> m_spriteram;
-	required_shared_ptr<uint32_t> m_shareram;
-	required_device<eeprom_parallel_28xx_device> m_eeprom;
-	required_shared_ptr<uint16_t> m_pSlaveExternalRAM;
-	required_shared_ptr<uint16_t> m_pMasterExternalRAM;
-	required_shared_ptr<uint32_t> m_paletteram;
-	required_shared_ptr<uint32_t> m_cgram;
-	required_shared_ptr<uint32_t> m_textram;
-	required_shared_ptr<uint32_t> m_polygonram;
-	required_shared_ptr<uint32_t> m_mixer;
-	optional_region_ptr<uint8_t> m_gamma_proms;
-	optional_shared_ptr<uint32_t> m_vics_data;
-	optional_shared_ptr<uint32_t> m_vics_control;
 	optional_shared_ptr<uint32_t> m_czattr;
-	required_shared_ptr<uint32_t> m_tilemapattr;
 	optional_shared_ptr<uint32_t> m_czram;
-	optional_device<timer_device> m_motor_timer;
-	optional_device<timer_device> m_pc_pedal_interrupt;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_ioport_array<8> m_adc_ports;
-	optional_ioport m_p1;
-	optional_ioport m_p2;
-	optional_ioport m_mcup5a;
-	optional_ioport m_mcup5b;
-
-	uint8_t m_syscontrol[0x20];
-	bool m_dsp_irq_enabled;
-	emu_timer *m_ar_tb_interrupt[2];
-	uint16_t m_dsp_master_bioz;
-	std::unique_ptr<uint32_t[]> m_pointram;
-	uint32_t m_old_coin_state;
-	uint32_t m_credits1;
-	uint32_t m_credits2;
-	uint32_t m_point_address;
-	uint32_t m_point_data;
-	uint16_t m_SerialDataSlaveToMasterNext;
-	uint16_t m_SerialDataSlaveToMasterCurrent;
-	int m_RenderBufSize;
-	uint16_t m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ];
-	uint16_t m_portbits[2];
-	int m_irq_state;
-	namcos22_dsp_upload_state m_dsp_upload_state;
-	int m_UploadDestIdx;
-	uint32_t m_alpinesa_protection;
-	int m_motor_status;
-	int m_p4;
-	uint16_t m_su_82;
-	uint16_t m_keycus_id;
-	uint16_t m_keycus_rng;
-	int m_gametype;
-	int m_is_ss22;
-	int m_chipselect;
-	int m_spot_enable;
-	int m_spot_read_address;
-	int m_spot_write_address;
-	std::unique_ptr<uint16_t[]> m_spotram;
-	std::unique_ptr<uint16_t[]> m_banked_czram[4];
-	std::unique_ptr<uint8_t[]> m_recalc_czram[4];
-	uint32_t m_cz_was_written[4];
-	int m_cz_adjust;
-	namcos22_renderer *m_poly;
+	int m_poly_translucency;
 	uint16_t *m_texture_tilemap;
 	std::unique_ptr<uint8_t[]> m_texture_tileattr;
 	uint8_t *m_texture_tiledata;
 	std::unique_ptr<uint8_t[]> m_texture_ayx_to_pixel;
-	uint16_t m_dspram_bank;
-	uint16_t m_dspram16_latch;
-	bool m_slave_simulation_active;
-	int32_t m_absolute_priority;
-	int32_t m_objectshift;
-	uint16_t m_PrimitiveID;
-	float m_viewmatrix[4][4];
-	uint8_t m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES];
-	int32_t m_SurfaceNormalFormat;
-	unsigned m_LitSurfaceCount;
-	unsigned m_LitSurfaceIndex;
-	int m_pointrom_size;
-	int32_t *m_pointrom;
-	std::unique_ptr<uint8_t[]> m_dirtypal;
-	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
-	tilemap_t *m_bgtilemap;
-
+	std::unique_ptr<uint8_t[]> m_recalc_czram[4];
+	int m_is_ss22;
 	int m_mixer_flags;
 	int m_fog_r;
 	int m_fog_g;
@@ -305,28 +230,14 @@ public:
 	int m_fog_g_per_cztype[4];
 	int m_fog_b_per_cztype[4];
 	uint32_t m_fog_colormask;
-	int m_poly_fade_r;
-	int m_poly_fade_g;
-	int m_poly_fade_b;
-	int m_poly_fade_enabled;
 	int m_screen_fade_r;
 	int m_screen_fade_g;
 	int m_screen_fade_b;
 	int m_screen_fade_factor;
-	int m_spot_limit;
-	int m_poly_translucency;
-	int m_text_palbase;
-
-	float m_camera_zoom;
-	float m_camera_vx;
-	float m_camera_vy;
-	float m_camera_vw;
-	float m_camera_vh;
-	float m_camera_lx; // unit vector for light direction
-	float m_camera_ly; // "
-	float m_camera_lz; // "
-	int m_camera_ambient; // 0.0..1.0
-	int m_camera_power;   // 0.0..1.0
+	int m_poly_fade_r;
+	int m_poly_fade_g;
+	int m_poly_fade_b;
+	int m_poly_fade_enabled;
 
 	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);
 	DECLARE_READ32_MEMBER(namcos22s_czram_r);
@@ -467,28 +378,25 @@ public:
 	void install_141_speedup();
 	void namcos22_init(int game_type);
 
-	DECLARE_DRIVER_INIT(acedrvr);
-	DECLARE_DRIVER_INIT(aquajet);
-	DECLARE_DRIVER_INIT(adillor);
-	DECLARE_DRIVER_INIT(cybrcyc);
-	DECLARE_DRIVER_INIT(raveracw);
-	DECLARE_DRIVER_INIT(ridger2j);
-	DECLARE_DRIVER_INIT(victlap);
-	DECLARE_DRIVER_INIT(cybrcomm);
-	DECLARE_DRIVER_INIT(timecris);
-	DECLARE_DRIVER_INIT(tokyowar);
-	DECLARE_DRIVER_INIT(propcycl);
-	DECLARE_DRIVER_INIT(alpiner2);
-	DECLARE_DRIVER_INIT(dirtdash);
-	DECLARE_DRIVER_INIT(airco22);
-	DECLARE_DRIVER_INIT(alpiner);
-	DECLARE_DRIVER_INIT(ridgeraj);
-	DECLARE_DRIVER_INIT(alpinesa);
+	void init_acedrvr();
+	void init_aquajet();
+	void init_adillor();
+	void init_cybrcyc();
+	void init_raveracw();
+	void init_ridger2j();
+	void init_victlap();
+	void init_cybrcomm();
+	void init_timecris();
+	void init_tokyowar();
+	void init_propcycl();
+	void init_alpiner2();
+	void init_dirtdash();
+	void init_airco22();
+	void init_alpiner();
+	void init_ridgeraj();
+	void init_alpinesa();
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	DECLARE_MACHINE_START(adillor);
 	uint32_t screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -532,4 +440,103 @@ public:
 	void slave_dsp_io(address_map &map);
 	void slave_dsp_program(address_map &map);
 	void timecris_am(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_master;
+	required_device<cpu_device> m_slave;
+	required_device<cpu_device> m_mcu;
+	optional_device<cpu_device> m_iomcu;
+	required_shared_ptr<uint32_t> m_shareram;
+	required_device<eeprom_parallel_28xx_device> m_eeprom;
+	required_shared_ptr<uint16_t> m_pSlaveExternalRAM;
+	required_shared_ptr<uint16_t> m_pMasterExternalRAM;
+	required_shared_ptr<uint32_t> m_paletteram;
+	required_shared_ptr<uint32_t> m_cgram;
+	required_shared_ptr<uint32_t> m_textram;
+	required_shared_ptr<uint32_t> m_polygonram;
+	required_shared_ptr<uint32_t> m_mixer;
+	optional_region_ptr<uint8_t> m_gamma_proms;
+	optional_shared_ptr<uint32_t> m_vics_data;
+	optional_shared_ptr<uint32_t> m_vics_control;
+	required_shared_ptr<uint32_t> m_tilemapattr;
+	optional_device<timer_device> m_motor_timer;
+	optional_device<timer_device> m_pc_pedal_interrupt;
+	required_device<screen_device> m_screen;
+	optional_ioport_array<8> m_adc_ports;
+	optional_ioport m_p1;
+	optional_ioport m_p2;
+	optional_ioport m_mcup5a;
+	optional_ioport m_mcup5b;
+	output_finder<> m_led;
+	output_finder<8> m_cpuled;
+
+	uint8_t m_syscontrol[0x20];
+	bool m_dsp_irq_enabled;
+	emu_timer *m_ar_tb_interrupt[2];
+	uint16_t m_dsp_master_bioz;
+	std::unique_ptr<uint32_t[]> m_pointram;
+	uint32_t m_old_coin_state;
+	uint32_t m_credits1;
+	uint32_t m_credits2;
+	uint32_t m_point_address;
+	uint32_t m_point_data;
+	uint16_t m_SerialDataSlaveToMasterNext;
+	uint16_t m_SerialDataSlaveToMasterCurrent;
+	int m_RenderBufSize;
+	uint16_t m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ];
+	uint16_t m_portbits[2];
+	int m_irq_state;
+	namcos22_dsp_upload_state m_dsp_upload_state;
+	int m_UploadDestIdx;
+	uint32_t m_alpinesa_protection;
+	int m_motor_status;
+	int m_p4;
+	uint16_t m_su_82;
+	uint16_t m_keycus_id;
+	uint16_t m_keycus_rng;
+	int m_gametype;
+	int m_chipselect;
+	int m_spot_enable;
+	int m_spot_read_address;
+	int m_spot_write_address;
+	std::unique_ptr<uint16_t[]> m_spotram;
+	std::unique_ptr<uint16_t[]> m_banked_czram[4];
+	uint32_t m_cz_was_written[4];
+	int m_cz_adjust;
+	namcos22_renderer *m_poly;
+	uint16_t m_dspram_bank;
+	uint16_t m_dspram16_latch;
+	bool m_slave_simulation_active;
+	int32_t m_absolute_priority;
+	int32_t m_objectshift;
+	uint16_t m_PrimitiveID;
+	float m_viewmatrix[4][4];
+	uint8_t m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES];
+	int32_t m_SurfaceNormalFormat;
+	unsigned m_LitSurfaceCount;
+	unsigned m_LitSurfaceIndex;
+	int m_pointrom_size;
+	int32_t *m_pointrom;
+	std::unique_ptr<uint8_t[]> m_dirtypal;
+	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
+	tilemap_t *m_bgtilemap;
+
+	int m_spot_limit;
+	int m_text_palbase;
+
+	float m_camera_zoom;
+	float m_camera_vx;
+	float m_camera_vy;
+	float m_camera_vw;
+	float m_camera_vh;
+	float m_camera_lx; // unit vector for light direction
+	float m_camera_ly; // "
+	float m_camera_lz; // "
+	int m_camera_ambient; // 0.0..1.0
+	int m_camera_power;   // 0.0..1.0
 };

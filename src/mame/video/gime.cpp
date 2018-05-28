@@ -1254,16 +1254,9 @@ inline uint16_t gime_device::get_lines_per_row(void)
 	uint16_t lines_per_row;
 	if (m_legacy_video)
 	{
-		switch(m_ff22_value & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0))
+		switch(m_ff22_value & MODE_AG)
 		{
 			case 0:
-			case MODE_GM0:
-			case MODE_GM1:
-			case MODE_GM1|MODE_GM0:
-			case MODE_GM2:
-			case MODE_GM2|MODE_GM0:
-			case MODE_GM2|MODE_GM1:
-			case MODE_GM2|MODE_GM1|MODE_GM0:
 			{
 				// http://cocogamedev.mxf.yuku.com/topic/4299238#.VyC6ozArI-U
 				static int ff9c_lines_per_row[16] =
@@ -1278,20 +1271,21 @@ inline uint16_t gime_device::get_lines_per_row(void)
 			}
 
 			case MODE_AG:
-			case MODE_AG|MODE_GM0:
-			case MODE_AG|MODE_GM1:
-				lines_per_row = 3;
-				break;
-
-			case MODE_AG|MODE_GM1|MODE_GM0:
-			case MODE_AG|MODE_GM2:
-				lines_per_row = 2;
-				break;
-
-			case MODE_AG|MODE_GM2|MODE_GM0:
-			case MODE_AG|MODE_GM2|MODE_GM1:
-			case MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0:
-				lines_per_row = 1;
+				switch (m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+				{
+				case 0:
+					lines_per_row = 12;
+					break;
+				case SAM_STATE_V1:
+					lines_per_row = 3;
+					break;
+				case SAM_STATE_V2:
+				case SAM_STATE_V1|SAM_STATE_V0:
+					lines_per_row = 2;
+					break;
+				default:
+					lines_per_row = 1;
+				}
 				break;
 
 			default:

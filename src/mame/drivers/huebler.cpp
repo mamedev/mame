@@ -306,7 +306,7 @@ static const gfx_layout amu880_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( amu880 )
+static GFXDECODE_START( gfx_amu880 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, amu880_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	MCFG_SCREEN_UPDATE_DRIVER(amu880_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amu880)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amu880)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
@@ -380,5 +380,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT           INIT  COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state,  0,    "Militaerverlag der DDR",   "Ausbaufaehiger Mikrocomputer mit dem U 880",   MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY                   FULLNAME                                      FLAGS */
+COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state, empty_init, "Militaerverlag der DDR", "Ausbaufaehiger Mikrocomputer mit dem U 880", MACHINE_NO_SOUND )

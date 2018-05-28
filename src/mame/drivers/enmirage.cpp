@@ -68,7 +68,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
@@ -220,7 +220,8 @@ MACHINE_CONFIG_START(enmirage_state::mirage)
 
 	MCFG_DEFAULT_LAYOUT( layout_mirage )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ES5503_ADD("es5503", 7000000)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
 	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, enmirage_state, mirage_doc_irq))
@@ -237,7 +238,7 @@ MACHINE_CONFIG_START(enmirage_state::mirage)
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -254,7 +255,7 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-DRIVER_INIT_MEMBER(enmirage_state,mirage)
+void enmirage_state::init_mirage()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;
@@ -291,4 +292,4 @@ DRIVER_INIT_MEMBER(enmirage_state,mirage)
 	m_via->write_pb7(0);
 }
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )
+CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )

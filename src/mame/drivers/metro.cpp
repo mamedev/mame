@@ -300,7 +300,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // seen metro_rxd_r
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // seen metro_rxd_r
 		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
@@ -2997,18 +2997,18 @@ static const gfx_layout layout_053936_16 =
 	8*8*8*4
 };
 
-static GFXDECODE_START( i4100 )
+static GFXDECODE_START( gfx_i4100 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( i4220 )
+static GFXDECODE_START( gfx_i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0,  0x10 ) // [3] 8 Bit Tiles 16x16
 GFXDECODE_END
 
-static GFXDECODE_START( blzntrnd )
+static GFXDECODE_START( gfx_blzntrnd )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3016,7 +3016,7 @@ static GFXDECODE_START( blzntrnd )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_053936,   0x0,  0x10 ) // [4] 053936 Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( gstrik2 )
+static GFXDECODE_START( gfx_gstrik2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3025,7 +3025,7 @@ static GFXDECODE_START( gstrik2 )
 GFXDECODE_END
 
 // same as i4220:
-static GFXDECODE_START( i4300 )
+static GFXDECODE_START( gfx_i4300 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3067,7 +3067,7 @@ MACHINE_CONFIG_START(metro_state::i4100_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp:palette", i4100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp:palette", gfx_i4100)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4220_config)
@@ -3083,7 +3083,7 @@ MACHINE_CONFIG_START(metro_state::i4220_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp2", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp2:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp2:palette", i4220)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_i4220)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4300_config)
@@ -3099,7 +3099,7 @@ MACHINE_CONFIG_START(metro_state::i4300_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp3", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp3:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp3:palette", i4300)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp3:palette", gfx_i4300)
 MACHINE_CONFIG_END
 
 // TODO: these comes from the CRTC inside the i4100
@@ -3160,7 +3160,7 @@ MACHINE_CONFIG_START(metro_state::msgogo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq)) // timing is off, shaking sprites in intro
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
@@ -3254,7 +3254,7 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3294,7 +3294,7 @@ MACHINE_CONFIG_START(metro_state::dharma)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3321,7 +3321,7 @@ MACHINE_CONFIG_START(metro_state::karatour)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3349,7 +3349,7 @@ MACHINE_CONFIG_START(metro_state::sankokushi)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3377,7 +3377,7 @@ MACHINE_CONFIG_START(metro_state::lastfort)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3403,7 +3403,7 @@ MACHINE_CONFIG_START(metro_state::lastforg)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3428,7 +3428,7 @@ MACHINE_CONFIG_START(metro_state::dokyusei)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3455,7 +3455,7 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3483,7 +3483,7 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -3512,7 +3512,7 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -3538,7 +3538,7 @@ MACHINE_CONFIG_START(metro_state::pangpoms)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3566,7 +3566,7 @@ MACHINE_CONFIG_START(metro_state::poitto)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3594,7 +3594,7 @@ MACHINE_CONFIG_START(metro_state::pururun)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3622,7 +3622,7 @@ MACHINE_CONFIG_START(metro_state::skyalert)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3650,7 +3650,7 @@ MACHINE_CONFIG_START(metro_state::toride2g)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3678,7 +3678,7 @@ MACHINE_CONFIG_START(metro_state::mouja)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/1024*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -3706,7 +3706,7 @@ MACHINE_CONFIG_START(metro_state::vmetal)
 	MCFG_I4100_TILEMAP_YOFFSETS(-16,-16,-16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3750,14 +3750,15 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp2:palette", blzntrnd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_blzntrnd)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_OFFSETS(-77, -21)
 
 	/* sound hardware */
 	// HUM-002 PCB Configuration : Stereo output with second speaker connector
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -3772,7 +3773,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::gstrik2)
 	blzntrnd(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	MCFG_DEVICE_MODIFY("k053936")
@@ -3784,7 +3785,7 @@ MACHINE_CONFIG_START(metro_state::gstrik2)
 	// HUM-003 PCB Configuration : Mono output only
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM2610, 16_MHz_XTAL/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3816,7 +3817,7 @@ MACHINE_CONFIG_START(metro_state::puzzlet)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, puzzlet_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL/5, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -5564,7 +5565,7 @@ void metro_state::metro_common(  )
 }
 
 
-DRIVER_INIT_MEMBER(metro_state,metro)
+void metro_state::init_metro()
 {
 	metro_common();
 	if (m_audiobank.found())
@@ -5578,16 +5579,16 @@ DRIVER_INIT_MEMBER(metro_state,metro)
 	m_busy_sndcpu = 0;
 }
 
-DRIVER_INIT_MEMBER(metro_state,karatour)
+void metro_state::init_karatour()
 {
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 }
 
 
 /* Unscramble the GFX ROMs */
-DRIVER_INIT_MEMBER(metro_state,balcube)
+void metro_state::init_balcube()
 {
 	uint8_t *ROM         = memregion("gfx1")->base();
 	const unsigned len = memregion("gfx1")->bytes();
@@ -5602,15 +5603,12 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 }
 
 
-DRIVER_INIT_MEMBER(metro_state,dharmak)
+void metro_state::init_dharmak()
 {
 	uint8_t *src = memregion( "gfx1" )->base();
-	int i;
-
-	for (i = 0; i < 0x200000; i += 4)
+	for (int i = 0; i < 0x200000; i += 4)
 	{
-		uint8_t dat;
-		dat = src[i + 1];
+		uint8_t dat = src[i + 1];
 		dat = bitswap<8>(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
 
@@ -5619,10 +5617,10 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 		src[i + 3] = dat;
 	}
 
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 }
 
-DRIVER_INIT_MEMBER(metro_state,blzntrnd)
+void metro_state::init_blzntrnd()
 {
 	metro_common();
 	m_irq_line = 1;
@@ -5631,7 +5629,7 @@ DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 }
 
-DRIVER_INIT_MEMBER(metro_state,vmetal)
+void metro_state::init_vmetal()
 {
 	metro_common();
 	m_irq_line = 1;
@@ -5639,7 +5637,7 @@ DRIVER_INIT_MEMBER(metro_state,vmetal)
 	save_item(NAME(m_essnd_gate));
 }
 
-DRIVER_INIT_MEMBER(metro_state,mouja)
+void metro_state::init_mouja()
 {
 	metro_common();
 	m_irq_line = -1;    /* split interrupt handlers */
@@ -5648,7 +5646,7 @@ DRIVER_INIT_MEMBER(metro_state,mouja)
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 }
 
-DRIVER_INIT_MEMBER(metro_state,gakusai)
+void metro_state::init_gakusai()
 {
 	metro_common();
 	m_irq_line = -1;
@@ -5656,7 +5654,7 @@ DRIVER_INIT_MEMBER(metro_state,gakusai)
 	m_blitter_bit = 3;
 }
 
-DRIVER_INIT_MEMBER(metro_state,puzzlet)
+void metro_state::init_puzzlet()
 {
 	metro_common();
 	m_irq_line = 0;
@@ -5664,9 +5662,9 @@ DRIVER_INIT_MEMBER(metro_state,puzzlet)
 	m_blitter_bit = 3;
 }
 
-DRIVER_INIT_MEMBER(metro_state,lastfortg)
+void metro_state::init_lastfortg()
 {
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 }
 
@@ -5679,56 +5677,56 @@ DRIVER_INIT_MEMBER(metro_state,lastfortg)
 ***************************************************************************/
 
 // VG420 / VG460
-GAME( 1992, karatour,  0,        karatour,  karatour,  metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, karatourj, karatour, karatour,  karatour,  metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pangpoms,  0,        pangpoms,  pangpoms,  metro_state, metro,    ROT0,   "Metro",                                           "Pang Pom's", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pangpomsm, pangpoms, pangpoms,  pangpoms,  metro_state, metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, skyalert,  0,        skyalert,  skyalert,  metro_state, metro,    ROT270, "Metro",                                           "Sky Alert", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ladykill,  0,        karatour,  ladykill,   metro_state, karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, moegonta,  ladykill, karatour,  moegonta,   metro_state, karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfort,  0,        lastfort,  lastfort,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastforte, lastfort, lastfort,  lastfero,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortea,lastfort, lastfort,  lastfero,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_state, lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatour,  0,        karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "The Karate Tournament", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatourj, karatour, karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "The Karate Tournament (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pangpoms,  0,        pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro",                                           "Pang Pom's", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pangpomsm, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, skyalert,  0,        skyalert,  skyalert,   metro_state, init_metro,    ROT270, "Metro",                                           "Sky Alert", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ladykill,  0,        karatour,  ladykill,   metro_state, init_karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, moegonta,  ladykill, karatour,  moegonta,   metro_state, init_karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfort,  0,        lastfort,  lastfort,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastforte, lastfort, lastfort,  lastfero,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortea,lastfort, lastfort,  lastfero,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_state, init_metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_state, init_lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)", MACHINE_SUPPORTS_SAVE )
 
 // MTR5260 / MTR527
-GAME( 1993, poitto,    0,        poitto,    poitto,     metro_state, metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dharma,    0,        dharma,    dharma,     metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dharmaj,   dharma,   dharma,    dharma,     metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_state, metro,    ROT0,   "Metro",                                           "Toride II (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_state, metro,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_state, metro,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, metro,    ROT0,   "Metro / Banpresto",                               "Pururun", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, metro,    ROT0,   "Metro / Banpresto",                               "Puzzli",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, poitto,    0,        poitto,    poitto,     metro_state, init_metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharma,    0,        dharma,    dharma,     metro_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharmaj,   dharma,   dharma,    dharma,     metro_state, init_metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_state, init_metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_state, init_metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_state, init_metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_state, init_metro,    ROT0,   "Metro",                                           "Toride II (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_state, init_metro,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_state, init_metro,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_state, init_karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // ? with additional gfx data scramble (probably MTR5260 based)
-GAME( 1995, msgogo,    0,        msgogo,    msgogo,     metro_state, balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, daitorida, daitorid, daitoa,    daitorid,   metro_state, balcube,  ROT0,   "Metro",                                           "Daitoride (YMF278B version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, balcube,   0,        balcube,   balcube,    metro_state, balcube,  ROT0,   "Metro",                                           "Bal Cube", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bangball,  0,        bangball,  bangball,   metro_state, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, batlbubl,  bangball, batlbubl,  batlbubl,   metro_state, balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1995, msgogo,    0,        msgogo,    msgogo,     metro_state, init_balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, daitorida, daitorid, daitoa,    daitorid,   metro_state, init_balcube,  ROT0,   "Metro",                                           "Daitoride (YMF278B version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, balcube,   0,        balcube,   balcube,    metro_state, init_balcube,  ROT0,   "Metro",                                           "Bal Cube", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bangball,  0,        bangball,  bangball,   metro_state, init_balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, batlbubl,  bangball, batlbubl,  batlbubl,   metro_state, init_balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 
 // VG330 / VG340 / VG410
-GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, mouja,     0,        mouja,     mouja,      metro_state, mouja,    ROT0,   "Etona",                                           "Mouja (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gakusai,   0,        gakusai,   gakusai,    metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, gakusai2,  0,        gakusai2,  gakusai,    metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   metro_state, init_gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    metro_state, init_gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, mouja,     0,        mouja,     mouja,      metro_state, init_mouja,    ROT0,   "Etona",                                           "Mouja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gakusai,   0,        gakusai,   gakusai,    metro_state, init_gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gakusai2,  0,        gakusai2,  gakusai,    metro_state, init_gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // HUM-002 / HUM-003
-GAME( 1994, blzntrnd,  0,        blzntrnd,  blzntrnd,   metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, gstrik2,   0,        gstrik2,   gstrik2,    metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, gstrik2j,  gstrik2,  gstrik2,   gstrik2,    metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
+GAME( 1994, blzntrnd,  0,        blzntrnd,  blzntrnd,   metro_state, init_blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, gstrik2,   0,        gstrik2,   gstrik2,    metro_state, init_blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, gstrik2j,  gstrik2,  gstrik2,   gstrik2,    metro_state, init_blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
 
 // ES-9309B-B
-GAME( 1995, vmetal,    0,        vmetal,    vmetal,     metro_state, vmetal,   ROT90,  "Excellent System",                                "Varia Metal", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, vmetaln,   vmetal,   vmetal,    vmetal,     metro_state, vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, vmetal,    0,        vmetal,    vmetal,     metro_state, init_vmetal,   ROT90,  "Excellent System",                                "Varia Metal", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, vmetaln,   vmetal,   vmetal,    vmetal,     metro_state, init_vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)", MACHINE_SUPPORTS_SAVE )
 
 // VG2200
-GAME( 2000, puzzlet,   0,        puzzlet,   puzzlet,    metro_state, puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, puzzlet,   0,        puzzlet,   puzzlet,    metro_state, init_puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

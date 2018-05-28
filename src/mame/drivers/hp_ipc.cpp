@@ -737,7 +737,7 @@ static void hp_ipc_floppies(device_slot_interface &device)
  *  1   Real-time clock
  */
 MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(15'920'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 15.92_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_outer)
 
 	MCFG_HP1LL3_ADD("gpu")
@@ -746,22 +746,22 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 
 	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
 	// XXX when floppy code correctly handles 600 rpm drives.
-	MCFG_WD2797_ADD("fdc", XTAL(2'000'000))
+	MCFG_DEVICE_ADD("fdc", WD2797, 2_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_5))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","hp_ipc")
 
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_1))
 //  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_6))
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
+	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, 15.92_MHz_XTAL / 2)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_2))
 	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_7))
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
 
-	MCFG_DEVICE_ADD("hpib" , TMS9914 , XTAL(4000000))
+	MCFG_DEVICE_ADD("hpib", TMS9914, 4_MHz_XTAL)
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))
 	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , dio_w))
 	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
@@ -803,7 +803,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	// ver.period = 16.7ms (~60 hz)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 512, 278, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 512, 278, 0, 256)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -823,7 +823,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 640, 480, 0, 400)
+	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 640, 480, 0, 400)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -858,6 +858,6 @@ ROM_END
 
 #define rom_hp9808a rom_hp_ipc
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT           STATE          INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1985, hp_ipc,     0,       0,      hp_ipc,        hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, hp9808a,    0,       0,      hp9808a,       hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                            FLAGS
+COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, hp9808a, 0,      0,      hp9808a, hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)

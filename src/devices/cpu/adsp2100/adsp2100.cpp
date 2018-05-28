@@ -418,7 +418,7 @@ void adsp21xx_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-2>();
+	m_cache = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = has_space(AS_IO) ? &space(AS_IO) : nullptr;
 
@@ -806,7 +806,7 @@ inline void adsp21xx_device::program_write(uint32_t addr, uint32_t data)
 
 inline uint32_t adsp21xx_device::opcode_read()
 {
-	return m_direct->read_dword(m_pc);
+	return m_cache->read_dword(m_pc);
 }
 
 

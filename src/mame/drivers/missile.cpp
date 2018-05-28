@@ -361,56 +361,31 @@ class missile_state : public driver_device
 {
 public:
 	missile_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_videoram(*this, "videoram"),
-		m_watchdog(*this, "watchdog"),
-		m_pokey(*this, "pokey"),
-		m_in0(*this, "IN0"),
-		m_in1(*this, "IN1"),
-		m_r10(*this, "R10"),
-		m_r8(*this, "R8"),
-		m_track0_x(*this, "TRACK0_X"),
-		m_track0_y(*this, "TRACK0_Y"),
-		m_track1_x(*this, "TRACK1_X"),
-		m_track1_y(*this, "TRACK1_Y"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_videoram(*this, "videoram")
+		, m_watchdog(*this, "watchdog")
+		, m_pokey(*this, "pokey")
+		, m_in0(*this, "IN0")
+		, m_in1(*this, "IN1")
+		, m_r10(*this, "R10")
+		, m_r8(*this, "R8")
+		, m_track0_x(*this, "TRACK0_X")
+		, m_track0_y(*this, "TRACK0_Y")
+		, m_track1_x(*this, "TRACK1_X")
+		, m_track1_y(*this, "TRACK1_Y")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_leds(*this, "led%u", 0U)
 	{ }
-
-	required_device<m6502_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_device<watchdog_timer_device> m_watchdog;
-	optional_device<pokey_device> m_pokey;
-	required_ioport m_in0;
-	required_ioport m_in1;
-	required_ioport m_r10;
-	required_ioport m_r8;
-	required_ioport m_track0_x;
-	required_ioport m_track0_y;
-	required_ioport m_track1_x;
-	required_ioport m_track1_y;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	const uint8_t *m_mainrom;
-	const uint8_t *m_writeprom;
-	emu_timer *m_irq_timer;
-	emu_timer *m_cpu_timer;
-	uint8_t m_irq_state;
-	uint8_t m_ctrld;
-	uint8_t m_flipscreen;
-	uint64_t m_madsel_lastcycles;
 
 	DECLARE_WRITE8_MEMBER(missile_w);
 	DECLARE_READ8_MEMBER(missile_r);
 	DECLARE_WRITE8_MEMBER(bootleg_w);
 	DECLARE_READ8_MEMBER(bootleg_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	DECLARE_DRIVER_INIT(missilem);
-	DECLARE_DRIVER_INIT(suprmatk);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void init_missilem();
+	void init_suprmatk();
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
@@ -428,6 +403,35 @@ public:
 	void missilea(machine_config &config);
 	void bootleg_main_map(address_map &map);
 	void main_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<m6502_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<watchdog_timer_device> m_watchdog;
+	optional_device<pokey_device> m_pokey;
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_r10;
+	required_ioport m_r8;
+	required_ioport m_track0_x;
+	required_ioport m_track0_y;
+	required_ioport m_track1_x;
+	required_ioport m_track1_y;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	output_finder<2> m_leds;
+
+	const uint8_t *m_mainrom;
+	const uint8_t *m_writeprom;
+	emu_timer *m_irq_timer;
+	emu_timer *m_cpu_timer;
+	uint8_t m_irq_state;
+	uint8_t m_ctrld;
+	uint8_t m_flipscreen;
+	uint64_t m_madsel_lastcycles;
 };
 
 
@@ -529,6 +533,8 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 
 void missile_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* initialize globals */
 	m_mainrom = memregion("maincpu")->base();
 	m_writeprom = memregion("proms")->base();
@@ -742,8 +748,8 @@ WRITE8_MEMBER(missile_state::missile_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 		machine().bookkeeping().coin_counter_w(1, data & 0x10);
 		machine().bookkeeping().coin_counter_w(2, data & 0x08);
-		output().set_led_value(1, ~data & 0x04);
-		output().set_led_value(0, ~data & 0x02);
+		m_leds[1] = BIT(~data, 2);
+		m_leds[0] = BIT(~data, 1);
 		m_ctrld = data & 1;
 	}
 
@@ -855,8 +861,8 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 		machine().bookkeeping().coin_counter_w(1, data & 0x10);
 		machine().bookkeeping().coin_counter_w(2, data & 0x08);
-		output().set_led_value(1, ~data & 0x04);
-		output().set_led_value(0, ~data & 0x02);
+		m_leds[1] = BIT(~data, 2);
+		m_leds[0] = BIT(~data, 1);
 		m_ctrld = data & 1;
 	}
 
@@ -1159,7 +1165,7 @@ MACHINE_CONFIG_START(missile_state::missile)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("R8"))
@@ -1393,12 +1399,11 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(missile_state,suprmatk)
+void missile_state::init_suprmatk()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 	{
 		rom[0x7CC0+i] = rom[0x8000+i];
 		rom[0x5440+i] = rom[0x8040+i];
@@ -1467,7 +1472,7 @@ DRIVER_INIT_MEMBER(missile_state,suprmatk)
 	}
 }
 
-DRIVER_INIT_MEMBER(missile_state,missilem)
+void missile_state::init_missilem()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("maincpu")->base();
@@ -1494,17 +1499,17 @@ DRIVER_INIT_MEMBER(missile_state,missilem)
  *
  *************************************/
 
-GAME( 1980, missile,  0,       missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile2, missile, missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile1, missile, missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state, suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,        0, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile,  0,       missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile2, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile1, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state,  init_suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,     empty_init, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
 
 /* the following bootleg has extremely similar program ROMs to missile1, but has different unknown sound hardware and 2 more ROMs */
-GAME( 1981, missilea, missile, missilea, missile, missile_state,        0, ROT0, "bootleg (Ugames)", "Missile Attack", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, missilea, missile, missilea, missile, missile_state,     empty_init, ROT0, "bootleg (Ugames)", "Missile Attack", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* the following bootlegs are on different hardware and don't work */
-GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombata, missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombats, missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
-GAME( 2005, missilem, missile, missilea, missileb, missile_state, missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )
+GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombata, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombats, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
+GAME( 2005, missilem, missile, missilea, missileb, missile_state, init_missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )

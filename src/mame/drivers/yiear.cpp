@@ -134,7 +134,7 @@ WRITE_LINE_MEMBER(yiear_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
 {
 	if (m_yiear_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -263,7 +263,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( yiear )
+static GFXDECODE_START( gfx_yiear )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 1 )
 GFXDECODE_END
@@ -299,12 +299,12 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, yiear_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yiear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yiear)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
@@ -369,5 +369,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, empty_init, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, empty_init, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )

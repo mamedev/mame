@@ -566,7 +566,16 @@ void arm7_cpu_device::postload()
 void arm7_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+
+	if(m_program->endianness() == ENDIANNESS_LITTLE) {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	} else {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
 
 	save_item(NAME(m_insn_prefetch_depth));
 	save_item(NAME(m_insn_prefetch_count));
@@ -751,7 +760,7 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 		{
 			break;
 		}
-		uint32_t op = m_direct->read_dword(pc);
+		uint32_t op = m_pr32(pc);
 		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
 		m_insn_prefetch_buffer[index] = op;
 		m_insn_prefetch_address[index] = pc;

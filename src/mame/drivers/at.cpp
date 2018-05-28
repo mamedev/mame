@@ -111,13 +111,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(at);
-	DECLARE_DRIVER_INIT(atpci);
-	DECLARE_DRIVER_INIT(megapcpla);
+	void init_at();
+	void init_atpci();
 	DECLARE_READ16_MEMBER(ps1_unk_r);
 	DECLARE_WRITE16_MEMBER(ps1_unk_w);
 	DECLARE_READ8_MEMBER(ps1_portb_r);
-	DECLARE_MACHINE_START(vrom_fix);
 
 	void init_at_common(int xmsbase);
 	uint16_t m_ps1_reg[2];
@@ -127,7 +125,6 @@ public:
 	void ct386sx(machine_config &config);
 	void xb42639(machine_config &config);
 	void at486l(machine_config &config);
-	void megapcpla(machine_config &config);
 	void comportii(machine_config &config);
 	void comportiii(machine_config &config);
 	void ibm5162(machine_config &config);
@@ -140,7 +137,6 @@ public:
 	void at386sx(machine_config &config);
 	void pc40iii(machine_config &config);
 	void atvga(machine_config &config);
-	void ibmps1(machine_config &config);
 	void at386(machine_config &config);
 	void ews286(machine_config &config);
 
@@ -158,11 +154,25 @@ public:
 	void ps1_16_io(address_map &map);
 };
 
+class at_vrom_fix_state : public at_state
+{
+public:
+	using at_state::at_state;
+
+	void init_megapcpla();
+
+	void ibmps1(machine_config &config);
+	void megapcpla(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+};
+
 class megapc_state : public driver_device
 {
 public:
-	megapc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	megapc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_wd7600(*this, "wd7600"),
 		m_isabus(*this, "isabus"),
@@ -175,8 +185,8 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_DRIVER_INIT(megapc);
-	DECLARE_DRIVER_INIT(megapcpl);
+	void init_megapc();
+	void init_megapcpl();
 
 	DECLARE_READ16_MEMBER( wd7600_ior );
 	DECLARE_WRITE16_MEMBER( wd7600_iow );
@@ -295,21 +305,21 @@ void at_state::ficpio_io(address_map &map)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
-DRIVER_INIT_MEMBER(megapc_state, megapc)
+void megapc_state::init_megapc()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x19145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(megapc_state, megapcpl)
+void megapc_state::init_megapcpl()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x187b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(at_state, megapcpla)
+void at_vrom_fix_state::init_megapcpla()
 {
 	uint8_t* ROM = memregion("bios")->base();
 
@@ -387,18 +397,20 @@ void at_state::init_at_common(int xmsbase)
 	}
 }
 
-DRIVER_INIT_MEMBER(at_state,at)
+void at_state::init_at()
 {
 	init_at_common(0xa0000);
 }
 
-DRIVER_INIT_MEMBER(at_state,atpci)
+void at_state::init_atpci()
 {
 	init_at_common(0x100000);
 }
 
-MACHINE_START_MEMBER(at_state,vrom_fix)
+void at_vrom_fix_state::machine_start()
 {
+	at_state::machine_start();
+
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_bank(0xc0000, 0xcffff, "vrom_bank");
 	membank("vrom_bank")->set_base(machine().root_device().memregion("bios")->base());
@@ -423,7 +435,7 @@ static void pci_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(12'000'000)/2 /*6000000*/)
+	MCFG_DEVICE_ADD("maincpu", I80286, 12_MHz_XTAL / 2 /*6000000*/)
 	MCFG_DEVICE_PROGRAM_MAP(at16_map)
 	MCFG_DEVICE_IO_MAP(at16_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -449,13 +461,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::ibm5170a)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/2)
+	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ews286)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/2) // Exact crystal needs to be verified, 8 MHz according to specification
+	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 2) // Exact crystal needs to be verified, 8 MHz according to specification
 
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K) // From pictures but also with a 3.5" as second floppy
@@ -480,11 +492,10 @@ MACHINE_CONFIG_START(at_state::ibm5162)
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "cga", false)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(at_state::ibmps1)
+MACHINE_CONFIG_START(at_vrom_fix_state::ibmps1)
 	ibm5170(config);
-	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(10'000'000))
+	MCFG_DEVICE_CLOCK(10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(at16l_map)
 	MCFG_DEVICE_IO_MAP(ps1_16_io)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -600,7 +611,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::pc30iii)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
+	MCFG_DEVICE_CLOCK(6000000) // should be 24_MHz_XTAL / 2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be ATI EGA Wonder 800+
 MACHINE_CONFIG_END
@@ -609,18 +620,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::pc40iii)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
+	MCFG_DEVICE_CLOCK(6000000) // should be 24_MHz_XTAL / 2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megapc_state::megapc)
-	MCFG_DEVICE_ADD("maincpu", I386SX, XTAL(50'000'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", I386SX, 50_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(megapc_map)
 	MCFG_DEVICE_IO_MAP(megapc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
-	MCFG_WD7600_ADD("wd7600",XTAL(50'000'000) / 2, ":maincpu", ":isa", ":bios", ":keybc")
+	MCFG_WD7600_ADD("wd7600", 50_MHz_XTAL / 2, ":maincpu", ":isa", ":bios", ":keybc")
 	MCFG_WD7600_HOLD(WRITELINE(*this, megapc_state, wd7600_hold));
 	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
 	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
@@ -663,7 +674,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	// ISA cards
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, 12_MHz_XTAL)
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE("wd7600", wd7600_device, kbrst_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE("wd7600", wd7600_device, gatea20_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("wd7600", wd7600_device, irq01_w))
@@ -680,7 +691,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,15M,16M")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -699,12 +710,11 @@ MACHINE_CONFIG_START(megapc_state::megapcpl)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(at_state::megapcpla)
+MACHINE_CONFIG_START(at_vrom_fix_state::megapcpla)
 	MCFG_DEVICE_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
 	MCFG_DEVICE_PROGRAM_MAP(at32l_map)
 	MCFG_DEVICE_IO_MAP(at32_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -778,7 +788,7 @@ MACHINE_CONFIG_END
 // Compaq Portable III
 MACHINE_CONFIG_START(at_state::comportiii)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, 48_MHz_XTAL/4 /*12000000*/)
+	MCFG_DEVICE_ADD("maincpu", I80286, 48_MHz_XTAL / 4 /*12000000*/)
 	MCFG_DEVICE_PROGRAM_MAP(at16_map)
 	MCFG_DEVICE_IO_MAP(at16_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -808,7 +818,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::comportii)
 	ibm5170(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(48_MHz_XTAL/6)
+	MCFG_DEVICE_CLOCK(48_MHz_XTAL / 6)
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_360K)
 	MCFG_DEVICE_MODIFY("isa4")
@@ -1422,53 +1432,53 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME       PARENT   COMPAT   MACHINE    INIT  INPUT          STATE    COMPANY                              FULLNAME                FLAGS
-COMP ( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170", MACHINE_NOT_WORKING )
-COMP ( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
-COMP ( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,    at_state,      at,      "International Business Machines",  "IBM PC/XT-286 5162", MACHINE_NOT_WORKING )
-COMP ( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,    at_state,      at,      "International Business Machines",  "IBM PS/1 (Spanish)", MACHINE_NOT_WORKING )
-COMP ( 1987, at,        ibm5170, 0,       ibm5162,   0,    at_state,      at,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1987, atvga,     ibm5170, 0,       atvga,     0,    at_state,      at,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
-COMP ( 1988, at386,     ibm5170, 0,       at386,     0,    at_state,      at,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, at386sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, at486,     ibm5170, 0,       at486,     0,    at_state,      at,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, neat,      ibm5170, 0,       neat,      0,    at_state,      at,      "<generic>",  "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, ec1842,    ibm5150, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1842", MACHINE_NOT_WORKING )
-COMP ( 1993, ec1849,    ibm5170, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1849", MACHINE_NOT_WORKING )
-COMP ( 1993, megapc,    0,       0,       megapc,    0,    megapc_state,  megapc,   "Amstrad plc", "MegaPC", MACHINE_NOT_WORKING )
-COMP ( 199?, megapcpl,  megapc,  0,       megapcpl,  0,    megapc_state,  megapcpl, "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
-COMP ( 199?, megapcpla, megapc,  0,       megapcpla, 0,    at_state,      megapcpla,"Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
-COMP ( 1989, pc2386,    ibm5170, 0,       at386l,    0,    at_state,      at,      "Amstrad plc", "Amstrad PC2386", MACHINE_NOT_WORKING )
-COMP ( 1991, aprfte,    ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1991, ftsserv,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
-COMP ( 1992, aprpand,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
-COMP ( 1990, aplanst,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Krypton Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, aplannb,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Novell Remote Boot)", MACHINE_NOT_WORKING )
-COMP ( 1992, aplscar,   ibm5170, 0,       at486l,    0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1992, aplsbon,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, xb42663,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 300 (Rev D,E & F Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, qi600,     ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, qi900,     ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, apvxft,    ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot VX FT server", MACHINE_NOT_WORKING )
-COMP ( 1991, apxenls3,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1993, apxlsam,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1987, apxeni,    ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-i 386 (Leopard Motherboard)" , MACHINE_NOT_WORKING )
-COMP ( 1989, xb42639,   ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 286)" , MACHINE_NOT_WORKING )
-COMP ( 1990, xb42639a,  ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 286)" , MACHINE_NOT_WORKING )
-COMP ( 1989, xb42664,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 386)" , MACHINE_NOT_WORKING )
-COMP ( 1990, xb42664a,  ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
-COMP ( 1993, apxena1,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1993, apxenp2,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
-COMP ( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
-COMP ( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
-COMP ( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,    at_state,      atpci,   "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
-COMP ( 1985, k286i,     ibm5170, 0,       k286i,     0,    at_state,      at,      "Kaypro",   "286i", MACHINE_NOT_WORKING )
-COMP ( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )
-COMP ( 199?, mbc28,     ibm5170, 0,       at386sx,   0,    at_state,      at,      "Sanyo",  "MBC-28", MACHINE_NOT_WORKING )
-COMP ( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,    at_state,      at,      "Siemens",  "PCD-2", MACHINE_NOT_WORKING )
-COMP ( 1987, comportii ,ibm5170, 0,       comportii, 0,    at_state,      at,      "Compaq",   "Portable II", MACHINE_NOT_WORKING )
-COMP ( 1987, comportiii,ibm5170, 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
-COMP ( 1986, ews286,    ibm5170, 0,       ews286,    0,    at_state,      at,      "Ericsson", "Ericsson WS286", MACHINE_NOT_WORKING )
-//COMP ( 1988, nws286,    ibm5170,  0,      ews286,    0,    at_state,      at,      "Nokia Data", "Nokia Data WS286", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT  CLASS         INIT            COMPANY        FULLNAME                FLAGS
+COMP( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,     at_state,     init_at,        "International Business Machines",  "IBM PC/AT 5170", MACHINE_NOT_WORKING )
+COMP( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,     at_state,     init_at,        "International Business Machines",  "IBM PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
+COMP( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "International Business Machines",  "IBM PC/XT-286 5162", MACHINE_NOT_WORKING )
+COMP( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "IBM PS/1 (Spanish)", MACHINE_NOT_WORKING )
+COMP( 1987, at,        ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<generic>",   "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1987, atvga,     ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<generic>",   "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
+COMP( 1988, at386,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<generic>",   "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,     at_state,     init_at,        "<generic>",   "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1988, at386sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<generic>",   "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1990, at486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "<generic>",   "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1989, neat,      ibm5170, 0,       neat,      0,     at_state,     init_at,        "<generic>",   "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1989, ec1842,    ibm5150, 0,       ec1842,    0,     at_state,     init_at,        "<unknown>",   "EC-1842", MACHINE_NOT_WORKING )
+COMP( 1993, ec1849,    ibm5170, 0,       ec1842,    0,     at_state,     init_at,        "<unknown>",   "EC-1849", MACHINE_NOT_WORKING )
+COMP( 1993, megapc,    0,       0,       megapc,    0,     megapc_state, init_megapc,    "Amstrad plc", "MegaPC", MACHINE_NOT_WORKING )
+COMP( 199?, megapcpl,  megapc,  0,       megapcpl,  0,     megapc_state, init_megapcpl,  "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
+COMP( 199?, megapcpla, megapc,  0,       megapcpla, 0,     at_vrom_fix_state, init_megapcpla, "Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
+COMP( 1989, pc2386,    ibm5170, 0,       at386l,    0,     at_state,     init_at,        "Amstrad plc", "Amstrad PC2386", MACHINE_NOT_WORKING )
+COMP( 1991, aprfte,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1991, ftsserv,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
+COMP( 1992, aprpand,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
+COMP( 1990, aplanst,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot LANstation (Krypton Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1990, aplannb,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot LANstation (Novell Remote Boot)", MACHINE_NOT_WORKING )
+COMP( 1992, aplscar,   ibm5170, 0,       at486l,    0,     at_state,     init_at,        "Apricot",     "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1992, aplsbon,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1988, xb42663,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 300 (Rev D,E & F Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1988, qi600,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1990, qi900,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1989, apvxft,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot VX FT server", MACHINE_NOT_WORKING )
+COMP( 1991, apxenls3,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1993, apxlsam,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1987, apxeni,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-i 386 (Leopard Motherboard)" , MACHINE_NOT_WORKING )
+COMP( 1989, xb42639,   ibm5170, 0,       xb42639,   0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus I Motherboard 286)" , MACHINE_NOT_WORKING )
+COMP( 1990, xb42639a,  ibm5170, 0,       xb42639,   0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus II Motherboard 286)" , MACHINE_NOT_WORKING )
+COMP( 1989, xb42664,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus I Motherboard 386)" , MACHINE_NOT_WORKING )
+COMP( 1990, xb42664a,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
+COMP( 1993, apxena1,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1993, apxenp2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
+COMP( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
+COMP( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
+COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
+COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
+COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
+COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING )
+COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
+COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )
+COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
+COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
+//COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )

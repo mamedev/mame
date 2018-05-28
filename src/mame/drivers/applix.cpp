@@ -134,7 +134,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
-	DECLARE_DRIVER_INIT(applix);
+	void init_applix();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
@@ -844,9 +844,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 
 MACHINE_CONFIG_START(applix_state::applix)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'000'000) / 4) // MC68000-P10 @ 7.5 MHz
+	MCFG_DEVICE_ADD("maincpu", M68000, 30_MHz_XTAL / 4) // MC68000-P10 @ 7.5 MHz
 	MCFG_DEVICE_PROGRAM_MAP(applix_mem)
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(16'000'000) / 2) // Z80H
+	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 2) // Z80H
 	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
 	MCFG_DEVICE_IO_MAP(subcpu_io)
 	MCFG_DEVICE_ADD("kbdcpu", I8051, 11060250)
@@ -870,24 +870,24 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_PALETTE_INIT_OWNER(applix_state, applix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ldac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
 	MCFG_DEVICE_ADD("rdac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(30'000'000) / 16) // MC6545 @ 1.875 MHz
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 30_MHz_XTAL / 16) // MC6545 @ 1.875 MHz
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, applix_state, vsync_w))
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(30'000'000) / 4 / 10) // VIA uses 68000 E clock
+	MCFG_DEVICE_ADD("via6522", VIA6522, 30_MHz_XTAL / 4 / 10) // VIA uses 68000 E clock
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, applix_state, applix_pb_r))
 	// in CB1 kbd clk
 	// in CA2 vsync
@@ -905,7 +905,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_WD1772_ADD("fdc", XTAL(16'000'000) / 2) //connected to Z80H clock pin
+	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2) //connected to Z80H clock pin
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", applix_floppies, "35dd", applix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", applix_floppies, "35dd", applix_state::floppy_formats)
@@ -947,7 +947,7 @@ ROM_START( applix )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(applix_state, applix)
+void applix_state::init_applix()
 {
 	uint8_t *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
@@ -956,8 +956,8 @@ DRIVER_INIT_MEMBER(applix_state, applix)
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY           FULLNAME       FLAGS
-COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME       FLAGS
+COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, "Applix Pty Ltd", "Applix 1616", 0 )
 
 
 

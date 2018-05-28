@@ -345,8 +345,8 @@ void i8085a_cpu_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
-	m_opcode_direct = has_space(AS_OPCODES) ? space(AS_OPCODES).direct<0>() : m_direct;
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+	m_opcode_cache = has_space(AS_OPCODES) ? space(AS_OPCODES).cache<0, 0, ENDIANNESS_LITTLE>() : m_cache;
 	m_io = &space(AS_IO);
 
 	/* resolve callbacks */
@@ -669,21 +669,21 @@ u8 i8085a_cpu_device::get_rim_value()
 // memory access
 u8 i8085a_cpu_device::read_arg()
 {
-	return m_direct->read_byte(m_PC.w.l++);
+	return m_cache->read_byte(m_PC.w.l++);
 }
 
 PAIR i8085a_cpu_device::read_arg16()
 {
 	PAIR p;
-	p.b.l = m_direct->read_byte(m_PC.w.l++);
-	p.b.h = m_direct->read_byte(m_PC.w.l++);
+	p.b.l = m_cache->read_byte(m_PC.w.l++);
+	p.b.h = m_cache->read_byte(m_PC.w.l++);
 	return p;
 }
 
 u8 i8085a_cpu_device::read_op()
 {
 	set_status(0xa2); // instruction fetch
-	return m_opcode_direct->read_byte(m_PC.w.l++);
+	return m_opcode_cache->read_byte(m_PC.w.l++);
 }
 
 u8 i8085a_cpu_device::read_mem(u32 a)

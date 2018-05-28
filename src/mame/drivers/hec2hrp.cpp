@@ -414,7 +414,7 @@ static void minidisc_floppies(device_slot_interface &device)
 MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 /******************************************************************************/
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_DEVICE_IO_MAP(hec2hrp_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
@@ -449,7 +449,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_DEVICE_IO_MAP(hec2hrp_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
@@ -489,13 +489,13 @@ static void hector_floppies(device_slot_interface &device)
 MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_DEVICE_IO_MAP(hec2mx40_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 
 	/* Disc II unit */
-	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_DEVICE_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
@@ -533,7 +533,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 /*****************************************************************************/
 /* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_DEVICE_IO_MAP(hec2hrx_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
-	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_DEVICE_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 /*****************************************************************************/
 // minidisc
 /* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_DEVICE_IO_MAP(hec2mdhrx_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
@@ -586,7 +586,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* Mini Disc */
-	MCFG_FD1793_ADD("wd179x", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("wd179x", FD1793, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats)
 
@@ -619,7 +619,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_DEVICE_IO_MAP(hec2mx80_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
@@ -627,7 +627,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
-	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_DEVICE_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
@@ -737,11 +737,11 @@ ROM_END
 
 /* Driver */
 
-/*  YEAR    NAME    PARENT      COMPAT      MACHINE     INPUT    STATE          INIT  COMPANY        FULLNAME                  FLAGS */
-COMP(1983,  hec2hrp,    0,      interact,   hec2hrp,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
-COMP(1980,  victor,     hec2hrp, 0,         hec2hrp,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Victor",                 MACHINE_IMPERFECT_SOUND)
-COMP(1983,  hec2hr,     hec2hrp, 0,         hec2hr,     hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
-COMP(1984,  hec2hrx,    hec2hrp, 0,         hec2hrx,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mdhrx,  hec2hrp, 0,         hec2mdhrx,  hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mx80,   hec2hrp, 0,         hec2mx80,   hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector MX 80c + Disc2",  MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mx40,   hec2hrp, 0,         hec2mx40,   hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector MX 40c + Disc2",  MACHINE_IMPERFECT_SOUND)
+/*  YEAR   NAME       PARENT   COMPAT    MACHINE    INPUT    CLASS          INIT        COMPANY       FULLNAME                  FLAGS */
+COMP(1983, hec2hrp,   0,       interact, hec2hrp,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
+COMP(1980, victor,    hec2hrp, 0,        hec2hrp,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Victor",                 MACHINE_IMPERFECT_SOUND)
+COMP(1983, hec2hr,    hec2hrp, 0,        hec2hr,    hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
+COMP(1984, hec2hrx,   hec2hrp, 0,        hec2hrx,   hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mdhrx, hec2hrp, 0,        hec2mdhrx, hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mx80,  hec2hrp, 0,        hec2mx80,  hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector MX 80c + Disc2",  MACHINE_IMPERFECT_SOUND)
+COMP(1985, hec2mx40,  hec2hrp, 0,        hec2mx40,  hec2hrp, hec2hrp_state, empty_init, "Micronique", "Hector MX 40c + Disc2",  MACHINE_IMPERFECT_SOUND)

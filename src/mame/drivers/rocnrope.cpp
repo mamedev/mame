@@ -187,7 +187,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( rocnrope )
+static GFXDECODE_START( gfx_rocnrope )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rocnrope_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rocnrope)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rocnrope)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
@@ -376,7 +376,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
+void rocnrope_state::init_rocnrope()
 {
 	memregion("maincpu")->base()[0x703d] = 0x98^0x22; // HACK: fix one instruction
 }
@@ -388,6 +388,6 @@ DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
  *
  *************************************/
 
-GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, 0,        ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, empty_init,    ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )

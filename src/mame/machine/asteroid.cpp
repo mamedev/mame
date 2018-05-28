@@ -19,21 +19,21 @@ INTERRUPT_GEN_MEMBER(asteroid_state::asteroid_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (!(ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::asterock_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if ((ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::llander_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (ioport("IN0")->read() & 0x02)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(asteroid_state::cocktail_inv_w)

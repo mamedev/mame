@@ -14,7 +14,9 @@
 #include "debugcpu.h"
 #include "debugger.h"
 
+#include <algorithm>
 #include <ctype.h>
+#include <tuple>
 
 
 //**************************************************************************
@@ -153,24 +155,26 @@ void debug_view_memory::enumerate_sources()
 		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region.second.get())));
 	}
 
-	// finally add all global array symbols
-	for (int itemnum = 0; itemnum < 10000; itemnum++)
+	// finally add all global array symbols in alphabetical order
+	std::vector<std::tuple<std::string, void *, u32, u32> > itemnames;
+	itemnames.reserve(machine().save().registration_count());
+
+	for (int itemnum = 0; itemnum < machine().save().registration_count(); itemnum++)
 	{
-		// stop when we run out of items
 		u32 valsize, valcount;
 		void *base;
-		const char *itemname = machine().save().indexed_item(itemnum, base, valsize, valcount);
-		if (itemname == nullptr)
-			break;
+		std::string name_string(machine().save().indexed_item(itemnum, base, valsize, valcount));
 
 		// add pretty much anything that's not a timer (we may wish to cull other items later)
 		// also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
-		if (strncmp(itemname, "timer/", 6))
-		{
-			name.assign(itemname);
-			m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), base, valsize, valcount)));
-		}
+		if (strncmp(name_string.c_str(), "timer/", 6))
+			itemnames.emplace_back(std::move(name_string), base, valsize, valcount);
 	}
+
+	std::sort(itemnames.begin(), itemnames.end(), [] (auto const &x, auto const &y) { return std::get<0>(x) < std::get<0>(y); });
+
+	for (auto const &item : itemnames)
+		m_source_list.append(*global_alloc(debug_view_memory_source(std::get<0>(item).c_str(), std::get<1>(item), std::get<2>(item), std::get<3>(item))));
 
 	// reset the source to a known good entry
 	set_source(*m_source_list.first());

@@ -86,7 +86,7 @@ READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
@@ -322,7 +322,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( blueprnt )
+static GFXDECODE_START( gfx_blueprnt )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,     0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     128*4,   1 )
 GFXDECODE_END
@@ -373,12 +373,12 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blueprnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blueprnt)
 	MCFG_PALETTE_ADD("palette", 128*4+8)
 	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -503,7 +503,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, saturnzi,  0,        blueprnt, saturn,   blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, grasspin,  0,        grasspin, grasspin, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major
+GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, saturnzi,  0,        blueprnt, saturn,   blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, grasspin,  0,        grasspin, grasspin, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major

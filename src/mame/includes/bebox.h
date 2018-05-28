@@ -67,7 +67,7 @@ public:
 	uint16_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];
 	uint32_t m_scsi53c810_data[0x100 / 4];
-	DECLARE_DRIVER_INIT(bebox);
+	void init_bebox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);

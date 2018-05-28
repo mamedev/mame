@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("z80", INPUT_LINE_IRQ0))
 
 	/* fdc */
-	MCFG_FD1771_ADD("fdc", 4_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", FD1771, 4_MHz_XTAL / 2)
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, proteus_state, motor_w))
 	MCFG_WD_FDC_FORCE_READY
 
@@ -427,5 +427,5 @@ ROM_START(proteus)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY     FULLNAME                     FLAGS */
-COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, 0,    "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME                     FLAGS */
+COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, empty_init, "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )

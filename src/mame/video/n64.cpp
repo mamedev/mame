@@ -95,7 +95,7 @@ void n64_state::video_start()
 
 	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
-	m_rdp->set_n64_periphs(machine().device<n64_periphs>("rcp"));
+	m_rdp->set_n64_periphs(m_rcp_periphs);
 
 	m_rdp->m_blender.set_machine(machine());
 	m_rdp->m_blender.set_processor(m_rdp);

@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
@@ -563,12 +563,12 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_FD1771_ADD("wd1771", XTAL(2'000'000) / 2)
+	MCFG_DEVICE_ADD("wd1771", FD1771, 2_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
@@ -637,8 +637,8 @@ ROM_START( z80netf )
 	ROM_LOAD( "ep2390.ic6", 0x14C00, 0x0400, CRC(28d28eee) SHA1(b80f75c1ac4905ae369ecbc9b9ce120cc85502ed) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE          INIT     COMPANY               FULLNAME                      FLAGS
-COMP( 1980, z80ne,    0,        0,      z80ne,    z80ne,   z80ne_state,   z80ne,   "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW)
-COMP( 1980, z80net,   z80ne,    0,      z80net,   z80net,  z80ne_state,   z80net,  "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW)
-COMP( 1980, z80netb,  z80ne,    0,      z80netb,  z80net,  z80ne_state,   z80netb, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW)
-COMP( 1980, z80netf,  z80ne,    0,      z80netf,  z80netf, z80netf_state, z80netf, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY               FULLNAME                      FLAGS
+COMP( 1980, z80ne,   0,      0,      z80ne,   z80ne,   z80ne_state,   init_z80ne,   "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW)
+COMP( 1980, z80net,  z80ne,  0,      z80net,  z80net,  z80ne_state,   init_z80net,  "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW)
+COMP( 1980, z80netb, z80ne,  0,      z80netb, z80net,  z80ne_state,   init_z80netb, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW)
+COMP( 1980, z80netf, z80ne,  0,      z80netf, z80netf, z80netf_state, init_z80netf, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW)

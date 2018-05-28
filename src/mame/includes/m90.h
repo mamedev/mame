@@ -35,9 +35,9 @@ public:
 	DECLARE_WRITE16_MEMBER(coincounter_w);
 	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
+	void init_bomblord();
+	void init_quizf1();
 	DECLARE_WRITE16_MEMBER(bootleg_video_w);
-	DECLARE_DRIVER_INIT(bomblord);
-	DECLARE_DRIVER_INIT(quizf1);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;

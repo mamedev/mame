@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cassert>
+
 // Windows headers are crap, let me count the ways
 #undef PARITY_NONE
 #undef PARITY_ODD

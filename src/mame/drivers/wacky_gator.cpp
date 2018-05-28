@@ -42,7 +42,7 @@ public:
 		m_samples(*this, "oki"),
 		m_alligator(*this, "alligator%u", 0U),
 		m_digit(*this, "digit%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
@@ -72,7 +72,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
 	void program_map(address_map &map);
 
@@ -85,7 +85,7 @@ private:
 	required_memory_region m_samples;
 	output_finder<5> m_alligator;
 	output_finder<8> m_digit;
-	output_finder<32> m_lamp;
+	output_finder<32> m_lamps;
 
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -185,7 +185,7 @@ void wackygtr_state::machine_start()
 {
 	m_alligator.resolve();
 	m_digit.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_adpcm_sel));
 	save_item(NAME(m_adpcm_pos));
@@ -211,7 +211,7 @@ void wackygtr_state::set_digits(int p, uint8_t value)
 void wackygtr_state::set_lamps(int p, uint8_t value)
 {
 	for (int i=0; i<8; i++)
-		m_lamp[p + i] = BIT(value, i);
+		m_lamps[p + i] = BIT(value, i);
 }
 
 static INPUT_PORTS_START( wackygtr )
@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_DEFAULT_LAYOUT(layout_wackygtr)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wackygtr_state, adpcm_int))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
@@ -348,4 +348,4 @@ ROM_START( wackygtr )
 	ROM_LOAD("wp3-vo0.2h", 0x0000, 0x10000, CRC(91c7986f) SHA1(bc9fa0d41c1caa0f909a349f511d022b7e42c6cd))
 ROM_END
 
-GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, 0,  ROT0,   "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
+GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
