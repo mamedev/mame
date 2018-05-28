@@ -761,7 +761,7 @@ pos is 11.5 fixed point
 	int y,x;
 	int visible_line=0;
 	const uint16_t *data = m_roundup_r_ram;
-
+	
 	// Road layer enable (?)
 	if ((m_roundup5_unknown0[0x1]&0x1)==0)
 		return;
@@ -769,17 +769,18 @@ pos is 11.5 fixed point
 	// Road data bank select (double buffered)
 	if (m_roundup5_e0000_ram[0]&0x10)
 		data+=0x400;
-
-	// ??  Todo: This is wrong - don't know how to clip the road properly
-	y=256 - (m_roundup5_unknown0[0xb/2] >> 8);
+	
+	// Apply clipping: global screen + local road y offsets
+	y = 256 - ((m_roundup5_unknown0[0xa/2] >> 8) + m_roundup5_d0000_ram[0]);
 	data+=y*4;
 
 	visible_line=0;
 
-	for (/*y=0*/; y<256; y++) {
+	for (/*y=0*/; y<cliprect.max_y+1; y++) 
+	{
 		int shift=data[0];
 		int shift2=data[2];
-		int pal=4; //(data[3]>>8)&0xf;
+		int pal = 4; //(data[3]>>8)&0xf;
 		int step=((data[1]&0xff)<<8)|((data[1]&0xff00)>>8);
 		int samplePos=0;
 		const uint16_t* linedata=m_roundup_p_ram;// + (0x100 * pal);
@@ -811,7 +812,7 @@ offset is from last pixel of first road segment?
 		*/
 
 		palette_byte=m_roundup_l_ram[visible_line/8];
-		pal=4 + ((palette_byte>>(visible_line%8))&1);
+		pal = 4 + ((palette_byte>>(visible_line%8))&1);
 
 		visible_line++;
 
@@ -823,7 +824,8 @@ offset is from last pixel of first road segment?
 			startPos=((shift<<8) + 0x80 )/ step;
 
 		/* Fill in left of road segment */
-		for (x=0; x<startPos && x<320; x++) {
+		for (x=0; (x < startPos) && (x < cliprect.max_x+1); x++) 
+		{
 			int col = linedata[0]&0xf;
 			uint8_t shadow=shadow_bitmap.pix8(y, x);
 			if (shadow)
@@ -833,15 +835,19 @@ offset is from last pixel of first road segment?
 		}
 
 		/* If startpos is negative, clip it and adjust the sampling position accordingly */
-		if (startPos<0) {
+		if (startPos<0) 
+		{
 			samplePos=step*(0-startPos);
 			startPos=0;
-		} else {
+		} 
+		else 
+		{
 			samplePos=0;
 		}
 
 		/* Fill in main part of road, then right-hand side edge */
-		for (x=startPos; x<320 && (samplePos>>11)<0x80; x++) {
+		for (x=startPos; x < (cliprect.max_x + 1) && ((samplePos>>11)<0x80); x++) 
+		{
 			// look up colour
 			int col = linedata[(samplePos>>11)&0x7f]&0xf;
 			uint8_t shadow=shadow_bitmap.pix8(y, x);
@@ -873,7 +879,8 @@ offset is from last pixel of first road segment?
 		endPos=startPos+endPos;
 
 		/* Fill pixels */
-		for (x=startPos; x<320 && x<endPos; x++) {
+		for (x=startPos; x < (cliprect.max_x+1) && (x < endPos); x++) 
+		{
 			int col = linedata[0x80]&0xf;
 			uint8_t shadow=shadow_bitmap.pix8(y, x);
 
@@ -887,16 +894,21 @@ offset is from last pixel of first road segment?
 				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
 		}
 
-		if (endPos<0) {
+		if (endPos<0) 
+		{
 			samplePos=step*(0-startPos);
 		}
-		else if (endPos<x) {
+		else if (endPos<x) 
+		{
 			samplePos=step*(x-endPos);
-		} else {
+		} 
+		else 
+		{
 			samplePos=0; // todo
 		}
 
-		for (/*x=endPos*/; x<320; x++) {
+		for (/*x=endPos*/; x < cliprect.max_x+1; x++) 
+		{
 			// look up colour
 			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;
 			uint8_t shadow=shadow_bitmap.pix8(y, x);
@@ -1050,6 +1062,7 @@ void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &clipr
 	// TODO: guess, assume back layer having less scroll increment than front for parallax scrolling.
 	// also notice that unknown0[8/2] >> 8 is identical to [0x0c/2], always?
 	uint16_t x_base = type ? m_bg_scrollx[0] : m_roundup5_unknown0[0xc/2];
+	// TODO: maybe [0xa/2] applies here as well?
 	uint16_t y_base = m_bg_scrolly[0] & 0x1ff;
 	uint16_t y_scroll = 0x180 - y_base;
 	uint32_t base_offset;
@@ -1110,8 +1123,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	m_tx_layer->set_scrolly(0,(tx_start_addr >> 4) | m_hd6445_reg[0x1d]);
 
 	bitmap.fill(m_palette->pen(384), cliprect); // todo
-	screen.priority().fill(0, cliprect);
-
+	screen.priority().fill(0, cliprect);	
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_landscape(bitmap,cliprect,0);
 	draw_landscape(bitmap,cliprect,1);

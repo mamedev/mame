@@ -302,8 +302,8 @@ void roundup5_state::roundup5_68000_map(address_map &map)
 	map(0xa0000, 0xa0fff).ram().share("roundup_r_ram"); // Road control data
 	map(0xb0000, 0xb0fff).ram().share("roundup_p_ram"); // Road pixel data
 	map(0xc0000, 0xc0fff).ram().share("roundup_l_ram"); // Road colour data
-	map(0xd0000, 0xd0003).w(this, FUNC(roundup5_state::roundup5_d0000_w)).share("ru5_d0000_ram");
-	map(0xe0000, 0xe0001).w(this, FUNC(roundup5_state::roundup5_e0000_w)).share("ru5_e0000_ram");
+	map(0xd0000, 0xd0003).ram().w(this, FUNC(roundup5_state::roundup5_d0000_w)).share("ru5_d0000_ram");
+	map(0xe0000, 0xe0001).ram().w(this, FUNC(roundup5_state::roundup5_e0000_w)).share("ru5_e0000_ram");
 }
 
 void roundup5_state::roundup5_z80_map(address_map &map)
