@@ -19,9 +19,9 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, dd_present(false)
 	, disk_present(false)
 	, cart_present(false)
-	, m_vr4300(*this, ":maincpu")
-	, m_rsp(*this, ":rsp")
-	, ai_dac(*this, "dac%u", 1U)
+	, m_vr4300(*this, "^maincpu")
+	, m_rsp(*this, "^rsp")
+	, ai_dac(*this, "^dac%u", 1U)
 {
 	for (int32_t i = 0; i < 256; i++)
 	{
