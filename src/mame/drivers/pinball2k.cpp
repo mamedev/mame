@@ -40,6 +40,7 @@ public:
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
+		m_ramdac(*this, "ramdac"),
 		m_palette(*this, "palette") { }
 
 	required_shared_ptr<uint32_t> m_main_ram;
@@ -48,6 +49,7 @@ public:
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	required_device<ramdac_device> m_ramdac;
 	required_device<palette_device> m_palette;
 	uint8_t m_pal[768];
 
@@ -342,8 +344,6 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
-		ramdac_device *ramdac = machine().device<ramdac_device>("ramdac");
-
 		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
 			// guess: crtc params?
@@ -352,7 +352,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			m_pal_index = data;
-			ramdac->index_w( space, 0, data );
+			m_ramdac->index_w( space, 0, data );
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
@@ -362,7 +362,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 			{
 				m_pal_index = 0;
 			}
-			ramdac->pal_w( space, 0, data );
+			m_ramdac->pal_w( space, 0, data );
 		}
 	}
 	else
