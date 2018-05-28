@@ -50,6 +50,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_cart(*this, "cartslot")
 		, m_centronics(*this, CENTRONICS_TAG)
+		, m_expansions(*this, "exp%u", 1)
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "LINE.%u", 0)
 	{ }
@@ -60,10 +61,10 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
 	required_device<centronics_device> m_centronics;
+	required_device_array<tvcexp_slot_device, 4> m_expansions;
 	required_device<palette_device> m_palette;
 	required_ioport_array<16> m_keyboard;
 
-	tvcexp_slot_device *m_expansions[4];
 	memory_region *m_bios_rom;
 	memory_region *m_cart_rom;
 	memory_region *m_ext;
@@ -608,11 +609,6 @@ void tvc_state::machine_start()
 		m_col[i] = i;
 
 	m_int_flipflop = 0;
-
-	m_expansions[0] = machine().device<tvcexp_slot_device>("exp1");
-	m_expansions[1] = machine().device<tvcexp_slot_device>("exp2");
-	m_expansions[2] = machine().device<tvcexp_slot_device>("exp3");
-	m_expansions[3] = machine().device<tvcexp_slot_device>("exp4");
 
 	m_bios_rom = memregion("sys");
 	m_ext = memregion("ext");

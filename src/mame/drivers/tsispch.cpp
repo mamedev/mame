@@ -114,7 +114,6 @@
 #include "includes/tsispch.h"
 
 #include "cpu/i86/i86.h"
-#include "cpu/upd7725/upd7725.h"
 #include "machine/i8251.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -184,44 +183,38 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 *****************************************************************************/
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(true);
+	uint8_t temp = m_dsp->snesdsp_read(true);
 	fprintf(stderr, "dsp data read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(true);
+	return m_dsp->snesdsp_read(true);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_data_w )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP_W
 	fprintf(stderr, "dsp data write: %02x\n", data);
 #endif
-	upd7725->snesdsp_write(true, data);
+	m_dsp->snesdsp_write(true, data);
 }
 
 READ16_MEMBER( tsispch_state::dsp_status_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(false);
+	uint8_t temp = m_dsp->snesdsp_read(false);
 	fprintf(stderr, "dsp status read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(false);
+	return m_dsp->snesdsp_read(false);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_status_w )
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
-	upd7725->snesdsp_write(false, data);
+	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
