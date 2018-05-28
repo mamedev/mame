@@ -251,6 +251,7 @@ public:
 		m_reset_patch(*this, "reset_patch"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0(*this, "vr0"),
+		m_video(*this, "vrender"),
 		m_ds1302(*this, "rtc"),
 		m_screen(*this, "screen")
 	{ }
@@ -266,6 +267,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<vr0video_device> m_vr0;
+	required_device<vrender0_device> m_video;
 	required_device<ds1302_device> m_ds1302;
 	required_device<screen_device> m_screen;
 
@@ -928,8 +930,6 @@ void crystal_state::machine_start()
 
 void crystal_state::machine_reset()
 {
-	int i;
-
 	memset(m_sysregs, 0, 0x10000);
 	memset(m_vidregs, 0, 0x10000);
 
@@ -943,13 +943,13 @@ void crystal_state::machine_reset()
 	m_DMActrl[0] = 0;
 	m_DMActrl[1] = 0;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		*TimerRegsPtr(i) = 0xff << 8;
 		m_Timer[i]->adjust(attotime::never);
 	}
 
-	machine().device<vrender0_device>("vrender")->set_areas(m_textureram, m_frameram);
+	m_video->set_areas(m_textureram, m_frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	m_FlipCntRead = 0;
 #endif
@@ -1503,8 +1503,7 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, crystal_state, screen_vblank_crystal))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)
-	MCFG_VIDEO_VRENDER0_CPU("maincpu")
+	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0, "maincpu")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 
