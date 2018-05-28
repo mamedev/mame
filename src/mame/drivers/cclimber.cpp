@@ -2668,8 +2668,9 @@ void cclimber_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
-	m_encrypted_cpu->set_region_p(memregion("user1")->base());
-	m_encrypted_cpu->set_decrypted_p(m_opcodes.get());
+	segacrpt_z80_device &cpu = downcast<segacrpt_z80_device &>(*m_maincpu);
+	cpu.set_region_p(memregion("user1")->base());
+	cpu.set_decrypted_p(m_opcodes.get());
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
 	membank("bank1d")->configure_entries(0, 3, m_opcodes.get(), 0x6000);

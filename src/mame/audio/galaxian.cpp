@@ -393,7 +393,7 @@ galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, cons
 	: device_t(mconfig, GALAXIAN, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_lfo_val(0)
-	, m_discrete(*this, GAL_AUDIO)
+	, m_discrete(*this, "^" GAL_AUDIO)
 {
 }
 
