@@ -951,7 +951,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
+	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(apache3_state, screen_update_apache3)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apache3)
@@ -1004,10 +1004,7 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(roundup5_state, screen_update_roundup5)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_roundup5)
@@ -1063,10 +1060,7 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_cyclwarr)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
@@ -1123,10 +1117,7 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
