@@ -282,9 +282,9 @@ void roundup5_state::roundup5_v30_map(address_map &map)
 	map(0x08000, 0x0bfff).ram().w(this, FUNC(roundup5_state::text_w)).share("videoram");
 	map(0x0c000, 0x0c003).w(this, FUNC(tatsumi_state::hd6445_crt_w)).umask16(0x00ff);
 	map(0x0d000, 0x0d001).portr("DSW");
-	map(0x0d400, 0x0d40f).writeonly().share("ru5_unknown0");
-	map(0x0d800, 0x0d801).writeonly().share("ru5_unknown1"); // VRAM2 X scroll (todo)
-	map(0x0dc00, 0x0dc01).writeonly().share("ru5_unknown2"); // VRAM2 Y scroll (todo)
+	map(0x0d400, 0x0d40f).ram().share("ru5_unknown0");
+	map(0x0d800, 0x0d801).writeonly().share("bg_scrollx"); // VRAM2 X scroll (todo)
+	map(0x0dc00, 0x0dc01).writeonly().share("bg_scrolly"); // VRAM2 Y scroll (todo)
 	map(0x0e000, 0x0e001).w(this, FUNC(roundup5_state::roundup5_control_w));
 	map(0x0f000, 0x0ffff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x10000, 0x1ffff).rw(this, FUNC(roundup5_state::roundup_v30_z80_r), FUNC(roundup5_state::roundup_v30_z80_w));
@@ -850,19 +850,6 @@ static const gfx_layout roundup5_vramlayout =
 	8*8
 };
 
-// TODO: wrong, just for debugging
-// color data is likely to be at 0x100 - 0x11f (same color as background during VRAM uploads)
-static const gfx_layout roundup5_bglayout =
-{
-	8,8,
-	4096*4,
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_apache3 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    1024, 256)
 	GFXDECODE_ENTRY( "text",    0, gfx_8x8x3_planar, 768,  16)
@@ -871,7 +858,6 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_roundup5 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     1024, 256)
 	GFXDECODE_ENTRY(  nullptr,  0, roundup5_vramlayout, 0,  16)
-	GFXDECODE_ENTRY(  nullptr,  0, roundup5_bglayout, 512,  1)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cyclwarr )

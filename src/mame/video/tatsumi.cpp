@@ -51,11 +51,7 @@ WRITE8_MEMBER(roundup5_state::gfxdata_w)
 {
 	if((m_control_word & 0x200) == 0x200)
 	{	
-		offset += (m_control_word & 0x6000) << 2;
-		//m_gfxdecode->gfx(2)->mark_dirty(offset/8);
-		// TODO: temp, until we get the actual decoding
-		m_gfxdecode->gfx(2)->mark_all_dirty();
-		
+		offset += (m_control_word & 0x6000) << 2;		
 		m_bg_gfxram[offset] = data;
 		return;
 	}
@@ -204,7 +200,6 @@ VIDEO_START_MEMBER(roundup5_state,roundup5)
 	m_tx_layer->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
-	m_gfxdecode->gfx(2)->set_source(m_bg_gfxram.get());
 	
 	save_pointer(NAME(m_tx_gfxram.get()),0x20000);
 	save_pointer(NAME(m_bg_gfxram.get()),0x20000);
@@ -1047,6 +1042,45 @@ if (0) {
 }
 }
 
+// background layer landscape for Round Up 5
+// two bitmap layers, back layer is 512 x 128, the other one is 512 x 64
+// it's safe to assume that three monitor version will have a different arrangement here ...
+void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type)
+{
+	// TODO: guess, assume back layer having less scroll increment than front for parallax scrolling.
+	// also notice that unknown0[8/2] >> 8 is identical to [0x0c/2], always?
+	uint16_t x_base = type ? m_bg_scrollx[0] : m_roundup5_unknown0[0xc/2];
+	uint16_t y_base = m_bg_scrolly[0] & 0x1ff;
+	uint16_t y_scroll = 0x180 - y_base;
+	uint32_t base_offset;
+	uint16_t color_base = type ? 0x100 : 0x110;
+	int ysize = type ? 64 : 128;
+	
+	base_offset = 0x10000 + type * 0x8000;
+	if(type)
+		y_scroll += 64;
+	
+	//popmessage("%04x %04x %04x",m_roundup5_unknown0[8/2],m_roundup5_unknown0[0xc/2],m_bg_scrollx[0]);
+	
+	for(int y = 0; y < ysize; y++)
+	{
+		for(int x = 0; x < 512; x++)
+		{
+			int res_x = (x_base + x) & 0x1ff;
+			uint32_t color = m_bg_gfxram[(res_x >> 1)+y*256+base_offset];
+
+			if(res_x & 1)
+				color >>= 4;
+			
+			color &= 0xf;
+		
+			if(cliprect.contains(x, y+y_scroll) && color)
+				bitmap.pix32(y+y_scroll, x) = m_palette->pen(color+color_base);
+		}
+	}
+
+}
+
 /**********************************************************************/
 
 uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1065,8 +1099,6 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
 
 uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-//  uint16_t bg_x_scroll=m_roundup5_unknown1[0];
-//  uint16_t bg_y_scroll=m_roundup5_unknown2[0];
 	int tx_start_addr;
 	
 	tx_start_addr = (m_hd6445_reg[0xc] << 8) | (m_hd6445_reg[0xd]);
@@ -1081,6 +1113,8 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	screen.priority().fill(0, cliprect);
 
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_landscape(bitmap,cliprect,0);
+	draw_landscape(bitmap,cliprect,1);
 	draw_road(bitmap,cliprect,screen.priority());
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{

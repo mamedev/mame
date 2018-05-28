@@ -135,8 +135,8 @@ public:
 		, m_roundup5_d0000_ram(*this, "ru5_d0000_ram")
 		, m_roundup5_e0000_ram(*this, "ru5_e0000_ram")
 		, m_roundup5_unknown0(*this, "ru5_unknown0")
-		, m_roundup5_unknown1(*this, "ru5_unknown1")
-		, m_roundup5_unknown2(*this, "ru5_unknown2")
+		, m_bg_scrollx(*this, "bg_scrollx")
+		, m_bg_scrolly(*this, "bg_scrolly")
 		, m_roundup_r_ram(*this, "roundup_r_ram")
 		, m_roundup_p_ram(*this, "roundup_p_ram")
 		, m_roundup_l_ram(*this, "roundup_l_ram")
@@ -162,12 +162,13 @@ public:
 	
 private:
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
-
+	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
+	
 	required_shared_ptr<uint16_t> m_roundup5_d0000_ram;
 	required_shared_ptr<uint16_t> m_roundup5_e0000_ram;
 	required_shared_ptr<uint16_t> m_roundup5_unknown0;
-	required_shared_ptr<uint16_t> m_roundup5_unknown1;
-	required_shared_ptr<uint16_t> m_roundup5_unknown2;
+	required_shared_ptr<uint16_t> m_bg_scrollx;
+	required_shared_ptr<uint16_t> m_bg_scrolly;
 	required_shared_ptr<uint16_t> m_roundup_r_ram;
 	required_shared_ptr<uint16_t> m_roundup_p_ram;
 	required_shared_ptr<uint16_t> m_roundup_l_ram;
