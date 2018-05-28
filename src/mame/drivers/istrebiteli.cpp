@@ -151,6 +151,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
 
+	void init_istreb();
+	void init_moto();
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
@@ -164,6 +167,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	tilemap_t *m_tilemap;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t moto_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t coin_count;
 	uint8_t m_spr_ctrl[2];
@@ -213,20 +217,38 @@ TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index] & 0x1f, 0, 0);
 }
 
-void istrebiteli_state::video_start()
+void istrebiteli_state::init_istreb()
 {
 	uint8_t *gfx = memregion("sprite")->base();
 	uint8_t temp[64];
 
 	for (int offs = 0; offs < 0x200; offs += 0x40)
 	{
-		memset(&temp[0], 0, 64);
+		memset(&temp[0], 0, sizeof(temp));
 		for (int spnum = 0; spnum < 8; spnum++)
 			for (int dot = 0; dot < 64; dot++)
 				temp[(dot >> 3) + spnum * 8] |= ((gfx[offs + dot] >> spnum) & 1) << (dot & 7);
-		memcpy(&gfx[offs], &temp[0], 64);
+		memcpy(&gfx[offs], &temp[0], sizeof(temp));
 	}
+}
 
+void istrebiteli_state::init_moto()
+{
+	uint8_t *gfx = memregion("sprite")->base();
+	uint8_t temp[256];
+
+	for (int offs = 0; offs < 0x600; offs += 0x100)
+	{
+		memset(&temp[0], 0, sizeof(temp));
+		for (int spnum = 0; spnum < 8; spnum++)
+			for (int dot = 0; dot < 256; dot++)
+				temp[(dot >> 3) + spnum * 32] |= ((gfx[offs + dot] >> spnum) & 1) << (dot & 7);
+		memcpy(&gfx[offs], &temp[0], sizeof(temp));
+	}
+}
+
+void istrebiteli_state::video_start()
+{
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
 		8, 16, 16, 1);
 	m_tilemap->set_scrolldx(96, 96);
@@ -250,6 +272,32 @@ uint32_t istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[0], m_spr_xy[1], 1);
 	spritecode = (m_spr_ctrl[1] & 0x1f) + ((m_spr_ctrl[1] & 0x80) >> 2);
 	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[2], m_spr_xy[3], 1);
+
+	return 0;
+}
+
+uint32_t istrebiteli_state::moto_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(1);
+
+	rectangle rect = cliprect;
+	rect.offset(32, 64);
+	rect.set_size(16 * 8, 16);
+	m_tilemap->draw(screen, bitmap, rect, 0, 0);
+
+//	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr_ctrl[0] & 0x40) ? 5 : 7, 0, 0, 0, m_spr_xy[4], m_spr_xy[5], 1);
+//	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, (m_spr_ctrl[1] & 0x40) ? 4 : 6, 0, 0, 0, m_spr_xy[6], m_spr_xy[7], 1);
+
+	int spritecode;
+
+	spritecode = ((m_spr_ctrl[0] >> 1) & 7) + ((m_spr_ctrl[0] << 3) & 8);
+	m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[0], m_spr_xy[1], 1);
+	spritecode = ((m_spr_ctrl[1] >> 1) & 7) + ((m_spr_ctrl[1] << 3) & 8);
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[2], m_spr_xy[3], 1);
+	spritecode = (m_spr_ctrl[0] >> 4) & 7;
+	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[4], m_spr_xy[5], 1);
+	spritecode = ((m_spr_ctrl[1] >> 5) & 7) + ((m_spr_ctrl[1] >> 1) & 8);
+	m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, spritecode, 0, 0, 0, m_spr_xy[6], m_spr_xy[7], 1);
 
 	return 0;
 }
@@ -313,7 +361,7 @@ WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 
 WRITE8_MEMBER(istrebiteli_state::moto_spr_xy_w)
 {
-	m_spr_xy[offset] = data ^ 0xff;
+	m_spr_xy[offset] = data;
 }
 
 void istrebiteli_state::mem_map(address_map &map)
@@ -412,23 +460,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( moto )
 	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) // l/r
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  // l/r
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) // handle left
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  // handle right
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)	  // speed 30
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  // speed 80
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        // speed 120
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        // ??
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        // ??
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4)	      // brake or collision ?
-	//PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        // speed 120, 3 above bits encode 0 30 50 80 100 120 speeds
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON2)       // skip RAM test
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        // handle full left/right
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4)	      // brake
 
 	PORT_START("IN1")
-
-	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)  // coin, TODO check why it is locked
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON5) // brake or collision ?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen") // guess, seems unused
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON5) // collision ?
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_HBLANK("screen") // guess, seems unused
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static const gfx_layout char_layout =
@@ -453,6 +498,17 @@ static const gfx_layout sprite_layout =
 	8*8
 };
 
+static const gfx_layout moto_sprite_layout =
+{
+	16,16,
+	16,
+	1,
+	{ 0 },
+	{ 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7 },
+	{ 15*16,14*16,13*16,12*16,11*16,10*16,9*16,8*16,7*16,6*16,5*16,4*16,3*16,2*16,1*16,0*16 },
+	16*16
+};
+
 static const gfx_layout projectile_layout =
 {
 	16,16,
@@ -469,6 +525,13 @@ static GFXDECODE_START( gfx_istrebiteli )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 2, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 0, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 0, 2 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_motogonki )
+	GFXDECODE_ENTRY( "chars", 0x0000, char_layout, 2, 2 )
+	GFXDECODE_ENTRY( "sprite", 0x0000, moto_sprite_layout, 0, 2 )
+	GFXDECODE_ENTRY( "sprite", 0x0200, moto_sprite_layout, 0, 2 )
+	GFXDECODE_ENTRY( "sprite", 0x0400, moto_sprite_layout, 2, 2 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(istrebiteli_state::istreb)
@@ -504,14 +567,35 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(istrebiteli_state::motogonki)
-	istreb(config);
-
-	MCFG_DEVICE_REPLACE(I8080_TAG, I8080, XTAL(15'700'000) / 9)       // KR580VM80A
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(15'700'000) / 9)       // KR580VM80A
 	MCFG_DEVICE_PROGRAM_MAP(moto_mem_map)
 	MCFG_DEVICE_IO_MAP(moto_io_map)
 
-	MCFG_DEVICE_MODIFY("ppi1")
+	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, istrebiteli_state, spr0_ctrl_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, istrebiteli_state, spr1_ctrl_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, istrebiteli_state, sound_w))
+
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	// PORT B writen 1 if speed 120, never reset later
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256)
+	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, moto_screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_motogonki)
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, istrebiteli)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 ROM_START( istreb )
@@ -545,16 +629,16 @@ ROM_START( motogonki )
 	ROM_LOAD( "003_ig8.g8", 0x000, 0x200, CRC(9af1e9de) SHA1(4bc89bc0c1f229ca3ebee983ae2fb3910d8ca599) )
 
 	ROM_REGION( 0x1000, "sprite", 0 ) // gfx layout is not correct
-	ROM_LOAD( "006_b1.b1",  0x000, 0x200, CRC(ae9820fb) SHA1(7727d20e314aee670ba36ca6ea7ca5a4da0fc1cd) )
-	ROM_LOAD( "006_02.b5",  0x200, 0x200, CRC(e5c17daf) SHA1(1b6ffeba7dd98da11e5eb953280dd53f0f77fa7f) )
-	ROM_LOAD( "006_03.b7",  0x400, 0x200, CRC(e1731d8d) SHA1(744fd768754a65a66bfcdb1959b4d6796bff4fcb) )
-	ROM_LOAD( "006_05.b3",  0x600, 0x100, CRC(7dc4f9c9) SHA1(8a40f9f021b1662b1c638c7fdcefead1687ca4f1) )
-	ROM_LOAD( "006_01.d3",  0x700, 0x100, CRC(b53b83c9) SHA1(8f9733c827cc9aacc7c182585dcbc5da01357468) )
-	ROM_LOAD( "006_04.w13", 0x800, 0x100, CRC(6d6441f6) SHA1(999356e5b31a03c667d6cb975210e058e340509e) )
+	ROM_LOAD( "006_b1.b1",  0x000, 0x200, CRC(ae9820fb) SHA1(7727d20e314aee670ba36ca6ea7ca5a4da0fc1cd) ) // player bike sprites, 16 16x16
+	ROM_LOAD( "006_02.b5",  0x200, 0x200, CRC(e5c17daf) SHA1(1b6ffeba7dd98da11e5eb953280dd53f0f77fa7f) ) // opponents, road signs, etc sprites, 16 16x16
+	ROM_LOAD( "006_03.b7",  0x400, 0x200, CRC(e1731d8d) SHA1(744fd768754a65a66bfcdb1959b4d6796bff4fcb) ) // more opponents, road signs, etc sprites, 16 16x16
+	ROM_LOAD( "006_05.b3",  0x600, 0x100, CRC(7dc4f9c9) SHA1(8a40f9f021b1662b1c638c7fdcefead1687ca4f1) ) // unknown
+	ROM_LOAD( "006_01.d3",  0x700, 0x100, CRC(b53b83c9) SHA1(8f9733c827cc9aacc7c182585dcbc5da01357468) ) // unknown
+	ROM_LOAD( "006_04.w13", 0x800, 0x100, CRC(6d6441f6) SHA1(999356e5b31a03c667d6cb975210e058e340509e) ) // unknown
 
 	ROM_REGION(0x200, "soundrom", 0)
 	ROM_LOAD( "003_iw3.w3", 0x000, 0x200, CRC(814854ba) SHA1(2cbfd60df01f00d7659393efa58547de660bf201) )
 ROM_END
 
-GAME( 198?, istreb,    0, istreb,    istreb, istrebiteli_state, empty_init, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 198?, motogonki, 0, motogonki, moto,   istrebiteli_state, empty_init, ROT0, "Terminal", "Motogonki", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 198?, istreb,    0, istreb,    istreb, istrebiteli_state, init_istreb, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 198?, motogonki, 0, motogonki, moto,   istrebiteli_state, init_moto,   ROT0, "Terminal", "Motogonki", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
