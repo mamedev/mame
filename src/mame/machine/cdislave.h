@@ -29,15 +29,6 @@ TODO:
 #include "sound/dmadac.h"
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDISLAVE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CDISLAVE, 0)
-#define MCFG_CDISLAVE_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, CDISLAVE, 0)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -115,6 +106,6 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(CDISLAVE, cdislave_device)
+DECLARE_DEVICE_TYPE(CDI_SLAVE, cdislave_device)
 
-#endif // __CDISLAVE_H__
+#endif // MAME_MACHINE_CDISLAVE_H

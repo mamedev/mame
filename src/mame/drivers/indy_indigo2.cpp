@@ -75,7 +75,7 @@ public:
 		, m_scsi(*this, "wd33c93")
 		, m_hal2(*this, HAL2_TAG)
 		, m_hpc3(*this, HPC3_TAG)
-		, m_ioc2(*this, "ioc2")
+		, m_ioc2(*this, IOC2_TAG)
 		, m_rtc(*this, RTC_TAG)
 	{
 	}
@@ -95,6 +95,7 @@ public:
 
 	static const char* HAL2_TAG;
 	static const char* HPC3_TAG;
+	static const char* IOC2_TAG;
 	static const char* RTC_TAG;
 
 protected:
@@ -114,6 +115,7 @@ protected:
 
 /*static*/ const char* ip22_state::HAL2_TAG = "hal2";
 /*static*/ const char* ip22_state::HPC3_TAG = "hpc3";
+/*static*/ const char* ip22_state::IOC2_TAG = "ioc2";
 /*static*/ const char* ip22_state::RTC_TAG = "rtc";
 
 #define VERBOSE_LEVEL ( 0 )
@@ -221,7 +223,7 @@ MACHINE_CONFIG_START(ip22_state::ip225015)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_NEWPORT_ADD("newport")
+	MCFG_DEVICE_ADD("newport", NEWPORT_VIDEO, 0)
 
 	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 
@@ -241,15 +243,9 @@ MACHINE_CONFIG_START(ip22_state::ip225015)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(HPC3_TAG, hpc3_device, scsi_irq))
 
-	MCFG_SGI_HAL2_ADD(HAL2_TAG)
-
-	MCFG_IOC2_GUINNESS_ADD("ioc2")
-	MCFG_IOC2_CPU("maincpu")
-
-	MCFG_SGI_HPC3_ADD(HPC3_TAG)
-	MCFG_HPC3_CPU_TAG("maincpu")
-	MCFG_HPC3_SCSI_TAG("wd33c93")
-	MCFG_HPC3_IOC2_TAG("ioc2")
+	MCFG_DEVICE_ADD(HAL2_TAG, SGI_HAL2, 0)
+	MCFG_DEVICE_ADD(IOC2_TAG, SGI_IOC2_GUINNESS, 0, "maincpu")
+	MCFG_DEVICE_ADD(HPC3_TAG, SGI_HPC3, 0, "maincpu", "wd33c93", "ioc2")
 
 	MCFG_DEVICE_ADD(RTC_TAG, DS1386_8K, 32768)
 MACHINE_CONFIG_END

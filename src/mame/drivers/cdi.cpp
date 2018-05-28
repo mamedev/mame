@@ -751,8 +751,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_DEVICE_PROGRAM_MAP(cdimono1_mem)
 
-	MCFG_MCD212_ADD("mcd212")
-	MCFG_MCD212_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -772,11 +772,10 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 
 	MCFG_DEFAULT_LAYOUT(layout_cdi)
 
-	MCFG_CDI68070_ADD("scc68070")
-	MCFG_CDI68070_CPU_TAG("maincpu")
+	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
 
-	MCFG_CDICDIC_ADD("cdic")
-	MCFG_CDISLAVE_ADD("slave_hle")
+	MCFG_DEVICE_ADD("cdic", CDI_CDIC, 0)
+	MCFG_DEVICE_ADD("slave_hle", CDI_SLAVE, 0)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -800,8 +799,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_mem)
 
-	MCFG_MCD212_ADD("mcd212")
-	MCFG_MCD212_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -823,14 +822,13 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	MCFG_CDI68070_ADD("scc68070")
-	MCFG_CDI68070_CPU_TAG("maincpu")
+	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("cdi_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
@@ -849,15 +847,15 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-	MCFG_MK48T08_ADD( "mk48t08" )
+	MCFG_MK48T08_ADD("mk48t08")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_DEVICE_PROGRAM_MAP(cdi910_mem)
 
-	MCFG_MCD212_ADD("mcd212")
-	MCFG_MCD212_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -879,8 +877,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	MCFG_CDI68070_ADD("scc68070")
-	MCFG_CDI68070_CPU_TAG("maincpu")
+	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
