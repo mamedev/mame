@@ -160,7 +160,10 @@ public:
 	void roundup5_68000_map(address_map &map);
 	void roundup5_v30_map(address_map &map);
 	void roundup5_z80_map(address_map &map);
-	
+
+protected:
+//	virtual void machine_reset() override;
+
 private:
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
@@ -217,6 +220,9 @@ public:
 	void cyclwarr_68000a_map(address_map &map);
 	void cyclwarr_68000b_map(address_map &map);
 	void cyclwarr_z80_map(address_map &map);
+	
+protected:
+	virtual void machine_reset() override;
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 

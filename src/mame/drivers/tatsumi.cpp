@@ -18,7 +18,10 @@
     - Apache 3: road layer, has twelve rotation registers!
     - Cycle Warriors: transparent road layer on sidelines, wrong mask_data?
     - Missing BG layer (Round Up 5) - banked VRAM data from somewhere!?
-    - Round Up 5: always boots with a coin inserted
+    - Round Up 5: always boots with a coin inserted 
+	  $5152 is the coin counter, gets an explicit 1 at boot.
+	  There are other two buffers read from 68k before that, written to $5156 and $515a
+	  If these are 0xffff by then game boots normally ...
     - (fixed) Round Up 5 doesn't survive a reset 
     - (fixed?) Cycle Warriors: test mode text does not appear as it needs a -256 Y 
 	  scroll offset from somewhere. 
@@ -591,6 +594,7 @@ static INPUT_PORTS_START( roundup5 )
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW-2:7") /* Manual only shows nothing for this one */
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// putting this and sw-2:6 ON position after POST to enable debugging info
 	PORT_DIPNAME( 0x8000, 0x8000, "Hardware Test Mode" ) PORT_DIPLOCATION("SW-2:8") /* Manual only shows nothing for this one */
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1029,6 +1033,19 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
+void cyclwarr_state::machine_reset()
+{
+	uint8_t *dst = m_subregion->base();
+	memcpy(m_cyclwarr_cpub_ram,dst,8);
+	membank("bank2")->set_base(dst);
+	m_last_control = 0;
+	m_control_word = 0;
+
+	// reset sub CPU so that above will be notified.
+	// TODO: better way?
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
 MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 
 	/* basic machine hardware */
@@ -1043,7 +1060,8 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_z80_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	// saner sync value (avoids crashing after crediting)
+	MCFG_QUANTUM_TIME(attotime::from_hz(CLOCK_2 / 1024))
 
 	MCFG_DEVICE_ADD("io1", CXD1095, 0)
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("SERVICE"))
