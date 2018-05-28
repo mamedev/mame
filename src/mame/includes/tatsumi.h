@@ -150,6 +150,7 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_e0000_w);
 	DECLARE_READ8_MEMBER(gfxdata_r);
 	DECLARE_WRITE8_MEMBER(gfxdata_w);
+	DECLARE_WRITE8_MEMBER(output_w);
 
 	void init_roundup5();
 	DECLARE_VIDEO_START(roundup5);

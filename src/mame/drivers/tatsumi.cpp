@@ -222,9 +222,29 @@ WRITE16_MEMBER(cyclwarr_state::cyclwarr_videoram_w)
 WRITE16_MEMBER(cyclwarr_state::output_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);	
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 	if(data & 0xfffc)
 		logerror("output_w = %04x & %04x\n",data,mem_mask);
+}
+
+WRITE8_MEMBER(roundup5_state::output_w)
+{	
+	/*
+		---- x--- depending on Output Mode dipswitch:
+				  A Mode: enables when police siren is on
+				  B Mode: enables when player collides with objects or go offroad
+		---- -x-- start button light
+		---- --xx coin counters
+	*/
+	// avoid spurious write to coin counters
+	if(data == 0xff)
+		return;
+
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
+
+	if(data & 0xf0)
+		logerror("output_w = %02x\n",data);
 }
 
 /***************************************************************************/
@@ -283,8 +303,8 @@ void roundup5_state::roundup5_v30_map(address_map &map)
 	map(0x0c000, 0x0c003).w(this, FUNC(tatsumi_state::hd6445_crt_w)).umask16(0x00ff);
 	map(0x0d000, 0x0d001).portr("DSW");
 	map(0x0d400, 0x0d40f).ram().share("ru5_unknown0");
-	map(0x0d800, 0x0d801).writeonly().share("bg_scrollx"); // VRAM2 X scroll (todo)
-	map(0x0dc00, 0x0dc01).writeonly().share("bg_scrolly"); // VRAM2 Y scroll (todo)
+	map(0x0d800, 0x0d801).writeonly().share("bg_scrollx");
+	map(0x0dc00, 0x0dc01).writeonly().share("bg_scrolly");
 	map(0x0e000, 0x0e001).w(this, FUNC(roundup5_state::roundup5_control_w));
 	map(0x0f000, 0x0ffff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x10000, 0x1ffff).rw(this, FUNC(roundup5_state::roundup_v30_z80_r), FUNC(roundup5_state::roundup_v30_z80_w));
@@ -509,10 +529,19 @@ static INPUT_PORTS_START( roundup5 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME(DEF_STR(Free_Play)) PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Extra 2") PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Extra 3") PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Extra 4") PORT_TOGGLE
+	// Tested in service mode, probably unused
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW-3:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW-3:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW-3:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW-3:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("STICKX")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -540,28 +569,29 @@ static INPUT_PORTS_START( roundup5 )
 	PORT_DIPNAME( 0x0080, 0x0000, "Output Mode" )       PORT_DIPLOCATION("SW-1:8")
 	PORT_DIPSETTING(      0x0000, "A (Light)" )
 	PORT_DIPSETTING(      0x0080, "B (Vibration)" )
+	// TODO: Coinage was all wrong, maybe manual refers to an undumped version?
 	PORT_DIPNAME( 0x0700, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW-2:1,2,3")
-	PORT_DIPSETTING(      0x0600, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(      0x0500, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0700, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_6C ) )
 	PORT_DIPNAME( 0x3800, 0x0000, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW-2:4,5,6")
+	PORT_DIPSETTING(      0x3000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x3800, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x2800, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(      0x3800, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW-2:7") /* Manual only shows nothing for this one */
+	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x2800, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW-2:7") /* Manual only shows nothing for this one */
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Hardware Test Mode" )    PORT_DIPLOCATION("SW-2:8") /* Manual only shows nothing for this one */
+	PORT_DIPNAME( 0x8000, 0x8000, "Hardware Test Mode" ) PORT_DIPLOCATION("SW-2:8") /* Manual only shows nothing for this one */
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -966,10 +996,11 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_DEVICE_PROGRAM_MAP(roundup5_z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
+	
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, roundup5_state, output_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

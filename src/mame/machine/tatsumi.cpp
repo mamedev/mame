@@ -123,11 +123,11 @@ WRITE16_MEMBER(apache3_state::apache3_rotate_w)
 READ16_MEMBER(roundup5_state::roundup_v30_z80_r)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
-
+		
 	/* Each Z80 byte maps to a V30 word */
 	if (m_control_word & 0x20)
 		offset += 0x8000; /* Upper half */
-
+	
 	return 0xff00 | targetspace.read_byte(offset);
 }
 
