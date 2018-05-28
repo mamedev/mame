@@ -34,24 +34,42 @@ WRITE8_MEMBER(apache3_state::apache3_road_x_w)
 	m_apache3_road_x_ram[data] = offset;
 }
 
-READ16_MEMBER(roundup5_state::roundup5_vram_r)
+READ8_MEMBER(roundup5_state::gfxdata_r)
 {
-	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
-	return m_roundup5_vram[offset];
+	if((m_control_word & 0x200) == 0x200)
+	{
+		offset += (m_control_word & 0x6000) << 2;
+
+		return m_bg_gfxram[offset];
+	}
+
+	offset+=((m_control_word&0x0c00)>>10) * 0x8000;
+	return m_tx_gfxram[offset];
 }
 
-WRITE16_MEMBER(roundup5_state::roundup5_vram_w)
+WRITE8_MEMBER(roundup5_state::gfxdata_w)
 {
-	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
+	if((m_control_word & 0x200) == 0x200)
+	{	
+		offset += (m_control_word & 0x6000) << 2;
+		//m_gfxdecode->gfx(2)->mark_dirty(offset/8);
+		// TODO: temp, until we get the actual decoding
+		m_gfxdecode->gfx(2)->mark_all_dirty();
+		
+		m_bg_gfxram[offset] = data;
+		return;
+	}
 
-//  if (offset>=0x30000)
-//      logerror("effective write to vram %06x %02x (control %04x)\n",offset,data,m_control_word);
+	offset+=((m_control_word&0x0c00)>>10) * 0x8000;
 
-	COMBINE_DATA(&m_roundup5_vram[offset]);
+	if (offset>=0x18000 && data)
+		logerror("effective write to vram %06x %02x (control %04x)\n",offset,data,m_control_word);
 
-	offset=offset%0xc000;
+	m_tx_gfxram[offset] = data;
 
-	m_gfxdecode->gfx(1)->mark_dirty(offset/0x10);
+	offset=offset%0x8000;
+	
+	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
 }
 
 WRITE16_MEMBER(tatsumi_state::text_w)
@@ -180,11 +198,16 @@ VIDEO_START_MEMBER(roundup5_state,roundup5)
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
-	m_roundup5_vram = std::make_unique<uint16_t[]>((0x48000 * 4)/2);
-
+	m_tx_gfxram = std::make_unique<uint8_t[]>(0x20000);
+	m_bg_gfxram = std::make_unique<uint8_t[]>(0x20000);
+	
 	m_tx_layer->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(1)->set_source((uint8_t *)m_roundup5_vram.get());
+	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
+	m_gfxdecode->gfx(2)->set_source(m_bg_gfxram.get());
+	
+	save_pointer(NAME(m_tx_gfxram.get()),0x20000);
+	save_pointer(NAME(m_bg_gfxram.get()),0x20000);
 }
 
 VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)

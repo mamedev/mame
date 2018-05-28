@@ -289,7 +289,7 @@ void roundup5_state::roundup5_v30_map(address_map &map)
 	map(0x0f000, 0x0ffff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x10000, 0x1ffff).rw(this, FUNC(roundup5_state::roundup_v30_z80_r), FUNC(roundup5_state::roundup_v30_z80_w));
 	map(0x20000, 0x2ffff).rw(this, FUNC(roundup5_state::tatsumi_v30_68000_r), FUNC(roundup5_state::tatsumi_v30_68000_w));
-	map(0x30000, 0x3ffff).rw(this, FUNC(roundup5_state::roundup5_vram_r), FUNC(roundup5_state::roundup5_vram_w));
+	map(0x30000, 0x3ffff).rw(this, FUNC(roundup5_state::gfxdata_r), FUNC(roundup5_state::gfxdata_w)).umask16(0x00ff);
 	map(0x80000, 0xfffff).rom();
 }
 
@@ -842,12 +842,25 @@ static const gfx_layout spritelayout =
 static const gfx_layout roundup5_vramlayout =
 {
 	8,8,
-	4096 + 2048,
+	4096,
 	3,
-	{ 0x30000 * 8, 0x18000 * 8, 0 },
+	{ 0x10000 * 8, 0x8000 * 8, 0 },
 	{ STEP8(0,1) },
-	{ STEP8(0,8*2) },
-	8*16
+	{ STEP8(0,8) },
+	8*8
+};
+
+// TODO: wrong, just for debugging
+// color data is likely to be at 0x100 - 0x11f (same color as background during VRAM uploads)
+static const gfx_layout roundup5_bglayout =
+{
+	8,8,
+	4096*4,
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 static GFXDECODE_START( gfx_apache3 )
@@ -858,6 +871,7 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_roundup5 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     1024, 256)
 	GFXDECODE_ENTRY(  nullptr,  0, roundup5_vramlayout, 0,  16)
+	GFXDECODE_ENTRY(  nullptr,  0, roundup5_bglayout, 512,  1)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cyclwarr )

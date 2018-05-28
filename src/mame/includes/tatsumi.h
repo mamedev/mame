@@ -148,8 +148,8 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_control_w);
 	DECLARE_WRITE16_MEMBER(roundup5_d0000_w);
 	DECLARE_WRITE16_MEMBER(roundup5_e0000_w);
-	DECLARE_READ16_MEMBER(roundup5_vram_r);
-	DECLARE_WRITE16_MEMBER(roundup5_vram_w);
+	DECLARE_READ8_MEMBER(gfxdata_r);
+	DECLARE_WRITE8_MEMBER(gfxdata_w);
 
 	void init_roundup5();
 	DECLARE_VIDEO_START(roundup5);
@@ -172,7 +172,8 @@ private:
 	required_shared_ptr<uint16_t> m_roundup_p_ram;
 	required_shared_ptr<uint16_t> m_roundup_l_ram;
 
-	std::unique_ptr<uint16_t[]> m_roundup5_vram;
+	std::unique_ptr<uint8_t[]> m_tx_gfxram;
+	std::unique_ptr<uint8_t[]> m_bg_gfxram;
 };
 
 class cyclwarr_state : public tatsumi_state
