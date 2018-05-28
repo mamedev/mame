@@ -220,7 +220,7 @@ public:
 	template <typename T> tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tia_tag)
 		: tia_pal_video_device(mconfig, tag, owner, clock)
 	{
-		m_tia.set_tag(std::forward<T>(tia_tag));
+		set_tia_tag(tia_tag);
 	}
 
 	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -238,7 +238,7 @@ public:
 	template <typename T> tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tia_tag)
 		: tia_ntsc_video_device(mconfig, tag, owner, clock)
 	{
-		m_tia.set_tag(std::forward<T>(tia_tag));
+		set_tia_tag(tia_tag);
 	}
 
 	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
