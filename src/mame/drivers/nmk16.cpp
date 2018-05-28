@@ -7041,6 +7041,14 @@ ROM_START( manybloc )
 	ROM_LOAD( "u120.bpr",    0x0320, 0x0100, CRC(576c5984) SHA1(6e9b7f30de0d91cb766a62abc5888ec9af085a27) ) /* unknown */
 ROM_END
 
+/*
+
+There are many gambling related strings in the Tom Tom Magic ROMs
+
+An alt version is called Lucky Ball TomTom Magic, possibly that one is a gambling title and this isn't?
+There is also known to exsist and alternate titled version called Tong Tong Magic
+
+*/
 ROM_START( tomagic )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 */
 	ROM_LOAD16_BYTE( "4.bin", 0x00000, 0x40000, CRC(5055664a) SHA1(d078bd5ab30aedb760bf0a0237484fb56a51d759) )
@@ -7064,7 +7072,7 @@ ROM_START( tomagic )
 	ROM_REGION( 0x80000, "oki1", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "1.bin",  0x00000, 0x40000, CRC(02b042e3) SHA1(05fca0f83292be49cef457633aba36fed3dc0114) )
 
-	// & undumped PROMs?
+	// & undumped PROMs - N82S123N, N82S129N & N82S147AN
 ROM_END
 
 /***************************************************************************
@@ -8245,4 +8253,4 @@ GAME( 2001, firehawkv,  spec2k,   firehawk,     firehawkv,    nmk16_state, empty
 GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_tharrier,        ROT270, "Bee-Oh",                            "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // clone board, different sound / bg hardware, but similar memory maps, same tx layer, sprites etc.
-GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 ) // there are many gambling related strings in the ROM, and an alt version is called Lucky Ball, possibly that one is a gambling title and this isn't?
+GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 )
