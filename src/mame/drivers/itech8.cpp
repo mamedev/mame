@@ -8,11 +8,11 @@
     driver by Aaron Giles
 
     Games supported:
-        * Strata Bowling [2 sets]
+        * Strata Bowling [3 sets]
         * Super Strike Bowling
         * Wheel of Fortune [2 sets]
         * Grudge Match
-        * Golden Tee Golf [2 sets]
+        * Golden Tee Golf [4 sets]
         * Golden Tee Golf II [3 sets]
         * Slick Shot [3 sets]
         * Dyno-Bop
@@ -2101,9 +2101,31 @@ ROM_END
 
 ROM_START( gtg )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bin_3.1.u5", 0x04000, 0x4000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version */
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_LOAD( "gtg_joy_3.3_u5.u5", 0x04000, 0x4000, CRC(983a5c0c) SHA1(245fd6b86e96ef57ea9a85c7a501d846e135cfc6) ) /* Joystick version - Labeled GTG JOY V3.3 (U5) */
+	ROM_CONTINUE(                  0x10000, 0xc000 )
+	ROM_COPY( "maincpu",  0x14000, 0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "grom5.grom5",      0xa0000, 0x20000, CRC(c108c56c) SHA1(5c67b6479e093c34e7ee2b68d93eba07a96f72e4) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+ROM_END
+
+
+ROM_START( gtgj31 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_LOAD( "gtg_joy_3.1_u5.u5", 0x04000, 0x4000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version - Labeled GTG JOY V3.1 (U5) */
+	ROM_CONTINUE(                  0x10000, 0xc000 )
+	ROM_COPY( "maincpu",  0x14000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
@@ -2119,6 +2141,7 @@ ROM_START( gtg )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
+
 
 ROM_START( gtgt )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
@@ -2140,6 +2163,7 @@ ROM_START( gtgt )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "golf-srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
+
 
 ROM_START( gtgt1 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
@@ -2187,7 +2211,6 @@ ROM_START( gtg2t )
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u11", 0x0000, 0x0104, CRC(9bf5a75f) SHA1(79786f7ce656f30a33a92887a290b767a7cbbf31) )
 ROM_END
-
 
 
 ROM_START( gtg2j )
@@ -2788,7 +2811,8 @@ GAME( 1989, grmatch,    0,        grmatch,           grmatch,  itech8_state, ini
 /* Strata Bowling-style PCB */
 GAME( 1990, stratab,    0,        stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
 GAME( 1990, stratab1,   stratab,  stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
-GAME( 1990, gtg,        0,        stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
+GAME( 1990, gtg,        0,        stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.3)", 0 )
+GAME( 1990, gtgj31,     gtg,      stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
 GAME( 1989, gtgt,       gtg,      stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
 GAME( 1989, gtgt1,      gtg,      stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
 GAME( 1989, gtg2t,      gtg2,     stratab_hi,        gtg2t,    itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
