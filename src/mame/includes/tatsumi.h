@@ -20,8 +20,8 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")
-		, m_68k_ram(*this, "68k_ram")
-		, m_sprite_control_ram(*this, "sprite_ctlram")
+		, m_sharedram(*this, "sharedram")
+		, m_sprite_control_ram(*this, "obj_ctrl_ram")
 		, m_spriteram(*this, "spriteram")
 		, m_mainregion(*this, "maincpu")
 		, m_subregion(*this, "sub")
@@ -36,7 +36,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<uint16_t> m_videoram;
-	optional_shared_ptr<uint16_t> m_68k_ram;
+	optional_shared_ptr<uint16_t> m_sharedram;
 	required_shared_ptr<uint16_t> m_sprite_control_ram;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_memory_region m_mainregion;
@@ -132,22 +132,21 @@ class roundup5_state : public tatsumi_state
 public:
 	roundup5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
-		, m_roundup5_d0000_ram(*this, "ru5_d0000_ram")
-		, m_roundup5_e0000_ram(*this, "ru5_e0000_ram")
-		, m_roundup5_unknown0(*this, "ru5_unknown0")
+		, m_vregs(*this, "vregs")
 		, m_bg_scrollx(*this, "bg_scrollx")
 		, m_bg_scrolly(*this, "bg_scrolly")
-		, m_roundup_r_ram(*this, "roundup_r_ram")
-		, m_roundup_p_ram(*this, "roundup_p_ram")
-		, m_roundup_l_ram(*this, "roundup_l_ram")
+		, m_road_ctrl_ram(*this, "road_ctrl_ram")
+		, m_road_pixel_ram(*this, "road_pixel_ram")
+		, m_road_color_ram(*this, "road_color_ram")
+		, m_road_yclip(*this, "road_yclip")
+		, m_road_vregs(*this, "road_vregs")
 	{
 	}
 
 	DECLARE_READ16_MEMBER(roundup_v30_z80_r);
 	DECLARE_WRITE16_MEMBER(roundup_v30_z80_w);
 	DECLARE_WRITE16_MEMBER(roundup5_control_w);
-	DECLARE_WRITE16_MEMBER(roundup5_d0000_w);
-	DECLARE_WRITE16_MEMBER(roundup5_e0000_w);
+	DECLARE_WRITE16_MEMBER(road_vregs_w);
 	DECLARE_READ8_MEMBER(gfxdata_r);
 	DECLARE_WRITE8_MEMBER(gfxdata_w);
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -168,14 +167,14 @@ private:
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
 	
-	required_shared_ptr<uint16_t> m_roundup5_d0000_ram;
-	required_shared_ptr<uint16_t> m_roundup5_e0000_ram;
-	required_shared_ptr<uint16_t> m_roundup5_unknown0;
+	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_bg_scrollx;
 	required_shared_ptr<uint16_t> m_bg_scrolly;
-	required_shared_ptr<uint16_t> m_roundup_r_ram;
-	required_shared_ptr<uint16_t> m_roundup_p_ram;
-	required_shared_ptr<uint16_t> m_roundup_l_ram;
+	required_shared_ptr<uint16_t> m_road_ctrl_ram;
+	required_shared_ptr<uint16_t> m_road_pixel_ram;
+	required_shared_ptr<uint16_t> m_road_color_ram;
+	required_shared_ptr<uint16_t> m_road_yclip;
+	required_shared_ptr<uint16_t> m_road_vregs;
 
 	std::unique_ptr<uint8_t[]> m_tx_gfxram;
 	std::unique_ptr<uint8_t[]> m_bg_gfxram;

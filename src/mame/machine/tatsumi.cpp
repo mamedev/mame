@@ -207,19 +207,13 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 	m_last_control = m_control_word;
 }
 
-WRITE16_MEMBER(roundup5_state::roundup5_d0000_w)
-{
-	COMBINE_DATA(&m_roundup5_d0000_ram[offset]);
-//  logerror("d_68k_d0000_w %s %04x\n", m_maincpu->pc(), data);
-}
-
-WRITE16_MEMBER(roundup5_state::roundup5_e0000_w)
+WRITE16_MEMBER(roundup5_state::road_vregs_w)
 {
 	/*  Bit 0x10 is road bank select,
 	    Bit 0x100 is used, but unknown
 	*/
 
-	COMBINE_DATA(&m_roundup5_e0000_ram[offset]);
+	COMBINE_DATA(&m_road_vregs[offset]);
 	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
 //  logerror("d_68k_e0000_w %s %04x\n", m_maincpu->pc(), data);
@@ -286,7 +280,7 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 		}
 		#endif
 
-		return m_68k_ram[offset & 0x1fff];
+		return m_sharedram[offset & 0x1fff];
 	}
 
 	/* Read from 68k ROM */
@@ -300,7 +294,7 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 	if ((m_control_word&0x1f)!=0x18)
 		logerror("68k write in bank %05x\n",m_control_word);
 
-	COMBINE_DATA(&m_68k_ram[offset]);
+	COMBINE_DATA(&m_sharedram[offset]);
 }
 
 /***********************************************************************************/

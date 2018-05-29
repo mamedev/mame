@@ -270,9 +270,9 @@ void apache3_state::apache3_v30_map(address_map &map)
 void apache3_state::apache3_68000_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
-	map(0x80000, 0x83fff).ram().share("68k_ram");
+	map(0x80000, 0x83fff).ram().share("sharedram");
 	map(0x90000, 0x93fff).ram().share("spriteram");
-	map(0x9a000, 0x9a1ff).rw(this, FUNC(apache3_state::tatsumi_sprite_control_r), FUNC(apache3_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0x9a000, 0x9a1ff).rw(this, FUNC(apache3_state::tatsumi_sprite_control_r), FUNC(apache3_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
 	map(0xa0000, 0xa0001).w(this, FUNC(apache3_state::apache3_rotate_w)); // /BNKCS
 	map(0xb0000, 0xb0001).w(this, FUNC(apache3_state::apache3_z80_ctrl_w));
 	map(0xc0000, 0xc0001).w(this, FUNC(apache3_state::apache3_road_z_w)); // /LINCS
@@ -305,7 +305,7 @@ void roundup5_state::roundup5_v30_map(address_map &map)
 	map(0x08000, 0x0bfff).ram().w(this, FUNC(roundup5_state::text_w)).share("videoram");
 	map(0x0c000, 0x0c003).w(this, FUNC(tatsumi_state::hd6445_crt_w)).umask16(0x00ff);
 	map(0x0d000, 0x0d001).portr("DSW");
-	map(0x0d400, 0x0d40f).ram().share("ru5_unknown0");
+	map(0x0d400, 0x0d40f).ram().share("vregs");
 	map(0x0d800, 0x0d801).writeonly().share("bg_scrollx");
 	map(0x0dc00, 0x0dc01).writeonly().share("bg_scrolly");
 	map(0x0e000, 0x0e001).w(this, FUNC(roundup5_state::roundup5_control_w));
@@ -319,14 +319,14 @@ void roundup5_state::roundup5_v30_map(address_map &map)
 void roundup5_state::roundup5_68000_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
-	map(0x80000, 0x83fff).ram().share("68k_ram");
+	map(0x80000, 0x83fff).ram().share("sharedram");
 	map(0x90000, 0x93fff).ram().share("spriteram");
-	map(0x9a000, 0x9a1ff).rw(this, FUNC(roundup5_state::tatsumi_sprite_control_r), FUNC(roundup5_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
-	map(0xa0000, 0xa0fff).ram().share("roundup_r_ram"); // Road control data
-	map(0xb0000, 0xb0fff).ram().share("roundup_p_ram"); // Road pixel data
-	map(0xc0000, 0xc0fff).ram().share("roundup_l_ram"); // Road colour data
-	map(0xd0000, 0xd0003).ram().w(this, FUNC(roundup5_state::roundup5_d0000_w)).share("ru5_d0000_ram");
-	map(0xe0000, 0xe0001).ram().w(this, FUNC(roundup5_state::roundup5_e0000_w)).share("ru5_e0000_ram");
+	map(0x9a000, 0x9a1ff).rw(this, FUNC(roundup5_state::tatsumi_sprite_control_r), FUNC(roundup5_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
+	map(0xa0000, 0xa0fff).ram().share("road_ctrl_ram"); // Road control data
+	map(0xb0000, 0xb0fff).ram().share("road_pixel_ram"); // Road pixel data
+	map(0xc0000, 0xc0fff).ram().share("road_color_ram"); // Road colour data
+	map(0xd0000, 0xd0001).ram().share("road_yclip");
+	map(0xe0000, 0xe0001).ram().w(this, FUNC(roundup5_state::road_vregs_w)).share("road_vregs");
 }
 
 void roundup5_state::roundup5_z80_map(address_map &map)
@@ -359,7 +359,7 @@ void cyclwarr_state::cyclwarr_68000a_map(address_map &map)
 	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0bc000, 0x0bc001).w(this, FUNC(cyclwarr_state::output_w));
 	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
-	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
 	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x1bffff).bankr("bank2"); /* CPU B ROM */
 	map(0x2c0000, 0x33ffff).bankr("bank1"); /* CPU A ROM */
@@ -379,7 +379,7 @@ void cyclwarr_state::cyclwarr_68000b_map(address_map &map)
 	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w));
-	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
 	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x1bffff).bankr("bank2"); /* CPU B ROM */
 	map(0x2c0000, 0x33ffff).bankr("bank1"); /* CPU A ROM */
@@ -418,7 +418,7 @@ void cyclwarr_state::bigfight_68000a_map(address_map &map)
 	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0bc000, 0x0bc001).w(this, FUNC(cyclwarr_state::output_w));
 	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
-	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
 	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x100000, 0x17ffff).bankr("bank2"); /* CPU A ROM */
 	map(0x200000, 0x27ffff).bankr("bank1"); /* CPU B ROM */
@@ -436,7 +436,7 @@ void cyclwarr_state::bigfight_68000b_map(address_map &map)
 	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w));
-	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
 	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x100000, 0x17ffff).bankr("bank2"); /* CPU A ROM */
 	map(0x200000, 0x27ffff).bankr("bank1"); /* CPU B ROM */

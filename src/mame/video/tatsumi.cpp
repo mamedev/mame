@@ -760,18 +760,18 @@ pos is 11.5 fixed point
 */
 	int y,x;
 	int visible_line=0;
-	const uint16_t *data = m_roundup_r_ram;
+	const uint16_t *data = m_road_ctrl_ram;
 	
 	// Road layer enable (?)
-	if ((m_roundup5_unknown0[0x1]&0x1)==0)
+	if ((m_vregs[0x1]&0x1)==0)
 		return;
 
 	// Road data bank select (double buffered)
-	if (m_roundup5_e0000_ram[0]&0x10)
+	if (m_road_vregs[0]&0x10)
 		data+=0x400;
 	
 	// Apply clipping: global screen + local road y offsets
-	y = 256 - ((m_roundup5_unknown0[0xa/2] >> 8) + m_roundup5_d0000_ram[0]);
+	y = 256 - ((m_vregs[0xa/2] >> 8) + m_road_yclip[0]);
 	data+=y*4;
 
 	visible_line=0;
@@ -783,10 +783,10 @@ pos is 11.5 fixed point
 		int pal = 4; //(data[3]>>8)&0xf;
 		int step=((data[1]&0xff)<<8)|((data[1]&0xff00)>>8);
 		int samplePos=0;
-		const uint16_t* linedata=m_roundup_p_ram;// + (0x100 * pal);
+		const uint16_t* linedata=m_road_pixel_ram;// + (0x100 * pal);
 		int startPos=0, endPos=0;
 
-		int palette_byte;//=m_roundup_l_ram[visible_line/8];
+		int palette_byte;//=m_road_color_ram[visible_line/8];
 
 		/*
 		    Each road line consists of up to two sets of 128 pixel data that can be positioned
@@ -811,7 +811,7 @@ offset is from last pixel of first road segment?
 
 		*/
 
-		palette_byte=m_roundup_l_ram[visible_line/8];
+		palette_byte=m_road_color_ram[visible_line/8];
 		pal = 4 + ((palette_byte>>(visible_line%8))&1);
 
 		visible_line++;
@@ -1060,8 +1060,8 @@ if (0) {
 void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type)
 {
 	// TODO: guess, assume back layer having less scroll increment than front for parallax scrolling.
-	// also notice that unknown0[8/2] >> 8 is identical to [0x0c/2], always?
-	uint16_t x_base = type ? m_bg_scrollx[0] : m_roundup5_unknown0[0xc/2];
+	// also notice that m_vregs[8/2] >> 8 is identical to [0x0c/2], always?
+	uint16_t x_base = type ? m_bg_scrollx[0] : m_vregs[0xc/2];
 	// TODO: maybe [0xa/2] applies here as well?
 	uint16_t y_base = m_bg_scrolly[0] & 0x1ff;
 	uint16_t y_scroll = 0x180 - y_base;
@@ -1073,7 +1073,7 @@ void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &clipr
 	if(type)
 		y_scroll += 64;
 	
-	//popmessage("%04x %04x %04x",m_roundup5_unknown0[8/2],m_roundup5_unknown0[0xc/2],m_bg_scrollx[0]);
+	//popmessage("%04x %04x %04x",m_vregs[8/2],m_vregs[0xc/2],m_bg_scrollx[0]);
 	
 	for(int y = 0; y < ysize; y++)
 	{
