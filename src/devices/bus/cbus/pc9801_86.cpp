@@ -83,9 +83,9 @@ ROM_START( pc9801_86 )
 	// supposedly these are -86 roms according to eikanwa2 sound card detection,
 	// loading a -26 rom in a -86 environment causes an hang there.
 	ROM_SYSTEM_BIOS( 0,  "86rx",    "nec86rx" )
-	ROMX_LOAD( "sound_rx.rom",    0x0000, 0x4000, BAD_DUMP CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef), ROM_BIOS(1) )
+	ROMX_LOAD( "sound_rx.rom",    0x0000, 0x4000, BAD_DUMP CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1,  "86mu",    "nec86mu" )
-	ROMX_LOAD( "sound_486mu.rom", 0x0000, 0x4000, BAD_DUMP CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c), ROM_BIOS(2) )
+	ROMX_LOAD( "sound_486mu.rom", 0x0000, 0x4000, BAD_DUMP CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c), ROM_BIOS(1) )
 
 	// RAM
 	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )

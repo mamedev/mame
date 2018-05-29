@@ -84,7 +84,7 @@ WRITE8_MEMBER(tatsumi_state::hd6445_crt_w)
 	{
 		m_hd6445_reg[m_hd6445_address] = data;
 		
-		static const char *regnames[40] =
+		static char const *const regnames[40] =
 		{ 
 			"Horizontal Total Characters", "Horizontal Displayed Characters", "Horizontal Sync Position",   "Sync Width",
 			"Vertical Total Rows",         "Vertical Total Adjust",           "Vertical Displayed Rows",    "Vertical Sync Position",

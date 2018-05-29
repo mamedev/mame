@@ -593,20 +593,20 @@ MACHINE_CONFIG_END
 ROM_START(apfm1000)
 	ROM_REGION(0x1000,"roms", 0)
 	ROM_SYSTEM_BIOS( 0, "0", "Standard" )
-	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4), ROM_BIOS(1) )
+	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4), ROM_BIOS(0) )
 	ROM_RELOAD(0x0800, 0x0800)
 
 	ROM_SYSTEM_BIOS( 1, "trash", "Trash II" ) // In Rocket Patrol, the ships are replaced by garbage trucks
-	ROMX_LOAD("trash-ii.bin", 0x0000, 0x1000, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(2) )
+	ROMX_LOAD("trash-ii.bin", 0x0000, 0x1000, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 2, "mod", "Mod Bios" ) // (c) 1982 W.Lunquist - In Basic, CALL 18450 to get a machine-language monitor
-	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(3) )
+	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(2) )
 ROM_END
 
 #define rom_apfimag rom_apfm1000
 
 // old rom, has a bad byte at 0087.
-//ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(1) )
+//ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(0) )
 
 /***************************************************************************
 
@@ -614,6 +614,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME
 COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
 CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )

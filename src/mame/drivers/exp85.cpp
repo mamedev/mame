@@ -221,17 +221,17 @@ ROM_START( exp85 )
 	ROM_LOAD( "d000.bin", 0xd000, 0x0800, CRC(c10c4a22) SHA1(30588ba0b27a775d85f8c581ad54400c8521225d) )
 	ROM_LOAD( "d800.bin", 0xd800, 0x0800, CRC(dfa43ef4) SHA1(56a7e7a64928bdd1d5f0519023d1594cacef49b3) )
 	ROM_SYSTEM_BIOS( 0, "eia", "EIA Terminal" )
-	ROMX_LOAD( "ex 85.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(1) )
+	ROMX_LOAD( "ex 85.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "hex", "Hex Keyboard" )
-	ROMX_LOAD( "1kbd.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "1kbd.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, I8355_TAG, ROMREGION_ERASE00 )
 
 /*  ROM_DEFAULT_BIOS("terminal")
     ROM_SYSTEM_BIOS( 0, "terminal", "Terminal" )
-    ROMX_LOAD( "eia.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(1) )
+    ROMX_LOAD( "eia.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(0) )
     ROM_SYSTEM_BIOS( 1, "hexkbd", "Hex Keyboard" )
-    ROMX_LOAD( "hex.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(2) )*/
+    ROMX_LOAD( "hex.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(1) )*/
 ROM_END
 
 /* System Drivers */

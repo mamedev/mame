@@ -716,7 +716,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define BIOS_CPU                                            \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \

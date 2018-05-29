@@ -87,11 +87,11 @@ ROM_START( m1comm )
 
 	// found on Virtua Racing and WingWar
 	ROM_SYSTEM_BIOS( 0, "epr15112", "EPR-15112" )
-	ROMX_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a), ROM_BIOS(1) )
+	ROMX_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a), ROM_BIOS(0) )
 
 	// found on Virtua Formula
 	ROM_SYSTEM_BIOS( 1, "epr15624", "EPR-15624" )
-	ROMX_LOAD( "epr-15624.17", 0x0000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a), ROM_BIOS(2) )
+	ROMX_LOAD( "epr-15624.17", 0x0000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a), ROM_BIOS(1) )
 ROM_END
 
 //**************************************************************************

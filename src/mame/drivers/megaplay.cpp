@@ -54,11 +54,11 @@ this reason.
 class mplay_state : public md_base_state
 {
 public:
-	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag),
-	m_ic3_ram(*this, "ic3_ram"),
-	m_vdp1(*this, "vdp1"),
-	m_bioscpu(*this, "mtbios")
+	mplay_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_base_state(mconfig, type, tag),
+		m_ic3_ram(*this, "ic3_ram"),
+		m_vdp1(*this, "vdp1"),
+		m_bioscpu(*this, "mtbios")
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(start1_r);
@@ -711,7 +711,7 @@ MACHINE_CONFIG_END
 /* MegaPlay Games - Modified Genesis games */
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define MEGAPLAY_BIOS \
 	ROM_SYSTEM_BIOS( 0, "ver1",       "Megaplay Bios (Ver. 1)" ) \

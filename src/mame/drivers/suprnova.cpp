@@ -1034,7 +1034,7 @@ void skns_state::init_galpans3()   { m_spritegen->skns_sprite_kludge(-1,-1); ini
 // maybe we should treat each motherboard region as a separate parent / root?
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
  /* NOTE: The Euro BIOS rom has been found labeled SKNSE1 and SKNSE2 but the data is the same */
 #define SKNS_BIOS \

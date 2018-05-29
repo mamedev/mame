@@ -446,7 +446,7 @@ void csplayh5_state::init_tsuwaku()   { general_init(0x856e/2, 0x6018); }
  */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define DVD_BIOS \
 	ROM_REGION( 0x20000, "subcpu", 0 ) \

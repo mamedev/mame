@@ -222,9 +222,9 @@ as well as the PCB.
 ROM_START(gamate)
 	ROM_REGION(0x1000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "default", "DEFAULT")
-	ROMX_LOAD("gamate_bios_umc.bin", 0x0000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(1) )
+	ROMX_LOAD("gamate_bios_umc.bin", 0x0000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "newer", "NEWER")
-	ROMX_LOAD("gamate_bios_bit.bin", 0x0000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
+	ROMX_LOAD("gamate_bios_bit.bin", 0x0000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(1))
 ROM_END
 
 

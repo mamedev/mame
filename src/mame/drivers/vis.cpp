@@ -35,7 +35,6 @@ private:
 	uint8_t m_index[2]; // unknown indexed registers, volume?
 	uint8_t m_data[2][16];
 	uint8_t m_mode;
-	uint8_t m_stat;
 	uint8_t m_ctrl;
 	unsigned int m_sample_byte;
 	unsigned int m_samples;
