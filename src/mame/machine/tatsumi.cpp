@@ -209,13 +209,17 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 
 WRITE16_MEMBER(roundup5_state::road_vregs_w)
 {
-	/*  Bit 0x10 is road bank select,
-	    Bit 0x100 is used, but unknown
+	/*  
+	    ---- ---x ---- ---- enabled when there's a road slope of any kind, unknown purpose
+		---- ---- -xx- ---- enables alternatively in tunnels sometimes, color mods?
+		---- ---- ---x ---- road bank select
+		---- ---- ---- xxxx various values written during POST while accessing road pixel ram, 
+		                    otherwise 0xb at the start of irq service
 	*/
 
 	COMBINE_DATA(&m_road_vregs[offset]);
-	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
+	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 //  logerror("d_68k_e0000_w %s %04x\n", m_maincpu->pc(), data);
 }
 
