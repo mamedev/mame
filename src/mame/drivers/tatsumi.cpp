@@ -1073,60 +1073,18 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cyclwarr_state::bigfight)
+	cyclwarr(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
-
-	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
-
-	MCFG_DEVICE_ADD("io1", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P1"))
-	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P2"))
-	MCFG_CXD1095_IN_PORTE_CB(IOPORT("DSW3"))
-
-	MCFG_DEVICE_ADD("io2", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P4"))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, cyclwarr_state, cyclwarr_control_w))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
+	// TODO: it's same video HW, we don't know how/where video registers are mapped
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
-	MCFG_PALETTE_ADD("palette", 8192 + 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
-
-	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8 / 2, okim6295_device::PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	// TODO: 2MHz was too fast. Can the clock be software controlled?
+	MCFG_DEVICE_MODIFY("oki")
+	MCFG_DEVICE_CLOCK(CLOCK_1 / 8 / 2)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
