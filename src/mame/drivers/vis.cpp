@@ -212,11 +212,10 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 	}
 	if((m_mode & 0x10) && (m_mode ^ oldmode))
 	{
-		const int divs[] = {1, 2, 4, 8};
 		m_samples = 0;
 		m_sample_byte = 0;
 		m_isa->drq7_w(ASSERT_LINE);
-		attotime rate = attotime::from_ticks((double)(divs[(m_mode >> 5) & 3]), 44100.0); // TODO : Unknown clock
+		attotime rate = attotime::from_ticks((double)(1 << ((m_mode >> 5) & 3)), 44100.0); // TODO : Unknown clock
 		m_pcm->adjust(rate, 0, rate);
 	}
 	else if(!(m_mode & 0x10))
