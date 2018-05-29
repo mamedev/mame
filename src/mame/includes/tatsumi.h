@@ -23,8 +23,8 @@ public:
 		, m_sharedram(*this, "sharedram")
 		, m_sprite_control_ram(*this, "obj_ctrl_ram")
 		, m_spriteram(*this, "spriteram")
-		, m_mainregion(*this, "maincpu")
-		, m_subregion(*this, "sub")
+		, m_mainregion(*this, "master_rom")
+		, m_subregion(*this, "slave_rom")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -39,8 +39,8 @@ public:
 	optional_shared_ptr<uint16_t> m_sharedram;
 	required_shared_ptr<uint16_t> m_sprite_control_ram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_memory_region m_mainregion;
-	required_memory_region m_subregion;
+	optional_memory_region m_mainregion;
+	optional_memory_region m_subregion;
 
 	uint8_t *m_rom_sprite_lookup[2];
 	uint8_t *m_rom_clut[2];
@@ -186,8 +186,8 @@ public:
 	cyclwarr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
 		, m_soundlatch(*this, "soundlatch")
-		, m_cyclwarr_cpua_ram(*this, "cw_cpua_ram")
-		, m_cyclwarr_cpub_ram(*this, "cw_cpub_ram")
+		, m_master_ram(*this, "master_ram")
+		, m_slave_ram(*this, "slave_ram")
 		, m_cyclwarr_videoram(*this, "cw_videoram%u", 0U)
 		, m_cyclwarr_tileclut(*this, "cw_tileclut")
 	{
@@ -214,20 +214,19 @@ public:
 
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
+
 	void common_map(address_map &map);
-	void bigfight_68000a_map(address_map &map);
-	void bigfight_68000b_map(address_map &map);
-	void cyclwarr_68000a_map(address_map &map);
-	void cyclwarr_68000b_map(address_map &map);
-	void cyclwarr_z80_map(address_map &map);
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+	void sound_map(address_map &map);
 	
 protected:
 	virtual void machine_reset() override;
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<uint16_t> m_cyclwarr_cpua_ram;
-	required_shared_ptr<uint16_t> m_cyclwarr_cpub_ram;
+	required_shared_ptr<uint16_t> m_master_ram;
+	required_shared_ptr<uint16_t> m_slave_ram;
 	required_shared_ptr_array<uint16_t, 2> m_cyclwarr_videoram;
 	required_region_ptr<uint8_t> m_cyclwarr_tileclut;
 

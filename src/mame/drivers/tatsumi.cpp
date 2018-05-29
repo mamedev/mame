@@ -359,48 +359,36 @@ void cyclwarr_state::common_map(address_map &map)
 	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
 	map(0x0ca000, 0x0ca1ff).rw(this, FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
 	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	
+	// games accesses these ranges differently, we do mirroring in rom loading to make them match.
+	// address bit A19 controls if access routes to upper or lower roms
+	// TODO: it's unknown what Big Fight is supposed to return for the lower roms, let's assume mirror for the time being.
+	// slave ROMs
+	// 0x140000 - 0x1bffff tested in Cycle Warriors
+	// 0x100000 - 0x17ffff tested in Big Fight
+	map(0x100000, 0x1fffff).rom().region("slave_rom",0);
+	// same as above but A20 instead of A19
+	// master ROMs
+	// 0x2c0000 - 0x33ffff tested in Cycle Warriors
+	// 0x200000 - 0x27ffff tested in Big Fight
+	map(0x200000, 0x3fffff).rom().region("master_rom",0);
 }
 
-void cyclwarr_state::cyclwarr_68000a_map(address_map &map)
+void cyclwarr_state::master_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).ram().share("cw_cpua_ram");
-	map(0x03e000, 0x03efff).ram();
-	map(0x040000, 0x04ffff).ram().share("cw_cpub_ram");
+	map(0x000000, 0x00ffff).ram().share("master_ram");
+	map(0x03e000, 0x03efff).ram(); // RAM_A
+	map(0x040000, 0x04ffff).ram().share("slave_ram");
 	common_map(map);
-	map(0x140000, 0x1bffff).bankr("bank2"); /* CPU B ROM */
-	map(0x2c0000, 0x33ffff).bankr("bank1"); /* CPU A ROM */
 }
 
-void cyclwarr_state::cyclwarr_68000b_map(address_map &map)
+void cyclwarr_state::slave_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).ram().share("cw_cpub_ram");
+	map(0x000000, 0x00ffff).ram().share("slave_ram");
 	common_map(map);
-	map(0x140000, 0x1bffff).bankr("bank2"); /* CPU B ROM */
-	map(0x2c0000, 0x33ffff).bankr("bank1"); /* CPU A ROM */
 }
 
-// TODO: merge with above
-void cyclwarr_state::bigfight_68000a_map(address_map &map)
-{
-	map(0x000000, 0x00ffff).ram().share("cw_cpua_ram");
-
-	map(0x03e000, 0x03efff).ram();
-	map(0x040000, 0x04ffff).ram().share("cw_cpub_ram");
-	common_map(map);
-	map(0x100000, 0x17ffff).bankr("bank2"); /* CPU A ROM */
-	map(0x200000, 0x27ffff).bankr("bank1"); /* CPU B ROM */
-}
-
-void cyclwarr_state::bigfight_68000b_map(address_map &map)
-{
-	map(0x000000, 0x00ffff).ram().share("cw_cpub_ram");
-	common_map(map);
-	map(0x100000, 0x17ffff).bankr("bank2"); /* CPU A ROM */
-	map(0x200000, 0x27ffff).bankr("bank1"); /* CPU B ROM */
-}
-
-
-void cyclwarr_state::cyclwarr_z80_map(address_map &map)
+void cyclwarr_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffef).ram();
@@ -1004,30 +992,41 @@ MACHINE_CONFIG_END
 
 void cyclwarr_state::machine_reset()
 {
-	uint8_t *dst = m_subregion->base();
-	memcpy(m_cyclwarr_cpub_ram,dst,8);
-	membank("bank2")->set_base(dst);
+	uint16_t *src;
+	
+	// transfer data from rom to initial vector table
+	src = (uint16_t *)memregion("master_rom")->base();
+	
+	for(int i=0;i<0x100/2;i++)
+		m_master_ram[i] = src[i];
+		
+	src = (uint16_t *)memregion("slave_rom")->base();
+
+	for(int i=0;i<0x100/2;i++)
+		m_slave_ram[i] = src[i];
+
+	// reset CPUs again so that above will be notified.
+	// TODO: better way?
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	
 	m_last_control = 0;
 	m_control_word = 0;
-
-	// reset sub CPU so that above will be notified.
-	// TODO: better way?
-	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_68000a_map)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
 	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_68000b_map)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_z80_map)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	// saner sync value (avoids crashing after crediting)
 	MCFG_QUANTUM_TIME(attotime::from_hz(CLOCK_2 / 1024))
@@ -1077,15 +1076,15 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bigfight_68000a_map)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
 	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bigfight_68000b_map)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_z80_map)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -1281,17 +1280,25 @@ ROM_START( roundup5 )
 ROM_END
 
 ROM_START( cyclwarr )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 main cpu */
+	ROM_REGION16_BE( 0x200000, "master_rom", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "cw16c",   0x000000, 0x20000, CRC(4d88892b) SHA1(dc85231a3c4f83118922c13615381f185bcee832) )
 	ROM_LOAD16_BYTE( "cw18c",   0x000001, 0x20000, CRC(4ff56209) SHA1(d628dc3fdc3e9de568ba8dbabf8e13a62e20a215) )
-	ROM_LOAD16_BYTE( "cw17b",   0x040000, 0x20000, CRC(da998afc) SHA1(dd9377ce079df5c66bdb29dfd333428cce817656) )
-	ROM_LOAD16_BYTE( "cw19b",   0x040001, 0x20000, CRC(c15a8413) SHA1(647b2a994a4912b5d7dc71b875f5d08c14412c6a) )
+	ROM_COPY("master_rom",      0x000000, 0x040000, 0x040000 )
+	ROM_COPY("master_rom",      0x000000, 0x080000, 0x040000 )
+	ROM_COPY("master_rom",      0x000000, 0x0c0000, 0x040000 )
+	ROM_LOAD16_BYTE( "cw17b",   0x100000, 0x20000, CRC(da998afc) SHA1(dd9377ce079df5c66bdb29dfd333428cce817656) )
+	ROM_LOAD16_BYTE( "cw19b",   0x100001, 0x20000, CRC(c15a8413) SHA1(647b2a994a4912b5d7dc71b875f5d08c14412c6a) )
+	ROM_COPY("master_rom",      0x100000, 0x140000, 0x040000 )
+	ROM_COPY("master_rom",      0x100000, 0x180000, 0x040000 )
+	ROM_COPY("master_rom",      0x100000, 0x1c0000, 0x040000 )
 
-	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
+	ROM_REGION16_BE( 0x100000, "slave_rom", 0 ) /* 68000 sub cpu */
 	ROM_LOAD16_BYTE( "cw20b",   0x000000, 0x20000, CRC(4d75292a) SHA1(71d59c1d03b323d4021209a7f0506b4a855a73af) )
 	ROM_LOAD16_BYTE( "cw22b",   0x000001, 0x20000, CRC(0aec0ba4) SHA1(d559e54d303afac4a981c4a933a05278044ac068) )
-	ROM_LOAD16_BYTE( "cw21",    0x040000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
-	ROM_LOAD16_BYTE( "cw23",    0x040001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
+	ROM_COPY("slave_rom",       0x000000, 0x40000, 0x040000 )
+	ROM_LOAD16_BYTE( "cw21",    0x080000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
+	ROM_LOAD16_BYTE( "cw23",    0x080001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
+	ROM_COPY("slave_rom",       0x080000, 0xc0000, 0x040000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
@@ -1333,17 +1340,25 @@ ROM_START( cyclwarr )
 ROM_END
 
 ROM_START( cyclwarra )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 main cpu */
+	ROM_REGION16_BE( 0x200000, "master_rom", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "cw16b",   0x000000, 0x20000, CRC(cb1a737a) SHA1(a603ee1256be5641d00a72f64efaaacb65ed9d7d) )
 	ROM_LOAD16_BYTE( "cw18b",   0x000001, 0x20000, CRC(0633ddcb) SHA1(1196ab17065352ec5b37f2f6b383a43a2d0fa3a6) )
-	ROM_LOAD16_BYTE( "cw17a",   0x040000, 0x20000, CRC(2ad6f836) SHA1(5fa4275b433013943ba1d1b64a3c725097f946f9) )
-	ROM_LOAD16_BYTE( "cw19a",   0x040001, 0x20000, CRC(d3853658) SHA1(c9338083a04f55bd22285176831f4b0bdb78564f) )
+	ROM_COPY("master_rom",      0x000000, 0x040000, 0x040000 )
+	ROM_COPY("master_rom",      0x000000, 0x080000, 0x040000 )
+	ROM_COPY("master_rom",      0x000000, 0x0c0000, 0x040000 )
+	ROM_LOAD16_BYTE( "cw17a",   0x100000, 0x20000, CRC(2ad6f836) SHA1(5fa4275b433013943ba1d1b64a3c725097f946f9) )
+	ROM_LOAD16_BYTE( "cw19a",   0x100001, 0x20000, CRC(d3853658) SHA1(c9338083a04f55bd22285176831f4b0bdb78564f) )
+	ROM_COPY("master_rom",      0x100000, 0x140000, 0x040000 )
+	ROM_COPY("master_rom",      0x100000, 0x180000, 0x040000 )
+	ROM_COPY("master_rom",      0x100000, 0x1c0000, 0x040000 )
 
-	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
+	ROM_REGION16_BE( 0x100000, "slave_rom", 0 ) /* 68000 sub cpu */
 	ROM_LOAD16_BYTE( "cw20a",   0x000000, 0x20000, CRC(c3578ac1) SHA1(21d369da874f01922d0f0b757a42b4321df891d4) )
 	ROM_LOAD16_BYTE( "cw22a",   0x000001, 0x20000, CRC(5339ed24) SHA1(5b0a54c2442dcf7373ff8b55b91af9772473ff77) )
-	ROM_LOAD16_BYTE( "cw21",    0x040000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
-	ROM_LOAD16_BYTE( "cw23",    0x040001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
+	ROM_COPY("slave_rom",       0x000000, 0x040000, 0x040000 )
+	ROM_LOAD16_BYTE( "cw21",    0x080000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
+	ROM_LOAD16_BYTE( "cw23",    0x080001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
+	ROM_COPY("slave_rom",       0x080000, 0x0c0000, 0x040000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
@@ -1385,13 +1400,17 @@ ROM_START( cyclwarra )
 ROM_END
 
 ROM_START( bigfight )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 main cpu */
+	ROM_REGION16_BE( 0x200000, "master_rom", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "rom16.ic77",   0x000000, 0x40000, CRC(e7304ec8) SHA1(31a37e96bf963b349d36534bc5ebbf45e19ad00e) )
 	ROM_LOAD16_BYTE( "rom17.ic98",   0x000001, 0x40000, CRC(4cf090f6) SHA1(9ae0274c890e829a90108ce316aff9665128c982) )
+	ROM_COPY("master_rom",       0x000000, 0x080000, 0x080000 )
+	ROM_COPY("master_rom",       0x100000, 0x080000, 0x080000 )
+	ROM_COPY("master_rom",       0x180000, 0x080000, 0x080000 )
 
-	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
+	ROM_REGION16_BE( 0x100000, "slave_rom", 0 ) /* 68000 sub cpu */
 	ROM_LOAD16_BYTE( "rom18.ic100",   0x000000, 0x40000, CRC(49df6207) SHA1(c4126f4542add11a3a3d236311c8787c24c98440) )
 	ROM_LOAD16_BYTE( "rom19.ic102",   0x000001, 0x40000, CRC(c12aa9e9) SHA1(19cc7feaa97c6f5148ae8c0077174f96be684f05) )
+	ROM_COPY("slave_rom",       0x000000, 0x080000, 0x080000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) )
@@ -1499,14 +1518,6 @@ void cyclwarr_state::init_cyclwarr()
 		dst+=32;
 		src2+=32;
 	}
-
-	dst = m_mainregion->base();
-	memcpy(m_cyclwarr_cpua_ram,dst,8);
-	membank("bank1")->set_base(dst);
-
-	dst = m_subregion->base();
-	memcpy(m_cyclwarr_cpub_ram,dst,8);
-	membank("bank2")->set_base(dst);
 
 	// Copy sprite & palette data out of GFX rom area
 	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
