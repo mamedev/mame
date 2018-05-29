@@ -167,8 +167,8 @@ void cyclwarr_state::tile_expand()
 				uint8_t pix = (*c0++ & 7);
 				uint8_t respix = m_cyclwarr_tileclut[(c << 3)|pix];
 				*dest++ = respix;
-				// Transparent pixels are set by both the tile pixel data==0 AND colour palette==0
-				m_mask[(c << 3) | (y & 7)] |= ((pix != 0) && (respix != 0)) ? (0x80 >> (x & 7)) : 0;
+				// Transparent pixels are set by both the tile pixel data==0 AND colour palette & 7 == 0
+				m_mask[(c << 3) | (y & 7)] |= ((pix&0x7)!=0 || ((pix&0x7)==0 && (respix&0x7)!=0)) ? (0x80 >> (x & 7)) : 0;
 			}
 			c0base += gx0->rowbytes();
 		}
