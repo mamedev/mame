@@ -11,7 +11,6 @@
     OPNA mapped at 0x58*
 
     TODO:
-    - joystick code should be shared between -26, -86 and -118
     - Test all pcm modes
     - Make volume work
     - Recording
@@ -19,7 +18,6 @@
     - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
       "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM"
       Sounds like a sound core flaw since OPNA requires a rom region in any case;
-    - SpeakBoard: sounds horrible, due of the MAME mixing (same as Sega 32X, needs user to lower individual channel volumes);
     - verify sound irq;
 
 ***************************************************************************/
@@ -390,10 +388,15 @@ pc9801_speakboard_device::pc9801_speakboard_device(const machine_config &mconfig
 MACHINE_CONFIG_START(pc9801_speakboard_device::device_add_mconfig)
 	pc9801_86_config(config);
 
+	MCFG_DEVICE_MODIFY("opna")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+
 	MCFG_DEVICE_ADD("opna_slave", YM2608, 7.987_MHz_XTAL)
 	MCFG_AY8910_OUTPUT_TYPE(0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 void pc9801_speakboard_device::device_start()
