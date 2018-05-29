@@ -214,6 +214,7 @@ public:
 
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
+	void common_map(address_map &map);
 	void bigfight_68000a_map(address_map &map);
 	void bigfight_68000b_map(address_map &map);
 	void cyclwarr_68000a_map(address_map &map);
