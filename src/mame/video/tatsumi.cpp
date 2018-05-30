@@ -1131,7 +1131,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	m_tx_layer->set_scrolly(0,(tx_start_addr >> 4) | m_hd6445_reg[0x1d]);
 
 	bitmap.fill(m_palette->pen(384), cliprect); // todo
-	screen.priority().fill(0, cliprect);	
+	screen.priority().fill(0, cliprect);
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_landscape(bitmap,cliprect,0);
 	draw_landscape(bitmap,cliprect,1);
@@ -1149,6 +1149,22 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	return 0;
 }
 
+void cyclwarr_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+{
+	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	{
+		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		{
+			uint8_t shadow = shadow_bitmap.pix8(y, x);
+			if(shadow)
+			{
+				rgb_t shadow_pen = bitmap.pix32(y, x);
+				bitmap.pix32(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
+			}
+		}
+	}	
+}
+
 uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bigfight_bank=m_bigfight_a40000[0];
@@ -1164,9 +1180,19 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	
 	bitmap.fill(m_palette->pen(0), cliprect);
 
+	#ifdef UNUSED_FUNCTION
+	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
+													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
+														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
+														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
+	#endif													
+	
+	screen.priority().fill(0, cliprect);
+	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80, false, true);
 	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80, false, false);
 	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, true, false);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
 	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80, false, false);
 
@@ -1185,11 +1211,22 @@ uint32_t cyclwarr_state::screen_update_bigfight(screen_device &screen, bitmap_rg
 		m_bigfight_last_bank=m_bigfight_bank;
 	}
 	update_cluts(8192, 4096, 8192);
+
+	#ifdef UNUSED_FUNCTION
+	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
+													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
+														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
+														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
+	#endif
 	
 	bitmap.fill(m_palette->pen(0), cliprect);
+	
+	screen.priority().fill(0, cliprect);
+	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x40, false, true);
 	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x40, false, false);
 	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, false, false);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
 	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x40, false, false);
 
