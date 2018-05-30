@@ -176,9 +176,9 @@
  *   U324  Intel 82586-10            Ethernet controller
  *   U303  CICD84607 TC110G75CY
  *   U311  NCR 53C90A                SCSI controller
- *   U336  27C010 (MPRGG360F)        128Kx8 Boot EPROM ?SB
+ *   U336  27C010 (MPRGG360F)        128Kx8 Boot EPROM MSB
  *   U341  Dallas DS1287             RTC and NVRAM
- *   U349  27C010 (MPRGG350F)        128Kx8 Boot EPROM ?SB
+ *   U349  27C010 (MPRGG350F)        128Kx8 Boot EPROM LSB
  *   U347  Intel 82072               Floppy drive controller
  *
  * 6400 (SMT046 rev B, SMT082)
@@ -735,7 +735,8 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	MCFG_DEVICE_ADD(INTERPRO_MCGA_TAG, INTERPRO_MCGA, 0)
 
 	// floppy controller
-	MCFG_I82072_ADD(INTERPRO_FDC_TAG, false)
+	// FIXME: not sure this should really be ready connected, but prevents crash at startup
+	MCFG_I82072_ADD(INTERPRO_FDC_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir1_w))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_floppy))
 
@@ -743,7 +744,7 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	MCFG_DEVICE_ADD("fdc:0", FLOPPY_CONNECTOR, 0)
 	MCFG_DEVICE_ADD("fdc:1", FLOPPY_CONNECTOR, 0)
 	MCFG_DEVICE_ADD("fdc:2", FLOPPY_CONNECTOR, 0)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", interpro_floppies, "525hd", interpro_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", interpro_floppies, "35hd", interpro_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// serial controllers and ports
@@ -986,10 +987,16 @@ MACHINE_CONFIG_START(emerald_state::ip6000)
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
 	//MCFG_DEVICE_CLOCK(80_MHz_XTAL / 2)
 
+	// EDGE systems use graphics keyboard
+	MCFG_DEVICE_MODIFY(INTERPRO_KEYBOARD_PORT_TAG)
+	MCFG_SLOT_DEFAULT_OPTION(nullptr)
+
 	// srx and slots (default to 6040 with EDGE-1 graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
 	MCFG_SRX_MEMORY(INTERPRO_CPU_TAG, 0, 1)
-	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
+	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir3_w))
+	MCFG_SRX_OUT_IRQ1_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir4_w))
+	MCFG_SRX_OUT_IRQ2_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir5_w))
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":1", srx_cards, "mpcb828", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":2", srx_cards, nullptr, false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":3", srx_cards, nullptr, false)
@@ -1009,7 +1016,9 @@ MACHINE_CONFIG_START(sapphire_state::ip6400)
 	// srx and slots (default to 6450 with GT II graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
 	MCFG_SRX_MEMORY(INTERPRO_CPU_TAG, 0, 1)
-	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
+	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir3_w))
+	MCFG_SRX_OUT_IRQ1_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir4_w))
+	MCFG_SRX_OUT_IRQ2_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir5_w))
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":1", srx_cards, "mpcbb92", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":2", srx_cards, nullptr, false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":3", srx_cards, nullptr, false)
@@ -1034,7 +1043,9 @@ MACHINE_CONFIG_START(sapphire_state::ip6700)
 	// srx and slots (default to 6780 with EDGE-2 Plus graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
 	MCFG_SRX_MEMORY(INTERPRO_CPU_TAG, 0, 1)
-	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
+	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir3_w))
+	MCFG_SRX_OUT_IRQ1_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir4_w))
+	MCFG_SRX_OUT_IRQ2_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir5_w))
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":1", srx_cards, "msmt094", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":2", srx_cards, "mpcb896", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":3", srx_cards, nullptr, false)
@@ -1148,12 +1159,12 @@ ROM_START(ip6000)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
-	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(d81bda5c) SHA1(27e6baffb13fa9f3118b7ff539c7e11b7e778416))
+	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(100f4f94) SHA1(64242eadd40ce5b9d12625db8707a07ff9e4d05c))
 
 	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro 6000 EPROM")
-	ROMX_LOAD("ip6000_lo.bin", 0x00001, 0x20000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("ip6000_hi.bin", 0x00000, 0x20000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("mprgg360f__04_may_90v.u336", 0x00001, 0x20000, CRC(9e8b798b) SHA1(54412e26a468e038fb44ffa322ed3ddfae423c17), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("mprgg350f__04_may_90v.u349", 0x00000, 0x20000, CRC(32ab99fd) SHA1(202a6082bade8a084b8cd25109daff8443f6a5c7), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(ip6400)
@@ -1203,12 +1214,12 @@ ROM_START(ip6800)
 ROM_END
 
 /*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY        FULLNAME         FLAGS */
-COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,init_common,"Intergraph",  "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990,  ip6000,  0,      0,      ip6000,  interpro, emerald_state,  init_common,"Intergraph",  "InterPro 6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1992,  ip6400,  0,      0,      ip6400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip6700,  0,      0,      ip6700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip6800,  0,      0,      ip6800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,init_common,"Intergraph",  "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1990,  ip6000,  0,      0,      ip6000,  interpro, emerald_state,  init_common,"Intergraph",  "InterPro 6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip6400,  0,      0,      ip6400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6700,  0,      0,      ip6700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6800,  0,      0,      ip6800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
