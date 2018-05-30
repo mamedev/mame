@@ -592,7 +592,7 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 	switch (offset & 0x300000)
 	{
 		case 0x000000:
-		case 0x100000: 
+		case 0x100000:
 		case 0x200000: return m_sndflash[offset >> 20]->read(offset & 0xfffff) | m_sndflash[offset >> 20]->read((offset & 0xfffff) | 1) << 16;
 
 		default:
@@ -936,7 +936,7 @@ INPUT_PORTS_END
 //
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \

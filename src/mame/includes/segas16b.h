@@ -65,7 +65,7 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_bootleg_scroll(*this, "bootleg_scroll")
 		, m_bootleg_page(*this, "bootleg_page")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	// memory mapping
@@ -198,7 +198,7 @@ protected:
 
 	// device overrides
 	virtual void video_start() override;
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -272,7 +272,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	optional_shared_ptr<uint16_t> m_bootleg_scroll;
 	optional_shared_ptr<uint16_t> m_bootleg_page;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 };
 
 class afighter_16b_analog_state : public segas16b_state

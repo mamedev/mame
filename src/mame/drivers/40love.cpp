@@ -306,33 +306,10 @@ READ8_MEMBER(fortyl_state::pix2_r)
 
 /***************************************************************************/
 
-void fortyl_state::init_undoukai()
+void fortyl_state::driver_init()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
-
-	m_pix_color[0] = 0x000;
-	m_pix_color[1] = 0x1e3;
-	m_pix_color[2] = 0x16c;
-	m_pix_color[3] = 0x1ec;
-}
-
-void fortyl_state::init_40love()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
-
-	#if 0
-		/* character ROM hack
-		    to show a white line on the opponent side */
-
-		uint8_t *ROM = memregion("gfx2")->base();
-		int adr = 0x10 * 0x022b;
-		ROM[adr + 0x000a] = 0x00;
-		ROM[adr + 0x000b] = 0x00;
-		ROM[adr + 0x400a] = 0x00;
-		ROM[adr + 0x400b] = 0x00;
-	#endif
 
 	m_pix_color[0] = 0x000;
 	m_pix_color[1] = 0x1e3;
@@ -664,7 +641,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-MACHINE_START_MEMBER(fortyl_state,40love)
+void fortyl_state::machine_start()
 {
 	/* video */
 	save_item(NAME(m_pix1));
@@ -680,10 +657,8 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 }
 
 
-MACHINE_RESET_MEMBER(fortyl_state,common)
+void fortyl_state::machine_reset()
 {
-	//MACHINE_RESET_CALL_MEMBER(ta7630);
-
 	/* video */
 	m_pix1 = 0;
 	m_pix2[0] = 0;
@@ -695,11 +670,6 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 	m_snd_ctrl1 = 0;
 	m_snd_ctrl2 = 0;
 	m_snd_ctrl3 = 0;
-}
-
-MACHINE_RESET_MEMBER(fortyl_state,40love)
-{
-	MACHINE_RESET_CALL_MEMBER(common);
 }
 
 MACHINE_CONFIG_START(fortyl_state::_40love)
@@ -724,8 +694,6 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6) /* OK */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* high interleave to ensure proper synchronization of CPUs */
-	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
-	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -790,8 +758,6 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
-	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)  /* init machine */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -986,7 +952,7 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, init_40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, init_40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
-GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, init_undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, init_undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
+GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

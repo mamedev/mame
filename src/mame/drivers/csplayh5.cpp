@@ -446,7 +446,7 @@ void csplayh5_state::init_tsuwaku()   { general_init(0x856e/2, 0x6018); }
  */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define DVD_BIOS \
 	ROM_REGION( 0x20000, "subcpu", 0 ) \
@@ -921,9 +921,9 @@ ROM_END
 ***************************************************************************/
 
 // 1995
-         GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
+		 GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
-         GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
+		 GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
 /* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )

@@ -25,11 +25,12 @@ struct lcd_spi_t
 class hp49gp_state : public driver_device
 {
 public:
-	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_s3c2410(*this, "s3c2410"),
 		m_steppingstone(*this, "steppingstone"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	uint32_t m_port[9];
 	required_device<s3c2410_device> m_s3c2410;
@@ -42,8 +43,8 @@ public:
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	void lcd_spi_reset( );
-	void lcd_spi_init( );
+	void lcd_spi_reset();
+	void lcd_spi_init();
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r( int line);
 	required_device<cpu_device> m_maincpu;
@@ -334,9 +335,9 @@ INPUT_PORTS_END
 ROM_START( hp49gp )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "319", "Version 3.19" )
-	ROMX_LOAD( "319.bin", 0x0000, 0x4000, CRC(6bb5ebfb) SHA1(089c4e4ee7223b489e2f06c30aab0b89131d1c3c), ROM_BIOS(1) )
+	ROMX_LOAD( "319.bin", 0x0000, 0x4000, CRC(6bb5ebfb) SHA1(089c4e4ee7223b489e2f06c30aab0b89131d1c3c), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "315", "Version 3.15.04" )
-	ROMX_LOAD( "31504.bin", 0x0000, 0x4000, CRC(9c71825e) SHA1(0a12b2b70a8573bc90ab5be06e6b2f814b8544ae), ROM_BIOS(2) )
+	ROMX_LOAD( "31504.bin", 0x0000, 0x4000, CRC(9c71825e) SHA1(0a12b2b70a8573bc90ab5be06e6b2f814b8544ae), ROM_BIOS(1) )
 ROM_END
 
 COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, init_hp49gp, "Hewlett Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

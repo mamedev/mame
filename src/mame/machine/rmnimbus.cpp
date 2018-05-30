@@ -895,7 +895,7 @@ static const nimbus_blocks ramblocks[] =
 
 void rmnimbus_state::nimbus_bank_memory()
 {
-	address_space &space = machine().device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int     ramsize = m_ram->size();
 	int     ramblock = 0;
 	int     blockno;

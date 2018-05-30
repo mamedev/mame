@@ -616,11 +616,11 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 #endif
 
 MACHINE_CONFIG_START(esq5505_state::vfx)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("maincpu", M68000, 10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(vfx_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, 10_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -642,11 +642,11 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, 10_MHz_XTAL / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("otis", ES5505, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("otis", ES5505, 10_MHz_XTAL)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
@@ -687,20 +687,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::vfxsd)
 	vfx(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
 MACHINE_CONFIG_START(esq5505_state::vfx32)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 30.4761_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, 10_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -722,11 +722,11 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, 30.4761_MHz_XTAL / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("otis", ES5505, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("otis", ES5505, 30.4761_MHz_XTAL / 2)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
 	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -850,7 +850,7 @@ static INPUT_PORTS_START( sq1 )
 INPUT_PORTS_END
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
 
 ROM_START( vfx )
 	ROM_REGION(0x40000, "osrom", 0)
@@ -868,11 +868,11 @@ ROM_END
 ROM_START( vfxsd )
 	ROM_REGION(0x40000, "osrom", 0)
 	ROM_SYSTEM_BIOS( 0, "v200", "V200" )
-	ROMX_LOAD( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v133", "V133" )
-	ROMX_LOAD( "vfxsd_133_lower.bin", 0x000000, 0x010000, CRC(65407fcf) SHA1(83952a19f6f9ae7886ac828d8bd5ea7fee8d0fe3), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "vfxsd_133_upper.bin", 0x000001, 0x010000, CRC(150fcd18) SHA1(e42cf08604b52fab248d15d761de7d835a076940), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "vfxsd_133_lower.bin", 0x000000, 0x010000, CRC(65407fcf) SHA1(83952a19f6f9ae7886ac828d8bd5ea7fee8d0fe3), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "vfxsd_133_upper.bin", 0x000001, 0x010000, CRC(150fcd18) SHA1(e42cf08604b52fab248d15d761de7d835a076940), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )

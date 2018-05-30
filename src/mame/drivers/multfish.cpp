@@ -846,14 +846,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps1_w)
     -X-- ---- Start Lamp 34A
     X--- ---- Bet/Double Lamp 29B
 */
-	m_lamp[1] = BIT(data, 0); /* Hold 1 Lamp */
-	m_lamp[2] = BIT(data, 1); /* Hold 2 Lamp */
-	m_lamp[3] = BIT(data, 2); /* Hold 3 Lamp */
-	m_lamp[4] = BIT(data, 3); /* Hold 4 Lamp */
-	m_lamp[5] = BIT(data, 4); /* Hold 5 Lamp */
-	m_lamp[8] = BIT(data, 5); /* Help Lamp */
-	m_lamp[6] = BIT(data, 6); /* Start Lamp */
-	m_lamp[0] = BIT(data, 7); /* Bet/Double Lamp */
+	m_lamps[1] = BIT(data, 0); /* Hold 1 Lamp */
+	m_lamps[2] = BIT(data, 1); /* Hold 2 Lamp */
+	m_lamps[3] = BIT(data, 2); /* Hold 3 Lamp */
+	m_lamps[4] = BIT(data, 3); /* Hold 4 Lamp */
+	m_lamps[5] = BIT(data, 4); /* Hold 5 Lamp */
+	m_lamps[8] = BIT(data, 5); /* Help Lamp */
+	m_lamps[6] = BIT(data, 6); /* Start Lamp */
+	m_lamps[0] = BIT(data, 7); /* Bet/Double Lamp */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
@@ -866,10 +866,10 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
     ---- -X-- Maxbet Lamp 30B
     ---X ---- Upper Lamp Green 25B  (Demo Mode)
 */
-	m_lamp[9] = BIT(data, 0);  /* Payout Lamp */
-	m_lamp[12] = BIT(data, 1); /* Upper Lamp Yellow */
-	m_lamp[7] = BIT(data, 2);  /* Maxbet Lamp */
-	m_lamp[10] = BIT(data, 4); /* Upper Lamp Green */
+	m_lamps[9] = BIT(data, 0);  /* Payout Lamp */
+	m_lamps[12] = BIT(data, 1); /* Upper Lamp Yellow */
+	m_lamps[7] = BIT(data, 2);  /* Maxbet Lamp */
+	m_lamps[10] = BIT(data, 4); /* Upper Lamp Green */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
@@ -879,7 +879,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
     7654 3210
     ---- --X- Upper Lamp Red 26B (Service Mode)
 */
-	m_lamp[11] = BIT(data, 1); /* Upper Lamp Red */
+	m_lamps[11] = BIT(data, 1); /* Upper Lamp Red */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)
@@ -1010,7 +1010,7 @@ GFXDECODE_END
 
 void igrosoft_gamble_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_disp_enable));
 	save_item(NAME(m_rambk));
@@ -1051,7 +1051,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_DEVICE_ADD("aysnd", AY8910, 6000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_M48T35_ADD( "m48t35" )
+	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
 	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 

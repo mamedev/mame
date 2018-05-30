@@ -601,6 +601,7 @@ public:
 	void garouh(machine_config &config);
 	void garoubl(machine_config &config);
 	void mslug3(machine_config &config);
+	void mslug3a(machine_config &config);
 	void mslug3h(machine_config &config);
 	void mslug3b6(machine_config &config);
 	void kof2000(machine_config &config);
@@ -1434,6 +1435,7 @@ void neogeo_base_state::set_slot_idx(int slot)
 				space.install_read_handler(0x2ffff0, 0x2ffff1, read16_delegate(FUNC(neogeo_cart_slot_device::addon_r),(neogeo_cart_slot_device*)m_slots[m_curr_slot]));
 				break;
 			case NEOGEO_MSLUG3:
+			case NEOGEO_MSLUG3A:
 				space.install_write_handler(0x2fffe4, 0x2fffe5, write16_delegate(FUNC(neogeo_base_state::write_bankprot),this));
 				space.install_read_handler(0x2fe446, 0x2fe447, read16_delegate(FUNC(neogeo_cart_slot_device::protection_r),(neogeo_cart_slot_device*)m_slots[m_curr_slot]));
 				//space.install_read_handler(0x2ffff8, 0x2ffff9, read16_delegate(FUNC(neogeo_cart_slot_device::addon_r),(neogeo_cart_slot_device*)m_slots[m_curr_slot]));
@@ -2177,7 +2179,7 @@ MACHINE_CONFIG_END
 */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define NEOGEO_UNIBIOS(x) \
 	ROM_SYSTEM_BIOS( x+ 0, "unibios33", "Universe Bios (Hack, Ver. 3.3)" ) \
@@ -2495,6 +2497,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mvs_led_state::mslug3)
 	mv1_fixed(config);
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_mslug3")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(mvs_led_state::mslug3a)
+	mv1_fixed(config);
+	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_mslug3a")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mvs_led_state::mslug3h)
@@ -8756,8 +8763,7 @@ ROM_END
 
 ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 2000.4.1 */ /* MVS VERSION */
 	ROM_REGION( 0x900000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
-	ROM_LOAD16_WORD_SWAP( "neo-sma",    0x0c0000, 0x040000, CRC(9cd55736) SHA1(d6efb2b313127c2911d47d9324626b3f1e7c6ccb) )  /* stored in the custom chip */
-	/* The SMA for this release has a green colour marking; the older revision has a white colour marking */
+	ROM_LOAD16_WORD_SWAP( "green.neo-sma",    0x0c0000, 0x040000, CRC(9cd55736) SHA1(d6efb2b313127c2911d47d9324626b3f1e7c6ccb) )  /* stored in the custom SMA chip, the SMA has a green colour marking */
 	ROM_LOAD16_WORD_SWAP( "256-pg1.p1", 0x100000, 0x400000, CRC(b07edfd5) SHA1(dcbd9e500bfae98d754e55cdbbbbf9401013f8ee) ) /* TC5332202 */
 	ROM_LOAD16_WORD_SWAP( "256-pg2.p2", 0x500000, 0x400000, CRC(6097c26b) SHA1(248ec29d21216f29dc6f5f3f0e1ad1601b3501b6) ) /* TC5332202 */
 
@@ -8788,6 +8794,59 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 	ROM_LOAD16_BYTE( "256-c7.c7", 0x3000000, 0x800000, CRC(cfceddd2) SHA1(7def666adf8bd1703f40c61f182fc040b6362dc9) ) /* Plane 0,1 */ /* TC5364205 */
 	ROM_LOAD16_BYTE( "256-c8.c8", 0x3000001, 0x800000, CRC(4d9be34c) SHA1(a737bdfa2b815aea7067e7af2636e83a9409c414) ) /* Plane 2,3 */ /* TC5364205 */
 ROM_END
+
+/*
+	The Program roms for the set below are actually 4 ROMs contained on a recycled NeoGeo Pocket card and marked
+
+	SNK48249Q
+	JAPAN9948HAK
+	T8V12A
+	(two of these)
+
+	SNK48327V
+	JAPAN9948HAK
+	T8V12A
+	(two of these)
+
+	KOF2000 and Garou boards have been found with the same setup (data verified to match existing sets)
+	The roms were dumped via the NGPC cartridge edge connector, so the exact way they should be split into 4 is unknown.
+	As a result the ROM has been split to match the usual configuration as it likely exists like this too anyway.
+*/
+
+ROM_START( mslug3a ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION */
+	ROM_REGION( 0x900000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "white.neo-sma",    0x0c0000, 0x040000, CRC(c60d29b2) SHA1(1647260ccbda833b35005608ef1fdc82fba02f04) ) /* stored in the custom SMA chip, the SMA has a white colour marking */
+	ROM_LOAD16_WORD_SWAP( "256.p1", 0x100000, 0x400000, CRC(a1177628) SHA1(4c4c379d9fc3a83265b7f32fbfce9d16b7d0f0fd) )
+	ROM_LOAD16_WORD_SWAP( "256.p2", 0x500000, 0x400000, CRC(9b659826) SHA1(d6bd03cf61879217922c18db4d3bd77095c0fe19) )
+
+	ROM_Y_ZOOM
+
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
+	ROM_REGION( 0x80000, "cslot1:fixed", 0 ) /* larger char set */
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "fixedbios", 0 )
+	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
+
+	NEO_BIOS_AUDIO_512K( "256-m1.m1", CRC(eaeec116) SHA1(54419dbb21edc8c4b37eaac2e7ad9496d2de037a) ) /* mask rom TC534000 */
+
+	ROM_REGION( 0x1000000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "256-v1.v1", 0x000000, 0x400000, CRC(f2690241) SHA1(fd56babc1934d10e0d27c32f032f9edda7ca8ce9) ) /* TC5332204 */
+	ROM_LOAD( "256-v2.v2", 0x400000, 0x400000, CRC(7e2a10bd) SHA1(0d587fb9f64cba0315ce2d8a03e2b8fe34936dff) ) /* TC5332204 */
+	ROM_LOAD( "256-v3.v3", 0x800000, 0x400000, CRC(0eaec17c) SHA1(c3ed613cc6993edd6fc0d62a90bcd85de8e21915) ) /* TC5332204 */
+	ROM_LOAD( "256-v4.v4", 0xc00000, 0x400000, CRC(9b4b22d4) SHA1(9764fbf8453e52f80aa97a46fb9cf5937ef15a31) ) /* TC5332204 */
+
+	ROM_REGION( 0x4000000, "cslot1:sprites", 0 )
+	/* Encrypted */
+	ROM_LOAD16_BYTE( "256-c1.c1", 0x0000000, 0x800000, CRC(5a79c34e) SHA1(b8aa51fa50935cae62ab3d125b723ab888691e60) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "256-c2.c2", 0x0000001, 0x800000, CRC(944c362c) SHA1(3843ab300f956280475469caee70135658f67089) ) /* Plane 2,3 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "256-c3.c3", 0x1000000, 0x800000, CRC(6e69d36f) SHA1(94e8cf42e999114b4bd8b30e0aa2f365578c4c9a) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "256-c4.c4", 0x1000001, 0x800000, CRC(b755b4eb) SHA1(804700a0966a48f130c434ede3f970792ea74fa5) ) /* Plane 2,3 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "256-c5.c5", 0x2000000, 0x800000, CRC(7aacab47) SHA1(312c1c9846175fe1a3cad51d5ae230cf674fc93d) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "256-c6.c6", 0x2000001, 0x800000, CRC(c698fd5d) SHA1(16818883b06849ba2f8d61bdd5e21aaf99bd8408) ) /* Plane 2,3 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "256-c7.c7", 0x3000000, 0x800000, CRC(cfceddd2) SHA1(7def666adf8bd1703f40c61f182fc040b6362dc9) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "256-c8.c8", 0x3000001, 0x800000, CRC(4d9be34c) SHA1(a737bdfa2b815aea7067e7af2636e83a9409c414) ) /* Plane 2,3 */ /* TC5364205 */
+ROM_END
+
 
 ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* revision 2000.3.17 */ /* AES VERSION */
 	ROM_REGION( 0x500000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
@@ -11563,6 +11622,7 @@ GAME( 1999, garouha,    garou,    garou,     neogeo,    mvs_led_state, empty_ini
 GAME( 1999, garoup,     garou,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, garoubl,    garou,    garoubl,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Garou - Mark of the Wolves (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Bootleg of garoup */
 GAME( 2000, mslug3,     neogeo,   mslug3,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 2000, mslug3a,    mslug3,   mslug3a,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560, earlier)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX - revision Mar/17/2000 1:36 (from SMA rom) */
 GAME( 2000, mslug3h,    mslug3,   mslug3h,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGH-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2000, mslug3b6,   mslug3,   mslug3b6,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", MACHINE_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.c ;-) */
 GAME( 2000, kof2000,    neogeo,   kof2000,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */

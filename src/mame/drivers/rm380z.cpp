@@ -235,7 +235,7 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(rm380z_state::rm380z)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(rm380z_mem)
 	MCFG_DEVICE_IO_MAP(rm380z_io)
 
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	MCFG_RAM_DEFAULT_SIZE("56K")
 
 	/* floppy disk */
-	MCFG_FD1771_ADD("wd1771", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("wd1771", FD1771, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
@@ -275,7 +275,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rm380z_state::rm480z)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(rm480z_mem)
 	MCFG_DEVICE_IO_MAP(rm480z_io)
 

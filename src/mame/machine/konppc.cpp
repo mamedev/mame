@@ -129,8 +129,8 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-        cpu_device &dsp = *m_dsp[cgboard_id];
-        if (offset == 0)
+		cpu_device &dsp = *m_dsp[cgboard_id];
+		if (offset == 0)
 		{
 			if (ACCESSING_BITS_24_31)
 			{

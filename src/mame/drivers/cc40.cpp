@@ -97,7 +97,7 @@ public:
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{
 		m_sysram[0] = nullptr;
 		m_sysram[1] = nullptr;
@@ -153,7 +153,7 @@ private:
 	u16 m_sysram_size[2];
 	u16 m_sysram_end[2];
 	u16 m_sysram_mask[2];
-	output_finder<80> m_lamp;
+	output_finder<80> m_lamps;
 };
 
 
@@ -204,7 +204,7 @@ void cc40_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// ---- raw lcd screen here ----
 	// under    |    ERROR   v      v      v      v      v      v    _LOW
 	// output#  |    60     61     62     63     50     51     52     53
-	m_lamp[y * 10 + x] = state ? 1 : 0;
+	m_lamps[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
@@ -548,7 +548,7 @@ void cc40_state::postload()
 void cc40_state::machine_start()
 {
 	// init
-	m_lamp.resolve();
+	m_lamps.resolve();
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 

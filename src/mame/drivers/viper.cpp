@@ -2416,7 +2416,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -2447,7 +2447,7 @@ void viper_state::init_vipercf()
 /*****************************************************************************/
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define VIPER_BIOS \
 	ROM_REGION64_BE(0x40000, "user1", 0)    /* Boot ROM */ \

@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(bbc_state::bbcbp)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_WD1770_ADD("wd1770", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1349,7 +1349,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* rtc and cmos */
-	MCFG_MC146818_ADD( "rtc", 32.768_kHz_XTAL )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -1414,7 +1414,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* fdc */
-	MCFG_WD1770_ADD("wd1770", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1613,7 +1613,7 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770")
 
-	MCFG_WD1772_ADD("wd1772", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
 
@@ -1706,21 +1706,21 @@ ROM_START(bbca)
 	/* rom page 15 0c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
-	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) /* os */
-	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 3  0c000 */
+	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(0)) // os
+	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 1, "os12b1", "OS 1.20 / BASIC1" )
-	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(2)) /* os */
-	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(2)) /* rom page 3  0c000 */
+	ROMX_LOAD("os12.rom",   0x10000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) // os
+	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(1)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 2, "os10b2", "OS 1.00 / BASIC2" )
-	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) /* os */
-	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3)) /* rom page 3  0c000 */
+	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(2)) // os
+	ROMX_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(2)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 3, "os10b1", "OS 1.00 / BASIC1" )
-	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(4)) /* os */
-	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) /* rom page 3  0c000 */
+	ROMX_LOAD("os10.rom",   0x10000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) // os
+	ROMX_LOAD("basic1.rom", 0x0c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(3)) // rom page 3  0c000
 	ROM_SYSTEM_BIOS( 4, "os01b1", "OS 0.10 / BASIC1" )
-	ROMX_LOAD("os01.rom",   0x10000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(5)) /* os */
-	/* OS0.1 does not support rom paging, load BASIC into all pages */
-	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(5)) /* rom page 0  00000 */
+	ROMX_LOAD("os01.rom",   0x10000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(4)) // os
+	// OS0.1 does not support rom paging, load BASIC into all pages
+	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) // rom page 0  00000
 	ROM_RELOAD(             0x04000, 0x4000 )
 	ROM_RELOAD(             0x08000, 0x4000 )
 	ROM_RELOAD(             0x0c000, 0x4000 )
@@ -1757,21 +1757,21 @@ ROM_START(bbcb)
 	/* rom page 15 3c000 IC101 BASIC */
 	ROM_DEFAULT_BIOS("os12b2")
 	ROM_SYSTEM_BIOS( 0, "os12b2", "OS 1.20 / BASIC2" )
-	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) /* os */
-	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(0)) // os
+	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 1, "os12b1", "OS 1.20 / BASIC1" )
-	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(2)) /* os */
-	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(2)) /* rom page 15 3c000 */
+	ROMX_LOAD("os12.rom",   0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d), ROM_BIOS(1)) // os
+	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(1)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 2, "os10b2", "OS 1.00 / BASIC2" )
-	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) /* os */
-	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3)) /* rom page 15 3c000 */
+	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(2)) // os
+	ROMX_LOAD("basic2.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(2)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 3, "os10b1", "OS 1.00 / BASIC1" )
-	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(4)) /* os */
-	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) /* rom page 15 3c000 */
+	ROMX_LOAD("os10.rom",   0x40000, 0x4000, CRC(9679b8f8) SHA1(d35f6723132aabe3c4d00fc16fd9ecc6768df753), ROM_BIOS(3)) // os
+	ROMX_LOAD("basic1.rom", 0x3c000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(3)) // rom page 15 3c000
 	ROM_SYSTEM_BIOS( 4, "os01b1", "OS 0.10 / BASIC1" )
-	ROMX_LOAD("os01.rom",   0x40000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(5)) /* os */
-	/* OS0.1 does not support rom paging, load BASIC into all pages */
-	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(5)) /* rom page 0 00000 */
+	ROMX_LOAD("os01.rom",   0x40000, 0x4000, CRC(45ee0980) SHA1(4b0ece6dc139d5d3f4fabd023716fb6f25149b80), ROM_BIOS(4)) // os
+	// OS0.1 does not support rom paging, load BASIC into all pages
+	ROMX_LOAD("basic1.rom", 0x00000, 0x4000, CRC(b3364108) SHA1(890f6e3e7fab3340f75b85e93ff29332bc9ecb2e), ROM_BIOS(4)) // rom page 0 00000
 	ROM_RELOAD(             0x04000, 0x4000 )
 	ROM_RELOAD(             0x08000, 0x4000 )
 	ROM_RELOAD(             0x0c000, 0x4000 )
@@ -1808,8 +1808,8 @@ ROM_START(bbcb_de)
 	/* rom page 15 3c000 IC75 BASIC */
 	ROM_DEFAULT_BIOS("os12")
 	ROM_SYSTEM_BIOS( 0, "os12", "OS 1.20 / BASIC2" )
-	ROMX_LOAD("os_de.rom",   0x40000, 0x4000, CRC(b7262caf) SHA1(aadf90338ee9d1c85dfa73beba50e930c2a38f10), ROM_BIOS(1))
-	ROMX_LOAD("basic2.rom",  0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("os_de.rom",   0x40000, 0x4000, CRC(b7262caf) SHA1(aadf90338ee9d1c85dfa73beba50e930c2a38f10), ROM_BIOS(0))
+	ROMX_LOAD("basic2.rom",  0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0)) // rom page 15 3c000
 
 	ROM_LOAD("dfs10.rom",    0x30000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
 
@@ -1843,8 +1843,8 @@ ROM_START(bbcb_us)
 	/* rom page 15 3c000 IC75 SPARE SOCKET */
 	ROM_DEFAULT_BIOS("os10b3")
 	ROM_SYSTEM_BIOS( 0, "os10b3", "OS A1.0 / BASIC3" )
-	ROMX_LOAD("usmos10.rom",  0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(1))
-	ROMX_LOAD("usbasic3.rom", 0x38000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("usmos10.rom",  0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(0))
+	ROMX_LOAD("usbasic3.rom", 0x38000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(0)) // rom page 15 3c000
 
 	ROM_LOAD("viewa210.rom", 0x30000, 0x4000, CRC(4345359f) SHA1(88c93df1854f5fbe6cd6e5f0e29a8bf4ea3b5614))
 	ROM_LOAD("usdnfs10.rom", 0x34000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
@@ -1872,13 +1872,13 @@ ROM_START(torchf)
 
 	ROM_DEFAULT_BIOS("mcp120cbl")
 	ROM_SYSTEM_BIOS( 0, "mcp120cbl", "MCP120CBL" )
-	ROMX_LOAD("mcp120cbl.rom", 0x38000, 0x4000, CRC(851d0879) SHA1(2e54ef15692ba7dd9fcfd1ef0d660464a772b156), ROM_BIOS(1))
+	ROMX_LOAD("mcp120cbl.rom", 0x38000, 0x4000, CRC(851d0879) SHA1(2e54ef15692ba7dd9fcfd1ef0d660464a772b156), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mcp101ci", "MCP101CI" )
-	ROMX_LOAD("mcp101ci.rom", 0x38000, 0x4000, NO_DUMP, ROM_BIOS(2))
+	ROMX_LOAD("mcp101ci.rom", 0x38000, 0x4000, NO_DUMP, ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "mcp041cbl", "MCP041CBL" )
-	ROMX_LOAD("mcp041cbl.rom", 0x38000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(3))
+	ROMX_LOAD("mcp041cbl.rom", 0x38000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "cpn071", "CPN71+" )
-	ROMX_LOAD("cpn071.rom",    0x38000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(4))
+	ROMX_LOAD("cpn071.rom",    0x38000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(3))
 	ROM_RELOAD(                0x3a000, 0x2000 )
 
 	ROM_REGION(0x4000, "os", 0)
@@ -1901,7 +1901,7 @@ ROM_START(bbcbp)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("os20")
 	ROM_SYSTEM_BIOS( 0, "os20", "OS 2.00" )
-	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(1)) /* rom page 15 3C000 BASIC */
+	ROMX_LOAD("bpos2.ic71", 0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2), ROM_BIOS(0)) // rom page 15 3C000 BASIC
 	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
 	/* rom page 0  00000 SWRAM (B+ 128K only) */
 	/* rom page 1  04000 SWRAM (B+ 128K only) */
@@ -1939,17 +1939,17 @@ ROM_START(abc110)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos200")
 	ROM_SYSTEM_BIOS( 0, "mos200", "MOS2.00" )
-	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(1))
-	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(1))
+	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(0))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos123stor", "MOS1.23 + ViewStore" )
-	ROMX_LOAD("mos123stor.rom", 0x3c000, 0x4000, CRC(4e84f452) SHA1(145ee54f04b3eb4d0e5afaabe21915be48db3c54), ROM_BIOS(2)) /* rom page 15 3C000 ViewStore */
-	ROM_CONTINUE(               0x40000, 0x4000)  /* OS */
+	ROMX_LOAD("mos123stor.rom", 0x3c000, 0x4000, CRC(4e84f452) SHA1(145ee54f04b3eb4d0e5afaabe21915be48db3c54), ROM_BIOS(1)) // rom page 15 3C000 ViewStore
+	ROM_CONTINUE(               0x40000, 0x4000)  // OS
 	ROM_SYSTEM_BIOS( 2, "mos123", "MOS1.23" )
-	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(3))
-	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3))
+	ROMX_LOAD("mos123.rom", 0x40000, 0x4000, CRC(90d31d08) SHA1(42a01892cf8bd2ada4db1c8b36aff80c85eb5dcb), ROM_BIOS(2))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "mos120", "MOS1.20" )
-	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(4))
-	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(4))
+	ROMX_LOAD("mos120.rom", 0x40000, 0x4000, CRC(0a1e83a0) SHA1(21dc3a94eef7c003b194686730fb461779f44925), ROM_BIOS(3))
+	ROMX_LOAD("basic200.rom", 0x3c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(3))
 	/* rom page 0  00000 */
 	/* rom page 1  04000 IC71 selectable with link S13 */
 	/* rom page 2  08000 IC35 32K IN PAGE 3 */
@@ -1987,9 +1987,9 @@ ROM_START(acw443)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos210")
 	ROM_SYSTEM_BIOS( 0, "mos210", "MOS2.10" )
-	ROMX_LOAD("acwmos210.rom", 0x40000, 0x4000, CRC(168d6753) SHA1(dcd01d8f5f6e0cd92ae626ca52a3db71abf5d282), ROM_BIOS(1))
+	ROMX_LOAD("acwmos210.rom", 0x40000, 0x4000, CRC(168d6753) SHA1(dcd01d8f5f6e0cd92ae626ca52a3db71abf5d282), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos200", "MOS2.00" )
-	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(2))
+	ROMX_LOAD("mos200.rom", 0x40000, 0x4000, CRC(5e88f994) SHA1(76235ff15d736f5def338f73ac7497c41b916505), ROM_BIOS(1))
 	/* rom page 0  00000 */
 	/* rom page 1  04000  IC71 selectable with link S13 */
 	/* rom page 2  08000  IC35 32K IN PAGE 3 */
@@ -2085,9 +2085,9 @@ ROM_START(bbcm)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos350", "Enhanced MOS 3.50" )
-	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(2))
+	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2113,8 +2113,8 @@ ROM_START(bbcm)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(1))
-	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(2))
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
+	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
 ROM_END
 
 
@@ -2128,7 +2128,7 @@ ROM_START(bbcmaiv)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2154,7 +2154,7 @@ ROM_START(bbcmaiv)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320aiv.cmos", 0x0E, 0x32, BAD_DUMP CRC(b9ae42a1) SHA1(abf3e94b013f24027ca36c96720963c3411e93f8), ROM_BIOS(1))
+	ROMX_LOAD("mos320aiv.cmos", 0x0E, 0x32, BAD_DUMP CRC(b9ae42a1) SHA1(abf3e94b013f24027ca36c96720963c3411e93f8), ROM_BIOS(0))
 ROM_END
 
 
@@ -2164,7 +2164,7 @@ ROM_START(bbcmet)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos400")
 	ROM_SYSTEM_BIOS( 0, "mos400", "Econet MOS 4.00" )
-	ROMX_LOAD("mos400.ic24", 0x30000, 0x10000, CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(1))
+	ROMX_LOAD("mos400.ic24", 0x30000, 0x10000, CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(0))
 	ROM_COPY("option", 0x34000, 0x24000, 0xC000) /* Mirror */
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xff)
@@ -2190,7 +2190,7 @@ ROM_START(bbcmet)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos400.cmos", 0x0E, 0x32, BAD_DUMP CRC(fff41cc5) SHA1(3607568758f90b3bd6c7dc9533e2aa24f9806ff3), ROM_BIOS(1))
+	ROMX_LOAD("mos400.cmos", 0x0E, 0x32, BAD_DUMP CRC(fff41cc5) SHA1(3607568758f90b3bd6c7dc9533e2aa24f9806ff3), ROM_BIOS(0))
 ROM_END
 
 
@@ -2200,7 +2200,7 @@ ROM_START(bbcmarm)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2226,7 +2226,7 @@ ROM_START(bbcmarm)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320arm.cmos", 0x00, 0x40, CRC(56117257) SHA1(ed98563bef18f9d2a0b2d941cd20823d760fb127), ROM_BIOS(1))
+	ROMX_LOAD("mos320arm.cmos", 0x00, 0x40, CRC(56117257) SHA1(ed98563bef18f9d2a0b2d941cd20823d760fb127), ROM_BIOS(0))
 ROM_END
 
 
@@ -2236,10 +2236,10 @@ ROM_START(bbcmc)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos510")
 	ROM_SYSTEM_BIOS( 0, "mos510", "Enhanced MOS 5.10" )
-	ROMX_LOAD("mos510.ic49", 0x30000, 0x10000, BAD_DUMP CRC(9a2a6086) SHA1(094ab37b0b6437c4f1653eaa0602ef102737adb6), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
+	ROMX_LOAD("mos510.ic49", 0x30000, 0x10000, BAD_DUMP CRC(9a2a6086) SHA1(094ab37b0b6437c4f1653eaa0602ef102737adb6), ROM_BIOS(0)) // Merged individual ROM bank dumps
 	ROM_SYSTEM_BIOS( 1, "mos500", "Original MOS 5.00" )
-	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(2))
-	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(1))
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -2269,8 +2269,8 @@ ROM_START(bbcmc_ar)
 	ROM_REGION(0x44000,"option",0) /* ROM */
 	ROM_DEFAULT_BIOS("mos511i")
 	ROM_SYSTEM_BIOS( 0, "mos511i", "International MOS 5.11i" )
-	ROMX_LOAD("mos511.ic49", 0x30000, 0x10000, BAD_DUMP CRC(8708803c) SHA1(d2170c8b9b536f3ad84a4a603a7fe712500cc751), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
-	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos511.ic49", 0x30000, 0x10000, BAD_DUMP CRC(8708803c) SHA1(d2170c8b9b536f3ad84a4a603a7fe712500cc751), ROM_BIOS(0)) // Merged individual ROM bank dumps
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -2302,8 +2302,8 @@ ROM_START(pro128s)
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_DEFAULT_BIOS("mos510o")
 	ROM_SYSTEM_BIOS(0, "mos510o", "Olivetti MOS 5.10")
-	ROMX_LOAD("mos510o.ic49", 0x30000, 0x10000, CRC(c16858d3) SHA1(ad231ed21a55e493b553703285530d1cacd3de7a), ROM_BIOS(1))
-	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos510o.ic49", 0x30000, 0x10000, CRC(c16858d3) SHA1(ad231ed21a55e493b553703285530d1cacd3de7a), ROM_BIOS(0))
+	ROM_COPY("option", 0x30000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
@@ -2333,8 +2333,8 @@ ROM_START(autoc15)
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_DEFAULT_BIOS("mos510i")
 	ROM_SYSTEM_BIOS(0, "mos510i", "Swedish MOS 5.10i")
-	ROMX_LOAD("swedish_mega_29-1.ic49", 0x20000, 0x20000, CRC(67512992) SHA1(5d04b6e53a3a75af22ab10c652cceb9a63b23a6d), ROM_BIOS(1))
-	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("swedish_mega_29-1.ic49", 0x20000, 0x20000, CRC(67512992) SHA1(5d04b6e53a3a75af22ab10c652cceb9a63b23a6d), ROM_BIOS(0))
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   IC38 SBII */
 	/* 04000 rom 1   IC38 SBII */
@@ -2368,8 +2368,8 @@ ROM_START(discmon)
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
-	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
@@ -2394,7 +2394,7 @@ ROM_START(discmon)
 
 	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(1))
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 ROM_END
 
 
@@ -2404,8 +2404,8 @@ ROM_START(discmate)
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_DEFAULT_BIOS("mos320")
 	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
-	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("option", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
@@ -2430,7 +2430,7 @@ ROM_START(discmate)
 
 	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(1))
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 ROM_END
 
 

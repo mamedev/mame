@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	MCFG_PCI9050_USER_OUTPUT_CALLBACK(WRITE32(*this, atlantis_state, user_io_output))
 	MCFG_PCI9050_USER_INPUT_CALLBACK(READ32(*this, atlantis_state, user_io_input))
 
-	MCFG_M48T37_ADD(m_rtc)
+	MCFG_DEVICE_ADD(m_rtc, M48T37, 0)
 	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, atlantis_state, watchdog_reset))
 	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, atlantis_state, watchdog_irq))
 

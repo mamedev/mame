@@ -17,10 +17,10 @@
 /*static*/ const char *ioc2_device::RS232A_TAG = "rs232a";
 /*static*/ const char *ioc2_device::RS232B_TAG = "rs232b";
 
-/*static*/ const XTAL ioc2_device::SCC_PCLK = XTAL(10'000'000);
-/*static*/ const XTAL ioc2_device::SCC_RXA_CLK = XTAL(3'686'400); // Needs verification
+/*static*/ const XTAL ioc2_device::SCC_PCLK = 10_MHz_XTAL;
+/*static*/ const XTAL ioc2_device::SCC_RXA_CLK = 3.6864_MHz_XTAL; // Needs verification
 /*static*/ const XTAL ioc2_device::SCC_TXA_CLK = XTAL(0);
-/*static*/ const XTAL ioc2_device::SCC_RXB_CLK = XTAL(3'686'400); // Needs verification
+/*static*/ const XTAL ioc2_device::SCC_RXB_CLK = 3.6864_MHz_XTAL; // Needs verification
 /*static*/ const XTAL ioc2_device::SCC_TXB_CLK = XTAL(0);
 
 DEFINE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device,   "ioc2g", "SGI IOC2 (Guiness)")
@@ -49,7 +49,8 @@ ioport_constructor ioc2_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
-	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value())
+	MCFG_DEVICE_ADD(SCC_TAG, SCC85230, SCC_PCLK)
+	MCFG_Z80SCC_OFFSETS(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value())
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_rts))

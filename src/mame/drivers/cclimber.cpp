@@ -242,7 +242,6 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 #include "audio/cclimber.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "screen.h"
@@ -1147,7 +1146,7 @@ MACHINE_CONFIG_START(cclimber_state::cclimber)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
+	MCFG_DEVICE_ADD("cclimber_audio", CCLIMBER_AUDIO, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cclimber_state::cclimberx)
@@ -2669,18 +2668,9 @@ void cclimber_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
-	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
-
-	// this seems to be a messy abuse / use of the encryption, investigate
-	if (!cpu)
-	{
-		fatalerror("can't find cpu!\n");
-	}
-	else
-	{
-		cpu->set_region_p(memregion("user1")->base());
-		cpu->set_decrypted_p(m_opcodes.get());
-	}
+	segacrpt_z80_device &cpu = downcast<segacrpt_z80_device &>(*m_maincpu);
+	cpu.set_region_p(memregion("user1")->base());
+	cpu.set_decrypted_p(m_opcodes.get());
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
 	membank("bank1d")->configure_entries(0, 3, m_opcodes.get(), 0x6000);

@@ -315,7 +315,7 @@
 
 ***********************************************************************************************************************************************/
 
-#define MAIN_CLOCK  XTAL(12'000'000)
+#define MAIN_CLOCK  12_MHz_XTAL
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -1816,7 +1816,7 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 
-	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
 	SPEAKER(config, "mono").front_center();
 

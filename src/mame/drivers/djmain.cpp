@@ -301,9 +301,9 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 	{
 		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
 		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
-		m_led[0] = BIT(data, 16);            // 1P START
-		m_led[1] = BIT(data, 17);            // 2P START
-		m_led[2] = BIT(data, 18);            // EFFECT
+		m_leds[0] = BIT(data, 16);            // 1P START
+		m_leds[1] = BIT(data, 17);            // 2P START
+		m_leds[2] = BIT(data, 18);            // EFFECT
 	}
 }
 
@@ -1351,7 +1351,7 @@ void djmain_state::machine_start()
 	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
@@ -1366,9 +1366,9 @@ void djmain_state::machine_reset()
 	m_sndram_bank = 0;
 
 	/* reset LEDs */
-	m_led[0] = 1;
-	m_led[1] = 1;
-	m_led[2] = 1;
+	m_leds[0] = 1;
+	m_leds[1] = 1;
+	m_leds[2] = 1;
 }
 
 
@@ -1405,7 +1405,7 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(djmain_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1, "none")
+	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")

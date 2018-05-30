@@ -96,7 +96,7 @@ public:
 		, m_backup_ram(*this, "backup_ram")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
@@ -163,13 +163,13 @@ protected:
 	optional_shared_ptr<uint8_t> m_backup_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	output_finder<10> m_led;
+	output_finder<10> m_leds;
 };
 
 
 void merit_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_question_address = 0;
 	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 
@@ -346,21 +346,21 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 WRITE8_MEMBER(merit_state::led1_w)
 {
 	/* 5 button lamps player 1 */
-	m_led[0] = BIT(~data, 0);
-	m_led[1] = BIT(~data, 1);
-	m_led[2] = BIT(~data, 2);
-	m_led[3] = BIT(~data, 3);
-	m_led[4] = BIT(~data, 4);
+	m_leds[0] = BIT(~data, 0);
+	m_leds[1] = BIT(~data, 1);
+	m_leds[2] = BIT(~data, 2);
+	m_leds[3] = BIT(~data, 3);
+	m_leds[4] = BIT(~data, 4);
 }
 
 WRITE8_MEMBER(merit_state::led2_w)
 {
 	/* 5 button lamps player 2 */
-	m_led[5] = BIT(~data, 0);
-	m_led[6] = BIT(~data, 1);
-	m_led[7] = BIT(~data, 2);
-	m_led[8] = BIT(~data, 3);
-	m_led[9] = BIT(~data, 4);
+	m_leds[5] = BIT(~data, 0);
+	m_leds[6] = BIT(~data, 1);
+	m_leds[7] = BIT(~data, 2);
+	m_leds[8] = BIT(~data, 3);
+	m_leds[9] = BIT(~data, 4);
 
 	/* coin counter */
 	machine().bookkeeping().coin_counter_w(0, BIT(~data, 7));

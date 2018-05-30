@@ -647,14 +647,14 @@ static void mbee_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(mbee_state::mbee)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 6)         /* 2 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL / 6)         /* 2 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(mbee_mem)
 	MCFG_DEVICE_IO_MAP(mbee_io)
 	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(12'000'000) / 6)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, 12_MHz_XTAL / 6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, mbee_state, pio_ardy))
@@ -681,7 +681,7 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(12'000'000) / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 12_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
@@ -774,7 +774,8 @@ MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_premium)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
@@ -784,7 +785,8 @@ MACHINE_CONFIG_START(mbee_state::mbee56)
 	MCFG_DEVICE_PROGRAM_MAP(mbee56_mem)
 	MCFG_DEVICE_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
-	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
+
+	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -800,7 +802,8 @@ MACHINE_CONFIG_START(mbee_state::mbee128)
 	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
 	MCFG_DEVICE_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
@@ -810,7 +813,8 @@ MACHINE_CONFIG_START(mbee_state::mbee128p)
 	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
 	MCFG_DEVICE_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
-	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
+
+	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -1123,17 +1127,17 @@ ROM_START( mbee128p ) // Premium 128K
 
 	ROM_REGION(0x8000, "roms", 0) // rom plus optional undumped roms plus dummy area
 	ROM_SYSTEM_BIOS( 0, "bn56", "bn56" )
-	ROMX_LOAD("bn56.rom",     0x0000, 0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f), ROM_BIOS(1) )
+	ROMX_LOAD("bn56.rom",     0x0000, 0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "bn59", "Version 2.02" )
-	ROMX_LOAD("bn59.rom",     0x0000, 0x2000, CRC(97384116) SHA1(87f2c4ab1a1f2964ba4f2bb60e62dc9c163831ba), ROM_BIOS(2) )
+	ROMX_LOAD("bn59.rom",     0x0000, 0x2000, CRC(97384116) SHA1(87f2c4ab1a1f2964ba4f2bb60e62dc9c163831ba), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "bn60", "Version 2.03" )
-	ROMX_LOAD("bn60.rom",     0x0000, 0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda), ROM_BIOS(3) )
+	ROMX_LOAD("bn60.rom",     0x0000, 0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "bn55", "bn55" )
-	ROMX_LOAD("bn55.rom",     0x0000, 0x2000, CRC(ca2c1073) SHA1(355d90d181de899cc7af892df96305fead9c81b4), ROM_BIOS(4) )
+	ROMX_LOAD("bn55.rom",     0x0000, 0x2000, CRC(ca2c1073) SHA1(355d90d181de899cc7af892df96305fead9c81b4), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "bn54", "bn54" )
-	ROMX_LOAD("bn54.rom",     0x0000, 0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af), ROM_BIOS(5) )
+	ROMX_LOAD("bn54.rom",     0x0000, 0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "hd18", "Hard Disk System" )
-	ROMX_LOAD("hd18.rom",     0x0000, 0x2000, CRC(ed53ace7) SHA1(534e2e00cc527197c76b3c106b3c9ff7f1328487), ROM_BIOS(6) )
+	ROMX_LOAD("hd18.rom",     0x0000, 0x2000, CRC(ed53ace7) SHA1(534e2e00cc527197c76b3c106b3c9ff7f1328487), ROM_BIOS(5) )
 
 	ROM_REGION(0x4000, "pals", 0) // undumped; using prom from 256tc for now
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, BAD_DUMP CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
@@ -1152,9 +1156,9 @@ ROM_START( mbee256 ) // 256tc
 
 	ROM_REGION(0x5000, "roms", 0) // rom plus dummy area
 	ROM_SYSTEM_BIOS( 0, "1.20", "Version 1.20" )
-	ROMX_LOAD("256tc_boot_1.20.u38", 0x0000, 0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4), ROM_BIOS(1) )
+	ROMX_LOAD("256tc_boot_1.20.u38", 0x0000, 0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "1.15", "Version 1.15" )
-	ROMX_LOAD("256tc_boot_1.15.u38", 0x0000, 0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(2) )
+	ROMX_LOAD("256tc_boot_1.15.u38", 0x0000, 0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(1) )
 
 	ROM_REGION(0x4000, "pals", 0)
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )

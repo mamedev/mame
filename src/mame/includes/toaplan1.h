@@ -6,6 +6,7 @@
 ****************************************************************************/
 
 #include "cpu/m68000/m68000.h"
+#include "sound/3812intf.h"
 #include "video/toaplan_scu.h"
 #include "screen.h"
 
@@ -20,6 +21,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_ymsnd(*this, "ymsnd"),
 		m_dsp(*this, "dsp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -159,6 +161,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(toaplan1_reset_callback);
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ym3812_device> m_ymsnd;
 	optional_device<cpu_device> m_dsp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

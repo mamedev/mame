@@ -1442,21 +1442,21 @@ static INPUT_PORTS_START( tomagic )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")   // $080002.w
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -1486,7 +1486,7 @@ static INPUT_PORTS_START( tomagic )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW2")
+	PORT_START("DSW2") /* somewhere in here is likely Difficulty & Bonus */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1505,12 +1505,11 @@ static INPUT_PORTS_START( tomagic )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Balls" )
+	PORT_DIPSETTING(      0x0040, "2" )
+	PORT_DIPSETTING(      0x00c0, "3" )
+	PORT_DIPSETTING(      0x0080, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -7042,6 +7041,14 @@ ROM_START( manybloc )
 	ROM_LOAD( "u120.bpr",    0x0320, 0x0100, CRC(576c5984) SHA1(6e9b7f30de0d91cb766a62abc5888ec9af085a27) ) /* unknown */
 ROM_END
 
+/*
+
+There are many gambling related strings in the Tom Tom Magic ROMs
+
+An alt version is called Lucky Ball TomTom Magic, possibly that one is a gambling title and this isn't?
+There is also known to exsist and alternate titled version called Tong Tong Magic
+
+*/
 ROM_START( tomagic )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 */
 	ROM_LOAD16_BYTE( "4.bin", 0x00000, 0x40000, CRC(5055664a) SHA1(d078bd5ab30aedb760bf0a0237484fb56a51d759) )
@@ -7054,7 +7061,7 @@ ROM_START( tomagic )
 	ROM_LOAD( "9.bin", 0x000000, 0x20000, CRC(fcceb24b) SHA1(49e3162c34dfa2ef54ffe190ba91bff73cebe12b) )
 
 	ROM_REGION( 0x80000, "bgtile", 0 )
-	ROM_LOAD( "10.bin", 0x040000, 0x40000, BAD_DUMP CRC(6d5ee72a) SHA1(f90746cb5bbd87213dece062b7efd59d8fd56d84) ) // half size
+	ROM_LOAD( "10.bin", 0x000000, 0x80000, CRC(14ef466c) SHA1(02711bd44e146dc30d68cd199023834a63170b0f) )
 
 	ROM_REGION( 0x200000, "sprites", 0 ) /* 16x16 sprite tiles */
 	ROM_LOAD16_BYTE( "7.bin", 0x100001, 0x80000, CRC(0a297c78) SHA1(effe1ee2ab64cb9fbeae0d168346168245942034) )
@@ -7065,7 +7072,7 @@ ROM_START( tomagic )
 	ROM_REGION( 0x80000, "oki1", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "1.bin",  0x00000, 0x40000, CRC(02b042e3) SHA1(05fca0f83292be49cef457633aba36fed3dc0114) )
 
-	// & undumped PROMs?
+	// & undumped PROMs - N82S123N, N82S129N & N82S147AN
 ROM_END
 
 /***************************************************************************
@@ -8246,4 +8253,4 @@ GAME( 2001, firehawkv,  spec2k,   firehawk,     firehawkv,    nmk16_state, empty
 GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_tharrier,        ROT270, "Bee-Oh",                            "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // clone board, different sound / bg hardware, but similar memory maps, same tx layer, sprites etc.
-GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", MACHINE_NOT_WORKING ) // there are many gambling related strings in the ROM, and an alt version is called Lucky Ball, possibly that one is a gambling title and this isn't?
+GAME( 1997, tomagic,   0,         tomagic,      tomagic,     nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 )

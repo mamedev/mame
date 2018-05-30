@@ -280,7 +280,7 @@ static void v6809_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(v6809_state::v6809)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(16'000'000) / 4) // divided by 4 again internally
+	MCFG_DEVICE_ADD("maincpu", MC6809, 16_MHz_XTAL / 4) // divided by 4 again internally
 	MCFG_DEVICE_PROGRAM_MAP(v6809_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(16'000'000) / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 16_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 16_MHz_XTAL / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
 	MCFG_PTM6840_O1_CB(WRITELINE(*this, v6809_state, speaker_w))
 	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_MB8876_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("fdc", MB8876, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

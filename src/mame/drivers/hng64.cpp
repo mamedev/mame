@@ -1564,7 +1564,7 @@ MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios))
 
 // all BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, or only the MCU internal ROM
 #define HNG64_BIOS \

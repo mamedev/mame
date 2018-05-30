@@ -63,18 +63,12 @@
 	devcb = &downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
 
 #define MCFG_DS1386_INTB_HANDLER(_devcb) \
-	devcb = &downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
+	devcb = &downcast<ds1386_device &>(*device).set_intb_cb(DEVCB_##_devcb);
 
 #define MCFG_DS1386_SQW_HANDLER(_devcb) \
 	devcb = &downcast<ds1386_device &>(*device).set_sqw_cb(DEVCB_##_devcb);
 
 // devices
-
-#define MCFG_DS1386_8K_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, DS1386_8K, _clock)
-
-#define MCFG_DS1386_32K_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, DS1386_32K, _clock)
 
 class ds1386_device : public device_t,
 					  public device_nvram_interface

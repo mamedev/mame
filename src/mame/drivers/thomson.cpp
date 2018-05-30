@@ -690,13 +690,13 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
-		MCFG_WD2793_ADD("wd2793", XTAL(1'000'000))
-		MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
-		MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+	MCFG_DEVICE_ADD("wd2793", WD2793, 1_MHz_XTAL)
+	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 
 
 /* network */
-	MCFG_DEVICE_ADD( "mc6854", MC6854, 0 )
+	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
 	MCFG_MC6854_OUT_FRAME_CB(thomson_state, to7_network_got_frame)
 
 
@@ -720,7 +720,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	/// 2400 7N2

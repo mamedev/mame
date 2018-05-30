@@ -855,7 +855,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx_common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(camplynx_state::lynx_disk)
-	MCFG_FD1793_ADD("fdc", 24_MHz_XTAL / 24)
+	MCFG_DEVICE_ADD("fdc", FD1793, 24_MHz_XTAL / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
@@ -887,7 +887,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'000'000) / 8 )
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12_MHz_XTAL / 8 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
@@ -979,11 +979,11 @@ ROM_START( lynx48k )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("1")
 	ROM_SYSTEM_BIOS(0, "1", "Set1")
-	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(1) )
-	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(0) )
+	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "2", "Set2")
-	ROMX_LOAD( "lynx4811.rom", 0x0000, 0x2000, CRC(a933e577) SHA1(c7b30a28d99b38dbe63a1314c78e3e614287143b), ROM_BIOS(2) )
-	ROMX_LOAD( "lynx4812.rom", 0x2000, 0x2000, CRC(3d3fdd0e) SHA1(259d124f05367a96f891790f9418cc9c7798e2f8), ROM_BIOS(2) )
+	ROMX_LOAD( "lynx4811.rom", 0x0000, 0x2000, CRC(a933e577) SHA1(c7b30a28d99b38dbe63a1314c78e3e614287143b), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx4812.rom", 0x2000, 0x2000, CRC(3d3fdd0e) SHA1(259d124f05367a96f891790f9418cc9c7798e2f8), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( lynx96k )
@@ -992,11 +992,11 @@ ROM_START( lynx96k )
 	ROM_LOAD( "lynx9645.rom",  0x2000, 0x2000, CRC(f596b9a3) SHA1(3fca46bd68422d34c6cd801dd904507e52bd8846) )
 	ROM_DEFAULT_BIOS("orig")
 	ROM_SYSTEM_BIOS(0, "orig", "Original")
-	ROMX_LOAD( "lynx9644.rom", 0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx9644.rom", 0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "scorp", "Scorpion") /* Scorpion ROM v2.1 03/86 (Reading Lynx User Group) */
-	ROMX_LOAD( "skorprom.rom", 0x4000, 0x2000, CRC(698d3de9) SHA1(c707bdcecef79774c2a8a23d1f3e9ba382cb9304), ROM_BIOS(2) )
+	ROMX_LOAD( "skorprom.rom", 0x4000, 0x2000, CRC(698d3de9) SHA1(c707bdcecef79774c2a8a23d1f3e9ba382cb9304), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "danish", "Danish")
-	ROMX_LOAD( "danish96k3.rom", 0x4000, 0x2000, CRC(795c22ea) SHA1(0a57394cd986c5b338b38d514e894bace7f6e47b), ROM_BIOS(3) )
+	ROMX_LOAD( "danish96k3.rom", 0x4000, 0x2000, CRC(795c22ea) SHA1(0a57394cd986c5b338b38d514e894bace7f6e47b), ROM_BIOS(2) )
 	ROM_LOAD( "dosrom.rom",    0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
 

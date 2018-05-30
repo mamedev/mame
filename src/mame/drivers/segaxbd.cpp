@@ -310,7 +310,7 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 	, m_io0_porta(*this, "IO0PORTA")
 	, m_adc_ports(*this, "ADC%u", 0)
 	, m_mux_ports(*this, "MUX%u", 0)
-	, m_lamp(*this, "lamp%u", 0U)
+	, m_lamps(*this, "lamp%u", 0U)
 {
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 	palette_init();
@@ -322,7 +322,7 @@ void segaxbd_state::device_start()
 	if(!m_segaic16road->started())
 		throw device_missing_dependencies();
 
-	m_lamp.resolve();
+	m_lamps.resolve();
 	// point globals to allocated memory regions
 	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
@@ -690,10 +690,10 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 	// d6: danger lamp
 	// in clone aburner, lamps work only in testmode?
 
-	m_lamp[0] = BIT(data, 5);
-	m_lamp[1] = BIT(data, 6);
-	m_lamp[2] = BIT(data, 1);
-	m_lamp[3] = BIT(data, 2);
+	m_lamps[0] = BIT(data, 5);
+	m_lamps[1] = BIT(data, 6);
+	m_lamps[2] = BIT(data, 1);
+	m_lamps[3] = BIT(data, 2);
 }
 
 

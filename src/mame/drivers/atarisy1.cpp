@@ -879,10 +879,10 @@ MACHINE_CONFIG_END
 */
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1) | ROM_SKIP(1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios) | ROM_SKIP(1))
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define MOTHERBOARD_BIOS                                                                                                       \
 	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )                                                                     \
@@ -1913,7 +1913,11 @@ ROM_START( roadblstgu )
 	ROM_LOAD( "136048-1174.a7", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )//
 	ROM_LOAD( "136048-1173.a5", 0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )//
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 
@@ -2404,7 +2408,11 @@ ROM_START( roadblstcg )
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 

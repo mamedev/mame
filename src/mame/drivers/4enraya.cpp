@@ -266,7 +266,7 @@ void _4enraya_state::main_portmap(address_map &map)
 }
 
 
-void _4enraya_state::unkpacg_main_map(address_map &map)
+void unk_gambl_state::unkpacg_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
@@ -274,7 +274,7 @@ void _4enraya_state::unkpacg_main_map(address_map &map)
 	map(0x8000, 0x9fff).rom();
 }
 
-void _4enraya_state::unkpacg_main_portmap(address_map &map)
+void unk_gambl_state::unkpacg_main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW1");
@@ -498,7 +498,7 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(_4enraya_state::unkpacg)
+MACHINE_CONFIG_START(unk_gambl_state::unkpacg)
 	_4enraya(config);
 
 	/* basic machine hardware */
@@ -636,8 +636,10 @@ ROM_END
 *          Driver Init             *
 ***********************************/
 
-void _4enraya_state::init_unkpacg()
+void unk_gambl_state::driver_init()
 {
+	_4enraya_state::driver_init();
+
 	// descramble rom
 	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0xa000; i++)
@@ -649,9 +651,9 @@ void _4enraya_state::init_unkpacg()
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS           INIT          ROT   COMPANY      FULLNAME                                         FLAGS  */
-GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state, empty_init,   ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state, empty_init,   ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, init_unkpacg, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksig,   0,       unkpacg,  unkfr,   _4enraya_state, init_unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   _4enraya_state, init_unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                         FLAGS  */
+GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,   0,       unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -12,7 +12,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_READ16_MEMBER(sderby_input_r);
@@ -47,7 +47,7 @@ public:
 	void spacewin_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	required_shared_ptr<uint16_t> m_videoram;
@@ -63,5 +63,5 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<8> m_lamp;
+	output_finder<7> m_lamps;
 };

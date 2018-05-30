@@ -84,7 +84,7 @@ enum
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(a2bus_corvfdc01_device::device_add_mconfig)
-	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL(16'000'000) / 8)
+	MCFG_DEVICE_ADD(FDC01_FDC_TAG, FD1793, 16_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)

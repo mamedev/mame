@@ -41,8 +41,8 @@
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
 
-#define XTAL_X001  XTAL(10'738'635)
-#define XTAL_X002  XTAL(8'000'000)
+#define XTAL_X001  10.738635_MHz_XTAL
+#define XTAL_X002  8_MHz_XTAL
 
 #define IC_I001  "i001"  /* Z8400A */
 #define IC_I030  "i030"  /* AY-3-8910 */
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL(10'738'635) / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9129, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
 
 	// floppy
-	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
+	MCFG_DEVICE_ADD(IC_I042, WD1770, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
@@ -696,9 +696,9 @@ ROM_START( einstein )
 	ROM_REGION(0x8000, "bios", 0)
 	/* i023 */
 	ROM_SYSTEM_BIOS(0,  "mos12",  "MOS 1.2")
-	ROMX_LOAD("mos12.i023", 0, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(1))
+	ROMX_LOAD("mos12.i023", 0, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1,  "mos121",  "MOS 1.21")
-	ROMX_LOAD("mos121.i023", 0, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(2))
+	ROMX_LOAD("mos121.i023", 0, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(1))
 	ROM_RELOAD(0x2000, 0x2000)
 	/* i024 */
 	ROM_FILL(0x4000, 0x4000, 0xff)

@@ -1431,7 +1431,7 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_adc_ports(*this, "ADC.%u", 0),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	render_t m_render;
@@ -1617,7 +1617,7 @@ protected:
 	uint8_t m_sub_porta;
 	uint8_t m_sub_portb;
 	uint8_t m_tssio_port_4;
-	output_finder<8> m_lamp;
+	output_finder<8> m_lamps;
 };
 
 
@@ -2797,7 +2797,7 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 		if(m_ctl_led != (data & 0xff)) {
 			m_ctl_led = data & 0xff;
 			for(int i = 0; i < 8; i++)
-				m_lamp[i] = BIT(data, 7 - i);
+				m_lamps[i] = BIT(data, 7 - i);
 		}
 		break;
 
@@ -3472,7 +3472,7 @@ INPUT_PORTS_END
 
 void namcos23_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
@@ -3627,7 +3627,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
@@ -3694,7 +3694,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3774,7 +3774,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
+	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)

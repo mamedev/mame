@@ -1305,7 +1305,7 @@ public:
 		m_ay8910(*this, "ay8910"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
@@ -1382,7 +1382,7 @@ public:
 	void witchcrd_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1392,7 +1392,7 @@ protected:
 	optional_device<ay8910_device> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<5> m_lamp;
+	output_finder<5> m_lamps;
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_mux_data;
@@ -1774,11 +1774,11 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 */
 	data = data ^ 0xff;
 
-	m_lamp[0] = BIT(data, 0);    /* Lamp 0 */
-	m_lamp[1] = BIT(data, 1);    /* Lamp 1 */
-	m_lamp[2] = BIT(data, 2);    /* Lamp 2 */
-	m_lamp[3] = BIT(data, 3);    /* Lamp 3 */
-	m_lamp[4] = BIT(data, 4);    /* Lamp 4 */
+	m_lamps[0] = BIT(data, 0);    /* Lamp 0 */
+	m_lamps[1] = BIT(data, 1);    /* Lamp 1 */
+	m_lamps[2] = BIT(data, 2);    /* Lamp 2 */
+	m_lamps[3] = BIT(data, 3);    /* Lamp 3 */
+	m_lamps[4] = BIT(data, 4);    /* Lamp 4 */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* counter1 */
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);  /* counter2 */
@@ -4285,7 +4285,7 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(goldnpkr_state, mondial)
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
@@ -4717,7 +4717,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, blitz_state, mcu_portb_w))
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, blitz_state, mcu_portc_w))
 
-	MCFG_M48T02_ADD("timekpr")
+	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))

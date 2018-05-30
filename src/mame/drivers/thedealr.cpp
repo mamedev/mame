@@ -48,7 +48,7 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	// IOX
@@ -83,7 +83,7 @@ private:
 	required_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
-	output_finder<8> m_led;
+	output_finder<8> m_leds;
 };
 
 /***************************************************************************
@@ -165,14 +165,14 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x20:  // leds
 				m_iox_leds = data;
-				m_led[0] = BIT(data, 0);  // bet
-				m_led[1] = BIT(data, 1);  // deal
-				m_led[2] = BIT(data, 2);
-				m_led[3] = BIT(data, 3);
-				m_led[4] = BIT(data, 4);  // hold 1-5?
-				m_led[5] = BIT(data, 5);
-				m_led[6] = BIT(data, 6);
-				m_led[7] = BIT(data, 7);
+				m_leds[0] = BIT(data, 0);  // bet
+				m_leds[1] = BIT(data, 1);  // deal
+				m_leds[2] = BIT(data, 2);
+				m_leds[3] = BIT(data, 3);
+				m_leds[4] = BIT(data, 4);  // hold 1-5?
+				m_leds[5] = BIT(data, 5);
+				m_leds[6] = BIT(data, 6);
+				m_leds[7] = BIT(data, 7);
 				break;
 
 			case 0x40:  // coin counters
@@ -513,7 +513,7 @@ GFXDECODE_END
 
 void thedealr_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));

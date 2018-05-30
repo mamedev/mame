@@ -3492,6 +3492,7 @@ ROM_START( shabdama )
 ROM_END
 
 // PCB pics are rather blurry, might better fit in another driver
+// LD QUIZ 第4弾 答えたもん勝ち!
 ROM_START( ldquiz4 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 27512
 	ROM_LOAD( "1.e3", 0x00000,  0x10000, CRC(49255f66) SHA1(bdd01987331c2aadea7f588d39c48c70cd43fc71) )
@@ -3558,4 +3559,4 @@ GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, init_nbmj919
 
 GAME( 1991, shabdama, 0,        shabdama, mjuraden, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "LD Mahjong #4 Shabon-Dama", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, ldquiz4,  0,        shabdama, mjuraden, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "LD Quiz 4 - Kotaemon Gachi (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ldquiz4,  0,        shabdama, mjuraden, nbmj9195_state, init_nbmj9195, ROT0,    "Nichibutsu", "LD Quiz dai 4-dan - Kotaetamon Gachi! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

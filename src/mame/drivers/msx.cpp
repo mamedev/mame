@@ -61,7 +61,7 @@
 ** - cpc50a/cpc50b/cpc51: Boot to a black screen, is this correct?
 ** - mbh2: speed controller not implemented
 ** - mbh70: Verify firmware operation
-** - kmc5000: Floppy supprt broken
+** - kmc5000: Floppy support broken
 ** - mlg3: rs232c not emulated
 ** - perfect1: Firmware broken
 ** - mpc2500f: Fix keyboard layout?
@@ -194,7 +194,7 @@ National CF-3000 - MSX1 - cf3000
 National CF-3300 - MSX1 - cf3300
 National FS-1300 - MSX1 - fs1300
 National FS-4000 - MSX1 - fs4000
-Matioanl FS-4000 (alt) - MSX1 - fs4000a
+National FS-4000 (alt) - MSX1 - fs4000a
 National FS-4500 - MSX2 - fs4500
 National FS-4600 - MSX2 - fs4600
 National FS-4700 - MSX2 - fs4700
@@ -442,7 +442,7 @@ Notes:
    IC40              - TA75559P
    Q1                - 10687.5
    Q2                - 3579545
-   CN1               - Cassette connecter
+   CN1               - Cassette connector
    CN2               - RF connector
    CN3               - Audio connector
    CN4               - Video connector
@@ -507,8 +507,8 @@ Yamaha YIS-503IIR (Russian) - MSX1 - y503iir
 Yamaha YIS-503IIR (Estonian) - MSX1 - y503iir2
 Yamaha YIS-503M - MSX1 - yis503m
 Yamaha YIS-503IIIR - MSX2 - y503iiir
-Yamaha YIS-503IIIR Estonion - MSX2 - y503iiire
-Ymaha YIS604 - MSX2 - yis60464
+Yamaha YIS-503IIIR Estonian - MSX2 - y503iiire
+Yamaha YIS604 - MSX2 - yis60464
 Yamaha YIS604-128 - MSX2 - yis604
 Yamaha YIS805-128 - MSX2 - y805128
 Yamaha YIS805-128R2 - MSX2 - y805128r2
@@ -1234,7 +1234,7 @@ WRITE_LINE_MEMBER(msx_state::turbo_w)
 {
 	// 0 - 5.369317 MHz
 	// 1 - 3.579545 MHz
-	m_maincpu->set_unscaled_clock(state ? XTAL(21'477'272)/6 : XTAL(21'477'272)/4);
+	m_maincpu->set_unscaled_clock(21.477272_MHz_XTAL / (state ? 6 : 4));
 }
 
 
@@ -1289,7 +1289,7 @@ static void msx_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(msx_state::msx_fd1793)
-	MCFG_FD1793_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
@@ -1297,19 +1297,19 @@ MACHINE_CONFIG_START(msx_state::msx_wd2793_force_ready)
 	// From NMS8245 schematics:
 	// READY + HLT - pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
-	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx_wd2793)
-	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx_mb8877a)
 	// From CF-3300 FDC schematic:
 	// READY + HLT - pulled high
 	// -DDEN - pulled low
-	MCFG_MB8877_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", MB8877, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
@@ -1318,7 +1318,7 @@ MACHINE_CONFIG_START(msx_state::msx_tc8566af)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx_microsol)
-	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
@@ -1336,7 +1336,7 @@ MACHINE_CONFIG_START(msx_state::msx_2_35_dd_drive)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx_ym2413)
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(21'477'272)/6)
+	MCFG_DEVICE_ADD("ym2413", YM2413, 21.477272_MHz_XTAL / 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 MACHINE_CONFIG_END
 
@@ -1347,7 +1347,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)         /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 10.738635_MHz_XTAL / 3)         /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
 	MCFG_DEVICE_IO_MAP(msx_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
@@ -1365,7 +1365,7 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)
+	MCFG_DEVICE_ADD("ay8910", AY8910, 10.738635_MHz_XTAL / 3 / 2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx_state, msx_psg_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx_state, msx_psg_port_b_r))
@@ -1397,7 +1397,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_ntsc)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_tms9118)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9118, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9118, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -1419,7 +1419,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_tms9128)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9128, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -1430,7 +1430,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_tms9918)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9918, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9918, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -1441,7 +1441,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_tms9918a)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9918A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9918A, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -1452,7 +1452,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_tms9928)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9928A, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -1463,7 +1463,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_pal)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
@@ -1474,7 +1474,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_tms9129)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9129, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9129, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
@@ -1485,7 +1485,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx_tms9929)
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD("tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
@@ -1495,7 +1495,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)       /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 21.477272_MHz_XTAL / 6)       /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
 	MCFG_DEVICE_IO_MAP(msx2_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1506,9 +1506,9 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x20000, XTAL(21'477'272))
+	MCFG_V9938_ADD("v9938", "screen", 0x20000, 21.477272_MHz_XTAL)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL(21'477'272))
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", 21.477272_MHz_XTAL)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1517,7 +1517,7 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(21'477'272)/6/2)
+	MCFG_DEVICE_ADD("ay8910", AY8910, 21.477272_MHz_XTAL / 6 / 2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx_state, msx_psg_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx_state, msx_psg_port_b_r))
@@ -1542,7 +1542,7 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	MCFG_CASSETTE_INTERFACE("msx_cass")
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", RP5C01, 32.768_kHz_XTAL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
@@ -1552,7 +1552,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx2p)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)       /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 21.477272_MHz_XTAL / 6)       /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
 	MCFG_DEVICE_IO_MAP(msx2p_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1563,9 +1563,9 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272))
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, 21.477272_MHz_XTAL)
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", 21.477272_MHz_XTAL)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1574,7 +1574,7 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(21'477'272)/6/2)
+	MCFG_DEVICE_ADD("ay8910", AY8910, 21.477272_MHz_XTAL / 6 / 2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx_state, msx_psg_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx_state, msx_psg_port_b_r))
@@ -1599,7 +1599,7 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	MCFG_CASSETTE_INTERFACE("msx_cass")
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", RP5C01, 32.768_kHz_XTAL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
@@ -1610,7 +1610,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(msx_state::msx2_pal)
 	msx2(config);
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_V99X8_SCREEN_ADD_PAL("screen", "v9938", XTAL(21'477'272))
+	MCFG_V99X8_SCREEN_ADD_PAL("screen", "v9938", 21.477272_MHz_XTAL)
 MACHINE_CONFIG_END
 
 
@@ -2052,6 +2052,28 @@ MACHINE_CONFIG_START(msx_state::cpc51)
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 0, 4)  /* 64KB RAM */
+
+	msx1_cartlist(config);
+MACHINE_CONFIG_END
+
+/* MSX - Dragon MSX-64 */
+
+ROM_START(dgnmsx)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("uk1msx048.ic37", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
+	ROM_LOAD("uk2msx058.ic6",  0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
+ROM_END
+
+MACHINE_CONFIG_START(msx_state::dgnmsx)
+	msx_pal(config);
+	// AY8910
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+
+	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 0, 4)  /* 64KB RAM */
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
 	msx1_cartlist(config);
 MACHINE_CONFIG_END
@@ -8520,6 +8542,7 @@ COMP(1985, dpc200e,    0,        0,     dpc200e,    msx,      msx_state, empty_i
 COMP(1983, cpc50a,     cpc51,    0,     cpc50a,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50A (Korea) (MSX1)", 0)
 COMP(1983, cpc50b,     cpc51,    0,     cpc50b,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50B (Korea) (MSX1)", 0)
 COMP(1986, cpc51,      0,        0,     cpc51,      msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-51 (Korea) (MSX1)", 0)
+COMP(1985, dgnmsx,     0,        0,     dgnmsx,     msx,      msx_state, empty_init, "Eurohard S.A.", "Dragon MSX-64 (MSX1)", 0)
 COMP(1983, fdpc200,    0,        0,     fdpc200,    msx,      msx_state, empty_init, "Fenner", "DPC-200 (Italy) (MSX1)", 0)
 COMP(1984, fpc500,     0,        0,     fpc500,     msx,      msx_state, empty_init, "Fenner", "FPC-500 (Italy) (MSX1)", 0)
 COMP(1986, fspc800,    0,        0,     fspc800,    msx,      msx_state, empty_init, "Fenner", "SPC-800 (Italy) (MSX1)", 0)

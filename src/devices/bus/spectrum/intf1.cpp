@@ -29,10 +29,10 @@ ROM_START( intf1 )
 	ROM_REGION( 0x2000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v2")
 	ROM_SYSTEM_BIOS(0, "v1", "v1")
-	ROMX_LOAD("if1-1.rom", 0x0000, 0x2000, CRC(e72a12ae) SHA1(4ffd9ed9c00cdc6f92ce69fdd8b618ef1203f48e), ROM_BIOS(1))
+	ROMX_LOAD("if1-1.rom", 0x0000, 0x2000, CRC(e72a12ae) SHA1(4ffd9ed9c00cdc6f92ce69fdd8b618ef1203f48e), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v2", "v2")
-	ROMX_LOAD("if1-2.rom", 0x0000, 0x2000, CRC(bb66dd1e) SHA1(5cfb6bca4177c45fefd571734576b55e3a127c08), ROM_BIOS(2))
+	ROMX_LOAD("if1-2.rom", 0x0000, 0x2000, CRC(bb66dd1e) SHA1(5cfb6bca4177c45fefd571734576b55e3a127c08), ROM_BIOS(1))
 ROM_END
 
 //-------------------------------------------------

@@ -49,6 +49,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
 
 	void williams_cvsd_map(address_map &map);
+
+	mc6809e_device *get_cpu() { return m_cpu; }
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -98,6 +101,9 @@ public:
 
 	void williams_narc_master_map(address_map &map);
 	void williams_narc_slave_map(address_map &map);
+
+	mc6809e_device *get_cpu() { return m_cpu0; }
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -110,16 +110,6 @@ typedef int16_t SWORD68K;
 #define BYTE68K_MAX 255
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MCD212_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_MCD212, 0)
-#define MCFG_MCD212_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACHINE_MCD212, 0)
-#define MCFG_MCD212_SET_SCREEN MCFG_VIDEO_SET_SCREEN
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -251,6 +241,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(MACHINE_MCD212, mcd212_device)
+DECLARE_DEVICE_TYPE(MCD212, mcd212_device)
 
 #endif // MAME_VIDEO_MCD212_H

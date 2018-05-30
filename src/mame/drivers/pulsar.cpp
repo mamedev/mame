@@ -213,7 +213,7 @@ void pulsar_state::init_pulsar()
 
 MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(pulsar_mem)
 	MCFG_DEVICE_IO_MAP(pulsar_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
@@ -226,9 +226,9 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))
 
-	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("dart", Z80DART, 4_MHz_XTAL)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -239,14 +239,14 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("dart", z80dart_device, ctsa_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800))
+	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL)
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
 	MCFG_COM8116_FR_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE("dart", z80dart_device, txcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxcb_w))
 
-	MCFG_FD1797_ADD("fdc", XTAL(4'000'000) / 2)
+	MCFG_DEVICE_ADD("fdc", FD1797, 4_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
@@ -257,9 +257,9 @@ MACHINE_CONFIG_END
 ROM_START( pulsarlb )
 	ROM_REGION( 0x10800, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "mon7", "MP7A")
-	ROMX_LOAD( "mp7a.bin", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(1))
+	ROMX_LOAD( "mp7a.bin", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mon6", "LBOOT6") // Blank screen until floppy boots
-	ROMX_LOAD( "lboot6.rom", 0x10000, 0x800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(2))
+	ROMX_LOAD( "lboot6.rom", 0x10000, 0x800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

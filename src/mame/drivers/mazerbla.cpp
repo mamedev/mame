@@ -129,8 +129,8 @@ public:
 		, m_vcu(*this,"vcu")
 		, m_screen(*this, "screen")
 		, m_soundlatch(*this, "soundlatch")
-		, m_led(*this, "led%u", 0U)
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
@@ -181,8 +181,8 @@ protected:
 	required_device<mb_vcu_device> m_vcu;
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	output_finder<3> m_led;
-	output_finder<2> m_lamp;
+	output_finder<3> m_leds;
+	output_finder<2> m_lamps;
 
 	uint8_t m_port02_status;
 	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
@@ -402,7 +402,7 @@ WRITE8_MEMBER(mazerbla_state::zpu_led_w)
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	m_led[0] = BIT(offset, 0);
+	m_leds[0] = BIT(offset, 0);
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
@@ -410,8 +410,8 @@ WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*m_lamp[0] = BIT(data, 4);*/
-	/*m_lamp[1] = BIT(data, 5);*/
+	/*m_lamps[0] = BIT(data, 4);*/
+	/*m_lamps[1] = BIT(data, 5);*/
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
@@ -423,13 +423,13 @@ WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
 WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 {
 	/* bit 7 - led on */
-	m_led[2] = BIT(data, 7);
+	m_leds[2] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
 {
 	/* bit 0, bit 1 - led on */
-	m_led[1] = BIT(data, 0);
+	m_leds[1] = BIT(data, 0);
 }
 
 
@@ -444,7 +444,7 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	m_vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	m_led[1] = BIT(data, 5);
+	m_leds[1] = BIT(data, 5);
 }
 
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
@@ -927,8 +927,8 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
-	m_led.resolve();
-	m_lamp.resolve();
+	m_leds.resolve();
+	m_lamps.resolve();
 
 	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 

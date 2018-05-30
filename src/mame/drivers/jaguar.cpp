@@ -406,7 +406,7 @@ void cojag_devices(device_slot_interface &device)
  *  Machine init
  *
  *************************************/
- 
+
 void jaguar_state::machine_start()
 {
 	/* configure banks for gfx/sound ROMs */
@@ -446,7 +446,7 @@ void jaguar_state::machine_reset()
 			m_butch_cmd_size = 1;
 		}
 	}
-	
+
 	/* reset banks for gfx/sound ROMs */
 	if (m_romboard_region != nullptr)
 	{
@@ -1341,7 +1341,7 @@ void jaguar_state::jaguarcd_map(address_map &map)
  *  Main CPU memory handlers
  *
  *************************************/
- 
+
 void jaguar_state::r3000_map(address_map &map)
 {
 	map(0x04000000, 0x047fffff).ram().share("sharedram");
@@ -2177,9 +2177,9 @@ ROM_START( jaguarcd )
 
 	ROM_REGION(0x40000, "cdbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Jaguar CD" )
-	ROMX_LOAD( "jag_cd.bin", 0x00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
+	ROMX_LOAD( "jag_cd.bin", 0x00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "dev", "Jaguar Developer CD" )
-	ROMX_LOAD( "jagdevcd.bin", 0x00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
+	ROMX_LOAD( "jagdevcd.bin", 0x00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )

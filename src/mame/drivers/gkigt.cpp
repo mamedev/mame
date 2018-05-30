@@ -611,10 +611,10 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_DEVICE_ADD("maincpu", I960, XTAL(24'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(igt_gameking_map)
 
-	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
+	MCFG_DEVICE_ADD("quart1", SC28C94, XTAL(24'000'000) / 6)
 	MCFG_SC28C94_D_TX_CALLBACK(WRITELINE("diag", rs232_port_device, write_txd))
 
-	MCFG_SC28C94_ADD("quart2", XTAL(24'000'000) / 6)
+	MCFG_DEVICE_ADD("quart2", SC28C94, XTAL(24'000'000) / 6)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
 
 	MCFG_DEVICE_ADD("diag", RS232_PORT, default_rs232_devices, nullptr)

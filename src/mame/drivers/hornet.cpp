@@ -1059,7 +1059,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
 	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
 	MCFG_ADC1213X_IPT_CONVERT_CB(hornet_state, adc12138_input_callback)

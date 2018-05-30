@@ -238,7 +238,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_dvg(*this, "dvg")
 		, m_soundlatch(*this, "soundlatch")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
@@ -253,14 +253,14 @@ public:
 	void sound_port(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dvg_device> m_dvg;
 	required_device<generic_latch_8_device> m_soundlatch;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 };
 
 
@@ -343,10 +343,10 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	m_led[0] = BIT(~data, 2);
-	m_led[1] = BIT(~data, 3);
-	m_led[2] = BIT(~data, 4);
-	m_led[3] = BIT(~data, 5);
+	m_leds[0] = BIT(~data, 2);
+	m_leds[1] = BIT(~data, 3);
+	m_leds[2] = BIT(~data, 4);
+	m_leds[3] = BIT(~data, 5);
 
 	/* bit 6 flips screen (not supported) */
 }

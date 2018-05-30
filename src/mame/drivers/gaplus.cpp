@@ -486,8 +486,8 @@ static const char *const gaplus_sample_names[] =
 
 WRITE8_MEMBER(gaplus_state::out_lamps0)
 {
-	m_lamp[0] = BIT(data, 0);
-	m_lamp[1] = BIT(data, 1);
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
 	machine().bookkeeping().coin_lockout_global_w(data & 4);
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
@@ -499,7 +499,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps1)
 
 void gaplus_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	m_namcoio0_run_timer = timer_alloc(TIMER_NAMCOIO0_RUN);
 	m_namcoio1_run_timer = timer_alloc(TIMER_NAMCOIO1_RUN);
 

@@ -349,13 +349,15 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
     m_via->write_ca1(state);
 }*/
 
-#define CPU_CLK (XTAL(22'321'000) / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
+#define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
 MACHINE_CONFIG_START(lwriter_state::lwriter)
 	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLK)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_SCC8530_ADD("scc", CPU_CLK, RXC_CLK, 0, RXC_CLK, 0)
+
+	MCFG_DEVICE_ADD("scc", SCC8530N, CPU_CLK)
+	MCFG_Z80SCC_OFFSETS(RXC_CLK, 0, RXC_CLK, 0)
 	/* Port A */
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
@@ -368,13 +370,13 @@ MACHINE_CONFIG_START(lwriter_state::lwriter)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE("via", via6522_device, write_ca1))
 	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, lwriter_state, scc_int))
 
-	MCFG_DEVICE_ADD ("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsa_w))
 
-	MCFG_DEVICE_ADD ("rs232b", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsb_w))
 
 #if TPI
 	MCFG_DEVICE_ADD("tpi", TPI6525, 0)

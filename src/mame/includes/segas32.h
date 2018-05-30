@@ -351,7 +351,7 @@ protected:
 //  virtual void device_reset() override;
 
 private:
-	output_finder<16> m_lamp;
+	output_finder<16> m_lamps;
 };
 
 class sega_multi32_state : public segas32_state

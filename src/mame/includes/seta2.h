@@ -38,8 +38,8 @@ public:
 		m_spriteram(*this, "spriteram", 0),
 		m_tileram(*this, "tileram", 0),
 		m_vregs(*this, "vregs", 0),
-		m_led(*this, "led%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_leds(*this, "led%u", 0U),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
@@ -110,7 +110,7 @@ public:
 	void telpacfl_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); m_lamp.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -130,8 +130,8 @@ protected:
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_tileram;
 	optional_shared_ptr<uint16_t> m_vregs;
-	output_finder<7> m_led;
-	output_finder<11> m_lamp;
+	output_finder<7> m_leds;
+	output_finder<11> m_lamps;
 
 	int m_xoffset;
 	int m_yoffset;

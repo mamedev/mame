@@ -429,13 +429,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_led[0] = BIT(data, 0);  // start
-		m_led[1] = BIT(data, 1);  // small
-		m_led[2] = BIT(data, 2);  // bet
-		m_led[3] = BIT(data, 3);  // big
-		m_led[4] = BIT(data, 4);  // double up
-		m_led[5] = BIT(data, 5);  // collect
-		m_led[6] = BIT(data, 6);  // bet cancel
+		m_leds[0] = BIT(data, 0);  // start
+		m_leds[1] = BIT(data, 1);  // small
+		m_leds[2] = BIT(data, 2);  // bet
+		m_leds[3] = BIT(data, 3);  // big
+		m_leds[4] = BIT(data, 4);  // double up
+		m_leds[5] = BIT(data, 5);  // collect
+		m_leds[6] = BIT(data, 6);  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -557,9 +557,9 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps1_w)
 	COMBINE_DATA(&m_lamps1);
 	if (ACCESSING_BITS_0_7)
 	{
-		m_led[0] = BIT(data, 0);  // Lamp 1 |
-		m_led[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
-		m_led[2] = BIT(data, 2);  // Lamp 3 |
+		m_leds[0] = BIT(data, 0);  // Lamp 1 |
+		m_leds[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
+		m_leds[2] = BIT(data, 2);  // Lamp 3 |
 		//                        data & 0x0008 );  // Degauss
 	}
 	staraudi_debug_outputs();
@@ -571,8 +571,8 @@ WRITE16_MEMBER(staraudi_state::staraudi_lamps2_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		//                        data & 0x0020 );  // ? Always On
-		m_led[3] = BIT(data, 6);  // 2P Switch Lamp
-		m_led[4] = BIT(data, 7);  // 1P Switch Lamp
+		m_leds[3] = BIT(data, 6);  // 2P Switch Lamp
+		m_leds[4] = BIT(data, 7);  // 1P Switch Lamp
 	}
 	staraudi_debug_outputs();
 }
@@ -652,14 +652,14 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp1_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_lamp[0] = BIT(data, 0); //
-		m_lamp[1] = BIT(data, 1); //
-		m_lamp[2] = BIT(data, 2); //
-		m_lamp[3] = BIT(data, 3); //
-		m_lamp[4] = BIT(data, 4); //
-		m_lamp[5] = BIT(data, 5); //
-		m_lamp[6] = BIT(data, 6); //
-		m_lamp[7] = BIT(data, 7); //
+		m_lamps[0] = BIT(data, 0); //
+		m_lamps[1] = BIT(data, 1); //
+		m_lamps[2] = BIT(data, 2); //
+		m_lamps[3] = BIT(data, 3); //
+		m_lamps[4] = BIT(data, 4); //
+		m_lamps[5] = BIT(data, 5); //
+		m_lamps[6] = BIT(data, 6); //
+		m_lamps[7] = BIT(data, 7); //
 	}
 
 //  popmessage("LAMP1 %04X", data);
@@ -669,9 +669,9 @@ WRITE16_MEMBER(seta2_state::telpacfl_lamp2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_lamp[8] = BIT(data, 0); // on/off lamp (throughout)
-		m_lamp[9] = BIT(data, 1); // bet lamp
-		m_lamp[10] = BIT(data, 2); // payout lamp
+		m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
+		m_lamps[9] = BIT(data, 1); // bet lamp
+		m_lamps[10] = BIT(data, 2); // payout lamp
 		m_dispenser->motor_w(       data & 0x0008 ); // coin out motor
 		machine().bookkeeping().coin_counter_w(0,  data & 0x0010); // coin out counter
 		//                          data & 0x0020 ); // on credit increase
@@ -994,14 +994,14 @@ WRITE16_MEMBER(funcube_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	m_led[0] = BIT(~data, 0); // win lamp (red)
-	m_led[1] = BIT(~data, 1); // win lamp (green)
+	m_leds[0] = BIT(~data, 0); // win lamp (red)
+	m_leds[1] = BIT(~data, 1); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	m_led[2] = BIT(~data, 4);
-	m_led[3] = BIT(~data, 5);
-	m_led[4] = BIT(~data, 6);
-	m_led[5] = BIT(~data, 7);
+	m_leds[2] = BIT(~data, 4);
+	m_leds[3] = BIT(~data, 5);
+	m_leds[4] = BIT(~data, 6);
+	m_leds[5] = BIT(~data, 7);
 
 	funcube_debug_outputs();
 }
@@ -1024,7 +1024,7 @@ WRITE16_MEMBER(funcube_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	m_led[6] = BIT(~data, 3);
+	m_leds[6] = BIT(~data, 3);
 
 	funcube_debug_outputs();
 }
@@ -4258,7 +4258,7 @@ ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a 
 
 	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) 
+	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
 ROM_END
 
 ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9 - on a P0-145-1 main PCB with a P1-115A flash ROM board */
@@ -4364,7 +4364,7 @@ GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state,    empty_init,
 GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyht,  trophyh,  samshoot, trophyht, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0 (Location Test)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyht,  trophyh,  samshoot, trophyht, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0 (location test)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, funcube,   0,        funcube,  funcube,  funcube_state,  init_funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                               MACHINE_NO_COCKTAIL )
 GAME( 2001, funcube2,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                             MACHINE_NO_COCKTAIL )
 GAME( 2001, funcube3,  0,        funcube3, funcube,  funcube_state,  init_funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )

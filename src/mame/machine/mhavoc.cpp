@@ -65,7 +65,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_irq_ack_w)
 
 void mhavoc_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_alpha_data));
 	save_item(NAME(m_alpha_rcvd));
@@ -269,17 +269,17 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 	/* this is the unpopulated processor in the corner of the pcb farthest from the quad pokey, not used on shipping boards */
 
 	/* Bit 0 = Roller light (Blinks on fatal errors) */
-	m_lamp[0] = BIT(data, 0);
+	m_lamps[0] = BIT(data, 0);
 }
 
 
 WRITE8_MEMBER(mhavoc_state::alphaone_out_0_w)
 {
 	/* Bit 5 = P2 lamp */
-	m_lamp[0] = BIT(~data, 5);
+	m_lamps[0] = BIT(~data, 5);
 
 	/* Bit 4 = P1 lamp */
-	m_lamp[1] = BIT(~data, 4);
+	m_lamps[1] = BIT(~data, 4);
 
 	/* Bit 1 = right coin counter */
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);

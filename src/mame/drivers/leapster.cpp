@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(leapster_state::leapster)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 /* There are various build dates and revisions for different parts of the code, the date listed is the newest on in each rom.
    This is always in the same place relative to the rest of the data

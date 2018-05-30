@@ -311,7 +311,7 @@ public:
 		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
 		m_in1(*this, "IN1/DSW0"),
 		m_in2(*this, "IN2"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
@@ -344,7 +344,7 @@ private:
 	required_ioport m_buttons_p2;
 	required_ioport m_in1;
 	required_ioport m_in2;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	uint8_t m_player_select;
 };
@@ -352,7 +352,7 @@ private:
 
 void tempest_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	save_item(NAME(m_player_select));
 }
 
@@ -413,8 +413,8 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
 
 WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	m_led[0] = BIT(~data, 1);
-	m_led[1] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 0);
 	/* FLIP is bit 0x04 */
 	m_player_select = data & 0x04;
 }

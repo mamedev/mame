@@ -11,7 +11,7 @@ MACHINE_CONFIG_START(voodoo_1_pci_device::device_add_mconfig)
 	MCFG_VOODOO_FBMEM(4)
 	MCFG_VOODOO_TMUMEM(1, 0)
 MACHINE_CONFIG_END
-	
+
 MACHINE_CONFIG_START(voodoo_2_pci_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
 	MCFG_VOODOO_FBMEM(4)

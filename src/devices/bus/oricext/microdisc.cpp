@@ -69,7 +69,7 @@ const tiny_rom_entry *microdisc_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(microdisc_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
+	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, microdisc_device, fdc_hld_w))

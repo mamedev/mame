@@ -44,7 +44,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -81,12 +81,12 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	output_finder<8> m_lamp;
+	output_finder<8> m_lamps;
 };
 
 void cardline_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
 	for (int i=0; i < 0x2000; i++)
@@ -207,14 +207,14 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	m_lamp[5] = BIT(data, 0);
-	m_lamp[0] = BIT(data, 1);
-	m_lamp[1] = BIT(data, 2);
-	m_lamp[2] = BIT(data, 3);
-	m_lamp[3] = BIT(data, 4);
-	m_lamp[4] = BIT(data, 5);
-	m_lamp[6] = BIT(data, 6);
-	m_lamp[7] = BIT(data, 7);
+	m_lamps[5] = BIT(data, 0);
+	m_lamps[0] = BIT(data, 1);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 3);
+	m_lamps[3] = BIT(data, 4);
+	m_lamps[4] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 }
 
 void cardline_state::mem_prg(address_map &map)

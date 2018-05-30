@@ -2251,7 +2251,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
-	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	MCFG_DEVICE_ADD("fdc", MB8877, MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 

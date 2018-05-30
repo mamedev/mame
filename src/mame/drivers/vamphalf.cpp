@@ -138,7 +138,7 @@ public:
 	DECLARE_WRITE32_MEMBER(eeprom32_w);
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE32_MEMBER(flipscreen32_w);
-	
+
 	void banked_oki(int chip);
 
 	void common_map(address_map &map);
@@ -2845,7 +2845,7 @@ ROMs:
     VROM1/VROM2                   - ST M27C4001 4MBit DIP32 EPROM
     ROM0/ROM1                     - ST M27C4001 4MBit DIP32 EPROM
   * ROM2/ROM3                     - Unpopulated space for DIP32 EPROM (up to 4MBit)
- 
+
 */
 
 ROM_START( boonggab )

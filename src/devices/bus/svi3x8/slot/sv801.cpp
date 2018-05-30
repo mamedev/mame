@@ -32,7 +32,7 @@ static void svi_floppies(device_slot_interface &device)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sv801_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, sv801_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, sv801_device, drq_w))
 

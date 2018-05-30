@@ -38,7 +38,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_filter(*this, {"2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l"}),
 		m_steer(*this, "STEER"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
@@ -96,7 +96,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device_array<filter_volume_device, 4> m_filter;
 	optional_ioport m_steer;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);

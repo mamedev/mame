@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
@@ -563,12 +563,12 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_FD1771_ADD("wd1771", XTAL(2'000'000) / 2)
+	MCFG_DEVICE_ADD("wd1771", FD1771, 2_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
