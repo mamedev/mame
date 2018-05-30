@@ -884,14 +884,17 @@ offset is from last pixel of first road segment?
 
 		if (endPos<0) 
 		{
+			// end of left intersection (taking right turn)
 			samplePos=step*(0-startPos);
 		}
 		else if (endPos<x) 
 		{
+			// start of right intersection
 			samplePos=step*(x-endPos);
 		} 
 		else 
 		{
+			// end of right intersection (taking right turn)
 			samplePos=0; // todo
 		}
 
