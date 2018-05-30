@@ -482,7 +482,7 @@
 #define DMA_INT_PEND    (0x00000001)    // interrupt pending, set when TC=1
 #define DMA_READ_ONLY   (DMA_TC | DMA_BYTE_ADDR | DMA_REQ_PEND | DMA_PACK_CNT | DMA_ERR_PEND | DMA_INT_PEND)
 #define DMA_WRITE_ONLY  (DMA_FLUSH)
-#define DMA_READ_WRITE  (DMA_EN_CNT | DMA_EN_DMA | DMA_WRITE | DMA_RESET | DMA_INT_EN)
+#define DMA_READ_WRITE  (DMA_EN_CNT | DMA_EN_DMA | DMA_WRITE | DMA_RESET | DMA_DRAIN | DMA_INT_EN)
 #define DMA_CTRL        (0)
 #define DMA_ADDR        (1)
 #define DMA_BYTE_COUNT  (2)
@@ -1808,29 +1808,22 @@ WRITE32_MEMBER( sun4_state::dma_w )
 		{
 			// clear write-only bits
 			logerror("dma_w: ctrl: %08x\n", data);
-			uint32_t old_ctrl = m_dma[DMA_CTRL];
 
-			m_dma[DMA_CTRL] &= (DMA_WRITE_ONLY | DMA_READ_WRITE);
-			m_dma[DMA_CTRL] |= (data & (DMA_WRITE_ONLY | DMA_READ_WRITE));
+			mem_mask &= (DMA_READ_WRITE);
+			COMBINE_DATA(&m_dma[DMA_CTRL]);
 
-			uint32_t diff = old_ctrl ^ m_dma[DMA_CTRL];
-
-			if (diff & DMA_FLUSH)
+			if (data & DMA_RESET)
+				m_dma[DMA_CTRL] &= ~(DMA_ERR_PEND | DMA_PACK_CNT | DMA_INT_EN | DMA_FLUSH | DMA_DRAIN | DMA_WRITE | DMA_EN_DMA | DMA_REQ_PEND | DMA_EN_CNT | DMA_TC);
+			else if (data & DMA_FLUSH)
 			{
-				m_dma[DMA_CTRL] &= ~DMA_PACK_CNT;
-				m_dma[DMA_CTRL] &= ~DMA_ERR_PEND;
-				m_dma[DMA_CTRL] &= ~DMA_TC;
+				m_dma[DMA_CTRL] &= ~(DMA_PACK_CNT | DMA_ERR_PEND | DMA_TC);
 
 				dma_check_interrupts();
 			}
+			// TODO: DMA_DRAIN
 
-			if (diff & DMA_EN_DMA)
-			{
-				if ((data & DMA_EN_DMA) != 0 && (m_dma[DMA_CTRL] & DMA_REQ_PEND) != 0)
-				{
-					dma_transfer();
-				}
-			}
+			if (data & DMA_EN_DMA && (m_dma[DMA_CTRL] & DMA_REQ_PEND))
+				dma_transfer();
 			break;
 		}
 

@@ -338,10 +338,19 @@ void ncr5390_device::step(bool timeout)
 		step(false);
 		break;
 
+	case DISC_SEL_ARBITRATION_INIT:
+		// wait until a command is in the fifo
+		if (!fifo_pos || (dma_command && !(status & S_TC0)))
+			break;
+
+		command_length = derive_msg_size(fifo[0]);
+		state = DISC_SEL_ARBITRATION;
+		step(false);
+		break;
+
 	case DISC_SEL_ARBITRATION:
 		if(c == CD_SELECT) {
 			state = DISC_SEL_WAIT_REQ;
-			command_length = derive_msg_size(fifo[0]);
 		} else
 			state = DISC_SEL_ATN_WAIT_REQ;
 
@@ -432,7 +441,6 @@ void ncr5390_device::step(bool timeout)
 		case S_PHASE_DATA_OUT:
 		case S_PHASE_COMMAND:
 		case S_PHASE_MSG_OUT:
-			dma_set(dma_command ? DMA_OUT : DMA_NONE);
 			state = INIT_XFR_SEND_BYTE;
 
 			// can't send if the fifo is empty
@@ -449,8 +457,6 @@ void ncr5390_device::step(bool timeout)
 		case S_PHASE_DATA_IN:
 		case S_PHASE_STATUS:
 		case S_PHASE_MSG_IN:
-			dma_set(dma_command ? DMA_IN : DMA_NONE);
-
 			// can't receive if the fifo is full
 			if (fifo_pos == 16)
 				break;
@@ -473,7 +479,7 @@ void ncr5390_device::step(bool timeout)
 			break;
 
 		// check for command complete
-		if ((dma_command && tcounter == 0 && (dma_dir == DMA_IN || fifo_pos == 0)) // dma in/out: transfer counter == 0
+		if ((dma_command && (status & S_TC0) && (dma_dir == DMA_IN || fifo_pos == 0)) // dma in/out: transfer count == 0
 		|| (!dma_command && (xfr_phase & S_INP) == 0 && fifo_pos == 0)      // non-dma out: fifo empty
 		|| (!dma_command && (xfr_phase & S_INP) == S_INP && fifo_pos == 1)) // non-dma in: every byte
 			state = INIT_XFR_BUS_COMPLETE;
@@ -489,34 +495,31 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case INIT_XFR_SEND_BYTE:
-		decrement_tcounter();
 		state = INIT_XFR_WAIT_REQ;
 		step(false);
 		break;
 
 	case INIT_XFR_RECV_BYTE_ACK:
-		decrement_tcounter();
 		state = INIT_XFR_WAIT_REQ;
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		break;
 
 	case INIT_XFR_RECV_BYTE_NACK:
-		decrement_tcounter();
 		state = INIT_XFR_FUNCTION_COMPLETE;
 		step(false);
 		break;
 
 	case INIT_XFR_FUNCTION_COMPLETE:
-		// wait for the fifo to drain
-		if (dma_command && fifo_pos)
+		// wait for dma transfer to complete
+		if (dma_command && !(status & S_TC0))
 			break;
 
 		function_complete();
 		break;
 
 	case INIT_XFR_BUS_COMPLETE:
-		// wait for the fifo to drain
-		if (dma_command && fifo_pos)
+		// wait for dma transfer to complete
+		if (dma_command && !(status & S_TC0))
 			break;
 
 		bus_complete();
@@ -537,7 +540,7 @@ void ncr5390_device::step(bool timeout)
 
 	case INIT_XFR_SEND_PAD:
 		decrement_tcounter();
-		if(tcounter) {
+		if(!(status & S_TC0)) {
 			state = INIT_XFR_SEND_PAD_WAIT_REQ;
 			step(false);
 		} else
@@ -559,7 +562,7 @@ void ncr5390_device::step(bool timeout)
 
 	case INIT_XFR_RECV_PAD:
 		decrement_tcounter();
-		if(tcounter) {
+		if(!(status & S_TC0)) {
 			state = INIT_XFR_RECV_PAD_WAIT_REQ;
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 			step(false);
@@ -671,7 +674,7 @@ uint8_t ncr5390_device::fifo_pop()
 	uint8_t r = fifo[0];
 	fifo_pos--;
 	memmove(fifo, fifo+1, fifo_pos);
-	if((!fifo_pos) && dma_dir == DMA_OUT)
+	if((!fifo_pos) && dma_dir == DMA_OUT && !(status & S_TC0))
 		drq_set();
 	return r;
 }
@@ -679,7 +682,7 @@ uint8_t ncr5390_device::fifo_pop()
 void ncr5390_device::fifo_push(uint8_t val)
 {
 	fifo[fifo_pos++] = val;
-	if(!drq && dma_dir == DMA_IN)
+	if(!drq && dma_dir == DMA_IN && !(status & S_TC0))
 		drq_set();
 }
 
@@ -796,7 +799,8 @@ void ncr5390_device::start_command()
 			(c == CD_SELECT_ATN) ? "Select with ATN sequence\n" : 
 			"Select with ATN and stop sequence\n");
 		seq = 0;
-		state = DISC_SEL_ARBITRATION;
+		state = DISC_SEL_ARBITRATION_INIT;
+		dma_set(dma_command ? DMA_OUT : DMA_NONE);
 		arbitrate();
 		break;
 
@@ -814,6 +818,7 @@ void ncr5390_device::start_command()
 		LOGMASKED(LOG_COMMAND, "Transfer information\n");
 		state = INIT_XFR;
 		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+		dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
 		step(false);
 		break;
 
@@ -989,7 +994,8 @@ void ncr5390_device::dma_set(int dir)
 void ncr5390_device::dma_w(uint8_t val)
 {
 	fifo_push(val);
-	if(fifo_pos == 16)
+	decrement_tcounter();
+	if(fifo_pos == 16 || (status & S_TC0))
 		drq_clear();
 	step(false);
 }
@@ -997,7 +1003,8 @@ void ncr5390_device::dma_w(uint8_t val)
 uint8_t ncr5390_device::dma_r()
 {
 	uint8_t r = fifo_pop();
-	if(!fifo_pos)
+	decrement_tcounter();
+	if(!fifo_pos || (status & S_TC0))
 		drq_clear();
 	step(false);
 	return r;
