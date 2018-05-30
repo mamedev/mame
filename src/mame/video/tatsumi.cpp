@@ -701,7 +701,7 @@ start_offset-=48;
 	}
 }
 
-void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 /*
 0xf980 0x0008 0x8c80 0x4a00 - road right to below, width unknown (32 pixels guess)
@@ -775,7 +775,7 @@ pos is 11.5 fixed point
 	data+=y*4;
 
 	visible_line=0;
-
+	
 	for (/*y=0*/; y<cliprect.max_y+1; y++) 
 	{
 		int shift=data[0];
@@ -827,11 +827,7 @@ offset is from last pixel of first road segment?
 		for (x=0; (x < startPos) && (x < cliprect.max_x+1); x++) 
 		{
 			int col = linedata[0]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
 		}
 
 		/* If startpos is negative, clip it and adjust the sampling position accordingly */
@@ -850,16 +846,12 @@ offset is from last pixel of first road segment?
 		{
 			// look up colour
 			int col = linedata[(samplePos>>11)&0x7f]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
 			//  col=linedata[0x7f]&0xf;
 
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
 
 			samplePos+=step;
 		}
@@ -882,16 +874,12 @@ offset is from last pixel of first road segment?
 		for (x=startPos; x < (cliprect.max_x+1) && (x < endPos); x++) 
 		{
 			int col = linedata[0x80]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
 			//  col=linedata[0x7f]&0xf;
 
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col + 32);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
 		}
 
 		if (endPos<0) 
@@ -911,16 +899,12 @@ offset is from last pixel of first road segment?
 		{
 			// look up colour
 			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			if ((samplePos>>11) > 0x7f)
 				col=linedata[0x7f + 0x200]&0xf;
 
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col + 32);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
 
 			samplePos+=step;
 		}
@@ -1111,7 +1095,10 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
 	m_tx_layer->set_scrollx(0,24);
 
 	bitmap.fill(m_palette->pen(0), cliprect);
+	screen.priority().fill(0, cliprect);
+	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
 //  draw_ground(bitmap, cliprect);
 	draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1135,7 +1122,8 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_landscape(bitmap,cliprect,0);
 	draw_landscape(bitmap,cliprect,1);
-	draw_road(bitmap,cliprect,screen.priority());
+	draw_road(bitmap,cliprect);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1149,7 +1137,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-void cyclwarr_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
 {
 	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
 	{

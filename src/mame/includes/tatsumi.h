@@ -69,6 +69,7 @@ public:
 	
 protected:
 	uint8_t m_hd6445_reg[64];
+	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 private:
 	uint8_t m_hd6445_address;
 };
@@ -164,7 +165,7 @@ protected:
 //	virtual void machine_reset() override;
 
 private:
-	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
+	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
 	
 	required_shared_ptr<uint16_t> m_vregs;
@@ -242,5 +243,4 @@ private:
 
 	void tile_expand();
 	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool is_road, bool is_opaque);
-	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 };
