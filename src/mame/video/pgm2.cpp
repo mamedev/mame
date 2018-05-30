@@ -11,8 +11,7 @@ inline void pgm2_state::draw_sprite_pixel(uint32_t* dst, uint8_t* dstpri, const 
 		uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
 		if ((!(dstpri[realx] & 2)) || (!pri)) // sprite is 1/3, bg is 2
 		{
-			uint32_t pendat = pen[pix];
-			dst[realx] = pendat;
+			dst[realx] = pen[pix];
 		}
 		dstpri[realx] |= 1;
 	}
