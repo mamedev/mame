@@ -2190,23 +2190,23 @@ ROM_END
 ROM_START( gtg2t )
 	/* banks are loaded in the opposite order from the others, */
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg2.bin_1.1.u5", 0x10000, 0x4000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) ) /* Trackball version */
-	ROM_CONTINUE(        0x04000, 0xc000 )
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_LOAD( "gtgii_tb_v1.1.u5", 0x10000, 0x4000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) ) /* Trackball version - labeled GTGII TB V1.1 (U5) */
+	ROM_CONTINUE(                 0x04000, 0xc000 )
+	ROM_COPY( "maincpu",  0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) )
+	ROM_LOAD( "gtgii_snd_v1_u27.u27", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) ) /* labeled GTGII SND V1 (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
-	ROM_LOAD( "grom5.bin", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
+	ROM_LOAD( "gtgii-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "gtgii-grom1.grom1", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
+	ROM_LOAD( "gtgii-grom2.grom2", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
+	ROM_LOAD( "gtgii-grom3.grom3", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
+	ROM_LOAD( "gtgii-grom4.grom4", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
+	ROM_LOAD( "gtgii-grom5.grom5", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom00.bin", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) )
+	ROM_LOAD( "gtgii_vr_srom0.srom0", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) ) /* labeled GTGII VR-SROM0 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u11", 0x0000, 0x0104, CRC(9bf5a75f) SHA1(79786f7ce656f30a33a92887a290b767a7cbbf31) )
@@ -2220,15 +2220,15 @@ ROM_START( gtg2j )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) )
+	ROM_LOAD( "gtgii_snd_v1_u27.u27", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) ) /* labeled GTGII SND V1 (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
-	ROM_LOAD( "grom5.bin", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
+	ROM_LOAD( "gtgii-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "gtgii-grom1.grom1", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
+	ROM_LOAD( "gtgii-grom2.grom2", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
+	ROM_LOAD( "gtgii-grom3.grom3", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
+	ROM_LOAD( "gtgii-grom4.grom4", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
+	ROM_LOAD( "gtgii-grom5.grom5", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
