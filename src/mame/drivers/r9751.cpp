@@ -721,8 +721,8 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 
 	/* i/o hardware */
 	MCFG_DEVICE_ADD("smioc", SMIOC, 0)
-	MCFG_SMIOC_R_CB(READ8(r9751_state, smioc_dma_r))
-	MCFG_SMIOC_W_CB(WRITE8(r9751_state, smioc_dma_w))
+	MCFG_SMIOC_R_CB(READ8(*this, r9751_state, smioc_dma_r))
+	MCFG_SMIOC_W_CB(WRITE8(*this, r9751_state, smioc_dma_w))
 
 	/* disk hardware */
 	PDC(config, m_pdc, 0);

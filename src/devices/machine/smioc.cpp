@@ -121,30 +121,38 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* DMA */
 	for (required_device<am9517a_device> &dma : m_dma8237)
 		AM9517A(config, dma, 20_MHz_XTAL / 4); // Clock division unknown
-	MCFG_AM9517A_IN_MEMR_CB(READ8(smioc_device, dma8237_2_dmaread))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(smioc_device, dma8237_2_dmawrite))
-
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(smioc_device, dma8237_2_hreq_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(smioc_device, dma8237_dack_2_0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(smioc_device, dma8237_dack_2_1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(smioc_device, dma8237_dack_2_2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(smioc_device, dma8237_dack_2_3_w))
 
 	/* RS232 */	
 	/* Port 1: Console */
+	MCFG_DEVICE_ADD("rs232_p1", RS232_PORT, default_rs232_devices, "terminal")
 	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
 		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("scc2698b", scc2698b_device, port_a_rx_w))
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("scc2698b", scc2698b_device, port_b_rx_w))
+
+	
 
 	/* SCC2698B */
 	MCFG_DEVICE_ADD("scc2698b", SCC2698B, XTAL(3'686'400))
-	//MCFG_SCC2698B_TX_CALLBACK(a, DEVWRITELINE("rs232_p1", rs232_port_device, write_txd))
-	//MCFG_SCC2698B_MPP1_CALLBACK(a, DEVWRITELINE("dma8237_2", am9517a_device, dreq1_w)) // MPP1 output is TxRDY, DREQ1 is UART 0 TX request
-	//MCFG_SCC2698B_MPP2_CALLBACK(a, DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w)) // MPP2 output is RxRDY, DREQ0 is UART 0 RX request
-	//MCFG_SCC2698B_TX_CALLBACK(b, DEVWRITELINE("rs232_p2", rs232_port_device, write_txd))
-	//MCFG_SCC2698B_MPP1_CALLBACK(b, DEVWRITELINE("dma8237_2", am9517a_device, dreq3_w)) 
-	//MCFG_SCC2698B_MPP2_CALLBACK(b, DEVWRITELINE("dma8237_2", am9517a_device, dreq2_w)) 
+	MCFG_SCC2698B_TX_CALLBACK(a, WRITELINE("rs232_p1", rs232_port_device, write_txd))
+	MCFG_SCC2698B_MPP1_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq1_w)) // MPP1 output is TxRDY, DREQ1 is UART 0 TX request
+	MCFG_SCC2698B_MPP2_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq0_w)) // MPP2 output is RxRDY, DREQ0 is UART 0 RX request
+	MCFG_SCC2698B_TX_CALLBACK(b, WRITELINE("rs232_p2", rs232_port_device, write_txd))
+	MCFG_SCC2698B_MPP1_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq3_w)) 
+	MCFG_SCC2698B_MPP2_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq2_w)) 
+
+
+	MCFG_DEVICE_MODIFY("dma8237_2")
+	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, smioc_device, dma8237_2_dmaread))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, smioc_device, dma8237_2_dmawrite))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, smioc_device, dma8237_2_hreq_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_3_w))
+
+	MCFG_DEVICE_MODIFY("rs232_p1")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc2698b", scc2698b_device, port_a_rx_w))
+	MCFG_DEVICE_MODIFY("rs232_p2")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc2698b", scc2698b_device, port_b_rx_w))
 
 
 MACHINE_CONFIG_END
@@ -161,13 +169,15 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, SMIOC, tag, owner, clock),
 	m_smioccpu(*this, I188_TAG),
 	m_dma8237(*this, "dma8237_%u", 1),
-	m_rs232_p(*this, "rs232_p%u", 1),
+	m_rs232_p1(*this, "rs232_p1"),
+	m_rs232_p(*this, "rs232_p%u", 2),
 	m_scc2698b(*this, "scc2698b"),
 	m_smioc_ram(*this, "smioc_ram"),
 	m_dma_timer(nullptr),
 	m_m68k_r_cb(*this),
 	m_m68k_w_cb(*this)
 {
+
 
 }
 
@@ -195,8 +205,8 @@ void smioc_device::device_reset()
 	m_m68k_w_cb.resolve_safe();
 
 	// Attempt to get DMA working by just holding DREQ high for the first dma chip
-	m_dma8237_2->dreq1_w(1);
-	m_dma8237_2->dreq3_w(1);
+	//m_dma8237_2->dreq1_w(1);
+	//m_dma8237_2->dreq3_w(1);
 }
 
 void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
@@ -408,7 +418,7 @@ WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_3_w)
 
 WRITE_LINE_MEMBER(smioc_device::dma8237_2_hreq_w)
 {
-	m_dma8237_2->hack_w(state);
+	//m_dma8237_2->hack_w(state);
 }
 
 READ8_MEMBER(smioc_device::dma8237_2_dmaread)

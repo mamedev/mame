@@ -64,21 +64,13 @@ void scc2698b_device::map(address_map &map)
 
 scc2698b_channel::scc2698b_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCC2698B_CHANNEL, tag, owner, clock),
-	device_serial_interface(mconfig, *this),
-	write_tx(*this),
-	write_mpp1(*this),
-	write_mpp2(*this),
-	write_mpo(*this)
+	device_serial_interface(mconfig, *this)
 {
 
 }
 
 void scc2698b_channel::device_start()
 {
-	write_tx.resolve_safe();
-	write_mpp1.resolve_safe();
-	write_mpp2.resolve_safe();
-	write_mpo.resolve_safe();
 
 }
 
@@ -128,7 +120,7 @@ void scc2698b_channel::tra_callback()
 {
 	// Started bit transmit - Update output line
 	int bit = transmit_register_get_data_bit();
-	write_tx(bit);
+	parent->write_line_tx(channel_port, bit);
 }
 
 void scc2698b_channel::write_TXH(int txh)
@@ -329,12 +321,12 @@ void scc2698b_channel::recompute_pin_output(bool force)
 
 		if (new_mpp1 != mpp1_value || force)
 		{
-			write_mpp1(new_mpp1);
+			parent->write_line_mpp1(channel_port, new_mpp1);
 			mpp1_value = new_mpp1;
 		}
 		if (new_mpp2 != mpp2_value || force)
 		{
-			write_mpp2(new_mpp2);
+			parent->write_line_mpp2(channel_port, new_mpp2);
 			mpp2_value = new_mpp2;
 		}
 	}
@@ -354,19 +346,18 @@ WRITE_LINE_MEMBER( scc2698b_channel::mpi1_w )
 
 scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCC2698B, tag, owner, clock),
-	m_channel_a(*this, CHANA_TAG),
-	m_channel_b(*this, CHANB_TAG),
-	m_channel_c(*this, CHANC_TAG),
-	m_channel_d(*this, CHAND_TAG),
-	m_channel_e(*this, CHANE_TAG),
-	m_channel_f(*this, CHANF_TAG),
-	m_channel_g(*this, CHANG_TAG),
-	m_channel_h(*this, CHANH_TAG),
+	m_channel(*this, "channel_%u",1),
 	write_intr_A(*this),
 	write_intr_B(*this),
 	write_intr_C(*this),
-	write_intr_D(*this)
+	write_intr_D(*this),
+	write_a_tx(*this), write_b_tx(*this), write_c_tx(*this), write_d_tx(*this), write_e_tx(*this), write_f_tx(*this), write_g_tx(*this), write_h_tx(*this),
+	write_a_mpp1(*this), write_b_mpp1(*this), write_c_mpp1(*this), write_d_mpp1(*this), write_e_mpp1(*this), write_f_mpp1(*this), write_g_mpp1(*this), write_h_mpp1(*this),
+	write_a_mpp2(*this), write_b_mpp2(*this), write_c_mpp2(*this), write_d_mpp2(*this), write_e_mpp2(*this), write_f_mpp2(*this), write_g_mpp2(*this), write_h_mpp2(*this),
+	write_a_mpo(*this), write_b_mpo(*this), write_c_mpo(*this), write_d_mpo(*this), write_e_mpo(*this), write_f_mpo(*this), write_g_mpo(*this), write_h_mpo(*this)
+
 {
+
 }
 
 
@@ -384,6 +375,45 @@ void scc2698b_device::device_start()
 	write_intr_C.resolve_safe();
 	write_intr_D.resolve_safe();
 
+	write_a_tx.resolve_safe();
+	write_b_tx.resolve_safe();
+	write_c_tx.resolve_safe();
+	write_d_tx.resolve_safe();
+	write_e_tx.resolve_safe();
+	write_f_tx.resolve_safe();
+	write_g_tx.resolve_safe();
+	write_h_tx.resolve_safe();
+	write_a_mpp1.resolve_safe();
+	write_b_mpp1.resolve_safe();
+	write_c_mpp1.resolve_safe();
+	write_d_mpp1.resolve_safe();
+	write_e_mpp1.resolve_safe();
+	write_f_mpp1.resolve_safe();
+	write_g_mpp1.resolve_safe();
+	write_h_mpp1.resolve_safe();
+	write_a_mpp2.resolve_safe();
+	write_b_mpp2.resolve_safe();
+	write_c_mpp2.resolve_safe();
+	write_d_mpp2.resolve_safe();
+	write_e_mpp2.resolve_safe();
+	write_f_mpp2.resolve_safe();
+	write_g_mpp2.resolve_safe();
+	write_h_mpp2.resolve_safe();
+	write_a_mpo.resolve_safe();
+	write_b_mpo.resolve_safe();
+	write_c_mpo.resolve_safe();
+	write_d_mpo.resolve_safe();
+	write_e_mpo.resolve_safe();
+	write_f_mpo.resolve_safe();
+	write_g_mpo.resolve_safe();
+	write_h_mpo.resolve_safe();
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_channel[i]->channel_port = i;
+		m_channel[i]->parent = this;
+	}
+
 }
 
 
@@ -391,6 +421,70 @@ void scc2698b_device::device_reset()
 {
 
 }
+
+
+void scc2698b_device::write_line_tx(int port, int value)
+{
+	switch (port)
+	{
+	case 0: write_a_tx(value); break;
+	case 1: write_b_tx(value); break;
+	case 2: write_c_tx(value); break;
+	case 3: write_d_tx(value); break;
+	case 4: write_e_tx(value); break;
+	case 5: write_f_tx(value); break;
+	case 6: write_g_tx(value); break;
+	case 7: write_h_tx(value); break;
+	default: logerror("Unsupported port %d in write_line_tx\n", port);
+	}
+}
+void scc2698b_device::write_line_mpp1(int port, int value)
+{
+	switch (port)
+	{
+	case 0: write_a_mpp1(value); break;
+	case 1: write_b_mpp1(value); break;
+	case 2: write_c_mpp1(value); break;
+	case 3: write_d_mpp1(value); break;
+	case 4: write_e_mpp1(value); break;
+	case 5: write_f_mpp1(value); break;
+	case 6: write_g_mpp1(value); break;
+	case 7: write_h_mpp1(value); break;
+	default: logerror("Unsupported port %d in write_line_mpp1\n", port);
+	}
+}
+
+void scc2698b_device::write_line_mpp2(int port, int value)
+{
+	switch (port)
+	{
+	case 0: write_a_mpp2(value); break;
+	case 1: write_b_mpp2(value); break;
+	case 2: write_c_mpp2(value); break;
+	case 3: write_d_mpp2(value); break;
+	case 4: write_e_mpp2(value); break;
+	case 5: write_f_mpp2(value); break;
+	case 6: write_g_mpp2(value); break;
+	case 7: write_h_mpp2(value); break;
+	default: logerror("Unsupported port %d in write_line_mpp2\n", port);
+	}
+}
+void scc2698b_device::write_line_mpo(int port, int value)
+{
+	switch (port)
+	{
+	case 0: write_a_mpo(value); break;
+	case 1: write_b_mpo(value); break;
+	case 2: write_c_mpo(value); break;
+	case 3: write_d_mpo(value); break;
+	case 4: write_e_mpo(value); break;
+	case 5: write_f_mpo(value); break;
+	case 6: write_g_mpo(value); break;
+	case 7: write_h_mpo(value); break;
+	default: logerror("Unsupported port %d in write_line_mpo\n", port);
+	}
+}
+
 
 READ8_MEMBER(scc2698b_device::read)
 {
@@ -540,30 +634,19 @@ void scc2698b_device::write_reg(int offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(scc2698b_device::port_a_rx_w) { m_channel_a->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_b_rx_w) { m_channel_b->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_c_rx_w) { m_channel_c->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_d_rx_w) { m_channel_d->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_e_rx_w) { m_channel_e->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_f_rx_w) { m_channel_f->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_g_rx_w) { m_channel_g->rx_w(state); }
-WRITE_LINE_MEMBER(scc2698b_device::port_h_rx_w) { m_channel_h->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_a_rx_w) { m_channel[0]->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_b_rx_w) { m_channel[1]->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_c_rx_w) { m_channel[2]->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_d_rx_w) { m_channel[3]->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_e_rx_w) { m_channel[4]->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_f_rx_w) { m_channel[5]->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_g_rx_w) { m_channel[6]->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_h_rx_w) { m_channel[7]->rx_w(state); }
 
 
 scc2698b_channel* scc2698b_device::get_channel(int port)
 {
-	switch (port)
-	{
-	case 0: return &*m_channel_a;
-	case 1: return &*m_channel_b;
-	case 2: return &*m_channel_c;
-	case 3: return &*m_channel_d;
-	case 4: return &*m_channel_e;
-	case 5: return &*m_channel_f;
-	case 6: return &*m_channel_g;
-	case 7: return &*m_channel_h;
-	}
-	return NULL;
+	return &*m_channel[port];
 }
 
 void scc2698b_device::reset_port(int port)
@@ -739,12 +822,6 @@ attotime scc2698b_device::generate_baudrate(int block, int tx, int table_index)
 
 
 MACHINE_CONFIG_START(scc2698b_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, SCC2698B_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, SCC2698B_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANC_TAG, SCC2698B_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHAND_TAG, SCC2698B_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANE_TAG, SCC2698B_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANF_TAG, SCC2698B_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANG_TAG, SCC2698B_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANH_TAG, SCC2698B_CHANNEL, 0)
+	for (required_device<scc2698b_channel> &channel : m_channel)
+		SCC2698B_CHANNEL(config, channel, 0);
 MACHINE_CONFIG_END

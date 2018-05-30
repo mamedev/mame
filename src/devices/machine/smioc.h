@@ -86,7 +86,8 @@ private:
 
 	required_device_array<am9517a_device, 5> m_dma8237;
 
-	required_device_array<rs232_port_device, 8> m_rs232_p;
+	required_device<rs232_port_device> m_rs232_p1;
+	required_device_array<rs232_port_device, 7> m_rs232_p;
 
 	required_device<scc2698b_device> m_scc2698b;
 
