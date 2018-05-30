@@ -39,8 +39,8 @@ public:
 	optional_shared_ptr<uint16_t> m_sharedram;
 	required_shared_ptr<uint16_t> m_sprite_control_ram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	optional_memory_region m_mainregion;
-	optional_memory_region m_subregion;
+	required_memory_region m_mainregion;
+	required_memory_region m_subregion;
 
 	uint8_t *m_rom_sprite_lookup[2];
 	uint8_t *m_rom_clut[2];
