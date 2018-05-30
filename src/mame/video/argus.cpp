@@ -143,7 +143,8 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
 	uint8_t hi, lo;
 
 	tile_index <<= 1;
-	tile_index = (m_vrom[0][(tile_index >> 3) & ~1] << 4) | ((m_vrom[0][(tile_index >> 3) | 1] & 0x7) << 12) | (tile_index & 0xf);
+	int vrom_offset = (tile_index >> 3);
+	tile_index = (m_vrom[0][vrom_offset & ~1] << 4) | ((m_vrom[0][vrom_offset | 1] & 0x7) << 12) | (tile_index & 0xf);
 
 	lo = m_vrom[1][tile_index];
 	hi = m_vrom[1][tile_index | 1];
