@@ -964,30 +964,37 @@ void tatsumi_state::update_cluts(int fake_palette_offset, int object_base, int l
 
 /**********************************************************************/
 
-// TODO: rowscroll_enable might be selectable somehow
-void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool rowscroll_enable, bool is_road)
+void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool is_road, bool is_opaque)
 {
 	rectangle clip;
 	clip.min_x = cliprect.min_x;
 	clip.max_x = cliprect.max_x;
+	// TODO: both enabled when this occurs
+	bool rowscroll_enable = (scrollx[0] & 0x1000) == 0;
+	bool colscroll_enable = (scrollx[0] & 0x2000) == 0;
 
 	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
 	{
 		clip.min_y = clip.max_y = y;
 		int y_base = rowscroll_enable ? y : 0;
-		int src_x = scrollx[y_base] + xscroll_offset;
-		int src_y = scrolly[y_base] + yscroll_offset;
+		int x_base = colscroll_enable ? y : 0;
+		int src_y = (scrolly[y_base] & 0xfff) + yscroll_offset;
+		int src_x = (scrollx[x_base] & 0xfff) + xscroll_offset;
+
 		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
 		// additional tile color bank and per scanline.
 		if(is_road == true && scrolly[y_base] & 0x8000)
 		{
 			m_cyclwarr_color_bank = (scrolly[y_base] >> 13) & 3;
 			src->mark_all_dirty();
+			// TODO: road sidelines attempt, still not right (cuts off cyan color at intro and farmost road lines)
+			//if(m_cyclwarr_color_bank)
+			//	is_opaque = true;
 		}
 
 		src->set_scrollx(0,src_x);
 		src->set_scrolly(0,src_y);
-		src->draw(screen, bitmap, clip, 0, 0);
+		src->draw(screen, bitmap, clip, is_opaque ? TILEMAP_DRAW_OPAQUE : 0, 0);
 	}
 }
 
@@ -1157,11 +1164,11 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80,false, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80,false, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40,true, true);
+	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80, false, true);
+	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80, false, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, true, false);
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80,false, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80, false, false);
 
 	return 0;
 }
@@ -1180,11 +1187,11 @@ uint32_t cyclwarr_state::screen_update_bigfight(screen_device &screen, bitmap_rg
 	update_cluts(8192, 4096, 8192);
 	
 	bitmap.fill(m_palette->pen(0), cliprect);
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x40,true, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x40,true, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40,true, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x40, false, true);
+	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x40, false, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, false, false);
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x40,true, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x40, false, false);
 
 	return 0;
 }
