@@ -9,8 +9,8 @@
 #include "bus/lpci/i82371sb.h"
 #include "bus/lpci/i82439tx.h"
 #include "machine/at.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
+#include "machine/fdc37c93x.h"
+#include "machine/pckeybrd.h"
 
 class at586_state : public driver_device
 {
@@ -22,6 +22,7 @@ public:
 
 	void at586x3(machine_config &config);
 	void at586(machine_config &config);
+	void at586m55(machine_config &config);
 
 protected:
 	void at_softlists(machine_config &config);
@@ -30,6 +31,7 @@ protected:
 
 	static void tx_config(device_t *device);
 	static void sb_config(device_t *device);
+	static void superio_config(device_t *device);
 
 	void at586_io(address_map &map);
 	void at586_map(address_map &map);
@@ -41,6 +43,7 @@ private:
 WRITE8_MEMBER(at586_state::boot_state_w)
 {
 	logerror("Boot state %02x\n", data);
+	printf("[%02x]",data);
 }
 
 void at586_state::tx_config(device_t *device)
@@ -53,14 +56,33 @@ void at586_state::sb_config(device_t *device)
 {
 	devcb_base *devcb = nullptr;
 	(void)devcb;
-	MCFG_I82371SB_BOOT_STATE_HOOK(DEVWRITE8(":", at586_state, boot_state_w))
+	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(":", at586_state, boot_state_w))
+	MCFG_I82371SB_SMI_CB(INPUTLINE(":maincpu", INPUT_LINE_SMI))
 }
 
-static SLOT_INTERFACE_START( pci_devices )
-	SLOT_INTERFACE_INTERNAL("i82439tx", I82439TX)
-	SLOT_INTERFACE_INTERNAL("i82371ab", I82371AB)
-	SLOT_INTERFACE_INTERNAL("i82371sb", I82371SB)
-SLOT_INTERFACE_END
+
+void at586_state::superio_config(device_t *device)
+{
+	devcb_base *devcb = nullptr;
+	(void)devcb;
+	MCFG_FDC37C93X_SYSOPT(1)
+	MCFG_FDC37C93X_GP20_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
+	MCFG_FDC37C93X_GP25_GATEA20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
+	MCFG_FDC37C93X_IRQ1_CB(WRITELINE(":pcibus:7:i82371sb:pic8259_master", pic8259_device, ir1_w))
+}
+
+
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("fdc37c93x", FDC37C93X);
+}
+
+static void pci_devices(device_slot_interface &device)
+{
+	device.option_add_internal("i82439tx", I82439TX_LEGACY);
+	device.option_add_internal("i82371ab", I82371AB);
+	device.option_add_internal("i82371sb", I82371SB);
+}
 
 void at586_state::at586_map(address_map &map)
 {
@@ -84,10 +106,10 @@ MACHINE_CONFIG_START(at586_state::at_softlists)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at586_state::at586)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
-	MCFG_CPU_PROGRAM_MAP(at586_map)
-	MCFG_CPU_IO_MAP(at586_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371ab:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(at586_map)
+	MCFG_DEVICE_IO_MAP(at586_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371ab:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -99,20 +121,22 @@ MACHINE_CONFIG_START(at586_state::at586)
 
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", true)
 
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
 
 	at_softlists(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at586_state::at586x3)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
-	MCFG_CPU_PROGRAM_MAP(at586_map)
-	MCFG_CPU_IO_MAP(at586_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371sb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(at586_map)
+	MCFG_DEVICE_IO_MAP(at586_io)
+	MCFG_I386_SMIACT(WRITELINE("pcibus:0:i82439tx", i82439tx_device, smi_act_w))
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371sb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -125,11 +149,45 @@ MACHINE_CONFIG_START(at586_state::at586x3)
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82371sb", sb_config)
 
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
+
+	at_softlists(config);
+MACHINE_CONFIG_END
+
+static INPUT_PORTS_START(at586m55)
+	PORT_INCLUDE(at_keyboard)
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(at586_state::at586m55)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(at586_map)
+	MCFG_DEVICE_IO_MAP(at586_io)
+	MCFG_I386_SMIACT(WRITELINE("pcibus:0:i82439tx", i82439tx_device, smi_act_w))
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:7:i82371sb:pic8259_master", pic8259_device, inta_cb)
+
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
+
+	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
+
+	MCFG_PCI_BUS_DEVICE("pcibus:7", pci_devices, "i82371sb", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82371sb", sb_config)
+
+	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  isa_internal_devices, "fdc37c93x", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc37c93x", superio_config)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
 
 	at_softlists(config);
 MACHINE_CONFIG_END
@@ -160,20 +218,8 @@ ROM_START(at586x3)
 	ROM_SYSTEM_BIOS(2, "n7s04", "Version 21/01/98, with integrated sound")
 	ROMX_LOAD("m7s04.rom", 0x00000, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(3, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(4))
-
-	ROM_SYSTEM_BIOS(4, "m55s04", "m55n04") // with sound
-	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(5))
-
-	ROM_SYSTEM_BIOS(5, "m55ns03", "m55ns03") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55ns03.rom", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(6))
-
-	ROM_SYSTEM_BIOS(6, "m55hi03", "m55hi03") // with sound
-	ROMX_LOAD("m55hi03.rom", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(7))
-
-	ROM_SYSTEM_BIOS(7, "m7shi03", "m7shi03") // Micronics M7S-Hi
-	ROMX_LOAD("m7shi03.snd", 0x00000, 0x40000, CRC(3a35a939) SHA1(74af69eb5ca546b0960540e7c3ea62a532157f2a), ROM_BIOS(8))
+	ROM_SYSTEM_BIOS(3, "m7shi03", "m7shi03") // Micronics M7S-Hi
+	ROMX_LOAD("m7shi03.snd", 0x00000, 0x40000, CRC(3a35a939) SHA1(74af69eb5ca546b0960540e7c3ea62a532157f2a), ROM_BIOS(4))
 ROM_END
 
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */
@@ -191,6 +237,24 @@ ROM_START( ficvt503 )
 	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(5))
 ROM_END
 
-COMP ( 1990, at586,    ibm5170, 0,       at586,     0, at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
-COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   0, at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
-COMP ( 1997, ficvt503, ibm5170, 0,       at586,     0, at586_state,   0,  "FIC",        "VT-503",            MACHINE_NOT_WORKING )
+/* Micronics M55Hi-Plus (Intel 430HX chipset, SMSC FDC37C93X Super I/O) */
+ROM_START(m55hipl)
+	ROM_REGION32_LE(0x40000, "isa", 0)
+	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
+	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "m55s04", "m55s04") // with sound
+	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(2, "m55ns03", "m55ns03") // Micronics M55HI-Plus with no sound
+	ROMX_LOAD("m55ns03.rom", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(3, "m55hi03", "m55hi03") // with sound
+	ROMX_LOAD("m55hi03.rom", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(4))
+ROM_END
+
+//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     CLASS        INIT        COMPANY      FULLNAME             FLAGS
+COMP( 1990, at586,    ibm5170, 0,       at586,    0,        at586_state, empty_init, "<generic>", "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
+COMP( 1990, at586x3,  ibm5170, 0,       at586x3,  0,        at586_state, empty_init, "<generic>", "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
+COMP( 1997, ficvt503, ibm5170, 0,       at586,    0,        at586_state, empty_init, "FIC",       "VT-503",            MACHINE_NOT_WORKING )
+COMP( 1990, m55hipl,  ibm5170, 0,       at586m55, at586m55, at586_state, empty_init, "Micronics", "M55Hi-Plus",        MACHINE_NOT_WORKING )

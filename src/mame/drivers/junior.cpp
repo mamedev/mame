@@ -228,8 +228,8 @@ void junior_state::machine_reset()
 
 MACHINE_CONFIG_START(junior_state::junior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, 1_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(junior_mem)
+	MCFG_DEVICE_ADD("maincpu",M6502, 1_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
@@ -237,10 +237,10 @@ MACHINE_CONFIG_START(junior_state::junior)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(junior_state, junior_riot_b_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, junior_state, junior_riot_a_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, junior_state, junior_riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, junior_state, junior_riot_b_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, junior_state, junior_riot_b_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
@@ -264,5 +264,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY                FULLNAME           FLAGS */
-COMP( 1980, junior, 0,      0,       junior,    junior, junior_state,  0,     "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME           FLAGS */
+COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

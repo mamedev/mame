@@ -96,8 +96,8 @@ WRITE16_MEMBER(zeropnt_state::zeropnt_sound_bank_w)
 		memcpy(dst + 0x20000, src, 0x20000);
 
 		machine().bookkeeping().coin_counter_w(0,data & 0x1000);
-		output().set_led_value(0,data & 0x0800); // Start 1
-		output().set_led_value(1,data & 0x0400); // Start 2
+		m_led[0] = BIT(data, 11); // Start 1
+		m_led[1] = BIT(data, 10); // Start 2
 	}
 }
 
@@ -192,8 +192,8 @@ WRITE32_MEMBER(zeropnt2_state::zeropnt2_leds_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		machine().bookkeeping().coin_counter_w(0,data & 0x00010000);
-		output().set_led_value(0,data & 0x00800000); // Start 1
-		output().set_led_value(1,data & 0x00400000); // Start 2
+		m_led[0] = BIT(data, 23); // Start 1
+		m_led[1] = BIT(data, 22); // Start 2
 	}
 }
 
@@ -549,7 +549,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( unico )
+static GFXDECODE_START( gfx_unico )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x0, 0x20 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x0, 0x20 ) // [1] Layers
 GFXDECODE_END
@@ -565,6 +565,12 @@ GFXDECODE_END
 ***************************************************************************/
 
 
+void unico_state::machine_start()
+{
+	m_led.resolve();
+}
+
+
 /***************************************************************************
                                 Burglar X
 ***************************************************************************/
@@ -572,9 +578,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(unico_state::burglarx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(burglarx_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(burglarx_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -585,17 +591,18 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -609,9 +616,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(zeropnt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zeropnt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -622,17 +629,18 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -646,9 +654,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(zeropnt2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zeropnt2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -661,21 +669,22 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(14'318'181)/4, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(14'318'181)/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
@@ -1032,8 +1041,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state,    0, ROT0, "Unico", "Burglar X" ,         0 )
-GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 1)", 0 )
-GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 2)", 0 )
-GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (Japan)", 0 )
-GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, zeropnt2_state, 0, ROT0, "Unico", "Zero Point 2",       0 )
+GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state,    empty_init, ROT0, "Unico", "Burglar X" ,         0 )
+GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (set 1)", 0 )
+GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (Japan)", 0 )
+GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, zeropnt2_state, empty_init, ROT0, "Unico", "Zero Point 2",       0 )

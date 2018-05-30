@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irqctrl_w);
 	DECLARE_WRITE8_MEMBER(memmap_w);
 	DECLARE_PALETTE_INIT(hunter2);
-	DECLARE_DRIVER_INIT(hunter2);
+	void init_hunter2();
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 	DECLARE_WRITE_LINE_MEMBER(timer1_out);
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
@@ -332,7 +332,7 @@ void hunter2_state::machine_reset()
 }
 
 // it is presumed that writing to rom will go nowhere
-DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
+void hunter2_state::init_hunter2()
 {
 	uint8_t *ram = m_ram->base();
 
@@ -348,7 +348,7 @@ PALETTE_INIT_MEMBER(hunter2_state, hunter2)
 WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 {
 	if(state == ASSERT_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(hunter2_state::timer1_out)
@@ -374,9 +374,9 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 
 MACHINE_CONFIG_START(hunter2_state::hunter2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
-	MCFG_CPU_IO_MAP(hunter2_io)
+	MCFG_DEVICE_ADD("maincpu", NSC800, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hunter2_mem)
+	MCFG_DEVICE_IO_MAP(hunter2_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -393,8 +393,8 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -404,16 +404,16 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_MM58274C_DAY1(1)   // monday
 
 	MCFG_NSC810_ADD("iotimer",XTAL(4'000'000),XTAL(4'000'000))
-	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,keyboard_r))
-	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,serial_dsr_r))
-	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,keyboard_w))
-	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,serial_rx_r))
-	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
-	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
+	MCFG_NSC810_PORTA_READ(READ8(*this, hunter2_state,keyboard_r))
+	MCFG_NSC810_PORTB_READ(READ8(*this, hunter2_state,serial_dsr_r))
+	MCFG_NSC810_PORTB_WRITE(WRITE8(*this, hunter2_state,keyboard_w))
+	MCFG_NSC810_PORTC_READ(READ8(*this, hunter2_state,serial_rx_r))
+	MCFG_NSC810_TIMER0_OUT(WRITELINE(*this, hunter2_state,timer0_out))
+	MCFG_NSC810_TIMER1_OUT(WRITELINE(*this, hunter2_state,timer1_out))
 
-	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
+	MCFG_DEVICE_ADD("serial",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, hunter2_state,cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, hunter2_state,rxd_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -449,5 +449,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE           INIT      COMPANY   FULLNAME   FLAGS
-COMP( 1981, hunter2, 0,      0,       hunter2,   hunter2, hunter2_state,  hunter2,  "Husky", "Hunter 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
+COMP( 1981, hunter2, 0,      0,      hunter2, hunter2, hunter2_state, init_hunter2, "Husky", "Hunter 2", MACHINE_NOT_WORKING )

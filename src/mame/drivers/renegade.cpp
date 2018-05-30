@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	{
 		m_msm->reset_w(1);
 		m_adpcm_playing = false;
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	else
 	{
@@ -187,7 +187,11 @@ void renegade_state::machine_start()
 
 READ8_MEMBER(renegade_state::mcu_reset_r)
 {
-	m_mcu->reset_w(PULSE_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_mcu->reset_w(ASSERT_LINE);
+		m_mcu->reset_w(CLEAR_LINE);
+	}
 	return 0;
 }
 
@@ -217,7 +221,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 	int scanline = param;
 
 	if (scanline == 112) // ???
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else if(scanline == 240)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
@@ -420,7 +424,7 @@ static const gfx_layout tileslayout4 =
 	64*8 /* offset to next tile */
 };
 
-static GFXDECODE_START( renegade )
+static GFXDECODE_START( gfx_renegade )
 	/* 8x8 text, 8 colors */
 	GFXDECODE_ENTRY( "chars", 0x00000, charlayout,   0, 4 ) /* colors   0- 32 */
 
@@ -469,12 +473,12 @@ void renegade_state::machine_reset()
 MACHINE_CONFIG_START(renegade_state::renegade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
-	MCFG_CPU_PROGRAM_MAP(renegade_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
+	MCFG_DEVICE_PROGRAM_MAP(renegade_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, 12000000/2) // HD68A09P
-	MCFG_CPU_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
+	MCFG_DEVICE_ADD("audiocpu", MC6809, 12000000/2) // HD68A09P
+	MCFG_DEVICE_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, 12000000/4) // ?
 
@@ -487,22 +491,22 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 	MCFG_SCREEN_UPDATE_DRIVER(renegade_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", renegade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_renegade)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 12000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3526, 12000000/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 12000000/32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(renegade_state, adpcm_int))
+	MCFG_DEVICE_ADD("msm", MSM5205, 12000000/32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, renegade_state, adpcm_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -510,8 +514,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(renegade_state::kuniokunb)
 	renegade(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(renegade_nomcu_map)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
@@ -681,7 +685,7 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, 0, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, 0, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

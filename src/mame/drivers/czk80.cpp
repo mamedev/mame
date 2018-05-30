@@ -43,7 +43,7 @@ I/O ports: These ranges are what is guessed
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
@@ -61,7 +61,7 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
-	DECLARE_DRIVER_INIT(czk80);
+	void init_czk80();
 	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
@@ -170,7 +170,7 @@ MACHINE_RESET_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( czk80_state, czk80 )
+void czk80_state::init_czk80()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -183,9 +183,10 @@ DRIVER_INIT_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->configure_entry(0, &main[0xe000]);
 }
 
-static SLOT_INTERFACE_START( czk80_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void czk80_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 void czk80_state::kbd_put(u8 data)
 {
@@ -194,9 +195,9 @@ void czk80_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(czk80_state::czk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(czk80_mem)
-	MCFG_CPU_IO_MAP(czk80_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(czk80_mem)
+	MCFG_DEVICE_IO_MAP(czk80_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
 
@@ -207,14 +208,14 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(czk80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(czk80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, czk80_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, czk80_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, czk80_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
-	//MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	//MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000)/4)
@@ -230,5 +231,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT   COMPAT MACHINE  INPUT  CLASS        INIT   COMPANY       FULLNAME  FLAGS
-COMP( 198?, czk80,  0,       0,     czk80,   czk80, czk80_state, czk80, "<unknown>",  "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 198?, czk80, 0,      0,      czk80,   czk80, czk80_state, init_czk80, "<unknown>", "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

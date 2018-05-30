@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(missb2_oki_w);
 	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_DRIVER_INIT(missb2);
+	void init_missb2();
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -420,12 +420,12 @@ static const gfx_layout bglayout_alt =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( missb2 )
+static GFXDECODE_START( gfx_missb2 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bglayout,   0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( bublpong )
+static GFXDECODE_START( gfx_bublpong )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bglayout_alt,   0, 2 )
 GFXDECODE_END
@@ -464,17 +464,17 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 MACHINE_CONFIG_START(missb2_state::missb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(subcpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", missb2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_missb2)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -502,27 +502,27 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
 
 	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3526, MAIN_XTAL/8)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, missb2_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(missb2_state::bublpong)
 	missb2(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bublpong)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -607,7 +607,7 @@ void missb2_state::configure_banks()
 	membank("bank3")->configure_entries(0, 7, &SUBCPU[0x9000], 0x1000);
 }
 
-DRIVER_INIT_MEMBER(missb2_state,missb2)
+void missb2_state::init_missb2()
 {
 	configure_banks();
 	m_video_enable = 0;
@@ -615,5 +615,5 @@ DRIVER_INIT_MEMBER(missb2_state,missb2)
 
 /* Game Drivers */
 
-GAME( 1996, missb2,   0,      missb2,   missb2, missb2_state, missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, missb2, ROT0,  "Top Ltd.",  "Bubble Pong Pong", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, missb2,   0,      missb2,   missb2, missb2_state, init_missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, init_missb2, ROT0,  "Top Ltd.",  "Bubble Pong Pong", MACHINE_SUPPORTS_SAVE )

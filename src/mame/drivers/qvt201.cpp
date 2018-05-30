@@ -78,14 +78,14 @@ static INPUT_PORTS_START( qvt201 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(qvt201_state::qvt201)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'686'400))
-	MCFG_CPU_PROGRAM_MAP(mem_map) // IORQ is not used at all
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'686'400))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map) // IORQ is not used at all
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainint") // open collector
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // XTAL not directly connected
-	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("mainint", input_merger_device, in_w<1>))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<1>))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -96,7 +96,7 @@ MACHINE_CONFIG_START(qvt201_state::qvt201)
 
 	MCFG_DEVICE_ADD("crtc", SCN2672, XTAL(48'654'000) / 30)
 	MCFG_SCN2672_CHARACTER_WIDTH(10) // 9 in 132-column mode
-	MCFG_SCN2672_INTR_CALLBACK(DEVWRITELINE("mainint", input_merger_device, in_w<0>))
+	MCFG_SCN2672_INTR_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<0>))
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
@@ -121,4 +121,4 @@ ROM_START( qvt201 )
 	ROM_LOAD( "301847-01.u42",  0x0000, 0x1000, CRC(546ed236) SHA1(312d57a7012f50327310bd11bda000149f13342e) )
 ROM_END
 
-COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, 0, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )
+COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, empty_init, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )

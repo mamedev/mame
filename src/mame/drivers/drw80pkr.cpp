@@ -67,7 +67,7 @@ public:
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_READ8_MEMBER(bus_r);
 	DECLARE_READ8_MEMBER(drw80pkr_io_r);
-	DECLARE_DRIVER_INIT(drw80pkr);
+	void init_drw80pkr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -382,7 +382,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( drw80pkr )
+static GFXDECODE_START( gfx_drw80pkr )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -391,7 +391,7 @@ GFXDECODE_END
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
+void drw80pkr_state::init_drw80pkr()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }
@@ -445,19 +445,19 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(drw80pkr_map)
-	MCFG_CPU_IO_MAP(drw80pkr_io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(drw80pkr_state, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(drw80pkr_state, t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(drw80pkr_state, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(drw80pkr_state, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(drw80pkr_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(drw80pkr_state, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(drw80pkr_state, prog_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(drw80pkr_state, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(drw80pkr_state, bus_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", I8039, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(drw80pkr_map)
+	MCFG_DEVICE_IO_MAP(drw80pkr_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, drw80pkr_state, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, drw80pkr_state, t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, drw80pkr_state, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, drw80pkr_state, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, drw80pkr_state, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, drw80pkr_state, p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, drw80pkr_state, prog_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, drw80pkr_state, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, drw80pkr_state, bus_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
 
 
 	// video hardware
@@ -470,16 +470,16 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update_drw80pkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drw80pkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drw80pkr)
 	MCFG_PALETTE_ADD("palette", 16*16)
 	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 20000000/12)
+	MCFG_DEVICE_ADD("aysnd", AY8912, 20000000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -517,6 +517,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY                                FULLNAME                FLAGS
-GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker",        MACHINE_NOT_WORKING )
-GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker - Minn", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT    COMPANY                                FULLNAME                FLAGS
+GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker",        MACHINE_NOT_WORKING )
+GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker - Minn", MACHINE_NOT_WORKING )

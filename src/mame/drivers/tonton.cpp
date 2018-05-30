@@ -223,9 +223,9 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 MACHINE_CONFIG_START(tonton_state::tonton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
-	MCFG_CPU_PROGRAM_MAP(tonton_map)
-	MCFG_CPU_IO_MAP(tonton_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
+	MCFG_DEVICE_PROGRAM_MAP(tonton_map)
+	MCFG_DEVICE_IO_MAP(tonton_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -238,8 +238,8 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
 	/*
 	  AY8910: Port A out: FF
 	  AY8910: Port B out: FF
@@ -248,8 +248,8 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	  AY8910: Port A out: 00
 	  AY8910: Port B out: 00
 	*/
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tonton_state, ay_aout_w))    /* Write all bits twice, and then reset them at boot */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tonton_state, ay_bout_w))     /* Write all bits twice, and then reset them at boot */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tonton_state, ay_aout_w))    /* Write all bits twice, and then reset them at boot */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tonton_state, ay_bout_w))     /* Write all bits twice, and then reset them at boot */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -266,5 +266,5 @@ ROM_START( tonton )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT    COMPANY                   FULLNAME                                 FLAGS
-GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY                   FULLNAME                                 FLAGS
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

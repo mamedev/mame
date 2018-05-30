@@ -23,7 +23,7 @@ void radio86_state::radio86_init_keyboard()
 }
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(radio86_state,radio86)
+void radio86_state::init_radio86()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -33,9 +33,9 @@ DRIVER_INIT_MEMBER(radio86_state,radio86)
 	radio86_init_keyboard();
 }
 
-DRIVER_INIT_MEMBER(radio86_state,radioram)
+void radio86_state::init_radioram()
 {
-	DRIVER_INIT_CALL(radio86);
+	init_radio86();
 	m_radio_ram_disk = std::make_unique<uint8_t[]>(0x20000);
 	memset(m_radio_ram_disk.get(),0,0x20000);
 }
@@ -202,8 +202,6 @@ I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap;
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if(linecount == 8)
-		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}

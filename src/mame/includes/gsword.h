@@ -89,8 +89,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 
-	DECLARE_DRIVER_INIT(gsword);
-	DECLARE_DRIVER_INIT(gsword2);
+	void init_gsword();
+	void init_gsword2();
 
 	DECLARE_PALETTE_INIT(gsword);
 

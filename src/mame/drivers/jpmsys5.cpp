@@ -588,28 +588,28 @@ void jpmsys5v_state::machine_reset()
  *************************************/
 
 MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(m68000_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m68000_map)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5v_state, a0_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5v_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5v_state, a0_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5v_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5v_state, a1_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5v_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5v_state, a1_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5v_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5v_state, a2_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5v_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5v_state, a2_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5v_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 10000) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_0", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_1", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_2", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_2", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_0", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_2", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_2", acia6850_device, write_rxc))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -622,32 +622,32 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
 	MCFG_TMS34061_VRAM_SIZE(0x40000) /* size of video RAM */
-	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(jpmsys5v_state, generate_tms34061_interrupt))      /* interrupt gen callback */
+	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(*this, jpmsys5v_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("upd7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd7759", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	/* Earlier revisions use an SAA1099, but no video card games seem to (?) */
-	MCFG_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
+	MCFG_DEVICE_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(jpmsys5v_state, u29_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jpmsys5v_state, u29_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(jpmsys5v_state, u29_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(jpmsys5v_state, u29_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(jpmsys5v_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5v_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, jpmsys5v_state, u29_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jpmsys5v_state, u29_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, jpmsys5v_state, u29_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, jpmsys5v_state, u29_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, jpmsys5v_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, jpmsys5v_state, pia_irq))
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(jpmsys5v_state, u26_o1_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5v_state, ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5v_state, u26_o1_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5v_state, ptm_irq))
 MACHINE_CONFIG_END
 
 READ16_MEMBER(jpmsys5_state::mux_awp_r)
@@ -807,55 +807,55 @@ void jpmsys5_state::machine_reset()
 
 // later (incompatible with earlier revision) motherboards used a YM2413
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
 
-	MCFG_CPU_PROGRAM_MAP(m68000_awp_map)
+	MCFG_DEVICE_PROGRAM_MAP(m68000_awp_map)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a0_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5_state, a0_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a1_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5_state, a1_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a2_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5_state, a2_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 10000) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_0", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_1", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_2", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_2", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_0", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_2", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_2", acia6850_device, write_rxc))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_S16LF01_ADD("vfd",0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("upd7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd7759", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	/* Earlier revisions use an SAA1099 */
-	MCFG_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
+	MCFG_DEVICE_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(jpmsys5_state, u29_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jpmsys5_state, u29_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(jpmsys5_state, u29_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(jpmsys5_state, u29_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, jpmsys5_state, u29_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jpmsys5_state, u29_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
@@ -864,53 +864,53 @@ MACHINE_CONFIG_END
 
 // the first rev PCB used an SAA1099
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(m68000_awp_map_saa)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m68000_awp_map_saa)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a0_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5_state, a0_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a1_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5_state, a1_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a2_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(jpmsys5_state, acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, jpmsys5_state, a2_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, jpmsys5_state, acia_irq))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 10000) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_0", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_1", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_2", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_2", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_0", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_2", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_2", acia6850_device, write_rxc))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_S16LF01_ADD("vfd",0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("upd7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd7759", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SAA1099_ADD("saa", 4000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(jpmsys5_state, u29_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jpmsys5_state, u29_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(jpmsys5_state, u29_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(jpmsys5_state, u29_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, jpmsys5_state, u29_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jpmsys5_state, u29_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
@@ -1016,8 +1016,8 @@ ROM_END
 
 
 /* Video based titles */
-GAME( 1994, monopoly    , 0         , jpmsys5v, monopoly, jpmsys5v_state, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 1)",  0 )
-GAME( 1994, monopolya   , monopoly  , jpmsys5v, monopoly, jpmsys5v_state, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 2)",  0 )
-GAME( 1995, monoplcl    , monopoly  , jpmsys5v, monopoly, jpmsys5v_state, 0, ROT0, "JPM", "Monopoly Classic (JPM) (SYSTEM5 VIDEO)", 0 )
-GAME( 1995, monopldx    , 0         , jpmsys5v, monopoly, jpmsys5v_state, 0, ROT0, "JPM", "Monopoly Deluxe (JPM) (SYSTEM5 VIDEO)",  0 )
-GAME( 199?, cashcade    , 0         , jpmsys5v, monopoly, jpmsys5v_state, 0, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?
+GAME( 1994, monopoly,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 1)",  0 )
+GAME( 1994, monopolya,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 2)",  0 )
+GAME( 1995, monoplcl,     monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (SYSTEM5 VIDEO)", 0 )
+GAME( 1995, monopldx,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (SYSTEM5 VIDEO)",  0 )
+GAME( 199?, cashcade,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?

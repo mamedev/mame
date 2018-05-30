@@ -69,7 +69,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
@@ -326,7 +326,7 @@ static const gfx_layout layout_8x8x3 =
 	8*8
 };
 
-static GFXDECODE_START( pipeline )
+static GFXDECODE_START( gfx_pipeline )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0x000, 1 ) // 8bpp tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x3, 0x100, 32 ) // 3bpp tiles
 GFXDECODE_END
@@ -359,16 +359,16 @@ PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 MACHINE_CONFIG_START(pipeline_state::pipeline)
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("maincpu", Z80, 7372800/2)
-	MCFG_CPU_PROGRAM_MAP(cpu0_mem)
+	MCFG_DEVICE_ADD("maincpu", Z80, 7372800/2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_mem)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 7372800/2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 7372800/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
-	MCFG_CPU_PROGRAM_MAP(cpu1_mem)
-	MCFG_CPU_IO_MAP(sound_port)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_mem)
+	MCFG_DEVICE_IO_MAP(sound_port)
 
-	MCFG_CPU_ADD("mcu", M68705R3, 7372800/2)
-	MCFG_M68705_PORTA_W_CB(WRITE8(pipeline_state, mcu_portA_w))
+	MCFG_DEVICE_ADD("mcu", M68705R3, 7372800/2)
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pipeline_state, mcu_portA_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 7372800/2 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -376,13 +376,13 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
 	// PORT B Write - related to sound/music : check code at 0x1c0a
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pipeline_state, vidctrl_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pipeline_state, vidctrl_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(pipeline_state, protection_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pipeline_state, protection_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pipeline_state, protection_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pipeline_state, protection_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 
@@ -396,14 +396,14 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipeline)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pipeline)
 
 	MCFG_PALETTE_ADD("palette", 0x100+0x100)
 	MCFG_PALETTE_INIT_OWNER(pipeline_state, pipeline)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 7372800/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 7372800/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 MACHINE_CONFIG_END
@@ -440,4 +440,4 @@ ROM_START( pipeline )
 	ROM_LOAD( "82s123.u79", 0x00200, 0x00020,CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-GAME( 1990, pipeline, 0, pipeline, pipeline, pipeline_state, 0, ROT0, "Daehyun Electronics", "Pipeline", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipeline, 0, pipeline, pipeline, pipeline_state, empty_init, ROT0, "Daehyun Electronics", "Pipeline", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -392,13 +392,13 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	// cpu
-	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL(11'059'200) )
-	MCFG_CPU_PROGRAM_MAP( cybikov1_mem )
-	MCFG_CPU_IO_MAP( cybikov1_io )
+	MCFG_DEVICE_ADD( "maincpu", H8S2241, XTAL(11'059'200) )
+	MCFG_DEVICE_PROGRAM_MAP( cybikov1_mem )
+	MCFG_DEVICE_IO_MAP( cybikov1_io )
 
 	MCFG_DEVICE_MODIFY("maincpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, si_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, sck_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("flash1", at45db041_device, si_w))
+	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("flash1", at45db041_device, sck_w))
 
 	// screen
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -411,14 +411,14 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_HD66421_ADD("hd66421")
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	// machine
 	/* rtc */
 	MCFG_PCF8593_ADD("rtc")
 	MCFG_AT45DB041_ADD("flash1")
-	MCFG_AT45DBXXX_SO_CALLBACK(DEVWRITELINE("maincpu:sci1", h8_sci_device, rx_w))
+	MCFG_AT45DBXXX_SO_CALLBACK(WRITELINE("maincpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -428,15 +428,15 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 
 	/* serial debug port */
-	MCFG_RS232_PORT_ADD ("debug_serial", default_rs232_devices, nullptr)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
+	MCFG_DEVICE_ADD ("debug_serial", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
 
 	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
@@ -445,13 +445,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cybiko_state::cybikov2)
 	cybikov1(config);
 	// cpu
-	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(cybikov2_mem)
-	MCFG_CPU_IO_MAP(cybikov2_io)
+	MCFG_DEVICE_REPLACE("maincpu", H8S2246, XTAL(11'059'200))
+	MCFG_DEVICE_PROGRAM_MAP(cybikov2_mem)
+	MCFG_DEVICE_IO_MAP(cybikov2_io)
 
 	MCFG_DEVICE_MODIFY("maincpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, si_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, sck_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("flash1", at45db041_device, si_w))
+	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("flash1", at45db041_device, sck_w))
 
 	// machine
 	MCFG_SST_39VF020_ADD("flash2")
@@ -463,17 +463,17 @@ MACHINE_CONFIG_START(cybiko_state::cybikov2)
 
 	/* serial debug port */
 	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cybiko_state::cybikoxt)
 	cybikov1(config);
 	// cpu
-	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL(18'432'000))
-	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )
-	MCFG_CPU_IO_MAP(cybikoxt_io )
+	MCFG_DEVICE_REPLACE("maincpu", H8S2323, XTAL(18'432'000))
+	MCFG_DEVICE_PROGRAM_MAP(cybikoxt_mem )
+	MCFG_DEVICE_IO_MAP(cybikoxt_io )
 
 	// machine
 	MCFG_DEVICE_REMOVE("flash1")
@@ -485,9 +485,9 @@ MACHINE_CONFIG_START(cybiko_state::cybikoxt)
 
 	/* serial debug port */
 	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 
 	/* quickload */
 	MCFG_DEVICE_REMOVE("quickload")
@@ -539,7 +539,7 @@ ROM_END
 // DRIVERS  //
 //////////////
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE         INIT        COMPANY       FULLNAME                FLAGS */
-COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V1)",  MACHINE_IMPERFECT_SOUND )
-COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V2)",  MACHINE_IMPERFECT_SOUND )
-COMP( 2001, cybikoxt,   cybikov1,   0,      cybikoxt,   cybikoxt, cybiko_state, cybikoxt,   "Cybiko Inc", "Cybiko Xtreme",        MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT           COMPANY       FULLNAME               FLAGS */
+COMP( 2000, cybikov1, 0,        0,      cybikov1, cybiko,   cybiko_state, init_cybiko,   "Cybiko Inc", "Cybiko Classic (V1)", MACHINE_IMPERFECT_SOUND )
+COMP( 2000, cybikov2, cybikov1, 0,      cybikov2, cybiko,   cybiko_state, init_cybiko,   "Cybiko Inc", "Cybiko Classic (V2)", MACHINE_IMPERFECT_SOUND )
+COMP( 2001, cybikoxt, cybikov1, 0,      cybikoxt, cybikoxt, cybiko_state, init_cybikoxt, "Cybiko Inc", "Cybiko Xtreme",       MACHINE_IMPERFECT_SOUND )

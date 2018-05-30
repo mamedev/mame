@@ -302,55 +302,55 @@ void micro3d_state::soundmem_io(address_map &map)
 
 MACHINE_CONFIG_START(micro3d_state::micro3d)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(hostmem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(hostmem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
 
-	MCFG_CPU_ADD("vgb", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(vgbmem)
+	MCFG_DEVICE_ADD("vgb", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vgbmem)
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000) / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(micro3d_state, tms_interrupt))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, micro3d_state, tms_interrupt))
 
-	MCFG_CPU_ADD("drmath", AM29000, XTAL(32'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(drmath_prg)
-	MCFG_CPU_DATA_MAP(drmath_data)
+	MCFG_DEVICE_ADD("drmath", AM29000, XTAL(32'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
+	MCFG_DEVICE_DATA_MAP(drmath_data)
 
 	MCFG_SCC8530_ADD("scc", XTAL(32'000'000) / 2 / 2, 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("monitor_drmath", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("monitor_drmath", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("monitor_drmath", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("scc", z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("scc", z80scc_device, dcdb_w)) MCFG_DEVCB_XOR(1)
+	MCFG_DEVICE_ADD("monitor_drmath", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("scc", z80scc_device, dcdb_w)) MCFG_DEVCB_XOR(1)
 
-	MCFG_CPU_ADD("audiocpu", I8051, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
-	MCFG_CPU_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(micro3d_state, micro3d_sound_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(micro3d_state, micro3d_sound_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(micro3d_state, micro3d_sound_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(micro3d_state, micro3d_sound_p3_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(micro3d_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(micro3d_state, data_to_i8031))
+	MCFG_DEVICE_ADD("audiocpu", I8051, XTAL(11'059'200))
+	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
+	MCFG_DEVICE_IO_MAP(soundmem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p3_w))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, micro3d_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, micro3d_state, data_to_i8031))
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("monitor_host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(micro3d_state, duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(micro3d_state, duart_output_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("monitor_host", rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, micro3d_state, duart_txb))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, micro3d_state, duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, micro3d_state, duart_output_w))
 
 	MCFG_DEVICE_ADD("mfp", MC68901, 4000000)
 	MCFG_MC68901_TIMER_CLOCK(4000000)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_4))
-	//MCFG_MC68901_OUT_TAO_CB(DEVWRITELINE("mfp", mc68901_device, rc_w))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mfp", mc68901_device, tc_w))
-	MCFG_MC68901_OUT_TCO_CB(DEVWRITELINE("mfp", mc68901_device, tbi_w))
+	//MCFG_MC68901_OUT_TAO_CB(WRITELINE("mfp", mc68901_device, rc_w))
+	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mfp", mc68901_device, tc_w))
+	MCFG_MC68901_OUT_TCO_CB(WRITELINE("mfp", mc68901_device, tbi_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
@@ -364,37 +364,38 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("uart", MC2661, XTAL(40'000'000) / 8) // actually SCN2651
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("monitor_vgb", rs232_port_device, write_txd))
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("monitor_vgb", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("monitor_vgb", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", mc2661_device, dsr_w))
+	MCFG_DEVICE_ADD("monitor_vgb", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", mc2661_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", mc2661_device, dsr_w))
 
-	MCFG_RS232_PORT_ADD("monitor_host", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w))
+	MCFG_DEVICE_ADD("monitor_host", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", mc68681_device, rx_a_w))
 
 	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(DEVWRITELINE("mfp", mc68901_device, i3_w))
+	MCFG_ADC0844_INTR_CB(WRITELINE("mfp", mc68901_device, i3_w))
 	MCFG_ADC0844_CH1_CB(IOPORT("THROTTLE"))
-	MCFG_ADC0844_CH2_CB(READ8(micro3d_state, adc_volume_r))
+	MCFG_ADC0844_CH2_CB(READ8(*this, micro3d_state, adc_volume_r))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("upd7759", UPD7759, XTAL(640'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	UPD7759(config, m_upd7759)
+			.add_route(ALL_OUTPUTS, "lspeaker", 0.35)
+			.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+	YM2151(config, "ym2151", XTAL(3'579'545))
+			.add_route(0, "lspeaker", 0.35)
+			.add_route(1, "rspeaker", 0.35);
 
-	MCFG_SOUND_ADD("noise_1", MICRO3D, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MICRO3D_SOUND(config, m_noise_1)
+			.add_route(0, "lspeaker", 1.0)
+			.add_route(1, "rspeaker", 1.0);
 
-	MCFG_SOUND_ADD("noise_2", MICRO3D, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MICRO3D_SOUND(config, m_noise_2)
+			.add_route(0, "lspeaker", 1.0)
+			.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(micro3d_state::botss11)
@@ -688,8 +689,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, f15se,    0,     micro3d, f15se,    micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)",          MACHINE_IMPERFECT_SOUND )
-GAME( 1991, f15se21,  f15se, micro3d, f15se,    micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)",          MACHINE_IMPERFECT_SOUND )
-GAME( 1992, botss,    0,     micro3d, botss,    micro3d_state, botss,   ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1a 7/23/92)", MACHINE_IMPERFECT_SOUND )
-GAME( 1992, botss11,  botss, botss11, botss11,  micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1 3/24/92)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1992, tankbatl, 0,     botss11, tankbatl, micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "Tank Battle (prototype rev. 4/21/92)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1991, f15se,    0,     micro3d, f15se,    micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)",          MACHINE_IMPERFECT_SOUND )
+GAME( 1991, f15se21,  f15se, micro3d, f15se,    micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)",          MACHINE_IMPERFECT_SOUND )
+GAME( 1992, botss,    0,     micro3d, botss,    micro3d_state, init_botss,   ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1a 7/23/92)", MACHINE_IMPERFECT_SOUND )
+GAME( 1992, botss11,  botss, botss11, botss11,  micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1 3/24/92)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1992, tankbatl, 0,     botss11, tankbatl, micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "Tank Battle (prototype rev. 4/21/92)",           MACHINE_IMPERFECT_SOUND )

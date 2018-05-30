@@ -90,9 +90,9 @@ void lft_state::machine_reset()
 
 MACHINE_CONFIG_START(lft_state::lft)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80186, 4000000) // no idea
-	MCFG_CPU_PROGRAM_MAP(lft_mem)
-	MCFG_CPU_IO_MAP(lft_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, 4000000) // no idea
+	MCFG_DEVICE_PROGRAM_MAP(lft_mem)
+	MCFG_DEVICE_IO_MAP(lft_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -118,6 +118,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT   COMPANY  FULLNAME    FLAGS
-COMP( ????, lft1510, 0,       0,      lft,     lft,   lft_state, 0,     "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
-COMP( ????, lft1230, lft1510, 0,      lft,     lft,   lft_state, 0,     "LFT",   "LFT 1230", MACHINE_IS_SKELETON)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME    FLAGS
+COMP( ????, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
+COMP( ????, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1230", MACHINE_IS_SKELETON)

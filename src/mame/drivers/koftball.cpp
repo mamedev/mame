@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
 	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
-	DECLARE_DRIVER_INIT(koftball);
+	void init_koftball();
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 	virtual void video_start() override;
@@ -229,14 +229,14 @@ static const gfx_layout tilelayout =
 	8*32
 };
 
-static GFXDECODE_START( koftball )
+static GFXDECODE_START( gfx_koftball )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(koftball_state::koftball)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
-	MCFG_CPU_PROGRAM_MAP(koftball_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(koftball_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -250,15 +250,16 @@ MACHINE_CONFIG_START(koftball_state::koftball)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koftball)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_LOW) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -304,14 +305,14 @@ static const uint16_t nvram[]=
 };
 
 #endif
-DRIVER_INIT_MEMBER(koftball_state,koftball)
+void koftball_state::init_koftball()
 {
 	save_item(NAME(m_prot_data));
 
 #if NVRAM_HACK
 	{
-		int offset=0;
-		while(nvram[offset]!=0xffff)
+		int offset = 0;
+		while(nvram[offset] != 0xffff)
 		{
 			m_main_ram[offset]=nvram[offset];
 			++offset;
@@ -320,4 +321,4 @@ DRIVER_INIT_MEMBER(koftball_state,koftball)
 #endif
 }
 
-GAME( 1995, koftball,    0, koftball,    koftball, koftball_state,    koftball, ROT0,  "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

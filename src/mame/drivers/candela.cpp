@@ -667,15 +667,15 @@ DEVICE_INPUT_DEFAULTS_END
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
 MACHINE_CONFIG_START(can09t_state::can09t)
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'915'200)) // IPL crystal
-	MCFG_CPU_PROGRAM_MAP(can09t_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'915'200)) // IPL crystal
+	MCFG_DEVICE_PROGRAM_MAP(can09t_map)
 
 	/* --PIA inits----------------------- */
 	MCFG_DEVICE_ADD(SYSPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(can09t_state, syspia_A_r))
-	MCFG_PIA_READPB_HANDLER(READ8(can09t_state, syspia_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(can09t_state, syspia_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, syspia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, can09t_state, syspia_A_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, can09t_state, syspia_B_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, can09t_state, syspia_B_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09t_state, syspia_cb2_w))
 	/* 0xE1FB 0xB112 (SYSPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE1FB 0xB113 (SYSPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE203 0xB110 (SYSPIA DDR A)     = 0x00 - Port A all inputs */
@@ -684,7 +684,7 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	/* 0xE20A 0xB113 (SYSPIA Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xE20E 0xB111 (SYSPIA port B)    = 0x10 - Data to port B */
 	MCFG_DEVICE_ADD(USRPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, usrpia_cb2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09t_state, usrpia_cb2_w))
 	/* 0xE212 0xB122 (USRPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE212 0xB123 (USRPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE215 0xB120 (USRPIA DDR A)     = 0x00 - Port A all inputs */
@@ -698,21 +698,21 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 
 	/* RS232 usage: mame can09t -window -debug -rs232 terminal */
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE ("rs232", rs232_port_device, write_rts))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_cts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE ("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE ("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE ("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE ("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD ("acia_clock", CLOCK, CAN09T_ACIA_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE (can09t_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE (*this, can09t_state, write_acia_clock))
 MACHINE_CONFIG_END
 
 #define CAN09_X1_CLOCK XTAL(22'118'400)        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
 MACHINE_CONFIG_START(can09_state::can09)
-	MCFG_CPU_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
-	MCFG_CPU_PROGRAM_MAP(can09_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
+	MCFG_DEVICE_PROGRAM_MAP(can09_map)
 
 	/* RAM banks */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -764,11 +764,11 @@ MACHINE_CONFIG_START(can09_state::can09)
 
 	/* --PIA inits----------------------- */
 	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(can09_state, pia1_A_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(can09_state, pia1_A_w))
-	MCFG_PIA_READPB_HANDLER(READ8(can09_state, pia1_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(can09_state, pia1_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09_state, pia1_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, can09_state, pia1_A_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, can09_state, pia1_A_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, can09_state, pia1_B_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, can09_state, pia1_B_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09_state, pia1_cb2_w))
 	/* 0xFF7D 0xE035 (PIA1 Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF81 0xE037 (PIA1 Control B) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF85 0xE034 (PIA1 DDR A)     = 0x1F - Port A mixed mode */
@@ -799,6 +799,6 @@ ROM_START( can09 ) /* The bigger black computer CAN v1 */
 	ROM_LOAD( "ic14-vdu42.bin", 0x0000, 0x2000, CRC(67fc3c8c) SHA1(1474d6259646798377ef4ce7e43d3c8d73858344) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME            FLAGS
-COMP( 1984, can09,      0,          0,      can09,      can09,  can09_state,  0,          "Candela Data AB",  "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1984, can09t,     0,          0,      can09t,     can09t, can09t_state, 0,          "Candela Data AB",  "Candela CAN09",    MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME            FLAGS
+COMP( 1984, can09,  0,      0,      can09,   can09,  can09_state,  empty_init, "Candela Data AB", "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1984, can09t, 0,      0,      can09t,  can09t, can09t_state, empty_init, "Candela Data AB", "Candela CAN09",    MACHINE_NO_SOUND_HW )

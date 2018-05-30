@@ -152,20 +152,21 @@ FLOPPY_FORMATS_MEMBER( vector06_state::floppy_formats )
 	FLOPPY_VECTOR06_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( vector06_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void vector06_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 /* Machine driver */
 MACHINE_CONFIG_START(vector06_state::vector06)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
-	MCFG_CPU_PROGRAM_MAP(vector06_mem)
-	MCFG_CPU_IO_MAP(vector06_io)
-	MCFG_I8085A_STATUS(WRITE8(vector06_state, vector06_status_callback))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
+	MCFG_DEVICE_PROGRAM_MAP(vector06_mem)
+	MCFG_DEVICE_IO_MAP(vector06_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, vector06_state, vector06_status_callback))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -179,22 +180,21 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(vector06_state, vector06)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vector06_state, vector06_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(vector06_state, vector06_8255_portc_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vector06_state, vector06_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, vector06_state, vector06_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vector06_state, vector06_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, vector06_state, vector06_8255_portc_r))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vector06_state, vector06_romdisk_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(vector06_state, vector06_romdisk_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vector06_state, vector06_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vector06_state, vector06_romdisk_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vector06_state, vector06_romdisk_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, vector06_state, vector06_romdisk_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vector06_state, vector06_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vector06_state, vector06_romdisk_portc_w))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -216,19 +216,19 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_RAM_DEFAULT_SIZE("320K")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1500000)
 	MCFG_PIT8253_CLK1(1500000)
 	MCFG_PIT8253_CLK2(1500000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vector06_state, speaker_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vector06_state, speaker_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(vector06_state, speaker_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
 
 	// optional
-	MCFG_SOUND_ADD("aysnd", AY8910, 1773400)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1773400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -270,8 +270,8 @@ ROM_START( krista2 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME       FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 06c",  0)
-COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
-COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
-COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME       FLAGS */
+COMP( 1987, vector06, 0,        0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 06c",  0)
+COMP( 1987, vec1200,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
+COMP( 1987, pk6128c,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
+COMP( 1987, krista2,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)

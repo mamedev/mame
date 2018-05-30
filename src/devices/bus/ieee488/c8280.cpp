@@ -269,18 +269,19 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 	*/
 
 	// activity led 1
-	machine().output().set_led_value(LED_ACT1, BIT(data, 3));
+	m_led[LED_ACT1] = BIT(data, 3);
 
 	// activity led 0
-	machine().output().set_led_value(LED_ACT0, BIT(data, 4));
+	m_led[LED_ACT0] = BIT(data, 4);
 
 	// error led
-	machine().output().set_led_value(LED_ERR, BIT(data, 5));
+	m_led[LED_ERR] = BIT(data, 5);
 }
 
-static SLOT_INTERFACE_START( c8280_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void c8280_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 FLOPPY_FORMATS_MEMBER( c8280_device::floppy_formats )
 	FLOPPY_C8280_FORMAT
@@ -292,22 +293,22 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c8280_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(c8280_main_mem)
+	MCFG_DEVICE_ADD(M6502_DOS_TAG, M6502, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(c8280_main_mem)
 
 	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(12'000'000)/8)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c8280_device, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c8280_device, dio_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8280_device, dio_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8280_device, dio_w))
 
 	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(12'000'000)/8)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c8280_device, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(c8280_device, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(c8280_device, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c8280_device, riot1_pb_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8280_device, riot1_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, c8280_device, riot1_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, c8280_device, riot1_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8280_device, riot1_pb_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_DOS_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
+	MCFG_DEVICE_ADD(M6502_FDC_TAG, M6502, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(c8280_fdc_mem)
 
 	MCFG_FD1797_ADD(WD1797_TAG, XTAL(12'000'000)/6)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_IRQ_LINE))
@@ -384,7 +385,9 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 	m_fdc(*this, WD1797_TAG),
 	m_floppy0(*this, WD1797_TAG ":0"),
 	m_floppy1(*this, WD1797_TAG ":1"),
-	m_address(*this, "ADDRESS"), m_floppy(nullptr),
+	m_address(*this, "ADDRESS"),
+	m_floppy(nullptr),
+	m_led(*this, "led%u", 0U),
 	m_rfdo(1),
 	m_daco(1),
 	m_atna(1), m_ifc(0), m_fk5(0)
@@ -398,6 +401,8 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
+	m_led.resolve();
+
 	// state saving
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));

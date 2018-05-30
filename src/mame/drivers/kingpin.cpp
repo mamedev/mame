@@ -69,7 +69,7 @@ private:
 WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void kingpin_state::kingpin_program_map(address_map &map)
@@ -147,9 +147,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kingpin_state::kingpin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(kingpin_program_map)
-	MCFG_CPU_IO_MAP(kingpin_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(kingpin_program_map)
+	MCFG_DEVICE_IO_MAP(kingpin_io_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	// PORT A read = watchdog?
@@ -163,9 +163,9 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(kingpin_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kingpin_state, irq0_line_hold,  1000) // unknown freq
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(kingpin_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingpin_state, irq0_line_hold,  1000) // unknown freq
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
@@ -176,18 +176,18 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingpin_state::dealracl)
 	kingpin(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dealracl_program_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dealracl_program_map)
 MACHINE_CONFIG_END
 
 
@@ -306,6 +306,6 @@ ROM_END
 
 
 
-GAME( 1983, kingpin,  0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Kingpin",     0 )
-GAME( 1983, maxideal, 0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
-GAME( 1981, dealracl, 0, dealracl, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "The Dealer (ACL)",  MACHINE_NOT_WORKING )
+GAME( 1983, kingpin,  0, kingpin,  kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "Kingpin",     0 )
+GAME( 1983, maxideal, 0, kingpin,  kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
+GAME( 1981, dealracl, 0, dealracl, kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "The Dealer (ACL)",  MACHINE_NOT_WORKING )

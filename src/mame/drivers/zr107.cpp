@@ -249,9 +249,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
 	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(zr107);
-	DECLARE_DRIVER_INIT(jetwave);
+	void init_common();
+	void init_zr107();
+	void init_jetwave();
 	DECLARE_VIDEO_START(zr107);
 	DECLARE_VIDEO_START(jetwave);
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -287,15 +287,13 @@ uint32_t zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	m_k001604->draw_back_layer(bitmap, cliprect);
-
 	m_k001005->draw(bitmap, cliprect);
-
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
+	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -340,7 +338,7 @@ uint32_t zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &b
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
+	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -775,16 +773,16 @@ void zr107_state::machine_reset()
 MACHINE_CONFIG_START(zr107_state::zr107)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(zr107_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zr107_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc_map)
+	MCFG_DEVICE_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(750000))// Very high sync needed to prevent lockups - why?
 
@@ -811,8 +809,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_K056832_CONFIG("gfx2", K056832_BPP_8, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k001005", K001005, 0)
-	MCFG_K001005_TEXEL_CHIP("k001006_1")
+	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
 
 	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
 	MCFG_K001006_GFX_REGION("gfx1")
@@ -821,11 +818,12 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, zr107_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
@@ -846,16 +844,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(jetwave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jetwave_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc_map)
+	MCFG_DEVICE_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2000000)) // Very high sync needed to prevent lockups - why?
 
@@ -884,8 +882,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k001005", K001005, 0)
-	MCFG_K001005_TEXEL_CHIP("k001006_1")
+	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
 
 	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
 	MCFG_K001006_GFX_REGION("gfx1")
@@ -900,11 +897,12 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, zr107_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
@@ -923,7 +921,7 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(zr107_state,common)
+void zr107_state::init_common()
 {
 	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
@@ -932,12 +930,12 @@ DRIVER_INIT_MEMBER(zr107_state,common)
 	m_dsp->enable_recompiler();
 }
 
-DRIVER_INIT_MEMBER(zr107_state,zr107)
+void zr107_state::init_zr107()
 {
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(zr107_state,jetwave)
+void zr107_state::init_jetwave()
 {
 	init_common();
 }
@@ -1180,12 +1178,12 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS )

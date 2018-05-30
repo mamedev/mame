@@ -17,17 +17,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define SSIO_CLOCK          XTAL(16'000'000)
-#define SOUNDSGOOD_CLOCK    XTAL(16'000'000)
-#define TURBOCS_CLOCK       XTAL(8'000'000)
-#define SQUAWKTALK_CLOCK    XTAL(3'579'545)
-
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -93,16 +82,17 @@ WRITE8_MEMBER(midway_ssio_device::write)
 
 WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
 {
-	// going high halts the CPU
 	if (state)
 	{
+		// going high halts the CPU
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-
-	// going low resets and reactivates the CPU
 	else
+	{
+		// going low resets and reactivates the CPU
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 }
 
 
@@ -412,19 +402,20 @@ const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_ssio_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
-	MCFG_CPU_PROGRAM_MAP(ssio_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
+	MCFG_DEVICE_ADD("cpu", Z80, DERIVED_CLOCK(1, 2*4))
+	MCFG_DEVICE_PROGRAM_MAP(ssio_map)
+	if (clock())
+		MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, clock() / (2*16*10))
 
-	MCFG_SOUND_ADD("ay0", AY8910, SSIO_CLOCK/2/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb0_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 0)
+	MCFG_DEVICE_ADD("ay0", AY8910, DERIVED_CLOCK(1, 2*4))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, midway_ssio_device, porta0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, midway_ssio_device, portb0_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 0)
 
-	MCFG_SOUND_ADD("ay1", AY8910, SSIO_CLOCK/2/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta1_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb1_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 1)
+	MCFG_DEVICE_ADD("ay1", AY8910, DERIVED_CLOCK(1, 2*4))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, midway_ssio_device, porta1_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, midway_ssio_device, portb1_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 1)
 MACHINE_CONFIG_END
 
 
@@ -590,18 +581,18 @@ void midway_sounds_good_device::soundsgood_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
+	MCFG_DEVICE_ADD("cpu", M68000, DERIVED_CLOCK(1, 2))
+	MCFG_DEVICE_PROGRAM_MAP(soundsgood_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_sounds_good_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_sounds_good_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_sounds_good_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, midway_sounds_good_device, portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_sounds_good_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_sounds_good_device, irq_w))
 
-	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0) /// ad7533jn.u10
+	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0) /// ad7533jn.u10
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -745,18 +736,18 @@ void midway_turbo_cheap_squeak_device::turbocs_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", MC6809E, TURBOCS_CLOCK / 4)
-	MCFG_CPU_PROGRAM_MAP(turbocs_map)
+	MCFG_DEVICE_ADD("cpu", MC6809E, DERIVED_CLOCK(1, 4))
+	MCFG_DEVICE_PROGRAM_MAP(turbocs_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_turbo_cheap_squeak_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_turbo_cheap_squeak_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_turbo_cheap_squeak_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, midway_turbo_cheap_squeak_device, portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_turbo_cheap_squeak_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_turbo_cheap_squeak_device, irq_w))
 
-	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
+	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -949,23 +940,23 @@ void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
+	MCFG_DEVICE_ADD("cpu", M6802, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(squawkntalk_map)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_squawk_n_talk_device, porta1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_squawk_n_talk_device, porta1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_squawk_n_talk_device, porta2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_squawk_n_talk_device, portb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_squawk_n_talk_device, porta2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, midway_squawk_n_talk_device, portb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
 
 	// only used on Discs of Tron, which is stereo
-	MCFG_SOUND_ADD("tms5200", TMS5200, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
+	MCFG_DEVICE_ADD("tms5200", TMS5200, 640000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
 
 	// the board also supports an AY-8912 and/or an 8-bit DAC, neither of
 	// which are populated on the Discs of Tron board

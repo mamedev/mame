@@ -30,7 +30,7 @@ public:
 	{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
 	void esprit(machine_config &config);
 	void esprit3(machine_config &config);
@@ -106,11 +106,11 @@ static const gfx_layout esprit_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( esprit )
+static GFXDECODE_START( gfx_esprit )
 	GFXDECODE_ENTRY( "chargen", 0x0000, esprit_charlayout, 0, 1 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER( esprit_state, init )
+void esprit_state::init_init()
 {
 	// chargen is incomplete, copy the first half into the vacant second half
 	for (u16 i = 0; i < 0x800; i++)
@@ -119,8 +119,8 @@ DRIVER_INIT_MEMBER( esprit_state, init )
 
 
 MACHINE_CONFIG_START(esprit_state::esprit)
-	MCFG_CPU_ADD("maincpu", M6502, 1000000) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -129,7 +129,7 @@ MACHINE_CONFIG_START(esprit_state::esprit)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprit)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -141,8 +141,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esprit_state::esprit3)
 	esprit(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mem3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mem3_map)
 MACHINE_CONFIG_END
 
 ROM_START( esprit )
@@ -161,5 +161,5 @@ ROM_START( esprit3 )
 	ROM_LOAD( "hazeltine_espritiii.u19", 0x0000, 0x1000, CRC(33e4a8ef) SHA1(e19c84a3c5f94812928ea84bab3ede7970dd5e72) )
 ROM_END
 
-COMP( 1981, esprit,  0,         0, esprit,  esprit, esprit_state, init, "Hazeltine", "Esprit", MACHINE_IS_SKELETON )
-COMP( 1981, esprit3, esprit,    0, esprit3, esprit, esprit_state, 0,    "Hazeltine", "Esprit III", MACHINE_IS_SKELETON )
+COMP( 1981, esprit,  0,      0, esprit,  esprit, esprit_state, init_init,  "Hazeltine", "Esprit",     MACHINE_IS_SKELETON )
+COMP( 1981, esprit3, esprit, 0, esprit3, esprit, esprit_state, empty_init, "Hazeltine", "Esprit III", MACHINE_IS_SKELETON )

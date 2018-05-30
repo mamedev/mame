@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	m_control_regs[BDMA_CONTROL_REG] |= ((param >> 14) & 0xff) << 8;
 
 	if (m_control_regs[BDMA_CONTROL_REG] & 8)
-		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	else
 		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum_time());
 
@@ -491,12 +491,12 @@ acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
-	MCFG_CPU_ADD("adsp", ADSP2181, XTAL(16'670'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2181, XTAL(16'670'000))
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
+	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(*this, acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
 	MCFG_TIMER_DEVICE_ADD("adsp_reg_timer0", DEVICE_SELF, acclaim_rax_device, adsp_irq0)
 	MCFG_TIMER_DEVICE_ADD("adsp_dma_timer", DEVICE_SELF, acclaim_rax_device, dma_timer_callback)
@@ -504,12 +504,13 @@ MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_GENERIC_LATCH_16_ADD("data_in")
 	MCFG_GENERIC_LATCH_16_ADD("data_out")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dacl", DMADAC, 0)
+	MCFG_DEVICE_ADD("dacl", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dacr", DMADAC, 0)
+	MCFG_DEVICE_ADD("dacr", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

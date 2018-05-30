@@ -14,10 +14,12 @@ Sound Chips  :  K-665 9546 (= M6295)
 To Do:
 
 - Flip screen unused ?
-- Better driving wheel(s) support
+- Better driving wheel(s) support, merge with World Rally implementation
 
 Blomby Car is said to be a bootleg of Gaelco's World Rally and uses many
 of the same fonts
+(Update: it actually is a bootleg of World Rally by looking how much
+similar the two HWs are, down to the dipswitches!)
 
 Waterball
 
@@ -65,7 +67,7 @@ WRITE16_MEMBER(blmbycar_state::okibank_w)
 WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_reset_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_pot_wheel = ~ioport("WHEEL")->read() & 0xff;
+		m_pot_wheel = ioport("POT_WHEEL")->read() & 0xff;
 }
 
 WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_shift_w)
@@ -88,7 +90,7 @@ READ16_MEMBER(blmbycar_state::blmbycar_pot_wheel_r)
 
 READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 {
-	return (~ioport("WHEEL")->read() & 0xff) << 8;
+	return ((ioport("OPT_WHEEL")->read() & 0xff) << 8) | 0xff;
 }
 
 
@@ -128,8 +130,8 @@ void blmbycar_state::blmbycar_map(address_map &map)
 	map(0x700006, 0x700007).portr("UNK");
 	map(0x700008, 0x700009).r(this, FUNC(blmbycar_state::blmbycar_pot_wheel_r));                              // Wheel (potentiometer)
 	map(0x70000a, 0x70000b).nopw();                                                // ? Wheel
-	map(0x70006a, 0x70006b).w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
-	map(0x70007a, 0x70007b).w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
+	map(0x70006a, 0x70006b).nopr().w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
+	map(0x70007a, 0x70007b).nopr().w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
 }
 
 READ16_MEMBER(blmbycar_state::waterball_unk_r)
@@ -174,8 +176,8 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x0004, "2" )
 	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:5,4")
 	PORT_DIPSETTING(      0x0018, DEF_STR( Joystick ) )
-//  PORT_DIPSETTING(      0x0010, "Pot Wheel" ) // Preliminary
-//  PORT_DIPSETTING(      0x0008, "Opt Wheel" ) // Preliminary
+	PORT_DIPSETTING(      0x0010, "Pot Wheel" ) // Preliminary
+	PORT_DIPSETTING(      0x0008, "Opt Wheel" ) // Preliminary
 //  PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )   // Time goes to 0 rally fast!
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
@@ -211,12 +213,14 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P1_P2") /* $700002.w */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN   ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN   ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gear Shift") PORT_TOGGLE PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Accelerator")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2  )
 
@@ -229,8 +233,11 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2  )
 
-	PORT_START("WHEEL") /* $700004.w */
-	PORT_BIT ( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1)
+	PORT_START("OPT_WHEEL") /* $700004.w */
+	PORT_BIT ( 0x00ff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_REVERSE PORT_CONDITION("DSW", 0x18, EQUALS, 0x08) PORT_NAME("P1 Opt Wheel")
+
+	PORT_START("POT_WHEEL")
+	PORT_BIT ( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_REVERSE PORT_CONDITION("DSW", 0x18, EQUALS, 0x10) PORT_NAME("P1 Pot Wheel")
 
 	PORT_START("UNK")       /* $700006.w */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -318,7 +325,7 @@ static const gfx_layout layout_16x16x4 =
 };
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
-static GFXDECODE_START( blmbycar )
+static GFXDECODE_START( gfx_blmbycar )
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
 GFXDECODE_END
 
@@ -350,9 +357,9 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12MHz */
-	MCFG_CPU_PROGRAM_MAP(blmbycar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(blmbycar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,blmbycar)
 	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,blmbycar)
@@ -366,15 +373,16 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blmbycar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blmbycar)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, blmbycar_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -397,8 +405,8 @@ MACHINE_CONFIG_START(blmbycar_state::watrball)
 	blmbycar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(watrball_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(watrball_map)
 
 	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,watrball)
 	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,watrball)
@@ -496,13 +504,11 @@ ROM_START( watrball )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
+void blmbycar_state::init_blmbycar()
 {
 	uint16_t *RAM  = (uint16_t *) memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes() / 2;
-	int i;
-
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		uint16_t x = RAM[i];
 		x = (x & ~0x0606) | ((x & 0x0202) << 1) | ((x & 0x0404) >> 1);
@@ -518,6 +524,6 @@ DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 
 ***************************************************************************/
 
-GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, watrball,  0,        watrball, watrball, blmbycar_state, 0,        ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, init_blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, empty_init,    ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, watrball,  0,        watrball, watrball, blmbycar_state, empty_init,    ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )

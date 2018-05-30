@@ -291,13 +291,10 @@ WRITE16_MEMBER(polepos_state::polepos_view16_hscroll_w)
 	m_bg_tilemap->set_scrollx(0,m_scroll);
 }
 
-WRITE8_MEMBER(polepos_state::polepos_chacl_w)
+WRITE_LINE_MEMBER(polepos_state::chacl_w)
 {
-	if (m_chacl != (data & 1))
-	{
-		m_chacl = data & 1;
-		m_tx_tilemap->mark_all_dirty();
-	}
+	m_chacl = state;
+	m_tx_tilemap->mark_all_dirty();
 }
 
 

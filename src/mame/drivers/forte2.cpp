@@ -52,7 +52,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(pesadelo);
+	void init_pesadelo();
 	void pesadelo(machine_config &config);
 
 protected:
@@ -129,9 +129,9 @@ void forte2_state::machine_start()
 MACHINE_CONFIG_START(forte2_state::pesadelo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(program_mem)
-	MCFG_CPU_IO_MAP(io_mem)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(program_mem)
+	MCFG_DEVICE_IO_MAP(io_mem)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL(10'738'635)/2)
@@ -141,14 +141,14 @@ MACHINE_CONFIG_START(forte2_state::pesadelo)
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(forte2_state, forte2_ay8910_read_input))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(forte2_state, forte2_ay8910_set_input_mask))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, forte2_state, forte2_ay8910_read_input))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, forte2_state, forte2_ay8910_set_input_mask))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(forte2_state,pesadelo)
+void forte2_state::init_pesadelo()
 {
 	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
@@ -160,8 +160,8 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	}
 
 	// address line swap
-	std::vector<uint8_t> buf(memsize);
-	memcpy(&buf[0], mem, memsize);
+	std::vector<uint8_t> buf(&mem[0], &mem[memsize]);
+
 	for (int i = 0; i < memsize; i++)
 	{
 		mem[bitswap<16>(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
@@ -173,4 +173,4 @@ ROM_START( pesadelo )
 	ROM_LOAD( "epr2764.15", 0x00000, 0x10000, CRC(1ae2f724) SHA1(12880dd7ad82acf04861843fb9d4f0f926d18f6b) )
 ROM_END
 
-GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, init_pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )

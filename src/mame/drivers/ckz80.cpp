@@ -90,7 +90,7 @@ public:
 	// Master
 	DECLARE_READ8_MEMBER(master_input_r);
 	DECLARE_WRITE8_MEMBER(master_control_w);
-	DECLARE_DRIVER_INIT(master);
+	void init_master();
 	DECLARE_READ8_MEMBER(master_trampoline_r);
 	DECLARE_WRITE8_MEMBER(master_trampoline_w);
 	void master_map(address_map &map);
@@ -254,7 +254,7 @@ READ8_MEMBER(ckz80_state::master_input_r)
 	return ~read_inputs(10);
 }
 
-DRIVER_INIT_MEMBER(ckz80_state, master)
+void ckz80_state::init_master()
 {
 	u8 *rom = memregion("maincpu")->base();
 	const u32 len = memregion("maincpu")->bytes();
@@ -434,8 +434,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ckz80_state::master)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(master_trampoline)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(master_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", ckz80_state, irq_on, attotime::from_hz(429)) // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(429) - attotime::from_nsec(22870)) // active for 22.87us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", ckz80_state, irq_off, attotime::from_hz(429))
@@ -450,10 +450,10 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	MCFG_DEFAULT_LAYOUT(layout_ck_master)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -473,5 +473,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT   STATE         INIT    COMPANY, FULLNAME, FLAGS */
-CONS( 1984, ckmaster,  0,        0,      master,  master, ckz80_state,  master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT         COMPANY       FULLNAME               FLAGS */
+CONS( 1984, ckmaster, 0,      0,      master,  master, ckz80_state, init_master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

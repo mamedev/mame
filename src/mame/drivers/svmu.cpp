@@ -307,13 +307,13 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 
 MACHINE_CONFIG_START(svmu_state::svmu)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LC8670, XTAL(32'768))
-	MCFG_CPU_PROGRAM_MAP(svmu_mem)
-	MCFG_CPU_IO_MAP(svmu_io_mem)
+	MCFG_DEVICE_ADD("maincpu", LC8670, XTAL(32'768))
+	MCFG_DEVICE_PROGRAM_MAP(svmu_mem)
+	MCFG_DEVICE_IO_MAP(svmu_io_mem)
 
 	/* specific LC8670 configurations */
 	MCFG_LC8670_SET_CLOCK_SOURCES(XTAL(32'768), 600000, XTAL(6'000'000))    // tolerance range of the RC oscillator is 600kHz to 1200kHz
-	MCFG_LC8670_BANKSWITCH_CB(WRITE8(svmu_state, page_w))
+	MCFG_LC8670_BANKSWITCH_CB(WRITE8(*this, svmu_state, page_w))
 	MCFG_LC8670_LCD_UPDATE_CB(svmu_lcd_update)
 
 	/* video hardware */
@@ -330,8 +330,8 @@ MACHINE_CONFIG_START(svmu_state::svmu)
 	MCFG_PALETTE_INIT_OWNER(svmu_state, svmu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -387,5 +387,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME               FLAGS */
-COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, 0,    "Sega",   "Visual Memory Unit",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY  FULLNAME              FLAGS */
+COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, empty_init, "Sega",  "Visual Memory Unit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

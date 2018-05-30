@@ -264,15 +264,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(rotaryf_state::rotaryf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
-	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
-	MCFG_CPU_IO_MAP(rotaryf_io_map)
+	MCFG_DEVICE_ADD("maincpu",I8085A,4000000) /* ?? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rotaryf_map)
+	MCFG_DEVICE_IO_MAP(rotaryf_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rotaryf_state, rotaryf_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(rotaryf_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(rotaryf_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(rotaryf_state, portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, rotaryf_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, rotaryf_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, rotaryf_state, portc_w))
 	//MCFG_I8255_TRISTATE_PORTC_CB(CONSTANT(0))
 
 	/* video hardware */
@@ -282,9 +282,9 @@ MACHINE_CONFIG_START(rotaryf_state::rotaryf)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(rotaryf_state, screen_update)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                 // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                          // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))          // attack_decay_cap + attack_res
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(rotaryf_state::rotaryf)
 	MCFG_SN76477_ENABLE(1)                             // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(rotaryf_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -318,4 +318,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, 0, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, empty_init, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

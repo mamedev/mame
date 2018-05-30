@@ -580,9 +580,9 @@ INPUT_PORTS_END
 /* machine definition */
 MACHINE_CONFIG_START(ti85_state::ti81)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(ti81_mem)
-	MCFG_CPU_IO_MAP(ti81_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ti81_mem)
+	MCFG_DEVICE_IO_MAP(ti81_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -603,9 +603,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti85)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
-	MCFG_CPU_IO_MAP(ti85_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
+	MCFG_DEVICE_IO_MAP(ti85_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(ti85_state::ti85)
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -626,9 +626,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti82)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
-	MCFG_CPU_IO_MAP(ti82_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
+	MCFG_DEVICE_IO_MAP(ti82_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
@@ -642,22 +642,22 @@ MACHINE_CONFIG_START(ti85_state::ti82)
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti81v2)
 	ti82(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(ti81v2_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ti81v2_io)
 
 	MCFG_DEVICE_REMOVE("linkport")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
-	MCFG_CPU_IO_MAP(ti83_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
+	MCFG_DEVICE_IO_MAP(ti83_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
@@ -674,9 +674,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti86)
 	ti85(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ti86_mem)
-	MCFG_CPU_IO_MAP(ti86_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ti86_mem)
+	MCFG_DEVICE_IO_MAP(ti86_io)
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -686,10 +686,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83p)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(ti83p_asic_mem)
-	MCFG_CPU_IO_MAP(ti83p_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ti83p_asic_mem)
+	MCFG_DEVICE_IO_MAP(ti83p_io)
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83p )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti83p )
@@ -728,16 +728,16 @@ MACHINE_CONFIG_START(ti85_state::ti83p)
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 
 	MCFG_AMD_29F400T_ADD("flash")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83pse)
 	ti83p(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( 15000000)
-	MCFG_CPU_IO_MAP(ti83pse_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( 15000000)
+	MCFG_DEVICE_IO_MAP(ti83pse_io)
 
 	MCFG_DEVICE_MODIFY("membank1")
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
@@ -1138,29 +1138,29 @@ ROM_START (ti84pcev30)
 	ROMX_LOAD( "ti84pcev30v530.bin", 0x00000, 0x400000, CRC(cc7a7047) SHA1(0d348e60dc57276b1f8d5ff87935e47cdd27455c), ROM_BIOS(1) )
 ROM_END
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY              FULLNAME                                        FLAGS
-COMP( 1990, ti81,       0,       0,      ti81,    ti81,  ti85_state,  0,     "Texas Instruments", "TI-81",                                           MACHINE_NO_SOUND_HW )
-COMP( 1992, ti85,       0,       0,      ti85d,   ti85,  ti85_state,  0,     "Texas Instruments", "TI-85",                                           MACHINE_NO_SOUND_HW )
-COMP( 1993, ti82,       0,       0,      ti82,    ti82,  ti85_state,  0,     "Texas Instruments", "TI-82",                                           MACHINE_NO_SOUND_HW )
-COMP( 1994, ti81v2,     ti81,    0,      ti81v2,  ti81,  ti85_state,  0,     "Texas Instruments", "TI-81 v2.0",                                      MACHINE_NO_SOUND_HW )
-COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state,  0,     "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW )
-COMP( 1997, ti86,       0,       0,      ti86,    ti85,  ti85_state,  0,     "Texas Instruments", "TI-86",                                           MACHINE_NO_SOUND_HW )
-COMP( 1998, ti73,       0,       0,      ti73,    ti82,  ti85_state,  0,     "Texas Instruments", "TI-73 Explorer",                                  MACHINE_NO_SOUND_HW )
-COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state,  0,     "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 1999, ti83p,      0,       0,      ti83p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti83pb,     ti83p,   0,      ti83p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2001, ti83pse,    0,       0,      ti83pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2004, ti84p,      0,       0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 200?, ti84pv2,    ti84p,   0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2011, ti84pv3,    ti84p,   0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (Boot Code 1.03)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pob,    ti84p,   0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Orion (bootleg)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pov2,   ti84p,   0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.02)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pov3,   ti84p,   0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.03)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2004, ti84pse,    0,       0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2011, ti84psev3,  ti84pse, 0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.03)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Color Silver Edition (Boot Code 4.0)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2015, ti84pce,    ti84pse, 0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.00)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.15)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.30)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY              FULLNAME                                           FLAGS
+COMP( 1990, ti81,       0,       0,      ti81,    ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81",                                           MACHINE_NO_SOUND_HW )
+COMP( 1992, ti85,       0,       0,      ti85d,   ti85,  ti85_state, empty_init, "Texas Instruments", "TI-85",                                           MACHINE_NO_SOUND_HW )
+COMP( 1993, ti82,       0,       0,      ti82,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-82",                                           MACHINE_NO_SOUND_HW )
+COMP( 1994, ti81v2,     ti81,    0,      ti81v2,  ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81 v2.0",                                      MACHINE_NO_SOUND_HW )
+COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW )
+COMP( 1997, ti86,       0,       0,      ti86,    ti85,  ti85_state, empty_init, "Texas Instruments", "TI-86",                                           MACHINE_NO_SOUND_HW )
+COMP( 1998, ti73,       0,       0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer",                                  MACHINE_NO_SOUND_HW )
+COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1999, ti83p,      0,       0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti83pb,     ti83p,   0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2001, ti83pse,    0,       0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2004, ti84p,      0,       0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 200?, ti84pv2,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2011, ti84pv3,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.03)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pob,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (bootleg)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pov2,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.02)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pov3,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Orion (Boot Code 1.03)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2004, ti84pse,    0,       0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2011, ti84psev3,  ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.03)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 20??, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Silver Edition (Boot Code 4.0)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2015, ti84pce,    ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.00)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.15)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Color Edition (Boot Code 5.30)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

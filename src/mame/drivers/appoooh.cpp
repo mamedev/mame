@@ -349,7 +349,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( appoooh )
+static GFXDECODE_START( gfx_appoooh )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     32*8, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,      0, 32 )
@@ -382,7 +382,7 @@ static const gfx_layout robowres_spritelayout =
 };
 
 
-static GFXDECODE_START( robowres )
+static GFXDECODE_START( gfx_robowres )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, robowres_charlayout,         0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_spritelayout,      0, 32 )
@@ -416,32 +416,32 @@ void appoooh_state::machine_reset()
 INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(appoooh_state::appoooh_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn3", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn3", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(appoooh_state, adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, appoooh_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(appoooh_state::appoooh)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", appoooh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_appoooh)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	appoooh_common(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robowres)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robowres)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
@@ -490,11 +490,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(appoooh_state::robowrese)
 	robowres(config);
 
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -603,7 +603,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(appoooh_state,robowresb)
+void appoooh_state::init_robowresb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x1c000, 0x8000);
 }
@@ -615,6 +615,6 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh,  appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowrese,robowres, appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,   appoooh,  appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowrese, robowres, appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres,  robowres, appoooh_state, init_robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -158,8 +158,8 @@ void _3do_state::machine_reset()
 MACHINE_CONFIG_START(_3do_state::_3do)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL(50'000'000)/4 )
-	MCFG_CPU_PROGRAM_MAP( _3do_mem)
+	MCFG_DEVICE_ADD( "maincpu", ARM7_BE, XTAL(50'000'000)/4 )
+	MCFG_DEVICE_PROGRAM_MAP( _3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -178,8 +178,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(_3do_state::_3do_pal)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL(50'000'000)/4 )
-	MCFG_CPU_PROGRAM_MAP( _3do_mem)
+	MCFG_DEVICE_ADD("maincpu", ARM7_BE, XTAL(50'000'000)/4 )
+	MCFG_DEVICE_PROGRAM_MAP( _3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -249,9 +249,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   STATE       INIT    COMPANY             FULLNAME        FLAGS */
-CONS( 1991, 3do,        0,      0,      _3do,        3do,    _3do_state, 0,      "The 3DO Company",  "3DO (NTSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1991, 3do_pal,    3do,    0,      _3do_pal,    3do,    _3do_state, 0,      "The 3DO Company",  "3DO (PAL)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE       INIT        COMPANY            FULLNAME      FLAGS */
+CONS( 1991, 3do,     0,      0,      _3do,       3do,    _3do_state, empty_init, "The 3DO Company", "3DO (NTSC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1991, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init, "The 3DO Company", "3DO (PAL)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 1991, 3dobios,    0,      _3do,    3do, _3do_state, 0, ROT0,     "The 3DO Company",  "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME( 199?, orbatak,    3dobios,_3do,    3do, _3do_state, 0, ROT0,     "<unknown>",        "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME     PARENT   MACHINE  INPUT  STATE       INIT        MONITOR   COMPANY             FULLNAME               FLAGS */
+GAME( 1991, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",  "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 199?, orbatak, 3dobios, _3do,    3do,   _3do_state, empty_init, ROT0,     "<unknown>",        "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

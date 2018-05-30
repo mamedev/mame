@@ -209,9 +209,10 @@ public:
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 	bool allow_logging() const { return !m_logerror_list.empty(); }
 
-    // fetch items by name
-	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
-	template <class DeviceClass> inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(device(tag)); }
+	// fetch items by name
+	[[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
+	template <class DeviceClass> [[deprecated("absolute tag lookup; use subdevice or finder instead")]] inline DeviceClass *device(const char *tag) { return downcast<DeviceClass *>(device(tag)); }
+
 #if defined(__LIBRETRO__)
 void retro_machineexit();
 void retro_loop();

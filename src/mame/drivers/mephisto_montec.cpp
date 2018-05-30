@@ -41,6 +41,8 @@ public:
 		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
+		, m_low_leds(*this, "led%u", 0U)
+		, m_high_leds(*this, "led%u", 100U)
 	{ }
 
 
@@ -85,6 +87,7 @@ private:
 	required_device<beep_device> m_beeper;
 	optional_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
+	output_finder<16> m_low_leds, m_high_leds;
 
 	uint8_t m_lcd_mux;
 	uint8_t m_input_mux;
@@ -104,6 +107,8 @@ private:
 void mephisto_montec_state::machine_start()
 {
 	m_digits.resolve();
+	m_low_leds.resolve();
+	m_high_leds.resolve();
 
 	save_item(NAME(m_lcd_mux));
 	save_item(NAME(m_input_mux));
@@ -133,7 +138,7 @@ WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
 	for(int i=0; i<4; i++)
 		for(int j=0; j<4; j++)
 			if (BIT(data, i))
-				output().set_led_value(100 + i * 4 + j, BIT(data, 4 + j) ? 0 : 1);
+				m_high_leds[(i << 2) | j] = BIT(~data, 4 + j);
 }
 
 
@@ -228,9 +233,9 @@ WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 		{
 			if (!BIT(m_leds_mux, i))
 			{
-				output().set_led_value(100 + i, BIT(data, 0) | BIT(data, 1));
-				output().set_led_value(0 + i, BIT(data, 2) | BIT(data, 3));
-				output().set_led_value(8 + i, BIT(data, 4) | BIT(data, 5));
+				m_high_leds[i] = BIT(data, 0) | BIT(data, 1);
+				m_low_leds[0 + i] = BIT(data, 2) | BIT(data, 3);
+				m_low_leds[8 + i] = BIT(data, 4) | BIT(data, 5);
 			}
 		}
 	}
@@ -299,9 +304,9 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_board_mux_w)
 
 	for (int i=0; i<8; i++)
 	{
-		if (m_leds_mux & 0x03)      output().set_led_value(100 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x0c)      output().set_led_value(  8 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x30)      output().set_led_value(  0 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
+		if (m_leds_mux & 0x03) m_high_leds[i] = BIT(~m_smondial_board_mux, i);
+		if (m_leds_mux & 0x0c) m_low_leds[8 + i] = BIT(~m_smondial_board_mux, i);
+		if (m_leds_mux & 0x30) m_low_leds[0 + i] = BIT(~m_smondial_board_mux, i);
 	}
 }
 
@@ -336,9 +341,9 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 	{
 		if (!BIT(leds_data, i))
 		{
-			if (data & 0x10)    output().set_led_value(100 + i, 1);
-			if (data & 0x20)    output().set_led_value(  8 + i, 1);
-			if (data & 0x40)    output().set_led_value(  0 + i, 1);
+			if (data & 0x10) m_high_leds[i] = 1;
+			if (data & 0x20) m_low_leds[8 + i] = 1;
+			if (data & 0x40) m_low_leds[0 + i] = 1;
 		}
 	}
 
@@ -360,9 +365,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_montec_state::refresh_leds)
 {
 	for (int i=0; i<8; i++)
 	{
-		output().set_led_value(0 + i, 0);
-		output().set_led_value(8 + i, 0);
-		output().set_led_value(100 + i, 0);
+		m_low_leds[0 + i] = 0;
+		m_low_leds[8 + i] = 0;
+		m_high_leds[i] = 0;
 	}
 }
 
@@ -455,14 +460,14 @@ static INPUT_PORTS_START( smondial2 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::montec)
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP( montec_mem )
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP( montec_mem )
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
@@ -472,16 +477,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::monteciv)
 	montec(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(8'000'000) )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(8'000'000) )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
 	montec(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(4'915'200) )
-	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(4'915'200) )
+	MCFG_DEVICE_PROGRAM_MAP(megaiv_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
@@ -491,10 +496,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
 	megaiv(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(2'000'000) )
-	MCFG_CPU_PROGRAM_MAP(mondial2_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(2'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(mondial2_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
@@ -502,16 +507,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::smondial)
 	megaiv(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(4'000'000) )
-	MCFG_CPU_PROGRAM_MAP(smondial_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'000'000) / (1 << 13))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(4'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(smondial_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'000'000) / (1 << 13))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
 	smondial(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(smondial2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(smondial2_mem)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")
@@ -551,10 +556,10 @@ ROM_START(mondial2)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS                   INIT COMPANY             FULLNAME                      FLAGS */
-CONS( 1986, smondial, 0,       0,      smondial,  megaiv,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Super Mondial",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, montec,   0,       0,      montec,    montec,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mondial2, 0,       0,      mondial2,  mondial2, mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, smondial2,0,       0,      smondial2, smondial2,mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, megaiv,   0,       0,      megaiv,    megaiv,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, monteciv, montec,  0,      monteciv,  montec,   mephisto_montec_state,  0,   "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                      FLAGS */
+CONS( 1986, smondial,  0,      0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, montec,    0,      0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mondial2,  0,      0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, smondial2, 0,      0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, megaiv,    0,      0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, monteciv,  montec, 0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

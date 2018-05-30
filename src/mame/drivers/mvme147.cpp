@@ -640,17 +640,18 @@ WRITE16_MEMBER (mvme147_state::vme_a16_w){
 }
 #endif
 
-static SLOT_INTERFACE_START(mvme147_vme_cards)
-	SLOT_INTERFACE("mvme350", VME_MVME350)
-SLOT_INTERFACE_END
+static void mvme147_vme_cards(device_slot_interface &device)
+{
+	device.option_add("mvme350", VME_MVME350);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68030, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP (mvme147_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68030, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (mvme147_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, mvme147_vme_cards, nullptr)
 
@@ -658,13 +659,13 @@ MACHINE_CONFIG_START(mvme147_state::mvme147)
 
 	/* Terminal Port config */
 	MCFG_SCC85C30_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232trm", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232trm", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232trm", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc85c30_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc85c30_device, ctsa_w))
+	MCFG_DEVICE_ADD ("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc85c30_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc85c30_device, ctsa_w))
 
 	MCFG_SCC85C30_ADD("scc2", SCC_CLOCK, 0, 0, 0, 0 )
 MACHINE_CONFIG_END
@@ -714,5 +715,5 @@ ROM_START (mvme147)
 ROM_END
 
 /* Driver */
-//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS          INIT COMPANY       FULLNAME    FLAGS
-COMP (1989, mvme147,      0,      0,       mvme147,        mvme147, mvme147_state, 0,   "Motorola",   "MVME-147", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
+COMP( 1989, mvme147, 0,      0,      mvme147, mvme147, mvme147_state, empty_init, "Motorola", "MVME-147", MACHINE_NO_SOUND_HW )

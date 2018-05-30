@@ -197,12 +197,12 @@ public:
 	DECLARE_WRITE16_MEMBER(mjzoomin_mcu_w);
 	DECLARE_READ16_MEMBER(kakumei_mcu_r);
 	DECLARE_READ16_MEMBER(suchiesp_mcu_r);
-	DECLARE_DRIVER_INIT(suchiesp);
-	DECLARE_DRIVER_INIT(kakumei);
-	DECLARE_DRIVER_INIT(urashima);
-	DECLARE_DRIVER_INIT(kakumei2);
-	DECLARE_DRIVER_INIT(daireika);
-	DECLARE_DRIVER_INIT(mjzoomin);
+	void init_suchiesp();
+	void init_kakumei();
+	void init_urashima();
+	void init_kakumei2();
+	void init_daireika();
+	void init_mjzoomin();
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
 	TILEMAP_MAPPER_MEMBER(range1_16x16);
 	TILEMAP_MAPPER_MEMBER(range2_16x16);
@@ -1388,7 +1388,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( jalmah )
+static GFXDECODE_START( gfx_jalmah )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x300, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1396,7 +1396,7 @@ static GFXDECODE_START( jalmah )
 GFXDECODE_END
 
 /*different color offsets*/
-static GFXDECODE_START( urashima )
+static GFXDECODE_START( gfx_urashima )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1425,13 +1425,13 @@ void jalmah_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(jalmah_state::jalmah)
-	MCFG_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
-	MCFG_CPU_PROGRAM_MAP(jalmah)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
+	MCFG_DEVICE_PROGRAM_MAP(jalmah)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
 
 	//M50747 MCU
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jalmah)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1446,18 +1446,18 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, jalmah_mcu_sim, attotime::from_hz(10000))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 4000000, PIN7_LOW)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jalmah_state::urashima)
 	jalmah(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(urashima)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(urashima)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", urashima)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_urashima)
 
 	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
 	MCFG_SCREEN_MODIFY("screen")
@@ -2442,7 +2442,7 @@ READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
 	return res;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,urashima)
+void jalmah_state::init_urashima()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), this));
@@ -2450,7 +2450,7 @@ DRIVER_INIT_MEMBER(jalmah_state,urashima)
 	m_mcu_prg = 0x12;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,daireika)
+void jalmah_state::init_daireika()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), this));
@@ -2458,7 +2458,7 @@ DRIVER_INIT_MEMBER(jalmah_state,daireika)
 	m_mcu_prg = 0x11;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,mjzoomin)
+void jalmah_state::init_mjzoomin()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), this));
@@ -2466,20 +2466,20 @@ DRIVER_INIT_MEMBER(jalmah_state,mjzoomin)
 	m_mcu_prg = 0x13;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,kakumei)
+void jalmah_state::init_kakumei()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
 	m_mcu_prg = 0x21;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,kakumei2)
+void jalmah_state::init_kakumei2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
 
 	m_mcu_prg = 0x22;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,suchiesp)
+void jalmah_state::init_suchiesp()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchiesp_mcu_r), this));
 
@@ -2487,10 +2487,10 @@ DRIVER_INIT_MEMBER(jalmah_state,suchiesp)
 }
 
 /*First version of the MCU*/
-GAME( 1989, urashima, 0, urashima,  urashima,  jalmah_state,  urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1989, daireika, 0, jalmah,    daireika,  jalmah_state,  daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin,  jalmah_state,  mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, urashima, 0, urashima,  urashima, jalmah_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, daireika, 0, jalmah,    daireika, jalmah_state, init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin, jalmah_state, init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 /*Second version of the MCU*/
-GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state,   kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1993, suchiesp,  0, jalmah,    suchiesp,  jalmah_state,   suchiesp,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state, init_kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state, init_kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1993, suchiesp, 0, jalmah,    suchiesp, jalmah_state, init_suchiesp, ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       MACHINE_IMPERFECT_GRAPHICS )

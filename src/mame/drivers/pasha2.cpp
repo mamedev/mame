@@ -126,7 +126,7 @@ public:
 	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
 	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bank_w);
-	DECLARE_DRIVER_INIT(pasha2);
+	void init_pasha2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -397,12 +397,12 @@ void pasha2_state::machine_reset()
 MACHINE_CONFIG_START(pasha2_state::pasha2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(pasha2_map)
-	MCFG_CPU_IO_MAP(pasha2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(pasha2_map)
+	MCFG_DEVICE_IO_MAP(pasha2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I80C52, 12000000)     /* actually AT89C52; clock from docs */
+	MCFG_DEVICE_ADD("audiocpu", I80C52, 12000000)     /* actually AT89C52; clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -419,12 +419,12 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	//and ATMEL DREAM SAM9773
@@ -462,7 +462,7 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 	return m_wram[(0x95744 / 2) + offset];
 }
 
-DRIVER_INIT_MEMBER(pasha2_state,pasha2)
+void pasha2_state::init_pasha2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
 
@@ -470,4 +470,4 @@ DRIVER_INIT_MEMBER(pasha2_state,pasha2)
 	m_mainbank->set_entry(0);
 }
 
-GAMEL( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_pasha2 )
+GAMEL( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, init_pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_pasha2 )

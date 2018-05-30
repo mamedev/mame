@@ -233,7 +233,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(bfcobra);
+	void init_bfcobra();
 	void bfcobra(machine_config &config);
 
 protected:
@@ -1569,7 +1569,7 @@ WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
 
 
 /* TODO: Driver vs Machine Init */
-DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
+void bfcobra_state::init_bfcobra()
 {
 	/*
 	    6809 ROM address and data lines are scrambled.
@@ -1578,24 +1578,20 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	static const uint8_t datalookup[] = { 1, 3, 5, 6, 4, 2, 0, 7 };
 	static const uint8_t addrlookup[] = { 11, 12, 0, 2, 3, 5, 7, 9, 8, 6, 1, 4, 10, 13, 14 };
 
-	uint32_t i;
-	uint8_t *rom;
-
 	std::vector<uint8_t> tmp(0x8000);
-	rom = memregion("audiocpu")->base() + 0x8000;
+	uint8_t *rom = memregion("audiocpu")->base() + 0x8000;
 	memcpy(&tmp[0], rom, 0x8000);
 
-	for (i = 0; i < 0x8000; i++)
+	for (uint32_t i = 0; i < 0x8000; i++)
 	{
-		uint16_t addr = 0;
-		uint8_t x;
-		uint8_t data = 0;
 		uint8_t val = tmp[i];
 
-		for (x = 0; x < 8; x ++)
+		uint8_t data = 0;
+		for (uint8_t x = 0; x < 8; x ++)
 			data |= ((val >> x) & 1) << datalookup[x];
 
-		for (x = 0; x < 15; x ++)
+		uint16_t addr = 0;
+		for (uint8_t x = 0; x < 15; x ++)
 			addr |= ((i >> x) & 1)  << addrlookup[x];
 
 		rom[addr] = data;
@@ -1642,14 +1638,14 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 }
 
 MACHINE_CONFIG_START(bfcobra_state::bfcobra)
-	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
-	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
-	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
+	MCFG_DEVICE_ADD("maincpu", Z80, Z80_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(z80_prog_map)
+	MCFG_DEVICE_IO_MAP(z80_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
-	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
+	MCFG_DEVICE_PROGRAM_MAP(m6809_prog_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1667,28 +1663,28 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	MCFG_RAMDAC_SPLIT_READ(1)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL / 4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, M6809_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* ACIAs */
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bfcobra_state, z80_acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, z80_acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_rxd))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_rxd))
 
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bfcobra_state, data_acia_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bfcobra_state, m6809_data_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bfcobra_state, data_acia_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, m6809_data_irq))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bfcobra_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfcobra_state, write_acia_clock))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
@@ -1851,11 +1847,11 @@ ROM_START( qosb )
 ROM_END
 
 
-GAME( 1989, inquiztr, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Inquizitor",                       MACHINE_NOT_WORKING )
-GAME( 1990, escounts, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,  0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,      0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,     qos       ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,     qos       ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, inquiztr, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Inquizitor",                       MACHINE_NOT_WORKING )
+GAME( 1990, escounts, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,  0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,      0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,     qos, bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,     qos, bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )

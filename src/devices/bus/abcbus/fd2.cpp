@@ -223,9 +223,10 @@ static const z80_daisy_config daisy_chain[] =
 //  SLOT_INTERFACE( abc_fd2_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( abc_fd2_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
-SLOT_INTERFACE_END
+static void abc_fd2_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+}
 
 FLOPPY_FORMATS_MEMBER( abc_fd2_device::floppy_formats )
 	FLOPPY_ABC_FD2_FORMAT
@@ -237,22 +238,22 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc_fd2_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(abc_fd2_mem)
-	MCFG_CPU_IO_MAP(abc_fd2_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(abc_fd2_mem)
+	MCFG_DEVICE_IO_MAP(abc_fd2_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(4'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(abc_fd2_device, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(abc_fd2_device, pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(abc_fd2_device, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc_fd2_device, pio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, abc_fd2_device, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, abc_fd2_device, pio_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, abc_fd2_device, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, abc_fd2_device, pio_pb_w))
 
 	MCFG_FD1771_ADD(FD1771_TAG, XTAL(4'000'000)/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb7_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb5_w))
-	MCFG_WD_FDC_HLD_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb6_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb7_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb5_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb6_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)

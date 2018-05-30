@@ -1267,7 +1267,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 {
 	if(m_video.nmi_mask == 0 && m_video.sub_halt == 0)
-		m_sub->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_sub->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
@@ -1905,7 +1905,7 @@ static INPUT_PORTS_START( fm8 )
 	PORT_DIPSETTING(0x02,"BASIC")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(fm7_state,fm7)
+void fm7_state::init_fm7()
 {
 //  m_shared_ram = std::make_unique<uint8_t[]>(0x80);
 	m_video_ram = std::make_unique<uint8_t[]>(0x18000);  // 2 pages on some systems
@@ -2052,9 +2052,10 @@ void fm7_state::machine_reset()
 }
 
 
-static SLOT_INTERFACE_START( fm7_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void fm7_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 #define MCFG_ADDRESS_BANK(tag) \
@@ -2067,23 +2068,21 @@ MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 MACHINE_CONFIG_START(fm7_state::fm7)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(16'128'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fm7_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(16'128'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fm7_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, XTAL(16'128'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809, XTAL(16'128'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("psg", AY8910, XTAL(4'915'200) / 4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("psg", AY8910, XTAL(4'915'200) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.25)
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2102,8 +2101,8 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
 	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
@@ -2112,31 +2111,29 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_SLOT_OPTION_ADD( "dsjoy", DEMPA_SHINBUNSHA_JOYSTICK )
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'915'200))  // 1.2MHz 68A09
-	MCFG_CPU_PROGRAM_MAP(fm8_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'915'200))  // 1.2MHz 68A09
+	MCFG_DEVICE_PROGRAM_MAP(fm8_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, XTAL(16'128'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809, XTAL(16'128'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2153,43 +2150,41 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm77av)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(16'128'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(16'128'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(fm77av_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809E, XTAL(16'128'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(fm77av_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809E, XTAL(16'128'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(fm77av_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym", YM2203, XTAL(4'915'200) / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(fm7_state, fm77av_fmirq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(fm7_state, fm77av_joy_1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(fm7_state, fm77av_joy_2_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ym", YM2203, XTAL(4'915'200) / 4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, fm7_state, fm77av_fmirq))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, fm7_state, fm77av_joy_1_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, fm7_state, fm77av_joy_2_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
@@ -2226,8 +2221,8 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
 	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
@@ -2236,35 +2231,33 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list", "fm7_disk")
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
-	MCFG_CPU_PROGRAM_MAP(fm11_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(fm11_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
-	MCFG_CPU_PROGRAM_MAP(fm11_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
+	MCFG_DEVICE_PROGRAM_MAP(fm11_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_CPU_ADD("x86", I8088, 8000000)  // 8MHz i8088
-	MCFG_CPU_PROGRAM_MAP(fm11_x86_mem)
-	MCFG_CPU_IO_MAP(fm11_x86_io)
+	MCFG_DEVICE_ADD("x86", I8088, 8000000)  // 8MHz i8088
+	MCFG_DEVICE_PROGRAM_MAP(fm11_x86_mem)
+	MCFG_DEVICE_IO_MAP(fm11_x86_io)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
@@ -2298,38 +2291,36 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm16beta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
-	MCFG_CPU_PROGRAM_MAP(fm16_mem)
-	MCFG_CPU_IO_MAP(fm16_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
+	MCFG_DEVICE_PROGRAM_MAP(fm16_mem)
+	MCFG_DEVICE_IO_MAP(fm16_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, 8000000)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_CPU_PROGRAM_MAP(fm16_sub_mem)
+	MCFG_DEVICE_ADD("sub", MC6809, 8000000)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_PROGRAM_MAP(fm16_sub_mem)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
@@ -2346,17 +2337,17 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
 	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
@@ -2523,13 +2514,13 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY      FULLNAME         FLAGS */
-COMP( 1981, fm8,      0,      0,      fm8,     fm8,   fm7_state,  fm7,  "Fujitsu",   "FM-8",          0)
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-7",          0)
-COMP( 1984, fmnew7,   fm7,    0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-NEW7",       0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV40SX",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT      COMPANY    FULLNAME         FLAGS */
+COMP( 1981, fm8,      0,      0,      fm8,      fm8,   fm7_state, init_fm7, "Fujitsu", "FM-8",          0)
+COMP( 1982, fm7,      0,      0,      fm7,      fm7,   fm7_state, init_fm7, "Fujitsu", "FM-7",          0)
+COMP( 1984, fmnew7,   fm7,    0,      fm7,      fm7,   fm7_state, init_fm7, "Fujitsu", "FM-NEW7",       0)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,   fm7,   fm7_state, init_fm7, "Fujitsu", "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,   fm7,   fm7_state, init_fm7, "Fujitsu", "FM-77AV40SX",   MACHINE_NOT_WORKING)
 
 // These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
-COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm7_state,  fm7, "Fujitsu",   "FM-11 EX",      MACHINE_NOT_WORKING)
-COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state,  fm7, "Fujitsu",   "FM-16\xCE\xB2", MACHINE_NOT_WORKING)
+COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm7_state, init_fm7, "Fujitsu", "FM-11 EX",      MACHINE_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state, init_fm7, "Fujitsu", "FM-16\xCE\xB2", MACHINE_NOT_WORKING)

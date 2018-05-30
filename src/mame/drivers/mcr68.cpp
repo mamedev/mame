@@ -855,7 +855,7 @@ static const gfx_layout mcr68_sprite_layout =
 	32*32
 };
 
-static GFXDECODE_START( mcr68 )
+static GFXDECODE_START( gfx_mcr68 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr68_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0, 4 )
 GFXDECODE_END
@@ -898,8 +898,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7723800)
-	MCFG_CPU_PROGRAM_MAP(mcr68_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 7723800)
+	MCFG_DEVICE_PROGRAM_MAP(mcr68_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -920,14 +920,14 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr68)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr68)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_FORMAT(xxxxxxxRRRBBBGGG)
 
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
 
 	/* sound hardware -- determined by specific machine */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
@@ -935,7 +935,7 @@ MACHINE_CONFIG_START(mcr68_state::xenophob)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -943,7 +943,7 @@ MACHINE_CONFIG_START(mcr68_state::intlaser)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
@@ -955,9 +955,9 @@ MACHINE_CONFIG_START(mcr68_state::spyhunt2)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
+	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_ADC0844_ADD("adc")
@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(mcr68_state::archrivl)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -981,11 +981,11 @@ MACHINE_CONFIG_START(mcr68_state::pigskin)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pigskin_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pigskin_map)
 MACHINE_CONFIG_END
 
 
@@ -993,11 +993,11 @@ MACHINE_CONFIG_START(mcr68_state::trisport)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trisport_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trisport_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
@@ -1485,7 +1485,7 @@ void mcr68_state::mcr68_common_init(int clip, int xoffset)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,xenophob)
+void mcr68_state::init_xenophob()
 {
 	mcr68_common_init(0, -4);
 
@@ -1497,7 +1497,7 @@ DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
+void mcr68_state::init_spyhunt2()
 {
 	mcr68_common_init(0, -6);
 
@@ -1511,7 +1511,7 @@ DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,blasted)
+void mcr68_state::init_blasted()
 {
 	mcr68_common_init(0, 0);
 
@@ -1527,7 +1527,7 @@ DRIVER_INIT_MEMBER(mcr68_state,blasted)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
-DRIVER_INIT_MEMBER(mcr68_state,intlaser)
+void mcr68_state::init_intlaser()
 {
 	mcr68_common_init(0, 0);
 
@@ -1541,7 +1541,7 @@ DRIVER_INIT_MEMBER(mcr68_state,intlaser)
 
 
 
-DRIVER_INIT_MEMBER(mcr68_state,archrivl)
+void mcr68_state::init_archrivl()
 {
 	mcr68_common_init(16, 0);
 
@@ -1563,7 +1563,7 @@ READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
 	return ioport("IN1")->read();
 }
 
-DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
+void mcr68_state::init_archrivlb()
 {
 	mcr68_common_init(16, 0);
 
@@ -1582,7 +1582,7 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
 
 
 
-DRIVER_INIT_MEMBER(mcr68_state,pigskin)
+void mcr68_state::init_pigskin()
 {
 	mcr68_common_init(16, 0);
 
@@ -1593,7 +1593,7 @@ DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,trisport)
+void mcr68_state::init_trisport()
 {
 	mcr68_common_init(0, 0);
 
@@ -1611,20 +1611,20 @@ DRIVER_INIT_MEMBER(mcr68_state,trisport)
  *
  *************************************/
 
-GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, init_xenophob, ROT0,   "Bally Midway", "Xenophobe", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, blasted,  ROT0,   "Bally Midway", "Blasted", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, init_blasted,  ROT0,   "Bally Midway", "Blasted", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, init_intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, init_trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", MACHINE_SUPPORTS_SAVE )

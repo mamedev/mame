@@ -257,9 +257,9 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 	*/
 
-	machine().output().set_led_value(LED_A, !BIT(data, 0));
-	machine().output().set_led_value(LED_B, !BIT(data, 1));
-	machine().output().set_led_value(LED_READY, !BIT(data, 2));
+	m_led[LED_A] = BIT(~data, 0);
+	m_led[LED_B] = BIT(~data, 1);
+	m_led[LED_READY] = BIT(~data, 2);
 }
 
 
@@ -269,21 +269,21 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 MACHINE_CONFIG_START(hardbox_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(hardbox_mem)
-	MCFG_CPU_IO_MAP(hardbox_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(hardbox_mem)
+	MCFG_DEVICE_IO_MAP(hardbox_io)
 
 	// devices
 	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(hardbox_device, ppi0_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(hardbox_device, ppi0_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(hardbox_device, ppi0_pc_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi0_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi0_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi0_pc_r))
 
 	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(hardbox_device, ppi1_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(hardbox_device, ppi1_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(hardbox_device, ppi1_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(hardbox_device, ppi1_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi1_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi1_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi1_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, hardbox_device, ppi1_pc_w))
 
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
@@ -344,6 +344,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)
 	, m_hdc(*this, CORVUS_HDC_TAG)
+	, m_led(*this, "led%u", 0U)
 	, m_ifc(0)
 {
 }
@@ -355,6 +356,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 
 void hardbox_device::device_start()
 {
+	m_led.resolve();
 }
 
 

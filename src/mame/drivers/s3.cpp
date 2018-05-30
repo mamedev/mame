@@ -289,14 +289,14 @@ INPUT_CHANGED_MEMBER( s3_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( s3_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if ((newval==CLEAR_LINE) && !m_chimes)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( s3_state::sol0_w )
@@ -435,8 +435,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
 
 MACHINE_CONFIG_START(s3_state::s3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 3580000)
-	MCFG_CPU_PROGRAM_MAP(s3_main_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s3_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s3_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
@@ -448,37 +448,37 @@ MACHINE_CONFIG_START(s3_state::s3)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s3_state, sol0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s3_state, sol1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s3_state, pia22_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s3_state, pia22_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s3_state, sol0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, sol1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia22_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia22_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s3_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s3_state, lamp1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s3_state, pia24_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s3_state, pia24_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s3_state, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, lamp1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia24_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia24_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s3_state, dips_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(s3_state, pia28_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s3_state, pia28_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s3_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s3_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s3_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s3_state, pia28_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s3_state, dips_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, s3_state, pia28_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, s3_state, pia28_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s3_state, dig0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, dig1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia28_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia28_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s3_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s3_state, switch_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s3_state, pia30_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s3_state, pia30_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s3_state, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, switch_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia30_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia30_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
@@ -488,18 +488,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(s3_state::s3a)
 	s3(config);
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
-	MCFG_CPU_PROGRAM_MAP(s3_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s3_audio_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3a)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(s3_state,sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, s3_state,sound_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
@@ -593,10 +593,10 @@ ROM_START(pkrno_l1)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
-GAME( 1977, httip_l1, 0, s3,  s3, s3_state, 0, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1977, lucky_l1, 0, s3,  s3, s3_state, 0, ROT0, "Williams", "Lucky Seven (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, wldcp_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "World Cup (L-1)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, cntct_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Contact (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, disco_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Disco Fever (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, phnix_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Phoenix (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, pkrno_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Pokerino (L-1)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977, httip_l1, 0, s3,  s3, s3_state, empty_init, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977, lucky_l1, 0, s3,  s3, s3_state, empty_init, ROT0, "Williams", "Lucky Seven (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, wldcp_l1, 0, s3a, s3, s3_state, empty_init, ROT0, "Williams", "World Cup (L-1)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, cntct_l1, 0, s3a, s3, s3_state, empty_init, ROT0, "Williams", "Contact (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, disco_l1, 0, s3a, s3, s3_state, empty_init, ROT0, "Williams", "Disco Fever (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, phnix_l1, 0, s3a, s3, s3_state, empty_init, ROT0, "Williams", "Phoenix (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, pkrno_l1, 0, s3a, s3, s3_state, empty_init, ROT0, "Williams", "Pokerino (L-1)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

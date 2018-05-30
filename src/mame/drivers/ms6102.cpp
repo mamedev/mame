@@ -12,7 +12,7 @@
 
     To do:
     - character attributes
-    - keyboard (MS7002)
+    - improve keyboard response and add LED layout (MS7002)
 
     Chips:
     - DD5 - KR580WM80A (8080 clone) - CPU
@@ -156,7 +156,7 @@ static const gfx_layout ms6102_charlayout =
 	16*8
 };
 
-static GFXDECODE_START(ms6102)
+static GFXDECODE_START(gfx_ms6102)
 	GFXDECODE_ENTRY("chargen", 0x0000, ms6102_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -185,7 +185,7 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
-	if (linecount < 12 && !vsp)
+	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
 	if (rvv)
@@ -284,35 +284,35 @@ void ms6102_state::machine_start()
 	// copy over the ascii chars into their new positions (lines 0-7)
 	for (i = 0x20; i < 0x80; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// copy the russian symbols to codes 0xc0-0xff for now
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// for punctuation, get the last 4 lines into place
 	for (i = 0x20; i < 0x40; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1700+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1700+i*8+j];
 	// for letters, get the last 4 lines into place
 	for (i = 0x40; i < 0x80; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1a00+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1a00+i*8+j];
 	// for russian, get the last 4 lines into place
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1604+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1604+i*8+j];
 }
 
 
 MACHINE_CONFIG_START(ms6102_state::ms6102)
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'432'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(ms6102_mem)
-	MCFG_CPU_IO_MAP(ms6102_io)
-	MCFG_I8085A_INTE(DEVWRITELINE("i8214", i8214_device, inte_w))
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms6102_state, ms6102_int_ack)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(18'432'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(ms6102_mem)
+	MCFG_DEVICE_IO_MAP(ms6102_io)
+	MCFG_I8085A_INTE(WRITELINE("i8214", i8214_device, inte_w))
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms6102_state, ms6102_int_ack)
 
 	MCFG_DEVICE_ADD("i8214", I8214, XTAL(18'432'000) / 9)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(ms6102_state, irq_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, ms6102_state, irq_w))
 
 	MCFG_DEVICE_ADD("earom", KR1601RR1, 0)
 
@@ -320,49 +320,51 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275_1", i8275_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms6102)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms6102)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(ms6102_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(ms6102_state, memory_read_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(ms6102_state, vdack_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, ms6102_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, ms6102_state, memory_read_byte))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, ms6102_state, vdack_w))
 
 	MCFG_DEVICE_ADD("i8275_1", I8275, XTAL(16'400'000) / 8) // XXX
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257", i8257_device, dreq2_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("i8275_2", I8275, XTAL(16'400'000) / 8) // XXX
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_attr)
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(ms6102_state, irq<5>))
+	MCFG_I8275_IRQ_CALLBACK(WRITELINE(*this, ms6102_state, irq<5>))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// keyboard
 	MCFG_DEVICE_ADD("589wa1", AY31015, 0)
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ms6102_state, irq<1>))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ms6102_state, irq<1>))
 	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_DEVICE_ADD("ie5", RIPPLE_COUNTER, XTAL(16'400'000) / 30)
 	MCFG_RIPPLE_COUNTER_STAGES(2)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(ms6102_state, kbd_uart_clock_w))
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, ms6102_state, kbd_uart_clock_w))
 
-	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
-	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(DEVWRITELINE("589wa1", ay31015_device, write_si))
+	MCFG_DEVICE_ADD("keyboard", MS7002, 0)
+	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(WRITELINE("589wa1", ay31015_device, write_si))
 
 	// serial connection to host
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(ms6102_state, irq<3>))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, ms6102_state, irq<3>))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("i8251", i8251_device, write_txc))
 	MCFG_PIT8253_CLK1(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("i8251", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 ROM_START( ms6102 )
@@ -383,5 +385,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT       COMPANY       FULLNAME       FLAGS */
-COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY        FULLNAME      FLAGS */
+COMP( 1984, ms6102, 0,      0,      ms6102,  0,     ms6102_state, empty_init, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING )

@@ -424,26 +424,26 @@ INPUT_PORTS_END
 /* machine definition */
 MACHINE_CONFIG_START(lviv_state::lviv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2500000)
-	MCFG_CPU_PROGRAM_MAP(lviv_mem)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(lviv_mem)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lviv_state, lviv_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lviv_state, lviv_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(lviv_state, lviv_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lviv_state, lviv_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(lviv_state, lviv_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lviv_state, lviv_ppi_0_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, lviv_state, lviv_ppi_0_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lviv_state, lviv_ppi_0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, lviv_state, lviv_ppi_0_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lviv_state, lviv_ppi_0_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, lviv_state, lviv_ppi_0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lviv_state, lviv_ppi_0_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lviv_state, lviv_ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lviv_state, lviv_ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(lviv_state, lviv_ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lviv_state, lviv_ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(lviv_state, lviv_ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lviv_state, lviv_ppi_1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, lviv_state, lviv_ppi_1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lviv_state, lviv_ppi_1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, lviv_state, lviv_ppi_1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lviv_state, lviv_ppi_1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, lviv_state, lviv_ppi_1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lviv_state, lviv_ppi_1_portc_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -459,11 +459,9 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_PALETTE_INIT_OWNER(lviv_state, lviv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
@@ -491,5 +489,5 @@ ROM_START(lviv)
 	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(3))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY         FULLNAME      FLAGS */
-COMP( 1989, lviv,   0,      0,      lviv,    lviv,  lviv_state, 0,      "V. I. Lenin",  "PK-01 Lviv", 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME      FLAGS */
+COMP( 1989, lviv, 0,      0,      lviv,    lviv,  lviv_state, empty_init, "V. I. Lenin", "PK-01 Lviv", 0 )

@@ -349,11 +349,11 @@ void sitcom_timer_state::update_dac(uint8_t value)
 
 MACHINE_CONFIG_START(sitcom_state::sitcom)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // 3.072MHz can be used for an old slow 8085
-	MCFG_CPU_PROGRAM_MAP(sitcom_mem)
-	MCFG_CPU_IO_MAP(sitcom_io)
-	MCFG_I8085A_SID(READLINE(sitcom_state, sid_line))
-	MCFG_I8085A_SOD(WRITELINE(sitcom_state, sod_led))
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // 3.072MHz can be used for an old slow 8085
+	MCFG_DEVICE_PROGRAM_MAP(sitcom_mem)
+	MCFG_DEVICE_IO_MAP(sitcom_io)
+	MCFG_I8085A_SID(READLINE(*this, sitcom_state, sid_line))
+	MCFG_I8085A_SOD(WRITELINE(*this, sitcom_state, sod_led))
 
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sitcom_bank)
@@ -366,19 +366,19 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_DEVICE_ADD("pia", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(sitcom_state, update_pia_pa))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(sitcom_state, update_pia_pb))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sitcom_state, update_pia_pa))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sitcom_state, update_pia_pb))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("PORTC"))
 
 	// video hardware
-	MCFG_DEVICE_ADD("ds0", DL1414T, 0) // left display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<0>))
-	MCFG_DEVICE_ADD("ds1", DL1414T, 0) // right display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<1>))
+	MCFG_DEVICE_ADD("ds0", DL1414T, u32(0)) // left display
+	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<0>))
+	MCFG_DEVICE_ADD("ds1", DL1414T, u32(0)) // right display
+	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<1>))
 
 	// host interface
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(sitcom_state, update_rxd))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, sitcom_state, update_rxd))
 
 	MCFG_SOFTWARE_LIST_ADD("bitb_list", "sitcom")
 	MCFG_DEFAULT_LAYOUT(layout_sitcom)
@@ -388,8 +388,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
 	sitcom(config);
 
-	MCFG_DEVICE_ADD("ds2", DL1414T, 0) // remote display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_timer_state, update_ds<2>))
+	MCFG_DEVICE_ADD("ds2", DL1414T, u32(0)) // remote display
+	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_timer_state, update_ds<2>))
 
 	MCFG_DEFAULT_LAYOUT(layout_sitcomtmr)
 MACHINE_CONFIG_END
@@ -410,6 +410,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT      STATE               INIT  COMPANY                            FULLNAME        FLAGS */
-COMP( 2002, sitcom,    0,      0,      sitcom,     sitcom,    sitcom_state,       0,    "San Bergmans & Izabella Malcolm", "SITCOM",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
-COMP( 2002, sitcomtmr, sitcom, 0,      sitcomtmr,  sitcomtmr, sitcom_timer_state, 0,    "San Bergmans & Izabella Malcolm", "SITCOM Timer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS               INIT        COMPANY                            FULLNAME        FLAGS */
+COMP( 2002, sitcom,    0,      0,      sitcom,    sitcom,    sitcom_state,       empty_init, "San Bergmans & Izabella Malcolm", "SITCOM",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+COMP( 2002, sitcomtmr, sitcom, 0,      sitcomtmr, sitcomtmr, sitcom_timer_state, empty_init, "San Bergmans & Izabella Malcolm", "SITCOM Timer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

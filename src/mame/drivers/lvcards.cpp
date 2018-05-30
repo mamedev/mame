@@ -449,7 +449,7 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( lvcards )
+static GFXDECODE_START( gfx_lvcards )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -457,10 +457,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(lvcards_state::lvcards)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
-	MCFG_CPU_PROGRAM_MAP(lvcards_map)
-	MCFG_CPU_IO_MAP(lvcards_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
+	MCFG_DEVICE_PROGRAM_MAP(lvcards_map)
+	MCFG_DEVICE_IO_MAP(lvcards_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -471,14 +471,14 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lvcards)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lvcards)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
+	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -489,8 +489,8 @@ MACHINE_CONFIG_START(lvcards_state::lvpoker)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lvpoker_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lvpoker_map)
 	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 MACHINE_CONFIG_END
@@ -500,8 +500,8 @@ MACHINE_CONFIG_START(lvcards_state::ponttehk)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ponttehk_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware
@@ -570,6 +570,6 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,        0, lvcards,  lvcards,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Cards",       0 )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
-GAME( 1985, ponttehk,       0, ponttehk, ponttehk, lvcards_state, 0, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )
+GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Cards",       0 )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
+GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvcards_state, empty_init, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )

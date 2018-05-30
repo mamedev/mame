@@ -86,7 +86,7 @@ public:
 
 
 MACHINE_CONFIG_START(sart3733_state::sart3733)
-	MCFG_CPU_ADD("maincpu", I4040, 750'000) // clock speed is a complete guess - can't see crystal or multi-phase clock generator
+	MCFG_DEVICE_ADD("maincpu", I4040, 750'000) // clock speed is a complete guess - can't see crystal or multi-phase clock generator
 	MCFG_I4040_ROM_MAP(sart3733_rom)
 	MCFG_I4040_RAM_MEMORY_MAP(sart3733_memory)
 	MCFG_I4040_RAM_STATUS_MAP(sart3733_status)
@@ -105,4 +105,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1978?, sart3733, 0, 0, sart3733, sart3733, sart3733_state, 0, "Sartorius-Werke GmbH", "3733 (digital scale)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+SYST( 1978?, sart3733, 0, 0, sart3733, sart3733, sart3733_state, empty_init, "Sartorius-Werke GmbH", "3733 (digital scale)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

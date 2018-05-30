@@ -968,7 +968,7 @@ static const gfx_layout charlayout =
 //  GFXDECODE( portfolio )
 //-------------------------------------------------
 
-static GFXDECODE_START( portfolio )
+static GFXDECODE_START( gfx_portfolio )
 	GFXDECODE_ENTRY( HD61830_TAG, 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -1018,10 +1018,10 @@ void portfolio_state::machine_reset()
 
 MACHINE_CONFIG_START(portfolio_state::portfolio)
 	// basic machine hardware
-	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL(4'915'200))
-	MCFG_CPU_PROGRAM_MAP(portfolio_mem)
-	MCFG_CPU_IO_MAP(portfolio_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(portfolio_state,portfolio_int_ack)
+	MCFG_DEVICE_ADD(M80C88A_TAG, I8088, XTAL(4'915'200))
+	MCFG_DEVICE_PROGRAM_MAP(portfolio_mem)
+	MCFG_DEVICE_IO_MAP(portfolio_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(portfolio_state,portfolio_int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -1036,25 +1036,25 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portfolio)
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)
-	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))
+	MCFG_HD61830_RD_CALLBACK(READ8(*this, portfolio_state, hd61830_rd_r))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(PCD3311T_TAG, PCD3311, XTAL(3'578'640))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(PCD3311T_TAG, PCD3311, XTAL(3'578'640))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_A_TAG, portfolio_memory_cards, nullptr)
 
 	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL(4'915'200), portfolio_expansion_cards, nullptr)
-	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(portfolio_state, eint_w))
+	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(*this, portfolio_state, eint_w))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(INPUTLINE(M80C88A_TAG, INPUT_LINE_NMI))
-	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(portfolio_state, wake_w))
+	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(*this, portfolio_state, wake_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL(32'768)/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL(32'768)/32768))
@@ -1098,5 +1098,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT      STATE            INIT  COMPANY   FULLNAME      FLAGS
-COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, portfolio_state, 0,    "Atari",  "Portfolio",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME     FLAGS
+COMP( 1989, pofo, 0,      0,      portfolio, portfolio, portfolio_state, empty_init, "Atari", "Portfolio", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

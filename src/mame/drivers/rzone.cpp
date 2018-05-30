@@ -244,12 +244,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SM510, 32.768_kHz_XTAL) // no external XTAL
+	MCFG_DEVICE_ADD("maincpu", SM510) // no external XTAL
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(rzone_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(rzone_state, t1_write_s))
-	MCFG_SM510_WRITE_R_CB(WRITE8(rzone_state, t1_write_r))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t1_write_s))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, rzone_state, t1_write_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -262,19 +262,19 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 	MCFG_DEFAULT_LAYOUT(layout_rzone)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rzone_state::rzbatfor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SM512, 32.768_kHz_XTAL) // no external XTAL
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(rzone_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(rzone_state, t2_write_s))
-	MCFG_SM510_WRITE_R_CB(WRITE8(rzone_state, t2_write_r))
+	MCFG_DEVICE_ADD("maincpu", SM512) // no external XTAL
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t2_write_s))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, rzone_state, t2_write_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -287,8 +287,8 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 	MCFG_DEFAULT_LAYOUT(layout_rzone)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -320,6 +320,6 @@ ROM_START( rzbatfor )
 ROM_END
 
 
-//    YEAR  NAME       PARENT  COMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1995, rzindy500, 0,        0, rzindy500, rzone,     rzone_state,    0, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )
-CONS( 1995, rzbatfor,  0,        0, rzbatfor,  rzone,     rzone_state,    0, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY                                   FULLNAME                  FLAGS
+CONS( 1995, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500",       MACHINE_SUPPORTS_SAVE )
+CONS( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics",                      "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )

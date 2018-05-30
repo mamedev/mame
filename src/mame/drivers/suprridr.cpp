@@ -118,7 +118,7 @@ WRITE8_MEMBER(suprridr_state::nmi_enable_w)
 INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -308,7 +308,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( suprridr )
+static GFXDECODE_START( gfx_suprridr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   32, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 64, 2 )
@@ -324,14 +324,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(suprridr_state::suprridr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(49'152'000)/16)     /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprridr_state,  main_nmi_gen)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(49'152'000)/16)     /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprridr_state,  main_nmi_gen)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/4)       /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/4)       /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -344,18 +344,18 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprridr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprridr)
 	MCFG_PALETTE_ADD("palette", 96)
 	MCFG_PALETTE_INIT_OWNER(suprridr_state, suprridr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(49'152'000)/32)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(49'152'000)/32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(49'152'000)/32)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(49'152'000)/32)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
@@ -415,4 +415,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, 0, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, empty_init, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

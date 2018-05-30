@@ -75,47 +75,49 @@ static const z80_daisy_config kc85_daisy_chain[] =
 	{ nullptr }
 };
 
-extern SLOT_INTERFACE_START(kc85_cart)
-	SLOT_INTERFACE("standard", KC_STANDARD) // standard 8KB ROM module
-	SLOT_INTERFACE("m006", KC_M006)         // BASIC
-	SLOT_INTERFACE("m011", KC_M011)         // 64KB RAM
-	SLOT_INTERFACE("m022", KC_M022)         // 16KB RAM
-	SLOT_INTERFACE("m032", KC_M032)         // 256KB segmented RAM
-	SLOT_INTERFACE("m033", KC_M033)         // TypeStar
-	SLOT_INTERFACE("m034", KC_M034)         // 512KB segmented RAM
-	SLOT_INTERFACE("m035", KC_M035)         // 1MB segmented RAM
-	SLOT_INTERFACE("m036", KC_M036)         // 128KB segmented RAM
-SLOT_INTERFACE_END
+void kc85_cart(device_slot_interface &device)
+{
+	device.option_add("standard", KC_STANDARD); // standard 8KB ROM module
+	device.option_add("m006", KC_M006);         // BASIC
+	device.option_add("m011", KC_M011);         // 64KB RAM
+	device.option_add("m022", KC_M022);         // 16KB RAM
+	device.option_add("m032", KC_M032);         // 256KB segmented RAM
+	device.option_add("m033", KC_M033);         // TypeStar
+	device.option_add("m034", KC_M034);         // 512KB segmented RAM
+	device.option_add("m035", KC_M035);         // 1MB segmented RAM
+	device.option_add("m036", KC_M036);         // 128KB segmented RAM
+}
 
-extern SLOT_INTERFACE_START(kc85_exp)
-	SLOT_INTERFACE("d002", KC_D002)         // D002 Bus Driver
-	SLOT_INTERFACE("d004", KC_D004)         // D004 Floppy Disk Interface
-	SLOT_INTERFACE("d004gide", KC_D004_GIDE) // D004 Floppy Disk + GIDE Interface
-SLOT_INTERFACE_END
+void kc85_exp(device_slot_interface &device)
+{
+	device.option_add("d002", KC_D002);         // D002 Bus Driver
+	device.option_add("d004", KC_D004);         // D004 Floppy Disk Interface
+	device.option_add("d004gide", KC_D004_GIDE); // D004 Floppy Disk + GIDE Interface
+}
 
 
 MACHINE_CONFIG_START(kc_state::kc85_3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kc85_3_mem)
-	MCFG_CPU_IO_MAP(kc85_3_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, KC85_3_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kc85_3_mem)
+	MCFG_DEVICE_IO_MAP(kc85_3_io)
 	MCFG_Z80_DAISY_CHAIN(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, KC85_3_CLOCK)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(kc_state, pio_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kc_state, pio_porta_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(kc_state, pio_ardy_cb))
-	MCFG_Z80PIO_IN_PB_CB(READ8(kc_state, pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(kc_state, pio_portb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(kc_state, pio_brdy_cb))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, kc_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kc_state, pio_porta_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, kc_state, pio_ardy_cb))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, kc_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, kc_state, pio_portb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, kc_state, pio_brdy_cb))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_3_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(kc_state, ctc_zc0_callback))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(kc_state, ctc_zc1_callback))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(kc_state, video_toggle_blink_state))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, kc_state, ctc_zc0_callback))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, kc_state, ctc_zc1_callback))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, kc_state, video_toggle_blink_state))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -128,14 +130,12 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_PALETTE_INIT_OWNER(kc_state, kc85 )
 
 	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL(4'000'000))
-	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(kc_state, keyboard_cb))
+	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(*this, kc_state, keyboard_cb))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
@@ -180,26 +180,26 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, KC85_4_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kc85_4_mem)
-	MCFG_CPU_IO_MAP(kc85_4_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, KC85_4_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kc85_4_mem)
+	MCFG_DEVICE_IO_MAP(kc85_4_io)
 	MCFG_Z80_DAISY_CHAIN(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, KC85_4_CLOCK)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(kc_state, pio_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kc_state, pio_porta_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(kc_state, pio_ardy_cb))
-	MCFG_Z80PIO_IN_PB_CB(READ8(kc_state, pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(kc_state, pio_portb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(kc_state, pio_brdy_cb))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, kc_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kc_state, pio_porta_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, kc_state, pio_ardy_cb))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, kc_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, kc_state, pio_portb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, kc_state, pio_brdy_cb))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_4_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(kc_state, ctc_zc0_callback))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(kc_state, ctc_zc1_callback))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(kc_state, video_toggle_blink_state))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, kc_state, ctc_zc0_callback))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, kc_state, ctc_zc1_callback))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, kc_state, video_toggle_blink_state))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -212,14 +212,12 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_PALETTE_INIT_OWNER(kc85_4_state, kc85 )
 
 	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL(4'000'000))
-	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(kc_state, keyboard_cb))
+	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(*this, kc_state, keyboard_cb))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
@@ -321,8 +319,8 @@ ROM_START(kc85_5)
 	ROMX_LOAD( "caos43e.855", 0x2000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(2))
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY                FULLNAME           FLAGS
-COMP( 1987, kc85_2,   0,       0,      kc85_3,  kc85,  kc_state,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
-COMP( 1987, kc85_3,   kc85_2,  0,      kc85_3,  kc85,  kc_state,     0,    "VEB Mikroelektronik", "KC 85/3",         MACHINE_NOT_WORKING)
-COMP( 1989, kc85_4,   kc85_2,  0,      kc85_4,  kc85,  kc85_4_state, 0,    "VEB Mikroelektronik", "KC 85/4",         MACHINE_NOT_WORKING)
-COMP( 1989, kc85_5,   kc85_2,  0,      kc85_5,  kc85,  kc85_4_state, 0,    "VEB Mikroelektronik", "KC 85/5",         MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                FULLNAME           wFLAGS
+COMP( 1987, kc85_2, 0,      0,      kc85_3,  kc85,  kc_state,     empty_init, "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
+COMP( 1987, kc85_3, kc85_2, 0,      kc85_3,  kc85,  kc_state,     empty_init, "VEB Mikroelektronik", "KC 85/3",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_4, kc85_2, 0,      kc85_4,  kc85,  kc85_4_state, empty_init, "VEB Mikroelektronik", "KC 85/4",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_5, kc85_2, 0,      kc85_5,  kc85,  kc85_4_state, empty_init, "VEB Mikroelektronik", "KC 85/5",         MACHINE_NOT_WORKING)

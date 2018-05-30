@@ -278,7 +278,7 @@ Few other notes:
 #include "includes/m5.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -980,14 +980,16 @@ FLOPPY_FORMATS_MEMBER( m5_state::floppy_formats )
 	FLOPPY_M5_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( m5_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void m5_floppies(device_slot_interface &device)
+{
+		device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START(m5_cart)
-	SLOT_INTERFACE_INTERNAL("std",  M5_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("ram",  M5_ROM_RAM)
-SLOT_INTERFACE_END
+static void m5_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",  M5_ROM_STD);
+	device.option_add_internal("ram",  M5_ROM_RAM);
+}
 
 //-------------------------------------------------
 //  z80_daisy_config m5_daisy_chain
@@ -1211,9 +1213,10 @@ FLOPPY_FORMATS_MEMBER( brno_state::floppy_formats )
 	FLOPPY_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( brno_floppies )
-		SLOT_INTERFACE("35hd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void brno_floppies(device_slot_interface &device)
+{
+		device.option_add("35hd", FLOPPY_35_DD);
+}
 
 
 //**************************************************************************
@@ -1404,18 +1407,18 @@ void brno_state::machine_reset()
 
 MACHINE_CONFIG_START(m5_state::m5)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(m5_mem)
-	MCFG_CPU_IO_MAP(m5_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(m5_mem)
+	MCFG_DEVICE_IO_MAP(m5_io)
 	MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
-	MCFG_CPU_ADD(Z80_FD5_TAG, Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(fd5_mem)
-	MCFG_CPU_IO_MAP(fd5_io)
+	MCFG_DEVICE_ADD(Z80_FD5_TAG, Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
+	MCFG_DEVICE_IO_MAP(fd5_io)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(14'318'181)/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
@@ -1425,7 +1428,7 @@ MACHINE_CONFIG_START(m5_state::m5)
 	// ZC2 = EXCLK
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m5_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, m5_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -1435,11 +1438,11 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_CASSETTE_INTERFACE("m5_cass")
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(m5_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(m5_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(m5_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(m5_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(m5_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, m5_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, m5_state, ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, m5_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, m5_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, m5_state, ppi_pc_w))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
@@ -1470,7 +1473,7 @@ MACHINE_CONFIG_START(m5_state::ntsc)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1485,7 +1488,7 @@ MACHINE_CONFIG_START(m5_state::pal)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1499,9 +1502,9 @@ MACHINE_CONFIG_START(brno_state::brno)
 	m5(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_PROGRAM_MAP(m5_mem_brno)
-	MCFG_CPU_IO_MAP(brno_io)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(m5_mem_brno)
+	MCFG_DEVICE_IO_MAP(brno_io)
 //  MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
 
@@ -1513,7 +1516,7 @@ MACHINE_CONFIG_START(brno_state::brno)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
@@ -1588,7 +1591,7 @@ ROM_END
 //  ROM( ntsc )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(m5_state,ntsc)
+void m5_state::init_ntsc()
 {
 }
 
@@ -1597,7 +1600,7 @@ DRIVER_INIT_MEMBER(m5_state,ntsc)
 //  ROM( pal )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(m5_state,pal)
+void m5_state::init_pal()
 {
 }
 
@@ -1605,7 +1608,7 @@ DRIVER_INIT_MEMBER(m5_state,pal)
 //  ROM( BRNO )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(brno_state,brno)
+void brno_state::init_brno()
 {
 //  logerror("Driver init entered\n" );
 }
@@ -1615,7 +1618,7 @@ DRIVER_INIT_MEMBER(brno_state,brno)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY     FULLNAME                 FLAGS
-COMP( 1983, m5,       0,      0,      ntsc,    m5,    m5_state,   ntsc,   "Sord",     "m.5 (Japan)",           0 )
-COMP( 1983, m5p,      m5,     0,      pal,     m5,    m5_state,   pal,    "Sord",     "m.5 (Europe)",          0 )
-COMP( 1983, m5p_brno, m5,     0,      brno,    m5,    brno_state, brno,   "Sord",     "m.5 (Europe) BRNO mod", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY  FULLNAME                 FLAGS
+COMP( 1983, m5,       0,      0,      ntsc,    m5,    m5_state,   init_ntsc, "Sord",  "m.5 (Japan)",           0 )
+COMP( 1983, m5p,      m5,     0,      pal,     m5,    m5_state,   init_pal,  "Sord",  "m.5 (Europe)",          0 )
+COMP( 1983, m5p_brno, m5,     0,      brno,    m5,    brno_state, init_brno, "Sord",  "m.5 (Europe) BRNO mod", 0 )

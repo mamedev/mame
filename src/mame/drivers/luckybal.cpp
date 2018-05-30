@@ -303,7 +303,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_port_b_w);
 	DECLARE_READ8_MEMBER(input_port_c_r);
 	DECLARE_WRITE8_MEMBER(output_port_c_w);
-	DECLARE_DRIVER_INIT(luckybal);
+	void init_luckybal();
 	uint8_t daclatch;
 
 	required_device<v9938_device> m_v9938;
@@ -525,15 +525,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io)
+	MCFG_DEVICE_ADD("maincpu", Z180, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(luckybal_state, output_port_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(luckybal_state, output_port_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(luckybal_state, input_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(luckybal_state, output_port_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, luckybal_state, output_port_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, luckybal_state, output_port_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, luckybal_state, input_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, luckybal_state, output_port_c_w))
 
 	MCFG_DEVICE_ADD("latch1", CD4099, 0)
 
@@ -547,10 +547,10 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", VID_CLOCK)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // DAC 08
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // DAC 08
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 
@@ -599,14 +599,12 @@ ROM_END
 *            Driver Init            *
 ************************************/
 
-DRIVER_INIT_MEMBER(luckybal_state, luckybal)
+void luckybal_state::init_luckybal()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
-	int i;
-
-	for (i = start; i < size; i++)
+	for (int i = start; i < size; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 6, 7, 4, 5, 2, 3, 0, 1);
 	}
@@ -617,8 +615,8 @@ DRIVER_INIT_MEMBER(luckybal_state, luckybal)
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY          FULLNAME                         FLAGS  */
-GAME( 1996, luckybal,   0,        luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_NOT_WORKING )//| MACHINE_NO_SOUND )
-GAME( 1996, luckybala,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 626)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1996, luckybalb,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 623)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1996, luckybalc,  luckybal, luckybal, luckybal, luckybal_state, luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY          FULLNAME                         FLAGS  */
+GAME( 1996, luckybal,  0,        luckybal, luckybal, luckybal_state, init_luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_NOT_WORKING )//| MACHINE_NO_SOUND )
+GAME( 1996, luckybala, luckybal, luckybal, luckybal, luckybal_state, init_luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 626)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1996, luckybalb, luckybal, luckybal, luckybal, luckybal_state, init_luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 623)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1996, luckybalc, luckybal, luckybal, luckybal, luckybal_state, init_luckybal, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

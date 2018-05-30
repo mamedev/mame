@@ -312,10 +312,10 @@ void risc2500_state::risc2500_mem(address_map &map)
 
 
 MACHINE_CONFIG_START(risc2500_state::risc2500)
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'322'000) / 2)      // VY86C010
-	MCFG_CPU_PROGRAM_MAP(risc2500_mem)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'322'000) / 2)      // VY86C010
+	MCFG_DEVICE_PROGRAM_MAP(risc2500_mem)
 	MCFG_ARM_COPRO(VL86C020)
-	MCFG_CPU_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -336,10 +336,10 @@ MACHINE_CONFIG_START(risc2500_state::risc2500)
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -360,6 +360,6 @@ ROM_START( montreux )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     STATE            INIT  COMPANY                      FULLNAME             FLAGS */
-CONS( 1992, risc,     0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek",                    "RISC 2500",         MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                      FULLNAME             FLAGS */
+CONS( 1992, risc,     0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek",                    "RISC 2500",         MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

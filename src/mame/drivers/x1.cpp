@@ -989,7 +989,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	}
 	else //compatible mode
 	{
-		switch (data & 0x0300)
+		switch (offset & 0x0300)
 		{
 		case 0x0000:
 			x1_pal_b_w(space, offset & 0x00ff, data);
@@ -1982,7 +1982,7 @@ static const gfx_layout x1_chars_16x16 =
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( x1 )
+static GFXDECODE_START( gfx_x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
@@ -2194,15 +2194,16 @@ FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(x1_mem)
-	MCFG_CPU_IO_MAP(x1_io)
+	MCFG_DEVICE_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
+	MCFG_DEVICE_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
 
 	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
@@ -2214,19 +2215,19 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(x1_state, x1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
 
 	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
@@ -2246,13 +2247,13 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -2264,19 +2265,18 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
@@ -2291,8 +2291,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x1_state::x1turbo)
 	x1(config);
-	MCFG_CPU_MODIFY("x1_cpu")
-	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
+	MCFG_DEVICE_MODIFY("x1_cpu")
+	MCFG_DEVICE_PROGRAM_MAP(x1turbo_mem)
 	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
@@ -2305,15 +2305,15 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("x1_cpu", INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(x1_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(x1_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(x1_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(x1_state, io_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, x1_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, x1_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, x1_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, x1_state, io_write_byte))
 
 	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(x1_state, fdc_drq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, x1_state, fdc_drq_w))
 
-	MCFG_YM2151_ADD("ym", MAIN_CLOCK/8) //option board
+	MCFG_DEVICE_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker",  0.50)
 MACHINE_CONFIG_END
@@ -2391,21 +2391,20 @@ ROM_END
 
 
 /* Convert the ROM interleaving into something usable by the write handlers */
-DRIVER_INIT_MEMBER(x1_state,x1_kanji)
+void x1_state::init_x1_kanji()
 {
-	uint32_t i,j,k,l;
 	uint8_t *kanji = memregion("kanji")->base();
 	uint8_t *raw_kanji = memregion("raw_kanji")->base();
 
-	k = 0;
-	for(l=0;l<2;l++)
+	uint32_t k = 0;
+	for (uint32_t l=0; l < 2; l++)
 	{
-		for(j=l*16;j<(l*16)+0x10000;j+=32)
+		for (uint32_t j = l*16; j < (l*16) + 0x10000; j += 32)
 		{
-			for(i=0;i<16;i++)
+			for (uint32_t i = 0; i  < 16; i++)
 			{
-				kanji[j+i] = raw_kanji[k];
-				kanji[j+i+0x10000] = raw_kanji[0x10000+k];
+				kanji[j + i] = raw_kanji[k];
+				kanji[j + i + 0x10000] = raw_kanji[0x10000 + k];
 				k++;
 			}
 		}
@@ -2413,9 +2412,9 @@ DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 }
 
 
-//    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT    STATE        INIT      COMPANY  FULLNAME              FLAGS
-COMP( 1982, x1,        0,      0,       x1,      x1,      x1_state,    0,        "Sharp", "X1 (CZ-800C)",       0 )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT           COMPANY  FULLNAME              FLAGS
+COMP( 1982, x1,        0,      0,      x1,      x1,      x1_state, empty_init,    "Sharp", "X1 (CZ-800C)",       0 )
 // x1twin in x1twin.c
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
-COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
-//COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )
+COMP( 1984, x1turbo,   x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
+COMP( 1985, x1turbo40, x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
+//COMP( 1986, x1turboz,  x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )

@@ -192,8 +192,6 @@
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-#include "sound/tms5220.h"
-#include "sound/pokey.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "screen.h"
@@ -211,24 +209,20 @@ Address: 543210
 */
 READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
 {
-	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset & 0x7) | control;
-	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
-	return pokey->read(pokey_reg);
+	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
 WRITE8_MEMBER(mhavoc_state::quad_pokeyn_w)
 {
-	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset & 0x7) | control;
-	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
-	pokey->write(pokey_reg, data);
+	m_pokey[pokey_num]->write(pokey_reg, data);
 }
 
 
@@ -251,10 +245,7 @@ READ8_MEMBER(mhavoc_state::dual_pokey_r)
 	int control = (offset & 0x10) >> 1;
 	int pokey_reg = (offset & 0x7) | control;
 
-	if (pokey_num == 0)
-		return machine().device<pokey_device>("pokey1")->read(pokey_reg);
-	else
-		return machine().device<pokey_device>("pokey2")->read(pokey_reg);
+	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
 
@@ -264,10 +255,7 @@ WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
 	int control = (offset & 0x10) >> 1;
 	int pokey_reg = (offset & 0x7) | control;
 
-	if (pokey_num == 0)
-		machine().device<pokey_device>("pokey1")->write(pokey_reg, data);
-	else
-		machine().device<pokey_device>("pokey2")->write(pokey_reg, data);
+	m_pokey[pokey_num]->write(pokey_reg, data);
 }
 
 
@@ -532,11 +520,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(alpha_map)
+	MCFG_DEVICE_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alpha_map)
 
-	MCFG_CPU_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)    /* 1.25 MHz */
-	MCFG_CPU_PROGRAM_MAP(gamma_map)
+	MCFG_DEVICE_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)    /* 1.25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gamma_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -556,7 +544,7 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: Outputs 1,2,3 are tied together
 	 * This signal and Output 4 are processed separately.
@@ -564,20 +552,20 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 	 * ==> DISCRETE emulation, below is just an approximation.
 	 */
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -586,7 +574,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mhavoc_state::mhavocrv)
 	mhavoc(config);
 
-	MCFG_SOUND_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
+	MCFG_DEVICE_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -595,18 +583,18 @@ MACHINE_CONFIG_START(mhavoc_state::alphaone)
 	mhavoc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("alpha")
-	MCFG_CPU_PROGRAM_MAP(alphaone_map)
+	MCFG_DEVICE_MODIFY("alpha")
+	MCFG_DEVICE_PROGRAM_MAP(alphaone_map)
 	MCFG_DEVICE_REMOVE("gamma")
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_DEVICE_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_REMOVE("pokey3")
@@ -810,9 +798,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, mhavocrv, ROT0, "Atari / JMA (hack/homebrew)",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, init_mhavocrv, ROT0, "Atari / JMA (hack/homebrew)",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, empty_init,    ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, empty_init,    ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )

@@ -133,16 +133,6 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cloak_state::start_led_1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(cloak_state::start_led_2_w)
-{
-	output().set_led_value(1, !state);
-}
-
 WRITE_LINE_MEMBER(cloak_state::coin_counter_l_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -311,7 +301,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( cloak )
+static GFXDECODE_START( gfx_cloak )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  32,  1 )
 GFXDECODE_END
@@ -326,25 +316,25 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cloak_state::cloak)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)     /* 1 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  4*60)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)     /* 1 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  4*60)
 
-	MCFG_CPU_ADD("slave", M6502, 1250000)       /* 1.25 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  2*60)
+	MCFG_DEVICE_ADD("slave", M6502, 1250000)       /* 1.25 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 10B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cloak_state, coin_counter_r_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cloak_state, coin_counter_l_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cloak_state, cocktail_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cloak_state, coin_counter_r_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cloak_state, coin_counter_l_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cloak_state, cocktail_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ???
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cloak_state, start_led_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cloak_state, start_led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LED 2
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LED 1
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -357,20 +347,20 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 	MCFG_SCREEN_UPDATE_DRIVER(cloak_state, screen_update_cloak)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cloak)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloak)
 	MCFG_PALETTE_ADD("palette", 64)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* more low pass filters ==> DISCRETE processing */
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
+	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("START"))
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
+	MCFG_DEVICE_ADD("pokey2", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.022), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -623,11 +613,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloak,   0,     cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (rev 5)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloaksp, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (Spanish)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloakfr, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (French)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloakgr, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (German)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx4, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx3, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx2, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx1, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloak,   0,     cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (rev 5)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloaksp, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (Spanish)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakfr, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (French)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakgr, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (German)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx4, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx3, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx2, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx1, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 1)", MACHINE_SUPPORTS_SAVE )

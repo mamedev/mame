@@ -154,26 +154,26 @@ void abc99_device::abc99_z5_mem(address_map &map)
 
 MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
 	// keyboard CPU
-	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL(6'000'000)/3) // from Z5 T0 output
-	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)
-	MCFG_CPU_IO_MAP(abc99_z2_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(abc99_device, z2_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(abc99_device, z2_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(abc99_device, z2_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc99_device, z2_t1_r))
+	MCFG_DEVICE_ADD(I8035_Z2_TAG, I8035, XTAL(6'000'000)/3) // from Z5 T0 output
+	MCFG_DEVICE_PROGRAM_MAP(abc99_z2_mem)
+	MCFG_DEVICE_IO_MAP(abc99_z2_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, abc99_device, z2_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, abc99_device, z2_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, abc99_device, z2_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, abc99_device, z2_t1_r))
 
 	// mouse CPU
-	MCFG_CPU_ADD(I8035_Z5_TAG, I8035, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(abc99_z5_mem)
-	//MCFG_MCS48_PORT_P1_IN_CB(READ8(abc99_device, z5_p1_r))
-	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc99_device, z5_p2_w))
+	MCFG_DEVICE_ADD(I8035_Z5_TAG, I8035, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(abc99_z5_mem)
+	//MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, abc99_device, z5_p1_r))
+	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, abc99_device, z5_p2_w))
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM() // Z2 CLK
-	//MCFG_MCS48_PORT_T1_IN_CB(READ8(abc99_device, z5_t1_r))
+	//MCFG_MCS48_PORT_T1_IN_CB(READ8(*this, abc99_device, z5_t1_r))
 	MCFG_DEVICE_DISABLE() // HACK fix for broken serial I/O
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -478,6 +478,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_speaker(*this, "speaker"),
 	m_z14(*this, "Z14"),
 	m_mouseb(*this, "MOUSEB"),
+	m_led(*this, "led%u", 0U),
 	m_si(1),
 	m_si_en(1),
 	m_so_z2(1),
@@ -498,6 +499,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 
 void abc99_device::device_start()
 {
+	m_led.resolve();
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
@@ -573,14 +575,14 @@ WRITE8_MEMBER( abc99_device::z2_led_w )
 {
 	if (m_led_en) return;
 
-	machine().output().set_led_value(LED_1, BIT(data, 0));
-	machine().output().set_led_value(LED_2, BIT(data, 1));
-	machine().output().set_led_value(LED_3, BIT(data, 2));
-	machine().output().set_led_value(LED_4, BIT(data, 3));
-	machine().output().set_led_value(LED_5, BIT(data, 4));
-	machine().output().set_led_value(LED_6, BIT(data, 5));
-	machine().output().set_led_value(LED_7, BIT(data, 6));
-	machine().output().set_led_value(LED_8, BIT(data, 7));
+	m_led[LED_1] = BIT(data, 0);
+	m_led[LED_2] = BIT(data, 1);
+	m_led[LED_3] = BIT(data, 2);
+	m_led[LED_4] = BIT(data, 3);
+	m_led[LED_5] = BIT(data, 4);
+	m_led[LED_6] = BIT(data, 5);
+	m_led[LED_7] = BIT(data, 6);
+	m_led[LED_8] = BIT(data, 7);
 }
 
 
@@ -616,9 +618,9 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
-	machine().output().set_led_value(LED_INS, BIT(data, 3));
-	machine().output().set_led_value(LED_ALT, BIT(data, 4));
-	machine().output().set_led_value(LED_CAPS_LOCK, BIT(data, 5));
+	m_led[LED_INS] = BIT(data, 3);
+	m_led[LED_ALT] = BIT(data, 4);
+	m_led[LED_CAPS_LOCK] = BIT(data, 5);
 
 	// speaker output
 	m_speaker->level_w(!BIT(data, 6));

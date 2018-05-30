@@ -278,6 +278,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
+		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
 		m_io_analog(*this, "AN%u", 0),
@@ -289,6 +290,7 @@ public:
 	required_device<mips3_device> m_maincpu;
 	optional_device<atari_cage_seattle_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;
+	required_device<screen_device> m_screen;
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
@@ -349,18 +351,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
-	DECLARE_DRIVER_INIT(sfrush);
-	DECLARE_DRIVER_INIT(blitz2k);
-	DECLARE_DRIVER_INIT(carnevil);
-	DECLARE_DRIVER_INIT(biofreak);
-	DECLARE_DRIVER_INIT(calspeed);
-	DECLARE_DRIVER_INIT(sfrushrk);
-	DECLARE_DRIVER_INIT(vaportrx);
-	DECLARE_DRIVER_INIT(hyprdriv);
-	DECLARE_DRIVER_INIT(blitz);
-	DECLARE_DRIVER_INIT(wg3dh);
-	DECLARE_DRIVER_INIT(mace);
-	DECLARE_DRIVER_INIT(blitz99);
+	void init_sfrush();
+	void init_blitz2k();
+	void init_carnevil();
+	void init_biofreak();
+	void init_calspeed();
+	void init_sfrushrk();
+	void init_vaportrx();
+	void init_hyprdriv();
+	void init_blitz();
+	void init_wg3dh();
+	void init_mace();
+	void init_blitz99();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -451,12 +453,12 @@ void seattle_state::machine_reset()
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs") != nullptr)
+	if (m_dcs != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-	else if (machine().device("cage") != nullptr)
+	else if (m_cage != nullptr)
 	{
 		m_cage->control_w(0);
 		m_cage->control_w(3);
@@ -1871,13 +1873,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(seattle_state::seattle_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_ADD(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 
 	// PCI Bus Devices
-	MCFG_PCI_ROOT_ADD(":pci")
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 
 	MCFG_GT64010_ADD(PCI_ID_GALILEO, ":maincpu", SYSTEM_CLOCK, GALILEO_IRQ_NUM)
 	MCFG_GT64XXX_SET_CS(0, seattle_state::seattle_cs0_map)
@@ -1886,22 +1888,22 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x100b0002, 0x01, 0x0)
-	MCFG_IDE_PCI_IRQ_ADD(":maincpu", IDE_IRQ_NUM)
+	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x100b0002, 0x01, 0x0)
+	MCFG_IDE_PCI_IRQ_HANDLER(INPUTLINE(m_maincpu, IDE_IRQ_NUM))
 	MCFG_IDE_PCI_SET_LEGACY_TOP(0x0a0)
 
-	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
+	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, m_screen)
 	MCFG_VOODOO_PCI_FBMEM(2)
 	MCFG_VOODOO_PCI_TMUMEM(4, 0)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(DEVWRITELINE(":", seattle_state, vblank_assert))
-	MCFG_VOODOO_STALL_CB(DEVWRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, seattle_state, vblank_assert))
+	MCFG_VOODOO_STALL_CB(WRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
 
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
@@ -1912,7 +1914,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::phoenixsa)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
+	MCFG_DEVICE_REPLACE(m_maincpu, R4700LE, SYSTEM_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1925,7 +1927,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::seattle150)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1935,13 +1937,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seattle_state::seattle150_widget)
 	seattle150(config);
 	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seattle_state::seattle200)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1951,12 +1953,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seattle_state::seattle200_widget)
 	seattle200(config);
 	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::flagstaff)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1965,7 +1967,7 @@ MACHINE_CONFIG_START(seattle_state::flagstaff)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_flagstaff_cs3_map)
 
 	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
 
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_FBMEM(2)
@@ -1984,7 +1986,7 @@ MACHINE_CONFIG_START(seattle_state::wg3dh)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_IOASIC_UPPER(310/* others? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 
@@ -1998,35 +2000,35 @@ MACHINE_CONFIG_START(seattle_state::mace)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
 	MCFG_MIDWAY_IOASIC_UPPER(319/* others? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::sfrush)
 	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5236)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_IOASIC_UPPER(315/* no alternates */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::sfrushrk)
 	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5329)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
 	MCFG_MIDWAY_IOASIC_UPPER(331/* unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::sfrushrkw)
@@ -2045,7 +2047,7 @@ MACHINE_CONFIG_START(seattle_state::calspeed)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
 	MCFG_MIDWAY_IOASIC_UPPER(328/* others? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
@@ -2059,7 +2061,7 @@ MACHINE_CONFIG_START(seattle_state::vaportrx)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_VAPORTRX)
 	MCFG_MIDWAY_IOASIC_UPPER(324/* 334? unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::biofreak)
@@ -2072,7 +2074,7 @@ MACHINE_CONFIG_START(seattle_state::biofreak)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_IOASIC_UPPER(231/* no alternates */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::blitz)
@@ -2085,7 +2087,7 @@ MACHINE_CONFIG_START(seattle_state::blitz)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
 	MCFG_MIDWAY_IOASIC_UPPER(444/* or 528 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::blitz99)
@@ -2098,7 +2100,7 @@ MACHINE_CONFIG_START(seattle_state::blitz99)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
 	MCFG_MIDWAY_IOASIC_UPPER(481/* or 484 or 520 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::blitz2k)
@@ -2111,7 +2113,7 @@ MACHINE_CONFIG_START(seattle_state::blitz2k)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
 	MCFG_MIDWAY_IOASIC_UPPER(494/* or 498 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::carnevil)
@@ -2124,7 +2126,7 @@ MACHINE_CONFIG_START(seattle_state::carnevil)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
 	MCFG_MIDWAY_IOASIC_UPPER(469/* 469 or 486 or 528 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::hyprdriv)
@@ -2137,7 +2139,7 @@ MACHINE_CONFIG_START(seattle_state::hyprdriv)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_HYPRDRIV)
 	MCFG_MIDWAY_IOASIC_UPPER(469/* unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 /*************************************
@@ -2543,7 +2545,7 @@ void seattle_state::init_common(int config)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,wg3dh)
+void seattle_state::init_wg3dh()
 {
 	init_common(PHOENIX_CONFIG);
 
@@ -2554,7 +2556,7 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,mace)
+void seattle_state::init_mace()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2563,7 +2565,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrush)
+void seattle_state::init_sfrush()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -2574,7 +2576,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
+void seattle_state::init_sfrushrk()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -2586,7 +2588,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,calspeed)
+void seattle_state::init_calspeed()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -2596,7 +2598,7 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,vaportrx)
+void seattle_state::init_vaportrx()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -2607,13 +2609,13 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,biofreak)
+void seattle_state::init_biofreak()
 {
 	init_common(SEATTLE_CONFIG);
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz)
+void seattle_state::init_blitz()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2626,7 +2628,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz99)
+void seattle_state::init_blitz99()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2636,7 +2638,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz2k)
+void seattle_state::init_blitz2k()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2646,7 +2648,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,carnevil)
+void seattle_state::init_carnevil()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2659,7 +2661,7 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
+void seattle_state::init_hyprdriv()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -2678,30 +2680,30 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
  *************************************/
 
 /* Atari */
-GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
-GAME(  1996, mace,       0,        mace,      mace,     seattle_state, mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrusha,    sfrush,   sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1997, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1997, sfrushrkw,  sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1997, sfrushrkwo, sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1998, calspeed,   0,        calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
-GAMEL( 1998, calspeeda,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
-GAMEL( 1998, calspeedb,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
+GAME(  1996, mace,       0,        mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrusha,    sfrush,   sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrkw,  sfrushrk, sfrushrkw, sfrush,   seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrkwo, sfrushrk, sfrushrkw, sfrush,   seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1998, calspeed,   0,        calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeeda,  calspeed, calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeedb,  calspeed, calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 
 
 
-GAMEL( 1998, vaportrx,   0,        vaportrx,  vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
-GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrx,   0,        vaportrx,  vaportrx, seattle_state, init_vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, init_vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
 
 /* Midway */
-GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz11,    blitz,    blitz,     blitz,    seattle_state, blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
-GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
+GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, init_biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz11,    blitz,    blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, init_blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )

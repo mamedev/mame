@@ -227,7 +227,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( itgambl3 )
+static GFXDECODE_START( gfx_itgambl3 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 16  )
 GFXDECODE_END
 
@@ -264,8 +264,8 @@ PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
-	MCFG_CPU_PROGRAM_MAP(itgambl3_map)
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	MCFG_DEVICE_PROGRAM_MAP(itgambl3_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -276,13 +276,13 @@ MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl3_state, screen_update_itgambl3)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgambl3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgambl3)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(itgambl3_state, itgambl3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/16, PIN7_HIGH) /* 1MHz */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/16, okim6295_device::PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -518,10 +518,10 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT ROT   COMPANY                  FULLNAME                          FLAGS
-GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
-GAME( 200?, grandprx, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
-GAME( 200?, supjolly, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
-GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
-GAME( 200?, queenotg, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
-GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                          FLAGS
+GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
+GAME( 200?, grandprx, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
+GAME( 200?, supjolly, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
+GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
+GAME( 200?, queenotg, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
+GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )

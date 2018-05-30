@@ -324,15 +324,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )
 
 MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
-	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
+	MCFG_DEVICE_PROGRAM_MAP(a600xl_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", maxaflex_state, mf_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("mcu", M68705P3, 3579545)
-	MCFG_M68705_PORTA_R_CB(READ8(maxaflex_state, mcu_portA_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(maxaflex_state, mcu_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(maxaflex_state, mcu_portB_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(maxaflex_state, mcu_portC_w))
+	MCFG_DEVICE_ADD("mcu", M68705P3, 3579545)
+	MCFG_M68705_PORTA_R_CB(READ8(*this, maxaflex_state, mcu_portA_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, maxaflex_state, mcu_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, maxaflex_state, mcu_portB_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, maxaflex_state, mcu_portC_w))
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 	MCFG_GTIA_REGION(GTIA_NTSC)
@@ -342,10 +342,10 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_ANTIC_GTIA("gtia")
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(maxaflex_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(maxaflex_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maxaflex_state, pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(maxaflex_state, pia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, maxaflex_state, pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, maxaflex_state, pia_pb_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, maxaflex_state, pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, maxaflex_state, pia_cb2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -361,15 +361,15 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_DEFAULT_LAYOUT(layout_maxaflex)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
+	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_INTERRUPT_CB(maxaflex_state, interrupt_cb)
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.0), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -435,8 +435,8 @@ ROM_START(mf_flip)
 ROM_END
 
 
-GAME( 1984, maxaflex, 0,        maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy",                       "Max-A-Flex",                MACHINE_IS_BIOS_ROOT )
-GAME( 1982, mf_achas, maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Astro Chase (Max-A-Flex)",  0 )
-GAME( 1983, mf_brist, maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)",     0 )
-GAME( 1983, mf_flip,  maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)",  0 )
-GAME( 1984, mf_bdash, maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Boulder Dash (Max-A-Flex)", 0 )
+GAME( 1984, maxaflex, 0,        maxaflex, a600xl, maxaflex_state, empty_init, ROT0, "Exidy",                       "Max-A-Flex",                MACHINE_IS_BIOS_ROOT )
+GAME( 1982, mf_achas, maxaflex, maxaflex, a600xl, maxaflex_state, empty_init, ROT0, "Exidy / First Star Software", "Astro Chase (Max-A-Flex)",  0 )
+GAME( 1983, mf_brist, maxaflex, maxaflex, a600xl, maxaflex_state, empty_init, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)",     0 )
+GAME( 1983, mf_flip,  maxaflex, maxaflex, a600xl, maxaflex_state, empty_init, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)",  0 )
+GAME( 1984, mf_bdash, maxaflex, maxaflex, a600xl, maxaflex_state, empty_init, ROT0, "Exidy / First Star Software", "Boulder Dash (Max-A-Flex)", 0 )

@@ -274,7 +274,7 @@ static const gfx_layout hitme_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( hitme )
+static GFXDECODE_START( gfx_hitme )
 	GFXDECODE_ENTRY( "gfx1", 0, hitme_charlayout, 0, 2  )
 GFXDECODE_END
 
@@ -290,7 +290,7 @@ static const gfx_layout barricad_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( barricad )
+static GFXDECODE_START( gfx_barricad )
 	GFXDECODE_ENTRY( "gfx1", 0, barricad_charlayout,   0, 1  )
 GFXDECODE_END
 
@@ -316,9 +316,9 @@ void hitme_state::machine_reset()
 MACHINE_CONFIG_START(hitme_state::hitme)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(hitme_map)
-	MCFG_CPU_IO_MAP(hitme_portmap)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(hitme_map)
+	MCFG_DEVICE_IO_MAP(hitme_portmap)
 
 
 	/* video hardware */
@@ -330,14 +330,13 @@ MACHINE_CONFIG_START(hitme_state::hitme)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitme)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitme)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(hitme)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, hitme_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -359,7 +358,7 @@ MACHINE_CONFIG_START(hitme_state::barricad)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", barricad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_barricad)
 
 	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
 MACHINE_CONFIG_END
@@ -693,9 +692,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
-GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
-GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, 0, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
-GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
-GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
+GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
+GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, empty_init, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
+GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )

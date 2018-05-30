@@ -353,41 +353,41 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
 MACHINE_CONFIG_START(lwriter_state::lwriter)
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLK)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLK)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 	MCFG_SCC8530_ADD("scc", CPU_CLK, RXC_CLK, 0, RXC_CLK, 0)
 	/* Port A */
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
 	/* Port B */
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
 	/* Interrupt */
-	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE("via", via6522_device, write_ca1))
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(lwriter_state, scc_int))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE("via", via6522_device, write_ca1))
+	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, lwriter_state, scc_int))
 
-	MCFG_RS232_PORT_ADD ("rs232a", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
+	MCFG_DEVICE_ADD ("rs232a", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD ("rs232b", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsb_w))
+	MCFG_DEVICE_ADD ("rs232b", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsb_w))
 
 #if TPI
 	MCFG_DEVICE_ADD("tpi", TPI6525, 0)
 #else
 	MCFG_DEVICE_ADD("via", VIA6522, CPU_CLK/10) // 68000 E clock presumed
-	MCFG_VIA6522_READPA_HANDLER(READ8(lwriter_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(lwriter_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(lwriter_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(lwriter_state, via_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(lwriter_state, via_cb1_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(lwriter_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(lwriter_state, via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(lwriter_state, via_int_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, lwriter_state, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, lwriter_state, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, lwriter_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, lwriter_state, via_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, lwriter_state, via_cb1_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, lwriter_state, via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, lwriter_state, via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, lwriter_state, via_int_w))
 #endif
 MACHINE_CONFIG_END
 
@@ -438,5 +438,5 @@ ROM_START(lwriter)
 
 ROM_END
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY            FULLNAME                    FLAGS */
-CONS( 1988, lwriter,    0,        0,      lwriter,   lwriter,   lwriter_state, 0,    "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY            FULLNAME                    FLAGS */
+CONS( 1988, lwriter, 0,      0,      lwriter, lwriter, lwriter_state, empty_init, "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)

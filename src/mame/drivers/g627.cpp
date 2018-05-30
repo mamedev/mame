@@ -61,8 +61,8 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(v115);
-	DECLARE_DRIVER_INIT(v117);
+	void init_v115();
+	void init_v117();
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
@@ -96,7 +96,7 @@ void g627_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x02).w(this, FUNC(g627_state::disp_w));
 	map(0x03, 0x07).w(this, FUNC(g627_state::lamp_w));
-	map(0x10, 0x17).w("astrocade", FUNC(astrocade_device::astrocade_sound_w));
+	map(0x10, 0x17).w("astrocade", FUNC(astrocade_io_device::write));
 	map(0x20, 0x27).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }
 
@@ -181,12 +181,12 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test 8") PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER( g627_state, v115 )
+void g627_state::init_v115()
 {
 	m_type = 0;
 }
 
-DRIVER_INIT_MEMBER( g627_state, v117 )
+void g627_state::init_v117()
 {
 	m_type = 1;
 }
@@ -296,22 +296,22 @@ WRITE8_MEMBER( g627_state::lamp_w )
 
 MACHINE_CONFIG_START(g627_state::g627)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 14138000/8)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("i8156", I8156, 14138000/8)
-	MCFG_I8155_IN_PORTA_CB(READ8(g627_state, porta_r))
-	MCFG_I8155_IN_PORTB_CB(READ8(g627_state, portb_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(g627_state, portc_w))
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, g627_state, porta_r))
+	MCFG_I8155_IN_PORTB_CB(READ8(*this, g627_state, portb_r))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, g627_state, portc_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("astrocade", ASTROCADE_IO, 14138000/8) // 0066-117XX audio chip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */
@@ -342,6 +342,6 @@ ROM_START(rota_101)
 	ROM_LOAD("v101-c.bin", 0x1000, 0x0800, CRC(c7e85638) SHA1(b59805d8b558ab8f5ea5b4b9261e862afca4b9d3))
 ROM_END
 
-GAME(1978,  rotation,  0,         g627,  g627, g627_state, v117,  ROT0,  "Midway", "Rotation VIII (v. 1.17)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  rota_115,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.15)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  rota_101,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.01)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, rotation, 0,        g627, g627, g627_state, init_v117, ROT0, "Midway", "Rotation VIII (v. 1.17)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, rota_115, rotation, g627, g627, g627_state, init_v115, ROT0, "Midway", "Rotation VIII (v. 1.15)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, rota_101, rotation, g627, g627, g627_state, init_v115, ROT0, "Midway", "Rotation VIII (v. 1.01)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

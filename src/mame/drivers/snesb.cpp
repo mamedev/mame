@@ -176,14 +176,14 @@ public:
 	DECLARE_READ8_MEMBER(snesb_coin_r);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	DECLARE_DRIVER_INIT(iron);
-	DECLARE_DRIVER_INIT(denseib);
-	DECLARE_DRIVER_INIT(kinstb);
-	DECLARE_DRIVER_INIT(sblast2b);
-	DECLARE_DRIVER_INIT(ffight2b);
-	DECLARE_DRIVER_INIT(endless);
-	DECLARE_DRIVER_INIT(mk3snes);
-	DECLARE_DRIVER_INIT(legendsb);
+	void init_iron();
+	void init_denseib();
+	void init_kinstb();
+	void init_sblast2b();
+	void init_ffight2b();
+	void init_endless();
+	void init_mk3snes();
+	void init_legendsb();
 	DECLARE_MACHINE_RESET(ffight2b);
 	void mk3snes(machine_config &config);
 	void ffight2b(machine_config &config);
@@ -697,13 +697,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(snesb_state::kinstb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_CPU_PROGRAM_MAP(snesb_map)
+	MCFG_DEVICE_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(snesb_map)
 
 	/* audio CPU */
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_CPU_PROGRAM_MAP(spc_mem)
+	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
+	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -713,12 +713,13 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -731,8 +732,8 @@ void snesb_state::mcu_io_map(address_map &map)
 MACHINE_CONFIG_START(snesb_state::mk3snes)
 	kinstb(config);
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 MACHINE_CONFIG_END
 
 
@@ -750,12 +751,11 @@ MACHINE_CONFIG_START(snesb_state::ffight2b)
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(snesb_state,kinstb)
+void snesb_state::init_kinstb()
 {
-	int32_t i;
 	uint8_t *rom = memregion("user3")->base();
 
-	for (i = 0; i < 0x400000; i++)
+	for (int32_t i = 0; i < 0x400000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 5, 0, 6, 1, 7, 4, 3, 2);
 	}
@@ -768,20 +768,19 @@ DRIVER_INIT_MEMBER(snesb_state,kinstb)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,mk3snes)
+void snesb_state::init_mk3snes()
 {
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,ffight2b)
+void snesb_state::init_ffight2b()
 {
-	int32_t i;
 	uint8_t *rom = memregion("user3")->base();
 
-	for(i = 0; i < 0x200000; i++)
+	for (int32_t i = 0; i < 0x200000; i++)
 	{
 		rom[i] = rom[i] ^ 0xff;
 
@@ -816,17 +815,16 @@ DRIVER_INIT_MEMBER(snesb_state,ffight2b)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,iron)
+void snesb_state::init_iron()
 {
-	int32_t i;
 	uint8_t *rom = memregion("user3")->base();
 
-	for (i = 0; i < 0x140000; i++)
+	for (int32_t i = 0; i < 0x140000; i++)
 	{
-		if(i < 0x80000)
+		if (i < 0x80000)
 		{
 			rom[i] = bitswap<8>(rom[i]^0xff,2,7,1,6,3,0,5,4);
 		}
@@ -841,15 +839,14 @@ DRIVER_INIT_MEMBER(snesb_state,iron)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,denseib)
+void snesb_state::init_denseib()
 {
 	uint8_t *rom = memregion("user3")->base();
-	int32_t i;
 
-	for (i = 0; i < 0x200000; i++)
+	for (int32_t i = 0; i < 0x200000; i++)
 	{
 		rom[i] = rom[i] ^ 0xff;
 		switch (i >> 16)
@@ -872,10 +869,10 @@ DRIVER_INIT_MEMBER(snesb_state,denseib)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,legendsb)
+void snesb_state::init_legendsb()
 {
 	u8 *rom = memregion("user3")->base();
 
@@ -904,7 +901,7 @@ DRIVER_INIT_MEMBER(snesb_state,legendsb)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
 static const uint8_t data_substitution0[] = {0x88,0x02,0x2a,0x08,0x28,0xaa,0x8a,0x0a,0xa2,0x00,0x80,0xa0,0x22,0xa8,0x82,0x20,};
@@ -924,17 +921,16 @@ static const uint8_t  address_substitution_high[] =
 	0x2b,0x25,0x28,0x2f,0x26,0x22,0x23,0x2a,0x2d,0x24,0x2e,0x20,0x27,0x2c,0x21,0x29
 };
 
-DRIVER_INIT_MEMBER(snesb_state,sblast2b)
+void snesb_state::init_sblast2b()
 {
-	int i, cipherText, plainText, newAddress;
 	uint8_t *src = memregion("user7")->base();
 	uint8_t *dst = memregion("user3")->base();
 
-	for (i =0; i < 0x80000 * 3; i++)
+	for (int i = 0; i < 0x80000 * 3; i++)
 	{
-		cipherText = src[i];
-		plainText = data_substitution0[cipherText & 0xf] | data_substitution1[cipherText >> 4];
-		newAddress = (address_substitution_high[i >> 15] << 15) | (i & 0x7fc0) | (address_substitution_low[i & 0x3f]);
+		int cipherText = src[i];
+		int plainText = data_substitution0[cipherText & 0xf] | data_substitution1[cipherText >> 4];
+		int newAddress = (address_substitution_high[i >> 15] << 15) | (i & 0x7fc0) | (address_substitution_low[i & 0x3f]);
 
 		if (newAddress < 0x10000)
 		{
@@ -971,12 +967,11 @@ DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,endless)
+void snesb_state::init_endless()
 {
-	int i;
 	uint8_t *src = memregion("user7")->base();
 	uint8_t *dst = memregion("user3")->base();
 
@@ -1002,7 +997,7 @@ DRIVER_INIT_MEMBER(snesb_state,endless)
 		0x41, 0x46, 0x02, 0x43, 0x03, 0x00, 0x40, 0x42, 0x04, 0x47, 0x45, 0x05, 0x06, 0x01, 0x44, 0x07
 	};
 
-	for (i = 0; i < 0x200000; i++) {
+	for (int i = 0; i < 0x200000; i++) {
 		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + address_tab_low[i & 0x3f];
 
 		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
@@ -1045,7 +1040,7 @@ DRIVER_INIT_MEMBER(snesb_state,endless)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
 
@@ -1226,11 +1221,11 @@ ROM_END
 
 
 
-GAME( 199?, kinstb,       0,     kinstb,         kinstb,   snesb_state,  kinstb,       ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, mk3snes,      0,     mk3snes,        kinstb,   snesb_state,  mk3snes,      ROT0, "bootleg",  "Mortal Kombat 3 (SNES bootleg)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, ffight2b,     0,     ffight2b,       ffight2b, snesb_state,  ffight2b,     ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, iron,         0,     kinstb,         iron,     snesb_state,  iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib,      0,     kinstb,         denseib,  snesb_state,  denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1996, endless,      0,     kinstb,         endless,  snesb_state,  endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, legendsb,     0,     kinstb,         kinstb,   snesb_state,  legendsb,     ROT0, "bootleg",  "Legend (SNES bootleg)",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, kinstb,       0,     kinstb,         kinstb,   snesb_state, init_kinstb,   ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, mk3snes,      0,     mk3snes,        kinstb,   snesb_state, init_mk3snes,  ROT0, "bootleg",  "Mortal Kombat 3 (SNES bootleg)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, ffight2b,     0,     ffight2b,       ffight2b, snesb_state, init_ffight2b, ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, iron,         0,     kinstb,         iron,     snesb_state, init_iron,     ROT0, "bootleg",  "Iron (SNES bootleg)",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib,      0,     kinstb,         denseib,  snesb_state, init_denseib,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state, init_sblast2b, ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1996, endless,      0,     kinstb,         endless,  snesb_state, init_endless,  ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, legendsb,     0,     kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

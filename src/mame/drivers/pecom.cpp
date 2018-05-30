@@ -172,14 +172,14 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(pecom_state::pecom64)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::DOT_CLK_PAL/3)
-	MCFG_CPU_PROGRAM_MAP(pecom64_mem)
-	MCFG_CPU_IO_MAP(pecom64_io)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::DOT_CLK_PAL/3)
+	MCFG_DEVICE_PROGRAM_MAP(pecom64_mem)
+	MCFG_DEVICE_IO_MAP(pecom64_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(pecom_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(pecom_state, ef2_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(pecom_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(pecom_state, sc_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, pecom_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, pecom_state, ef2_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, pecom_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, pecom_state, sc_w))
 
 	// sound and video hardware
 	pecom_video(config);
@@ -215,6 +215,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE     INPUT  STATE         INIT   COMPANY   FULLNAME     FLAGS */
-COMP( 1986, pecom32, 0,       0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 32",  0)
-COMP( 1987, pecom64, pecom32, 0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 64",  0)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME     FLAGS */
+COMP( 1986, pecom32, 0,       0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 32",  0)
+COMP( 1987, pecom64, pecom32, 0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 64",  0)

@@ -73,7 +73,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 	/* D7 is also connected to the NMI input of the CPU -
 	   the NMI is actually toggled by a 74121 (R1=27K, C10=330p) */
 	if ((data & 0x80) == 0x00)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -130,7 +130,7 @@ void redalert_state::redalert_audio_map(address_map &map)
  *
  *************************************/
 
-SOUND_START_MEMBER(redalert_state,redalert)
+void redalert_state::sound_start()
 {
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));
@@ -180,15 +180,15 @@ void redalert_state::redalert_voice_map(address_map &map)
 
 MACHINE_CONFIG_START(redalert_state::redalert_audio_m37b)
 
-	MCFG_CPU_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(redalert_audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)
+	MCFG_DEVICE_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(redalert_audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, REDALERT_AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(redalert_state, redalert_analog_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, REDALERT_AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, redalert_state, redalert_analog_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	/* channel C is used a noise source and is not connected to a speaker */
@@ -203,14 +203,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::redalert_audio_voice)
 
-	MCFG_CPU_ADD("voice", I8085A, REDALERT_VOICE_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(redalert_voice_map)
-	MCFG_I8085A_SID(READLINE(redalert_state,sid_callback))
-	MCFG_I8085A_SOD(WRITELINE(redalert_state,sod_callback))
+	MCFG_DEVICE_ADD("voice", I8085A, REDALERT_VOICE_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(redalert_voice_map)
+	MCFG_I8085A_SID(READLINE(*this, redalert_state,sid_callback))
+	MCFG_I8085A_SOD(WRITELINE(*this, redalert_state,sod_callback))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)
+	MCFG_DEVICE_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -222,12 +222,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::redalert_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	redalert_audio_m37b(config);
 	redalert_audio_voice(config);
-
-	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
 MACHINE_CONFIG_END
 
@@ -239,11 +237,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	redalert_audio_m37b(config);
-
-	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
 MACHINE_CONFIG_END
 
@@ -258,7 +254,7 @@ WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 {
 	/* the byte is connected to port A of the AY8910 */
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -324,19 +320,6 @@ void redalert_state::demoneye_audio_map(address_map &map)
 }
 
 
-/*************************************
- *
- *  Demoneye-X audio start
- *
- *************************************/
-
-SOUND_START_MEMBER( redalert_state, demoneye )
-{
-	save_item(NAME(m_ay8910_latch_1));
-	save_item(NAME(m_ay8910_latch_2));
-}
-
-
 
 /*************************************
  *
@@ -346,25 +329,23 @@ SOUND_START_MEMBER( redalert_state, demoneye )
 
 MACHINE_CONFIG_START(redalert_state::demoneye_audio)
 
-	MCFG_CPU_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(demoneye_audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
+	MCFG_DEVICE_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(demoneye_audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 
 	MCFG_DEVICE_ADD("sndpia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(redalert_state, demoneye_ay8910_latch_2_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(redalert_state, demoneye_ay8910_data_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(redalert_state, demoneye_ay8910_latch_1_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, redalert_state, demoneye_ay8910_latch_2_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_data_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_latch_1_w))
 
-	MCFG_SOUND_START_OVERRIDE( redalert_state, demoneye )
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, DEMONEYE_AY8910_CLOCK)
+	MCFG_DEVICE_ADD("ay1", AY8910, DEMONEYE_AY8910_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, DEMONEYE_AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay2", AY8910, DEMONEYE_AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

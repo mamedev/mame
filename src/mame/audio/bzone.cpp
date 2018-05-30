@@ -277,7 +277,7 @@ DISCRETE_RESET(bzone_custom_filter)
  *
  *************************************/
 
-static DISCRETE_SOUND_START(bzone)
+static DISCRETE_SOUND_START(bzone_discrete)
 
 	/************************************************/
 	/* Input register mapping for Battlezone        */
@@ -399,15 +399,14 @@ WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 
 MACHINE_CONFIG_START(bzone_state::bzone_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, BZONE_MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey", POKEY, BZONE_MASTER_CLOCK / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN3"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(bzone)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bzone_discrete)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

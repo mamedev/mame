@@ -108,23 +108,25 @@ void lb186_state::lb186_io(address_map &map)
 	map(0x1200, 0x1200).w(this, FUNC(lb186_state::drive_sel_w));
 }
 
-static SLOT_INTERFACE_START( lb186_floppies )
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void lb186_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 void lb186_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
 	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_IRQ_HANDLER(DEVWRITELINE(":maincpu", i80186_cpu_device, int1_w))
-	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE(":maincpu", i80186_cpu_device, drq0_w))
+	MCFG_NCR5380N_IRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, int1_w))
+	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, drq0_w))
 }
 
-static SLOT_INTERFACE_START( scsi_devices )
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
-SLOT_INTERFACE_END
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("ncr5380", NCR5380N);
+}
 
 FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 	FLOPPY_PC_FORMAT,
@@ -132,24 +134,24 @@ FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(lb186_state::lb186)
-	MCFG_CPU_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(lb186_map)
-	MCFG_CPU_IO_MAP(lb186_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(lb186_map)
+	MCFG_DEVICE_IO_MAP(lb186_io)
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(lb186_state, sio_out_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int0_w))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232_1", rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232_2", rs232_port_device, write_txd))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, lb186_state, sio_out_w))
 
-	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w))
-	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
+	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
+	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 
 	MCFG_WD1772_ADD("fdc", 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int2_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int2_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats)
@@ -164,7 +166,7 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", lb186_state::ncr5380)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", lb186_state::ncr5380)
 MACHINE_CONFIG_END
 
 ROM_START( lb186 )
@@ -173,4 +175,4 @@ ROM_START( lb186 )
 	ROM_LOAD16_BYTE("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6))
 ROM_END
 
-COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )
+COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, empty_init, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )

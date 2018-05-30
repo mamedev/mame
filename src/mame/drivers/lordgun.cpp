@@ -275,7 +275,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 	if (ACCESSING_BITS_0_7)     m_soundlatch->write(space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)    m_soundlatch2->write(space, 0, (data >> 8) & 0xff);
 
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void lordgun_state::lordgun_map(address_map &map)
@@ -431,7 +431,7 @@ static const gfx_layout lordgun_32x32x6_layout =
 	32*32*2
 };
 
-static GFXDECODE_START( lordgun )
+static GFXDECODE_START( gfx_lordgun )
 	GFXDECODE_ENTRY( "tiles0",  0, lordgun_8x8x6_layout,    0x000, 0x800/0x40*8  )  // [0] Tilemap 0
 	GFXDECODE_ENTRY( "tiles1",  0, lordgun_16x16x6_layout,  0x000, 0x800/0x40*8  )  // [1] Tilemap 1
 	GFXDECODE_ENTRY( "tiles1",  0, lordgun_32x32x6_layout,  0x000, 0x800/0x40*8  )  // [2] Tilemap 2
@@ -639,28 +639,28 @@ void lordgun_state::machine_start()
 }
 
 MACHINE_CONFIG_START(lordgun_state::lordgun)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(lordgun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MCFG_CPU_IO_MAP(lordgun_soundio_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_IO_MAP(lordgun_soundio_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DIP"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, lordgun_eeprom_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, lordgun_eeprom_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake2_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("START1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("START2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -672,47 +672,47 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right!
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right!
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lordgun_state::aliencha)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(aliencha_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(aliencha_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MCFG_CPU_IO_MAP(aliencha_soundio_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_IO_MAP(aliencha_soundio_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lordgun_state, aliencha_dip_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake2_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, aliencha_eeprom_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, lordgun_state, aliencha_dip_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake2_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, aliencha_eeprom_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, aliencha_dip_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, aliencha_dip_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -724,24 +724,24 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
+	MCFG_DEVICE_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(20'000'000) / 20, PIN7_HIGH)  // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)  // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1049,7 +1049,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(lordgun_state, lordgun)
+void lordgun_state::init_lordgun()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int rom_size = 0x100000;
@@ -1075,7 +1075,7 @@ DRIVER_INIT_MEMBER(lordgun_state, lordgun)
 	}
 }
 
-DRIVER_INIT_MEMBER(lordgun_state, aliencha)
+void lordgun_state::init_aliencha()
 {
 	save_item(NAME(m_aliencha_dip_sel));
 }
@@ -1086,6 +1086,6 @@ DRIVER_INIT_MEMBER(lordgun_state, aliencha)
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, init_lordgun, ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, empty_init,   ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, empty_init,   ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )

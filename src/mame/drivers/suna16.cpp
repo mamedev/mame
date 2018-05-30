@@ -59,10 +59,10 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0, data & 0x01);
-		output().set_led_value(1, data & 0x02);
-		output().set_led_value(2, data & 0x04);
-		output().set_led_value(3, data & 0x08);
+		m_led[0] = BIT(data, 0);
+		m_led[1] = BIT(data, 1);
+		m_led[2] = BIT(data, 2);
+		m_led[3] = BIT(data, 3);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
 	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
@@ -74,8 +74,8 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		output().set_led_value(0, data & 0x02);
-		output().set_led_value(1, data & 0x04);
+		m_led[0] = BIT(data, 1);
+		m_led[1] = BIT(data, 2);
 	}
 	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
@@ -309,6 +309,8 @@ void suna16_state::bestbest_sound_map(address_map &map)
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
+	m_led.resolve();
+
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
@@ -399,6 +401,8 @@ void suna16_state::uballoon_pcm_1_io_map(address_map &map)
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+
+	m_led.resolve();
 
 	save_item(NAME(m_prot));
 }
@@ -776,12 +780,12 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-static GFXDECODE_START( suna16 )
+static GFXDECODE_START( gfx_suna16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites
 GFXDECODE_END
 
 // Two sprites chips
-static GFXDECODE_START( bestbest )
+static GFXDECODE_START( gfx_bestbest )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 256*8/16 ) // [0] Sprites (Chip 1)
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 256*8/16 ) // [1] Sprites (Chip 2)
 GFXDECODE_END
@@ -815,20 +819,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 MACHINE_CONFIG_START(suna16_state::bssoccer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/4)    /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(bssoccer_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/4)    /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bssoccer_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* Z80B at 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* Z80B at 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bssoccer_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
-	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
-	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
+	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bssoccer_pcm_1_map)
+	MCFG_DEVICE_IO_MAP(bssoccer_pcm_1_io_map)
 
-	MCFG_CPU_ADD("pcm2", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
-	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
-	MCFG_CPU_IO_MAP(bssoccer_pcm_2_io_map)
+	MCFG_DEVICE_ADD("pcm2", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bssoccer_pcm_2_map)
+	MCFG_DEVICE_IO_MAP(bssoccer_pcm_2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -843,30 +847,31 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)  /* 3.579545MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)  /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)
 
-	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -878,16 +883,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(suna16_state::uballoon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/4)   /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(uballoon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/4)   /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(uballoon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(uballoon_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(uballoon_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL(32'000'000)/6) /* Z80B at 5.333MHz */
-	MCFG_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
-	MCFG_CPU_IO_MAP(uballoon_pcm_1_io_map)
+	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(32'000'000)/6) /* Z80B at 5.333MHz */
+	MCFG_DEVICE_PROGRAM_MAP(uballoon_pcm_1_map)
+	MCFG_DEVICE_IO_MAP(uballoon_pcm_1_io_map)
 
 	/* 2nd PCM Z80 missing */
 
@@ -905,25 +910,26 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)    /* 3.579545MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)    /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -933,16 +939,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(suna16_state::sunaq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
-	MCFG_CPU_PROGRAM_MAP(sunaq_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sunaq_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(sunaq_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sunaq_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* Z80B at 6MHz */
-	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
-	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
+	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* Z80B at 6MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bssoccer_pcm_1_map)
+	MCFG_DEVICE_IO_MAP(bssoccer_pcm_1_io_map)
 
 	/* 2nd PCM Z80 missing */
 
@@ -961,25 +967,26 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)    /* 3.579545MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)    /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -994,16 +1001,16 @@ WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 MACHINE_CONFIG_START(suna16_state::bestbest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
-	MCFG_CPU_PROGRAM_MAP(bestbest_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bestbest_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* 6MHz */
-	MCFG_CPU_PROGRAM_MAP(bestbest_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* 6MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bestbest_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* 6MHz */
-	MCFG_CPU_PROGRAM_MAP(bestbest_pcm_1_map)
-	MCFG_CPU_IO_MAP(bestbest_pcm_1_iomap)
+	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* 6MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bestbest_pcm_1_map)
+	MCFG_DEVICE_IO_MAP(bestbest_pcm_1_iomap)
 
 	/* 2nd PCM Z80 missing */
 
@@ -1020,35 +1027,36 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestbest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestbest)
 	MCFG_PALETTE_ADD("palette", 256*8)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/16)  /* 1.5MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna16_state, bestbest_ay8910_port_a_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/16)  /* 1.5MHz */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna16_state, bestbest_ay8910_port_a_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(24'000'000)/8)   /* 3MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(24'000'000)/8)   /* 3MHz */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1382,8 +1390,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest,  0,        bestbest, bestbest, suna16_state, 0, ROT0, "SunA",                 "Best Of Best",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, sunaq,     0,        sunaq,    sunaq,    suna16_state, 0, ROT0, "SunA",                 "SunA Quiz 6000 Academy (940620-6)",  MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, uballoon,  0,        uballoon, uballoon, suna16_state, 0, ROT0, "SunA (Unico license)", "Ultra Balloon",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bestbest,  0,        bestbest, bestbest, suna16_state, empty_init, ROT0, "SunA",                 "Best Of Best",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, sunaq,     0,        sunaq,    sunaq,    suna16_state, empty_init, ROT0, "SunA",                 "SunA Quiz 6000 Academy (940620-6)",  MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, uballoon,  0,        uballoon, uballoon, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Ultra Balloon",                      MACHINE_SUPPORTS_SAVE )

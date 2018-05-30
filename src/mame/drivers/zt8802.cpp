@@ -41,4 +41,4 @@ ROM_START( zt8802 )
 	ROM_LOAD( "c103207-218 a.rom", 0x00000, 0x80000, CRC(fc1c6e99) SHA1(cfbb2f0c9927bac5abc85c12d2b82f7da46cab03) )
 ROM_END
 
-COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, 0, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )
+COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )

@@ -41,21 +41,21 @@ public:
 	DECLARE_READ8_MEMBER(rtc_r);
 
 	void init();
-	DECLARE_DRIVER_INIT(tf95);
-	DECLARE_DRIVER_INIT(afm);
-	DECLARE_DRIVER_INIT(cc);
-	DECLARE_DRIVER_INIT(cv);
-	DECLARE_DRIVER_INIT(congo);
-	DECLARE_DRIVER_INIT(jy);
-	DECLARE_DRIVER_INIT(mm);
-	DECLARE_DRIVER_INIT(mb);
-	DECLARE_DRIVER_INIT(nbaf);
-	DECLARE_DRIVER_INIT(ngg);
-	DECLARE_DRIVER_INIT(sc);
-	DECLARE_DRIVER_INIT(ss);
-	DECLARE_DRIVER_INIT(totan);
-	DECLARE_DRIVER_INIT(cp);
-	DECLARE_DRIVER_INIT(ttt);
+	void init_tf95();
+	void init_afm();
+	void init_cc();
+	void init_cv();
+	void init_congo();
+	void init_jy();
+	void init_mm();
+	void init_mb();
+	void init_nbaf();
+	void init_ngg();
+	void init_sc();
+	void init_ss();
+	void init_totan();
+	void init_cp();
+	void init_ttt();
 
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
@@ -367,7 +367,7 @@ bool wpc_95_state::sc_aux_lamps_handler(int sid, bool state)
 	return false;
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, tf95)
+void wpc_95_state::init_tf95()
 {
 	pic->set_serial("648 123456 12345 123");
 	lamp->set_names(nullptr);
@@ -375,7 +375,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, tf95)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, afm)
+void wpc_95_state::init_afm()
 {
 	pic->set_serial("541 123456 12345 123");
 	lamp->set_names(lamps_afm);
@@ -384,7 +384,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, afm)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, cc)
+void wpc_95_state::init_cc()
 {
 	pic->set_serial("566 123456 12345 123");
 	lamp->set_names(lamps_cc);
@@ -392,7 +392,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, cc)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, cv)
+void wpc_95_state::init_cv()
 {
 	pic->set_serial("562 123456 12345 123");
 	lamp->set_names(lamps_cv);
@@ -400,7 +400,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, cv)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, congo)
+void wpc_95_state::init_congo()
 {
 	pic->set_serial("550 123456 12345 123");
 	lamp->set_names(lamps_congo);
@@ -408,7 +408,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, congo)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, jy)
+void wpc_95_state::init_jy()
 {
 	pic->set_serial("552 123456 12345 123");
 	lamp->set_names(lamps_jy);
@@ -416,7 +416,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, jy)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, mm)
+void wpc_95_state::init_mm()
 {
 	pic->set_serial("559 123456 12345 123");
 	lamp->set_names(lamps_mm);
@@ -424,7 +424,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, mm)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, mb)
+void wpc_95_state::init_mb()
 {
 	pic->set_serial("565 123456 12345 123");
 	lamp->set_names(lamps_mb);
@@ -432,7 +432,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, mb)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, nbaf)
+void wpc_95_state::init_nbaf()
 {
 	pic->set_serial("553 123456 12345 123");
 	lamp->set_names(lamps_nbaf);
@@ -440,7 +440,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, nbaf)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, ngg)
+void wpc_95_state::init_ngg()
 {
 	pic->set_serial("561 123456 12345 123");
 	lamp->set_names(lamps_ngg);
@@ -448,7 +448,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, ngg)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, sc)
+void wpc_95_state::init_sc()
 {
 	pic->set_serial("903 123456 12345 123");
 	lamp->set_names(lamps_sc);
@@ -457,7 +457,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, sc)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, ss)
+void wpc_95_state::init_ss()
 {
 	pic->set_serial("548 123456 12345 123");
 	lamp->set_names(lamps_ss);
@@ -465,7 +465,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, ss)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, totan)
+void wpc_95_state::init_totan()
 {
 	pic->set_serial("547 123456 12345 123");
 	lamp->set_names(lamps_totan);
@@ -473,7 +473,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, totan)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, cp)
+void wpc_95_state::init_cp()
 {
 	pic->set_serial("563 123456 12345 123");
 	lamp->set_names(lamps_cp);
@@ -481,7 +481,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, cp)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_95_state, ttt)
+void wpc_95_state::init_ttt()
 {
 	pic->set_serial("905 123456 12345 123");
 	lamp->set_names(lamps_ttt);
@@ -2249,16 +2249,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(wpc_95_state::wpc_95)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(8'000'000)/4) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(wpc_95_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_95_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000)/4) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(wpc_95_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_95_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_95_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
 	MCFG_WPC_PIC_ADD("pic")
 	MCFG_WPC_LAMP_ADD("lamp")
 	MCFG_WPC_OUT_ADD("out", 3)
 	MCFG_WPC_SHIFT_ADD("shift")
-	MCFG_WPC_DMD_ADD("dmd", WRITELINE(wpc_95_state, scanline_irq))
+	MCFG_WPC_DMD_ADD("dmd", WRITELINE(*this, wpc_95_state, scanline_irq))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_WPC, 0)
@@ -3021,65 +3021,65 @@ ROM_START(tf95_12)
 	ROM_LOAD16_BYTE("s2_10.rom", 0x000000, 0x100000, CRC(ceff7fe4) SHA1(ff2574f65e09d446b9e446abd58159a7d100059b))
 ROM_END
 
-GAME(1996,  tf95_12,    0,          wpc_95, afm,    wpc_95_state,   tf95,   ROT0,   "Bally",                "WPC 95 Test Fixture (1.2)",              MACHINE_MECHANICAL)
-GAME(1995,  afm_113,    0,          wpc_95, afm,    wpc_95_state,   afm,    ROT0,   "Bally",                "Attack From Mars (1.13, Free play)",     MACHINE_MECHANICAL)
-GAME(1995,  afm_113b,   afm_113,    wpc_95, afm,    wpc_95_state,   afm,    ROT0,   "Bally",                "Attack From Mars (1.13b)",               MACHINE_MECHANICAL)
-GAME(1995,  afm_11,     afm_113,    wpc_95, afm,    wpc_95_state,   afm,    ROT0,   "Bally",                "Attack From Mars (1.1)",                 MACHINE_MECHANICAL)
-GAME(1995,  afm_11u,    afm_113,    wpc_95, afm,    wpc_95_state,   afm,    ROT0,   "Bally",                "Attack From Mars (1.1 Ultrapin)",        MACHINE_MECHANICAL)
-GAME(1995,  afm_10,     afm_113,    wpc_95, afm,    wpc_95_state,   afm,    ROT0,   "Bally",                "Attack From Mars (1.0)",                 MACHINE_MECHANICAL)
-GAME(1998,  cc_13,      0,          wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.3)",                    MACHINE_MECHANICAL)
-GAME(1998,  cc_12,      cc_13,      wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.2)",                    MACHINE_MECHANICAL)
-GAME(1998,  cc_10,      cc_13,      wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.0)",                    MACHINE_MECHANICAL)
-GAME(1998,  cc_104,     cc_13,      wpc_95, cc,     wpc_95_state,   cc,     ROT0,   "Bally",                "Cactus Canyon (1.04 Test 0.2)",          MACHINE_MECHANICAL)
-GAME(1997,  cv_14,      0,          wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (1.4)",                  MACHINE_MECHANICAL)
-GAME(1997,  cv_20h,     cv_14,      wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (2.0H)",                 MACHINE_MECHANICAL)
-GAME(1997,  cv_10,      cv_14,      wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (1.0)",                  MACHINE_MECHANICAL)
-GAME(1997,  cv_11,      cv_14,      wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (1.1)",                  MACHINE_MECHANICAL)
-GAME(1997,  cv_13,      cv_14,      wpc_95, cv,     wpc_95_state,   cv,     ROT0,   "Bally",                "Cirqus Voltaire (1.3)",                  MACHINE_MECHANICAL)
-GAME(1995,  congo_21,   0,          wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (2.1)",                            MACHINE_MECHANICAL)
-GAME(1995,  congo_20,   congo_21,   wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (2.0)",                            MACHINE_MECHANICAL)
-GAME(1995,  congo_13,   congo_21,   wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (1.3)",                            MACHINE_MECHANICAL)
-GAME(1995,  congo_11,   congo_21,   wpc_95, congo,  wpc_95_state,   congo,  ROT0,   "Williams",             "Congo (1.1)",                            MACHINE_MECHANICAL)
-GAME(1996,  jy_12,      0,          wpc_95, jy,     wpc_95_state,   jy,     ROT0,   "Williams",             "Junk Yard (1.2)",                        MACHINE_MECHANICAL)
-GAME(1996,  jy_11,      jy_12,      wpc_95, jy,     wpc_95_state,   jy,     ROT0,   "Williams",             "Junk Yard (1.1)",                        MACHINE_MECHANICAL)
-GAME(1996,  jy_03,      jy_12,      wpc_95, jy,     wpc_95_state,   jy,     ROT0,   "Williams",             "Junk Yard (0.3)",                        MACHINE_MECHANICAL)
-GAME(1999,  mm_10,      0,          wpc_95, mm,     wpc_95_state,   mm,     ROT0,   "Williams",             "Medieval Madness (1.0)",                 MACHINE_MECHANICAL)
-GAME(1999,  mm_10u,     mm_10,      wpc_95, mm,     wpc_95_state,   mm,     ROT0,   "Williams",             "Medieval Madness (1.0 Ultrapin)",        MACHINE_MECHANICAL)
-GAME(1999,  mm_109,     mm_10,      wpc_95, mm,     wpc_95_state,   mm,     ROT0,   "Williams",             "Medieval Madness (1.09)",                MACHINE_MECHANICAL)
-GAME(1999,  mm_109b,    mm_10,      wpc_95, mm,     wpc_95_state,   mm,     ROT0,   "Williams",             "Medieval Madness (1.09B)",               MACHINE_MECHANICAL)
-GAME(1999,  mm_109c,    mm_10,      wpc_95, mm,     wpc_95_state,   mm,     ROT0,   "Williams",             "Medieval Madness (1.09C Profanity)",     MACHINE_MECHANICAL)
-GAME(1997,  mm_05,      mm_10,      wpc_95, mm,     wpc_95_state,   mm,     ROT0,   "Williams",             "Medieval Madness (0.50)",                MACHINE_MECHANICAL)
-GAME(1998,  mb_10,      0,          wpc_95, mb,     wpc_95_state,   mb,     ROT0,   "Williams",             "Monster Bash (1.0)",                     MACHINE_MECHANICAL)
-GAME(1998,  mb_106,     mb_10,      wpc_95, mb,     wpc_95_state,   mb,     ROT0,   "Williams",             "Monster Bash (1.06)",                    MACHINE_MECHANICAL)
-GAME(1998,  mb_106b,    mb_10,      wpc_95, mb,     wpc_95_state,   mb,     ROT0,   "Williams",             "Monster Bash (1.06b)",                   MACHINE_MECHANICAL)
-GAME(1997,  nbaf_31,    0,          wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (3.1 - S3.0)",             MACHINE_MECHANICAL)
-GAME(1997,  nbaf_31a,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (3.1 - S1.0)",             MACHINE_MECHANICAL)
-GAME(1997,  nbaf_11s,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (1.1 - S0.4)",             MACHINE_MECHANICAL)
-GAME(1997,  nbaf_11,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (1.1)",                    MACHINE_MECHANICAL)
-GAME(1997,  nbaf_11a,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (1.1 - S2.0)",             MACHINE_MECHANICAL)
-GAME(1997,  nbaf_115,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (1.15)",                   MACHINE_MECHANICAL)
-GAME(1997,  nbaf_21,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (2.1)",                    MACHINE_MECHANICAL)
-GAME(1997,  nbaf_22,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (2.2)",                    MACHINE_MECHANICAL)
-GAME(1997,  nbaf_23,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   nbaf,   ROT0,   "Bally",                "NBA Fastbreak (2.3)",                    MACHINE_MECHANICAL)
-GAME(1997,  ngg_13,     0,          wpc_95, ngg,    wpc_95_state,   ngg,    ROT0,   "Williams",             "No Good Gofers (1.3)",                   MACHINE_MECHANICAL)
-GAME(1997,  ngg_p06,    ngg_13,     wpc_95, ngg,    wpc_95_state,   ngg,    ROT0,   "Williams",             "No Good Gofers (p0.6)",                  MACHINE_MECHANICAL)
-GAME(1997,  ngg_10,     ngg_13,     wpc_95, ngg,    wpc_95_state,   ngg,    ROT0,   "Williams",             "No Good Gofers (1.0)",                   MACHINE_MECHANICAL)
-GAME(1998,  sc_18,      0,          wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.8)",                     MACHINE_MECHANICAL)
-GAME(1998,  sc_18n,     sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.8N)",                    MACHINE_MECHANICAL)
-GAME(1998,  sc_18s2,    sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.8 alternate sound)",     MACHINE_MECHANICAL)
-GAME(1996,  sc_17,      sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.7)",                     MACHINE_MECHANICAL)
-GAME(1996,  sc_17n,     sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.7N)",                    MACHINE_MECHANICAL)
-GAME(1996,  sc_14,      sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (1.4)",                     MACHINE_MECHANICAL)
-GAME(1996,  sc_091,     sc_18,      wpc_95, sc,     wpc_95_state,   sc,     ROT0,   "Bally",                "Safe Cracker (0.91)",                    MACHINE_MECHANICAL)
-GAME(1996,  ss_15,      0,          wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (1.5)",                     MACHINE_MECHANICAL)
-GAME(1996,  ss_14,      ss_15,      wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (1.4)",                     MACHINE_MECHANICAL)
-GAME(1996,  ss_12,      ss_15,      wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (1.2)",                     MACHINE_MECHANICAL)
-GAME(1996,  ss_03,      ss_15,      wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (0.3)",                     MACHINE_MECHANICAL)
-GAME(1996,  ss_01,      ss_15,      wpc_95, ss,     wpc_95_state,   ss,     ROT0,   "Bally",                "Scared Stiff (D0.1R with sound rev.25)", MACHINE_MECHANICAL)
-GAME(1996,  totan_14,   0,          wpc_95, totan,  wpc_95_state,   totan,  ROT0,   "Williams",             "Tales Of The Arabian Nights (1.4)",      MACHINE_MECHANICAL)
-GAME(1996,  totan_13,   totan_14,   wpc_95, totan,  wpc_95_state,   totan,  ROT0,   "Williams",             "Tales Of The Arabian Nights (1.3)",      MACHINE_MECHANICAL)
-GAME(1996,  totan_12,   totan_14,   wpc_95, totan,  wpc_95_state,   totan,  ROT0,   "Williams",             "Tales Of The Arabian Nights (1.2)",      MACHINE_MECHANICAL)
-GAME(1996,  totan_04,   totan_14,   wpc_95, totan,  wpc_95_state,   totan,  ROT0,   "Williams",             "Tales Of The Arabian Nights (0.4)",      MACHINE_MECHANICAL)
-GAME(1998,  cp_16,      0,          wpc_95, cp,     wpc_95_state,   cp,     ROT0,   "Bally",                "The Champion Pub (1.6)",                 MACHINE_MECHANICAL)
-GAME(1998,  cp_15,      cp_16,      wpc_95, cp,     wpc_95_state,   cp,     ROT0,   "Bally",                "The Champion Pub (1.5)",                 MACHINE_MECHANICAL)
-GAME(1996,  ttt_10,     0,          wpc_95, ttt,    wpc_95_state,   ttt,    ROT0,   "Williams",             "Ticket Tac Toe (1.0)",                   MACHINE_MECHANICAL)
+GAME(1996,  tf95_12,    0,          wpc_95, afm,    wpc_95_state,   init_tf95,   ROT0, "Bally",                "WPC 95 Test Fixture (1.2)",              MACHINE_MECHANICAL)
+GAME(1995,  afm_113,    0,          wpc_95, afm,    wpc_95_state,   init_afm,    ROT0, "Bally",                "Attack From Mars (1.13, Free play)",     MACHINE_MECHANICAL)
+GAME(1995,  afm_113b,   afm_113,    wpc_95, afm,    wpc_95_state,   init_afm,    ROT0, "Bally",                "Attack From Mars (1.13b)",               MACHINE_MECHANICAL)
+GAME(1995,  afm_11,     afm_113,    wpc_95, afm,    wpc_95_state,   init_afm,    ROT0, "Bally",                "Attack From Mars (1.1)",                 MACHINE_MECHANICAL)
+GAME(1995,  afm_11u,    afm_113,    wpc_95, afm,    wpc_95_state,   init_afm,    ROT0, "Bally",                "Attack From Mars (1.1 Ultrapin)",        MACHINE_MECHANICAL)
+GAME(1995,  afm_10,     afm_113,    wpc_95, afm,    wpc_95_state,   init_afm,    ROT0, "Bally",                "Attack From Mars (1.0)",                 MACHINE_MECHANICAL)
+GAME(1998,  cc_13,      0,          wpc_95, cc,     wpc_95_state,   init_cc,     ROT0, "Bally",                "Cactus Canyon (1.3)",                    MACHINE_MECHANICAL)
+GAME(1998,  cc_12,      cc_13,      wpc_95, cc,     wpc_95_state,   init_cc,     ROT0, "Bally",                "Cactus Canyon (1.2)",                    MACHINE_MECHANICAL)
+GAME(1998,  cc_10,      cc_13,      wpc_95, cc,     wpc_95_state,   init_cc,     ROT0, "Bally",                "Cactus Canyon (1.0)",                    MACHINE_MECHANICAL)
+GAME(1998,  cc_104,     cc_13,      wpc_95, cc,     wpc_95_state,   init_cc,     ROT0, "Bally",                "Cactus Canyon (1.04 Test 0.2)",          MACHINE_MECHANICAL)
+GAME(1997,  cv_14,      0,          wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.4)",                  MACHINE_MECHANICAL)
+GAME(1997,  cv_20h,     cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (2.0H)",                 MACHINE_MECHANICAL)
+GAME(1997,  cv_10,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.0)",                  MACHINE_MECHANICAL)
+GAME(1997,  cv_11,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.1)",                  MACHINE_MECHANICAL)
+GAME(1997,  cv_13,      cv_14,      wpc_95, cv,     wpc_95_state,   init_cv,     ROT0, "Bally",                "Cirqus Voltaire (1.3)",                  MACHINE_MECHANICAL)
+GAME(1995,  congo_21,   0,          wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (2.1)",                            MACHINE_MECHANICAL)
+GAME(1995,  congo_20,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (2.0)",                            MACHINE_MECHANICAL)
+GAME(1995,  congo_13,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (1.3)",                            MACHINE_MECHANICAL)
+GAME(1995,  congo_11,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (1.1)",                            MACHINE_MECHANICAL)
+GAME(1996,  jy_12,      0,          wpc_95, jy,     wpc_95_state,   init_jy,     ROT0, "Williams",             "Junk Yard (1.2)",                        MACHINE_MECHANICAL)
+GAME(1996,  jy_11,      jy_12,      wpc_95, jy,     wpc_95_state,   init_jy,     ROT0, "Williams",             "Junk Yard (1.1)",                        MACHINE_MECHANICAL)
+GAME(1996,  jy_03,      jy_12,      wpc_95, jy,     wpc_95_state,   init_jy,     ROT0, "Williams",             "Junk Yard (0.3)",                        MACHINE_MECHANICAL)
+GAME(1999,  mm_10,      0,          wpc_95, mm,     wpc_95_state,   init_mm,     ROT0, "Williams",             "Medieval Madness (1.0)",                 MACHINE_MECHANICAL)
+GAME(1999,  mm_10u,     mm_10,      wpc_95, mm,     wpc_95_state,   init_mm,     ROT0, "Williams",             "Medieval Madness (1.0 Ultrapin)",        MACHINE_MECHANICAL)
+GAME(1999,  mm_109,     mm_10,      wpc_95, mm,     wpc_95_state,   init_mm,     ROT0, "Williams",             "Medieval Madness (1.09)",                MACHINE_MECHANICAL)
+GAME(1999,  mm_109b,    mm_10,      wpc_95, mm,     wpc_95_state,   init_mm,     ROT0, "Williams",             "Medieval Madness (1.09B)",               MACHINE_MECHANICAL)
+GAME(1999,  mm_109c,    mm_10,      wpc_95, mm,     wpc_95_state,   init_mm,     ROT0, "Williams",             "Medieval Madness (1.09C Profanity)",     MACHINE_MECHANICAL)
+GAME(1997,  mm_05,      mm_10,      wpc_95, mm,     wpc_95_state,   init_mm,     ROT0, "Williams",             "Medieval Madness (0.50)",                MACHINE_MECHANICAL)
+GAME(1998,  mb_10,      0,          wpc_95, mb,     wpc_95_state,   init_mb,     ROT0, "Williams",             "Monster Bash (1.0)",                     MACHINE_MECHANICAL)
+GAME(1998,  mb_106,     mb_10,      wpc_95, mb,     wpc_95_state,   init_mb,     ROT0, "Williams",             "Monster Bash (1.06)",                    MACHINE_MECHANICAL)
+GAME(1998,  mb_106b,    mb_10,      wpc_95, mb,     wpc_95_state,   init_mb,     ROT0, "Williams",             "Monster Bash (1.06b)",                   MACHINE_MECHANICAL)
+GAME(1997,  nbaf_31,    0,          wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (3.1 - S3.0)",             MACHINE_MECHANICAL)
+GAME(1997,  nbaf_31a,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (3.1 - S1.0)",             MACHINE_MECHANICAL)
+GAME(1997,  nbaf_11s,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (1.1 - S0.4)",             MACHINE_MECHANICAL)
+GAME(1997,  nbaf_11,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (1.1)",                    MACHINE_MECHANICAL)
+GAME(1997,  nbaf_11a,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (1.1 - S2.0)",             MACHINE_MECHANICAL)
+GAME(1997,  nbaf_115,   nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (1.15)",                   MACHINE_MECHANICAL)
+GAME(1997,  nbaf_21,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (2.1)",                    MACHINE_MECHANICAL)
+GAME(1997,  nbaf_22,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (2.2)",                    MACHINE_MECHANICAL)
+GAME(1997,  nbaf_23,    nbaf_31,    wpc_95, nbaf,   wpc_95_state,   init_nbaf,   ROT0, "Bally",                "NBA Fastbreak (2.3)",                    MACHINE_MECHANICAL)
+GAME(1997,  ngg_13,     0,          wpc_95, ngg,    wpc_95_state,   init_ngg,    ROT0, "Williams",             "No Good Gofers (1.3)",                   MACHINE_MECHANICAL)
+GAME(1997,  ngg_p06,    ngg_13,     wpc_95, ngg,    wpc_95_state,   init_ngg,    ROT0, "Williams",             "No Good Gofers (p0.6)",                  MACHINE_MECHANICAL)
+GAME(1997,  ngg_10,     ngg_13,     wpc_95, ngg,    wpc_95_state,   init_ngg,    ROT0, "Williams",             "No Good Gofers (1.0)",                   MACHINE_MECHANICAL)
+GAME(1998,  sc_18,      0,          wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8)",                     MACHINE_MECHANICAL)
+GAME(1998,  sc_18n,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8N)",                    MACHINE_MECHANICAL)
+GAME(1998,  sc_18s2,    sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8 alternate sound)",     MACHINE_MECHANICAL)
+GAME(1996,  sc_17,      sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.7)",                     MACHINE_MECHANICAL)
+GAME(1996,  sc_17n,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.7N)",                    MACHINE_MECHANICAL)
+GAME(1996,  sc_14,      sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.4)",                     MACHINE_MECHANICAL)
+GAME(1996,  sc_091,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (0.91)",                    MACHINE_MECHANICAL)
+GAME(1996,  ss_15,      0,          wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.5)",                     MACHINE_MECHANICAL)
+GAME(1996,  ss_14,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.4)",                     MACHINE_MECHANICAL)
+GAME(1996,  ss_12,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.2)",                     MACHINE_MECHANICAL)
+GAME(1996,  ss_03,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (0.3)",                     MACHINE_MECHANICAL)
+GAME(1996,  ss_01,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (D0.1R with sound rev.25)", MACHINE_MECHANICAL)
+GAME(1996,  totan_14,   0,          wpc_95, totan,  wpc_95_state,   init_totan,  ROT0, "Williams",             "Tales Of The Arabian Nights (1.4)",      MACHINE_MECHANICAL)
+GAME(1996,  totan_13,   totan_14,   wpc_95, totan,  wpc_95_state,   init_totan,  ROT0, "Williams",             "Tales Of The Arabian Nights (1.3)",      MACHINE_MECHANICAL)
+GAME(1996,  totan_12,   totan_14,   wpc_95, totan,  wpc_95_state,   init_totan,  ROT0, "Williams",             "Tales Of The Arabian Nights (1.2)",      MACHINE_MECHANICAL)
+GAME(1996,  totan_04,   totan_14,   wpc_95, totan,  wpc_95_state,   init_totan,  ROT0, "Williams",             "Tales Of The Arabian Nights (0.4)",      MACHINE_MECHANICAL)
+GAME(1998,  cp_16,      0,          wpc_95, cp,     wpc_95_state,   init_cp,     ROT0, "Bally",                "The Champion Pub (1.6)",                 MACHINE_MECHANICAL)
+GAME(1998,  cp_15,      cp_16,      wpc_95, cp,     wpc_95_state,   init_cp,     ROT0, "Bally",                "The Champion Pub (1.5)",                 MACHINE_MECHANICAL)
+GAME(1996,  ttt_10,     0,          wpc_95, ttt,    wpc_95_state,   init_ttt,    ROT0, "Williams",             "Ticket Tac Toe (1.0)",                   MACHINE_MECHANICAL)

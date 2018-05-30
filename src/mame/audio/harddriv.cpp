@@ -435,27 +435,27 @@ void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
+	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(driversnd_68k_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 80R
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_write_w)) // SPWR - 5220 write strobe
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_reset_w)) // SPRES - 5220 hard reset
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_rate_w)) // SPRATE
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(harddriv_sound_board_device, cram_enable_w)) // CRAMEN
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_write_w)) // SPWR - 5220 write strobe
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_reset_w)) // SPRES - 5220 hard reset
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_rate_w)) // SPRATE
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, cram_enable_w)) // CRAMEN
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sounddsp", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // RES320
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(harddriv_sound_board_device, led_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, led_w))
 
-	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
+	MCFG_DEVICE_ADD("sounddsp", TMS32010, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
-	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(harddriv_sound_board_device, hdsnddsp_get_bio))
+	MCFG_DEVICE_IO_MAP(driversnd_dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, harddriv_sound_board_device, hdsnddsp_get_bio))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // ls374d.75e + ls374d.90e + am6012
+	MCFG_DEVICE_ADD("dac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // ls374d.75e + ls374d.90e + am6012
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

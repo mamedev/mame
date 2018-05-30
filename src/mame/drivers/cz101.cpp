@@ -379,15 +379,15 @@ void cz101_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START( cz101_state::cz101 )
-	MCFG_CPU_ADD("maincpu", UPD7810, 10_MHz_XTAL) // actually 7811, but internal ROM disabled
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(cz101_state, port_a_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(cz101_state, port_a_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(cz101_state, port_b_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(cz101_state, port_c_w))
+	MCFG_DEVICE_ADD("maincpu", UPD7810, 10_MHz_XTAL) // actually 7811, but internal ROM disabled
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, cz101_state, port_a_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, cz101_state, port_a_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, cz101_state, port_b_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, cz101_state, port_c_w))
 
 	MCFG_CLOCK_ADD("midi_clock", 2_MHz_XTAL)
-//  MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", upd7810_device, sck_w)) not supported yet
+//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("maincpu", upd7810_device, sck_w)) not supported yet
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -426,5 +426,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT  COMPANY  FULLNAME  FLAGS
-CONS( 1984, cz101, 0,      0,       cz101,   cz101, cz101_state, 0,    "Casio", "CZ-101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+CONS( 1984, cz101, 0,      0,      cz101,   cz101, cz101_state, empty_init, "Casio", "CZ-101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

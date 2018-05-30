@@ -201,7 +201,7 @@ public:
 
 	u16 m_clock_rate;
 
-	DECLARE_DRIVER_INIT(wildpkr);
+	void init_wildpkr();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wildpkr);
@@ -462,9 +462,9 @@ IRQ_CALLBACK_MEMBER(wildpkr_state::tabpkr_irq_ack)
 MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wildpkr_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // guess
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wildpkr_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // guess
 
 	MCFG_DEVICE_ADD("duart", MC68681, SEC_CLOCK)
 
@@ -484,8 +484,8 @@ MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8930, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8930, AY_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -493,10 +493,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(tabpkr_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wildpkr_state, irq3_line_assert, 60*256)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(wildpkr_state, tabpkr_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tabpkr_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wildpkr_state, irq3_line_assert, 60*256)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(wildpkr_state, tabpkr_irq_ack)
 
 	MCFG_NVRAM_ADD_1FILL("nvram") // DS1220Y
 
@@ -525,11 +525,11 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", AD557, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("dac", AD557, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -592,7 +592,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
+void wildpkr_state::init_wildpkr()
 {
 }
 
@@ -601,6 +601,6 @@ DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT      ROT   COMPANY        FULLNAME                    FLAGS
-GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, tabpkr,    0,        tabpkr,   tabpkr,  wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+//    YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT           ROT   COMPANY        FULLNAME                    FLAGS
+GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr, wildpkr_state,  init_wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, tabpkr,    0,        tabpkr,   tabpkr,  wildpkr_state,  init_wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

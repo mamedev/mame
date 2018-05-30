@@ -89,7 +89,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
+		, m_wave(*this, "wave")
 		, m_key_pressed(0)
 		, m_io_line0(*this, "LINE0")
 		, m_io_line1(*this, "LINE1")
@@ -417,34 +417,32 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tec1_state::tec1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
-	MCFG_CPU_PROGRAM_MAP(tec1_map)
-	MCFG_CPU_IO_MAP(tec1_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tec1_map)
+	MCFG_DEVICE_IO_MAP(tec1_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_tec1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tec1_state::tecjmon)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
-	MCFG_CPU_PROGRAM_MAP(tecjmon_map)
-	MCFG_CPU_IO_MAP(tecjmon_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tecjmon_map)
+	MCFG_DEVICE_IO_MAP(tecjmon_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_tec1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -473,6 +471,6 @@ ROM_START(tecjmon)
 	ROM_LOAD("util.rom",    0x3800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT STATE       INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1984, tec1,     0,      0,      tec1,       tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1",            0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1A with JMON", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                         FULLNAME            FLAGS
+COMP( 1984, tec1,     0,      0,      tec1,    tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1",            0 )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon, tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1A with JMON", 0 )

@@ -437,9 +437,9 @@ void mu100_state::mu100_iomap(address_map &map)
 }
 
 MACHINE_CONFIG_START(mu100_state::mu100)
-	MCFG_CPU_ADD( "maincpu", H8S2655, XTAL(16'000'000) )
-	MCFG_CPU_PROGRAM_MAP( mu100_map )
-	MCFG_CPU_IO_MAP( mu100_iomap )
+	MCFG_DEVICE_ADD( "maincpu", H8S2655, XTAL(16'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( mu100_map )
+	MCFG_DEVICE_IO_MAP( mu100_iomap )
 
 	MCFG_HD44780_ADD("lcd")
 	MCFG_HD44780_LCD_SIZE(4, 20)
@@ -452,14 +452,15 @@ MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 899, 0, 240)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("maincpu:sci0", h8_sci_device, rx_w))
+	MCFG_MIDI_RX_HANDLER(WRITELINE("maincpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 	MCFG_DEVICE_MODIFY("maincpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":mdout", midi_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("mdout", midi_port_device, write_txd))
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -502,5 +503,5 @@ ROM_START( mu100r )
 	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
+CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )

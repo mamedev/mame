@@ -45,7 +45,7 @@ static const gfx_layout fontlayout_8bit =
 	10*8            /* every char takes 10 consecutive bytes */
 };
 
-static GFXDECODE_START( vdt911 )
+static GFXDECODE_START( gfx_vdt911 )
 	// Caution: Array must use same order as vdt911_model_t
 	// US
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_device::US_chr_offset, fontlayout_7bit, 0, 4 )
@@ -148,11 +148,11 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 DEFINE_DEVICE_TYPE(VDT911, vdt911_device, "vdt911", "911 VDT")
 
 vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VDT911, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(vdt911), "palette"),
-		m_beeper(*this, "beeper"),
-		m_keyint_line(*this),
-		m_lineint_line(*this)
+	: device_t(mconfig, VDT911, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfx_vdt911, "palette")
+	, m_beeper(*this, "beeper")
+	, m_keyint_line(*this)
+	, m_lineint_line(*this)
 {
 }
 
@@ -812,8 +812,8 @@ MACHINE_CONFIG_START(vdt911_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 
 	MCFG_PALETTE_ADD("palette", 8)

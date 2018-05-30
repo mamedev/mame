@@ -932,7 +932,7 @@ static const gfx_layout tile_layout =
 };
 
 
-static GFXDECODE_START( ddragon )
+static GFXDECODE_START( gfx_ddragon )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,   0, 8 )   /* colors   0-127 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 128, 8 )   /* colors 128-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256, 8 )   /* colors 256-383 */
@@ -947,15 +947,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* HD63701YOP, 6 MHz / 4 internally */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* HD63701YOP, 6 MHz / 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* HD68A09P, 6 MHz / 4 internally */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* HD68A09P, 6 MHz / 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
@@ -963,7 +963,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddragon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -975,23 +975,23 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state, irq_handler))
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state, irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK / 32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm1", MSM5205, MAIN_CLOCK / 32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_1))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK / 32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm2", MSM5205, MAIN_CLOCK / 32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_2))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1001,8 +1001,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragonb)
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 MACHINE_CONFIG_END
 
 
@@ -1010,24 +1010,24 @@ MACHINE_CONFIG_START(ddragon_state::ddragonba)
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
-	MCFG_CPU_PROGRAM_MAP(ddragonba_sub_map)
-	MCFG_CPU_IO_MAP(ddragonba_sub_portmap)
+	MCFG_DEVICE_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(ddragonba_sub_map)
+	MCFG_DEVICE_IO_MAP(ddragonba_sub_portmap)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)  /* 1.5 Mhz */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, MAIN_CLOCK / 8)  /* 1.5 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", MC6809E, MAIN_CLOCK / 8) /* 1.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809E, MAIN_CLOCK / 8) /* 1.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
@@ -1035,7 +1035,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddragon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1047,23 +1047,23 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_1))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_2))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1072,15 +1072,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(dd2_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dd2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)        /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(dd2_sub_map)
+	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK / 3)        /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dd2_sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(dd2_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(dd2_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
@@ -1088,7 +1088,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddragon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1100,17 +1100,17 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -1119,8 +1119,8 @@ MACHINE_CONFIG_START(darktowr_state::darktowr)
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000))
-	MCFG_M68705_PORTA_W_CB(WRITE8(darktowr_state, mcu_port_a_w))
+	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, darktowr_state, mcu_port_a_w))
 
 	/* video hardware */
 MACHINE_CONFIG_END
@@ -2087,7 +2087,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon)
+void ddragon_state::init_ddragon()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_ym_irq = M6809_FIRQ_LINE;
@@ -2095,7 +2095,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
+void ddragon_state::init_ddragon2()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_ym_irq = 0;
@@ -2103,7 +2103,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 }
 
 
-DRIVER_INIT_MEMBER(darktowr_state, darktowr)
+void darktowr_state::init_darktowr()
 {
 	save_item(NAME(m_mcu_port_a_out));
 
@@ -2115,37 +2115,34 @@ DRIVER_INIT_MEMBER(darktowr_state, darktowr)
 }
 
 
-DRIVER_INIT_MEMBER(toffy_state, toffy)
+void toffy_state::init_toffy()
 {
-	int i, length;
-	uint8_t *rom;
-
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(toffy_state::toffy_bankswitch_w), this));
 
 	/* the program rom has a simple bitswap encryption */
-	rom = memregion("maincpu")->base();
-	length = memregion("maincpu")->bytes();
-	for (i = 0; i < length; i++)
+	uint8_t *rom = memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
 	rom = memregion("gfx2")->base();
 	length = memregion("gfx2")->bytes();
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
 	rom = memregion("gfx3")->base();
 	length = memregion("gfx3")->bytes();
-	for (i = 0; i < length / 2; i++)
+	for (int i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = bitswap<8>(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
 		rom[i + 1*length/2] = bitswap<8>(rom[i + 1*length/2], 7,6,2,4,3,5,1,0);
@@ -2154,17 +2151,14 @@ DRIVER_INIT_MEMBER(toffy_state, toffy)
 	/* should the sound rom be bitswapped too? */
 }
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
+void ddragon_state::init_ddragon6809()
 {
-	int i;
-	uint8_t *dst,*src;
+	uint8_t *src = memregion("chars")->base();
+	uint8_t *dst = memregion("gfx1")->base();
 
-	src = memregion("chars")->base();
-	dst = memregion("gfx1")->base();
-
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
-		switch(i & 0x18)
+		switch (i & 0x18)
 		{
 			case 0x00: dst[i] = src[(i & ~0x18) | 0x18]; break;
 			case 0x08: dst[i] = src[(i & ~0x18) | 0x00]; break;
@@ -2186,32 +2180,32 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
  *
  *************************************/
 
-GAME( 1987, ddragon,     0,        ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan",                         "Double Dragon (Japan)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonw,    ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonw1,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 2)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonu,    ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 1)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonua,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 2)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonub,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 3)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonb2,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonb,    ddragon,  ddragonb,    ddragon,  ddragon_state,  ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with HD6309)",         MACHINE_SUPPORTS_SAVE ) // according to dump notes
-GAME( 1987, ddragonba,   ddragon,  ddragonba,   ddragon,  ddragon_state,  ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with M6803)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragon6809, ddragon,  ddragon6809, ddragon,  ddragon_state,  ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
-GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon,  ddragon_state,  ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
+GAME( 1987, ddragon,      0,        ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan",                         "Double Dragon (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonw,     ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonw1,    ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonu,     ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonua,    ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 2)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonub,    ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 3)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonb2,    ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonb,     ddragon,  ddragonb,    ddragon,  ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with HD6309)",         MACHINE_SUPPORTS_SAVE ) // according to dump notes
+GAME( 1987, ddragonba,    ddragon,  ddragonba,   ddragon,  ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with M6803)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragon6809,  ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
+GAME( 1987, ddragon6809a, ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
 
-GAME( 1988, ddragon2,    0,        ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2u,   ddragon2, ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2j,   ddragon2, ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
-GAME( 1988, ddragon2b,   ddragon2, ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "bootleg",       "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
+GAME( 1988, ddragon2b,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
-GAME( 1991, tstrike,    0,         darktowr,    tstrike,  darktowr_state, darktowr,    ROT0, "East Coast Coin Company", "Thunder Strike (set 1)",        MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
-GAME( 1991, tstrikea,   tstrike,   darktowr,    tstrike,  darktowr_state, darktowr,    ROT0, "The Game Room",           "Thunder Strike (set 2, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, ddungeon,   0,         darktowr,    ddungeon, darktowr_state, darktowr,    ROT0, "The Game Room",           "Dangerous Dungeons (set 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, ddungeone,  ddungeon,  darktowr,    ddungeon, darktowr_state, darktowr,    ROT0, "East Coast Coin Company", "Dangerous Dungeons (set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, darktowr,   0,         darktowr,    darktowr, darktowr_state, darktowr,    ROT0, "The Game Room",           "Dark Tower",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tstrike,      0,        darktowr,    tstrike,  darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Thunder Strike (set 1)",        MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
+GAME( 1991, tstrikea,     tstrike,  darktowr,    tstrike,  darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Thunder Strike (set 2, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ddungeon,     0,        darktowr,    ddungeon, darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dangerous Dungeons (set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ddungeone,    ddungeon, darktowr,    ddungeon, darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Dangerous Dungeons (set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, darktowr,     0,        darktowr,    darktowr, darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dark Tower",                    MACHINE_SUPPORTS_SAVE )
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */
-GAME( 1993, toffy,      0,         toffy,       toffy,    toffy_state,    toffy,       ROT0, "Midas",                   "Toffy",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffy,        0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Toffy",                         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, stoffy,     0,         toffy,       toffy,    toffy_state,    toffy,       ROT0, "Midas",                   "Super Toffy",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stoffyu,    stoffy,    toffy,       toffy,    toffy_state,    toffy,       ROT0, "Midas (Unico license)",   "Super Toffy (Unico license)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stoffy,       0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Super Toffy",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stoffyu,      stoffy,    toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas (Unico license)",   "Super Toffy (Unico license)",   MACHINE_SUPPORTS_SAVE )

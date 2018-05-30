@@ -247,9 +247,9 @@ void poly880_state::machine_start()
 
 MACHINE_CONFIG_START(poly880_state::poly880)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(7'372'800)/8)
-	MCFG_CPU_PROGRAM_MAP(poly880_mem)
-	MCFG_CPU_IO_MAP(poly880_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(7'372'800)/8)
+	MCFG_DEVICE_PROGRAM_MAP(poly880_mem)
+	MCFG_DEVICE_IO_MAP(poly880_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_poly880 )
@@ -257,15 +257,15 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(7'372'800)/16)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(poly880_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(poly880_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, poly880_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, poly880_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, XTAL(7'372'800)/16)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(poly880_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(poly880_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(poly880_state, pio1_pb_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, poly880_state, pio1_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, poly880_state, pio1_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, poly880_state, pio1_pb_w))
 
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL(7'372'800)/16)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -288,5 +288,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY            FULLNAME             FLAGS
-COMP( 1983, poly880,    0,      0,      poly880,  poly880, poly880_state, 0,    "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME             FLAGS
+COMP( 1983, poly880, 0,      0,      poly880, poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

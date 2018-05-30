@@ -22,6 +22,7 @@ Wicat - various systems.
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
@@ -67,7 +68,8 @@ public:
 	DECLARE_WRITE16_MEMBER(invalid_w);
 	DECLARE_READ16_MEMBER(memmap_r);
 	DECLARE_WRITE16_MEMBER(memmap_w);
-	DECLARE_WRITE16_MEMBER(parallel_led_w);
+	DECLARE_WRITE_LINE_MEMBER(adir_w);
+	DECLARE_WRITE_LINE_MEMBER(bdir_w);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(video_r);
@@ -179,7 +181,7 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0xf00030, 0xf00037).rw(m_uart6, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00040, 0xf0005f).rw(this, FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
 	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
-	map(0xf000d0, 0xf000d1).w(this, FUNC(wicat_state::parallel_led_w));
+	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
 	map(0xf00180, 0xf0018f).rw(this, FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
 	map(0xf00190, 0xf0019f).rw(this, FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
 	map(0xf00f00, 0xf00fff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
@@ -288,9 +290,10 @@ static INPUT_PORTS_START( wicat )
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(wicat_floppies)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void wicat_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void wicat_state::driver_start()
 {
@@ -389,16 +392,14 @@ void wicat_state::send_key(uint8_t val)
 	m_kb_serial_timer->adjust(attotime::zero,0,attotime::from_hz(1200));
 }
 
-WRITE16_MEMBER( wicat_state::parallel_led_w )
+WRITE_LINE_MEMBER(wicat_state::adir_w)
 {
-	// bit 0 - parallel port A direction (0 = input)
-	// bit 1 - parallel port B direction (0 = input)
-	output().set_value("led1",data & 0x0400);
-	output().set_value("led2",data & 0x0800);
-	output().set_value("led3",data & 0x1000);
-	output().set_value("led4",data & 0x2000);
-	output().set_value("led5",data & 0x4000);
-	output().set_value("led6",data & 0x8000);
+	// parallel port A direction (0 = input, 1 = output)
+}
+
+WRITE_LINE_MEMBER(wicat_state::bdir_w)
+{
+	// parallel port B direction (0 = input, 1 = output)
 }
 
 WRITE8_MEMBER( wicat_state::via_a_w )
@@ -742,7 +743,7 @@ WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
 	if(state)
 	{
 		if(m_nmi_enable != 0)
-			m_videocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+			m_videocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -760,28 +761,26 @@ WRITE_LINE_MEMBER(wicat_state::crtc_cb)
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	uint8_t romdata = m_chargen->base()[((charcode << 4) | linecount) + 1];
+	uint8_t romdata = vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
 	const pen_t *pen = m_palette->pens();
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		int color = (romdata >> (7-i)) & 0x01;
-
-		if(vsp || linecount > 9)
-			color = 0;
+		int color = ((romdata & 0xc0) != 0) ^ rvv;
 
 		bitmap.pix32(y, x + i) = pen[color];
+		romdata <<= 1;
 	}
 }
 
 MACHINE_CONFIG_START(wicat_state::wicat)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(wicat_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(wicat_mem)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(8'000'000))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(wicat_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(wicat_state, via_b_w))
+	MCFG_DEVICE_ADD("via", VIA6522, 8_MHz_XTAL)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, wicat_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, wicat_state, via_b_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)  // actually an MM58174AN, but should be compatible
@@ -789,104 +788,114 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_MM58274C_DAY1(1)   // monday
 
 	// internal terminal
-	MCFG_DEVICE_ADD("uart0", MC2661, XTAL(5'068'800))  // connected to terminal board
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("videouart0", mc2661_device, rx_w))
+	MCFG_DEVICE_ADD("uart0", MC2661, 5.0688_MHz_XTAL)  // connected to terminal board
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("videouart0", mc2661_device, rx_w))
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("videouart0", mc2661_device, cts_w))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("videouart0", mc2661_device, dsr_w))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("videouart0", mc2661_device, cts_w))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("videouart0", mc2661_device, dsr_w))
 
 	// RS232C ports (x5)
-	MCFG_DEVICE_ADD("uart1", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("uart1", MC2661, 5.0688_MHz_XTAL)
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial1", rs232_port_device, write_txd))
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_dtr))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial1", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial1", rs232_port_device, write_dtr))
 	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_DEVICE_ADD("uart2", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial2", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("uart2", MC2661, 5.0688_MHz_XTAL)
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial2", rs232_port_device, write_txd))
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial2", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial2", rs232_port_device, write_dtr))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial2", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial2", rs232_port_device, write_dtr))
 
-	MCFG_DEVICE_ADD("uart3", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial3", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("uart3", MC2661, 5.0688_MHz_XTAL)
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial3", rs232_port_device, write_txd))
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial3", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial3", rs232_port_device, write_dtr))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial3", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial3", rs232_port_device, write_dtr))
 	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_DEVICE_ADD("uart4", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial4", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("uart4", MC2661, 5.0688_MHz_XTAL)
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial4", rs232_port_device, write_txd))
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial4", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial4", rs232_port_device, write_dtr))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial4", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial4", rs232_port_device, write_dtr))
 	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_DEVICE_ADD("uart5", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial5", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("uart5", MC2661, 5.0688_MHz_XTAL)
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial5", rs232_port_device, write_txd))
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial5", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial5", rs232_port_device, write_dtr))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial5", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial5", rs232_port_device, write_dtr))
 	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
 	// modem
-	MCFG_DEVICE_ADD("uart6", MC2661, XTAL(5'068'800))  // connected to modem port
+	MCFG_DEVICE_ADD("uart6", MC2661, 5.0688_MHz_XTAL)  // connected to modem port
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart1",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1",mc2661_device,cts_w))
+	MCFG_DEVICE_ADD("serial1",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart1",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial2",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart2",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2",mc2661_device,cts_w))
+	MCFG_DEVICE_ADD("serial2",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart2",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart2",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart2",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart2",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart3",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart3",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart3",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart3",mc2661_device,cts_w))
+	MCFG_DEVICE_ADD("serial3",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart3",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart3",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart3",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart3",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart4",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart4",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart4",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart4",mc2661_device,cts_w))
+	MCFG_DEVICE_ADD("serial4",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart4",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart4",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart4",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart4",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial5",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart5",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart5",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart5",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart5",mc2661_device,cts_w))
+	MCFG_DEVICE_ADD("serial5",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart5",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart5",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart5",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart5",mc2661_device,cts_w))
+
+	MCFG_DEVICE_ADD("ledlatch", LS259, 0) // U19 on I/O board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, adir_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wicat_state, bdir_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // 0 = on, 1 = off
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led4")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led5")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led6")) MCFG_DEVCB_INVERT
 
 	/* video hardware */
-	MCFG_CPU_ADD("videocpu",Z8002,XTAL(8'000'000)/2)  // AMD AMZ8002DC
-	MCFG_CPU_PROGRAM_MAP(wicat_video_mem)
-	MCFG_CPU_IO_MAP(wicat_video_io)
+	MCFG_DEVICE_ADD("videocpu", Z8002, 8_MHz_XTAL/2)  // AMD AMZ8002DC
+	MCFG_DEVICE_PROGRAM_MAP(wicat_video_mem)
+	MCFG_DEVICE_IO_MAP(wicat_video_io)
 
-	MCFG_DEVICE_ADD("videodma", AM9517A, XTAL(8'000'000))  // clock is a bit of guess
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(wicat_state, dma_hrq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(wicat_state, dma_nmi_cb))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(wicat_state, vram_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(wicat_state, vram_w))
-	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("video", i8275_device, dack_w))
+	MCFG_DEVICE_ADD("videodma", AM9517A, 8_MHz_XTAL)  // clock is a bit of guess
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, wicat_state, dma_hrq_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, wicat_state, dma_nmi_cb))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, wicat_state, vram_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, wicat_state, vram_w))
+	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8("video", i8275_device, dack_w))
 	MCFG_IM6402_ADD("videouart", 0, 0)
-	MCFG_IM6402_DR_CALLBACK(WRITELINE(wicat_state, kb_data_ready))
+	MCFG_IM6402_DR_CALLBACK(WRITELINE(*this, wicat_state, kb_data_ready))
 
 	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
-	MCFG_DEVICE_ADD("videouart0", MC2661, XTAL(5'068'800))  // the INS2651 looks similar enough to the MC2661...
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("uart0", mc2661_device, rx_w))
+	MCFG_DEVICE_ADD("videouart0", MC2661, 5.0688_MHz_XTAL)  // the INS2651 looks similar enough to the MC2661...
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("uart0", mc2661_device, rx_w))
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("uart0", mc2661_device, cts_w))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("uart0", mc2661_device, dsr_w))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("uart0", mc2661_device, cts_w))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("uart0", mc2661_device, dsr_w))
 
-	MCFG_DEVICE_ADD("videouart1", MC2661, XTAL(5'068'800))
+	MCFG_DEVICE_ADD("videouart1", MC2661, 5.0688_MHz_XTAL)
 	MCFG_MC2661_RXC(19200)
 	MCFG_MC2661_TXC(19200)
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
@@ -894,27 +903,25 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_X2210_ADD("vsram")  // XD2210
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_SIZE(720,300)
-	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_RAW_PARAMS(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300)
 	MCFG_SCREEN_UPDATE_DEVICE("video",i8275_device,screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("video", I8275, XTAL(19'660'800)/8)
-	MCFG_I8275_CHARACTER_WIDTH(9)
+	MCFG_DEVICE_ADD("video", I8275, 19.6608_MHz_XTAL/10)
+	MCFG_I8275_CHARACTER_WIDTH(10)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(wicat_state, wicat_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("videodma",am9517a_device, dreq0_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(wicat_state,crtc_cb))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("videodma",am9517a_device, dreq0_w))
+	MCFG_I8275_IRQ_CALLBACK(WRITELINE(*this, wicat_state,crtc_cb))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
-	MCFG_CPU_ADD("wd1kcpu",N8X300,XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
-	MCFG_CPU_IO_MAP(wicat_wd1000_io)
-	MCFG_FD1795_ADD("fdc",XTAL(8'000'000))
+	MCFG_DEVICE_ADD("wd1kcpu", N8X300, 8_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(wicat_wd1000_mem)
+	MCFG_DEVICE_IO_MAP(wicat_wd1000_io)
+	MCFG_FD1795_ADD("fdc", 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
@@ -1012,5 +1019,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY               FULLNAME            FLAGS
-COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, 0,    "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY               FULLNAME            FLAGS
+COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, empty_init, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

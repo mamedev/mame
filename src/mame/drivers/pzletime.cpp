@@ -304,7 +304,7 @@ static const gfx_layout layout16x16 =
 	32*32
 };
 
-static GFXDECODE_START( pzletime )
+static GFXDECODE_START( gfx_pzletime )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout16x16, 0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
@@ -334,9 +334,9 @@ void pzletime_state::machine_reset()
 MACHINE_CONFIG_START(pzletime_state::pzletime)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,10000000)
-	MCFG_CPU_PROGRAM_MAP(pzletime_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,10000000)
+	MCFG_DEVICE_PROGRAM_MAP(pzletime_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
 
 
 	/* video hardware */
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pzletime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pzletime)
 	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
@@ -357,8 +357,8 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 937500, PIN7_HIGH) //freq & pin7 taken from stlforce
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 937500, okim6295_device::PIN7_HIGH) //freq & pin7 taken from stlforce
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -405,4 +405,4 @@ ROM_START( pzletime )
 	ROM_LOAD( "pzletime.nv", 0x0000, 0x0080, CRC(e5ed3d40) SHA1(8c163a6e5839e5c82d52f046d3268202fdf9f4d1) )
 ROM_END
 
-GAME( 199?, pzletime, 0, pzletime,  pzletime, pzletime_state,  0, ROT0, "Elettronica Video-Games S.R.L.", "Puzzle Time (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, pzletime, 0, pzletime,  pzletime, pzletime_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Puzzle Time (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -70,17 +70,36 @@ class midzeus2_state : public midzeus_state
 {
 public:
 	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: midzeus_state(mconfig, type, tag), m_zeus(*this, "zeus2") { }
-	required_device<zeus2_device> m_zeus;
+		: midzeus_state(mconfig, type, tag)
+		, m_zeus(*this, "zeus2")
+		, m_led(*this, "led%u", 0U)
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
 	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
 	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
+	DECLARE_READ32_MEMBER(crusnexo_leds_r);
+	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
 	void thegrid(machine_config &config);
 	void crusnexo(machine_config &config);
 	void midzeus2(machine_config &config);
 	void zeus2_map(address_map &map);
+	void init_crusnexo();
+	void init_thegrid();
+
+protected:
+	virtual void machine_start() override
+	{
+		MACHINE_START_CALL_MEMBER(midzeus);
+		m_led.resolve();
+		m_lamp.resolve();
+	}
+
 private:
+	required_device<zeus2_device> m_zeus;
+	output_finder<32> m_led;
+	output_finder<8> m_lamp;
 };
 
 
@@ -411,14 +430,14 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::crusnexo_leds_r)
+READ32_MEMBER(midzeus2_state::crusnexo_leds_r)
 {
 	/* reads appear to just be for synchronization */
 	return ~0;
 }
 
 
-WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
+WRITE32_MEMBER(midzeus2_state::crusnexo_leds_w)
 {
 	int bit, led;
 
@@ -429,7 +448,7 @@ WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 
 		case 1: /* controls lamps */
 			for (bit = 0; bit < 8; bit++)
-				output().set_lamp_value(bit, (data >> bit) & 1);
+				m_lamp[bit] = BIT(data, bit);
 			break;
 
 		case 2: /* sets state of selected LEDs */
@@ -443,7 +462,7 @@ WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 			for (bit = 0; bit < 3; bit++)
 				if ((crusnexo_leds_select & (1 << bit)) == 0)
 					for (led = 0; led < 8; led++)
-						output().set_led_value(bit * 8 + led, (~data >> led) & 1);
+						m_led[bit * 8 + led] = BIT(~data, led);
 			break;
 
 		case 3: /* selects which set of LEDs we are addressing */
@@ -1266,9 +1285,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midzeus_state::midzeus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(zeus_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
+	MCFG_DEVICE_ADD("maincpu", TMS32032, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(zeus_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
@@ -1301,7 +1320,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midzeus_state::invasn)
 	midzeus(config);
-	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
+	MCFG_DEVICE_ADD("pic", PIC16C57, 8000000)  /* ? */
 
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
@@ -1310,11 +1329,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(zeus2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
+	MCFG_DEVICE_ADD("maincpu", TMS32032, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(zeus2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(midzeus2_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1324,7 +1342,7 @@ MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
 	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
-	MCFG_ZEUS2_IRQ_CB(WRITELINE(midzeus2_state, zeus_irq))
+	MCFG_ZEUS2_IRQ_CB(WRITELINE(*this, midzeus2_state, zeus_irq))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
@@ -1670,26 +1688,26 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midzeus_state,mk4)
+void midzeus_state::init_mk4()
 {
 }
 
 
-DRIVER_INIT_MEMBER(midzeus_state,invasn)
+void midzeus_state::init_invasn()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
+void midzeus2_state::init_crusnexo()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus2_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus2_state::crusnexo_leds_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(midzeus_state,thegrid)
+void midzeus2_state::init_thegrid()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32_delegate(FUNC(midzeus_state::trackball_r), this));
@@ -1704,16 +1722,16 @@ DRIVER_INIT_MEMBER(midzeus_state,thegrid)
  *
  *************************************/
 
-GAME(  1997, mk4,      0,        mk4,      mk4,      midzeus_state,  mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4a,     mk4,      mk4,      mk4,      midzeus_state,  mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4b,     mk4,      mk4,      mk4,      midzeus_state,  mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state,  invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state,  invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state,  invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAME(  2001, thegrid,  0,        thegrid,  thegrid,  midzeus2_state, thegrid,  ROT0, "Midway", "The Grid (version 1.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  2001, thegrida, thegrid,  thegrid,  thegrid,  midzeus2_state, thegrid,  ROT0, "Midway", "The Grid (version 1.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4,      0,        mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4a,     mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4b,     mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAME(  2001, thegrid,  0,        thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  2001, thegrida, thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

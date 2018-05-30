@@ -316,16 +316,16 @@ static const gfx_layout vt100_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vt100 )
+static GFXDECODE_START( gfx_vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(vt100_state::vt100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
-	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("rstbuf", rst_pos_buffer_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(vt100_mem)
+	MCFG_DEVICE_IO_MAP(vt100_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("rstbuf", rst_pos_buffer_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", vt100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_vt100)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
@@ -342,32 +342,32 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, XTAL(24'073'400))
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
-	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, video_ram_r))
-	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst4_w))
-	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(vt100_state, uart_clock_w))
-	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
+	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(*this, vt100_state, video_ram_r))
+	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE("rstbuf", rst_pos_buffer_device, rst4_w))
+	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(*this, vt100_state, uart_clock_w))
+	MCFG_VT_VIDEO_LBA7_CALLBACK(WRITELINE("nvr", er1400_device, clock_w))
 
 	MCFG_DEVICE_ADD("pusart", I8251, XTAL(24'883'200) / 9)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst2_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("rstbuf", rst_pos_buffer_device, rst2_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("pusart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("pusart", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD("dbrg", COM5016_013, XTAL(24'883'200) / 9) // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
 
 	MCFG_DEVICE_ADD("nvr", ER1400, 0)
 
 	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
-	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(DEVWRITELINE("kbduart", ay31015_device, write_si))
+	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(WRITELINE("kbduart", ay31015_device, write_si))
 
 	MCFG_DEVICE_ADD("kbduart", AY31015, 0)
-	MCFG_AY31015_WRITE_DAV_CB(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst1_w))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE("rstbuf", rst_pos_buffer_device, rst1_w))
 	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_DEVICE_ADD("rstbuf", RST_POS_BUFFER, 0)
@@ -393,21 +393,21 @@ void vt100_state::stp_io(address_map &map)
 
 MACHINE_CONFIG_START(vt100_state::vt100ac)
 	vt100(config);
-	MCFG_CPU_ADD("stpcpu", I8085A, 4915200)
-	MCFG_CPU_PROGRAM_MAP(stp_mem)
-	MCFG_CPU_IO_MAP(stp_io)
+	MCFG_DEVICE_ADD("stpcpu", I8085A, 4915200)
+	MCFG_DEVICE_PROGRAM_MAP(stp_mem)
+	MCFG_DEVICE_IO_MAP(stp_io)
 
 	MCFG_DEVICE_ADD("stpusart0", I8251, 2457600)
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<0>))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("stpusart1", I8251, 2457600)
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<1>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<1>))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("stpusart2", I8251, 2457600) // for printer?
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<2>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<2>))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<2>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<2>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("stptxint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST55_LINE))
@@ -416,37 +416,37 @@ MACHINE_CONFIG_START(vt100_state::vt100ac)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST65_LINE))
 
 	MCFG_DEVICE_MODIFY("dbrg")
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart0", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart2", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart0", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart2", i8251_device, write_txc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt100_state::vt180)
 	vt100(config);
-	MCFG_CPU_ADD("z80cpu", Z80, XTAL(24'883'200) / 9)
-	MCFG_CPU_PROGRAM_MAP(vt180_mem)
-	MCFG_CPU_IO_MAP(vt180_io)
+	MCFG_DEVICE_ADD("z80cpu", Z80, XTAL(24'883'200) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(vt180_mem)
+	MCFG_DEVICE_IO_MAP(vt180_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt100_state::vt101)
 	vt100(config);
-	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
-	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
+	MCFG_DEVICE_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(vt100_mem)
+	MCFG_DEVICE_IO_MAP(vt100_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
 
 	MCFG_DEVICE_MODIFY("pusart")
 	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
 	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE)) // 8085 pin 9, mislabeled RST 7.5 on schematics
 
 	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
 
 	MCFG_DEVICE_MODIFY("kbduart")
 	MCFG_AY31015_WRITE_TBMT_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
@@ -454,16 +454,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt100_state::vt102)
 	vt101(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(vt102_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(vt102_io)
 
 	MCFG_DEVICE_ADD("printuart", INS8250, XTAL(24'073'400) / 16)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("printer", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST75_LINE)) // 8085 pin 7, mislabeled RST 5.5 on schematics
 
-	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("printuart", ins8250_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("printuart", ins8250_device, dsr_w))
+	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("printuart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("printuart", ins8250_device, dsr_w))
 MACHINE_CONFIG_END
 
 /* VT1xx models:
@@ -875,16 +875,16 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1979, vt100ac,  vt100,  0,       vt100ac,   vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1981, vt101,    vt102,  0,       vt101,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT110", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT125", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT131", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT132", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT180", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                          FULLNAME    FLAGS */
+COMP( 1978, vt100,   0,      0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt100wp, vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1979, vt100ac, vt100,  0,      vt100ac, vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt101,   vt102,  0,      vt101,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT101",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt102,   0,      0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT102",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt103,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT103",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1978, vt105,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT105",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt110,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT110",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1981, vt125,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT125",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt131,   vt102,  0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT131",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt132,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT132",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1983, vt180,   vt100,  0,      vt180,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT180",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

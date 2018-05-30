@@ -402,8 +402,8 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 ***************************************************************************/
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         m_direct->read_byte(pc)
-#define ROP_ARG(pc)     m_direct->read_byte(pc)
+#define ROP(pc)         m_cache->read_byte(pc)
+#define ROP_ARG(pc)     m_cache->read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
 #define CODEMEM_R(a)    (uint8_t)m_program->read_byte(a)
@@ -1770,10 +1770,6 @@ void mcs51_cpu_device::check_irqs()
 		return;
 	}
 
-	/* also break out of jb int0,<self> loops */
-	if (ROP(PC) == 0x20 && ROP_ARG(PC+1) == 0xb2 && ROP_ARG(PC+2) == 0xfd)
-		PC += 3;
-
 	//Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	PC = int_vec;
@@ -1992,7 +1988,7 @@ void mcs51_cpu_device::execute_run()
 		/* Read next opcode */
 		PPC = PC;
 		debugger_instruction_hook(PC);
-		op = m_direct->read_byte(PC++);
+		op = m_cache->read_byte(PC++);
 
 		/* process opcode and count cycles */
 		m_inst_cycles = mcs51_cycles[op];
@@ -2107,7 +2103,7 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 void mcs51_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
@@ -2152,6 +2148,7 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_DPH, "DPH", DPH).noshow();
 	state_add( MCS51_DPL, "DPL", DPL).noshow();
 	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
+	state_add( MCS51_IP,  "IP", IP).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
@@ -2165,6 +2162,12 @@ void mcs51_cpu_device::device_start()
 	state_add<uint8_t>( MCS51_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
+	state_add( MCS51_TCON, "TCON", TCON).formatstr("%02X");
+	state_add( MCS51_TMOD, "TMOD", TMOD).formatstr("%02X");
+	state_add( MCS51_TL0,  "TL0",  TL0).formatstr("%02X");
+	state_add( MCS51_TH0,  "TH0",  TH0).formatstr("%02X");
+	state_add( MCS51_TL1,  "TL1",  TL1).formatstr("%02X");
+	state_add( MCS51_TH1,  "TH1",  TH1).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();

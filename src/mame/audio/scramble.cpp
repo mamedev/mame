@@ -294,9 +294,9 @@ void scramble_state::ad2083_sound_io_map(address_map &map)
 
 MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
-	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)
-	MCFG_CPU_IO_MAP(ad2083_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ad2083_sound_map)
+	MCFG_DEVICE_IO_MAP(ad2083_sound_io_map)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
 	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
@@ -309,23 +309,23 @@ MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 	MCFG_TMSPROM_CTL8_BIT(2)        /* bit # of ctl8 line */
 	MCFG_TMSPROM_RESET_BIT(6)       /* bit # of rom reset */
 	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
-	MCFG_TMSPROM_PDC_CB(DEVWRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
-	MCFG_TMSPROM_CTL_CB(DEVWRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
+	MCFG_TMSPROM_PDC_CB(WRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
+	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_ADD("ay1", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, hotshock_soundlatch_r))
+	MCFG_DEVICE_ADD("ay2", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tmsprom", tmsprom_device, m0_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tmsprom", tmsprom_device, data_r))
+	MCFG_DEVICE_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
+	MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
+	MCFG_TMS5110_DATA_CB(READLINE("tmsprom", tmsprom_device, data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

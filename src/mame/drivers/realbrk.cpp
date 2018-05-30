@@ -729,14 +729,14 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( realbrk )
+static GFXDECODE_START( gfx_realbrk )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
 	GFXDECODE_ENTRY( "gfx4", 0, layout_16x16x4,     0, 0x800    )   // [3] Sprites (16 colors)
 GFXDECODE_END
 
-static GFXDECODE_START( dai2kaku )
+static GFXDECODE_START( gfx_dai2kaku )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
@@ -763,13 +763,13 @@ WRITE_LINE_MEMBER(realbrk_state::vblank_irq)
 MACHINE_CONFIG_START(realbrk_state::realbrk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(32'000'000) / 2)          /* !! TMP68301 !! */
-	MCFG_CPU_PROGRAM_MAP(realbrk_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(32'000'000) / 2)          /* !! TMP68301 !! */
+	MCFG_DEVICE_PROGRAM_MAP(realbrk_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(realbrk_state,realbrk_flipscreen_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, realbrk_state,realbrk_flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -779,28 +779,29 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(realbrk_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, realbrk_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", realbrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_realbrk)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(33'868'800) / 2)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'868'800) / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(realbrk_state::pkgnsh)
 	realbrk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pkgnsh_mem)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
@@ -808,16 +809,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(realbrk_state::pkgnshdx)
 	pkgnsh(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(realbrk_state::dai2kaku)
 	realbrk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dai2kaku_mem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dai2kaku)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dai2kaku)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_dai2kaku)
 MACHINE_CONFIG_END
@@ -1287,13 +1288,13 @@ ROM_START( dai2kaku_alt_rom_size )
 ROM_END
 #endif
 
-GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   realbrk_state, empty_init, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, realbrk_state, empty_init, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, realbrk,  0,       realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrko, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrk,  0,       realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrko, realbrk, realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, realbrk_state, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, realbrk_state, empty_init, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

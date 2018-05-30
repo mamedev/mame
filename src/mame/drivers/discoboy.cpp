@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rambank2_w);
 	DECLARE_READ8_MEMBER(port_06_r);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(discoboy);
+	void init_discoboy();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -423,7 +423,7 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8
 };
 
-static GFXDECODE_START( discoboy )
+static GFXDECODE_START( gfx_discoboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x000, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0x000, 128 )
 GFXDECODE_END
@@ -455,13 +455,13 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 MACHINE_CONFIG_START(discoboy_state::discoboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(discoboy_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* 6 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(discoboy_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(10'000'000)/2) /* 5 MHz? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/2) /* 5 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rambank1_map)
@@ -479,25 +479,26 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	MCFG_SCREEN_UPDATE_DRIVER(discoboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", discoboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_discoboy)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(10'000'000)/4)   /* 2.5 MHz? */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(10'000'000)/4)   /* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
@@ -557,7 +558,7 @@ ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game
 	ROM_LOAD( "discob.u49",   0x190000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
 ROM_END
 
-DRIVER_INIT_MEMBER(discoboy_state,discoboy)
+void discoboy_state::init_discoboy()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *AUDIO = memregion("audiocpu")->base();
@@ -575,5 +576,5 @@ DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 }
 
 
-GAME( 1993, discoboy,  0,           discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, discoboyp, discoboy,    discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, init_discoboy, ROT270, "Soft Art Co.", "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboyp, discoboy, discoboy, discoboy, discoboy_state, init_discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

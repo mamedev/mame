@@ -383,7 +383,7 @@ static const gfx_layout blackt96_text_layout =
 	16*16
 };
 
-static GFXDECODE_START( blackt96 )
+static GFXDECODE_START( gfx_blackt96 )
 	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,      0, 8  )
 	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,     0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, blackt96_text_layout, 0, 16 )
@@ -477,18 +477,18 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 
 
 MACHINE_CONFIG_START(blackt96_state::blackt96)
-	MCFG_CPU_ADD("maincpu", M68000, 18000000 /2)
-	MCFG_CPU_PROGRAM_MAP(blackt96_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 18000000 /2)
+	MCFG_DEVICE_PROGRAM_MAP(blackt96_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(blackt96_state, blackt96_soundio_port_a_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(blackt96_state, blackt96_soundio_port_b_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(blackt96_state, blackt96_soundio_port_b_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(blackt96_state, blackt96_soundio_port_c_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(blackt96_state, blackt96_soundio_port_c_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 8000000) /* ? */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_a_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, blackt96_state, blackt96_soundio_port_b_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_b_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, blackt96_state, blackt96_soundio_port_c_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_c_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -507,14 +507,15 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
 	MCFG_SNK68_SPR_NO_PARTIAL
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 8000000/8, PIN7_HIGH) // music
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // music
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", 8000000/8, PIN7_HIGH) // sfx
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // sfx
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -554,4 +555,4 @@ ROM_START( blackt96 )
 ROM_END
 
 // I'm not really sure this needs MACHINE_IS_INCOMPLETE just because there are some original game bugs, it's quite typical of this type of Korean release
-GAME( 1996, blackt96,    0,        blackt96,    blackt96, blackt96_state,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE )
+GAME( 1996, blackt96, 0, blackt96, blackt96, blackt96_state, empty_init, ROT0, "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE )

@@ -324,7 +324,7 @@ static const gfx_layout pb1000_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( pb1000 )
+static GFXDECODE_START( gfx_pb1000 )
 	GFXDECODE_ENTRY( "hd44352", 0x0000, pb1000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -482,15 +482,15 @@ void pb1000_state::machine_start()
 
 MACHINE_CONFIG_START(pb1000_state::pb1000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD61700, 910000)
-	MCFG_CPU_PROGRAM_MAP(pb1000_mem)
-	MCFG_HD61700_LCD_CTRL_CB(WRITE8(pb1000_state, lcd_control))
-	MCFG_HD61700_LCD_READ_CB(READ8(pb1000_state, lcd_data_r))
-	MCFG_HD61700_LCD_WRITE_CB(WRITE8(pb1000_state, lcd_data_w))
-	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb1000_kb_r))
-	MCFG_HD61700_KB_WRITE_CB(WRITE8(pb1000_state, kb_matrix_w))
-	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb1000_port_r))
-	MCFG_HD61700_PORT_WRITE_CB(WRITE8(pb1000_state, port_w))
+	MCFG_DEVICE_ADD("maincpu", HD61700, 910000)
+	MCFG_DEVICE_PROGRAM_MAP(pb1000_mem)
+	MCFG_HD61700_LCD_CTRL_CB(WRITE8(*this, pb1000_state, lcd_control))
+	MCFG_HD61700_LCD_READ_CB(READ8(*this, pb1000_state, lcd_data_r))
+	MCFG_HD61700_LCD_WRITE_CB(WRITE8(*this, pb1000_state, lcd_data_w))
+	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb1000_kb_r))
+	MCFG_HD61700_KB_WRITE_CB(WRITE8(*this, pb1000_state, kb_matrix_w))
+	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb1000_port_r))
+	MCFG_HD61700_PORT_WRITE_CB(WRITE8(*this, pb1000_state, port_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pb1000 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pb1000)
 
 	MCFG_DEVICE_ADD("hd44352", HD44352, 910000)
 	MCFG_HD44352_ON_CB(INPUTLINE("maincpu", HD61700_ON_INT))
@@ -513,18 +513,18 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_NVRAM_ADD_0FILL("nvram2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pb1000_state::pb2000c)
 	pb1000(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)
-	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb2000c_kb_r))
-	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb2000c_port_r))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pb2000c_mem)
+	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb2000c_kb_r))
+	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb2000c_port_r))
 
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot1", generic_plain_slot, "pb2000c_card")
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot2", generic_plain_slot, "pb2000c_card")
@@ -575,7 +575,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT    STATE          INIT    COMPANY   FULLNAME     FLAGS */
-COMP( 1987, pb1000,  0,       0,       pb1000,    pb1000,  pb1000_state,  0,      "Casio",  "PB-1000",   MACHINE_NOT_WORKING)
-COMP( 1989, pb2000c, 0,       0,       pb2000c,   pb2000c, pb1000_state,  0,      "Casio",  "PB-2000c",  MACHINE_NOT_WORKING)
-COMP( 1989, ai1000,  pb2000c, 0,       pb2000c,   pb2000c, pb1000_state,  0,      "Casio",  "AI-1000",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME    FLAGS */
+COMP( 1987, pb1000,  0,       0,      pb1000,  pb1000,  pb1000_state, empty_init, "Casio", "PB-1000",  MACHINE_NOT_WORKING)
+COMP( 1989, pb2000c, 0,       0,      pb2000c, pb2000c, pb1000_state, empty_init, "Casio", "PB-2000c", MACHINE_NOT_WORKING)
+COMP( 1989, ai1000,  pb2000c, 0,      pb2000c, pb2000c, pb1000_state, empty_init, "Casio", "AI-1000",  MACHINE_NOT_WORKING)

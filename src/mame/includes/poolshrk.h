@@ -27,10 +27,11 @@ public:
 		m_discrete(*this, "discrete"),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_hpos_ram(*this, "hpos_ram"),
-		m_vpos_ram(*this, "vpos_ram")
+		m_vpos_ram(*this, "vpos_ram"),
+		m_led(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(poolshrk);
+	void init_poolshrk();
 	void poolshrk(machine_config &config);
 
 protected:
@@ -51,6 +52,7 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;
 	void poolshrk_cpu_map(address_map &map);
+	virtual void machine_start() override { m_led.resolve(); }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -62,6 +64,7 @@ private:
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_hpos_ram;
 	required_shared_ptr<uint8_t> m_vpos_ram;
+	output_finder<2> m_led;
 
 	tilemap_t* m_bg_tilemap;
 	int m_da_latch;
@@ -69,6 +72,6 @@ private:
 
 
 /*----------- defined in audio/poolshrk.c -----------*/
-DISCRETE_SOUND_EXTERN( poolshrk );
+DISCRETE_SOUND_EXTERN( poolshrk_discrete );
 
 #endif // MAME_INCLUDES_POOLSHRK_H

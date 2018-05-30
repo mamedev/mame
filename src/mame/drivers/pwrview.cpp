@@ -397,15 +397,16 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc2e6, 0xc2e6).r(this, FUNC(pwrview_state::pitclock_r));
 }
 
-static SLOT_INTERFACE_START(pwrview_floppies)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void pwrview_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(pwrview_state::pwrview)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(pwrview_map)
-	MCFG_CPU_OPCODES_MAP(pwrview_fetch_map)
-	MCFG_CPU_IO_MAP(pwrview_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pwrview_map)
+	MCFG_DEVICE_OPCODES_MAP(pwrview_fetch_map)
+	MCFG_DEVICE_IO_MAP(pwrview_io)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
@@ -418,8 +419,8 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("fdc", true, true) // Rockwell R7675P
-	//MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
-	//MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
+	//MCFG_UPD765_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
@@ -446,4 +447,4 @@ ROM_START(pwrview)
 	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, 0, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)
+COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, empty_init, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)

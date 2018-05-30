@@ -83,10 +83,10 @@ public:
 	DECLARE_READ8_MEMBER(nycaptor_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_DRIVER_INIT(cyclshtg);
-	DECLARE_DRIVER_INIT(colt);
-	DECLARE_DRIVER_INIT(bronx);
-	DECLARE_DRIVER_INIT(nycaptor);
+	void init_cyclshtg();
+	void init_colt();
+	void init_bronx();
+	void init_nycaptor();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -44,7 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_MACHINE_RESET(ec1841);
-	DECLARE_DRIVER_INIT(ec1841);
+	void init_ec1841();
 
 	struct
 	{
@@ -150,7 +150,7 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 	m_memory.enable[offset] = data;
 }
 
-DRIVER_INIT_MEMBER(ec184x_state, ec1841)
+void ec184x_state::init_ec1841()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
@@ -224,19 +224,20 @@ void ec184x_state::ec1847_io(address_map &map)
 
 // XXX verify everything
 MACHINE_CONFIG_START(ec184x_state::ec1840)
-	MCFG_CPU_ADD("maincpu", I8088, 4096000)
-	MCFG_CPU_PROGRAM_MAP(ec1840_map)
-	MCFG_CPU_IO_MAP(ec1840_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4096000)
+	MCFG_DEVICE_PROGRAM_MAP(ec1840_map)
+	MCFG_DEVICE_IO_MAP(ec1840_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1840.0002", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // actually ec1840.0003 -- w/o mouse port
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false)   // actually ec1840.0003 -- w/o mouse port
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
@@ -247,21 +248,22 @@ MACHINE_CONFIG_START(ec184x_state::ec1840)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ec184x_state::ec1841)
-	MCFG_CPU_ADD("maincpu", I8086, 4096000)
-	MCFG_CPU_PROGRAM_MAP(ec1841_map)
-	MCFG_CPU_IO_MAP(ec1841_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(12'288'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(ec1841_map)
+	MCFG_DEVICE_IO_MAP(ec1841_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
 	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1841.0002", false)   // cga
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // fdc + mouse port
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, "hdc", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false)   // cga
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false)   // fdc + mouse port
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "hdc", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
@@ -274,19 +276,20 @@ MACHINE_CONFIG_END
 
 // XXX verify everything
 MACHINE_CONFIG_START(ec184x_state::ec1847)
-	MCFG_CPU_ADD("maincpu", I8088, 4772720)
-	MCFG_CPU_PROGRAM_MAP(ec1847_map)
-	MCFG_CPU_IO_MAP(ec1847_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4772720)
+	MCFG_DEVICE_PROGRAM_MAP(ec1847_map)
+	MCFG_DEVICE_IO_MAP(ec1847_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)    // native variant (wd1010 + z80) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)    // native serial (2x8251) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)    // native variant (wd1010 + z80) not emulated
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)    // native serial (2x8251) not emulated
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
@@ -370,8 +373,8 @@ ROM_START( ec1847 )
 	ROM_LOAD( "317_d28_2732.bin", 0x00000, 0x1000, CRC(8939599b) SHA1(53d02460cf93596882a96758ef4bac5fa1ce55b2)) // monochrome font
 ROM_END
 
-//     YEAR  ROM NAME  PARENT   COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY       FULLNAME   FLAGS
-COMP ( 1987, ec1840,   ibm5150, 0,      ec1840,  0,     ec184x_state, 0,      "<unknown>",  "EC-1840", MACHINE_NOT_WORKING )
-COMP ( 1987, ec1841,   ibm5150, 0,      ec1841,  0,     ec184x_state, ec1841, "<unknown>",  "EC-1841", 0 )
-COMP ( 1989, ec1845,   ibm5150, 0,      ec1841,  0,     ec184x_state, ec1841, "<unknown>",  "EC-1845", MACHINE_NOT_WORKING )
-COMP ( 1990, ec1847,   ibm5150, 0,      ec1847,  0,     ec184x_state, 0,      "<unknown>",  "EC-1847", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  STATE         INIT         COMPANY      FULLNAME   FLAGS
+COMP( 1987, ec1840, ibm5150, 0,      ec1840,  0,     ec184x_state, empty_init,  "<unknown>", "EC-1840", MACHINE_NOT_WORKING )
+COMP( 1987, ec1841, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1841", 0 )
+COMP( 1989, ec1845, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1845", MACHINE_NOT_WORKING )
+COMP( 1990, ec1847, ibm5150, 0,      ec1847,  0,     ec184x_state, empty_init,  "<unknown>", "EC-1847", MACHINE_NOT_WORKING )

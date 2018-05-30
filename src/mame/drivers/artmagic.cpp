@@ -809,16 +809,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(artmagic_state::artmagic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
-	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
+	MCFG_DEVICE_PROGRAM_MAP(tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(MASTER_CLOCK_40MHz/6) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(artmagic_state, scanline)              /* scanline update (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(artmagic_state, m68k_gen_int))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, artmagic_state, m68k_gen_int))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(artmagic_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
@@ -835,9 +835,9 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK_40MHz/3/10, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_CONFIG_END
 
@@ -845,7 +845,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(artmagic_state::cheesech)
 	artmagic(config);
 
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -854,13 +854,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(artmagic_state::stonebal)
 	artmagic(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stonebal_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_map)
 
-	MCFG_CPU_MODIFY("tms")
-	MCFG_CPU_PROGRAM_MAP(stonebal_tms_map)
+	MCFG_DEVICE_MODIFY("tms")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_tms_map)
 
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -868,24 +868,24 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(artmagic_state::shtstar)
 	artmagic(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(shtstar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_map)
 
 	MCFG_DEVICE_ADD("mainduart", MC68681, 3686400)
 
 	/* sub cpu*/
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_CPU_PROGRAM_MAP(shtstar_subcpu_map)
+	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_subcpu_map)
 
 	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 3686400/2)
+	MCFG_DEVICE_ADD("aysnd", YM2149, 3686400/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/*gun board cpu*/
-	MCFG_CPU_ADD("guncpu", I80C31, 6000000)
-	MCFG_CPU_IO_MAP(shtstar_guncpu_io_map)
-	MCFG_CPU_PROGRAM_MAP(shtstar_guncpu_map)
+	MCFG_DEVICE_ADD("guncpu", I80C31, 6000000)
+	MCFG_DEVICE_IO_MAP(shtstar_guncpu_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_guncpu_map)
 	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ?
 MACHINE_CONFIG_END
 
@@ -1157,7 +1157,7 @@ void artmagic_state::decrypt_cheesech()
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,ultennis)
+void artmagic_state::init_ultennis()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 0;
@@ -1168,7 +1168,7 @@ DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,cheesech)
+void artmagic_state::init_cheesech()
 {
 	decrypt_cheesech();
 	m_is_stoneball = 0;
@@ -1176,14 +1176,14 @@ DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,stonebal)
+void artmagic_state::init_stonebal()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 1; /* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	m_protection_handler = &artmagic_state::stonebal_protection;
 }
 
-DRIVER_INIT_MEMBER(artmagic_state,shtstar)
+void artmagic_state::init_shtstar()
 {
 	/* wrong */
 	decrypt_ultennis();
@@ -1199,10 +1199,10 @@ DRIVER_INIT_MEMBER(artmagic_state,shtstar)
  *
  *************************************/
 
-GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )
+GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, init_ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, init_ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, init_cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, init_shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )

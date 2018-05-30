@@ -38,6 +38,7 @@ TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
 
 void runaway_state::machine_start()
 {
+	m_led.resolve();
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(runaway_state::interrupt_callback),this));
 }
 
@@ -72,7 +73,7 @@ READ8_MEMBER(runaway_state::runaway_pot_r)
 
 WRITE8_MEMBER(runaway_state::runaway_led_w)
 {
-	output().set_led_value(offset, ~data & 1);
+	m_led[offset] = BIT(~data, 0);
 }
 
 
@@ -316,13 +317,13 @@ static const gfx_layout qwak_sprite_layout =
 };
 
 
-static GFXDECODE_START( runaway )
+static GFXDECODE_START( gfx_runaway )
 	GFXDECODE_ENTRY( "gfx1", 0x000, runaway_tile_layout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x800, runaway_sprite_layout, 8, 1 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( qwak )
+static GFXDECODE_START( gfx_qwak )
 	GFXDECODE_ENTRY( "gfx1", 0x800, qwak_tile_layout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x000, qwak_sprite_layout, 0, 1 )
 GFXDECODE_END
@@ -331,8 +332,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(runaway_state::runaway)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(runaway_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 8) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(runaway_map)
 
 
 	MCFG_ATARIVGEAROM_ADD("earom")
@@ -345,26 +346,26 @@ MACHINE_CONFIG_START(runaway_state::runaway)
 	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_runaway)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", runaway)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_runaway)
 	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 12096000 / 8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, 12096000 / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("6008"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 12096000 / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT1_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT2_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT3_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT4_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT5_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT6_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT7_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_DEVICE_ADD("pokey2", POKEY, 12096000 / 8)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, runaway_state, runaway_pot_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -375,7 +376,7 @@ MACHINE_CONFIG_START(runaway_state::qwak)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", qwak)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_qwak)
 
 	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
 	MCFG_SCREEN_MODIFY("screen")
@@ -416,5 +417,5 @@ ROM_START( qwak )
 ROM_END
 
 
-GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, 0, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, runaway, 0, runaway, runaway, runaway_state, 0, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, empty_init, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, runaway, 0, runaway, runaway, runaway_state, empty_init, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )

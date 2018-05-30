@@ -398,10 +398,10 @@ void shanghai_state::hd63484_map(address_map &map)
 MACHINE_CONFIG_START(shanghai_state::shanghai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* NEC D70116C-8 */
-	MCFG_CPU_PROGRAM_MAP(shanghai_map)
-	MCFG_CPU_IO_MAP(shanghai_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* NEC D70116C-8 */
+	MCFG_DEVICE_PROGRAM_MAP(shanghai_map)
+	MCFG_DEVICE_IO_MAP(shanghai_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -419,9 +419,9 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -434,10 +434,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shanghai_state::shangha2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* ? */
-	MCFG_CPU_PROGRAM_MAP(shangha2_map)
-	MCFG_CPU_IO_MAP(shangha2_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000)/2) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(shangha2_map)
+	MCFG_DEVICE_IO_MAP(shangha2_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -454,9 +454,9 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -469,12 +469,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shanghai_state::kothello)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(kothello_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(kothello_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shanghai_state, half_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(kothello_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(kothello_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -494,11 +494,11 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_HD63484_EXTERNAL_SKEW(2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* same as standard seibu ym2203, but also reads "DSW" */
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -506,10 +506,10 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2203_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2203_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2203_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2203_device, write))
 
-	MCFG_SOUND_ADD("adpcm", SEIBU_ADPCM, 8000) // actually MSM5205
+	MCFG_DEVICE_ADD("adpcm", SEIBU_ADPCM, 8000) // actually MSM5205
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -671,8 +671,8 @@ ROM_END
 
 
 
-GAME( 1988, shanghai,  0,        shanghai, shanghai, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, shanghaij, shanghai, shanghai, shanghai, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shangha2,  0,        shangha2, shangha2, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shangha2a, shangha2, shangha2, shangha2, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, kothello,  0,        kothello, kothello, shanghai_state, 0, ROT0, "Success", "Kyuukyoku no Othello",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shanghai,  0,        shanghai, shanghai, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shanghaij, shanghai, shanghai, shanghai, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shangha2,  0,        shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shangha2a, shangha2, shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, kothello,  0,        kothello, kothello, shanghai_state, empty_init, ROT0, "Success", "Kyuukyoku no Othello",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

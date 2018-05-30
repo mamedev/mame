@@ -325,7 +325,7 @@ static const gfx_layout ram_tilelayout =
 	32*8
 };
 
-static GFXDECODE_START( bwing )
+static GFXDECODE_START( gfx_bwing )
 	GFXDECODE_ENTRY( "gfx1",      0, charlayout,     0x00, 1 ) // chars
 	GFXDECODE_ENTRY( "gfx2",      0, spritelayout,   0x20, 2 ) // sprites
 	GFXDECODE_RAM( "gfxram",      0, ram_tilelayout, 0x10, 2 ) // foreground tiles
@@ -366,16 +366,16 @@ void bwing_state::bwing_postload()
 MACHINE_CONFIG_START(bwing_state::bwing)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(bwp1_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(bwp1_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(bwp2_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(bwp2_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(bwp3_map)
-	MCFG_CPU_IO_MAP(bwp3_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bwing_state, bwp3_interrupt,  1000)
+	MCFG_DEVICE_ADD("audiocpu", DECO16, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(bwp3_map)
+	MCFG_DEVICE_IO_MAP(bwp3_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bwing_state, bwp3_interrupt,  1000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
 
@@ -396,24 +396,24 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	MCFG_SCREEN_UPDATE_DRIVER(bwing_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bwing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bwing)
 	MCFG_PALETTE_ADD("palette", 64)
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL(24'000'000) / 2 / 8)
+	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(24'000'000) / 2 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL(24'000'000) / 2 / 8)
+	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(24'000'000) / 2 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 //****************************************************************************
@@ -556,7 +556,7 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-DRIVER_INIT_MEMBER(bwing_state,bwing)
+void bwing_state::init_bwing()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 	int j = memregion("audiocpu")->bytes();
@@ -573,9 +573,9 @@ DRIVER_INIT_MEMBER(bwing_state,bwing)
 //****************************************************************************
 // Game Entries
 
-GAME( 1984, bwings,       0, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Japan new Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bwingso, bwings, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Japan old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bwingsa, bwings, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Alt Ver.?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bwings,       0, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "B-Wings (Japan new Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bwingso, bwings, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "B-Wings (Japan old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bwingsa, bwings, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "B-Wings (Alt Ver.?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, zaviga,       0, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "Zaviga", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, zaviga,       0, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "Zaviga", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", MACHINE_SUPPORTS_SAVE )

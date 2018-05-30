@@ -428,9 +428,9 @@ void alphasmart_state::machine_reset()
 
 MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
-	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
-	MCFG_CPU_IO_MAP(alphasmart_io)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	MCFG_DEVICE_PROGRAM_MAP(alphasmart_mem)
+	MCFG_DEVICE_IO_MAP(alphasmart_io)
 	MCFG_MC68HC11_CONFIG(0, 192, 0x00)
 
 	MCFG_KS0066_F05_ADD("ks0066_0")
@@ -459,8 +459,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(asma2k_state::asma2k)
 	alphasmart(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(asma2k_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -486,6 +486,6 @@ ROM_START( asma2k )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       STATE             INIT  COMPANY                           FULLNAME           FLAGS
-COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, 0,    "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     0,    "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS
+COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, empty_init, "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

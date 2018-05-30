@@ -875,15 +875,16 @@ void ibm6580_state::video_start()
 	memset(m_p_videoram, 0x0, 0x1000);
 }
 
-static SLOT_INTERFACE_START( dw_floppies )
-	SLOT_INTERFACE( "8sssd", IBM_6360 )
-SLOT_INTERFACE_END
+static void dw_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", IBM_6360);
+}
 
 MACHINE_CONFIG_START(ibm6580_state::ibm6580)
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3)
-	MCFG_CPU_PROGRAM_MAP(ibm6580_mem)
-	MCFG_CPU_IO_MAP(ibm6580_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600)/3)
+	MCFG_DEVICE_PROGRAM_MAP(ibm6580_mem)
+	MCFG_DEVICE_IO_MAP(ibm6580_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -893,7 +894,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'000'000)/2, 833, 0, 640, 428, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ibm6580_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ibm6580_state, vblank_w))
 	MCFG_DEFAULT_LAYOUT(layout_ibm6580)
 
 	MCFG_PALETTE_ADD("palette", 3)
@@ -903,57 +904,57 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ibm6580_state, ppi_a_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ibm6580_state, led_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ibm6580_state, ppi_c_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(ibm6580_state, ppi_c_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ibm6580_state, ppi_a_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ibm6580_state, led_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ibm6580_state, ppi_c_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ibm6580_state, ppi_c_r))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("kbd", DW_KEYBOARD, 0)
-	MCFG_DW_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(ibm6580_state, kb_data_w))
-	MCFG_DW_KEYBOARD_OUT_CLOCK_HANDLER(WRITELINE(ibm6580_state, kb_clock_w))
-	MCFG_DW_KEYBOARD_OUT_STROBE_HANDLER(WRITELINE(ibm6580_state, kb_strobe_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ppi8255", i8255_device, pc4_w))
+	MCFG_DW_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(*this, ibm6580_state, kb_data_w))
+	MCFG_DW_KEYBOARD_OUT_CLOCK_HANDLER(WRITELINE(*this, ibm6580_state, kb_clock_w))
+	MCFG_DW_KEYBOARD_OUT_STROBE_HANDLER(WRITELINE(*this, ibm6580_state, kb_strobe_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ppi8255", i8255_device, pc4_w))
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(14'745'600)/3)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(ibm6580_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(DEVWRITELINE(UPD765_TAG, upd765a_device, tc_line_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(ibm6580_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(ibm6580_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(DEVREAD8(UPD765_TAG, upd765a_device, mdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(DEVWRITE8(UPD765_TAG, upd765a_device, mdma_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, ibm6580_state, hrq_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(UPD765_TAG, upd765a_device, tc_line_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, ibm6580_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, ibm6580_state, memory_write_byte))
+	MCFG_I8257_IN_IOR_0_CB(READ8(UPD765_TAG, upd765a_device, mdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(UPD765_TAG, upd765a_device, mdma_w))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(ibm6580_state, floppy_intrq))
-//  MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq0_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, ibm6580_state, floppy_intrq))
+//  MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma8257", i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD( "upd8251a", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251a", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251a", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd8251a", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251a", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251a", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251a", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD( "upd8251b", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251b", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251b", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd8251b", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251b", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251b", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251b", i8251_device, write_cts))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ibm6580")
 MACHINE_CONFIG_END
@@ -977,5 +978,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME       FLAGS */
-COMP( 1980, ibm6580, 0,      0,       ibm6580,  ibm6580, ibm6580_state,  0,    "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME                  FLAGS */
+COMP( 1980, ibm6580, 0,      0,      ibm6580, ibm6580, ibm6580_state, empty_init, "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)

@@ -843,14 +843,14 @@ void kurukuru_state::machine_reset()
 MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kurukuru_map)
-	MCFG_CPU_IO_MAP(kurukuru_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kurukuru_map)
+	MCFG_DEVICE_IO_MAP(kurukuru_io)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kurukuru_audio_map)
-	MCFG_CPU_IO_MAP(kurukuru_audio_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+	MCFG_DEVICE_ADD("audiocpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kurukuru_audio_map)
+	MCFG_DEVICE_IO_MAP(kurukuru_audio_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -862,10 +862,10 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 
 	// latch irq vector is $ef (rst $28)
 	// timer irq vector is $f7 (rst $30)
@@ -873,14 +873,14 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
+	MCFG_DEVICE_ADD("ym2149", YM2149, YM2149_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kurukuru_state, ym2149_bout_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, kurukuru_state, ym2149_aout_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kurukuru_state, ym2149_bout_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
+	MCFG_DEVICE_ADD("adpcm", MSM5205, M5205_CLOCK)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kurukuru_state, kurukuru_msm5205_vck))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -890,13 +890,13 @@ MACHINE_CONFIG_START(kurukuru_state::ppj)
 	kurukuru(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ppj_map)
-	MCFG_CPU_IO_MAP(ppj_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ppj_map)
+	MCFG_DEVICE_IO_MAP(ppj_io)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(ppj_audio_map)
-	MCFG_CPU_IO_MAP(ppj_audio_io)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(ppj_audio_map)
+	MCFG_DEVICE_IO_MAP(ppj_audio_io)
 MACHINE_CONFIG_END
 
 
@@ -960,9 +960,9 @@ ROM_END
 *                              Game Drivers                                *
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT    COMPANY                   FULLNAME                        FLAGS
-GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
-GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        dROT    COMPANY                   FULLNAME                        FLAGS
+GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
+GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
 
 // unemulated....
 

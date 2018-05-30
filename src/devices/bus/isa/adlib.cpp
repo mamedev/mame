@@ -45,8 +45,8 @@ DEFINE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device, "isa_adlib", "Ad Lib Sound Car
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_adlib_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.00)
 MACHINE_CONFIG_END
 

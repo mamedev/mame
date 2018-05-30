@@ -81,8 +81,8 @@ void harriet_state::machine_reset()
 
 
 MACHINE_CONFIG_START(harriet_state::harriet)
-	MCFG_CPU_ADD("maincpu", M68010, 40_MHz_XTAL / 4) // MC68010FN10
-	MCFG_CPU_PROGRAM_MAP(harriet_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, 40_MHz_XTAL / 4) // MC68010FN10
+	MCFG_DEVICE_PROGRAM_MAP(harriet_map)
 
 	//MCFG_DEVICE_ADD("dmac", MC68450, DMAC_CLOCK)
 
@@ -92,13 +92,13 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_MC68901_TIMER_CLOCK(2.4576_MHz_XTAL)
 	MCFG_MC68901_RX_CLOCK(9600)
 	MCFG_MC68901_TX_CLOCK(9600)
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68901_OUT_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_M48T02_ADD("timekpr")
 	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mfp", mc68901_device, write_rx))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("mfp", mc68901_device, write_rx))
 
 	//MCFG_DEVICE_ADD("wdc1", WD33C93, WD_CLOCK)
 	//MCFG_DEVICE_ADD("wdc2", WD33C93, WD_CLOCK)
@@ -111,4 +111,4 @@ ROM_START( harriet )
 	ROM_LOAD16_BYTE("harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28))
 ROM_END
 
-COMP( 1990, harriet,  0,  0, harriet,  harriet, harriet_state,  0,    "Quantel",      "Harriet", MACHINE_IS_SKELETON )
+COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_IS_SKELETON )

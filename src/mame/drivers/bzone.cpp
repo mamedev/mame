@@ -252,7 +252,7 @@ void redbaron_state::machine_start()
 INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
 {
 	if (ioport("IN0")->read() & 0x10)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -541,9 +541,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bzone_state::bzone_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(bzone_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -577,8 +577,8 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	bzone_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(redbaron_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(redbaron_map)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -588,13 +588,13 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, 1500000)
-	MCFG_POKEY_ALLPOT_R_CB(READ8(redbaron_state, redbaron_joy_r))
+	MCFG_DEVICE_ADD("pokey", POKEY, 1500000)
+	MCFG_POKEY_ALLPOT_R_CB(READ8(*this, redbaron_state, redbaron_joy_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("custom", REDBARON, 0)
+	MCFG_DEVICE_ADD("custom", REDBARON, 0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -865,7 +865,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 }
 
 
-DRIVER_INIT_MEMBER(bzone_state,bradley)
+void bzone_state::init_bradley()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);
@@ -883,9 +883,9 @@ DRIVER_INIT_MEMBER(bzone_state,bradley)
  *
  *************************************/
 
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    init_bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )

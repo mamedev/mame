@@ -437,19 +437,19 @@ uint32_t svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32
 INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 {
 	if (BANK & 1)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_sound->sound_decrement();
 }
 
-DRIVER_INIT_MEMBER(svision_state, svision)
+void svision_state::init_svision()
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();
 	m_pet.on = false;
 }
 
-DRIVER_INIT_MEMBER(svision_state, svisions)
+void svision_state::init_svisions()
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();
@@ -516,9 +516,9 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 
 MACHINE_CONFIG_START(svision_state::svision)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
-	MCFG_CPU_PROGRAM_MAP(svision_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", svision_state,  svision_frame_int)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
+	MCFG_DEVICE_PROGRAM_MAP(svision_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", svision_state,  svision_frame_int)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -534,8 +534,9 @@ MACHINE_CONFIG_START(svision_state::svision)
 	MCFG_DEFAULT_LAYOUT(layout_svision)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", SVISION_SND, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("custom", SVISION_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	SVISION_SND_IRQ_CB(svision_state, svision_irq)
@@ -557,8 +558,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svision_state::svisionp)
 	svision(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(4430000)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(4430000)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_PALETTE_MODIFY("palette")
@@ -567,8 +568,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svision_state::svisionn)
 	svision(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(3560000/*?*/)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(3560000/*?*/)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_PALETTE_MODIFY("palette")
@@ -577,8 +578,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svision_state::tvlinkp)
 	svisionp(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tvlink_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tvlink_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink)
 
@@ -606,12 +607,12 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     STATE          INIT      COMPANY   FULLNAME                                       FLAGS
 // marketed under a ton of firms and names
-CONS(1992,  svision,  0,       0,      svision,  svision,  svision_state, svision,  "Watara", "Super Vision",                                0 )
+CONS(1992,  svision,  0,       0,      svision,  svision,  svision_state, init_svision,  "Watara", "Super Vision",                                0 )
 // svdual 2 connected via communication port
-CONS( 1992, svisions, svision, 0,      svisions, svisions, svision_state, svisions, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
+CONS( 1992, svisions, svision, 0,      svisions, svisions, svision_state, init_svisions, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
 
-CONS( 1993, svisionp, svision, 0,      svisionp, svision,  svision_state, svision,  "Watara", "Super Vision (PAL TV Link Colored)",          0 )
-CONS( 1993, svisionn, svision, 0,      svisionn, svision,  svision_state, svision,  "Watara", "Super Vision (NTSC TV Link Colored)",         0 )
+CONS( 1993, svisionp, svision, 0,      svisionp, svision,  svision_state, init_svision,  "Watara", "Super Vision (PAL TV Link Colored)",          0 )
+CONS( 1993, svisionn, svision, 0,      svisionn, svision,  svision_state, init_svision,  "Watara", "Super Vision (NTSC TV Link Colored)",         0 )
 // svtvlink (2 supervisions)
 // tvlink (pad supervision simulated)
-CONS( 199?, tvlinkp,  svision, 0,      tvlinkp,  svision,  svision_state, svision,  "Watara", "TV Link PAL",                                 0 )
+CONS( 199?, tvlinkp,  svision, 0,      tvlinkp,  svision,  svision_state, init_svision,  "Watara", "TV Link PAL",                                 0 )

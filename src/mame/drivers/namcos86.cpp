@@ -284,8 +284,8 @@ WRITE8_MEMBER(namcos86_state::coin_w)
 
 WRITE8_MEMBER(namcos86_state::led_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_led[0] = BIT(data, 3);
+	m_led[1] = BIT(data, 4);
 }
 
 
@@ -328,6 +328,8 @@ void namcos86_state::machine_start()
 
 	if (membank("bank2"))
 		membank("bank2")->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
+
+	m_led.resolve();
 
 	save_item(NAME(m_wdog));
 }
@@ -1052,7 +1054,7 @@ static const gfx_layout spritelayout =
 	64*64
 };
 
-static GFXDECODE_START( namcos86 )
+static GFXDECODE_START( gfx_namcos86 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   2048*0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   2048*0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 2048*1, 128 )
@@ -1063,18 +1065,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos86_state::hopmappy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("cpu1", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(hopmappy_cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)    /* or compatible 6808 with extra instructions */
-	MCFG_CPU_PROGRAM_MAP(hopmappy_mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)   /* ??? */
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)    /* or compatible 6808 with extra instructions */
+	MCFG_DEVICE_PROGRAM_MAP(hopmappy_mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)   /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000)) /* heavy interleaving needed to avoid hangs in rthunder */
 
@@ -1084,21 +1086,21 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos86_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos86_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos86)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos86)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(namcos86_state, namcos86)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "mono", 0.0)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1108,11 +1110,11 @@ MACHINE_CONFIG_START(namcos86_state::roishtar)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(roishtar_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(roishtar_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(roishtar_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(roishtar_mcu_map)
 MACHINE_CONFIG_END
 
 
@@ -1120,11 +1122,11 @@ MACHINE_CONFIG_START(namcos86_state::genpeitd)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(genpeitd_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(genpeitd_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(genpeitd_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(genpeitd_mcu_map)
 
 	/* sound hardware */
 	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
@@ -1136,11 +1138,11 @@ MACHINE_CONFIG_START(namcos86_state::rthunder)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(rthunder_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(rthunder_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(rthunder_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(rthunder_mcu_map)
 
 	/* sound hardware */
 	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
@@ -1152,11 +1154,11 @@ MACHINE_CONFIG_START(namcos86_state::wndrmomo)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(wndrmomo_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(wndrmomo_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(wndrmomo_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(wndrmomo_mcu_map)
 
 	/* sound hardware */
 	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
@@ -1684,30 +1686,26 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(namcos86_state,namco86)
+void namcos86_state::init_namco86()
 {
-	int size;
-	uint8_t *gfx;
-
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = memregion("gfx1")->base();
-	size = memregion("gfx1")->bytes() * 2 / 3;
+	uint8_t *gfx = memregion("gfx1")->base();
+	int size = memregion("gfx1")->bytes() * 2 / 3;
 
 	{
-		std::vector<uint8_t> buffer( size );
+		std::vector<uint8_t> buffer(size);
 		uint8_t *dest1 = gfx;
-		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *dest2 = gfx + (size / 2);
 		uint8_t *mono = gfx + size;
-		int i;
 
-		memcpy( &buffer[0], gfx, size );
+		memcpy(&buffer[0], gfx, size);
 
-		for ( i = 0; i < size; i += 2 )
+		for (int i = 0; i < size; i += 2)
 		{
 			uint8_t data1 = buffer[i];
 			uint8_t data2 = buffer[i+1];
-			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
-			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
+			*dest1++ = (data1 << 4) | (data2 & 0xf);
+			*dest2++ = (data1 & 0xf0) | (data2 >> 4);
 
 			*mono ^= 0xff; mono++;
 		}
@@ -1717,20 +1715,19 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 	size = memregion("gfx2")->bytes() * 2 / 3;
 
 	{
-		std::vector<uint8_t> buffer( size );
+		std::vector<uint8_t> buffer(size);
 		uint8_t *dest1 = gfx;
-		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *dest2 = gfx + (size / 2);
 		uint8_t *mono = gfx + size;
-		int i;
 
-		memcpy( &buffer[0], gfx, size );
+		memcpy(&buffer[0], gfx, size);
 
-		for ( i = 0; i < size; i += 2 )
+		for (int i = 0; i < size; i += 2)
 		{
 			uint8_t data1 = buffer[i];
 			uint8_t data2 = buffer[i+1];
-			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
-			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
+			*dest1++ = (data1 << 4) | (data2 & 0xf);
+			*dest2++ = (data1 & 0xf0) | (data2 >> 4);
 
 			*mono ^= 0xff; mono++;
 		}
@@ -1739,19 +1736,19 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 
 
 
-GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, init_namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, init_namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, namco86, ROT0,   "Namco",   "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, init_namco86, ROT0,   "Namco",   "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, namco86, ROT0,   "Namco",   "The Return of Ishtar", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, init_namco86, ROT0,   "Namco",   "The Return of Ishtar", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, namco86, ROT0,   "Namco",   "Genpei ToumaDen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, init_namco86, ROT0,   "Namco",   "Genpei ToumaDen", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthundera,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "bootleg", "Rolling Thunder (rev 3, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder0,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (oldest)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthundera,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "bootleg", "Rolling Thunder (rev 3, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder0,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (oldest)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, namco86, ROT0,   "Namco",   "Wonder Momo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, init_namco86, ROT0,   "Namco",   "Wonder Momo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

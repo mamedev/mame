@@ -641,12 +641,12 @@ void thunderx_state::machine_reset()
 MACHINE_CONFIG_START(thunderx_state::scontra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(scontra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(scontra_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(scontra_sound_map)
 
 	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(scontra_bank5800_map)
@@ -680,16 +680,16 @@ MACHINE_CONFIG_START(thunderx_state::scontra)
 	MCFG_K051960_CB(thunderx_state, sprite_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(thunderx_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, thunderx_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -706,11 +706,11 @@ MACHINE_CONFIG_START(thunderx_state::thunderx)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(thunderx_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
+	MCFG_DEVICE_PROGRAM_MAP(thunderx_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, thunderx_state, banking_callback))
 
 	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)
+	MCFG_DEVICE_PROGRAM_MAP(thunderx_sound_map)
 
 	MCFG_DEVICE_MODIFY("bank5800")
 	MCFG_DEVICE_PROGRAM_MAP(thunderx_bank5800_map)
@@ -724,8 +724,8 @@ MACHINE_CONFIG_START(thunderx_state::gbusters)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052526 */
-	MCFG_CPU_PROGRAM_MAP(gbusters_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
+	MCFG_DEVICE_PROGRAM_MAP(gbusters_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, thunderx_state, banking_callback))
 
 	MCFG_DEVICE_MODIFY("k052109")
 	MCFG_K052109_CB(thunderx_state, gbusters_tile_callback)
@@ -1044,19 +1044,19 @@ ROM_START( crazycop )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(thunderx_state, thunderx)
+void thunderx_state::init_thunderx()
 {
 	m_thunderx_firq_timer = timer_alloc(TIMER_THUNDERX_FIRQ);
 }
 
 /***************************************************************************/
 
-GAME( 1988, scontra,   0,        scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gbusters,  0,        gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
-GAME( 1988, gbustersa, gbusters, gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
-GAME( 1988, crazycop,  gbusters, gbusters, gbusters, thunderx_state, 0,        ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs
+GAME( 1988, scontra,   0,        scontra,  scontra,  thunderx_state, empty_init,    ROT90, "Konami", "Super Contra",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra,  thunderx_state, empty_init,    ROT90, "Konami", "Super Contra - Alien no Gyakushuu (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, init_thunderx, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gbusters,  0,        gbusters, gbusters, thunderx_state, empty_init,    ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
+GAME( 1988, gbustersa, gbusters, gbusters, gbusters, thunderx_state, empty_init,    ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
+GAME( 1988, crazycop,  gbusters, gbusters, gbusters, thunderx_state, empty_init,    ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs

@@ -294,8 +294,8 @@ void konmedal68k_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
-	MCFG_CPU_PROGRAM_MAP(kzaurus_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
+	MCFG_DEVICE_PROGRAM_MAP(kzaurus_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal68k_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -319,7 +319,8 @@ MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'868'800)/2) // 33.8688 MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -338,4 +339,4 @@ ROM_START( kzaurus )
 	ROM_LOAD( "540-a01-2f.bin", 0x000000, 0x080000, CRC(391c6ee6) SHA1(a345934687a8abf818350d0597843a1159395fc0) )
 ROM_END
 
-GAME( 1995, kzaurus,    0, kzaurus, kzaurus,  konmedal68k_state, 0, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

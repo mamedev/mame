@@ -567,7 +567,7 @@ static const gfx_layout igt_gameking_layout =
 };
 
 
-static GFXDECODE_START( igt_gameking )
+static GFXDECODE_START( gfx_igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
@@ -608,20 +608,20 @@ DEVICE_INPUT_DEFAULTS_END
 MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I960, XTAL(24'000'000))
-	MCFG_CPU_PROGRAM_MAP(igt_gameking_map)
+	MCFG_DEVICE_ADD("maincpu", I960, XTAL(24'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(igt_gameking_map)
 
 	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
-	MCFG_SC28C94_D_TX_CALLBACK(DEVWRITELINE("diag", rs232_port_device, write_txd))
+	MCFG_SC28C94_D_TX_CALLBACK(WRITELINE("diag", rs232_port_device, write_txd))
 
 	MCFG_SC28C94_ADD("quart2", XTAL(24'000'000) / 6)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
 
-	MCFG_RS232_PORT_ADD("diag", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("quart1", sc28c94_device, rx_d_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("diag", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("quart1", sc28c94_device, rx_d_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igt_gameking)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igt_gameking_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igt_gameking_state, vblank_irq))
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -638,9 +638,9 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -648,8 +648,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)
 	igt_gameking(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(igt_ms72c_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(igt_ms72c_map)
 MACHINE_CONFIG_END
 
 ROM_START( ms3 )
@@ -905,14 +905,14 @@ ROM_START( gkkey )
 	ROM_REGION( 0x200000, "snd", ROMREGION_ERASEFF )
 ROM_END
 
-GAME( 1994, ms3,       0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, ms72c,     0,            igt_ms72c,    igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4,    0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4ms,  gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43n,  gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtez,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtezms, gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt5p,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, igtsc,     0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
-GAME( 2003, gkkey,     0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps
+GAME( 1994, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtezms, gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt5p,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
+GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps

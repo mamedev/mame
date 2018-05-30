@@ -223,16 +223,16 @@ static const gfx_layout lcmate2_charlayout =
 	8*8 /* 8 bytes */
 };
 
-static GFXDECODE_START( lcmate2 )
+static GFXDECODE_START( gfx_lcmate2 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, lcmate2_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
-	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)
-	MCFG_CPU_IO_MAP(lcmate2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
+	MCFG_DEVICE_PROGRAM_MAP(lcmate2_mem)
+	MCFG_DEVICE_IO_MAP(lcmate2_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lcmate2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lcmate2)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)
@@ -254,8 +254,8 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -271,5 +271,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )

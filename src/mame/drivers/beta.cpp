@@ -58,7 +58,8 @@ public:
 		m_speaker(*this, "speaker"),
 		m_eprom(*this, EPROM_TAG),
 		m_q(*this, "Q%u", 6U),
-		m_digit(*this, "digit%u", 0U)
+		m_digit(*this, "digit%u", 0U),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
@@ -85,6 +86,7 @@ private:
 	required_device<generic_slot_device> m_eprom;
 	required_ioport_array<4> m_q;
 	output_finder<6> m_digit;
+	output_finder<2> m_led;
 
 	/* EPROM state */
 	int m_eprom_oe;
@@ -259,10 +261,10 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_speaker->level_w(!BIT(data, 4));
 
 	/* address led */
-	output().set_led_value(0, BIT(data, 5));
+	m_led[0] = BIT(data, 5);
 
 	/* data led */
-	output().set_led_value(1, !BIT(data, 5));
+	m_led[1] = !BIT(data, 5);
 
 	/* EPROM address shift */
 	if (!BIT(m_old_data, 5) && BIT(data, 5))
@@ -315,6 +317,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 void beta_state::machine_start()
 {
 	m_digit.resolve();
+	m_led.resolve();
 
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
 
@@ -343,23 +346,23 @@ void beta_state::machine_start()
 
 MACHINE_CONFIG_START(beta_state::beta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(beta_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(beta_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_beta )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
-	MCFG_MOS6530n_IN_PA_CB(READ8(beta_state, riot_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(beta_state, riot_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(beta_state, riot_pb_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, beta_state, riot_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, beta_state, riot_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, beta_state, riot_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, beta_state, riot_pb_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	/* EPROM socket */
@@ -382,5 +385,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, beta,   0,      0,      beta,   beta, beta_state, 0,    "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1984, beta, 0,      0,      beta,    beta,  beta_state, empty_init, "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )

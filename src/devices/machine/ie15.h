@@ -13,6 +13,7 @@
 
 #include "screen.h"
 #include "speaker.h"
+#include "diserial.h"
 
 
 #define SCREEN_PAGE     (80*48)

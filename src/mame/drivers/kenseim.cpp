@@ -149,8 +149,8 @@ GND | 20
 class kenseim_state : public cps_state
 {
 public:
-	kenseim_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag),
+	kenseim_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cps_state(mconfig, type, tag),
 		m_to_68k_cmd_low(0),
 		m_to_68k_cmd_d9(0),
 		m_to_68k_cmd_req(0),
@@ -158,8 +158,8 @@ public:
 		m_from68k_ack(0),
 		m_from68k_st4(0),
 		m_from68k_st3(0),
-		m_from68k_st2(0)
-
+		m_from68k_st2(0),
+		m_lamp(*this, "lamp%u", 1U)
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -204,7 +204,7 @@ public:
 
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
-	DECLARE_DRIVER_INIT(kenseim);
+	void init_kenseim();
 
 	// certain
 
@@ -224,17 +224,6 @@ public:
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
 
-	uint8_t m_to_68k_cmd_low;
-	uint8_t m_to_68k_cmd_d9;
-	uint8_t m_to_68k_cmd_req;
-	uint8_t m_to_68k_cmd_LVm;
-
-
-	int m_from68k_ack;
-	int m_from68k_st4;
-	int m_from68k_st3;
-	int m_from68k_st2;
-
 
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
@@ -243,16 +232,29 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
 
 	void set_leds(uint32_t ledstates);
+
+	void kenseim(machine_config &config);
+	void kenseim_io_map(address_map &map);
+	void kenseim_map(address_map &map);
+
+private:
+	uint8_t m_to_68k_cmd_low;
+	uint8_t m_to_68k_cmd_d9;
+	uint8_t m_to_68k_cmd_req;
+	uint8_t m_to_68k_cmd_LVm;
+
+	int m_from68k_ack;
+	int m_from68k_st4;
+	int m_from68k_st3;
+	int m_from68k_st2;
+
 	int m_led_latch;
 	int m_led_serial_data;
 	int m_led_clock;
 
 	int mole_state_a[6];
 	int mole_state_b[6];
-
-	void kenseim(machine_config &config);
-	void kenseim_io_map(address_map &map);
-	void kenseim_map(address_map &map);
+	output_finder<20> m_lamp;
 };
 
 
@@ -263,7 +265,7 @@ public:
 void kenseim_state::set_leds(uint32_t ledstates)
 {
 	for (int i=0; i<20; i++)
-		output().set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
+		m_lamp[i] = BIT(ledstates, i);
 }
 
 // could be wrong
@@ -479,27 +481,27 @@ MACHINE_CONFIG_START(kenseim_state::kenseim)
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
+	MCFG_DEVICE_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
-	MCFG_CPU_PROGRAM_MAP(kenseim_map)
-	MCFG_CPU_IO_MAP(kenseim_io_map)
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(kenseim_state, cpu_portc_w))
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(kenseim_state, cpu_portd_w))
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(kenseim_state, cpu_porte_w))
+	MCFG_DEVICE_PROGRAM_MAP(kenseim_map)
+	MCFG_DEVICE_IO_MAP(kenseim_io_map)
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portc_w))
+	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portd_w))
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, kenseim_state, cpu_porte_w))
 	MCFG_TMPZ84C011_PORTA_READ_CB(IOPORT("DSW1"))
 	MCFG_TMPZ84C011_PORTB_READ_CB(IOPORT("DSW2"))
 	MCFG_TMPZ84C011_PORTC_READ_CB(IOPORT("CAB-IN"))
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(kenseim_state, cpu_portd_r))
+	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(*this, kenseim_state, cpu_portd_r))
 
 	MCFG_MB89363B_ADD("mb89363b")
 	// a,b,c always $80: all ports set as output
 	// d,e,f always $92: port D and E as input, port F as output
-	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(kenseim_state, mb8936_porta_w))
-	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(kenseim_state, mb8936_portb_w))
-	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(kenseim_state, mb8936_portc_w))
+	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(*this, kenseim_state, mb8936_porta_w))
+	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(*this, kenseim_state, mb8936_portb_w))
+	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(*this, kenseim_state, mb8936_portc_w))
 	MCFG_MB89363B_IN_PORTD_CB(IOPORT("MOLEA"))
 	MCFG_MB89363B_IN_PORTE_CB(IOPORT("MOLEB"))
-	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(kenseim_state, mb8936_portf_w))
+	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(*this, kenseim_state, mb8936_portf_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
@@ -690,18 +692,20 @@ ROM_START( kenseim )
 	ROM_LOAD( "kensei_mogura_ver1.0.u2", 0x00000, 0x08000, CRC(725cfcfc) SHA1(5a4c6e6efe2ddb38bec3218e55a746ea0146209f) )
 ROM_END
 
-DRIVER_INIT_MEMBER(kenseim_state,kenseim)
+void kenseim_state::init_kenseim()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 
 	m_led_serial_data = 0;
 	m_led_clock = 0;
 	m_led_latch = 0;
+
+	m_lamp.resolve();
 }
 
 
 // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
 // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
-GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Capcom / Togo / Sigma", "Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)", MACHINE_CLICKABLE_ARTWORK, layout_kenseim )
+GAMEL( 1994, kenseim, 0, kenseim, kenseim, kenseim_state, init_kenseim, ROT0, "Capcom / Togo / Sigma", "Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)", MACHINE_CLICKABLE_ARTWORK, layout_kenseim )

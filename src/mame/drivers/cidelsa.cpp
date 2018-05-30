@@ -114,9 +114,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	    7   CONT. M1
 	*/
 
-	output().set_led_value(0, data & 0x08); // 1P
-	output().set_led_value(1, data & 0x10); // 2P
-	output().set_led_value(2, data & 0x20); // FIRE
+	m_led[0] = BIT(data, 3); // 1P
+	m_led[1] = BIT(data, 4); // 2P
+	m_led[2] = BIT(data, 5); // FIRE
 }
 
 WRITE8_MEMBER( draco_state::out1_w )
@@ -370,18 +370,21 @@ void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void cidelsa_state::machine_start()
 {
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_reset));
 }
 
 void draco_state::machine_start()
 {
+	cidelsa_state::machine_start();
+
 	/* setup COP402 memory banking */
 	membank("bank1")->configure_entries(0, 2, memregion(COP402N_TAG)->base(), 0x400);
 	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
-	save_item(NAME(m_reset));
 	save_item(NAME(m_sound));
 	save_item(NAME(m_psg_latch));
 }
@@ -399,12 +402,12 @@ void cidelsa_state::machine_reset()
 
 MACHINE_CONFIG_START(cidelsa_state::destryer)
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
-	MCFG_CPU_PROGRAM_MAP(destryer_map)
-	MCFG_CPU_IO_MAP(destryer_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(destryer_map)
+	MCFG_DEVICE_IO_MAP(destryer_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -414,12 +417,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::destryera)
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
-	MCFG_CPU_PROGRAM_MAP(destryera_map)
-	MCFG_CPU_IO_MAP(destryer_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(destryera_map)
+	MCFG_DEVICE_IO_MAP(destryer_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -429,12 +432,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::altair)
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
-	MCFG_CPU_PROGRAM_MAP(altair_map)
-	MCFG_CPU_IO_MAP(altair_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(altair_map)
+	MCFG_DEVICE_IO_MAP(altair_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -450,7 +453,7 @@ MACHINE_CONFIG_START(cidelsa_state::altair)
 	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN2"))
 	MCFG_DEVICE_ADD("ic26", CDP1852, ALTAIR_CHR1 / 8) // clock is CDP1802 TPB
 	MCFG_CDP1852_MODE_CALLBACK(VCC)
-	MCFG_CDP1852_DO_CALLBACK(WRITE8(cidelsa_state, altair_out1_w))
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, cidelsa_state, altair_out1_w))
 
 	/* sound and video hardware */
 	altair_video(config);
@@ -458,23 +461,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(draco_state::draco)
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
-	MCFG_CPU_PROGRAM_MAP(draco_map)
-	MCFG_CPU_IO_MAP(draco_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(draco_map)
+	MCFG_DEVICE_IO_MAP(draco_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_CPU_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
-	MCFG_CPU_PROGRAM_MAP(draco_sound_map)
+	MCFG_DEVICE_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(draco_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_D_CB(WRITE8(draco_state, sound_bankswitch_w))
-	MCFG_COP400_WRITE_G_CB(WRITE8(draco_state, sound_g_w))
-	MCFG_COP400_READ_L_CB(READ8(draco_state, psg_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(draco_state, psg_w))
-	MCFG_COP400_READ_IN_CB(READ8(draco_state, sound_in_r))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, draco_state, sound_bankswitch_w))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, draco_state, sound_g_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, draco_state, psg_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, draco_state, psg_w))
+	MCFG_COP400_READ_IN_CB(READ8(*this, draco_state, sound_in_r))
 
 	/* input/output hardware */
 	MCFG_DEVICE_ADD("ic29", CDP1852, 0) // clock is really tied to CDP1869 CMSEL (pin 37)
@@ -488,7 +491,7 @@ MACHINE_CONFIG_START(draco_state::draco)
 	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN2"))
 	MCFG_DEVICE_ADD("ic32", CDP1852, ALTAIR_CHR1 / 8) // clock is CDP1802 TPB
 	MCFG_CDP1852_MODE_CALLBACK(VCC)
-	MCFG_CDP1852_DO_CALLBACK(WRITE8(draco_state, out1_w))
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, draco_state, out1_w))
 
 	/* sound and video hardware */
 	draco_video(config);
@@ -540,7 +543,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1980, destryer, 0,        destryer, destryer, cidelsa_state, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, destryera,destryer, destryera,destryer, cidelsa_state, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, altair,   0,        altair,   altair,   cidelsa_state, 0, ROT90, "Cidelsa", "Altair", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, draco,    0,        draco,    draco,    draco_state,   0, ROT90, "Cidelsa", "Draco", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, destryer,  0,        destryer,  destryer, cidelsa_state, empty_init, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, destryera, destryer, destryera, destryer, cidelsa_state, empty_init, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, altair,    0,        altair,    altair,   cidelsa_state, empty_init, ROT90, "Cidelsa", "Altair", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, draco,     0,        draco,     draco,    draco_state,   empty_init, ROT90, "Cidelsa", "Draco", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

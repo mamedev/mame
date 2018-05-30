@@ -138,8 +138,8 @@ void besta_state::machine_reset()
 /* CP31 processor board */
 MACHINE_CONFIG_START(besta_state::besta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
-	MCFG_CPU_PROGRAM_MAP(besta_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, 2*16670000)
+	MCFG_DEVICE_PROGRAM_MAP(besta_mem)
 
 	MCFG_DEVICE_ADD ("pit1", PIT68230, 16670000 / 2)    // XXX verify clock
 
@@ -164,5 +164,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE         INIT  COMPANY   FULLNAME    FLAGS
-COMP( 1988, besta88,  0,      0,     besta,     besta,   besta_state,  0,    "Sapsan", "Besta-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME    FLAGS
+COMP( 1988, besta88, 0,      0,      besta,   besta, besta_state, empty_init, "Sapsan", "Besta-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

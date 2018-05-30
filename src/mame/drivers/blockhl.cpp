@@ -279,9 +279,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)     // Konami 052526
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(blockhl_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)     // Konami 052526
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, blockhl_state, banking_callback))
 
 	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank5800_map)
@@ -290,8 +290,8 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -319,11 +319,11 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_K051960_CB(blockhl_state, sprite_callback)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -384,6 +384,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT  ROT   COMPANY   FULLNAME          FLAGS
-GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT        ROT   COMPANY   FULLNAME          FLAGS
+GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, empty_init, ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, empty_init, ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )

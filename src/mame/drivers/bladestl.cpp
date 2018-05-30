@@ -48,7 +48,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
 		m_maincpu->set_input_line(HD6309_FIRQ_LINE, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in or timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /*************************************
@@ -73,8 +73,8 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	output().set_led_value(0,data & 0x04);
-	output().set_led_value(1,data & 0x08);
+	m_lamp[0] = BIT(data, 2);
+	m_lamp[1] = BIT(data, 3);
 
 	/* bit 4 = relay (???) */
 
@@ -270,7 +270,7 @@ static const gfx_layout spritelayout =
 	32*8            /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( bladestl )
+static GFXDECODE_START( gfx_bladestl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0,  2 ) /* colors 00..31 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 32, 16 ) /* colors 32..47 but using lookup table */
 GFXDECODE_END
@@ -285,6 +285,7 @@ GFXDECODE_END
 void bladestl_state::machine_start()
 {
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
+	m_lamp.resolve();
 
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_last_track));
@@ -305,12 +306,12 @@ void bladestl_state::machine_reset()
 MACHINE_CONFIG_START(bladestl_state::bladestl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // divider not verified (from 007342 custom)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD(m_maincpu, HD6309E, XTAL(24'000'000) / 8) // divider not verified (from 007342 custom)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bladestl_state, bladestl_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, MC6809E, XTAL(24'000'000) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -325,18 +326,18 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bladestl)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_bladestl)
 	MCFG_PALETTE_ADD("palette", 32 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)
 
-	MCFG_K007342_ADD("k007342")
+	MCFG_K007342_ADD(m_k007342)
 	MCFG_K007342_GFXNUM(0)
 	MCFG_K007342_CALLBACK_OWNER(bladestl_state, bladestl_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 
-	MCFG_K007420_ADD("k007420")
+	MCFG_K007420_ADD(m_k007420)
 	MCFG_K007420_BANK_LIMIT(0x3ff)
 	MCFG_K007420_CALLBACK_OWNER(bladestl_state, bladestl_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
@@ -346,28 +347,28 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	/* sound hardware */
 	/* the initialization order is important, the port callbacks being
 	   called at initialization time */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, M6809_IRQ_LINE))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("upd", UPD7759, XTAL(640'000))
+	MCFG_DEVICE_ADD(m_upd7759, UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("upd", upd775x_device, port_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bladestl_state, bladestl_port_B_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(m_upd7759, upd775x_device, port_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bladestl_state, bladestl_port_B_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.45)
 	MCFG_SOUND_ROUTE(1, "filter2", 0.45)
 	MCFG_SOUND_ROUTE(2, "filter3", 0.45)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD(m_filter2, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_DEVICE_ADD(m_filter3, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -448,6 +449,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )

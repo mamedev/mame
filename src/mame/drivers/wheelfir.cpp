@@ -733,16 +733,16 @@ void wheelfir_state::ramdac_map(address_map &map)
 
 MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP(wheelfir_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(wheelfir_main)
 
-	MCFG_CPU_ADD("subcpu", M68000, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP(wheelfir_sub)
+	MCFG_DEVICE_ADD("subcpu", M68000, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(wheelfir_sub)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_DEVICE_ADD("adc", ADC0808, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(WRITELINE(wheelfir_state, adc_eoc_w))
+	MCFG_ADC0808_EOC_FF_CB(WRITELINE(*this, wheelfir_state, adc_eoc_w))
 	MCFG_ADC0808_IN0_CB(IOPORT("STEERING"))
 	MCFG_ADC0808_IN1_CB(IOPORT("ACCELERATOR"))
 	MCFG_ADC0808_IN2_CB(IOPORT("BRAKE"))
@@ -754,7 +754,7 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wheelfir_state, screen_vblank_wheelfir))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wheelfir_state, screen_vblank_wheelfir))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)
@@ -765,12 +765,13 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -797,4 +798,4 @@ ROM_START( wheelfir )
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
 ROM_END
 
-GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, 0, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)

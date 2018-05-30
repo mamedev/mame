@@ -303,10 +303,10 @@ void dm7000_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(dm7000_state::dm7000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
+	MCFG_DEVICE_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now
 	MCFG_PPC_BUS_FREQUENCY(252000000)
-	MCFG_CPU_PROGRAM_MAP(dm7000_mem)
+	MCFG_DEVICE_PROGRAM_MAP(dm7000_mem)
 
 
 	/* video hardware */
@@ -348,7 +348,7 @@ ROM_START( dm500 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY             FULLNAME         FLAGS
-SYST( 2003, dm7000,  0,       0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST( 2004, dm5620,  dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST( 2006, dm500,   dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 500",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY             FULLNAME         FLAGS
+SYST( 2003, dm7000, 0,      0,      dm7000,  dm7000, dm7000_state, empty_init, "Dream Multimedia", "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2004, dm5620, dm7000, 0,      dm7000,  dm7000, dm7000_state, empty_init, "Dream Multimedia", "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2006, dm500,  dm7000, 0,      dm7000,  dm7000, dm7000_state, empty_init, "Dream Multimedia", "Dreambox 500",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

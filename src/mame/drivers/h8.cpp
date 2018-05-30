@@ -312,29 +312,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 
 MACHINE_CONFIG_START(h8_state::h8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(h8_mem)
-	MCFG_CPU_IO_MAP(h8_io)
-	MCFG_I8085A_STATUS(WRITE8(h8_state, h8_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(h8_state, h8_inte_callback))
+	MCFG_DEVICE_ADD("maincpu", I8080, H8_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(h8_mem)
+	MCFG_DEVICE_IO_MAP(h8_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, h8_state, h8_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, h8_state, h8_inte_callback))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, H8_BEEP_FRQ)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", H8_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(h8_state, txdata_callback))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, h8_state, txdata_callback))
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 4800)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -370,5 +368,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME PARENT  COMPAT  MACHINE  INPUT    CLASS,      INIT  COMPANY        FULLNAME       FLAGS */
-COMP( 1977, h8,  0,      0,      h8,      h8,      h8_state,   0,    "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS,    INIT        COMPANY        FULLNAME       FLAGS */
+COMP( 1977, h8,   0,      0,      h8,      h8,      h8_state, empty_init, "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )

@@ -348,16 +348,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segam1_state::segam1)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(segam1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(segam1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segam1_sound_map)
-	MCFG_CPU_IO_MAP(segam1_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_sound_map)
+	MCFG_DEVICE_IO_MAP(segam1_sound_io_map)
 
-	MCFG_CPU_ADD("m1comm", Z80, 4000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segam1_comms_map)
+	MCFG_DEVICE_ADD("m1comm", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_comms_map)
 
 	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("INA"))
@@ -388,22 +388,22 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	MCFG_PALETTE_ADD("palette", 8192*2)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(segam1_state, ym3438_irq_handler))
+	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segam1_state, ym3438_irq_handler))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segam1_state::unkm1)
 	segam1(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(unkm1_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(unkm1_sound_map)
 
-	MCFG_CPU_MODIFY("m1comm")
+	MCFG_DEVICE_MODIFY("m1comm")
 	MCFG_DEVICE_DISABLE() // not dumped yet
 MACHINE_CONFIG_END
 
@@ -438,5 +438,5 @@ ROM_START( unkm1 ) // 1992.01.31 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
-GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state,    0, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state, empty_init, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
+GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state, empty_init, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

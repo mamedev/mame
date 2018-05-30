@@ -981,23 +981,25 @@ FLOPPY_FORMATS_MEMBER( next_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( next_floppies )
-	SLOT_INTERFACE( "35ed", FLOPPY_35_ED )
-SLOT_INTERFACE_END
+static void next_floppies(device_slot_interface &device)
+{
+	device.option_add("35ed", FLOPPY_35_ED);
+}
 
-static SLOT_INTERFACE_START( next_scsi_devices )
-	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
-SLOT_INTERFACE_END
+static void next_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("ncr5390", NCR5390);
+}
 
 void next_state::ncr5390(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
 	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_drq))
+	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, next_state, scsi_irq))
+	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, next_state, scsi_drq))
 }
 
 MACHINE_CONFIG_START(next_state::next_base)
@@ -1009,17 +1011,17 @@ MACHINE_CONFIG_START(next_state::next_base)
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
 	MCFG_SCREEN_SIZE(1120, 900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(next_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, next_state, vblank_w))
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL(32'768))
 	MCFG_DEVICE_ADD("scc", SCC8530, XTAL(25'000'000))
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(next_state, scc_irq))
+	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(*this, next_state, scc_irq))
 	MCFG_DEVICE_ADD("keyboard", NEXTKBD, 0)
-	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(next_state, keyboard_irq))
-	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(next_state, power_irq))
-	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(next_state, nmi_irq))
+	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(*this, next_state, keyboard_irq))
+	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(*this, next_state, power_irq))
+	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(*this, next_state, nmi_irq))
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)
@@ -1028,30 +1030,30 @@ MACHINE_CONFIG_START(next_state::next_base)
 	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
 
 	MCFG_DEVICE_ADD("net", MB8795, 0)
-	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(next_state, net_tx_irq))
-	MCFG_MB8795_RX_IRQ_CALLBACK(WRITELINE(next_state, net_rx_irq))
-	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(next_state, net_tx_drq))
-	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(next_state, net_rx_drq))
+	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_irq))
+	MCFG_MB8795_RX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_irq))
+	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_drq))
+	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_drq))
 
 	MCFG_DEVICE_ADD("mo", NEXTMO, 0)
-	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(next_state, mo_irq))
-	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(next_state, mo_drq))
+	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(*this, next_state, mo_irq))
+	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(*this, next_state, mo_drq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::next)
 	next_base(config);
-	MCFG_CPU_ADD("maincpu", M68030, XTAL(25'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_0b_m_nofdc_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_nofdc_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::next_fdc_base)
 	next_base(config);
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(next_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(next_state, fdc_drq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, next_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, next_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
 
 	// software list
@@ -1060,46 +1062,46 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::nexts)
 	next_fdc_base(config);
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::nexts2)
 	next_fdc_base(config);
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::nextsc)
 	next_fdc_base(config);
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_2c_c_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_2c_c_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::nextst)
 	next_fdc_base(config);
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::nextstc)
 	next_fdc_base(config);
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::nextct)
 	next_fdc_base(config);
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_0c_m_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_0c_m_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::nextctc)
 	next_fdc_base(config);
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
 MACHINE_CONFIG_END
@@ -1169,54 +1171,54 @@ ROM_START(nextctc)
 	ROM_NEXT_V3
 ROM_END
 
-DRIVER_INIT_MEMBER(next_state,next)
+void next_state::init_next()
 {
 	setup(0x00010002, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nexts)
+void next_state::init_nexts()
 {
 	setup(0x00011002, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nexts2)
+void next_state::init_nexts2()
 {
 	setup(0x00012102, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextsc)
+void next_state::init_nextsc()
 {
 	setup(0x00013102, 1120, 832, 16, true);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextst)
+void next_state::init_nextst()
 {
 	setup(0x00014103, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextstc)
+void next_state::init_nextstc()
 {
 	setup(0x00015103,  832, 624, 0, true);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextct)
+void next_state::init_nextct()
 {
 	setup(0x00018103, 1120, 832, 0, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextctc)
+void next_state::init_nextctc()
 {
 	setup(0x00019103,  832, 624, 0, true);
 }
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT STATE         INIT     COMPANY                FULLNAME                      FLAGS
-COMP( 1987, next,    0,      0,       next,      next, next_state,   next,    "Next Software Inc",   "NeXT Cube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,   nexts,   "Next Software Inc",   "NeXTstation",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,   nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,   nextsc,  "Next Software Inc",   "NeXTstation color",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,   nextst,  "Next Software Inc",   "NeXTstation turbo",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,   nextstc, "Next Software Inc",   "NeXTstation turbo color",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,   nextct,  "Next Software Inc",   "NeXT Cube turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,   nextctc, "Next Software Inc",   "NeXT Cube turbo color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY              FULLNAME                     FLAGS
+COMP( 1987, next,    0,      0,      next,    next,  next_state, init_next,    "Next Software Inc", "NeXT Cube",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts,   0,      0,      nexts,   next,  next_state, init_nexts,   "Next Software Inc", "NeXTstation",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts2,  nexts,  0,      nexts2,  next,  next_state, init_nexts2,  "Next Software Inc", "NeXTstation (X15 variant)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextsc,  nexts,  0,      nextsc,  next,  next_state, init_nextsc,  "Next Software Inc", "NeXTstation color",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextst,  0,      0,      nextst,  next,  next_state, init_nextst,  "Next Software Inc", "NeXTstation turbo",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextstc, nextst, 0,      nextstc, next,  next_state, init_nextstc, "Next Software Inc", "NeXTstation turbo color",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextct,  nextst, 0,      nextct,  next,  next_state, init_nextct,  "Next Software Inc", "NeXT Cube turbo",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextctc, nextst, 0,      nextctc, next,  next_state, init_nextctc, "Next Software Inc", "NeXT Cube turbo color",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

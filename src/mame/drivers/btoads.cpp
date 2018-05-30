@@ -305,8 +305,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(btoads_state::btoads)
 
-	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34020, CPU_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -314,10 +314,10 @@ MACHINE_CONFIG_START(btoads_state::btoads)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(btoads_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(btoads_state, from_shiftreg) /* read from shiftreg function */
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(btoads_state, irq0_line_assert,  183)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(btoads_state, irq0_line_assert,  183)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -329,7 +329,8 @@ MACHINE_CONFIG_START(btoads_state::btoads)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34020_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_BSMT2000_ADD("bsmt", SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -372,4 +373,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, btoads_state, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btoads, 0, btoads, btoads, btoads_state, empty_init, ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )

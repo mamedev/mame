@@ -103,14 +103,14 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(stargame_state::stargame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 15000000 / 4) // clock line marked as CK4 and derived from 15MHz crystal
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_IO_MAP(maincpu_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 15000000 / 4) // clock line marked as CK4 and derived from 15MHz crystal
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_IO_MAP(maincpu_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 15000000 / 3) // ? check divider - clock line marked as CK6 and derived from 15MHz crystal
-	MCFG_CPU_PROGRAM_MAP(audiocpu_map)
-	MCFG_CPU_IO_MAP(audiocpu_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 15000000 / 3) // ? check divider - clock line marked as CK6 and derived from 15MHz crystal
+	MCFG_DEVICE_PROGRAM_MAP(audiocpu_map)
+	MCFG_DEVICE_IO_MAP(audiocpu_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(stargame_state, stargame)
 
@@ -123,11 +123,11 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 
 	/* sound hardware */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("measnd")
-	MCFG_SOUND_ADD("mea8000", MEA8000, 15000000 / 4)
+	SPEAKER(config, "measnd").front_center();
+	MCFG_DEVICE_ADD("mea8000", MEA8000, 15000000 / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "measnd", 1.0)
-	MCFG_SPEAKER_STANDARD_MONO("aysnd")
-	MCFG_SOUND_ADD("ay", AY8910, 15000000 / 8) // clock line marked as CK2 and derived from 15MHz crystal
+	SPEAKER(config, "aysnd").front_center();
+	MCFG_DEVICE_ADD("ay", AY8910, 15000000 / 8) // clock line marked as CK2 and derived from 15MHz crystal
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.25)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
@@ -162,5 +162,5 @@ ROM_START(whtforce)
 ROM_END
 
 
-GAME( 1986, spcship,  0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, whtforce, 0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "White Force",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, spcship,  0, stargame, stargame, stargame_state, empty_init, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, whtforce, 0, stargame, stargame, stargame_state, empty_init, ROT0, "Stargame", "White Force",           MACHINE_IS_SKELETON_MECHANICAL )

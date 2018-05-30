@@ -170,7 +170,7 @@ public:
 	DECLARE_READ16_MEMBER(irq2_ack_r);
 	DECLARE_READ16_MEMBER(irq4_ack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(pip);
+	void init_pip();
 	required_device<via6522_device> m_via;
 	void pntnpuzl(machine_config &config);
 	void mcu_map(address_map &map);
@@ -350,21 +350,21 @@ static INPUT_PORTS_START( pntnpuzl )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pntnpuzl_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(12'000'000) / 10)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
 	// CB2 used for serial communication with 8798
 
-	MCFG_CPU_ADD("mcu", P8098, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
+	MCFG_DEVICE_ADD("mcu", P8098, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -392,7 +392,7 @@ ROM_START( pntnpuzl )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
+void pntnpuzl_state::init_pip()
 {
 //  uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
@@ -400,4 +400,4 @@ DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 
 }
 
-GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, init_pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

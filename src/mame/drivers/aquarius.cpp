@@ -190,7 +190,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(aquarius_state,aquarius)
+void aquarius_state::init_aquarius()
 {
 	/* install expansion memory if available */
 	if (m_ram->size() > 0x1000)
@@ -340,7 +340,7 @@ static const gfx_layout aquarius_charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( aquarius )
+static GFXDECODE_START( gfx_aquarius )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -351,10 +351,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(aquarius_state::aquarius)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
-	MCFG_CPU_PROGRAM_MAP(aquarius_mem)
-	MCFG_CPU_IO_MAP(aquarius_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
+	MCFG_DEVICE_PROGRAM_MAP(aquarius_mem)
+	MCFG_DEVICE_IO_MAP(aquarius_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -365,18 +365,18 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarius )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarius)
 	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -422,6 +422,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     STATE           INIT      COMPANY   FULLNAME               FLAGS
-COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",     0 )
-//COMP( 1984, aquariu2,    aquarius, 0,      aquarius,    aquarius, aquarius_state, 0,        "Mattel", "Aquarius II",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY   FULLNAME           FLAGS
+COMP( 1983, aquarius, 0,        0,      aquarius, aquarius, aquarius_state, init_aquarius, "Mattel", "Aquarius (NTSC)", 0 )
+//COMP( 1984, aquariu2, aquarius, 0,      aquarius, aquarius, aquarius_state, empty_init,    "Mattel", "Aquarius II",     MACHINE_NOT_WORKING )

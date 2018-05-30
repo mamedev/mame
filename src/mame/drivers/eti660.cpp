@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* PULSE led */
-	output().set_led_value(LED_PULSE, state);
+	m_led[LED_PULSE] = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -263,6 +263,8 @@ void eti660_state::machine_reset()
 
 void eti660_state::machine_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_color_ram));
 }
 
@@ -306,30 +308,30 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 
 MACHINE_CONFIG_START(eti660_state::eti660)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(8'867'238)/5)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(8'867'238)/5)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(eti660_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(eti660_state, ef2_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(eti660_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(eti660_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(eti660_state, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, eti660_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, eti660_state, ef2_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, eti660_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, eti660_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, eti660_state, dma_w))
 
 	/* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(8'867'238)/5)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(8'867'238)/5, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(eti660_state, rdata_r), READLINE(eti660_state, bdata_r), READLINE(eti660_state, gdata_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(8'867'238)/5, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, eti660_state, rdata_r), READLINE(*this, eti660_state, bdata_r), READLINE(*this, eti660_state, gdata_r))
 	MCFG_CDP1864_CHROMINANCE(RES_K(2.2), RES_K(1), RES_K(4.7), RES_K(4.7)) // R7, R5, R6, R4
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(eti660_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eti660_state, pia_pa_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, eti660_state, pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, eti660_state, pia_pa_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
 
@@ -351,5 +353,5 @@ ROM_START( eti660 )
 	ROM_LOAD( "eti660.bin", 0x0000, 0x0400, CRC(811dfa62) SHA1(c0c4951e02f873f15560bdc3f35cdf3f99653922) )
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS            INIT  COMPANY                             FULLNAME    FLAGS
-COMP( 1981, eti660,     0,      0,      eti660,     eti660, eti660_state,    0,    "Electronics Today International",  "ETI-660",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                            FULLNAME   FLAGS
+COMP( 1981, eti660, 0,      0,      eti660,  eti660, eti660_state, empty_init, "Electronics Today International", "ETI-660", 0 )

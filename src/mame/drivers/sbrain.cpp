@@ -75,7 +75,7 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 		{}
 
-	DECLARE_DRIVER_INIT(sbrain);
+	void init_sbrain();
 	DECLARE_MACHINE_RESET(sbrain);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
@@ -335,16 +335,16 @@ static INPUT_PORTS_START( sbrain )
 	PORT_START("X1")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Insert") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Insert") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
 	PORT_START("X2")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_START("X3")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
@@ -458,7 +458,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 	m_term_data = 0xff;
 }
 
-DRIVER_INIT_MEMBER( sbrain_state, sbrain )
+void sbrain_state::init_sbrain()
 {
 	u8 *main = memregion("maincpu")->base();
 	u8 *sub = memregion("subcpu")->base();
@@ -470,9 +470,10 @@ DRIVER_INIT_MEMBER( sbrain_state, sbrain )
 	m_bank2->configure_entry(1, &main[0x8000]);
 }
 
-static SLOT_INTERFACE_START( sbrain_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void sbrain_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
@@ -538,14 +539,14 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 MACHINE_CONFIG_START(sbrain_state::sbrain)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(sbrain_mem)
-	MCFG_CPU_IO_MAP(sbrain_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sbrain_mem)
+	MCFG_DEVICE_IO_MAP(sbrain_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(sbrain_submem)
-	MCFG_CPU_IO_MAP(sbrain_subio)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
+	MCFG_DEVICE_IO_MAP(sbrain_subio)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sbrain_state, sbrain)
 
@@ -563,28 +564,28 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	//MCFG_DEVICE_ADD("crtc", DP8350, XTAL(10'920'000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(sbrain_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(sbrain_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(sbrain_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(sbrain_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(sbrain_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sbrain_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, sbrain_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sbrain_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, sbrain_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sbrain_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, sbrain_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sbrain_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD("uart0", I8251, 0)
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // BR1941L
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart0", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart0", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("uart0", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart0", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
 
 	MCFG_FD1791_ADD("fdc", XTAL(16'000'000) / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -610,4 +611,4 @@ ROM_START( sbrain )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )
+COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, init_sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )

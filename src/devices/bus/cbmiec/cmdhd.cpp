@@ -78,8 +78,8 @@ void cmd_hd_device::cmd_hd_mem(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(cmd_hd_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6502_TAG, M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(cmd_hd_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(cmd_hd_mem)
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 2000000)
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 2000000)

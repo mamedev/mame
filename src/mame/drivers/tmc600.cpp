@@ -255,14 +255,14 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 
 MACHINE_CONFIG_START(tmc600_state::tmc600)
 	// CPU
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(3'570'000))
-	MCFG_CPU_PROGRAM_MAP(tmc600_map)
-	MCFG_CPU_IO_MAP(tmc600_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'570'000))
+	MCFG_DEVICE_PROGRAM_MAP(tmc600_map)
+	MCFG_DEVICE_IO_MAP(tmc600_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc600_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc600_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc600_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc600_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc600_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc600_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, tmc600_state, sc_w))
 
 	// sound and video hardware
 	tmc600_video(config);
@@ -278,11 +278,11 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	// printer output latch
 	MCFG_DEVICE_ADD(CDP1852_TMC700_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
 	MCFG_CDP1852_MODE_CALLBACK(VCC)
-	MCFG_CDP1852_DO_CALLBACK(WRITE8(tmc600_state, printer_w))
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, tmc600_state, printer_w))
 
 	// printer connector
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, nullptr)
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
 
 	// cassette
 	MCFG_CASSETTE_ADD("cassette")
@@ -333,6 +333,6 @@ ROM_START( tmc600s2 )
 ROM_END
 
 /* System Drivers */
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME                     FLAGS
-//COMP( 1982, tmc600s1, 0,    0,      tmc600,   tmc600, tmc600_state, 0,    "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,      0,      tmc600,   tmc600, tmc600_state, 0,    "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME                     FLAGS
+//COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

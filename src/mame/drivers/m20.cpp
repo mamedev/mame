@@ -772,26 +772,28 @@ void m20_state::machine_reset()
 }
 
 
-static SLOT_INTERFACE_START( m20_floppies )
-	SLOT_INTERFACE( "5dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void m20_floppies(device_slot_interface &device)
+{
+	device.option_add("5dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( m20_state::floppy_formats )
 	FLOPPY_M20_FORMAT,
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("m20", M20_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("m20", M20_KEYBOARD);
+}
 
 MACHINE_CONFIG_START(m20_state::m20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m20_program_mem)
-	MCFG_CPU_DATA_MAP(m20_data_mem)
-	MCFG_CPU_IO_MAP(m20_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(m20_state,m20_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z8001, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(m20_program_mem)
+	MCFG_DEVICE_DATA_MAP(m20_data_mem)
+	MCFG_DEVICE_IO_MAP(m20_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m20_state,m20_irq_callback)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("160K")
@@ -809,7 +811,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 
 	/* Devices */
 	MCFG_FD1797_ADD("fd1797", 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("i8259", pic8259_device, ir0_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("i8259", pic8259_device, ir0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 
@@ -821,30 +823,30 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("kbd", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("i8259", pic8259_device, ir4_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("i8259", pic8259_device, ir3_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("i8259", pic8259_device, ir5_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir3_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir5_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1230782)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m20_state, tty_clock_tick_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, m20_state, tty_clock_tick_w))
 	MCFG_PIT8253_CLK1(1230782)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m20_state, kbd_clock_tick_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, m20_state, kbd_clock_tick_w))
 	MCFG_PIT8253_CLK2(1230782)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m20_state, timer_tick_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, m20_state, timer_tick_w))
 
 	MCFG_DEVICE_ADD("i8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(m20_state, int_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, m20_state, int_w))
 
-	MCFG_RS232_PORT_ADD("kbd", keyboard, "m20")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_1", i8251_device, write_rxd))
+	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "m20")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_1", i8251_device, write_rxd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_2", i8251_device, write_rxd))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("apb", M20_8086, 0)
 
@@ -875,6 +877,6 @@ ROM_START(m40)
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT STATE      INIT COMPANY     FULLNAME           FLAGS
-COMP( 1981, m20,   0,      0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1981, m40,   m20,    0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
+COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

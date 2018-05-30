@@ -331,7 +331,7 @@ static const gfx_layout spritelayout8 =
 };
 
 
-static GFXDECODE_START( wc90 )
+static GFXDECODE_START( gfx_wc90 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       1*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       2*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,       3*16*16, 16*16 )
@@ -349,16 +349,16 @@ void wc90_state::machine_start()
 MACHINE_CONFIG_START(wc90_state::wc90)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wc90_map_1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wc90_map_1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wc90_map_2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wc90_map_2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wc90)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -380,12 +380,12 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -568,9 +568,9 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.
+GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, empty_init, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

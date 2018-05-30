@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail
 
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
@@ -10,21 +11,26 @@ class tatsumi_state : public driver_device
 {
 public:
 	tatsumi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram"),
-		m_68k_ram(*this, "68k_ram"),
-		m_sprite_control_ram(*this, "sprite_ctlram"),
-		m_spriteram(*this, "spriteram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_subcpu(*this, "sub")
+		, m_ym2151(*this, "ymsnd")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_videoram(*this, "videoram")
+		, m_68k_ram(*this, "68k_ram")
+		, m_sprite_control_ram(*this, "sprite_ctlram")
+		, m_spriteram(*this, "spriteram")
+		, m_mainregion(*this, "maincpu")
+		, m_subregion(*this, "sub")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<m68000_base_device> m_subcpu;
+	optional_device<ym2151_device> m_ym2151;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -33,11 +39,11 @@ public:
 	optional_shared_ptr<uint16_t> m_68k_ram;
 	required_shared_ptr<uint16_t> m_sprite_control_ram;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_memory_region m_mainregion;
+	required_memory_region m_subregion;
 
-	uint8_t *m_rom_sprite_lookup1;
-	uint8_t *m_rom_sprite_lookup2;
-	uint8_t *m_rom_clut0;
-	uint8_t *m_rom_clut1;
+	uint8_t *m_rom_sprite_lookup[2];
+	uint8_t *m_rom_clut[2];
 	uint16_t m_control_word;
 	uint8_t m_last_control;
 	tilemap_t *m_tx_layer;
@@ -53,6 +59,9 @@ public:
 	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
 	void tatsumi_reset();
 	template<class _BitmapClass> void draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
+	template<class _BitmapClass> inline void roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, const rectangle &clip,
+		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
+		int scalex, int scaley, int rotate, int write_priority_only );
 	void update_cluts(int fake_palette_offset, int object_base, int length);
 };
 
@@ -60,11 +69,12 @@ class apache3_state : public tatsumi_state
 {
 public:
 	apache3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tatsumi_state(mconfig, type, tag),
-		m_subcpu2(*this, "sub2"),
-		m_apache3_g_ram(*this, "apache3_g_ram"),
-		m_apache3_z80_ram(*this, "apache3_z80_ram"),
-		m_vr1(*this, "VR1")
+		: tatsumi_state(mconfig, type, tag)
+		, m_subcpu2(*this, "sub2")
+		, m_apache3_g_ram(*this, "apache3_g_ram")
+		, m_apache3_z80_ram(*this, "apache3_z80_ram")
+		, m_apache3_prom(*this, "proms")
+		, m_vr1(*this, "VR1")
 	{
 	}
 
@@ -80,7 +90,7 @@ public:
 	DECLARE_WRITE16_MEMBER(apache3_road_z_w);
 	DECLARE_WRITE8_MEMBER(apache3_road_x_w);
 
-	DECLARE_DRIVER_INIT(apache3);
+	void init_apache3();
 	DECLARE_MACHINE_RESET(apache3);
 	DECLARE_VIDEO_START(apache3);
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -99,6 +109,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_apache3_g_ram;
 	required_shared_ptr<uint8_t> m_apache3_z80_ram;
+	required_region_ptr<uint8_t> m_apache3_prom;
 
 	required_ioport m_vr1;
 
@@ -112,15 +123,15 @@ class roundup5_state : public tatsumi_state
 {
 public:
 	roundup5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tatsumi_state(mconfig, type, tag),
-		m_roundup5_d0000_ram(*this, "ru5_d0000_ram"),
-		m_roundup5_e0000_ram(*this, "ru5_e0000_ram"),
-		m_roundup5_unknown0(*this, "ru5_unknown0"),
-		m_roundup5_unknown1(*this, "ru5_unknown1"),
-		m_roundup5_unknown2(*this, "ru5_unknown2"),
-		m_roundup_r_ram(*this, "roundup_r_ram"),
-		m_roundup_p_ram(*this, "roundup_p_ram"),
-		m_roundup_l_ram(*this, "roundup_l_ram")
+		: tatsumi_state(mconfig, type, tag)
+		, m_roundup5_d0000_ram(*this, "ru5_d0000_ram")
+		, m_roundup5_e0000_ram(*this, "ru5_e0000_ram")
+		, m_roundup5_unknown0(*this, "ru5_unknown0")
+		, m_roundup5_unknown1(*this, "ru5_unknown1")
+		, m_roundup5_unknown2(*this, "ru5_unknown2")
+		, m_roundup_r_ram(*this, "roundup_r_ram")
+		, m_roundup_p_ram(*this, "roundup_p_ram")
+		, m_roundup_l_ram(*this, "roundup_l_ram")
 	{
 	}
 
@@ -133,7 +144,7 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_vram_w);
 	DECLARE_WRITE16_MEMBER(roundup5_crt_w);
 
-	DECLARE_DRIVER_INIT(roundup5);
+	void init_roundup5();
 	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -162,12 +173,12 @@ class cyclwarr_state : public tatsumi_state
 {
 public:
 	cyclwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tatsumi_state(mconfig, type, tag),
-		m_soundlatch(*this, "soundlatch"),
-		m_cyclwarr_cpua_ram(*this, "cw_cpua_ram"),
-		m_cyclwarr_cpub_ram(*this, "cw_cpub_ram"),
-		m_cyclwarr_videoram0(*this, "cw_videoram0"),
-		m_cyclwarr_videoram1(*this, "cw_videoram1")
+		: tatsumi_state(mconfig, type, tag)
+		, m_soundlatch(*this, "soundlatch")
+		, m_cyclwarr_cpua_ram(*this, "cw_cpua_ram")
+		, m_cyclwarr_cpub_ram(*this, "cw_cpub_ram")
+		, m_cyclwarr_videoram(*this, "cw_videoram%u", 0U)
+		, m_cyclwarr_tileclut(*this, "cw_tileclut")
 	{
 	}
 
@@ -176,16 +187,14 @@ public:
 	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
-	DECLARE_WRITE16_MEMBER(cyclwarr_sound_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
-	DECLARE_READ16_MEMBER(cyclwarr_videoram0_r);
-	DECLARE_READ16_MEMBER(cyclwarr_videoram1_r);
-	DECLARE_WRITE16_MEMBER(cyclwarr_videoram0_w);
-	DECLARE_WRITE16_MEMBER(cyclwarr_videoram1_w);
+	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
+	template<int Bank> DECLARE_READ16_MEMBER(cyclwarr_videoram_r);
+	template<int Bank> DECLARE_WRITE16_MEMBER(cyclwarr_videoram_w);
 
-	DECLARE_DRIVER_INIT(cyclwarr);
-	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_1);
+	void init_cyclwarr();
+	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_bigfight);
+	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_cyclwarr_road);
 	DECLARE_VIDEO_START(cyclwarr);
 	DECLARE_VIDEO_START(bigfight);
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -203,19 +212,19 @@ private:
 
 	required_shared_ptr<uint16_t> m_cyclwarr_cpua_ram;
 	required_shared_ptr<uint16_t> m_cyclwarr_cpub_ram;
-	required_shared_ptr<uint16_t> m_cyclwarr_videoram0;
-	required_shared_ptr<uint16_t> m_cyclwarr_videoram1;
+	required_shared_ptr_array<uint16_t, 2> m_cyclwarr_videoram;
+	required_region_ptr<uint8_t> m_cyclwarr_tileclut;
 
-	tilemap_t *m_layer0;
-	tilemap_t *m_layer1;
-	tilemap_t *m_layer2;
-	tilemap_t *m_layer3;
+	std::vector<uint8_t> m_mask;
+	tilemap_t *m_layer[4];
 
 	uint16_t m_bigfight_a20000[8];
 	uint16_t m_bigfight_a60000[2];
 	uint16_t m_bigfight_a40000[2];
 	uint16_t m_bigfight_bank;
 	uint16_t m_bigfight_last_bank;
+	uint16_t m_cyclwarr_color_bank;
 
-	void draw_bg(bitmap_rgb32 &dst, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize);
+	void tile_expand();
+	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool rowscroll_enable, bool is_road);
 };

@@ -20,6 +20,8 @@
 
 #include "bus/rs232/rs232.h"
 
+#include "diserial.h"
+
 #include <memory>
 
 

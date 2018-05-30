@@ -10,6 +10,7 @@
 #include "audio/taitosnd.h"
 #include "machine/eepromser.h"
 #include "machine/taitoio.h"
+#include "sound/flt_vol.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
 #include "video/tc0150rod.h"
@@ -19,8 +20,8 @@
 class taitoz_state : public driver_device
 {
 public:
-	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taitoz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -35,7 +36,10 @@ public:
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_steer(*this, "STEER") { }
+		m_filter(*this, {"2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l"}),
+		m_steer(*this, "STEER"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
 
@@ -51,8 +55,8 @@ public:
 	void bsharkjjs(machine_config &config);
 	void enforce(machine_config &config);
 
-	DECLARE_DRIVER_INIT(taitoz);
-	DECLARE_DRIVER_INIT(bshark);
+	void init_taitoz();
+	void init_bshark();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -90,7 +94,9 @@ private:
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device_array<filter_volume_device, 4> m_filter;
 	optional_ioport m_steer;
+	output_finder<2> m_lamp;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
@@ -118,6 +124,7 @@ private:
 	DECLARE_MACHINE_RESET(taitoz);
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(bshark);
+	DECLARE_MACHINE_START(chasehq);
 	uint32_t screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

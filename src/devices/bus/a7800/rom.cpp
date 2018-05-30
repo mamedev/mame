@@ -245,9 +245,9 @@ WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
 
 // TO DO: do we need a PAL variant?!?
 MACHINE_CONFIG_START(a78_rom_pokey_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, XTAL(14'318'181)/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
 MACHINE_CONFIG_END
 
@@ -343,9 +343,9 @@ WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
 }
 
 MACHINE_CONFIG_START(a78_rom_sg_pokey_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, XTAL(14'318'181)/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
 MACHINE_CONFIG_END
 
@@ -498,33 +498,33 @@ WRITE8_MEMBER(a78_rom_act_device::write_40xx)
 // Machine configs for PCB variants with a POKEY at $0450
 
 MACHINE_CONFIG_START(a78_rom_p450_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("pokey_450")
+	SPEAKER(config, "pokey_450").front_center();
 
-	MCFG_SOUND_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
+	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a78_rom_p450_pokey_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("pokey", POKEY, XTAL(14'318'181)/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
 
-	MCFG_SOUND_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
+	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(a78_rom_p450_sg_ram_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("pokey_450")
+	SPEAKER(config, "pokey_450").front_center();
 
-	MCFG_SOUND_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
+	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a78_rom_p450_sg9_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("pokey_450")
+	SPEAKER(config, "pokey_450").front_center();
 
-	MCFG_SOUND_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
+	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
 MACHINE_CONFIG_END

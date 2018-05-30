@@ -48,8 +48,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(cursor_load_w);
 	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(led0_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 
@@ -191,7 +189,7 @@ TIMER_CALLBACK_MEMBER(destroyr_state::dial_callback)
 
 	if (m_potmask[dial])
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -248,18 +246,6 @@ WRITE8_MEMBER(destroyr_state::cursor_load_w)
 WRITE8_MEMBER(destroyr_state::interrupt_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(destroyr_state::led0_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(destroyr_state::led1_w)
-{
-	output().set_led_value(1, state); /* no second LED present on cab */
 }
 
 
@@ -443,7 +429,7 @@ static const gfx_layout destroyr_waves_layout =
 };
 
 
-static GFXDECODE_START( destroyr )
+static GFXDECODE_START( gfx_destroyr )
 	GFXDECODE_ENTRY( "gfx1", 0, destroyr_alpha_num_layout, 4, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, destroyr_minor_object_layout, 4, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, destroyr_major_object_layout, 0, 1 )
@@ -481,13 +467,13 @@ void destroyr_state::machine_start()
 MACHINE_CONFIG_START(destroyr_state::destroyr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(12'096'000) / 16)
-	MCFG_CPU_PROGRAM_MAP(destroyr_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(destroyr_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(destroyr_state, led0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(destroyr_state, led1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2 (no second LED present on cab)
 	// Q2 => songate
 	// Q3 => launch
 	// Q4 => explosion
@@ -505,7 +491,7 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", destroyr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_destroyr)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(destroyr_state, destroyr)
 
@@ -563,5 +549,5 @@ ROM_START( destroyr1 )
 ROM_END
 
 
-GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
-GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )

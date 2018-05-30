@@ -208,8 +208,8 @@
 class kas89_state : public driver_device
 {
 public:
-	kas89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kas89_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
@@ -222,8 +222,30 @@ public:
 		m_pl6(*this, "PL6"),
 		m_svc(*this, "SVC"),
 		m_dsw(*this, "DSW"),
-		m_unk(*this, "UNK")
+		m_unk(*this, "UNK"),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
+
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(sound_comm_w);
+	DECLARE_WRITE8_MEMBER(int_ack_w);
+	DECLARE_WRITE8_MEMBER(led_mux_data_w);
+	DECLARE_WRITE8_MEMBER(led_mux_select_w);
+	void init_kas89();
+	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
+	void kas89(machine_config &config);
+	void audio_io(address_map &map);
+	void audio_map(address_map &map);
+	void kas89_io(address_map &map);
+	void kas89_map(address_map &map);
+
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	uint8_t m_mux_data;
 	uint8_t m_main_nmi_enable;
@@ -245,24 +267,7 @@ public:
 	required_ioport m_svc;
 	required_ioport m_dsw;
 	required_ioport m_unk;
-
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(sound_comm_w);
-	DECLARE_WRITE8_MEMBER(int_ack_w);
-	DECLARE_WRITE8_MEMBER(led_mux_data_w);
-	DECLARE_WRITE8_MEMBER(led_mux_select_w);
-	DECLARE_DRIVER_INIT(kas89);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
-	void kas89(machine_config &config);
-	void audio_io(address_map &map);
-	void audio_map(address_map &map);
-	void kas89_io(address_map &map);
-	void kas89_map(address_map &map);
+	output_finder<38> m_lamp;
 };
 
 
@@ -272,7 +277,8 @@ public:
 
 void kas89_state::machine_start()
 {
-	output().set_lamp_value(37, 0);   /* turning off the operator led */
+	m_lamp.resolve();
+	m_lamp[37] = 0;   /* turning off the operator led */
 }
 
 void kas89_state::machine_reset()
@@ -309,7 +315,7 @@ READ8_MEMBER(kas89_state::mux_r)
 		case 0x20: return m_pl6->read();
 		case 0x40:
 		{
-			output().set_lamp_value(37, 1 - ((m_svc->read() >> 5) & 1));  /* Operator Key LAMP */
+			m_lamp[37] = BIT(~m_svc->read(), 5);  /* Operator Key LAMP */
 			return m_svc->read();
 		}
 		case 0x80: return m_dsw->read();    /* Polled at $162a through NMI routine */
@@ -323,12 +329,12 @@ READ8_MEMBER(kas89_state::mux_r)
 TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_nmi_cb)
 {
 	if (m_main_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_sound_nmi_cb)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -375,7 +381,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 			uint8_t i;
 			for ( i = 0; i < 37; i++ )
 			{
-				output().set_lamp_value(i, 0);    /* All roulette LEDs OFF */
+				m_lamp[i] = 0;    /* All roulette LEDs OFF */
 			}
 		}
 
@@ -421,7 +427,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 	uint8_t i;
 	for ( i = 0; i < 37; i++ )
 	{
-		output().set_lamp_value(i, 0);    /* All LEDs OFF */
+		m_lamp[i] = 0;    /* All LEDs OFF */
 	}
 
 	switch(data)
@@ -430,69 +436,69 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				output().set_lamp_value(i, 0);    /* All LEDs OFF */
+				m_lamp[i] = 0;    /* All LEDs OFF */
 			}
 		}
 
 		case 0x01:
 		{
-			output().set_lamp_value(11, (m_leds_mux_data >> 0) & 1);  /* Number 11 LED */
-			output().set_lamp_value(36, (m_leds_mux_data >> 1) & 1);  /* Number 36 LED */
-			output().set_lamp_value(13, (m_leds_mux_data >> 2) & 1);  /* Number 13 LED */
-			output().set_lamp_value(27, (m_leds_mux_data >> 3) & 1);  /* Number 27 LED */
-			output().set_lamp_value(06, (m_leds_mux_data >> 4) & 1);  /* Number  6 LED */
-			output().set_lamp_value(34, (m_leds_mux_data >> 5) & 1);  /* Number 34 LED */
-			output().set_lamp_value(17, (m_leds_mux_data >> 6) & 1);  /* Number 17 LED */
-			output().set_lamp_value(25, (m_leds_mux_data >> 7) & 1);  /* Number 25 LED */
+			m_lamp[11] = BIT(m_leds_mux_data, 0);  /* Number 11 LED */
+			m_lamp[36] = BIT(m_leds_mux_data, 1);  /* Number 36 LED */
+			m_lamp[13] = BIT(m_leds_mux_data, 2);  /* Number 13 LED */
+			m_lamp[27] = BIT(m_leds_mux_data, 3);  /* Number 27 LED */
+			m_lamp[06] = BIT(m_leds_mux_data, 4);  /* Number  6 LED */
+			m_lamp[34] = BIT(m_leds_mux_data, 5);  /* Number 34 LED */
+			m_lamp[17] = BIT(m_leds_mux_data, 6);  /* Number 17 LED */
+			m_lamp[25] = BIT(m_leds_mux_data, 7);  /* Number 25 LED */
 			break;
 		}
 
 		case 0x02:
 		{
-			output().set_lamp_value( 2, (m_leds_mux_data >> 0) & 1);  /* Number  2 LED */
-			output().set_lamp_value(21, (m_leds_mux_data >> 1) & 1);  /* Number 21 LED */
-			output().set_lamp_value( 4, (m_leds_mux_data >> 2) & 1);  /* Number  4 LED */
-			output().set_lamp_value(19, (m_leds_mux_data >> 3) & 1);  /* Number 19 LED */
-			output().set_lamp_value(15, (m_leds_mux_data >> 4) & 1);  /* Number 15 LED */
-			output().set_lamp_value(32, (m_leds_mux_data >> 5) & 1);  /* Number 32 LED */
-			output().set_lamp_value( 0, (m_leds_mux_data >> 6) & 1);  /* Number  0 LED */
-			output().set_lamp_value(26, (m_leds_mux_data >> 7) & 1);  /* Number 26 LED */
+			m_lamp[ 2] = BIT(m_leds_mux_data, 0);  /* Number  2 LED */
+			m_lamp[21] = BIT(m_leds_mux_data, 1);  /* Number 21 LED */
+			m_lamp[ 4] = BIT(m_leds_mux_data, 2);  /* Number  4 LED */
+			m_lamp[19] = BIT(m_leds_mux_data, 3);  /* Number 19 LED */
+			m_lamp[15] = BIT(m_leds_mux_data, 4);  /* Number 15 LED */
+			m_lamp[32] = BIT(m_leds_mux_data, 5);  /* Number 32 LED */
+			m_lamp[ 0] = BIT(m_leds_mux_data, 6);  /* Number  0 LED */
+			m_lamp[26] = BIT(m_leds_mux_data, 7);  /* Number 26 LED */
 			break;
 		}
 
 		case 0x04:
 		{
-			output().set_lamp_value( 3, (m_leds_mux_data >> 0) & 1);  /* Number  3 LED */
-			output().set_lamp_value(35, (m_leds_mux_data >> 1) & 1);  /* Number 35 LED */
-			output().set_lamp_value(12, (m_leds_mux_data >> 2) & 1);  /* Number 12 LED */
-			output().set_lamp_value(28, (m_leds_mux_data >> 3) & 1);  /* Number 28 LED */
-			output().set_lamp_value( 7, (m_leds_mux_data >> 4) & 1);  /* Number  7 LED */
-			output().set_lamp_value(29, (m_leds_mux_data >> 5) & 1);  /* Number 29 LED */
-			output().set_lamp_value(18, (m_leds_mux_data >> 6) & 1);  /* Number 18 LED */
+			m_lamp[ 3] = BIT(m_leds_mux_data, 0);  /* Number  3 LED */
+			m_lamp[35] = BIT(m_leds_mux_data, 1);  /* Number 35 LED */
+			m_lamp[12] = BIT(m_leds_mux_data, 2);  /* Number 12 LED */
+			m_lamp[28] = BIT(m_leds_mux_data, 3);  /* Number 28 LED */
+			m_lamp[ 7] = BIT(m_leds_mux_data, 4);  /* Number  7 LED */
+			m_lamp[29] = BIT(m_leds_mux_data, 5);  /* Number 29 LED */
+			m_lamp[18] = BIT(m_leds_mux_data, 6);  /* Number 18 LED */
 			break;
 		}
 
 		case 0x08:
 		{
-			output().set_lamp_value(22, (m_leds_mux_data >> 0) & 1);  /* Number 22 LED */
-			output().set_lamp_value( 9, (m_leds_mux_data >> 1) & 1);  /* Number  9 LED */
-			output().set_lamp_value(31, (m_leds_mux_data >> 2) & 1);  /* Number 31 LED */
-			output().set_lamp_value(14, (m_leds_mux_data >> 3) & 1);  /* Number 14 LED */
-			output().set_lamp_value(20, (m_leds_mux_data >> 4) & 1);  /* Number 20 LED */
-			output().set_lamp_value( 1, (m_leds_mux_data >> 5) & 1);  /* Number  1 LED */
-			output().set_lamp_value(33, (m_leds_mux_data >> 6) & 1);  /* Number 33 LED */
+			m_lamp[22] = BIT(m_leds_mux_data, 0);  /* Number 22 LED */
+			m_lamp[ 9] = BIT(m_leds_mux_data, 1);  /* Number  9 LED */
+			m_lamp[31] = BIT(m_leds_mux_data, 2);  /* Number 31 LED */
+			m_lamp[14] = BIT(m_leds_mux_data, 3);  /* Number 14 LED */
+			m_lamp[20] = BIT(m_leds_mux_data, 4);  /* Number 20 LED */
+			m_lamp[ 1] = BIT(m_leds_mux_data, 5);  /* Number  1 LED */
+			m_lamp[33] = BIT(m_leds_mux_data, 6);  /* Number 33 LED */
 			break;
 		}
 
 		case 0x10:
 		{
-			output().set_lamp_value(16, (m_leds_mux_data >> 0) & 1);  /* Number 16 LED */
-			output().set_lamp_value(24, (m_leds_mux_data >> 1) & 1);  /* Number 24 LED */
-			output().set_lamp_value( 5, (m_leds_mux_data >> 2) & 1);  /* Number  5 LED */
-			output().set_lamp_value(10, (m_leds_mux_data >> 3) & 1);  /* Number 10 LED */
-			output().set_lamp_value(23, (m_leds_mux_data >> 4) & 1);  /* Number 23 LED */
-			output().set_lamp_value( 8, (m_leds_mux_data >> 5) & 1);  /* Number  8 LED */
-			output().set_lamp_value(30, (m_leds_mux_data >> 6) & 1);  /* Number 30 LED */
+			m_lamp[16] = BIT(m_leds_mux_data, 0);  /* Number 16 LED */
+			m_lamp[24] = BIT(m_leds_mux_data, 1);  /* Number 24 LED */
+			m_lamp[ 5] = BIT(m_leds_mux_data, 2);  /* Number  5 LED */
+			m_lamp[10] = BIT(m_leds_mux_data, 3);  /* Number 10 LED */
+			m_lamp[23] = BIT(m_leds_mux_data, 4);  /* Number 23 LED */
+			m_lamp[ 8] = BIT(m_leds_mux_data, 5);  /* Number  8 LED */
+			m_lamp[30] = BIT(m_leds_mux_data, 6);  /* Number 30 LED */
 			break;
 		}
 
@@ -500,7 +506,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				output().set_lamp_value(i, 1);    /* All LEDs ON */
+				m_lamp[i] = 1;    /* All LEDs ON */
 			}
 		}
 	}
@@ -765,14 +771,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kas89_state::kas89)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(kas89_map)
-	MCFG_CPU_IO_MAP(kas89_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(kas89_map)
+	MCFG_DEVICE_IO_MAP(kas89_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_nmi", kas89_state, kas89_nmi_cb, attotime::from_hz(138))
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/6)   /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/6)   /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_snmi", kas89_state, kas89_sound_nmi_cb, attotime::from_hz(138))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -783,11 +789,11 @@ MACHINE_CONFIG_START(kas89_state::kas89)
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* Confirmed */
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -841,22 +847,20 @@ ROM_END
    A13-> A06
    A14-> A14
 */
-DRIVER_INIT_MEMBER(kas89_state,kas89)
+void kas89_state::init_kas89()
 {
-	int i;
 	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buf;
 
 	/* Unscrambling data lines */
-	for ( i = 0; i < memsize; i++ )
+	for (int i = 0; i < memsize; i++)
 	{
-		mem[i] = bitswap<8>(mem[i], 3, 1, 0, 5, 6, 4, 7, 2);
+		buf.push_back(bitswap<8>(mem[i], 3, 1, 0, 5, 6, 4, 7, 2));
 	}
 
 	/* Unscrambling address lines */
-	std::vector<uint8_t> buf(memsize);
-	memcpy(&buf[0], mem, memsize);
-	for ( i = 0; i < memsize; i++ )
+	for (int i = 0; i < memsize; i++)
 	{
 		mem[bitswap<16>(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
 	}
@@ -867,5 +871,5 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 *           Game Driver(s)            *
 **************************************/
 
-//     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
-GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )
+//     YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
+GAMEL( 1989, kas89, 0,      kas89,   kas89, kas89_state, init_kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )

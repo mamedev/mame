@@ -257,10 +257,11 @@ INPUT_PORTS_END
  *
  */
 
-static SLOT_INTERFACE_START( osborne1_floppies )
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD) // Siemens FDD 100-5, custom Osborne electronics
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_QD) // SSDD) // MPI 52(?), custom Osborne electronics
-SLOT_INTERFACE_END
+static void osborne1_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD); // Siemens FDD 100-5, custom Osborne electronics
+	device.option_add("525ssdd", FLOPPY_525_QD); // SSDD) // MPI 52(?), custom Osborne electronics
+}
 
 
 /* F4 Character Displayer */
@@ -277,62 +278,62 @@ static const gfx_layout osborne1_charlayout =
 	8                   // every char takes 16 x 1 bytes
 };
 
-static GFXDECODE_START( osborne1 )
+static GFXDECODE_START( gfx_osborne1 )
 	GFXDECODE_ENTRY("chargen", 0x0000, osborne1_charlayout, 0, 1)
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(osborne1_state::osborne1)
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
-	MCFG_CPU_OPCODES_MAP(osborne1_op)
-	MCFG_CPU_IO_MAP(osborne1_io)
-	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(osborne1_state, irqack_w))
+	MCFG_DEVICE_ADD(m_maincpu, Z80, MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(osborne1_mem)
+	MCFG_DEVICE_OPCODES_MAP(osborne1_op)
+	MCFG_DEVICE_IO_MAP(osborne1_io)
+	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(*this, osborne1_state, irqack_w))
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_ADD_MONOCHROME(m_screen, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10 )
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osborne1)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_osborne1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_READPB_HANDLER(READ8(osborne1_state, ieee_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, ieee_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, ieee_pia_irq_a_func))
+	MCFG_DEVICE_ADD(m_pia0, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(m_ieee, ieee488_device, dio_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, osborne1_state, ieee_pia_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, dio_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osborne1_state, ieee_pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, ifc_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, ren_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, osborne1_state, ieee_pia_irq_a_func))
 
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_pia0, pia6821_device, ca2_w))
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osborne1_state, video_pia_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, video_pia_port_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
+	MCFG_DEVICE_ADD(m_pia1, PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, osborne1_state, video_pia_port_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osborne1_state, video_pia_port_b_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, osborne1_state, video_pia_out_cb2_dummy))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, osborne1_state, video_pia_irq_a_func))
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(osborne1_state, serial_acia_irq_func))
+	MCFG_DEVICE_ADD(m_acia, ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, osborne1_state, serial_acia_irq_func))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("pia_1", pia6821_device, ca2_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_acia, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_acia, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_acia, acia6850_device, write_cts))
+	MCFG_RS232_RI_HANDLER(WRITELINE(m_pia1, pia6821_device, ca2_w))
 
-	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/16)
+	MCFG_DEVICE_ADD(m_fdc, MB8877, MAIN_CLOCK/16)
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -343,8 +344,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(osborne1nv_state::osborne1nv)
 	osborne1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(osborne1nv_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(osborne1nv_io)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_NO_PALETTE
@@ -397,6 +398,6 @@ ROM_START( osborne1nv )
 	ROM_LOAD( "character_generator_6-29-84.14", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS              INIT        COMPANY          FULLNAME                   FLAGS
-COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,    osborne1,   "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
-COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state,  osborne1,   "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS             INIT           COMPANY          FULLNAME                   FLAGS
+COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,   init_osborne1, "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state, init_osborne1, "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )

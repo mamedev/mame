@@ -351,7 +351,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( tecmo16 )
+static GFXDECODE_START( gfx_tecmo16 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   1*16*16, 16   )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 0x1000   )
@@ -365,12 +365,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,MASTER_CLOCK/2)          /* 12MHz */
-	MCFG_CPU_PROGRAM_MAP(fstarfrc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo16_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,MASTER_CLOCK/2)          /* 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fstarfrc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmo16_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK/6)         /* 4MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK/6)         /* 4MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmo16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo16)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -398,17 +398,18 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x300)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/6) // 4 MHz
+	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/6) // 4 MHz
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK/8, PIN7_HIGH) // sample rate 1 MHz / 132
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK/8, okim6295_device::PIN7_HIGH) // sample rate 1 MHz / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
@@ -416,8 +417,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tecmo16_state::ginkun)
 	fstarfrc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ginkun_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ginkun_map)
 
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
 MACHINE_CONFIG_END
@@ -632,7 +633,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, 0, ROT90, "Tecmo", "Final Star Force (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, 0, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, 0, ROT0,  "NMK",   "Riot",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, 0, ROT0,  "Tecmo", "Ganbare Ginkun",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",   "Riot",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo", "Ganbare Ginkun",           MACHINE_SUPPORTS_SAVE )

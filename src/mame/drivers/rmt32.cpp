@@ -353,9 +353,9 @@ void mt32_state::mt32_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(mt32_state::mt32)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_CPU_PROGRAM_MAP( mt32_map )
-	MCFG_CPU_IO_MAP( mt32_io )
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( mt32_map )
+	MCFG_DEVICE_IO_MAP( mt32_io )
 
 	MCFG_RAM_ADD( "ram" )
 	MCFG_RAM_DEFAULT_SIZE( "32K" )
@@ -439,5 +439,5 @@ ROM_START( cm32l )
 	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) )
 ROM_END
 
-CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, 0, "Roland", "MT32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, 0, "Roland", "CM32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "CM32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

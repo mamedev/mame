@@ -44,8 +44,6 @@ protected:
 	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(output_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(start_led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(start_led_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 

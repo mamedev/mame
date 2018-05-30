@@ -225,16 +225,15 @@
 class mgames_state : public driver_device
 {
 public:
-	mgames_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgames_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
 
-	uint8_t m_output[8];
-	required_shared_ptr<uint8_t> m_video;
-	int m_mixdata;
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
@@ -244,14 +243,22 @@ public:
 	DECLARE_WRITE8_MEMBER(outport5_w);
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mgames);
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mgames(machine_config &config);
+	void main_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+
+	uint8_t m_output[8];
+	required_shared_ptr<uint8_t> m_video;
+	int m_mixdata;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mgames(machine_config &config);
-	void main_map(address_map &map);
+	output_finder<10> m_lamp;
 };
 
 
@@ -349,8 +356,8 @@ READ8_MEMBER(mgames_state::mixport_r)
 
 WRITE8_MEMBER(mgames_state::outport0_w)
 {
-	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - BET */
-	output().set_lamp_value(5, (data >> 1) & 1);      /* Lamp 5 - HOLD 1 */
+	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - BET */
+	m_lamp[5] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
 
 	m_output[0] = data;
 	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -370,8 +377,8 @@ WRITE8_MEMBER(mgames_state::outport0_w)
 
 WRITE8_MEMBER(mgames_state::outport1_w)
 {
-	output().set_lamp_value(2, (data & 1));           /* Lamp 2 - DEAL */
-	output().set_lamp_value(6, (data >> 1) & 1);      /* Lamp 6 - HOLD 2 */
+	m_lamp[2] = BIT(data, 0);      /* Lamp 2 - DEAL */
+	m_lamp[6] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
 
 	m_output[1] = data;
 	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -391,8 +398,8 @@ WRITE8_MEMBER(mgames_state::outport1_w)
 
 WRITE8_MEMBER(mgames_state::outport2_w)
 {
-	output().set_lamp_value(3, (data & 1));           /* Lamp 3 - CANCEL */
-	output().set_lamp_value(7, (data >> 1) & 1);      /* Lamp 7 - HOLD 3 */
+	m_lamp[3] = BIT(data, 0);      /* Lamp 3 - CANCEL */
+	m_lamp[7] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
 
 	m_output[2] = data;
 	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -412,8 +419,8 @@ WRITE8_MEMBER(mgames_state::outport2_w)
 
 WRITE8_MEMBER(mgames_state::outport3_w)
 {
-	output().set_lamp_value(4, (data & 1));           /* Lamp 4 - STAND */
-	output().set_lamp_value(8, (data >> 1) & 1);      /* Lamp 8 - HOLD 4 */
+	m_lamp[4] = BIT(data, 0);      /* Lamp 4 - STAND */
+	m_lamp[8] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
 
 	m_output[3] = data;
 	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -433,7 +440,7 @@ WRITE8_MEMBER(mgames_state::outport3_w)
 
 WRITE8_MEMBER(mgames_state::outport4_w)
 {
-	output().set_lamp_value(9, (data >> 1) & 1);      /* Lamp 9 - HOLD 5 */
+	m_lamp[9] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
 
 	m_output[4] = data;
 	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -630,16 +637,16 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( mgames )
+static GFXDECODE_START( gfx_mgames )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(mgames_state::mgames)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -652,7 +659,7 @@ MACHINE_CONFIG_START(mgames_state::mgames)
 	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgames)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgames)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
 
@@ -683,5 +690,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE         INIT   ROT    COMPANY  FULLNAME      FLAGS...                                 LAYOUT  */
-GAMEL( 1981, mgames,   0,      mgames,   mgames, mgames_state, 0,     ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )
+/*     YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROT   COMPANY  FULLNAME       FLAGS...                                 LAYOUT  */
+GAMEL( 1981, mgames, 0,      mgames,  mgames, mgames_state, empty_init, ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )

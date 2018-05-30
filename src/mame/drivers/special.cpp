@@ -358,15 +358,16 @@ FLOPPY_FORMATS_MEMBER( special_state::specimx_floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( specimx_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void specimx_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* Machine driver */
 MACHINE_CONFIG_START(special_state::special)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(specialist_mem)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(specialist_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(special_state, special )
 
 	/* video hardware */
@@ -382,22 +383,21 @@ MACHINE_CONFIG_START(special_state::special)
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specialist_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specialist_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rks_cassette_formats)
@@ -410,8 +410,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(special_state::specialp)
 	special(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(specialp_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(specialp_mem)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specialp)
@@ -424,18 +424,18 @@ MACHINE_CONFIG_START(special_state::specialm)
 	special(config);
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specimx_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specimx_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(special_state::specimx)
 	special(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(specimx_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(specimx_mem)
 
 	MCFG_MACHINE_START_OVERRIDE (special_state, specimx )
 	MCFG_MACHINE_RESET_OVERRIDE (special_state, specimx )
@@ -450,29 +450,29 @@ MACHINE_CONFIG_START(special_state::specimx)
 	MCFG_PALETTE_INIT_OWNER(special_state, specimx )
 
 	/* audio hardware */
-	MCFG_SOUND_ADD("custom", SPECIMX_SND, 0)
+	MCFG_DEVICE_ADD("custom", SPECIMX_SND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD( "pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("custom", specimx_sound_device, set_input_ch0))
 	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch1))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("custom", specimx_sound_device, set_input_ch1))
 	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("custom", specimx_sound_device, set_input_ch2))
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specimx_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specimx_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
 
 	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","special_flop")
@@ -485,9 +485,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(special_state::erik)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(erik_mem)
-	MCFG_CPU_IO_MAP(erik_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(erik_mem)
+	MCFG_DEVICE_IO_MAP(erik_io_map)
 	MCFG_MACHINE_RESET_OVERRIDE(special_state, erik )
 
 	/* video hardware */
@@ -504,13 +504,12 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_PALETTE_INIT_OWNER(special_state,erik)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -519,15 +518,15 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_CASSETTE_INTERFACE("special_cass")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specialist_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specialist_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
 
 	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 
@@ -606,11 +605,11 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT       COMPANY      FULLNAME                    FLAGS
-COMP( 1985, special,    0,        0,       special,   special,  special_state,    special,   "<unknown>", "Specialist",               0 )
-COMP( 1985, specialm,   special,  0,       specialm,  special,  special_state,    special,   "<unknown>", "Specialist M",             0 )
-COMP( 1985, pioner,     special,  0,       special,   special,  special_state,    special,   "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
-COMP( 1985, specialp,   special,  0,       specialp,  specialp, special_state,    special,   "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
-COMP( 1985, lik,        special,  0,       special,   lik,      special_state,    special,   "<unknown>", "Lik",                      0 )
-COMP( 1985, specimx,    special,  0,       specimx,   specimx,  special_state,    0,         "<unknown>", "Specialist MX",            0 )
-COMP( 1994, erik,       special,  0,       erik,      special,  special_state,    erik,      "<unknown>", "Erik",                     0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY      FULLNAME                    FLAGS
+COMP( 1985, special,  0,       0,      special,  special,  special_state, init_special, "<unknown>", "Specialist",               0 )
+COMP( 1985, specialm, special, 0,      specialm, special,  special_state, init_special, "<unknown>", "Specialist M",             0 )
+COMP( 1985, pioner,   special, 0,      special,  special,  special_state, init_special, "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
+COMP( 1985, specialp, special, 0,      specialp, specialp, special_state, init_special, "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
+COMP( 1985, lik,      special, 0,      special,  lik,      special_state, init_special, "<unknown>", "Lik",                      0 )
+COMP( 1985, specimx,  special, 0,      specimx,  specimx,  special_state, empty_init,   "<unknown>", "Specialist MX",            0 )
+COMP( 1994, erik,     special, 0,      erik,     special,  special_state, init_erik,    "<unknown>", "Erik",                     0 )

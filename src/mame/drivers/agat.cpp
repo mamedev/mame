@@ -79,7 +79,6 @@
 
 #define A7_CPU_TAG "maincpu"
 #define A7_KBDC_TAG "ay3600"
-#define A7_BUS_TAG "a2bus"
 #define A7_SPEAKER_TAG "speaker"
 #define A7_CASSETTE_TAG "tape"
 #define A7_UPPERBANK_TAG "inhbank"
@@ -94,7 +93,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_ay3600(*this, A7_KBDC_TAG)
 		, m_video(*this, A7_VIDEO_TAG)
-		, m_a2bus(*this, A7_BUS_TAG)
+		, m_a2bus(*this, "a2bus")
 		, m_joy1x(*this, "joystick_1_x")
 		, m_joy1y(*this, "joystick_1_y")
 		, m_joy2x(*this, "joystick_2_x")
@@ -850,7 +849,7 @@ INTERRUPT_GEN_MEMBER(agat7_state::agat_vblank)
 {
 	if (m_agat7_interrupts)
 	{
-		m_maincpu->set_input_line(M6502_NMI_LINE, PULSE_LINE);
+		m_maincpu->pulse_input_line(M6502_NMI_LINE, attotime::zero);
 	}
 }
 
@@ -1063,14 +1062,15 @@ static INPUT_PORTS_START(agat7)
 	PORT_INCLUDE(agat7_joystick)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(agat7_cards)
+static void agat7_cards(device_slot_interface &device)
+{
 	// Standard cards
 
-	SLOT_INTERFACE("a7lang", A2BUS_AGAT7LANGCARD) // Agat-7 RAM Language Card -- decimal 3.089.119
-	SLOT_INTERFACE("a7ram", A2BUS_AGAT7RAM) // Agat-7 32K RAM Card -- decimal 3.089.119-01, KR565RU6D chips
-	SLOT_INTERFACE("a7fdc", A2BUS_AGAT7_FDC) // Disk II clone -- decimal 3.089.105
-	SLOT_INTERFACE("a7fdc840", A2BUS_AGAT840K_HLE) // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
-	SLOT_INTERFACE("a7ports", A2BUS_AGAT7_PORTS) // Serial-parallel card -- decimal 3.089.106
+	device.option_add("a7lang", A2BUS_AGAT7LANGCARD); // Agat-7 RAM Language Card -- decimal 3.089.119
+	device.option_add("a7ram", A2BUS_AGAT7RAM); // Agat-7 32K RAM Card -- decimal 3.089.119-01, KR565RU6D chips
+	device.option_add("a7fdc", A2BUS_AGAT7_FDC); // Disk II clone -- decimal 3.089.105
+	device.option_add("a7fdc840", A2BUS_AGAT840K_HLE); // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
+	device.option_add("a7ports", A2BUS_AGAT7_PORTS); // Serial-parallel card -- decimal 3.089.106
 	// Printer card (agat9) -- decimal 3.089.174
 
 	// 3rd party cards
@@ -1080,12 +1080,12 @@ static SLOT_INTERFACE_START(agat7_cards)
 	// Nippel ADC (digital oscilloscope)
 	// Nippel Clock (mc146818)
 	// Nippel Co-processor (R65C02 clone + dual-ported RAM)
-SLOT_INTERFACE_END
+}
 
 MACHINE_CONFIG_START(agat7_state::agat7)
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'300'000) / 14)
-	MCFG_CPU_PROGRAM_MAP(agat7_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'300'000) / 14)
+	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
 
@@ -1097,8 +1097,8 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
@@ -1119,10 +1119,10 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(agat7_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(agat7_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(agat7_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(agat7_state, ay3600_ako_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, agat7_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, agat7_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, agat7_state, ay3600_data_ready_w))
+	MCFG_AY3600_AKO_CB(WRITELINE(*this, agat7_state, ay3600_ako_w))
 
 	/* repeat timer.  10 Hz per Mymrin's book */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", agat7_state, ay3600_repeat, attotime::from_hz(10))
@@ -1131,16 +1131,16 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.
 	 * slot 1 always holds the CPU card.
 	 */
-	MCFG_DEVICE_ADD(A7_BUS_TAG, A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU(A7_CPU_TAG)
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(agat7_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(agat7_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(agat7_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl2", agat7_cards, "a7lang")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl3", agat7_cards, "a7fdc")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl4", agat7_cards, "a7ports")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl5", agat7_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl6", agat7_cards, "a7ram")
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, agat7_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, agat7_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, agat7_state, a2bus_inh_w))
+	A2BUS_SLOT(config, "sl2", m_a2bus, agat7_cards, "a7lang");
+	A2BUS_SLOT(config, "sl3", m_a2bus, agat7_cards, "a7fdc");
+	A2BUS_SLOT(config, "sl4", m_a2bus, agat7_cards, "a7ports");
+	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
 	MCFG_CASSETTE_ADD(A7_CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
@@ -1189,6 +1189,6 @@ ROM_START( agat9 )
 	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE         INIT      COMPANY            FULLNAME  FLAGS
-COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-7", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS)
-COMP( 1984, agat9,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-9", MACHINE_NOT_WORKING)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1983, agat7, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-7", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS)
+COMP( 1984, agat9, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-9", MACHINE_NOT_WORKING)

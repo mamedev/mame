@@ -342,7 +342,7 @@ static const gfx_layout char_layout =
 };
 #endif
 
-static GFXDECODE_START( dfruit )
+static GFXDECODE_START( gfx_dfruit )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
 	//GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
@@ -373,8 +373,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 MACHINE_CONFIG_START(dfruit_state::dfruit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
-	MCFG_CPU_PROGRAM_MAP(dfruit_map)
+	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
+	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
@@ -387,10 +387,10 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dfruit_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfruit )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
@@ -402,8 +402,8 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -423,4 +423,4 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 1993, dfruit,  0,   dfruit, dfruit, dfruit_state,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dfruit, 0, dfruit, dfruit, dfruit_state, empty_init, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )

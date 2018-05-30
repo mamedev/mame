@@ -166,8 +166,8 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_speech);
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
-	DECLARE_DRIVER_INIT(socrates);
-	DECLARE_DRIVER_INIT(iqunlimz);
+	void init_socrates();
+	void init_iqunlimz();
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -385,7 +385,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-DRIVER_INIT_MEMBER(socrates_state,socrates)
+void socrates_state::init_socrates()
 {
 	uint8_t *gfx = memregion("vram")->base();
 
@@ -396,7 +396,7 @@ DRIVER_INIT_MEMBER(socrates_state,socrates)
 	m_kbmcu_type = 0;
 }
 
-DRIVER_INIT_MEMBER(socrates_state,iqunlimz)
+void socrates_state::init_iqunlimz()
 {
 	uint8_t *gfx = memregion("vram")->base();
 
@@ -1464,11 +1464,11 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 
 MACHINE_CONFIG_START(socrates_state::socrates)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 
 	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(socrates_rombank_map)
@@ -1501,8 +1501,8 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
@@ -1513,11 +1513,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(socrates_state::socrates_pal)
 	socrates(config);
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1526,16 +1526,16 @@ MACHINE_CONFIG_START(socrates_state::socrates_pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_SOUND_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_DEVICE_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
-	MCFG_CPU_PROGRAM_MAP(iqunlimz_mem)
-	MCFG_CPU_IO_MAP(iqunlimz_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
+	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_mem)
+	MCFG_DEVICE_IO_MAP(iqunlimz_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
 
 	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
@@ -1574,8 +1574,8 @@ MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
@@ -1692,11 +1692,11 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT      COMPANY                  FULLNAME                             FLAGS
-COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
-COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
-COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
+//    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT           COMPANY                    FULLNAME                             FLAGS
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
+COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
+COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, init_socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 
-COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, iqunlimz, "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

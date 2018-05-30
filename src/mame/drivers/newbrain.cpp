@@ -811,19 +811,19 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 MACHINE_CONFIG_START(newbrain_state::newbrain)
 	// basic system hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(newbrain_mreq)
-	MCFG_CPU_IO_MAP(newbrain_iorq)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(newbrain_mreq)
+	MCFG_DEVICE_IO_MAP(newbrain_iorq)
 
-	MCFG_CPU_ADD(COP420_TAG, COP420, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(COP420_TAG, COP420, XTAL(16'000'000)/4)
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true)
-	MCFG_COP400_READ_G_CB(READ8(newbrain_state, cop_g_r))
-	MCFG_COP400_WRITE_G_CB(WRITE8(newbrain_state, cop_g_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(newbrain_state, cop_d_w))
-	MCFG_COP400_READ_IN_CB(READ8(newbrain_state, cop_in_r))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(newbrain_state, k1_w))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(newbrain_state, k2_w))
-	MCFG_COP400_READ_SI_CB(READLINE(newbrain_state, tdi_r))
+	MCFG_COP400_READ_G_CB(READ8(*this, newbrain_state, cop_g_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, newbrain_state, cop_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, newbrain_state, cop_d_w))
+	MCFG_COP400_READ_IN_CB(READ8(*this, newbrain_state, cop_in_r))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, newbrain_state, k1_w))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, newbrain_state, k2_w))
+	MCFG_COP400_READ_SI_CB(READLINE(*this, newbrain_state, tdi_r))
 
 	// video hardware
 	newbrain_video(config);
@@ -837,8 +837,8 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 	MCFG_CASSETTE_ADD(CASSETTE2_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD(RS232_V24_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD(RS232_PRN_TAG, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_V24_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_PRN_TAG, RS232_PORT, default_rs232_devices, nullptr)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -950,7 +950,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT     STATE             INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,   0,          0,      newbrain_ad,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain AD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain A",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbrainmd, newbrain,   0,      newbrain_md,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain MD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY                        FULLNAME       FLAGS
+COMP( 1981, newbrain,   0,        0,      newbrain_ad, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain AD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbraina,  newbrain, 0,      newbrain_a,  newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain A",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbrainmd, newbrain, 0,      newbrain_md, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain MD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

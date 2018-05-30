@@ -61,9 +61,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(recall_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
-	DECLARE_WRITE_LINE_MEMBER(led3_w);
 	DECLARE_READ8_MEMBER(starwars_prng_r);
 	DECLARE_WRITE_LINE_MEMBER(prng_reset_w);
 	DECLARE_READ8_MEMBER(starwars_div_reh_r);
@@ -74,8 +71,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_DRIVER_INIT(esb);
-	DECLARE_DRIVER_INIT(starwars);
+	void init_esb();
+	void init_starwars();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 	DECLARE_READ8_MEMBER(r6532_porta_r);

@@ -175,7 +175,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(bp1200);
+	void init_bp1200();
 	DECLARE_WRITE16_MEMBER(unknown_82200_w);
 	DECLARE_READ16_MEMBER(latch_84000_r);
 	DECLARE_WRITE16_MEMBER(latch_84002_w);
@@ -198,7 +198,7 @@ private:
  Driver Init
 ******************************************************************************/
 
-DRIVER_INIT_MEMBER(bpmmicro_state,bp1200)
+void bpmmicro_state::init_bp1200()
 {
 	m_shifter = 0;
 	m_latch = 0;
@@ -364,9 +364,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bpmmicro_state::bpmmicro)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(32'000'000)/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
-	MCFG_CPU_PROGRAM_MAP(i286_mem)
-	MCFG_CPU_IO_MAP(i286_io)
+	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(32'000'000)/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
+	MCFG_DEVICE_PROGRAM_MAP(i286_mem)
+	MCFG_DEVICE_IO_MAP(i286_io)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom_u38")
 MACHINE_CONFIG_END
@@ -418,5 +418,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT         COMPANY              FULLNAME      FLAGS
-COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT         COMPANY            FULLNAME   FLAGS
+COMP( 1992, bp1200, 0,      0,      bpmmicro, bpmmicro, bpmmicro_state, init_bp1200, "BP Microsystems", "BP-1200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

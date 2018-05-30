@@ -16,7 +16,7 @@ Atari Triple Hunt Driver
 
 
 
-DRIVER_INIT_MEMBER(triplhnt_state,triplhnt)
+void triplhnt_state::init_triplhnt()
 {
 	machine().device<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }
@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
 
 WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
 {
-	output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -111,6 +111,12 @@ READ8_MEMBER(triplhnt_state::da_latch_r)
 	/* the following is a slight simplification */
 
 	return (offset & 1) ? cross_x : cross_y;
+}
+
+
+void triplhnt_state::machine_start()
+{
+	m_lamp.resolve();
 }
 
 
@@ -270,7 +276,7 @@ static const gfx_layout triplhnt_tile_layout =
 };
 
 
-static GFXDECODE_START( triplhnt )
+static GFXDECODE_START( gfx_triplhnt )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_small_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_large_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, triplhnt_tile_layout, 4, 2 )
@@ -293,23 +299,23 @@ PALETTE_INIT_MEMBER(triplhnt_state, triplhnt)
 MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 
 /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 800000)
-	MCFG_CPU_PROGRAM_MAP(triplhnt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6800, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(triplhnt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // battery-backed 74C89 at J5
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // J7
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // unused
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(triplhnt_state, lamp1_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("discrete", discrete_device, write_line<TRIPLHNT_LAMP_EN>)) // Lamp is used to reset noise
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<TRIPLHNT_SCREECH_EN>)) // screech
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(triplhnt_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(triplhnt_state, sprite_zoom_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(triplhnt_state, ram_2_w)) // CMOS write
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(triplhnt_state, tape_control_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(triplhnt_state, sprite_bank_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("discrete", discrete_device, write_line<TRIPLHNT_BEAR_EN>)) // bear
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, triplhnt_state, lamp1_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_LAMP_EN>)) // Lamp is used to reset noise
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_SCREECH_EN>)) // screech
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, triplhnt_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, triplhnt_state, sprite_zoom_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, triplhnt_state, ram_2_w)) // CMOS write
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, triplhnt_state, tape_control_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, triplhnt_state, sprite_bank_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_BEAR_EN>)) // bear
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -321,20 +327,19 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triplhnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)  /* 2 channels */
 	MCFG_SAMPLES_NAMES(triplhnt_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(triplhnt)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, triplhnt_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -360,4 +365,4 @@ ROM_START( triplhnt )
 ROM_END
 
 
-GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, init_triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

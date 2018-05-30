@@ -283,14 +283,14 @@ u32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bi
 
 
 MACHINE_CONFIG_START(cfx9850_state::cfx9850)
-	MCFG_CPU_ADD("maincpu", HCD62121, 4300000)    /* X1 - 4.3 MHz */
-	MCFG_CPU_PROGRAM_MAP(cfx9850)
-	MCFG_HCD62121_KOL_CB(WRITE8(cfx9850_state, kol_w))
-	MCFG_HCD62121_KOH_CB(WRITE8(cfx9850_state, koh_w))
-	MCFG_HCD62121_PORT_CB(WRITE8(cfx9850_state, port_w))
-	MCFG_HCD62121_OPT_CB(WRITE8(cfx9850_state, opt_w))
-	MCFG_HCD62121_KI_CB(READ8(cfx9850_state, ki_r))
-	MCFG_HCD62121_IN0_CB(READ8(cfx9850_state, in0_r))
+	MCFG_DEVICE_ADD("maincpu", HCD62121, 4300000)    /* X1 - 4.3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cfx9850)
+	MCFG_HCD62121_KOL_CB(WRITE8(*this, cfx9850_state, kol_w))
+	MCFG_HCD62121_KOH_CB(WRITE8(*this, cfx9850_state, koh_w))
+	MCFG_HCD62121_PORT_CB(WRITE8(*this, cfx9850_state, port_w))
+	MCFG_HCD62121_OPT_CB(WRITE8(*this, cfx9850_state, opt_w))
+	MCFG_HCD62121_KI_CB(READ8(*this, cfx9850_state, ki_r))
+	MCFG_HCD62121_IN0_CB(READ8(*this, cfx9850_state, in0_r))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -320,4 +320,4 @@ ROM_START(cfx9850)
 ROM_END
 
 
-COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, cfx9850_state, 0, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

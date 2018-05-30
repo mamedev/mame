@@ -243,26 +243,26 @@ MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(p3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705P3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(p3prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705P3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(p5prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705P5, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(p5prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p5prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(r3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705R3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(r3prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705R3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, r3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(u3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705U3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(u3prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705U3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, u3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 
@@ -289,8 +289,8 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT      STATE        INIT  COMPANY     FULLNAME                FLAGS
-COMP( 1984, 705p5prg, 0,        0,      prg,     m68705prg, p5prg_state, 0,    "Motorola", "MC68705P5 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705p3prg, 705p5prg, 0,      prg,     m68705prg, p3prg_state, 0,    "Motorola", "MC68705P3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705r3prg, 705p5prg, 0,      prg,     m68705prg, r3prg_state, 0,    "Motorola", "MC68705R3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705u3prg, 705p5prg, 0,      prg,     m68705prg, u3prg_state, 0,    "Motorola", "MC68705U3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT      CLASS        INIT        COMPANY     FULLNAME                FLAGS
+COMP( 1984, 705p5prg, 0,        0,      prg,     m68705prg, p5prg_state, empty_init, "Motorola", "MC68705P5 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705p3prg, 705p5prg, 0,      prg,     m68705prg, p3prg_state, empty_init, "Motorola", "MC68705P3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705r3prg, 705p5prg, 0,      prg,     m68705prg, r3prg_state, empty_init, "Motorola", "MC68705R3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705u3prg, 705p5prg, 0,      prg,     m68705prg, u3prg_state, empty_init, "Motorola", "MC68705U3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

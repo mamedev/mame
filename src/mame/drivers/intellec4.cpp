@@ -818,47 +818,47 @@ DEVICE_INPUT_DEFAULTS_START(tty)
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(intellec4_state::intellec4)
-	MCFG_DEVICE_ADD("prgbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADD(m_program_banks, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(intellec4_program_banks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	MCFG_DEVICE_ADD("rpbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADD(m_rom_port_banks, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(intellec4_rom_port_banks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	MCFG_DEVICE_ADD("promprg", INTEL_IMM6_76, 0)
+	MCFG_DEVICE_ADD(m_prom_programmer, INTEL_IMM6_76, 0)
 
-	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal",   tty)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", tty)
+	MCFG_DEVICE_ADD(m_tty, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal",   tty)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", tty)
 
-	MCFG_DEVICE_ADD("bus", INTELLEC4_UNIV_BUS, 518000. / 7)
-	MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE("prgbank", AS_PROGRAM)
-	MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE("rpbank", AS_PROGRAM)
-	MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_MEMORY)
-	MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_STATUS)
-	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_PORTS)
-	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(intellec4_state, bus_reset_4002))
-	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(intellec4_state, bus_user_reset))
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j7",  5.185_MHz_XTAL / 7, intellec4_univ_cards, "imm4_90")
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j8",  5.185_MHz_XTAL / 7, intellec4_univ_cards, "imm6_26")
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j9",  5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j10", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j11", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j12", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j13", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j14", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j15", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j16", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j17", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j18", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j19", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_DEVICE_ADD(m_bus, INTELLEC4_UNIV_BUS, 518000. / 7)
+	MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE(m_program_banks, AS_PROGRAM)
+	MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE(m_rom_port_banks, AS_PROGRAM)
+	MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE(m_cpu, mcs40_cpu_device_base::AS_RAM_MEMORY)
+	MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE(m_cpu, mcs40_cpu_device_base::AS_RAM_STATUS)
+	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE(m_cpu, mcs40_cpu_device_base::AS_RAM_PORTS)
+	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(*this, intellec4_state, bus_reset_4002))
+	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(*this, intellec4_state, bus_user_reset))
+	INTELLEC4_UNIV_SLOT(config, "j7",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm4_90");
+	INTELLEC4_UNIV_SLOT(config, "j8",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm6_26");
+	INTELLEC4_UNIV_SLOT(config, "j9",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j10", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j11", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j12", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j13", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j14", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j15", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j16", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j17", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j18", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j19", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
 MACHINE_CONFIG_END
 
 
@@ -1123,7 +1123,7 @@ INPUT_CHANGED_MEMBER(mod4_state::sw_one_shot)
 
 MACHINE_CONFIG_START(mod4_state::mod4)
 	intellec4(config);
-	MCFG_CPU_ADD("maincpu", I4004, 5.185_MHz_XTAL / 7)
+	MCFG_DEVICE_ADD(m_cpu, I4004, 5.185_MHz_XTAL / 7)
 	MCFG_I4004_ROM_MAP(intellec4_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
 	MCFG_I4004_ROM_PORTS_MAP(intellec4_rom_ports)
@@ -1131,10 +1131,10 @@ MACHINE_CONFIG_START(mod4_state::mod4)
 	MCFG_I4004_RAM_PORTS_MAP(intellec4_ram_ports)
 	MCFG_I4004_PROGRAM_MEMORY_MAP(intellec4_program_memory)
 	MCFG_I4004_BUS_CYCLE_CB(BUSCYCLE(mod4_state, bus_cycle));
-	MCFG_I4004_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
+	MCFG_I4004_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
 
 	MCFG_DEVICE_MODIFY("bus")
-	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(mod4_state, bus_test))
+	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(*this, mod4_state, bus_test))
 
 	MCFG_DEFAULT_LAYOUT(layout_intlc44)
 MACHINE_CONFIG_END
@@ -1348,7 +1348,7 @@ INPUT_CHANGED_MEMBER(mod40_state::sw_single_step)
 
 MACHINE_CONFIG_START(mod40_state::mod40)
 	intellec4(config);
-	MCFG_CPU_ADD("maincpu", I4040, 5.185_MHz_XTAL / 7)
+	MCFG_DEVICE_ADD(m_cpu, I4040, 5.185_MHz_XTAL / 7)
 	MCFG_I4040_ROM_MAP(intellec4_rom)
 	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)
 	MCFG_I4040_ROM_PORTS_MAP(intellec4_rom_ports)
@@ -1356,12 +1356,12 @@ MACHINE_CONFIG_START(mod40_state::mod40)
 	MCFG_I4040_RAM_PORTS_MAP(intellec4_ram_ports)
 	MCFG_I4040_PROGRAM_MEMORY_MAP(intellec4_program_memory)
 	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle));
-	MCFG_I4040_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
-	MCFG_I4040_STP_ACK_CB(WRITELINE(mod40_state, stp_ack))
+	MCFG_I4040_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
+	MCFG_I4040_STP_ACK_CB(WRITELINE(*this, mod40_state, stp_ack))
 
 	MCFG_DEVICE_MODIFY("bus")
-	MCFG_INTELLEC4_UNIV_BUS_STOP_CB(WRITELINE(mod40_state, bus_stop))
-	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(mod40_state, bus_test))
+	MCFG_INTELLEC4_UNIV_BUS_STOP_CB(WRITELINE(*this, mod40_state, bus_stop))
+	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(*this, mod40_state, bus_test))
 
 	MCFG_DEFAULT_LAYOUT(layout_intlc440)
 MACHINE_CONFIG_END
@@ -1462,6 +1462,6 @@ ROM_END
     Machine definitions
 ***********************************************************************/
 
-//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT  STATE        INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1973?, intlc44,  0,      0,      mod4,     mod4,  mod4_state,  0,    "Intel", "INTELLEC 4/MOD 4",  MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
-COMP( 1974?, intlc440, 0,      0,      mod40,    mod40, mod40_state, 0,    "Intel", "INTELLEC 4/MOD 40", MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1973?, intlc44,  0,      0,      mod4,    mod4,  mod4_state,  empty_init, "Intel", "INTELLEC 4/MOD 4",  MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
+COMP( 1974?, intlc440, 0,      0,      mod40,   mod40, mod40_state, empty_init, "Intel", "INTELLEC 4/MOD 40", MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -42,19 +42,14 @@
 class thedealr_state : public driver_device
 {
 public:
-	thedealr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	thedealr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_led(*this, "led%u", 0U)
 	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<seta001_device> m_seta001;
-	required_device<palette_device> m_palette;
 
 	// IOX
 	DECLARE_READ8_MEMBER(iox_r);
@@ -68,8 +63,6 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 
 	// machine
-	DECLARE_MACHINE_START(thedealr);
-	DECLARE_MACHINE_RESET(thedealr);
 	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
 
 	// video
@@ -79,6 +72,18 @@ public:
 	void thedealr(machine_config &config);
 	void thedealr(address_map &map);
 	void thedealr_sub(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<seta001_device> m_seta001;
+	required_device<palette_device> m_palette;
+	output_finder<8> m_led;
 };
 
 /***************************************************************************
@@ -135,7 +140,7 @@ void thedealr_state::iox_reset()
 	m_iox_coins     =   0x00;
 }
 
-MACHINE_RESET_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_reset()
 {
 	iox_reset();
 }
@@ -160,14 +165,14 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x20:  // leds
 				m_iox_leds = data;
-				output().set_led_value(0, data & 0x01);  // bet
-				output().set_led_value(1, data & 0x02);  // deal
-				output().set_led_value(2, data & 0x04);
-				output().set_led_value(3, data & 0x08);
-				output().set_led_value(4, data & 0x10);  // hold 1-5?
-				output().set_led_value(5, data & 0x20);
-				output().set_led_value(6, data & 0x40);
-				output().set_led_value(7, data & 0x80);
+				m_led[0] = BIT(data, 0);  // bet
+				m_led[1] = BIT(data, 1);  // deal
+				m_led[2] = BIT(data, 2);
+				m_led[3] = BIT(data, 3);
+				m_led[4] = BIT(data, 4);  // hold 1-5?
+				m_led[5] = BIT(data, 5);
+				m_led[6] = BIT(data, 6);
+				m_led[7] = BIT(data, 7);
 				break;
 
 			case 0x40:  // coin counters
@@ -496,7 +501,7 @@ static const gfx_layout layout_planes_2roms =
 	16*16*2
 };
 
-static GFXDECODE_START( thedealr )
+static GFXDECODE_START( gfx_thedealr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 0, 32 )
 GFXDECODE_END
 
@@ -506,8 +511,10 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));
 	save_item(NAME(m_iox_cmd));
@@ -532,12 +539,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(thedealr)
+	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(thedealr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedealr_state, thedealr_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(thedealr_sub)
+	MCFG_DEVICE_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(thedealr_sub)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -546,9 +553,6 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_MACHINE_RESET_OVERRIDE(thedealr_state,thedealr)
-	MCFG_MACHINE_START_OVERRIDE(thedealr_state,thedealr)
-
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -556,17 +560,17 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thedealr_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thedealr_state, screen_vblank))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedealr)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(thedealr_state,thedealr)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -598,4 +602,4 @@ ROM_START( thedealr )
 	ROM_LOAD( "xb0-u68.u68", 0x200, 0x200, CRC(c0c54d43) SHA1(5ce352fb888c8e683014c73e6da00ec95f2ae572) )
 ROM_END
 
-GAME( 1988?, thedealr, 0, thedealr, thedealr, thedealr_state, 0, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988?, thedealr, 0, thedealr, thedealr, thedealr_state, empty_init, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )

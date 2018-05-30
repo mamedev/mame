@@ -112,10 +112,10 @@
 
 WRITE8_MEMBER(victory_state::lamp_control_w)
 {
-	output().set_led_value(0, data & 0x80);
-	output().set_led_value(1, data & 0x40);
-	output().set_led_value(2, data & 0x20);
-	output().set_led_value(3, data & 0x10);
+	m_lamp[0] = BIT(data, 7);
+	m_lamp[1] = BIT(data, 6);
+	m_lamp[2] = BIT(data, 5);
+	m_lamp[3] = BIT(data, 4);
 }
 
 
@@ -213,10 +213,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(victory_state::victory)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -326,5 +326,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, victory,  0,       victory, victory, victory_state, 0, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, victorba, victory, victory, victory, victory_state, 0, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victory,  0,       victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victorba, victory, victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )

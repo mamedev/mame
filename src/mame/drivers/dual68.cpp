@@ -98,12 +98,12 @@ void dual68_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(dual68_state::dual68)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(dual68_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(dual68_mem)
 
-	MCFG_CPU_ADD("siocpu", I8085A, XTAL(16'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(sio4_mem)
-	MCFG_CPU_IO_MAP(sio4_io)
+	MCFG_DEVICE_ADD("siocpu", I8085A, XTAL(16'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sio4_mem)
+	MCFG_DEVICE_IO_MAP(sio4_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -132,5 +132,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                     FULLNAME              FLAGS
-COMP( 1981, dual68,  0,     0,       dual68,    dual68, dual68_state, 0,    "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                     FULLNAME              FLAGS
+COMP( 1981, dual68, 0,      0,      dual68,  dual68, dual68_state, empty_init, "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

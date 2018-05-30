@@ -448,7 +448,7 @@ class dbox_state : public driver_device
 
 	virtual void machine_reset() override;
 	virtual void machine_start () override;
-	DECLARE_DRIVER_INIT(dbox);
+	void init_dbox();
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
@@ -600,25 +600,23 @@ static INPUT_PORTS_START( dbox )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dbox_state::dbox)
-	MCFG_CPU_ADD("maincpu", M68340, 0)       // The 68340 has an internal VCO as clock source, hence need no CPU clock
+	MCFG_DEVICE_ADD("maincpu", M68340, 0)       // The 68340 has an internal VCO as clock source, hence need no CPU clock
 	MCFG_MC68340_ADD_CRYSTAL(XTAL(32'768)) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
-	MCFG_CPU_PROGRAM_MAP(dbox_map)
-	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(dbox_state, write_pa))
+	MCFG_DEVICE_PROGRAM_MAP(dbox_map)
+	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(*this, dbox_state, write_pa))
 
 	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler  module */
-	//MCFG_MC68340_TOUT2_OUTPUT_CB(DEVWRITELINE("dcs", descrambler_device,  txd_receiver))
-	//MCFG_MC68340_TGATE2_INPUT_CB(DEVREADLINE("dsc", descrambler_device,  rxd_receiver))
+	//MCFG_MC68340_TOUT2_OUTPUT_CB(WRITELINE("dcs", descrambler_device,  txd_receiver))
+	//MCFG_MC68340_TGATE2_INPUT_CB(READLINE("dsc", descrambler_device,  rxd_receiver))
 
 	/* Configure the serial ports */
-#define CHA ":rs232"
-#define CHB ":modem"
 	MCFG_DEVICE_MODIFY("maincpu:serial")
-	MCFG_MC68340SER_A_TX_CALLBACK(DEVWRITELINE(CHA, rs232_port_device, write_txd))
-	MCFG_MC68340SER_B_TX_CALLBACK(DEVWRITELINE(CHB, rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD (CHA, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", mc68340_serial_module_device, rx_a_w))
-	MCFG_RS232_PORT_ADD (CHB, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (":maincpu:serial", mc68340_serial_module_device, rx_b_w))
+	MCFG_MC68340SER_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68340SER_B_TX_CALLBACK(WRITELINE("modem", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD ("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_a_w))
+	MCFG_DEVICE_ADD ("modem", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_b_w))
 
 	/* Add the boot flash */
 	MCFG_AMD_29F800B_16BIT_ADD("flash")
@@ -628,10 +626,10 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_DEFAULT_LAYOUT(layout_sda5708)
 	/* IP16 74256 8 bit latch */
 	MCFG_LATCH8_ADD("hct259.ip16")
-	MCFG_LATCH8_WRITE_4(DEVWRITELINE("display", sda5708_device, reset_w))
+	MCFG_LATCH8_WRITE_4(WRITELINE("display", sda5708_device, reset_w))
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(dbox_state, dbox)
+void dbox_state::init_dbox()
 {
 }
 
@@ -651,4 +649,4 @@ ROM_START( dbox )
 	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
 ROM_END
 
-COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

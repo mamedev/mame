@@ -540,10 +540,18 @@ void pci_bridge_device::reset_all_mappings()
 void pci_bridge_device::map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	for(int i = int(all_devices.size())-1; i>=0; i--)
+	const int count = int(all_devices.size()) - 1;
+
+	for(int i = count; i >= 0; i--)
+		if (all_devices[i] != this)
+			if (all_devices[i]->map_first())
+				all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
+											io_window_start, io_window_end, io_offset, io_space);
+	for(int i = count; i>=0; i--)
 		if(all_devices[i] != this)
-			all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
-										io_window_start, io_window_end, io_offset, io_space);
+			if (!all_devices[i]->map_first())
+				all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
+					io_window_start, io_window_end, io_offset, io_space);
 
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
 				io_window_start, io_window_end, io_offset, io_space);

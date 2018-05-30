@@ -89,7 +89,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(pyl601);
+	void init_pyl601();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
@@ -479,7 +479,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 
 
 
-DRIVER_INIT_MEMBER(pyl601_state,pyl601)
+void pyl601_state::init_pyl601()
 {
 	memset(m_ram->pointer(), 0, 64 * 1024);
 }
@@ -494,9 +494,10 @@ FLOPPY_FORMATS_MEMBER( pyl601_state::floppy_formats )
 	FLOPPY_PYLDIN_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pyl601_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pyl601_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout pyl601_charlayout =
@@ -525,19 +526,19 @@ static const gfx_layout pyl601a_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( pyl601 )
+static GFXDECODE_START( gfx_pyl601 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( pyl601a )
+static GFXDECODE_START( gfx_pyl601a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pyl601_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pyl601_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -546,12 +547,12 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pyl601)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pyl601)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -572,10 +573,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601a)
 	pyl601(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(2'000'000))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(2'000'000))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pyl601a)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
 
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))
@@ -628,6 +629,6 @@ ROM_START( pyl601a )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY             FULLNAME       FLAGS */
-COMP( 1989, pyl601,  0,       0,       pyl601,    pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601",  0 )
-COMP( 1989, pyl601a, pyl601,  0,       pyl601a,   pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601A", 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY             FULLNAME       FLAGS */
+COMP( 1989, pyl601,  0,      0,      pyl601,  pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601",  0 )
+COMP( 1989, pyl601a, pyl601, 0,      pyl601a, pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601A", 0 )

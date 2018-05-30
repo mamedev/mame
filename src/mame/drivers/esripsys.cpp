@@ -620,7 +620,7 @@ void esripsys_state::video_cpu_map(address_map &map)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(esripsys_state,esripsys)
+void esripsys_state::init_esripsys()
 {
 	uint8_t *rom = memregion("sound_data")->base();
 
@@ -665,25 +665,25 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 }
 
 MACHINE_CONFIG_START(esripsys_state::esripsys)
-	MCFG_CPU_ADD("game_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
+	MCFG_DEVICE_ADD("game_cpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(game_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
 	MCFG_QUANTUM_PERFECT_CPU("game_cpu")
 
-	MCFG_CPU_ADD("frame_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(frame_cpu_map)
+	MCFG_DEVICE_ADD("frame_cpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(frame_cpu_map)
 
-	MCFG_CPU_ADD("video_cpu", ESRIP, XTAL(40'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(video_cpu_map)
-	MCFG_ESRIP_FDT_R_CALLBACK(READ16(esripsys_state, fdt_rip_r))
-	MCFG_ESRIP_FDT_W_CALLBACK(WRITE16(esripsys_state, fdt_rip_w))
-	MCFG_ESRIP_STATUS_IN_CALLBACK(READ8(esripsys_state, rip_status_in))
+	MCFG_DEVICE_ADD("video_cpu", ESRIP, XTAL(40'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(video_cpu_map)
+	MCFG_ESRIP_FDT_R_CALLBACK(READ16(*this, esripsys_state, fdt_rip_r))
+	MCFG_ESRIP_FDT_W_CALLBACK(WRITE16(*this, esripsys_state, fdt_rip_w))
+	MCFG_ESRIP_STATUS_IN_CALLBACK(READ8(*this, esripsys_state, rip_status_in))
 	MCFG_ESRIP_DRAW_CALLBACK_OWNER(esripsys_state, esripsys_draw)
 	MCFG_ESRIP_LBRM_PROM("proms")
 	MCFG_ESRIP_SCREEN("screen")
 
-	MCFG_CPU_ADD("sound_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
+	MCFG_DEVICE_ADD("sound_cpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -694,21 +694,21 @@ MACHINE_CONFIG_START(esripsys_state::esripsys)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	/* Sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", MC3410, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("dacvol", MC3408, 0) // unknown DAC
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("dac", MC3410, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dacvol", MC3408, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("tms5220nl", TMS5220, 640000)
+	MCFG_DEVICE_ADD("tms5220nl", TMS5220, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(8'000'000) / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(esripsys_state, ptm_irq))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, esripsys_state, ptm_irq))
 MACHINE_CONFIG_END
 
 
@@ -1067,6 +1067,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )

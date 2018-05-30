@@ -110,6 +110,6 @@ private:
 	void sync_link();
 };
 
-extern const device_type GAELCO_SERIAL;
+DECLARE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device)
 
 #endif // MAME_MACHINE_GAELCO3D_H

@@ -366,7 +366,7 @@ public:
 
 	DECLARE_READ8_MEMBER(unk_r);
 
-	DECLARE_DRIVER_INIT(bondwell);
+	void init_bondwell();
 
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
 
@@ -461,7 +461,7 @@ INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
 	m_maincpu->set_clock_scale((newval & 2) ? 1 : m_turbo_off_speed);
 }
 
-DRIVER_INIT_MEMBER(pc_state,bondwell)
+void pc_state::init_bondwell()
 {
 	m_turbo_off_speed = 4.77/12;
 }
@@ -511,10 +511,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 
 #define MCFG_CPU_PC(mem, port, type, clock) \
-	MCFG_CPU_ADD("maincpu", type, clock)                \
-	MCFG_CPU_PROGRAM_MAP(mem##_map) \
-	MCFG_CPU_IO_MAP(port##_io) \
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", type, clock)                \
+	MCFG_DEVICE_PROGRAM_MAP(mem##_map) \
+	MCFG_DEVICE_IO_MAP(port##_io) \
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 
 MACHINE_CONFIG_START(pc_state::pccga)
@@ -524,11 +524,12 @@ MACHINE_CONFIG_START(pc_state::pccga)
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -611,12 +612,12 @@ MACHINE_CONFIG_START(pc_state::iskr3104)
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr3104)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "ega", false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "ega", false) // FIXME: determine ISA bus clock
 	MCFG_SLOT_OPTION_DEFAULT_BIOS("ega", "iskr3104")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -635,10 +636,10 @@ MACHINE_CONFIG_START(pc_state::poisk2)
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga_poisk2", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_poisk2", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -665,11 +666,11 @@ MACHINE_CONFIG_START(pc_state::zenith)
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -687,8 +688,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pc_state::ncrpc4i)
 	pccga(config);
 	//MCFG_DEVICE_MODIFY("mb:isa")
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -708,12 +709,13 @@ MACHINE_CONFIG_START(pc_state::siemens)
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(siemens)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "hdc", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hercules", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hdc", false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -733,10 +735,11 @@ MACHINE_CONFIG_START(pc_state::ibm5550)
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -789,14 +792,15 @@ MACHINE_CONFIG_START(pc_state::laser_xt3)
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false) // Multi I/O card (includes FDC)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false) // floppy drive A is 5.25" 360K and B is 3.5" 720K
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", pc_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false) // Multi I/O card (includes FDC)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false) // floppy drive A is 5.25" 360K and B is 3.5" 720K
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa8", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -818,14 +822,15 @@ MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false) // Multi I/O card (includes FDC)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", pc_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false) // Multi I/O card (includes FDC)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa8", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -1068,29 +1073,29 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
-COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
-COMP( 1985,   epc,              ibm5150,    0,          epc,            pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
-COMP( 1985,   eppc,             ibm5150,    0,          eppc,           pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
-COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
-COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
-COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
-COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    pc_state, 0,        "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
-COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    pc_state, 0,        "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )
-COMP( 1990,   mc1702,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "<unknown>",                       "Elektronika MC-1702",  MACHINE_NOT_WORKING )
-COMP( 1987,   zdsupers,         ibm5150,    0,          zenith,         pccga,    pc_state, 0,        "Zenith Data Systems",             "SuperSport",           0 )
-COMP( 1985,   sicpc1605,        ibm5150,    0,          siemens,        pccga,    pc_state, 0,        "Siemens",                         "Sicomp PC16-05",       MACHINE_NOT_WORKING )
-COMP( 1985,   ncrpc4i,          ibm5150,    0,          ncrpc4i,        pccga,    pc_state, 0,        "NCR",                             "PC4i",                 MACHINE_NOT_WORKING )
-COMP( 198?,   olivm15,          ibm5150,    0,          m15,            pccga,    pc_state, 0,        "Olivetti",                        "M15",                  0 )
-COMP( 1983,   ibm5550,          ibm5150,    0,          ibm5550,        pccga,    pc_state, 0,        "International Business Machines", "IBM 5550",             MACHINE_NOT_WORKING )
-COMP( 1985,   pc7000,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sharp",                           "PC-7000",              MACHINE_NOT_WORKING )
-COMP( 1988,   sx16,             ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sanyo",                           "SX-16",                MACHINE_NOT_WORKING )
-COMP( 198?,   mbc16,            ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sanyo",                           "MBC-16",               MACHINE_NOT_WORKING )
-COMP( 1987,   ataripc1,         ibm5150,    0,          ataripc1,       pccga,    pc_state, 0,        "Atari",                           "PC1" ,                 0 )
-COMP( 1988,   ataripc3,         ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Atari",                           "PC3" ,                 0 )
-COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Samsung",                         "Samtron 88S" ,         MACHINE_NOT_WORKING )
-COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    pc_state, 0,        "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
-COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
-COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )
-COMP( 198?,   olytext30,        ibm5150,    0,          olytext30,      pccga,    pc_state, 0,        "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
-COMP( 1985,   kaypro16,         ibm5150,    0,          kaypro16,       pccga,    pc_state, 0,        "Kaypro Corporation",              "Kaypro 16",            0 )
+//    YEAR  NAME            PARENT   COMPAT  MACHINE         INPUT     CLASS     INIT           COMPANY                            FULLNAME                FLAGS
+COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
+COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
+COMP( 1985, eppc,           ibm5150, 0,      eppc,           pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
+COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
+COMP( 1984, compc1,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
+COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
+COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
+COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )
+COMP( 1990, mc1702,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",  MACHINE_NOT_WORKING )
+COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",           0 )
+COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",       MACHINE_NOT_WORKING )
+COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                 MACHINE_NOT_WORKING )
+COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                  0 )
+COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "IBM 5550",             MACHINE_NOT_WORKING )
+COMP( 1985, pc7000,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",              MACHINE_NOT_WORKING )
+COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                MACHINE_NOT_WORKING )
+COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",               MACHINE_NOT_WORKING )
+COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1" ,                 0 )
+COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3" ,                 0 )
+COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S" ,         MACHINE_NOT_WORKING )
+COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
+COMP( 1988, laser_turbo_xt, ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser Turbo XT",       0 )
+COMP( 1989, laser_xt3,      ibm5150, 0,      laser_xt3,      0,        pc_state, empty_init,    "VTech",                           "Laser XT/3",           0 )
+COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
+COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",            0 )

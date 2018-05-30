@@ -1913,9 +1913,9 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 MACHINE_CONFIG_START(tmnt_state::cuebrick)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(cuebrick_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cuebrick_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -1953,9 +1953,9 @@ MACHINE_CONFIG_START(tmnt_state::cuebrick)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -1965,12 +1965,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::mia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(mia_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(mia_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(mia_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(mia_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2005,16 +2005,16 @@ MACHINE_CONFIG_START(tmnt_state::mia)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(tmnt_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -2030,12 +2030,12 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 MACHINE_CONFIG_START(tmnt_state::tmnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(tmnt_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(tmnt_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(tmnt_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(tmnt_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,tmnt)
@@ -2071,23 +2071,23 @@ MACHINE_CONFIG_START(tmnt_state::tmnt)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(tmnt_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.33)
 	MCFG_SOUND_ROUTE(1, "mono", 0.33)
 
-	MCFG_SOUND_ADD("upd", UPD7759, XTAL(640'000))
+	MCFG_DEVICE_ADD("upd", UPD7759, XTAL(640'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1) /* 1 channel for the title music */
 	MCFG_SAMPLES_START_CB(tmnt_state, tmnt_decode_sample)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2097,12 +2097,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::punkshot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(punkshot_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(punkshot_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(punkshot_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(punkshot_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2137,9 +2137,9 @@ MACHINE_CONFIG_START(tmnt_state::punkshot)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
@@ -2151,12 +2151,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(lgtnfght_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(lgtnfght_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2192,9 +2192,10 @@ MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2207,12 +2208,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::blswhstl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(blswhstl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(blswhstl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2230,7 +2231,7 @@ MACHINE_CONFIG_START(tmnt_state::blswhstl)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tmnt_state, screen_vblank_blswhstl))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tmnt_state, screen_vblank_blswhstl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2253,9 +2254,10 @@ MACHINE_CONFIG_START(tmnt_state::blswhstl)
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
@@ -2278,19 +2280,19 @@ static const gfx_layout zoomlayout =
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	16*64
 };
-static GFXDECODE_START( glfgreat )
+static GFXDECODE_START( gfx_glfgreat )
 	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(tmnt_state::glfgreat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(glfgreat_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(glfgreat_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(glfgreat_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(glfgreat_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2308,7 +2310,7 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", glfgreat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -2333,7 +2335,8 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2351,12 +2354,12 @@ MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(prmrsocr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(prmrsocr_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_audio_map)
 								/* NMIs are generated by the 054539 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,prmrsocr)
@@ -2376,7 +2379,7 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", glfgreat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -2400,7 +2403,8 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -2416,16 +2420,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::tmnt2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(tmnt2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(tmnt2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
 						/* access. Access speed of ROM/RAM used on the machine is 150ns, */
 						/* without the wait, they cannot run on 8MHz.                    */
 						/* We are not emulating the wait state, so the ROM test ends at  */
 						/* 02 instead of 00. */
-	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2464,9 +2468,10 @@ MACHINE_CONFIG_START(tmnt_state::tmnt2)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2479,12 +2484,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::ssriders)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(ssriders_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2523,9 +2528,10 @@ MACHINE_CONFIG_START(tmnt_state::ssriders)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2538,9 +2544,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(sunsetbl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sunsetbl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2574,9 +2580,10 @@ MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2584,12 +2591,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tmnt_state::thndrx2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(thndrx2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thndrx2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(thndrx2_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(thndrx2_audio_map)
 								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
@@ -2625,9 +2632,10 @@ MACHINE_CONFIG_START(tmnt_state::thndrx2)
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -4122,7 +4130,7 @@ static void chunky_to_planar(memory_region *rgn)
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, mia)
+void tmnt_state::init_mia()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4147,7 +4155,7 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, tmnt)
+void tmnt_state::init_tmnt()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4209,7 +4217,7 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 	}
 }
 
-DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
+void tmnt_state::init_cuebrick()
 {
 	membank("nvrambank")->configure_entries(0, 0x20, m_cuebrick_nvram, 0x400);
 
@@ -4219,68 +4227,68 @@ DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
 }
 
 //    YEAR  NAME         PARENT    MACHINE   INPUT      STATE       INIT      MONITOR COMPANY    FULLNAME,FLAGS
-GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, cuebrick, ROT0,   "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, init_cuebrick,ROT0,  "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mia,         0,        mia,      mia,       tmnt_state, mia,      ROT0,   "Konami",  "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state, mia,      ROT0,   "Konami",  "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mia,         0,        mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (Asia)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    tmnt_state, 0,        ROT90,  "Konami",  "Trigon (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    tmnt_state, empty_init,  ROT90,  "Konami",  "Trigon (Japan)",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Bells & Whistles (World, version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (World, version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  tmnt_state, 0,        ROT0,   "Konami",  "Golfing Greats",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, tmnt_state, 0,        ROT0,   "Konami",  "Golfing Greats (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, 0,        ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, empty_init,  ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver EAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssriderseaa, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver EAA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersebd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver EBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersebc, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver EBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UDA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UAB)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver UBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver ADD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver ABD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjad, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver JAD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjac, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver JAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver JBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, 0,        ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, 0,        ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver EAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriderseaa, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver EAA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersebd, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver EBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersebc, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver EBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver UDA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver UAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver UAB)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver UBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver ADD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver ABD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjad, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver JAD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjac, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver JAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (2 Players ver JBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr,  tmnt_state, 0,        ROT0,   "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr,  tmnt_state, 0,        ROT0,   "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr,  tmnt_state, empty_init,  ROT0,   "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr,  tmnt_state, empty_init,  ROT0,   "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )

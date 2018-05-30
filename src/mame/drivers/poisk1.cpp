@@ -93,7 +93,7 @@ public:
 
 	required_ioport_array<8> m_kbdio;
 
-	DECLARE_DRIVER_INIT(poisk1);
+	void init_poisk1();
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
@@ -594,7 +594,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER(p1_state, poisk1)
+void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -643,48 +643,48 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(p1_state::poisk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 5000000)
-	MCFG_CPU_PROGRAM_MAP(poisk1_map)
-	MCFG_CPU_IO_MAP(poisk1_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(poisk1_map)
+	MCFG_DEVICE_IO_MAP(poisk1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
 
 	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
 	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12) /* keyboard poll -- XXX edge or level triggered? */
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir6_w))
 	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(p1_state, p1_pit8253_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, p1_state, p1_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(p1_state, p1_ppi_porta_r)) /*60H*/
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(p1_state, p1_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(p1_state, p1_ppi_portb_r)) /*69H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(p1_state, p1_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(p1_state, p1_ppi_portc_w))   /*6AH*/
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, p1_state, p1_ppi_porta_r)) /*60H*/
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, p1_state, p1_ppi_portb_r)) /*69H*/
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, p1_state, p1_ppi_portc_w))   /*6AH*/
 
 	MCFG_DEVICE_ADD("ppi8255n2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(p1_state, p1_ppi2_porta_w))  /*68H*/
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(p1_state, p1_ppi2_portb_w))  /*61H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(p1_state, p1_ppi2_portc_r))    /*62H*/
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi2_porta_w))  /*68H*/
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, p1_state, p1_ppi2_portb_w))  /*61H*/
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi2_portc_r))    /*62H*/
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", p1_isa8_cards, "fdc", false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa2", p1_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa3", p1_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa4", p1_isa8_cards, nullptr, false)
+	MCFG_ISA8_CPU("maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -692,8 +692,8 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -748,5 +748,5 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR     NAME       PARENT      COMPAT  MACHINE   INPUT    STATE     INIT    COMPANY          FULLNAME   FLAGS
-COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,   poisk1,  p1_state, poisk1, "Electronmash",  "Poisk-1", 0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS     INIT         COMPANY         FULLNAME   FLAGS
+COMP( 1989, poisk1, ibm5150, 0,      poisk1,  poisk1, p1_state, init_poisk1, "Electronmash", "Poisk-1", 0 )

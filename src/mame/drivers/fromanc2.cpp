@@ -40,7 +40,7 @@ WRITE16_MEMBER(fromanc2_state::sndcmd_w)
 	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
 	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
 
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_sndcpu_nmi_flag = 0;
 }
 
@@ -103,7 +103,7 @@ WRITE16_MEMBER(fromanc2_state::subcpu_w)
 
 READ16_MEMBER(fromanc2_state::subcpu_r)
 {
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_subcpu_nmi_flag = 0;
 
 	return (m_datalatch_2h << 8) | m_datalatch_2l;
@@ -436,7 +436,7 @@ static const gfx_layout fromanc2_tilelayout =
 	32*8
 };
 
-static GFXDECODE_START( fromanc2 )
+static GFXDECODE_START( gfx_fromanc2 )
 	GFXDECODE_ENTRY( "gfx1", 0, fromanc2_tilelayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, fromanc2_tilelayout, 256, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, fromanc2_tilelayout, 512, 4 )
@@ -454,7 +454,7 @@ static const gfx_layout fromancr_tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( fromancr )
+static GFXDECODE_START( gfx_fromancr )
 	GFXDECODE_ENTRY( "gfx1", 0, fromancr_tilelayout, 512, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, fromancr_tilelayout, 256, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, fromancr_tilelayout,   0, 1 )
@@ -504,24 +504,24 @@ void fromanc2_state::machine_reset()
 MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
 
-	MCFG_CPU_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_CPU_IO_MAP(fromanc2_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromanc2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
@@ -549,12 +549,12 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
@@ -564,24 +564,24 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromanc2_state::fromancr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromancr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromancr_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
 
-	MCFG_CPU_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_CPU_IO_MAP(fromanc2_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
@@ -609,12 +609,12 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromancr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
@@ -624,13 +624,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc4_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc4_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
@@ -638,11 +638,11 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("link", rs232_port_device, write_rts))
+	//MCFG_INS8250_OUT_TX_CB(WRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_INS8250_OUT_RTS_CB(WRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -670,12 +670,12 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
@@ -827,14 +827,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(fromanc2_state,fromanc2)
+void fromanc2_state::init_fromanc2()
 {
 	m_subcpu_nmi_flag = 1;
 	m_subcpu_int_flag = 1;
 	m_sndcpu_nmi_flag = 1;
 }
 
-DRIVER_INIT_MEMBER(fromanc2_state,fromanc4)
+void fromanc2_state::init_fromanc4()
 {
 	m_sndcpu_nmi_flag = 1;
 }
@@ -846,7 +846,7 @@ DRIVER_INIT_MEMBER(fromanc2_state,fromanc4)
  *
  *************************************/
 
-GAME( 1995, fromanc2,  0,        fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fromanc2o, fromanc2, fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fromancr,  0,        fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fromanc4,  0,        fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromanc2,  0,        fromanc2, fromanc2, fromanc2_state, init_fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromanc2o, fromanc2, fromanc2, fromanc2, fromanc2_state, init_fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromancr,  0,        fromancr, fromanc2, fromanc2_state, init_fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fromanc4,  0,        fromanc4, fromanc4, fromanc2_state, init_fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

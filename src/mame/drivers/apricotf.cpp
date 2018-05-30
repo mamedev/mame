@@ -27,7 +27,6 @@
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
-#include "cpu/z80/z80daisy.h"
 #include "formats/apridisk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/apricotkb.h"
@@ -95,11 +94,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( palette_r );
-	DECLARE_WRITE16_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	DECLARE_READ16_MEMBER(palette_r);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(system_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	DECLARE_WRITE8_MEMBER(m1_w);
 
 	int m_40_80;
 	int m_200_256;
@@ -157,12 +157,12 @@ uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-READ16_MEMBER( f1_state::palette_r )
+READ16_MEMBER(f1_state::palette_r)
 {
 	return m_p_paletteram[offset];
 }
 
-WRITE16_MEMBER( f1_state::palette_w )
+WRITE16_MEMBER(f1_state::palette_w)
 {
 	uint8_t i,r,g,b;
 	COMBINE_DATA(&m_p_paletteram[offset]);
@@ -191,12 +191,12 @@ static const gfx_layout charset_8x8 =
 };
 
 
-static GFXDECODE_START( act_f1 )
+static GFXDECODE_START( gfx_act_f1 )
 	GFXDECODE_ENTRY( I8086_TAG, 0x0800, charset_8x8, 0, 1 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER( f1_state::system_w )
+WRITE8_MEMBER(f1_state::system_w)
 {
 	switch(offset)
 	{
@@ -272,7 +272,7 @@ void f1_state::act_f1_io(address_map &map)
 	map(0x0000, 0x000f).w(this, FUNC(f1_state::system_w));
 	map(0x0010, 0x0017).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x0020, 0x0027).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-//  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
+	map(0x0030, 0x0030).w(this, FUNC(f1_state::m1_w));
 	map(0x0040, 0x0047).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x01e0, 0x01ff) winchester
 }
@@ -300,15 +300,21 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( f1_state::ctc_z1_w )
+WRITE_LINE_MEMBER(f1_state::ctc_z1_w)
 {
 	m_sio->rxcb_w(state);
 	m_sio->txcb_w(state);
 }
 
-WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
+WRITE_LINE_MEMBER(f1_state::ctc_z2_w)
 {
 	m_sio->txca_w(state);
+}
+
+WRITE8_MEMBER(f1_state::m1_w)
+{
+	m_ctc->z80daisy_decode(data);
+	m_sio->z80daisy_decode(data);
 }
 
 //-------------------------------------------------
@@ -319,10 +325,11 @@ FLOPPY_FORMATS_MEMBER( f1_state::floppy_formats )
 	FLOPPY_APRIDISK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( apricotf_floppies )
-	SLOT_INTERFACE( "d31v", SONY_OA_D31V )
-	SLOT_INTERFACE( "d32w", SONY_OA_D32W )
-SLOT_INTERFACE_END
+void apricotf_floppies(device_slot_interface &device)
+{
+	device.option_add("d31v", SONY_OA_D31V);
+	device.option_add("d32w", SONY_OA_D32W);
+}
 
 
 
@@ -336,9 +343,9 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(f1_state::act_f1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL(14'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
-	MCFG_CPU_IO_MAP(act_f1_io)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, XTAL(14'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(act_f1_mem)
+	MCFG_DEVICE_IO_MAP(act_f1_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
@@ -353,21 +360,21 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO, 2500000)
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(f1_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
+	MCFG_Z80CTC_INTR_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, f1_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, f1_state, ctc_z2_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -416,8 +423,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME        FLAGS
-COMP( 1984, f1,    0,      0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f1e,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1e",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f2,    f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F2",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, f10,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1984, f1,   0,      0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f1e,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1e", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f2,   f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F2",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, f10,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

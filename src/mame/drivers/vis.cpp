@@ -131,17 +131,18 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 }
 
 MACHINE_CONFIG_START(vis_audio_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymf262", YMF262, XTAL(14'318'181))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 READ8_MEMBER(vis_audio_device::pcm_r)
@@ -239,23 +240,21 @@ private:
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	std::string m_screen_tag;
 	int m_extcnt;
 	uint8_t m_extreg;
 	uint8_t m_interlace;
 	uint16_t m_wina, m_winb;
 	uint8_t m_shift256, m_dw, m_8bit_640;
-	uint8_t m_crtc_regs[0x31];
+	uint8_t m_crtc_regs[0x32];
 };
 
 DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")
 
-vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, VIS_VGA, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_screen_tag(subtag("screen"))
+vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	svga_device(mconfig, VIS_VGA, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this)
 {
-	set_screen(m_screen_tag.c_str());
+	set_screen(*this, "screen");
 }
 
 MACHINE_CONFIG_START(vis_vga_device::device_add_mconfig)
@@ -825,7 +824,7 @@ READ8_MEMBER(vis_state::sysctl_r)
 WRITE8_MEMBER(vis_state::sysctl_w)
 {
 	if(BIT(data, 0) && !BIT(m_sysctl, 0))
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	//m_maincpu->set_input_line(INPUT_LINE_A20, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 	m_sysctl = data;
 }
@@ -859,10 +858,11 @@ void vis_state::at16_io(address_map &map)
 	map(0x031a, 0x031a).r(this, FUNC(vis_state::unk3_r));
 }
 
-static SLOT_INTERFACE_START(vis_cards)
-	SLOT_INTERFACE("visaudio", VIS_AUDIO)
-	SLOT_INTERFACE("visvga", VIS_VGA)
-SLOT_INTERFACE_END
+static void vis_cards(device_slot_interface &device)
+{
+	device.option_add("visaudio", VIS_AUDIO);
+	device.option_add("visvga", VIS_VGA);
+}
 
 // TODO: other buttons
 static INPUT_PORTS_START(vis)
@@ -887,11 +887,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vis_state::vis)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(12'000'000) )
-	MCFG_CPU_PROGRAM_MAP(at16_map)
-	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(at16_map)
+	MCFG_DEVICE_IO_MAP(at16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	// this doesn't have a real keyboard controller
@@ -902,11 +902,12 @@ MACHINE_CONFIG_START(vis_state::vis)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
 	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus", "mcd", pc_isa16_cards, "mcd", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus", "visaudio", vis_cards, "visaudio", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus", "visvga", vis_cards, "visvga", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("mcd",      ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "mcd",      true)
+	MCFG_DEVICE_ADD("visaudio", ISA16_SLOT, 0, "mb:isabus", vis_cards,      "visaudio", true)
+	MCFG_DEVICE_ADD("visvga",   ISA16_SLOT, 0, "mb:isabus", vis_cards,      "visvga",   true)
 MACHINE_CONFIG_END
 
 ROM_START(vis)
@@ -915,4 +916,4 @@ ROM_START(vis)
 	ROM_LOAD( "p513bk1b.bin", 0x80000, 0x80000, CRC(e18239c4) SHA1(a0262109e10a07a11eca43371be9978fff060bc5))
 ROM_END
 
-COMP ( 1992, vis,  0, 0, vis, vis, vis_state, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, vis, 0, 0, vis, vis, vis_state, empty_init, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

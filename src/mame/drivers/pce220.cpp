@@ -937,9 +937,9 @@ PALETTE_INIT_MEMBER(pce220_state,pce220)
 
 MACHINE_CONFIG_START(pce220_state::pce220)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
-	MCFG_CPU_PROGRAM_MAP(pce220_mem)
-	MCFG_CPU_IO_MAP(pce220_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
+	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
+	MCFG_DEVICE_IO_MAP(pce220_io)
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
@@ -956,8 +956,8 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
@@ -973,9 +973,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000) ) // 3.54MHz
-	MCFG_CPU_PROGRAM_MAP(pce220_mem)
-	MCFG_CPU_IO_MAP(pcg850v_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000) ) // 3.54MHz
+	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
+	MCFG_DEVICE_IO_MAP(pcg850v_io)
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
@@ -992,8 +992,8 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
@@ -1009,9 +1009,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) ) // CMOS-SC7852
-	MCFG_CPU_PROGRAM_MAP(pce220_mem)
-	MCFG_CPU_IO_MAP(pcg850v_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) ) // CMOS-SC7852
+	MCFG_DEVICE_PROGRAM_MAP(pce220_mem)
+	MCFG_DEVICE_IO_MAP(pcg850v_io)
 
 	/* video hardware */
 	// 6 lines x 24 characters, resp. 144 x 48 pixel
@@ -1028,8 +1028,8 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
@@ -1114,7 +1114,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY    FULLNAME        FLAGS
-COMP( 1991, pce220,  0,      0,      pce220,   pce220,  pce220_state,  0,    "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
-COMP( 1992, pcg815,  0,      0,      pcg815,   pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
-COMP( 2001, pcg850v, 0,      0,      pcg850v,  pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
+COMP( 1991, pce220,  0,      0,      pce220,  pce220,  pce220_state,  empty_init, "Sharp", "PC-E220",  MACHINE_NOT_WORKING )
+COMP( 1992, pcg815,  0,      0,      pcg815,  pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G815",  MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,      0,      pcg850v, pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G850V", MACHINE_NOT_WORKING )

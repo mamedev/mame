@@ -2107,7 +2107,7 @@ WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
 
 MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
+	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 
 	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
 
@@ -2124,16 +2124,16 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("djoy_0_1"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("djoy_2_3"))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("a8sio", a8sio_device, motor_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("fdc", atari_fdc_device, pia_cb2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("a8sio", a8sio_device, motor_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("fdc", atari_fdc_device, pia_cb2_w))
 
 	MCFG_DEVICE_ADD("a8sio", A8SIO, 0)
-	MCFG_A8SIO_DATA_IN_CB(DEVWRITELINE("pokey", pokey_device, sid_w))
+	MCFG_A8SIO_DATA_IN_CB(WRITELINE("pokey", pokey_device, sid_w))
 	MCFG_A8SIO_SLOT_ADD("a8sio", "sio", nullptr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
 	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
@@ -2142,8 +2142,8 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	MCFG_POKEY_POT5_R_CB(IOPORT("analog_5"))
 	MCFG_POKEY_POT6_R_CB(IOPORT("analog_6"))
 	MCFG_POKEY_POT7_R_CB(IOPORT("analog_7"))
-	MCFG_POKEY_SERIN_R_CB(DEVREAD8("fdc", atari_fdc_device, serin_r))
-	MCFG_POKEY_SEROUT_W_CB(DEVWRITE8("fdc", atari_fdc_device, serout_w))
+	MCFG_POKEY_SERIN_R_CB(READ8("fdc", atari_fdc_device, serin_r))
+	MCFG_POKEY_SEROUT_W_CB(WRITE8("fdc", atari_fdc_device, serout_w))
 	MCFG_POKEY_KEYBOARD_CB(a400_state, a800_keyboard)
 	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
 
@@ -2152,9 +2152,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a400_state::atari_common)
 	atari_common_nodac(config);
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -2162,7 +2162,7 @@ MACHINE_CONFIG_START(a400_state::atari_common)
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
 	MCFG_GTIA_READ_CB(IOPORT("console"))
-	MCFG_GTIA_WRITE_CB(WRITE8(a400_state, gtia_cb))
+	MCFG_GTIA_WRITE_CB(WRITE8(*this, a400_state, gtia_cb))
 
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")
@@ -2183,8 +2183,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a400)
 	atari_common(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a400_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
@@ -2202,8 +2202,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a400pal)
 	atari_common(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a400_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
@@ -2221,8 +2221,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a800)
 	atari_common(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a400_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
@@ -2242,8 +2242,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a800pal)
 	atari_common(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a400_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a400_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
@@ -2263,12 +2263,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a600xl)
 	atari_common(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a600xl_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a600xl_pia_pb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a600xl_pia_pb_w))
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
@@ -2288,12 +2288,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a800xl)
 	atari_common(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a800xl_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a800xl_pia_pb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a800xl_pia_pb_w))
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
@@ -2313,8 +2313,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a800xlpal)
 	a800xl(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK( 1773000 )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_CLOCK( 1773000 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
@@ -2323,8 +2323,8 @@ MACHINE_CONFIG_START(a400_state::a800xlpal)
 	MCFG_DEVICE_MODIFY("gtia")
 	MCFG_GTIA_REGION(GTIA_PAL)
 
-	MCFG_SOUND_MODIFY("pokey")
-	MCFG_SOUND_CLOCK(1773000)
+	MCFG_DEVICE_MODIFY("pokey")
+	MCFG_DEVICE_CLOCK(1773000)
 MACHINE_CONFIG_END
 
 
@@ -2332,11 +2332,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a1200xl)
 	a800xl(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a1200xl_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a1200xl_mem)
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a800xl_pia_pb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a800xl_pia_pb_w))
 MACHINE_CONFIG_END
 
 
@@ -2344,8 +2344,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a130xe)
 	a800xl(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a130xe_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a130xe_mem)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -2356,8 +2356,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::xegs)
 	a800xl(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(xegs_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(xegs_mem)
 
 	MCFG_DEVICE_REMOVE("cartleft")
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -2370,12 +2370,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a400_state::a5200)
 	atari_common_nodac(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a5200_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(a5200_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a5200_interrupt, "screen", 0, 1)
 
 	// FIXME: should there be anything connected where other system have the fdc?
-	MCFG_SOUND_MODIFY("pokey")
+	MCFG_DEVICE_MODIFY("pokey")
 	MCFG_POKEY_SERIN_R_CB(NOOP)
 	MCFG_POKEY_SEROUT_W_CB(NOOP)
 	MCFG_POKEY_KEYBOARD_CB(a400_state, a5200_keypads)
@@ -2523,19 +2523,19 @@ ROM_END
  *
  **************************************************************/
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT   STATE          INIT  COMPANY    FULLNAME */
-COMP ( 1979, a400,     0,        0,     a400,       a800,   a400_state,    0,    "Atari",   "Atari 400 (NTSC)",     0)
-COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,   a400_state,    0,    "Atari",   "Atari 400 (PAL)",      0)
-COMP ( 1979, a800,     0,        0,     a800,       a800,   a400_state,    0,    "Atari",   "Atari 800 (NTSC)",     0)
-COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,   a400_state,    0,    "Atari",   "Atari 800 (PAL)",      0)
-COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl, a400_state,    0,    "Atari",   "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl, a400_state,    0,    "Atari",   "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP ( 1983, a800xl,   0,        0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1983, a800xlp,  a800xl,   0,     a800xlpal,  a800xl, a400_state,    0,    "Atari",   "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP ( 1986, a130xe,   a800xl,   0,     a130xe,     a800xl, a400_state,    0,    "Atari",   "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1987, xegs,     0,        0,     xegs,       a800xl, a400_state,    0,    "Atari",   "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+/*     YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS       INIT        COMPANY  FULLNAME */
+COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state, empty_init, "Atari", "Atari 400 (NTSC)",     0)
+COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state, empty_init, "Atari", "Atari 400 (PAL)",      0)
+COMP( 1979, a800,    0,      0,      a800,      a800,   a400_state, empty_init, "Atari", "Atari 800 (NTSC)",     0)
+COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a400_state, empty_init, "Atari", "Atari 800 (PAL)",      0)
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800xl, a400_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800xl, a400_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
+COMP( 1983, a800xl,  0,      0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800xl, a400_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
+COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800xl, a400_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
+COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1987, xegs,    0,      0,      xegs,      a800xl, a400_state, empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
 
-CONS ( 1982, a5200,    0,        0,     a5200,      a5200,  a400_state,    0,    "Atari",   "Atari 5200",           0)
+CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a400_state, empty_init, "Atari", "Atari 5200",           0)

@@ -587,7 +587,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static GFXDECODE_START( othunder )
+static GFXDECODE_START( gfx_othunder )
 	GFXDECODE_ENTRY( "gfx2", 0, tile16x8_layout, 0, 256 )   /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 256 )   /* sprites & playfield */
 GFXDECODE_END
@@ -607,16 +607,16 @@ void othunder_state::machine_start()
 MACHINE_CONFIG_START(othunder_state::othunder)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(othunder_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(othunder_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("adc", ADC0808, 16_MHz_XTAL/2/2/8)
-	MCFG_ADC0808_EOC_CB(WRITELINE(othunder_state, adc_eoc_w))
+	MCFG_ADC0808_EOC_CB(WRITELINE(*this, othunder_state, adc_eoc_w))
 	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
 	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
 	MCFG_ADC0808_IN2_CB(IOPORT("P2X"))
@@ -626,9 +626,9 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(othunder_state, eeprom_w))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(othunder_state, coins_w))
+	MCFG_TC0220IOC_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(*this, othunder_state, eeprom_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, othunder_state, coins_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -639,9 +639,9 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(othunder_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, othunder_state, vblank_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_othunder)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
@@ -655,9 +655,9 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "2610.0l", 0.25)
 	MCFG_SOUND_ROUTE(0, "2610.0r", 0.25)
@@ -666,18 +666,12 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_SOUND_ROUTE(2, "2610.2l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.1l").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.1r").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -918,9 +912,9 @@ ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a small
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
-GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

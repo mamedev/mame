@@ -188,38 +188,37 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 
 MACHINE_CONFIG_START(aim65_state::aim65)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
-	MCFG_CPU_PROGRAM_MAP(aim65_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(aim65_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<1>))
-	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<2>))
-	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<3>))
-	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<4>))
-	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<5>))
+	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<1>))
+	MCFG_DEVICE_ADD("ds2", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<2>))
+	MCFG_DEVICE_ADD("ds3", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<3>))
+	MCFG_DEVICE_ADD("ds4", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<4>))
+	MCFG_DEVICE_ADD("ds5", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(aim65_state, aim65_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(aim65_state, aim65_riot_b_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, aim65_state, aim65_riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_READPB_HANDLER(READ8(aim65_state, aim65_pb_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, aim65_state, aim65_pb_r))
 	// in CA1 printer ready?
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pb_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pb_w))
 	// out CB1 printer start
 	// out CA2 cass control (H=in)
 	// out CB2 turn printer on
@@ -229,8 +228,8 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pia_b_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aim65_state, aim65_pia_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pia_b_w))
 
 	// Deck 1 can play and record
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -316,5 +315,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT    COMPANY    FULLNAME  FLAGS
-COMP(1977, aim65,       0,      0,      aim65,   aim65, aim65_state,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+//   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP(1977, aim65, 0,      0,      aim65,   aim65, aim65_state, empty_init, "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

@@ -229,7 +229,7 @@ public:
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
-	DECLARE_DRIVER_INIT(leapster);
+	void init_leapster();
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
@@ -309,9 +309,9 @@ void leapster_state::leapster_aux(address_map &map)
 MACHINE_CONFIG_START(leapster_state::leapster)
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
-	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
-	MCFG_CPU_PROGRAM_MAP(leapster_map)
-	MCFG_CPU_IO_MAP(leapster_aux)
+	MCFG_DEVICE_ADD("maincpu", ARCA5, 96000000/10)
+	MCFG_DEVICE_PROGRAM_MAP(leapster_map)
+	MCFG_DEVICE_IO_MAP(leapster_aux)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -354,9 +354,9 @@ ROM_START(leapstertv)
 	ROM_LOAD_BIOS( 0, "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
 ROM_END
 
-DRIVER_INIT_MEMBER(leapster_state,leapster)
+void leapster_state::init_leapster()
 {
 }
 
-CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster",    MACHINE_IS_SKELETON )
-CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV", MACHINE_IS_SKELETON )
+CONS( 2003, leapster,   0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",    MACHINE_IS_SKELETON )
+CONS( 2005, leapstertv, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV", MACHINE_IS_SKELETON )

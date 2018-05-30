@@ -423,7 +423,7 @@ static const gfx_layout slapshot_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( slapshot )
+static GFXDECODE_START( gfx_slapshot )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tilelayout,  0, 256 ) /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, slapshot_charlayout, 4096, 256 )    /* sprites & playfield */
 GFXDECODE_END
@@ -444,12 +444,12 @@ void slapshot_state::machine_start()
 MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
-	MCFG_CPU_PROGRAM_MAP(slapshot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(slapshot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
@@ -467,10 +467,10 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -486,9 +486,10 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -505,12 +506,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
-	MCFG_CPU_PROGRAM_MAP(opwolf3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -525,7 +526,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
@@ -535,10 +536,10 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -554,9 +555,10 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -659,24 +661,20 @@ ROM_START( opwolf3u )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(slapshot_state,slapshot)
+void slapshot_state::init_slapshot()
 {
-	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx2")->base();
 	int size = memregion("gfx2")->bytes();
-	int data;
 
-	offset = size / 2;
-	for (i = size / 2 + size / 4; i < size; i++)
+	uint32_t offset = size / 2;
+	for (uint32_t i = size / 2 + size / 4; i < size; i++)
 	{
-		int d1, d2, d3, d4;
-
 		/* Expand 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data >> 0) & 3;
-		d2 = (data >> 2) & 3;
-		d3 = (data >> 4) & 3;
-		d4 = (data >> 6) & 3;
+		int data = gfx[i];
+		int d1 = (data >> 0) & 3;
+		int d2 = (data >> 2) & 3;
+		int d3 = (data >> 4) & 3;
+		int d4 = (data >> 6) & 3;
 
 		gfx[offset] = (d1 << 2) | (d2 << 6);
 		offset++;
@@ -686,6 +684,6 @@ DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 	}
 }
 
-GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, init_slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, init_slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, init_slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )

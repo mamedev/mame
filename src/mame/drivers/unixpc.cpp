@@ -317,14 +317,15 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START( unixpc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void unixpc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(unixpc_state::unixpc)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(unixpc_mem)
+	MCFG_DEVICE_ADD("maincpu", M68010, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(unixpc_mem)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -351,8 +352,8 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 
 	// floppy
 	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, unixpc_state, wd2797_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, unixpc_state, wd2797_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
@@ -373,5 +374,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, 0,    "AT&T",  "3B1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, empty_init, "AT&T",  "3B1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -183,7 +183,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( sbasketb )
+static GFXDECODE_START( gfx_sbasketb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16*16 )
 GFXDECODE_END
@@ -197,19 +197,19 @@ WRITE_LINE_MEMBER(sbasketb_state::vblank_irq)
 MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, 1400000)        /* 1.400 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, 1400000)        /* 1.400 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sbasketb_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
-	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sbasketb_sound_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sbasketb_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sbasketb_state, irq_mask_w)) // INTST
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sbasketb_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sbasketb_state, irq_mask_w)) // INTST
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // MUT - not used?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sbasketb_state, coin_counter_1_w)) // COIN 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sbasketb_state, coin_counter_2_w)) // COIN 2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sbasketb_state, spriteram_select_w)) // OBJ CHE
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, sbasketb_state, coin_counter_1_w)) // COIN 1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, sbasketb_state, coin_counter_2_w)) // COIN 2
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, sbasketb_state, spriteram_select_w)) // OBJ CHE
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // END - not used
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -222,36 +222,36 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbasketb_state, screen_update_sbasketb)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sbasketb_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sbasketb_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbasketb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbasketb)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(sbasketb_state, sbasketb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76489, XTAL(14'318'181) / 8)
+	MCFG_DEVICE_ADD("snsnd", SN76489, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
+	MCFG_DEVICE_ADD("vlm", VLM5030, XTAL(3'579'545)) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sbasketb_state::sbasketbu)
 	sbasketb(config);
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sbasketb_map)
 MACHINE_CONFIG_END
 
 
@@ -428,11 +428,11 @@ ROM_START( sbaskete )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sbasketb_state,sbasketb)
+void sbasketb_state::init_sbasketb()
 {
 }
 
-GAME( 1984, sbasketb, 0,        sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbasketh, sbasketb, sbasketbu, sbasketb, sbasketb_state, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbasketg, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbaskete, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketb, 0,        sbasketb,  sbasketb, sbasketb_state, init_sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketh, sbasketb, sbasketbu, sbasketb, sbasketb_state, empty_init,    ROT90, "Konami", "Super Basketball (version H, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketg, sbasketb, sbasketb,  sbasketb, sbasketb_state, init_sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbaskete, sbasketb, sbasketb,  sbasketb, sbasketb_state, init_sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)",   MACHINE_SUPPORTS_SAVE )

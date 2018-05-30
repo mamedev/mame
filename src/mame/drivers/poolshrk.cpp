@@ -17,7 +17,7 @@ Atari Poolshark Driver
 
 
 
-DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
+void poolshrk_state::init_poolshrk()
 {
 	uint8_t* pSprite = memregion("gfx1")->base();
 	uint8_t* pOffset = memregion("proms")->base();
@@ -58,9 +58,9 @@ WRITE8_MEMBER(poolshrk_state::da_latch_w)
 WRITE8_MEMBER(poolshrk_state::led_w)
 {
 	if (offset & 2)
-		output().set_led_value(0, offset & 1);
+		m_led[0] = BIT(offset, 0);
 	if (offset & 4)
-		output().set_led_value(1, offset & 1);
+		m_led[1] = BIT(offset, 0);
 }
 
 
@@ -201,7 +201,7 @@ static const gfx_layout poolshrk_tile_layout =
 };
 
 
-static GFXDECODE_START( poolshrk )
+static GFXDECODE_START( gfx_poolshrk )
 	GFXDECODE_ENTRY( "gfx1", 0, poolshrk_sprite_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, poolshrk_tile_layout, 0, 1 )
 GFXDECODE_END
@@ -219,9 +219,9 @@ PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
 MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(poolshrk_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 8) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(poolshrk_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -233,15 +233,14 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poolshrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poolshrk)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(poolshrk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, poolshrk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -263,4 +262,4 @@ ROM_START( poolshrk )
 ROM_END
 
 
-GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, init_poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )

@@ -21,8 +21,6 @@ files {
 	MAME_DIR .. "src/devices/machine/keyboard.ipp",
 	MAME_DIR .. "src/devices/machine/laserdsc.cpp",
 	MAME_DIR .. "src/devices/machine/laserdsc.h",
-	MAME_DIR .. "src/devices/machine/latch.cpp",
-	MAME_DIR .. "src/devices/machine/latch.h",
 	MAME_DIR .. "src/devices/machine/nvram.cpp",
 	MAME_DIR .. "src/devices/machine/nvram.h",
 	MAME_DIR .. "src/devices/machine/ram.cpp",
@@ -2708,6 +2706,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tms9914.h,MACHINES["TMS9914"] = true
+---------------------------------------------------
+
+if (MACHINES["TMS9914"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tms9914.cpp",
+		MAME_DIR .. "src/devices/machine/tms9914.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tube.h,MACHINES["TUBE"] = true
 ---------------------------------------------------
 
@@ -3287,6 +3297,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fdc37c93x.h,MACHINES["FDC37C93X"] = true
+---------------------------------------------------
+
+if (MACHINES["FDC37C93X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c93x.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c93x.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pdc.h,MACHINES["PDC"] = true
 ---------------------------------------------------
 
@@ -3480,5 +3502,31 @@ if (MACHINES["GEN_FIFO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/gen_fifo.cpp",
 		MAME_DIR .. "src/devices/machine/gen_fifo.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/output_latch.h,MACHINES["OUTPUT_LATCH"] = true
+---------------------------------------------------
+
+if (MACHINES["OUTPUT_LATCH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/output_latch.cpp",
+		MAME_DIR .. "src/devices/machine/output_latch.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/z80daisy.h,MACHINES["Z80DAISY"] = true
+---------------------------------------------------
+
+if (MACHINES["Z80DAISY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/z80daisy.cpp",
+		MAME_DIR .. "src/devices/machine/z80daisy.h",
+		MAME_DIR .. "src/devices/machine/z80daisy_generic.cpp",
+		MAME_DIR .. "src/devices/machine/z80daisy_generic.h",
 	}
 end

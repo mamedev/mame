@@ -77,9 +77,9 @@ static INPUT_PORTS_START( v102 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(v102_state::v102)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 970, 0, 800, 319, 0, 300)
@@ -92,10 +92,10 @@ MACHINE_CONFIG_START(v102_state::v102)
 	MCFG_EEPROM_2804_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
@@ -104,8 +104,8 @@ MACHINE_CONFIG_START(v102_state::v102)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 
-	MCFG_CPU_ADD("kbdcpu", I8039, 12000000)
-	MCFG_CPU_PROGRAM_MAP(kbd_map)
+	MCFG_DEVICE_ADD("kbdcpu", I8039, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(kbd_map)
 MACHINE_CONFIG_END
 
 
@@ -129,4 +129,4 @@ ROM_START( v102 )
 	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
 ROM_END
 
-COMP( 1984, v102, 0, 0, v102, v102, v102_state, 0, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )
+COMP( 1984, v102, 0, 0, v102, v102, v102_state, empty_init, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )

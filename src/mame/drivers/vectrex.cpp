@@ -90,15 +90,16 @@ static INPUT_PORTS_START(vectrex)
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(vectrex_cart)
-	SLOT_INTERFACE_INTERNAL("vec_rom",    VECTREX_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("vec_rom64k", VECTREX_ROM_64K)
-	SLOT_INTERFACE_INTERNAL("vec_sram",   VECTREX_ROM_SRAM)
-SLOT_INTERFACE_END
+static void vectrex_cart(device_slot_interface &device)
+{
+	device.option_add_internal("vec_rom",    VECTREX_ROM_STD);
+	device.option_add_internal("vec_rom64k", VECTREX_ROM_64K);
+	device.option_add_internal("vec_sram",   VECTREX_ROM_SRAM);
+}
 
 MACHINE_CONFIG_START(vectrex_base_state::vectrex_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 6_MHz_XTAL) // 68A09
+	MCFG_DEVICE_ADD("maincpu", MC6809, 6_MHz_XTAL) // 68A09
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -109,32 +110,32 @@ MACHINE_CONFIG_START(vectrex_base_state::vectrex_base)
 	MCFG_SCREEN_UPDATE_DRIVER(vectrex_base_state, screen_update_vectrex)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic301 (also used for vector generation)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic301 (also used for vector generation)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("ay8912", AY8912, 6_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("ay8912", AY8912, 6_MHz_XTAL / 4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vectrex_base_state, vectrex_psg_port_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, vectrex_base_state, vectrex_psg_port_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 6_MHz_XTAL / 4)
-	MCFG_VIA6522_READPA_HANDLER(READ8(vectrex_base_state, vectrex_via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(vectrex_base_state, vectrex_via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vectrex_base_state, v_via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vectrex_base_state, v_via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vectrex_base_state, v_via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vectrex_base_state, v_via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vectrex_base_state, vectrex_via_irq))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vectrex_base_state, vectrex_via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, vectrex_base_state, vectrex_via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, vectrex_base_state, v_via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vectrex_base_state, v_via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, vectrex_base_state, v_via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, vectrex_base_state, v_via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, vectrex_base_state, vectrex_via_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vectrex_state::vectrex)
 	vectrex_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vectrex_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vectrex_map)
 
 	/* cartridge */
 	MCFG_VECTREX_CARTRIDGE_ADD("cartslot", vectrex_cart, nullptr)
@@ -226,13 +227,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(raaspec_state::raaspec)
 	vectrex_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(raaspec_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(raaspec_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* via */
 	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_VIA6522_READPB_HANDLER(READ8(raaspec_state, vectrex_s1_via_pb_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, raaspec_state, vectrex_s1_via_pb_r))
 MACHINE_CONFIG_END
 
 ROM_START(raaspec)
@@ -247,7 +248,7 @@ ROM_END
 
 ***************************************************************************/
 
-//   YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     STATE          INIT  MONITOR  COMPANY                         FULLNAME
-CONS(1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, 0,             "General Consumer Electronics", "Vectrex" , ROT270)
+//   YEAR  NAME       PARENT    COMPAT   MACHINE   INPUT     STATE          INIT        MONITOR  COMPANY                         FULLNAME
+CONS( 1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, empty_init,          "General Consumer Electronics", "Vectrex" , ROT270)
 
-GAME(1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, 0,    ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?
+GAME( 1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, empty_init, ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?

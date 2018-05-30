@@ -146,7 +146,7 @@ inline void dsp16_device_base::core_state::dau_f2(u16 op)
 		// p 3-13: "Round upper 20 bits of accumulator."
 		// p 3-14: "The contents of the source accumulator, aS, are rounded to 16 bits, and the sign-extended result is placed in aD[35 - 16] with zeroes in aD[15 - 0]."
 		// It presumably rounds to nearest, but does it yield a 16-bit or 20-bit result, and what does it do about overflow?
-		d = (s + ((0 > s) ? -(s16(1) << 15) : (s16(1) << 15))) & ~((u64(1) << 16) - 1);
+		d = (s + ((s32(1) << 15) - ((0 > s) ? 1 : 0))) & ~((u64(1) << 16) - 1);
 		break;
 	case 0xc: // aD = y
 		d = dau_y;
@@ -165,7 +165,7 @@ inline void dsp16_device_base::core_state::dau_f2(u16 op)
 	d = dau_set_psw_flags(d);
 }
 
-inline s64 &dsp16_device_base::core_state::dau_set_at(u16 op, s16 value)
+inline s64 &dsp16_device_base::core_state::dau_set_atx(u16 op, s16 value)
 {
 	s64 &at(op_dau_at(op));
 	if (op_x(op))
@@ -177,6 +177,13 @@ inline s64 &dsp16_device_base::core_state::dau_set_at(u16 op, s16 value)
 	{
 		return at = (at & ~((s64(1) << 16) - 1)) | u64(u16(value));
 	}
+}
+
+inline s64 &dsp16_device_base::core_state::dau_set_at(u16 op, s16 value)
+{
+	s64 &at(op_dau_at(op));
+	bool const clear(!BIT(dau_psw, 4 + op_d(~op)));
+	return at = s32((u32(u16(value)) << 16) | u32(clear ? u16(0) : u16(u64(at))));
 }
 
 /***********************************************************************

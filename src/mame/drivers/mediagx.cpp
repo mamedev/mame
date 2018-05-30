@@ -102,7 +102,7 @@ public:
 		m_ports(*this, "IN%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(a51site4);
+	void init_a51site4();
 	void mediagx(machine_config &config);
 
 protected:
@@ -791,7 +791,7 @@ static const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA )
+static GFXDECODE_START( gfx_cga )
 /* Support up to four CGA fonts */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout, 0, 256 )   /* Font 0 */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout, 0, 256 )   /* Font 1 */
@@ -883,10 +883,10 @@ void mediagx_state::ramdac_map(address_map &map)
 MACHINE_CONFIG_START(mediagx_state::mediagx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)
-	MCFG_CPU_PROGRAM_MAP(mediagx_map)
-	MCFG_CPU_IO_MAP(mediagx_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 166000000)
+	MCFG_DEVICE_PROGRAM_MAP(mediagx_map)
+	MCFG_DEVICE_IO_MAP(mediagx_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
@@ -894,7 +894,7 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, mediagx_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
@@ -907,17 +907,18 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update_mediagx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1005,7 +1006,7 @@ static const speedup_entry a51site4_speedups[] =
 
 #endif
 
-DRIVER_INIT_MEMBER(mediagx_state,a51site4)
+void mediagx_state::init_a51site4()
 {
 	init_mediagx();
 
@@ -1051,5 +1052,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
-GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )
+GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
+GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )

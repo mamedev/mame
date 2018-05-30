@@ -111,7 +111,7 @@ public:
 	DECLARE_READ8_MEMBER(pdc_dma_r);
 	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 
-	DECLARE_DRIVER_INIT(r9751);
+	void init_r9751();
 
 	void r9751(machine_config &config);
 	void r9751_mem(address_map &map);
@@ -227,7 +227,7 @@ WRITE8_MEMBER(r9751_state::pdc_dma_w)
 	if(TRACE_DMA) logerror("DMA WRITE: %08X DATA: %08X\n", address,data);
 }
 
-DRIVER_INIT_MEMBER(r9751_state,r9751)
+void r9751_state::init_r9751()
 {
 	reg_ff050004 = 0;
 	reg_fff80040 = 0;
@@ -643,8 +643,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(r9751_state::r9751)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68030, 20000000)
-	MCFG_CPU_PROGRAM_MAP(r9751_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(r9751_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -656,8 +656,8 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 
 	/* disk hardware */
 	MCFG_DEVICE_ADD("pdc", PDC, 0)
-	MCFG_PDC_R_CB(READ8(r9751_state, pdc_dma_r))
-	MCFG_PDC_W_CB(WRITE8(r9751_state, pdc_dma_w))
+	MCFG_PDC_R_CB(READ8(*this, r9751_state, pdc_dma_r))
+	MCFG_PDC_W_CB(WRITE8(*this, r9751_state, pdc_dma_w))
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
@@ -687,5 +687,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT      COMPAT  MACHINE  INPUT  STATE        INIT      COMPANY                 FULLNAME              FLAGS
-COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,    "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY               FULLNAME              FLAGS
+COMP( 1988, r9751, 0,      0,      r9751,   r9751, r9751_state, init_r9751, "ROLM Systems, Inc.", "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

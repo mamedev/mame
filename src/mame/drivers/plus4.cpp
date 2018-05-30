@@ -815,10 +815,11 @@ WRITE_LINE_MEMBER( plus4_state::exp_irq_w )
 //  SLOT_INTERFACE( cbm_datassette_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( plus4_datassette_devices )
-	SLOT_INTERFACE("c1531", C1531)
-	SLOT_INTERFACE("diag264", DIAG264_CASSETTE_LOOPBACK)
-SLOT_INTERFACE_END
+void plus4_datassette_devices(device_slot_interface &device)
+{
+	device.option_add("c1531", C1531);
+	device.option_add("diag264", DIAG264_CASSETTE_LOOPBACK);
+}
 
 
 
@@ -898,74 +899,74 @@ void plus4_state::machine_reset()
 
 MACHINE_CONFIG_START(plus4_state::plus4)
 	// basic machine hardware
-	MCFG_CPU_ADD(MOS7501_TAG, M7501, 0)
-	MCFG_CPU_PROGRAM_MAP(plus4_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_DEVICE_ADD(MOS7501_TAG, M7501, 0)
+	MCFG_DEVICE_PROGRAM_MAP(plus4_mem)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M7501_PORT_CALLBACKS(READ8(*this, plus4_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
 
 	// video and sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, 0, ted_videoram_map, WRITELINE(plus4_state, ted_irq_w), READ8(plus4_state, ted_k_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, 0, ted_videoram_map, WRITELINE(*this, plus4_state, ted_irq_w), READ8(*this, plus4_state, ted_k_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, plus4_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p2)) // cassette sense
-	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p3))
-	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p4))
-	MCFG_PET_USER_PORT_7_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p5))
-	MCFG_PET_USER_PORT_8_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxc))
-	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p0))
-	MCFG_PET_USER_PORT_C_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_PET_USER_PORT_F_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p7))
-	MCFG_PET_USER_PORT_H_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
-	MCFG_PET_USER_PORT_J_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p6))
-	MCFG_PET_USER_PORT_K_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p1))
-	MCFG_PET_USER_PORT_L_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p2)) // cassette sense
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p3))
+	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p4))
+	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p5))
+	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxc))
+	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p0))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p7))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p6))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p1))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
 
 	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_RXC_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(plus4_state, acia_irq_w))
+	MCFG_MOS6551_RXC_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, plus4_state, acia_irq_w))
 
 	MCFG_DEVICE_ADD(MOS6529_USER_TAG, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
-	MCFG_MOS6529_P1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_k))
-	MCFG_MOS6529_P2_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
-	MCFG_MOS6529_P3_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
-	MCFG_MOS6529_P4_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6529_P5_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6529_P6_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_j))
-	MCFG_MOS6529_P7_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_f))
+	MCFG_MOS6529_P0_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
+	MCFG_MOS6529_P1_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_k))
+	MCFG_MOS6529_P2_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
+	MCFG_MOS6529_P3_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
+	MCFG_MOS6529_P4_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
+	MCFG_MOS6529_P5_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
+	MCFG_MOS6529_P6_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_j))
+	MCFG_MOS6529_P7_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_f))
 
 	MCFG_DEVICE_ADD(MOS6529_KB_TAG, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(WRITELINE(plus4_state, write_kb0))
-	MCFG_MOS6529_P1_HANDLER(WRITELINE(plus4_state, write_kb1))
-	MCFG_MOS6529_P2_HANDLER(WRITELINE(plus4_state, write_kb2))
-	MCFG_MOS6529_P3_HANDLER(WRITELINE(plus4_state, write_kb3))
-	MCFG_MOS6529_P4_HANDLER(WRITELINE(plus4_state, write_kb4))
-	MCFG_MOS6529_P5_HANDLER(WRITELINE(plus4_state, write_kb5))
-	MCFG_MOS6529_P6_HANDLER(WRITELINE(plus4_state, write_kb6))
-	MCFG_MOS6529_P7_HANDLER(WRITELINE(plus4_state, write_kb7))
+	MCFG_MOS6529_P0_HANDLER(WRITELINE(*this, plus4_state, write_kb0))
+	MCFG_MOS6529_P1_HANDLER(WRITELINE(*this, plus4_state, write_kb1))
+	MCFG_MOS6529_P2_HANDLER(WRITELINE(*this, plus4_state, write_kb2))
+	MCFG_MOS6529_P3_HANDLER(WRITELINE(*this, plus4_state, write_kb3))
+	MCFG_MOS6529_P4_HANDLER(WRITELINE(*this, plus4_state, write_kb4))
+	MCFG_MOS6529_P5_HANDLER(WRITELINE(*this, plus4_state, write_kb5))
+	MCFG_MOS6529_P6_HANDLER(WRITELINE(*this, plus4_state, write_kb6))
+	MCFG_MOS6529_P7_HANDLER(WRITELINE(*this, plus4_state, write_kb7))
 
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NOOP)
 
 	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL(14'318'181)/16, plus4_expansion_cards, nullptr)
-	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(plus4_state, exp_irq_w))
-	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(plus4_state, read))
-	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(plus4_state, write))
+	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, plus4_state, exp_irq_w))
+	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, plus4_state, read))
+	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, plus4_state, write))
 	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
 
 	MCFG_QUICKLOAD_ADD("quickload", plus4_state, cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1026,8 +1027,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c16_state::c16n)
 	plus4n(config);
-	MCFG_CPU_MODIFY(MOS7501_TAG)
-	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_DEVICE_MODIFY(MOS7501_TAG)
+	MCFG_M7501_PORT_CALLBACKS(READ8(*this, c16_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 
 	MCFG_DEVICE_REMOVE(MOS6551_TAG)
@@ -1049,8 +1050,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c16_state::c16p)
 	plus4p(config);
-	MCFG_CPU_MODIFY(MOS7501_TAG)
-	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_DEVICE_MODIFY(MOS7501_TAG)
+	MCFG_M7501_PORT_CALLBACKS(READ8(*this, c16_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 
 	MCFG_DEVICE_REMOVE(MOS6551_TAG)
@@ -1083,7 +1084,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c16_state::v364)
 	plus4n(config);
-	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL(640'000))
+	MCFG_DEVICE_ADD(T6721A_TAG, T6721A, XTAL(640'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_MOS8706_ADD(MOS8706_TAG, XTAL(14'318'181)/16)
@@ -1287,13 +1288,13 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE       INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1984, c264,   0,      0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 264 (Prototype)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c232,   c264,   0,      c232,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 232 (Prototype)",    MACHINE_SUPPORTS_SAVE )
-COMP( 1984, v364,   c264,   0,      v364,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore V364 (Prototype)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4,  c264,   0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (NTSC)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4p, c264,   0,      plus4p, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (PAL)",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16,    c264,   0,      c16n,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (NTSC)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16p,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (PAL)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16_hu, c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (Hungary)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c116,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 116",                MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME                      FLAGS
+COMP( 1984, c264,   0,      0,      plus4n,  plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore 264 (Prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c232,   c264,   0,      c232,    plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore 232 (Prototype)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, v364,   c264,   0,      v364,    plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore V364 (Prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4,  c264,   0,      plus4n,  plus4, c16_state, empty_init, "Commodore Business Machines", "Plus/4 (NTSC)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4p, c264,   0,      plus4p,  plus4, c16_state, empty_init, "Commodore Business Machines", "Plus/4 (PAL)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16,    c264,   0,      c16n,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (NTSC)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16p,   c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (PAL)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16_hu, c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (Hungary)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c116,   c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 116",              MACHINE_SUPPORTS_SAVE )

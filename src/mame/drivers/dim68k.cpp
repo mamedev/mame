@@ -293,13 +293,14 @@ static const gfx_layout dim68k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dim68k )
+static GFXDECODE_START( gfx_dim68k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dim68k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( dim68k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void dim68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 void dim68k_state::kbd_put(u8 data)
 {
@@ -308,8 +309,8 @@ void dim68k_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(dim68k_state::dim68k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(dim68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(dim68k_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -319,11 +320,11 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dim68k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dim68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -400,5 +401,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME           FLAGS
-COMP( 1984, dim68k, 0,      0,      dim68k,   dim68k, dim68k_state, 0,    "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME           FLAGS
+COMP( 1984, dim68k, 0,      0,      dim68k,  dim68k, dim68k_state, empty_init, "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)

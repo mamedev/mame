@@ -370,7 +370,7 @@ static const gfx_layout bgcharlayout =
 };
 
 
-static GFXDECODE_START( m52 )
+static GFXDECODE_START( gfx_m52 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,                0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,          128*4,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, bgcharlayout, 128*4+16*4+0*4,   1 )
@@ -398,13 +398,13 @@ void m52_state::machine_reset()
 MACHINE_CONFIG_START(m52_state::m52)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m52)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m52)
 	MCFG_PALETTE_ADD("palette", 128*4+16*4+3*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(512+32+32)
 	MCFG_PALETTE_INIT_OWNER(m52_state, m52)
@@ -425,8 +425,8 @@ MACHINE_CONFIG_START(m52_state::alpha1v)
 	m52(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alpha1v_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alpha1v_map)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 16, 272)
 MACHINE_CONFIG_END
@@ -590,7 +590,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mpatrol,  0,        m52,      mpatrol,  m52_state,  0, ROT0, "Irem", "Moon Patrol",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, m52_state,  0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)",    MACHINE_SUPPORTS_SAVE ) // USA
-GAME( 1982, mranger,  mpatrol,  m52,      mpatrol,  m52_state,  0, ROT0, "bootleg", "Moon Ranger (bootleg of Moon Patrol)",      MACHINE_SUPPORTS_SAVE ) // Italy
-GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v,  m52_state,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mpatrol,  0,       m52,     mpatrol,  m52_state, empty_init, ROT0, "Irem", "Moon Patrol",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mpatrolw, mpatrol, m52,     mpatrolw, m52_state, empty_init, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)",    MACHINE_SUPPORTS_SAVE ) // USA
+GAME( 1982, mranger,  mpatrol, m52,     mpatrol,  m52_state, empty_init, ROT0, "bootleg", "Moon Ranger (bootleg of Moon Patrol)",      MACHINE_SUPPORTS_SAVE ) // Italy
+GAME( 1988, alpha1v,  0,       alpha1v, alpha1v,  m52_state, empty_init, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

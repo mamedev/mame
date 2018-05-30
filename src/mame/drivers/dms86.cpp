@@ -46,7 +46,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ16_MEMBER( port82_r );
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+
 	DECLARE_READ16_MEMBER( port9a_r );
 	DECLARE_READ16_MEMBER( port9c_r );
 	void kbd_put(u8 data);
@@ -61,12 +62,11 @@ private:
 };
 
 
-READ16_MEMBER( dms86_state::port82_r )
+WRITE_LINE_MEMBER(dms86_state::nmi_w)
 {
-// HiNet / Monitor switch
-
-	return 8;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
+
 
 READ16_MEMBER( dms86_state::port9a_r )
 {
@@ -92,8 +92,7 @@ void dms86_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x82, 0x83).r(this, FUNC(dms86_state::port82_r));
-	//AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("sio1", z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
+	map(0x80, 0x87).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x88, 0x8f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x90, 0x97).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x9A, 0x9B).r(this, FUNC(dms86_state::port9a_r)); // parallel SASI port
@@ -103,6 +102,8 @@ void dms86_state::io_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( dms86 )
+	PORT_START("FRONT")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Interrupt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, dms86_state, nmi_w)
 INPUT_PORTS_END
 
 
@@ -117,36 +118,36 @@ void dms86_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(dms86_state::dms86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600) / 3) // according to the manual... hmm
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600) / 3) // according to the manual... hmm
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	// According to the manual the clock is 14,765,600 / 4 but that couldn't possibly work.
 	// By maths, clock should be 9600*32*4*16 = 19,660,800 but not working either
 	// So, commented out because it makes the whole thing crawl, only get 18% on my machine
 	//MCFG_DEVICE_ADD("ctc_clock", CLOCK, 19660800) //XTAL(14'745'600) / 4)
-	//MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc" ,z80ctc_device, trg0))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc" ,z80ctc_device, trg1))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc" ,z80ctc_device, trg2))
+	//MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc" ,z80ctc_device, trg0))
+	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc" ,z80ctc_device, trg1))
+	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc" ,z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(14'745'600) / 3)
 	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))    // frame rate interrupt to maincpu
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio1", z80sio_device, rxtxcb_w))    // SIO1 Ch B
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio1", z80sio_device, txca_w))       // SIO1 Ch A
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1" ,z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio2", z80sio_device, rxtxcb_w))       // SIO2
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2" ,z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2" ,z80sio_device, rxca_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio1", z80sio_device, rxtxcb_w))    // SIO1 Ch B
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio1", z80sio_device, txca_w))       // SIO1 Ch A
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1" ,z80sio_device, rxca_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("sio2", z80sio_device, rxtxcb_w))       // SIO2
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio2" ,z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio2" ,z80sio_device, rxca_w))
 
 	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(14'745'600) / 3)
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcdb_w)) // HiNet / Monitor switch
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(14'745'600) / 3)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -162,5 +163,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                 FULLNAME  FLAGS */
-COMP( 1982, dms86,  0,       0,      dms86,     dms86,  dms86_state,  0,    "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS */
+COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

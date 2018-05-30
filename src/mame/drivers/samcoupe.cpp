@@ -513,17 +513,18 @@ FLOPPY_FORMATS_MEMBER( samcoupe_state::floppy_formats )
 	FLOPPY_MGT_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( samcoupe_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void samcoupe_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(samcoupe_mem)
-	MCFG_CPU_IO_MAP(samcoupe_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", samcoupe_state,  samcoupe_frame_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(samcoupe_mem)
+	MCFG_DEVICE_IO_MAP(samcoupe_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", samcoupe_state,  samcoupe_frame_interrupt)
 
 
 	/* video hardware */
@@ -537,12 +538,12 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 
 	/* devices */
 	MCFG_CENTRONICS_ADD("lpt1", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(samcoupe_state, write_lpt1_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt1_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt1_data_out", "lpt1")
 
 	MCFG_CENTRONICS_ADD("lpt2", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(samcoupe_state, write_lpt2_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt2_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
 
@@ -560,8 +561,8 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SAA1099_ADD("saa1099", SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -619,5 +620,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                        FULLNAME     FLAGS
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME     FLAGS
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", 0 )

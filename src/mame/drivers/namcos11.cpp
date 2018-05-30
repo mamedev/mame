@@ -607,16 +607,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
 }
 
 MACHINE_CONFIG_START(namcos11_state::coh110)
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("c76", NAMCO_C76, 16934400)
-	MCFG_CPU_PROGRAM_MAP(c76_map)
-	MCFG_CPU_IO_MAP(c76_io_map)
+	MCFG_DEVICE_ADD("c76", NAMCO_C76, 16934400)
+	MCFG_DEVICE_PROGRAM_MAP(c76_map)
+	MCFG_DEVICE_IO_MAP(c76_io_map)
 	/* TODO: irq generation for these */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcos11_state, mcu_irq0_cb, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcos11_state, mcu_irq2_cb, attotime::from_hz(60))
@@ -624,7 +624,8 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C352_ADD("c352", 25401600, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -637,8 +638,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::coh100)
 	coh110(config);
-	MCFG_CPU_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map )
+	MCFG_DEVICE_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -648,8 +649,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::tekken)
 	coh100(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	// TODO: either allow optional devices in memory maps, add another memory map without keycus or add a dummy keycus for tekken
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
@@ -657,64 +658,64 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::tekken2o)
 	coh100(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::tekken2)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::souledge)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C409, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::dunkmnia)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C410, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::primglex)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C411, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::xevi3dg)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C430, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::danceyes)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C431, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::pocketrc)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C432, 0 )
 MACHINE_CONFIG_END
@@ -726,16 +727,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::myangel3)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_64_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_64_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::ptblank2ua)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( ptblank2ua_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( ptblank2ua_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
 MACHINE_CONFIG_END
@@ -1695,30 +1696,30 @@ ROM_END
 9 = Location Test
 */
 
-GAME( 1994, tekken,     0,        tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (World, TE2/VER.C)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, tekkenb,    tekken,   tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (World, TE2/VER.B)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, tekkenjb,   tekken,   tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (Japan, TE1/VER.B)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, tekken2,    0,        tekken2,    tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.D)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.B)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2b,   tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (World, TES2/VER.B)",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.C)",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2jb,  tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.B)",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2a,   tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 (World, TES2/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, souledge,   0,        souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge Ver. II (Asia, SO4/VER.C)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgeuc, souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge Ver. II (US, SO3/VER.C)",            MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgea,  souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge (World, SO2/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgeua, souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge (US, SO3/VER.A)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgeja, souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge (Japan, SO1/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, dunkmnia,   0,        dunkmnia,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dunk Mania (World, DM2/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, dunkmniajc, dunkmnia, dunkmnia,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dunk Mania (Japan, DM1/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (World, XV32/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (Japan, XV31/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, 0, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, 0, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, 0, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, tekken,     0,        tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.C)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, tekkenb,    tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.B)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, tekkenjb,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Japan, TE1/VER.B)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, tekken2,    0,        tekken2,    tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.D)",              MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.B)",              MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tekken2b,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (World, TES2/VER.B)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.C)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tekken2jb,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.B)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tekken2a,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 (World, TES2/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, souledge,   0,        souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (Asia, SO4/VER.C)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, souledgeuc, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (US, SO3/VER.C)",            MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, souledgea,  souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (World, SO2/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, souledgeua, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (US, SO3/VER.A)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, souledgeja, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (Japan, SO1/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dunkmnia,   0,        dunkmnia,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dunk Mania (World, DM2/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dunkmniajc, dunkmnia, dunkmnia,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dunk Mania (Japan, DM1/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Xevious 3D/G (World, XV32/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Xevious 3D/G (Japan, XV31/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, empty_init, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )

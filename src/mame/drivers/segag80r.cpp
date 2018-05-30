@@ -147,7 +147,7 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -814,18 +814,18 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( segag80r )
+static GFXDECODE_START( gfx_segag80r )
 	GFXDECODE_ENTRY( nullptr, 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( spaceod )
+static GFXDECODE_START( gfx_spaceod )
 	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x6_planar, 64, 1 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( monsterb )
+static GFXDECODE_START( gfx_monsterb )
 	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar, 64, 16 )
 GFXDECODE_END
@@ -840,15 +840,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segag80r_state::g80r_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_OPCODES_MAP(g80r_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", Z80, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_OPCODES_MAP(g80r_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segag80r)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -857,7 +857,7 @@ MACHINE_CONFIG_START(segag80r_state::g80r_base)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
@@ -877,8 +877,8 @@ MACHINE_CONFIG_START(segag80r_state::sega005)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
 	sega005_sound_board(config);
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(segag80r_state::spaceod)
 	/* background board changes */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spaceod)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spaceod)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
@@ -907,11 +907,11 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
@@ -921,12 +921,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segag80r_state::monster2)
 	monsterb(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
-	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
+	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -936,7 +936,7 @@ MACHINE_CONFIG_START(segag80r_state::pignewt)
 	/* basic machine hardware */
 
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
@@ -949,33 +949,33 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	g80r_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(sindbadm_portmap)
-	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(sindbadm_portmap)
+	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("FC"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, sindbadm_misc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segag80r_state, sindbadm_misc_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
 
-	MCFG_CPU_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sindbadm_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sindbadm_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */
+	MCFG_DEVICE_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/4) /* matches PCB videos, correct? */
+	MCFG_DEVICE_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/4) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1466,7 +1466,7 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segag80r_state,astrob)
+void segag80r_state::init_astrob()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1488,7 +1488,7 @@ DRIVER_INIT_MEMBER(segag80r_state,astrob)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,005)
+void segag80r_state::init_005()
 {
 	/* configure the 315-0070 security chip */
 	m_decrypt = segag80_security(70);
@@ -1504,7 +1504,7 @@ DRIVER_INIT_MEMBER(segag80r_state,005)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,spaceod)
+void segag80r_state::init_spaceod()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1528,7 +1528,7 @@ DRIVER_INIT_MEMBER(segag80r_state,spaceod)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,monsterb)
+void segag80r_state::init_monsterb()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1551,7 +1551,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,monster2)
+void segag80r_state::init_monster2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1575,7 +1575,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monster2)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,pignewt)
+void segag80r_state::init_pignewt()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1599,7 +1599,7 @@ DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
+void segag80r_state::init_sindbadm()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1623,23 +1623,23 @@ DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
 /* basic G-80 system with: CPU board, PROM board, Video I board, custom sound boards */
-GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 3)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
-GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, 005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 
 
 /* basic G-80 system with individual background boards */
-GAME( 1981, spaceod,   0,        spaceod,  spaceod,  segag80r_state, spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spaceod2,  spaceod,  spaceod,  spaceod,  segag80r_state, spaceod,  ROT270, "Sega", "Space Odyssey (version 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, monsterb,  0,        monsterb, monsterb, segag80r_state, monsterb, ROT270, "Sega", "Monster Bash", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spaceod,   0,        spaceod,  spaceod,  segag80r_state, init_spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spaceod2,  spaceod,  spaceod,  spaceod,  segag80r_state, init_spaceod,  ROT270, "Sega", "Space Odyssey (version 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, monsterb,  0,        monsterb, monsterb, segag80r_state, init_monsterb, ROT270, "Sega", "Monster Bash", MACHINE_IMPERFECT_SOUND )
 
 /* 2-board G-80 system */
-GAME( 1982, monsterb2, monsterb, monster2, monsterb, segag80r_state, monster2, ROT270, "Sega", "Monster Bash (2 board version)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, pignewt,   0,        pignewt,  pignewt,  segag80r_state, pignewt,  ROT270, "Sega", "Pig Newton (version C)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, pignewta,  pignewt,  pignewt,  pignewta, segag80r_state, pignewt,  ROT270, "Sega", "Pig Newton (version A)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, sindbadm,  0,        sindbadm, sindbadm, segag80r_state, sindbadm, ROT270, "Sega", "Sindbad Mystery", 0 )
+GAME( 1982, monsterb2, monsterb, monster2, monsterb, segag80r_state, init_monster2, ROT270, "Sega", "Monster Bash (2 board version)", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pignewt,   0,        pignewt,  pignewt,  segag80r_state, init_pignewt,  ROT270, "Sega", "Pig Newton (version C)", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pignewta,  pignewt,  pignewt,  pignewta, segag80r_state, init_pignewt,  ROT270, "Sega", "Pig Newton (version A)", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, sindbadm,  0,        sindbadm, sindbadm, segag80r_state, init_sindbadm, ROT270, "Sega", "Sindbad Mystery", 0 )

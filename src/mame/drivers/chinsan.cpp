@@ -64,7 +64,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_DRIVER_INIT(chinsan);
+	void init_chinsan();
 
 	void chinsan(machine_config &config);
 	void mayumi(machine_config &config);
@@ -378,7 +378,7 @@ uint32_t chinsan_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //  DRAWGFX LAYOUTS
 //**************************************************************************
 
-static GFXDECODE_START( chinsan )
+static GFXDECODE_START( gfx_chinsan )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x3_planar, 0, 32)
 GFXDECODE_END
 
@@ -493,7 +493,7 @@ void chinsan_state::machine_reset()
 	m_trigger = 0;
 }
 
-DRIVER_INIT_MEMBER( chinsan_state, chinsan )
+void chinsan_state::init_chinsan()
 {
 	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
 	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
@@ -506,18 +506,18 @@ DRIVER_INIT_MEMBER( chinsan_state, chinsan )
 
 // C1-00114-B
 MACHINE_CONFIG_START(chinsan_state::chinsan)
-	MCFG_CPU_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
-	MCFG_CPU_PROGRAM_MAP(chinsan_map)
-	MCFG_CPU_IO_MAP(chinsan_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
+	MCFG_DEVICE_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
+	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
+	MCFG_DEVICE_IO_MAP(chinsan_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(chinsan_state, input_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(chinsan_state, input_p2_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(chinsan_state, input_p1_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, chinsan_state, input_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, chinsan_state, input_p2_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, chinsan_state, input_p1_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -528,13 +528,13 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinsan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinsan)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -542,8 +542,8 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, adpcm_int_w))
+	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinsan_state, adpcm_int_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 8kHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -552,10 +552,10 @@ MACHINE_CONFIG_START(chinsan_state::mayumi)
 	chinsan(config);
 	// standard Z80 instead of MC-8123
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(chinsan_map)
-	MCFG_CPU_IO_MAP(mayumi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
+	MCFG_DEVICE_IO_MAP(mayumi_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
 	// no ADPCM
 	MCFG_DEVICE_REMOVE("adpcm")
@@ -613,6 +613,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT    CLASS          INIT     ROTATION  COMPANY           FULLNAME                                         FLAGS
-GAME( 1987, chinsan,  0,      chinsan, chinsan, chinsan_state, chinsan, ROT0,     "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mayumi,   0,      mayumi,  mayumi,  chinsan_state, 0,       ROT0,     "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT          ROT   COMPANY           FULLNAME                                         FLAGS
+GAME( 1987, chinsan, 0,      chinsan, chinsan, chinsan_state, init_chinsan, ROT0, "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mayumi,  0,      mayumi,  mayumi,  chinsan_state, empty_init,   ROT0, "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )

@@ -555,7 +555,7 @@ static const gfx_layout ace_charlayout =
 //  GFXDECODE( ace )
 //-------------------------------------------------
 
-static GFXDECODE_START( ace )
+static GFXDECODE_START( gfx_ace )
 	GFXDECODE_ENTRY( Z80_TAG, 0xfc00, ace_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -753,9 +753,9 @@ void ace_state::machine_start()
 
 MACHINE_CONFIG_START(ace_state::ace)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
-	MCFG_CPU_PROGRAM_MAP(ace_mem)
-	MCFG_CPU_IO_MAP(ace_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ace_mem)
+	MCFG_DEVICE_IO_MAP(ace_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video hardware
@@ -769,19 +769,17 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
+	MCFG_DEVICE_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -793,14 +791,14 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8(ace_state, sby_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ace_state, ald_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ace_state, sby_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ace_state, ald_w))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(6'500'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(ace_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(ace_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ace_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ace_state, pio_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
@@ -841,5 +839,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT  STATE      INIT  COMPANY           FULLNAME       FLAGS
-COMP( 1981, jupace,  0,        0,      ace,       ace,   ace_state, 0,    "Jupiter Cantab", "Jupiter Ace", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME       FLAGS
+COMP( 1981, jupace, 0,      0,      ace,     ace,   ace_state, empty_init, "Jupiter Cantab", "Jupiter Ace", 0 )

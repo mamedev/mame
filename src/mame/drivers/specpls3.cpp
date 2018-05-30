@@ -338,19 +338,20 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 	spectrum_plus3_update_memory();
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus3)
+void spectrum_state::init_plus3()
 {
 	m_floppy = 1;
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus2)
+void spectrum_state::init_plus2()
 {
 	m_floppy = 0;
 }
 
-static SLOT_INTERFACE_START( specpls3_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
+static void specpls3_floppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
@@ -373,9 +374,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	spectrum_128(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spectrum_plus3_mem)
-	MCFG_CPU_IO_MAP(spectrum_plus3_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_plus3_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_plus3_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.01)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)
@@ -462,10 +463,10 @@ ROM_START(sp3eata)
 	ROMX_LOAD("3ezxaes.rom",0x10000,0x10000, CRC(8f0ae91a) SHA1(71693e18b30c90914be58cba26682ca025c924ea), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT      STATE            INIT    COMPANY                 FULLNAME                         FLAGS */
-COMP( 1987, specpl2a, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus2,  "Amstrad plc",          "ZX Spectrum +2a",               0 )
-COMP( 1987, specpls3, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3",                0 )
-COMP( 2000, specpl3e, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e",               MACHINE_UNOFFICIAL )
-COMP( 2002, sp3e8bit, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit IDE",      MACHINE_UNOFFICIAL )
-COMP( 2002, sp3eata,  spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , MACHINE_UNOFFICIAL )
-COMP( 2002, sp3ezcf,  spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF",     MACHINE_UNOFFICIAL )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE         INPUT      CLASS           INIT        COMPANY                 FULLNAME                         FLAGS */
+COMP( 1987, specpl2a, spec128, 0,      spectrum_plus3, spec_plus, spectrum_state, init_plus2, "Amstrad plc",          "ZX Spectrum +2a",               0 )
+COMP( 1987, specpls3, spec128, 0,      spectrum_plus3, spec_plus, spectrum_state, init_plus3, "Amstrad plc",          "ZX Spectrum +3",                0 )
+COMP( 2000, specpl3e, spec128, 0,      spectrum_plus3, spec_plus, spectrum_state, init_plus3, "Amstrad plc",          "ZX Spectrum +3e",               MACHINE_UNOFFICIAL )
+COMP( 2002, sp3e8bit, spec128, 0,      spectrum_plus3, spec_plus, spectrum_state, init_plus3, "Amstrad plc",          "ZX Spectrum +3e 8bit IDE",      MACHINE_UNOFFICIAL )
+COMP( 2002, sp3eata,  spec128, 0,      spectrum_plus3, spec_plus, spectrum_state, init_plus3, "Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , MACHINE_UNOFFICIAL )
+COMP( 2002, sp3ezcf,  spec128, 0,      spectrum_plus3, spec_plus, spectrum_state, init_plus3, "Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF",     MACHINE_UNOFFICIAL )

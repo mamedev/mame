@@ -132,7 +132,7 @@ public:
 		m_setup(*this, "setup")
 	{ }
 
-	DECLARE_DRIVER_INIT(hr16);
+	void init_hr16();
 	void mmt8(machine_config &config);
 	void hr16(machine_config &config);
 	void sr16(machine_config &config);

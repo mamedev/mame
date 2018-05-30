@@ -207,9 +207,10 @@ INPUT_PORTS_END
 
 /* Video */
 
-static SLOT_INTERFACE_START( prof180x_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void prof180x_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 /*
 static RTC8583_INTERFACE( rtc_intf )
@@ -238,9 +239,9 @@ void prof180x_state::machine_reset()
 
 MACHINE_CONFIG_START(prof180x_state::prof180x)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL(9'216'000))
-	MCFG_CPU_PROGRAM_MAP(prof180x_mem)
-	MCFG_CPU_IO_MAP(prof180x_io)
+	MCFG_DEVICE_ADD(HD64180_TAG, Z80, XTAL(9'216'000))
+	MCFG_DEVICE_PROGRAM_MAP(prof180x_mem)
+	MCFG_DEVICE_IO_MAP(prof180x_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -328,6 +329,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT  COMPANY                   FULLNAME       FLAGS */
-COMP( 1986, prof180x,  0,       0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-180X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1992, prof181x,  prof180x,0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-181X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME     FLAGS */
+COMP( 1986, prof180x, 0,        0,      prof180x, prof180x, prof180x_state, empty_init, "Conitec Datensysteme", "PROF-180X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, prof181x, prof180x, 0,      prof180x, prof180x, prof180x_state, empty_init, "Conitec Datensysteme", "PROF-181X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

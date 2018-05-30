@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 	if(m_more_data)
 	{
 		if(m_nmi_enable)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // generate NMI when we need more data
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // generate NMI when we need more data
 		m_more_data = false;
 	}
 	else
@@ -531,17 +531,17 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 
 MACHINE_CONFIG_START(de_2_state::de_bg_audio)
 	/* sound CPU */
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_CPU_PROGRAM_MAP(de_2_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
+	MCFG_DEVICE_PROGRAM_MAP(de_2_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("bg")
+	SPEAKER(config, "bg").front_center();
 
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, de_2_state, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
-	MCFG_SOUND_ADD("msm5205", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(de_2_state, msm5205_irq_w))
+	MCFG_DEVICE_ADD("msm5205", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, de_2_state, msm5205_irq_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 MACHINE_CONFIG_END
@@ -549,10 +549,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(de_2_state::de_type1)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE1_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(de_2_state,lamps_w))
+	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,display_w))
+	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
+	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
+	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2)
@@ -564,10 +564,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(de_2_state::de_type2)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(de_2_state,lamps_w))
+	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,display_w))
+	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
+	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
+	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2)
@@ -579,10 +579,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,type2alpha3_display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(de_2_state,lamps_w))
+	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,type2alpha3_display_w))
+	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
+	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
+	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
@@ -594,10 +594,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(de_2_state::de_type3)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE3_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(de_2_state,display_r),WRITE8(de_2_state,type3_display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(de_2_state,switch_r),WRITE8(de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(de_2_state,lamps_w))
+	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,type3_display_w))
+	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
+	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
+	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
@@ -926,29 +926,29 @@ ROM_START(torp_a16)
 ROM_END
 
 
-GAME(1990,  bttf_a28,       0,          de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a27,       bttf_a28,   de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a20,       bttf_a28,   de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.0)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a21,       bttf_a28,   de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.1)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?,  bttf_g27,       bttf_a28,   de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Back to the Future - The Pinball (2.7, Germany)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  kiko_a10,       0,          de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "King Kong (1.0)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  lwar_a83,       0,          de_type1,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Laser War (8.3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  lwar_a81,       lwar_a83,   de_type1,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Laser War (8.1)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  lwar_e90,       lwar_a83,   de_type1,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Laser War (9.0 Europe)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  mnfb_c29,       0,          de_type2_alpha3, de_2, de_2_state,   0,   ROT0,   "Data East",    "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  mnfb_c27,       mnfb_c29,   de_type2_alpha3, de_2, de_2_state,   0,   ROT0,   "Data East",    "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  poto_a32,       0,          de_type2_alpha3, de_2, de_2_state,   0,   ROT0,   "Data East",    "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  poto_a29,       poto_a32,   de_type2_alpha3, de_2, de_2_state,   0,   ROT0,   "Data East",    "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  play_a24,       0,          de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  robo_a34,       0,          de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  robo_a30,       robo_a34,   de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  ssvc_a26,       0,          de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  ssvc_b26,       ssvc_a26,   de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  ssvc_a42,       ssvc_a26,   de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  simp_a27,       0,          de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "The Simpsons (2.7)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  simp_a20,       simp_a27,   de_type3,        de_2, de_2_state,   0,   ROT0,   "Data East",    "The Simpsons (2.0)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  tmac_a24,       0,          de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Time Machine (2.4)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  tmac_a18,       tmac_a24,   de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Time Machine (1.8)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  tmac_g18,       tmac_a24,   de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Time Machine (1.8, Germany)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  torp_e21,       0,          de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Torpedo Alley (2.1, Europe)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  torp_a16,       torp_e21,   de_type2,        de_2, de_2_state,   0,   ROT0,   "Data East",    "Torpedo Alley (1.6)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a28, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a27, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a20, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.0)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a21, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.1)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 199?, bttf_g27, bttf_a28, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7, Germany)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, kiko_a10, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "King Kong (1.0)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, lwar_a83, 0,        de_type1,        de_2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.3)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, lwar_a81, lwar_a83, de_type1,        de_2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.1)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, lwar_e90, lwar_a83, de_type1,        de_2, de_2_state, empty_init, ROT0, "Data East", "Laser War (9.0 Europe)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, mnfb_c29, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, mnfb_c27, mnfb_c29, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, poto_a32, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, play_a24, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, robo_a34, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, robo_a30, robo_a34, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, ssvc_a26, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, simp_a27, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.7)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, simp_a20, simp_a27, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.0)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, tmac_a24, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (2.4)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, tmac_a18, tmac_a24, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, tmac_g18, tmac_a24, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8, Germany)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, torp_e21, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (2.1, Europe)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, torp_a16, torp_e21, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (1.6)",                  MACHINE_IS_SKELETON_MECHANICAL)

@@ -212,7 +212,7 @@ void scsp_device::device_start()
 	m_main_irq_cb.resolve_safe();
 	m_exts_cb.resolve_safe(0);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 }
 
 //-------------------------------------------------
@@ -598,7 +598,7 @@ void scsp_device::init()
 		t=ARTimes[i];   //In ms
 		if(t!=0.0)
 		{
-			step=(1023*1000.0)/( 44100.0*t);
+			step=(1023*1000.0)/( double(clock())*t);
 			scale=(double) (1<<EG_SHIFT);
 			m_ARTABLE[i]=(int) (step*scale);
 		}
@@ -606,7 +606,7 @@ void scsp_device::init()
 			m_ARTABLE[i]=1024<<EG_SHIFT;
 
 		t=DRTimes[i];   //In ms
-		step=(1023*1000.0)/( 44100.0*t);
+		step=(1023*1000.0)/( double(clock())*t);
 		scale=(double) (1<<EG_SHIFT);
 		m_DRTABLE[i]=(int) (step*scale);
 	}
@@ -621,8 +621,8 @@ void scsp_device::init()
 	}
 
 	LFO_Init();
-	m_buffertmpl=make_unique_clear<int32_t[]>(44100);
-	m_buffertmpr=make_unique_clear<int32_t[]>(44100);
+	m_buffertmpl=make_unique_clear<int32_t[]>(clock());
+	m_buffertmpr=make_unique_clear<int32_t[]>(clock());
 
 	// no "pend"
 	m_udata.data[0x20/2] = 0;
@@ -734,7 +734,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x18/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[0]) / (255-(m_udata.data[0x18/2]&0xff));
+					time = (clock() / m_TimPris[0]) / (255-(m_udata.data[0x18/2]&0xff));
 					if (time)
 					{
 						m_timerA->adjust(attotime::from_hz(time));
@@ -753,7 +753,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x1A/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[1]) / (255-(m_udata.data[0x1A/2]&0xff));
+					time = (clock() / m_TimPris[1]) / (255-(m_udata.data[0x1A/2]&0xff));
 					if (time)
 					{
 						m_timerB->adjust(attotime::from_hz(time));
@@ -772,7 +772,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x1C/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[2]) / (255-(m_udata.data[0x1C/2]&0xff));
+					time = (clock() / m_TimPris[2]) / (255-(m_udata.data[0x1C/2]&0xff));
 					if (time)
 					{
 						m_timerC->adjust(attotime::from_hz(time));
@@ -1549,7 +1549,7 @@ signed int scsp_device::ALFO_Step(SCSP_LFO_t *LFO)
 
 void scsp_device::LFO_ComputeStep(SCSP_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0f/(float)44100;
+	float step=(float) LFOFreq[LFOF]*256.0f/float(clock());
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{

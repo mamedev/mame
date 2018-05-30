@@ -59,35 +59,25 @@ class blitz68k_state : public driver_device
 {
 public:
 	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_frame_buffer(*this, "frame_buffer"),
-			m_blit_romaddr(*this, "blit_romaddr"),
-			m_blit_attr1_ram(*this, "blit_attr1_ram"),
-			m_blit_dst_ram_loword(*this, "blitram_loword"),
-			m_blit_attr2_ram(*this, "blit_attr2_ram"),
-			m_blit_dst_ram_hiword(*this, "blitram_hiword"),
-			m_blit_vregs(*this, "blit_vregs"),
-			m_blit_transpen(*this, "blit_transpen"),
-			m_leds0(*this, "leds0"),
-			m_leds1(*this, "leds1"),
-			m_leds2(*this, "leds2") ,
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_nvram(*this, "nvram")
+		, m_frame_buffer(*this, "frame_buffer")
+		, m_blit_romaddr(*this, "blit_romaddr")
+		, m_blit_attr1_ram(*this, "blit_attr1_ram")
+		, m_blit_dst_ram_loword(*this, "blitram_loword")
+		, m_blit_attr2_ram(*this, "blit_attr2_ram")
+		, m_blit_dst_ram_hiword(*this, "blitram_hiword")
+		, m_blit_vregs(*this, "blit_vregs")
+		, m_blit_transpen(*this, "blit_transpen")
+		, m_leds0(*this, "leds0")
+		, m_leds1(*this, "leds1")
+		, m_leds2(*this, "leds2")
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
-	optional_shared_ptr<uint16_t> m_nvram;
-	std::unique_ptr<uint8_t[]> m_blit_buffer;
-	optional_shared_ptr<uint16_t> m_frame_buffer;
-	optional_shared_ptr<uint16_t> m_blit_romaddr;
-	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
-	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
-	optional_shared_ptr<uint16_t> m_blit_attr2_ram;
-	optional_shared_ptr<uint16_t> m_blit_dst_ram_hiword;
-	optional_shared_ptr<uint16_t> m_blit_vregs;
-	optional_shared_ptr<uint16_t> m_blit_transpen;
-	optional_shared_ptr<uint16_t> m_leds0;
-	optional_shared_ptr<uint16_t> m_leds1;
-	optional_shared_ptr<uint16_t> m_leds2;
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -166,24 +156,22 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
-	DECLARE_DRIVER_INIT(bankrob);
-	DECLARE_DRIVER_INIT(cjffruit);
-	DECLARE_DRIVER_INIT(deucesw2);
-	DECLARE_DRIVER_INIT(megadble);
-	DECLARE_DRIVER_INIT(bankroba);
-	DECLARE_DRIVER_INIT(maxidbl);
-	DECLARE_DRIVER_INIT(cj3play);
-	DECLARE_DRIVER_INIT(megadblj);
-	DECLARE_DRIVER_INIT(hermit);
-	DECLARE_DRIVER_INIT(dualgame);
+	void init_bankrob();
+	void init_cjffruit();
+	void init_deucesw2();
+	void init_megadble();
+	void init_bankroba();
+	void init_maxidbl();
+	void init_cj3play();
+	void init_megadblj();
+	void init_hermit();
+	void init_dualgame();
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	void hermit(machine_config &config);
 	void bankrob(machine_config &config);
 	void cjffruit(machine_config &config);
@@ -203,6 +191,27 @@ public:
 	void maxidbl_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void steaser_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+
+	optional_shared_ptr<uint16_t> m_nvram;
+	std::unique_ptr<uint8_t[]> m_blit_buffer;
+	optional_shared_ptr<uint16_t> m_frame_buffer;
+	optional_shared_ptr<uint16_t> m_blit_romaddr;
+	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
+	optional_shared_ptr<uint16_t> m_blit_attr2_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_hiword;
+	optional_shared_ptr<uint16_t> m_blit_vregs;
+	optional_shared_ptr<uint16_t> m_blit_transpen;
+	optional_shared_ptr<uint16_t> m_leds0;
+	optional_shared_ptr<uint16_t> m_leds1;
+	optional_shared_ptr<uint16_t> m_leds2;
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	optional_device<mc6845_device> m_crtc;
+	output_finder<17> m_led;
 };
 
 /*************************************************************************************************************
@@ -767,8 +776,8 @@ void blitz68k_state::bankrob_map(address_map &map)
 	map(0x400005, 0x400005).rw(this, FUNC(blitz68k_state::bankrob_mcu1_r), FUNC(blitz68k_state::bankrob_mcu1_w));
 	map(0x400006, 0x400006).rw(this, FUNC(blitz68k_state::bankrob_mcu2_r), FUNC(blitz68k_state::bankrob_mcu2_w));
 
-	map(0x800000, 0x800000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
-	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x800000, 0x800000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
+	map(0x800002, 0x800002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 // bankroba:
@@ -869,13 +878,13 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
-		output().set_led_value(0, data & 0x0200);    // win???
+		m_led[0] = BIT(data, 9);     // win???
 //                                     1  data & 0x0400     // win???
-		output().set_led_value(2, data & 0x0800);    // small
-		output().set_led_value(3, data & 0x1000);    // big
-		output().set_led_value(4, data & 0x2000);    // take
-		output().set_led_value(5, data & 0x4000);    // double up
-		output().set_led_value(6, data & 0x8000);    // cancel
+		m_led[2] = BIT(data, 11);    // small
+		m_led[3] = BIT(data, 12);    // big
+		m_led[4] = BIT(data, 13);    // take
+		m_led[5] = BIT(data, 14);    // double up
+		m_led[6] = BIT(data, 15);    // cancel
 		show_leds123();
 	}
 }
@@ -885,14 +894,14 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // start
-		output().set_led_value( 8, data & 0x0200);   // bet
-		output().set_led_value( 9, data & 0x0400);   // hold 5
-		output().set_led_value(10, data & 0x0800);   // hold 4
-		output().set_led_value(11, data & 0x1000);   // hold 3
-		output().set_led_value(12, data & 0x2000);   // hold 2
-		output().set_led_value(13, data & 0x4000);   // collect
-		output().set_led_value(14, data & 0x8000);   // call attendant
+		m_led[ 7] = BIT(data, 8);    // start
+		m_led[ 8] = BIT(data, 9);    // bet
+		m_led[ 9] = BIT(data, 10);   // hold 5
+		m_led[10] = BIT(data, 11);   // hold 4
+		m_led[11] = BIT(data, 12);   // hold 3
+		m_led[12] = BIT(data, 13);   // hold 2
+		m_led[13] = BIT(data, 14);   // collect
+		m_led[14] = BIT(data, 15);   // call attendant
 		show_leds123();
 	}
 }
@@ -902,8 +911,8 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(15, data & 0x0100);   // hopper coins?
-		output().set_led_value(16, data & 0x0400);   // coin out?
+		m_led[15] = BIT(data, 8);    // hopper coins?
+		m_led[16] = BIT(data, 10);   // coin out?
 		show_leds123();
 	}
 }
@@ -911,28 +920,25 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 // CRTC
 READ8_MEMBER(blitz68k_state::crtc_r)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		return mc6845->register_r(space, 0);
+		return m_crtc->register_r(space, 0);
 	else
-		return mc6845->status_r(space, 0);
+		return m_crtc->status_r(space, 0);
 }
 
 WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		mc6845->register_w(space, 0, data);
+		m_crtc->register_w(space, 0, data);
 	else
-		mc6845->address_w(space, 0, data);
+		m_crtc->address_w(space, 0, data);
 }
 
 WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 {
-	device_t *device = machine().device("crtc");
 	// 8fe0006: 0->1
 	if (ACCESSING_BITS_8_15 && (data & 0x0100))
-		downcast<mc6845_device *>(device)->assert_light_pen_input();
+		m_crtc->assert_light_pen_input();
 	// 8fe0007: 1->0 (MCU irq?)
 }
 
@@ -1010,13 +1016,13 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
-		output().set_led_value(0, data & 0x0200);    // win???
+		m_led[0] = BIT(data, 9);     // win???
 //                                     1  data & 0x0400     // win???
-		output().set_led_value(2, data & 0x0800);    // small
-		output().set_led_value(3, data & 0x1000);    // big
-		output().set_led_value(4, data & 0x2000);    // take
-		output().set_led_value(5, data & 0x4000);    // double up
-		output().set_led_value(6, data & 0x8000);    // cancel
+		m_led[2] = BIT(data, 11);    // small
+		m_led[3] = BIT(data, 12);    // big
+		m_led[4] = BIT(data, 13);    // take
+		m_led[5] = BIT(data, 14);    // double up
+		m_led[6] = BIT(data, 15);    // cancel
 		show_leds123();
 	}
 }
@@ -1026,14 +1032,14 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // start
-		output().set_led_value( 8, data & 0x0200);   // bet
-		output().set_led_value( 9, data & 0x0400);   // hold 5
-		output().set_led_value(10, data & 0x0800);   // hold 4
-		output().set_led_value(11, data & 0x1000);   // hold 3
-		output().set_led_value(12, data & 0x2000);   // hold 2
-		output().set_led_value(13, data & 0x4000);   // hold 1
-		output().set_led_value(14, data & 0x8000);   // call attendant
+		m_led[ 7] = BIT(data, 8);    // start
+		m_led[ 8] = BIT(data, 9);    // bet
+		m_led[ 9] = BIT(data, 10);   // hold 5
+		m_led[10] = BIT(data, 11);   // hold 4
+		m_led[11] = BIT(data, 12);   // hold 3
+		m_led[12] = BIT(data, 13);   // hold 2
+		m_led[13] = BIT(data, 14);   // hold 1
+		m_led[14] = BIT(data, 15);   // call attendant
 		show_leds123();
 	}
 }
@@ -1043,8 +1049,8 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(15, data & 0x0100);   // hopper coins?
-		output().set_led_value(16, data & 0x0400);   // coin out?
+		m_led[15] = BIT(data, 8);    // hopper coins?
+		m_led[16] = BIT(data, 10);   // coin out?
 		show_leds123();
 	}
 }
@@ -1175,8 +1181,8 @@ void blitz68k_state::dualgame_map(address_map &map)
 	map(0x400005, 0x400005).rw(this, FUNC(blitz68k_state::dualgame_mcu1_r), FUNC(blitz68k_state::dualgame_mcu1_w));
 	map(0x400006, 0x400006).rw(this, FUNC(blitz68k_state::dualgame_mcu2_r), FUNC(blitz68k_state::dualgame_mcu2_w));
 
-	map(0x800000, 0x800000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x800000, 0x800000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x800002, 0x800002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 /*************************************************************************************************************
@@ -1211,7 +1217,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // button
+		m_led[7] = BIT(data, 8);    // button
 		show_leds12();
 	}
 }
@@ -1318,8 +1324,8 @@ void blitz68k_state::maxidbl_map(address_map &map)
 	map(0x500005, 0x500005).rw(this, FUNC(blitz68k_state::maxidbl_mcu1_r), FUNC(blitz68k_state::maxidbl_mcu1_w));
 	map(0x500006, 0x500006).rw(this, FUNC(blitz68k_state::maxidbl_mcu2_r), FUNC(blitz68k_state::maxidbl_mcu2_w));
 
-	map(0x600000, 0x600000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
-	map(0x600002, 0x600002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x600000, 0x600000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
+	map(0x600002, 0x600002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 
@@ -1704,9 +1710,9 @@ void blitz68k_state::ramdac_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(blitz68k_state::ilpag)
-	MCFG_CPU_ADD("maincpu", M68000, 11059200 )  // ?
-	MCFG_CPU_PROGRAM_MAP(ilpag_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 11059200 )  // ?
+	MCFG_DEVICE_PROGRAM_MAP(ilpag_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1717,7 +1723,7 @@ MACHINE_CONFIG_START(blitz68k_state::ilpag)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 
@@ -1764,16 +1770,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 
 MACHINE_CONFIG_START(blitz68k_state::steaser)
 	ilpag(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(steaser_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(steaser_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", blitz68k_state, steaser_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blitz68k_state::cjffruit)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400)/2)
-	MCFG_CPU_PROGRAM_MAP(cjffruit_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2)
+	MCFG_DEVICE_PROGRAM_MAP(cjffruit_map)
 
 	// MC68HC705C8P (Sound MCU)
 
@@ -1786,13 +1792,13 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
+	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq1))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq1))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1800,9 +1806,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankrob)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(bankrob_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
+	MCFG_DEVICE_PROGRAM_MAP(bankrob_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1818,13 +1824,13 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1832,9 +1838,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankroba)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200) )
-	MCFG_CPU_PROGRAM_MAP(bankroba_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
+	MCFG_DEVICE_PROGRAM_MAP(bankroba_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
 
 	// MC68HC705C8P (MCU)
@@ -1848,13 +1854,13 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq5))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq5))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1862,8 +1868,8 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::deucesw2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400) / 2)
-	MCFG_CPU_PROGRAM_MAP(deucesw2_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(deucesw2_map)
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU)
@@ -1877,13 +1883,13 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
+	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1891,9 +1897,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::dualgame)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200) )
-	MCFG_CPU_PROGRAM_MAP(dualgame_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
+	MCFG_DEVICE_PROGRAM_MAP(dualgame_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
 
 	// MC68HC705C8P (MCU1)
 
@@ -1908,13 +1914,13 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1922,9 +1928,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::hermit)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400)/2 )
-	MCFG_CPU_PROGRAM_MAP(hermit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2 )
+	MCFG_DEVICE_PROGRAM_MAP(hermit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
 
 	// MC68HC705C8P (MCU)
 
@@ -1937,13 +1943,13 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(22'118'400)/8)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq1))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq1))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1951,9 +1957,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::maxidbl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
+	MCFG_DEVICE_PROGRAM_MAP(maxidbl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1971,16 +1977,16 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
+	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD(m_palette, 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2769,7 +2775,7 @@ ROM_END
     ROM patches
 *************************************************************************************************************/
 
-DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
+void blitz68k_state::init_bankrob()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2784,7 +2790,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
 	ROM[0x1d4d4/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
+void blitz68k_state::init_bankroba()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2799,7 +2805,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
 	ROM[0x178ec/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
+void blitz68k_state::init_cj3play()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2815,7 +2821,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
 	ROM[0x20ab0/2] = 0x6050;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
+void blitz68k_state::init_cjffruit()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2826,7 +2832,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
 	ROM[0x1e7b8/2] = 0x6050;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
+void blitz68k_state::init_deucesw2()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2837,7 +2843,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
 	ROM[0x12f70/2] = 0x6054;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
+void blitz68k_state::init_dualgame()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2848,7 +2854,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
 	ROM[0x1739c/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,hermit)
+void blitz68k_state::init_hermit()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2865,7 +2871,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,hermit)
 	ROM[0x3238/2] = 0x4e75;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
+void blitz68k_state::init_maxidbl()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2876,7 +2882,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
 	ROM[0x17ca/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
+void blitz68k_state::init_megadblj()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2887,7 +2893,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
 	ROM[0x19d4/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,megadble)
+void blitz68k_state::init_megadble()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2900,16 +2906,16 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadble)
 
 
 
-GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
-GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
-GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
-GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, 0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
-GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
-GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, 0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
-GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, dualgame, ROT0,  "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
-GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
-GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
-GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, cj3play,  ROT0,  "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
-GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
-GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, 0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,  ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadblj, ROT0, "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
+GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadble, ROT0, "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
+GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
+GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
+GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
+GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgame, ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
+GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
+GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
+GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
+GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
+GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

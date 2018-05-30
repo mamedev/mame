@@ -729,26 +729,26 @@ static const gfx_layout nakajies_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( wales210 )
+static GFXDECODE_START( gfx_wales210 )
 	GFXDECODE_ENTRY( "bios", 0x55043, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( dator3k )
+static GFXDECODE_START( gfx_dator3k )
 	GFXDECODE_ENTRY( "bios", 0x54fb1, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( drwrt200 )
+static GFXDECODE_START( gfx_drwrt200 )
 	GFXDECODE_ENTRY( "bios", 0xdbbeb, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( drwrt400 )
+static GFXDECODE_START( gfx_drwrt400 )
 	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(nakajies_state::nakajies210)
-	MCFG_CPU_ADD( "v20hl", V20, X301 / 2 )
-	MCFG_CPU_PROGRAM_MAP( nakajies_map)
-	MCFG_CPU_IO_MAP( nakajies_io_map)
+	MCFG_DEVICE_ADD( "v20hl", V20, X301 / 2 )
+	MCFG_DEVICE_PROGRAM_MAP( nakajies_map)
+	MCFG_DEVICE_IO_MAP( nakajies_io_map)
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 50 )  /* Wild guess */
@@ -757,14 +757,14 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wales210)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wales210)
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* rtc */
@@ -775,12 +775,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nakajies_state::dator3k)
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dator3k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dator3k)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nakajies_state::nakajies220)
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt400)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt400)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nakajies_state::nakajies250)
@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(nakajies_state::nakajies250)
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt200)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt200)
 MACHINE_CONFIG_END
 
 
@@ -839,11 +839,11 @@ ROM_START( es210_es )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     STATE           INIT    COMPANY     FULLNAME            FLAGS
-COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, nakajies_state, 0,      "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, nakajies_state, 0,      "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, nakajies_state, 0,      "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB? RAM
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY     FULLNAME            FLAGS
+COMP( 199?, wales210, 0,        0,      nakajies210, nakajies, nakajies_state, empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, nakajies_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, nakajies_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB? RAM

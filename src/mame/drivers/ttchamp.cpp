@@ -639,15 +639,15 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 {
-	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ttchamp_map)
-	MCFG_CPU_IO_MAP(ttchamp_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ttchamp_map)
+	MCFG_DEVICE_IO_MAP(ttchamp_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -662,9 +662,9 @@ MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 
 	MCFG_NVRAM_ADD_0FILL("backram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 8000000/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -699,5 +699,5 @@ ROM_END
 
 
 // only the graphics differ between the two sets, code section is the same
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, 0, ROT0,  "Gamart",                               "Table Tennis Champions",                               MACHINE_SUPPORTS_SAVE ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, 0, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", MACHINE_SUPPORTS_SAVE ) // this only has Palencia Elektronik advertising boards
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, empty_init, ROT0,  "Gamart",                               "Table Tennis Champions",                               MACHINE_SUPPORTS_SAVE ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, empty_init, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", MACHINE_SUPPORTS_SAVE ) // this only has Palencia Elektronik advertising boards

@@ -75,6 +75,7 @@ using util::BIT;
 #include "cpu/m6502/m65ce02d.h"
 #include "cpu/m6502/m740d.h"
 #include "cpu/m6502/xavixd.h"
+#include "cpu/m6502/xavix2000d.h"
 #include "cpu/m6800/6800dasm.h"
 #include "cpu/m68000/m68kdasm.h"
 #include "cpu/m6805/6805dasm.h"
@@ -433,6 +434,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm500",           le,  0, []() -> util::disasm_interface * { return new sm500_disassembler; } },
 	{ "sm510",           le,  0, []() -> util::disasm_interface * { return new sm510_disassembler; } },
 	{ "sm511",           le,  0, []() -> util::disasm_interface * { return new sm511_disassembler; } },
+	{ "sm530",           le,  0, []() -> util::disasm_interface * { return new sm530_disassembler; } },
 	{ "sm590",           le,  0, []() -> util::disasm_interface * { return new sm590_disassembler; } },
 	{ "sm5a",            le,  0, []() -> util::disasm_interface * { return new sm5a_disassembler; } },
 	{ "sm8500",          le,  0, []() -> util::disasm_interface * { return new sm8500_disassembler; } },
@@ -485,6 +487,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "x86_32",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 32; return new i386_disassembler(&i386_unidasm); } },
 	{ "x86_64",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 64; return new i386_disassembler(&i386_unidasm); } },
 	{ "xavix",           le,  0, []() -> util::disasm_interface * { return new xavix_disassembler; } },
+	{ "xavix2000",       le,  0, []() -> util::disasm_interface * { return new xavix2000_disassembler; } },
 	{ "z180",            le,  0, []() -> util::disasm_interface * { return new z180_disassembler; } },
 	{ "z8",              be,  0, []() -> util::disasm_interface * { return new z8_disassembler; } },
 	{ "z80",             le,  0, []() -> util::disasm_interface * { return new z80_disassembler; } },

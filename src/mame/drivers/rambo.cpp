@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 
-	DECLARE_DRIVER_INIT(rambo);
+	void init_rambo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void rambo(machine_config &config);
@@ -126,7 +126,7 @@ void rambo_state::rambo_io_map(address_map &map)
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(rambo_state, rambo)
+void rambo_state::init_rambo()
 {
 }
 
@@ -147,10 +147,10 @@ void rambo_state::machine_reset()
 
 MACHINE_CONFIG_START(rambo_state::rambo)
 
-	MCFG_CPU_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(rambo_prg_map)
-	MCFG_CPU_DATA_MAP(rambo_data_map)
-	MCFG_CPU_IO_MAP(rambo_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(rambo_prg_map)
+	MCFG_DEVICE_DATA_MAP(rambo_data_map)
+	MCFG_DEVICE_IO_MAP(rambo_io_map)
 
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 	MCFG_CPU_AVR8_LFUSE(0xFF)
@@ -230,5 +230,5 @@ ROM_START( metamaq2 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-//   YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT    COMPANY        FULLNAME                            FLAGS
-COMP(2012, metamaq2, 0,      0,      rambo,   0,     rambo_state, rambo,  "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY        FULLNAME                            FLAGS
+COMP(2012, metamaq2, 0,      0,      rambo,   0,     rambo_state, init_rambo, "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -487,17 +487,17 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 
 MACHINE_CONFIG_START(abc80_state::abc80)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(11'980'800)/2/2) // 2.9952 MHz
-	MCFG_CPU_PROGRAM_MAP(abc80_mem)
-	MCFG_CPU_IO_MAP(abc80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(11'980'800)/2/2) // 2.9952 MHz
+	MCFG_DEVICE_PROGRAM_MAP(abc80_mem)
+	MCFG_DEVICE_IO_MAP(abc80_io)
 	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
 
 	// video hardware
 	abc80_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76477_TAG, SN76477, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76477_TAG, SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter: R26 47k - R24 330k - C52 390p
 	MCFG_SN76477_DECAY_RES(RES_K(47))                   //  decay_res: R23 47k
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(2.2))   // attack_decay_cap + attack_res: C50 10u/35V - R21 2.2k
@@ -509,26 +509,25 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", CASSETTE_TAG).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(11'980'800)/2/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(abc80_state, pio_pa_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(abc80_state, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc80_state, pio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, abc80_state, pio_pa_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, abc80_state, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, abc80_state, pio_pb_w))
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("abc80_cass")
 
 	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0)
-	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(abc80_state, keydown_w))
+	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(*this, abc80_state, keydown_w))
 
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(abc80_state, kbd_w))
 
@@ -592,5 +591,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE         INIT    COMPANY              FULLNAME    FLAGS
-COMP( 1978, abc80,  0,      0,      abc80,  0,     abc80_state,  0,      "Luxor Datorer AB",  "ABC 80",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

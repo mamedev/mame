@@ -755,17 +755,17 @@ static const gfx_layout charlayout_memory =
 };
 
 
-static GFXDECODE_START( sasuke )
+static GFXDECODE_START( gfx_sasuke )
 	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( satansat )
+static GFXDECODE_START( gfx_satansat )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( vanguard )
+static GFXDECODE_START( gfx_vanguard )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
@@ -836,9 +836,9 @@ MACHINE_RESET_MEMBER(snk6502_state,pballoon)
 MACHINE_CONFIG_START(snk6502_state::sasuke)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
-	MCFG_CPU_PROGRAM_MAP(sasuke_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
+	MCFG_DEVICE_PROGRAM_MAP(sasuke_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sasuke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sasuke)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
@@ -865,18 +865,18 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
+	MCFG_DEVICE_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sasuke_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.1", SN76477)
 	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_K(150), CAP_P(4700)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(22))                    // decay_res
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn76477.2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.2", SN76477)
 	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
 	MCFG_SN76477_NOISE_PARAMS(RES_K(340), RES_K(47), CAP_P(100)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(470))                   // decay_res
@@ -910,7 +910,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn76477.3", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.3", SN76477)
 	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
 	MCFG_SN76477_NOISE_PARAMS(RES_K(330), RES_K(47), CAP_P(100)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(1))                     // decay_res
@@ -931,21 +931,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::satansat)
 	sasuke(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(satansat_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
 
 	// video hardware
-	MCFG_GFXDECODE_MODIFY("gfxdecode", satansat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
 
 	// sound hardware
-	MCFG_SOUND_MODIFY("samples")
+	MCFG_DEVICE_MODIFY("samples")
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(vanguard_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// ???      GND: 2,26,27        +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -969,10 +969,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::vanguard)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
 
-	MCFG_CPU_PROGRAM_MAP(vanguard_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(vanguard_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,vanguard)
 
@@ -986,7 +986,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vanguard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vanguard)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
@@ -997,17 +997,17 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
+	MCFG_DEVICE_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(vanguard_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.1", SN76477)
 	// SHOT A   GND: 2,9,26,27  +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1024,7 +1024,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn76477.2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.2", SN76477)
 	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
 	MCFG_SN76477_NOISE_PARAMS(RES_K(10), RES_K(30), 0)   // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1045,16 +1045,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::fantasy)
 	vanguard(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fantasy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fantasy_map)
 
 	// sound hardware
-	MCFG_SOUND_MODIFY("samples")
+	MCFG_DEVICE_MODIFY("samples")
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(fantasy_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// BOMB     GND:    2,9,26,27       +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1071,10 +1071,9 @@ MACHINE_CONFIG_START(snk6502_state::fantasy)
 	// otherwise it is using the VCO for the envelope, but the VCO is not hooked up
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
 	MCFG_SN76477_ENABLE(0)                               // enable
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(fantasy)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, fantasy_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_DEVICE_REMOVE("sn76477.2")
@@ -1090,8 +1089,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::pballoon)
 	nibbler(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pballoon_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pballoon_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,pballoon)
 
@@ -1708,24 +1707,24 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, 0, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, 0, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, 0, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, 0, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, 0, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
-GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
-GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, 0, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler,     0,        nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, snk6502_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  snk6502_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, empty_init, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, empty_init, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler,     0,        nibbler,  nibbler,  snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, snk6502_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )

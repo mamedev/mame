@@ -37,7 +37,7 @@
 
 DECLARE_DEVICE_TYPE(HARDDRIV_BOARD,               harddriv_board_device_state)
 DECLARE_DEVICE_TYPE(HARDDRIVC_BOARD,              harddrivc_board_device_state)
-DECLARE_DEVICE_TYPE(RACEDRIV_BOARD,               racedrivc_board_device_state)
+DECLARE_DEVICE_TYPE(RACEDRIV_BOARD,               racedriv_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVB1_BOARD,             racedrivb1_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVC_BOARD,              racedrivc_board_device_state)
 DECLARE_DEVICE_TYPE(RACEDRIVC1_BOARD,             racedrivc1_board_device_state)
@@ -301,6 +301,7 @@ protected:
 	optional_device<screen_device> m_screen;
 	optional_device<mc68681_device> m_duartn68681;
 	required_device<adc0808_device> m_adc8;
+	output_finder<2> m_lamps;
 
 	uint8_t                   m_hd34010_host_access;
 

@@ -30,7 +30,7 @@ WRITE_LINE_MEMBER(labyrunr_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 {
 	if (m_k007121->ctrlram_r(7) & 0x01)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -147,7 +147,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( labyrunr )
+static GFXDECODE_START( gfx_labyrunr )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
@@ -167,9 +167,9 @@ void labyrunr_state::machine_start()
 MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
-	MCFG_CPU_PROGRAM_MAP(labyrunr_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
+	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
+	MCFG_DEVICE_PROGRAM_MAP(labyrunr_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -181,9 +181,9 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(labyrunr_state, screen_update_labyrunr)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(labyrunr_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", labyrunr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_labyrunr)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -194,9 +194,9 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 3000000)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
@@ -268,6 +268,6 @@ ROM_START( labyrunrk )
 ROM_END
 
 
-GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tricktrp,  0,        labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunr,  tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunrk, tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )

@@ -41,7 +41,7 @@ public:
 	required_ioport m_peny;
 
 	uint32_t m_port[9];
-	DECLARE_DRIVER_INIT(mini2440);
+	void init_mini2440();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
@@ -217,14 +217,14 @@ void mini2440_state::mini2440_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(mini2440_state,mini2440)
+void mini2440_state::init_mini2440()
 {
 	// do nothing
 }
 
 MACHINE_CONFIG_START(mini2440_state::mini2440)
-	MCFG_CPU_ADD("maincpu", ARM920T, 400000000)
-	MCFG_CPU_PROGRAM_MAP(mini2440_map)
+	MCFG_DEVICE_ADD("maincpu", ARM920T, 400000000)
+	MCFG_DEVICE_PROGRAM_MAP(mini2440_map)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
@@ -237,29 +237,30 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // uda1341ts.u12
-	MCFG_SOUND_ADD("rdac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // uda1341ts.u12
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // uda1341ts.u12
+	MCFG_DEVICE_ADD("rdac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // uda1341ts.u12
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_S3C2440_PALETTE("palette")
 	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_CORE_PIN_R_CB(READ32(mini2440_state, s3c2440_core_pin_r))
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(mini2440_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(mini2440_state, s3c2440_gpio_port_w))
-	MCFG_S3C2440_ADC_DATA_R_CB(READ32(mini2440_state, s3c2440_adc_data_r))
-	MCFG_S3C2440_I2S_DATA_W_CB(WRITE16(mini2440_state, s3c2440_i2s_data_w))
-	MCFG_S3C2440_NAND_COMMAND_W_CB(WRITE8(mini2440_state, s3c2440_nand_command_w))
-	MCFG_S3C2440_NAND_ADDRESS_W_CB(WRITE8(mini2440_state, s3c2440_nand_address_w))
-	MCFG_S3C2440_NAND_DATA_R_CB(READ8(mini2440_state, s3c2440_nand_data_r))
-	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(mini2440_state, s3c2440_nand_data_w))
+	MCFG_S3C2440_CORE_PIN_R_CB(READ32(*this, mini2440_state, s3c2440_core_pin_r))
+	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, mini2440_state, s3c2440_gpio_port_r))
+	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, mini2440_state, s3c2440_gpio_port_w))
+	MCFG_S3C2440_ADC_DATA_R_CB(READ32(*this, mini2440_state, s3c2440_adc_data_r))
+	MCFG_S3C2440_I2S_DATA_W_CB(WRITE16(*this, mini2440_state, s3c2440_i2s_data_w))
+	MCFG_S3C2440_NAND_COMMAND_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_command_w))
+	MCFG_S3C2440_NAND_ADDRESS_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_address_w))
+	MCFG_S3C2440_NAND_DATA_R_CB(READ8(*this, mini2440_state, s3c2440_nand_data_r))
+	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_data_w))
 
 	MCFG_DEVICE_ADD("nand", NAND, 0)
 	MCFG_NAND_TYPE(K9F1G08U0B)
-	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2440", s3c2440_device, frnb_w))
+	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mini2440 )
@@ -285,4 +286,4 @@ ROM_START( mini2440 )
 	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(3) )
 ROM_END
 
-COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, mini2440, "FriendlyARM", "Mini2440", 0)
+COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)

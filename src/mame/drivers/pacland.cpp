@@ -200,6 +200,8 @@ Notes:
 
 void pacland_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_mcu_irq_mask));
 }
@@ -237,8 +239,8 @@ WRITE8_MEMBER(pacland_state::coin_w)
 
 WRITE8_MEMBER(pacland_state::led_w)
 {
-	output().set_led_value(0, data & 0x08);
-	output().set_led_value(1, data & 0x10);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
@@ -409,7 +411,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( pacland )
+static GFXDECODE_START( gfx_pacland )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,          256*4, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  256*4+256*4, 64 )
@@ -428,12 +430,12 @@ WRITE_LINE_MEMBER(pacland_state::vblank_irq)
 MACHINE_CONFIG_START(pacland_state::pacland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) /* 1.536 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* 6.144 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* 6.144 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synching between the MCU and the CPU */
 
@@ -444,17 +446,17 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pacland_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacland_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacland)
 	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2/1024)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2/1024)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -671,9 +673,9 @@ ROM_END
 
 
 
-GAME( 1984, pacland,   0,       pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandj,  pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo, pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo2,pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandm,  pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandm2, pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Bally-Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pacland,   0,       pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandj,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo, pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo2,pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm2, pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Bally-Midway)", MACHINE_SUPPORTS_SAVE )

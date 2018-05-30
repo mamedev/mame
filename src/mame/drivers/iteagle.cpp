@@ -119,8 +119,8 @@ class iteagle_state : public driver_device
 {
 public:
 	iteagle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{}
 
 	required_device<mips3_device> m_maincpu;
@@ -164,31 +164,31 @@ void iteagle_state::machine_reset()
 MACHINE_CONFIG_START(iteagle_state::iteagle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
+	MCFG_DEVICE_ADD(m_maincpu, VR4310LE, 166666666)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(66666667)
 
-	MCFG_PCI_ROOT_ADD(                ":pci")
-	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
+	MCFG_DEVICE_ADD(PCI_ID_NILE, VRC4373, 0, m_maincpu)
 	MCFG_VRC4373_SET_RAM(0x00800000)
 	MCFG_VRC4373_SET_SIMM0(0x02000000)
-	MCFG_ITEAGLE_PERIPH_ADD(          PCI_ID_PERIPH)
-	MCFG_IDE_PCI_ADD(                 PCI_ID_IDE, 0x1080C693, 0x00, 0x0)
-	MCFG_IDE_PCI_IRQ_ADD(             ":maincpu", MIPS3_IRQ2)
+	MCFG_DEVICE_ADD(                  PCI_ID_PERIPH, ITEAGLE_PERIPH, 0)
+	MCFG_DEVICE_ADD(                  PCI_ID_IDE, IDE_PCI, 0, 0x1080C693, 0x00, 0x0)
+	MCFG_IDE_PCI_IRQ_HANDLER(         INPUTLINE(m_maincpu, MIPS3_IRQ2))
 
-	MCFG_ITEAGLE_FPGA_ADD(            PCI_ID_FPGA, ":maincpu", MIPS3_IRQ1, MIPS3_IRQ4)
-	MCFG_ES1373_ADD(                  PCI_ID_SOUND)
+	MCFG_DEVICE_ADD(                  PCI_ID_FPGA, ITEAGLE_FPGA, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4)
+	MCFG_DEVICE_ADD(                  PCI_ID_SOUND, ES1373, 0)
 	MCFG_SOUND_ROUTE(0, PCI_ID_SOUND":lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, PCI_ID_SOUND":rspeaker", 1.0)
-	MCFG_ES1373_IRQ_ADD(              ":maincpu", MIPS3_IRQ3)
+	MCFG_ES1373_IRQ_HANDLER(          INPUTLINE(m_maincpu, MIPS3_IRQ3))
 
-	MCFG_VOODOO_PCI_ADD(              PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
+	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_3_PCI, 0, m_maincpu, "screen")
 	MCFG_VOODOO_PCI_FBMEM(16)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(DEVWRITELINE(PCI_ID_FPGA, iteagle_fpga_device, vblank_update))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(PCI_ID_FPGA, iteagle_fpga_device, vblank_update))
 
-	MCFG_ITEAGLE_EEPROM_ADD(          PCI_ID_EEPROM)
+	MCFG_DEVICE_ADD(                  PCI_ID_EEPROM, ITEAGLE_EEPROM, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -291,12 +291,11 @@ MACHINE_CONFIG_START(iteagle_state::virtpool)
 	iteagle(config);
 	// Not sure what the actual value should be
 	// Setting a lower frequency helps delay the tutorial screen premature cut-out
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(99999999)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(99999999)
 	MCFG_MIPS3_SYSTEM_CLOCK(33333333)
 
-	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
-	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
+	MCFG_DEVICE_REPLACE(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, "screen")
 	MCFG_VOODOO_PCI_FBMEM(4)
 	MCFG_VOODOO_PCI_TMUMEM(4, 4)
 
@@ -711,24 +710,24 @@ ROM_END
  *
  *************************************/
 
-GAME( 2000, iteagle,    0,        iteagle,  iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, iteagle_state, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, carnking,   iteagle,  carnking, bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, gtfore03,   iteagle,  gtfore03, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, gtfore03a,  gtfore03, gtfore03, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, gtfore04,   iteagle,  gtfore04, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, gtfore04a,  gtfore04, gtfore04, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 2004, gtfore05,   iteagle,  gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", MACHINE_SUPPORTS_SAVE )
-GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", MACHINE_SUPPORTS_SAVE )
-GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, bbh,        iteagle,  bbh,      bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter (v1.00.14)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, bbhsca,     bbhsc,    bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE )
-GAME( 2004, bbh2sp,     iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, bbh2spa,    bbh2sp,   bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.09)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, bbh2spb,    bbh2sp,   bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.08)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, iteagle,   0,        iteagle,  iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1998, virtpool,  iteagle,  virtpool, virtpool, iteagle_state, empty_init, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, carnking,  iteagle,  carnking, bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, gtfore01,  iteagle,  gtfore01, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gtfore02,  iteagle,  gtfore02, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, gtfore03,  iteagle,  gtfore03, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, gtfore03a, gtfore03, gtfore03, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, gtfore04,  iteagle,  gtfore04, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, gtfore04a, gtfore04, gtfore04, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05,  iteagle,  gtfore05, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05a, gtfore05, gtfore05, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05b, gtfore05, gtfore05, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05c, gtfore05, gtfore05, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, gtfore06,  iteagle,  gtfore06, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bbh,       iteagle,  bbh,      bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter (v1.00.14)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, bbhsc,     iteagle,  bbhsc,    bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, bbhsca,    bbhsc,    bbhsc,    bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, bbh2sp,    iteagle,  bbh2sp,   bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, bbh2spa,   bbh2sp,   bbh2sp,   bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.09)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, bbh2spb,   bbh2sp,   bbh2sp,   bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.08)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, bbhcotw,   iteagle,  bbhcotw,  bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_SUPPORTS_SAVE )

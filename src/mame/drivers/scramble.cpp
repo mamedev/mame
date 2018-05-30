@@ -1274,27 +1274,27 @@ static const gfx_layout ad2083_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( scramble )
+static GFXDECODE_START( gfx_scramble )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( devilfsh )
+static GFXDECODE_START( gfx_devilfsh )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, devilfsh_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, devilfsh_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( newsin7 )
+static GFXDECODE_START( gfx_newsin7 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, newsin7_charlayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, newsin7_spritelayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( mrkougar )
+static GFXDECODE_START( gfx_mrkougar )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ad2083 )
+static GFXDECODE_START( gfx_ad2083 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_charlayout,    0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_spritelayout,  0, 8 )
 GFXDECODE_END
@@ -1305,22 +1305,22 @@ GFXDECODE_END
 MACHINE_CONFIG_START(scramble_state::scramble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(scramble_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scramble_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
-	MCFG_CPU_PROGRAM_MAP(scramble_sound_map)
-	MCFG_CPU_IO_MAP(scramble_sound_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scramble_sound_map)
+	MCFG_DEVICE_IO_MAP(scramble_sound_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
@@ -1334,8 +1334,8 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1346,23 +1346,23 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scramble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scramble)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("8910.1", AY8910, 14318000/8)
+	MCFG_DEVICE_ADD("8910.1", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
-	MCFG_SOUND_ADD("8910.2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_ADD("8910.2", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
@@ -1370,13 +1370,13 @@ MACHINE_CONFIG_START(scramble_state::mars)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 
 	/* video hardware */
@@ -1389,11 +1389,11 @@ MACHINE_CONFIG_START(scramble_state::devilfsh)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", devilfsh)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_devilfsh)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
@@ -1403,12 +1403,12 @@ MACHINE_CONFIG_START(scramble_state::newsin7)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(newsin7_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(newsin7_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_newsin7)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
@@ -1419,13 +1419,13 @@ MACHINE_CONFIG_START(scramble_state::mrkougb)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mrkougar_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, mrkougar_sh_irqtrigger_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, mrkougar_sh_irqtrigger_w))
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1437,15 +1437,15 @@ MACHINE_CONFIG_START(scramble_state::mrkougar)
 	mrkougb(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mrkougar)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ckongs)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ckongs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ckongs_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1458,14 +1458,14 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotshock_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotshock_map)
 
 	MCFG_DEVICE_REMOVE( "ppi8255_0" )
 	MCFG_DEVICE_REMOVE( "ppi8255_1" )
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_IO_MAP(hotshock_sound_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_IO_MAP(hotshock_sound_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
@@ -1475,13 +1475,13 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	MCFG_SOUND_MODIFY("8910.1")
+	MCFG_DEVICE_MODIFY("8910.1")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_MODIFY("8910.2")
-	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, hotshock_soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_MODIFY("8910.2")
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -1502,8 +1502,8 @@ MACHINE_CONFIG_START(scramble_state::mimonscr)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mimonscr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mimonscr_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,mimonkey)
@@ -1514,9 +1514,9 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(triplep_map)
-	MCFG_CPU_IO_MAP(triplep_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(triplep_map)
+	MCFG_DEVICE_IO_MAP(triplep_io_map)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
@@ -1528,8 +1528,8 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("8910.1")
-	MCFG_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
+	MCFG_DEVICE_MODIFY("8910.1")
+	MCFG_DEVICE_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
 
 
 	MCFG_SOUND_ROUTES_RESET()
@@ -1556,11 +1556,11 @@ MACHINE_CONFIG_START(scramble_state::hunchbks)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, 18432000/6)
-	MCFG_CPU_PROGRAM_MAP(hunchbks_map)
-	MCFG_CPU_IO_MAP(hunchbks_readport)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
+	MCFG_DEVICE_REPLACE("maincpu", S2650, 18432000/6)
+	MCFG_DEVICE_PROGRAM_MAP(hunchbks_map)
+	MCFG_DEVICE_IO_MAP(hunchbks_readport)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -1576,25 +1576,25 @@ MACHINE_CONFIG_START(scramble_state::hncholms)
 	hunchbks(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(18432000/6/2/2)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(18432000/6/2/2)
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ad2083)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(ad2083_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ad2083_map)
 
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
@@ -1611,7 +1611,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ad2083)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ad2083)
 	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,turtles)
@@ -1628,21 +1628,21 @@ MACHINE_CONFIG_START(scramble_state::harem)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(harem_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(harem_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(harem_sound_map)
-	MCFG_CPU_IO_MAP(harem_sound_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(harem_sound_map)
+	MCFG_DEVICE_IO_MAP(harem_sound_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
 	/* extra AY8910 with I/O ports */
-	MCFG_SOUND_ADD("8910.3", AY8910, 14318000/8)
+	MCFG_DEVICE_ADD("8910.3", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("digitalker", digitalker_device, digitalker_data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(scramble_state, harem_digitalker_control_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, scramble_state, harem_digitalker_control_w))
 
 	MCFG_DIGITALKER_ADD("digitalker", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
@@ -2264,45 +2264,45 @@ ROM_START( harem ) /* Main PCB version similar to Scorpion (also developed by I.
 ROM_END
 
 
-GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",         MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate
+GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",         MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate
 
-GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip",              "Mariner",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, init_mariner,      ROT90, "Amenip",              "Mariner",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, init_ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mars,     0,        mars,     mars,     scramble_state, mars,         ROT90, "Artic",               "Mars",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, devilfsh,     ROT90, "Artic",               "Devil Fish",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish",                     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, init_mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, init_newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, 0,            ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, 0,            ROT90, "bootleg",             "Mr. Kougar (bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
+GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg",             "Mr. Kougar (bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
 
-GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",  MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
+GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",  MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
 
-GAME( 198?, conquer,  0,        hotshock, hotshock, scramble_state, 0,            ROT90, "<unknown>",           "Conqueror",                      MACHINE_NOT_WORKING   )
+GAME( 198?, conquer,  0,        hotshock, hotshock, scramble_state, empty_init,        ROT90, "<unknown>",           "Conqueror",                      MACHINE_NOT_WORKING   )
 
-GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "bootleg (Sig)",       "Hunchback (Scramble hardware, bootleg)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, init_scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, init_scramble_ppi, ROT90, "bootleg (Sig)",       "Hunchback (Scramble hardware, bootleg)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, init_scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, cavelon,      ROT90, "Jetsoft",             "Cavelon",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, init_cavelon,      ROT90, "Jetsoft",             "Cavelon",                        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, ad2083,       ROT90, "Midcoin",             "A. D. 2083",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, init_ad2083,       ROT90, "Midcoin",             "A. D. 2083",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1983, harem,    0,        harem,    harem,    scramble_state, harem,        ROT90, "I.G.R.",              "Harem",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, harem,    0,        harem,    harem,    scramble_state, init_harem,        ROT90, "I.G.R.",              "Harem",                          MACHINE_SUPPORTS_SAVE )

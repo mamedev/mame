@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 
 	m_toggle ^= 1;
 	if (m_toggle)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
@@ -447,7 +447,7 @@ static const gfx_layout toki_tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( toki )
+static GFXDECODE_START( gfx_toki )
 	GFXDECODE_ENTRY( "gfx1", 0, toki_charlayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, toki_tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, toki_tilelayout, 32*16, 16 )
@@ -482,7 +482,7 @@ static const gfx_layout tokib_spriteslayout =
 	16*16
 };
 
-static GFXDECODE_START( tokib )
+static GFXDECODE_START( gfx_tokib )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   16*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tokib_spriteslayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tokib_tilelayout,   32*16, 16 )
@@ -495,47 +495,47 @@ GFXDECODE_END
 MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000) /2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(toki_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(20'000'000) /2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(toki_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(toki_audio_map)
-	MCFG_CPU_OPCODES_MAP(toki_audio_opcodes_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) // verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(toki_audio_map)
+	MCFG_DEVICE_OPCODES_MAP(toki_audio_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_toki)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // verified on pcb
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // verified on pcb
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(toki_state::jujuba)
@@ -543,47 +543,47 @@ MACHINE_CONFIG_START(toki_state::jujuba)
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(jujuba_audio_map)
-	MCFG_CPU_OPCODES_MAP(jujuba_audio_opcodes_map)
+	MCFG_DEVICE_PROGRAM_MAP(jujuba_audio_map)
+	MCFG_DEVICE_OPCODES_MAP(jujuba_audio_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(toki_state::tokib)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
-	MCFG_CPU_PROGRAM_MAP(tokib_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq6_line_hold)/* VBL (could be level1, same vector) */
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
+	MCFG_DEVICE_PROGRAM_MAP(tokib_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", toki_state,  irq6_line_hold)/* VBL (could be level1, same vector) */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified with PCB */
-	MCFG_CPU_PROGRAM_MAP(tokib_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified with PCB */
+	MCFG_DEVICE_PROGRAM_MAP(tokib_audio_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_tokib)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tokib)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tokib)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(toki_state, tokib_adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, toki_state, tokib_adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -958,53 +958,51 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(toki_state,toki)
+void toki_state::init_toki()
 {
 	uint8_t *ROM = memregion("oki")->base();
-	std::vector<uint8_t> buffer(0x20000);
-	int i;
-
+	uint8_t buffer[0x20000];
 	memcpy(&buffer[0],ROM,0x20000);
-	for( i = 0; i < 0x20000; i++ )
+
+	for (int i = 0; i < 0x20000; i++)
 	{
 		ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 }
 
 
-DRIVER_INIT_MEMBER(toki_state,tokib)
+void toki_state::init_tokib()
 {
-	std::vector<uint8_t> temp(65536 * 2);
-	int i, offs, len;
-	uint8_t *rom;
+	uint8_t temp[0x20000];
 
 	/* merge background tile graphics together */
-	len = memregion("gfx3")->bytes();
-	rom = memregion("gfx3")->base();
-	for (offs = 0; offs < len; offs += 0x20000)
+	int len = memregion("gfx3")->bytes();
+	uint8_t *rom = memregion("gfx3")->base();
+	for (int offs = 0; offs < len; offs += 0x20000)
 	{
 		uint8_t *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
-		for (i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 		{
-			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-			memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-			memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
+			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
+
 	len = memregion("gfx4")->bytes();
 	rom = memregion("gfx4")->base();
-	for (offs = 0; offs < len; offs += 0x20000)
+	for (int offs = 0; offs < len; offs += 0x20000)
 	{
 		uint8_t *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
-		for (i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 		{
-			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-			memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-			memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
+			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
 
@@ -1013,49 +1011,43 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 	save_item(NAME(m_toggle));
 }
 
-DRIVER_INIT_MEMBER(toki_state,jujuba)
+void toki_state::init_jujuba()
 {
 	/* Program ROMs are bitswapped */
-	{
-		int i;
-		uint16_t *prgrom = (uint16_t*)memregion("maincpu")->base();
+	uint16_t *prgrom = (uint16_t*)memregion("maincpu")->base();
 
-		for (i = 0; i < 0x60000/2; i++)
-		{
-			prgrom[i] = bitswap<16>(prgrom[i],15,12,13,14,
-											11,10, 9, 8,
-											7, 6,  5, 3,
-											4, 2,  1, 0);
-		}
+	for (int i = 0; i < 0x60000/2; i++)
+	{
+		prgrom[i] = bitswap<16>(prgrom[i],15,12,13,14,
+										11,10, 9, 8,
+										7, 6,  5, 3,
+										4, 2,  1, 0);
 	}
 
-	{
-		uint8_t *ROM = memregion("oki")->base();
-		std::vector<uint8_t> buffer(0x20000);
-		int i;
+	uint8_t *ROM = memregion("oki")->base();
+	uint8_t buffer[0x20000];
 
-		memcpy(&buffer[0],ROM,0x20000);
-		for( i = 0; i < 0x20000; i++ )
-		{
-			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
-		}
+	memcpy(&buffer[0],ROM,0x20000);
+	for (int i = 0; i < 0x20000; i++)
+	{
+		ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 }
 
 
 // these 2 are both unique revisions
-GAME( 1989, toki,  0,    toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tokiu, toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, toki,  0,    toki,   toki, toki_state,  init_toki,   ROT0, "TAD Corporation", "Toki (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokiu, toki, toki,   toki, toki_state,  init_toki,   ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tokip, toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokip, toki, toki,   toki, toki_state,  init_toki,   ROT0, "TAD Corporation (Fabtek license)", "Toki (US, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 
 // these 3 are all the same revision, only the region byte differs
-GAME( 1989, tokia, toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tokiua,toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, juju,  toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokia, toki, toki,   toki, toki_state,  init_toki,   ROT0, "TAD Corporation", "Toki (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokiua,toki, toki,   toki, toki_state,  init_toki,   ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, juju,  toki, toki,   toki, toki_state,  init_toki,   ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, tokib,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, jujub,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Playmark)", "JuJu Densetsu (Playmark bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tokib,  toki, tokib, tokib, toki_state, init_tokib,  ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, jujub,  toki, tokib, tokib, toki_state, init_tokib,  ROT0, "bootleg (Playmark)", "JuJu Densetsu (Playmark bootleg)", MACHINE_SUPPORTS_SAVE )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
-GAME( 1989, jujuba, toki, jujuba, toki, toki_state, jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg of tokia/juju revison
+GAME( 1989, jujuba, toki, jujuba, toki, toki_state, init_jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg of tokia/juju revison

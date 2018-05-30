@@ -445,9 +445,9 @@ PALETTE_INIT_MEMBER(mstation_state, mstation)
 
 MACHINE_CONFIG_START(mstation_state::mstation)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))      //unknown clock
-	MCFG_CPU_PROGRAM_MAP(mstation_mem)
-	MCFG_CPU_IO_MAP(mstation_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))      //unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(mstation_mem)
+	MCFG_DEVICE_IO_MAP(mstation_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
 
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(mstation_state, rtc_irq))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, mstation_state, rtc_irq))
 
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
@@ -502,5 +502,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1999, mstation, 0,      0,      mstation, mstation, mstation_state, 0,    "CIDCO", "MailStation", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1999, mstation, 0,      0,      mstation, mstation, mstation_state, empty_init, "CIDCO", "MailStation", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

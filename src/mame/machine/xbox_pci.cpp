@@ -15,11 +15,11 @@
 
 DEFINE_DEVICE_TYPE(NV2A_HOST, nv2a_host_device, "nv2a_host", "NV2A PCI Bridge Device - Host Bridge")
 
-nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
-	  cpu_tag(nullptr),
-	  cpu(nullptr)
+nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
+	cpu(*this, finder_base::DUMMY_TAG)
 {
+	set_ids(0x10de01b0, 0, 0, 0);
 }
 
 void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -28,15 +28,9 @@ void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 }
 
-void nv2a_host_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
-}
-
 void nv2a_host_device::device_start()
 {
 	pci_host_device::device_start();
-	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
 
@@ -382,16 +376,10 @@ void mcpx_apu_device::apu_mmio(address_map &map)
 	map(0x00000000, 0x00007ffff).rw(this, FUNC(mcpx_apu_device::apu_r), FUNC(mcpx_apu_device::apu_w));
 }
 
-mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_APU, tag, owner, clock),
-	cpu_tag(nullptr),
-	cpu(nullptr)
+mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, MCPX_APU, tag, owner, clock),
+	cpu(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void mcpx_apu_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
 }
 
 void mcpx_apu_device::device_start()
@@ -406,7 +394,6 @@ void mcpx_apu_device::device_start()
 	memset(apust.voices_position_start, 0, sizeof(apust.voices_position_start));
 	memset(apust.voices_position_end, 0, sizeof(apust.voices_position_end));
 	memset(apust.voices_position_increment, 0, sizeof(apust.voices_position_increment));
-	cpu = machine().device<cpu_device>(cpu_tag);
 	apust.space = &cpu->space();
 	apust.timer = timer_alloc(0);
 	apust.timer->enable(false);
@@ -716,7 +703,7 @@ void mcpx_ide_device::device_reset()
 
 MACHINE_CONFIG_START(mcpx_ide_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ide", BUS_MASTER_IDE_CONTROLLER, 0)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(mcpx_ide_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, mcpx_ide_device, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 MACHINE_CONFIG_END
 
@@ -762,18 +749,13 @@ void nv2a_gpu_device::nv2a_mirror(address_map &map)
 	map(0x00000000, 0x07ffffff).ram().rw(this, FUNC(nv2a_gpu_device::nv2a_mirror_r), FUNC(nv2a_gpu_device::nv2a_mirror_w));
 }
 
-nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, NV2A_GPU, tag, owner, clock),
+nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, NV2A_GPU, tag, owner, clock),
 	nvidia_nv2a(nullptr),
-	cpu_tag(nullptr),
+	cpu(*this, finder_base::DUMMY_TAG),
 	m_interrupt_handler(*this),
 	m_program(nullptr)
 {
-}
-
-void nv2a_gpu_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
 }
 
 void nv2a_gpu_device::device_start()
@@ -784,7 +766,7 @@ void nv2a_gpu_device::device_start()
 	bank_infos[0].adr = 0xfd000000;
 	add_map(0x08000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mirror));
 	bank_infos[1].adr = 0xf0000000;
-	m_program = &machine().device<cpu_device>(cpu_tag)->space();
+	m_program = &cpu->space(AS_PROGRAM); // FIXME: isn't there a proper way to map stuff or do DMA via the PCI device interface?
 	nvidia_nv2a = new nv2a_renderer(machine());
 	nvidia_nv2a->set_irq_callbaclk(
 		[&](int state)

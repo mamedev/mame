@@ -65,24 +65,23 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_watchdog(*this, "watchdog"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_inputs(*this, "IN%u", 0U),
+			m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	void dblcrown(machine_config &config);
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_bank;
-	uint8_t m_irq_src;
-	std::unique_ptr<uint8_t[]> m_pal_ram;
-	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t m_vram_bank[2];
-	uint8_t m_mux_data;
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(irq_source_r);
@@ -103,15 +102,23 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 	DECLARE_PALETTE_INIT(dblcrown);
 
-	void dblcrown(machine_config &config);
 	void dblcrown_io(address_map &map);
 	void dblcrown_map(address_map &map);
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
-	virtual void video_start() override;
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_ioport_array<4> m_inputs;
+	output_finder<8> m_lamps;
+
+	uint8_t m_bank;
+	uint8_t m_irq_src;
+	std::unique_ptr<uint8_t[]> m_pal_ram;
+	std::unique_ptr<uint8_t[]> m_vram;
+	uint8_t m_vram_bank[2];
+	uint8_t m_mux_data;
 };
 
 void dblcrown_state::video_start()
@@ -251,7 +258,6 @@ WRITE8_MEMBER( dblcrown_state::mux_w)
 
 READ8_MEMBER( dblcrown_state::in_mux_r )
 {
-	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
 	uint8_t res;
 
@@ -260,7 +266,7 @@ READ8_MEMBER( dblcrown_state::in_mux_r )
 	for(i = 0; i < 4; i++)
 	{
 		if(m_mux_data & 1 << i)
-			res |= ioport(muxnames[i])->read();
+			res |= m_inputs[i]->read();
 	}
 
 	return res;
@@ -268,7 +274,6 @@ READ8_MEMBER( dblcrown_state::in_mux_r )
 
 READ8_MEMBER( dblcrown_state::in_mux_type_r )
 {
-	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
 	uint8_t res;
 
@@ -276,7 +281,7 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 
 	for(i = 0; i < 4; i++)
 	{
-		if(ioport(muxnames[i])->read() != 0xff)
+		if (m_inputs[i]->read() != 0xff)
 			res &= ~(1 << i);
 	}
 
@@ -313,14 +318,9 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
   -x-- ----  Hold 2
   x--- ----  Hold 1
 */
-	output().set_lamp_value(0, (data) & 1);       /* Deal */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* Bet */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* Cancel */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* Hold 5 */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* Hold 4 */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
-	output().set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
+
+	for (int n = 0; n < 8; n++)
+		m_lamps[n] = BIT(data, n);
 }
 
 WRITE8_MEMBER(dblcrown_state::watchdog_w)
@@ -530,7 +530,7 @@ static const gfx_layout char_16x16_layout =
 };
 
 
-static GFXDECODE_START( dblcrown )
+static GFXDECODE_START( gfx_dblcrown )
 #ifdef DEBUG_VRAM
 	GFXDECODE_ENTRY( "vram", 0, char_8x8_layout, 0, 0x10 )
 #endif
@@ -543,6 +543,8 @@ void dblcrown_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("rom_bank")->configure_entries(0, 0x20, &ROM[0], 0x2000);
+
+	m_lamps.resolve();
 }
 
 void dblcrown_state::machine_reset()
@@ -600,9 +602,9 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dblcrown_map)
-	MCFG_CPU_IO_MAP(dblcrown_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dblcrown_map)
+	MCFG_DEVICE_IO_MAP(dblcrown_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dblcrown_state, dblcrown_irq_scanline, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -617,7 +619,7 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblcrown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblcrown)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
@@ -625,13 +627,13 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(dblcrown_state, lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(dblcrown_state, bank_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dblcrown_state, mux_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dblcrown_state, lamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dblcrown_state, bank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dblcrown_state, mux_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymz", YMZ284, SND_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymz", YMZ284, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -659,5 +661,5 @@ ROM_START( dblcrown )
 ROM_END
 
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT   ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
-GAMEL( 1997, dblcrown, 0,        dblcrown, dblcrown, dblcrown_state, 0,     ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
+GAMEL( 1997, dblcrown, 0,      dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX

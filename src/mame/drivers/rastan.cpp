@@ -339,7 +339,7 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static GFXDECODE_START( rastan )
+static GFXDECODE_START( gfx_rastan )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 0x80 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x80 )
 GFXDECODE_END
@@ -368,12 +368,12 @@ void rastan_state::machine_reset()
 MACHINE_CONFIG_START(rastan_state::rastan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rastan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rastan_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rastan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rastan_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rastan_s_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rastan_s_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_SCREEN_UPDATE_DRIVER(rastan_state, screen_update_rastan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rastan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rastan)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -401,21 +401,21 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rastan_state,rastan_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rastan_state,rastan_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(rastan_state, rastan_msm5205_vck)) /* VCK function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, rastan_state, rastan_msm5205_vck)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_DEVICE_ADD("adpcm_sel", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -707,14 +707,14 @@ ROM_START( rastsagab )
 ROM_END
 
 /* Newer revised code base */
-GAME( 1987, rastan,    0,      rastan, rastan,   rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastana,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanu,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US Rev 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanua,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsaga,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastan,    0,      rastan, rastan,   rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastana,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanu,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US Rev 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanua,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsaga,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Based on earliest code base */
-GAME( 1987, rastanb,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World, Earlier code base)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanub,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagaa, rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, Earlier code base)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagab, rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan, Earlier code base)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanb,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World, Earlier code base)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanub,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagaa, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, Earlier code base)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagab, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan, Earlier code base)",       MACHINE_SUPPORTS_SAVE )

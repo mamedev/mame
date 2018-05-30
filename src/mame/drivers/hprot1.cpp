@@ -74,7 +74,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(henry_p1_w);
 	DECLARE_WRITE8_MEMBER(henry_p3_w);
-	DECLARE_DRIVER_INIT(hprot1);
+	void init_hprot1();
 	DECLARE_PALETTE_INIT(hprot1);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void hprotr8a(machine_config &config);
@@ -96,16 +96,15 @@ void hprot1_state::i80c31_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
+void hprot1_state::init_hprot1()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t bitswapped_ROM[0x10000];
 
-	for(i=0x0000;i<0x10000;i++)
+	for (int i = 0x0000; i < 0x10000; i++)
 		bitswapped_ROM[i] = ROM[i];
 
-	for(i=0x0000;i<0x10000;i++)
+	for (int i = 0x0000; i < 0x10000; i++)
 		ROM[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
 }
 
@@ -224,7 +223,7 @@ static const gfx_layout henry_prot_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( hprot1 )
+static GFXDECODE_START( gfx_hprot1 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, henry_prot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -243,12 +242,12 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 
 MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hprot1_state, henry_p1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hprot1_state, henry_p3_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hprot1_state, henry_p1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hprot1_state, henry_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -262,7 +261,7 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hprot1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hprot1)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
@@ -275,13 +274,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hprot1_state::hprotr8a)
 	hprot1(config);
-	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip)
@@ -292,13 +291,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hprot1_state::hprot2r6)
 	hprot1(config);
-	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip) */
@@ -319,12 +318,12 @@ ROM_START( hprot2r6 )
 	ROM_LOAD( "hprot_card2_rev6.u2",  0x00000, 0x10000, CRC(791f2425) SHA1(70af8911a27921cac6d98a5cd07602a7f59c2848) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 2002, hprot1,   0,      0,      hprot1,     hprot1,   hprot1_state, hprot1, "HENRY", "Henry Prot I v19 (REV.1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT         COMPANY  FULLNAME                       FLAGS */
+COMP( 2002, hprot1,   0,      0,      hprot1,   hprot1,   hprot1_state, init_hprot1, "HENRY", "Henry Prot I v19 (REV.1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 /* fw version: "R19"        Release date: February 1st, 2002.   */
 
-COMP( 2006, hprotr8a, hprot1, 0,      hprotr8a,   hprotr8a, hprot1_state, hprot1, "HENRY", "Henry Prot CARD I (REV.08A)", MACHINE_NOT_WORKING)
+COMP( 2006, hprotr8a, hprot1, 0,      hprotr8a, hprotr8a, hprot1_state, init_hprot1, "HENRY", "Henry Prot CARD I (REV.08A)", MACHINE_NOT_WORKING)
 /* fw version: "V6.5QI I"   Release date: September 18th, 2006. */
 
-COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6,   hprot2r6, hprot1_state, hprot1, "HENRY", "Henry Prot CARD II (REV.6)",  MACHINE_NOT_WORKING)
+COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6, hprot2r6, hprot1_state, init_hprot1, "HENRY", "Henry Prot CARD II (REV.6)",  MACHINE_NOT_WORKING)
 /* fw version: "V5.8CF II"  Release date: June 23rd, 2003.      */

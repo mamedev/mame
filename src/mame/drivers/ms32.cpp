@@ -535,7 +535,7 @@ READ32_MEMBER(ms32_state::ms32_sound_r)
 
 WRITE32_MEMBER(ms32_state::reset_sub_w)
 {
-	if(data) m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
 }
 
 
@@ -1566,14 +1566,14 @@ static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 static GFXLAYOUT_RAW( f1layout, 2048, 1, 2048*8, 2048*8 )
 
 
-static GFXDECODE_START( ms32 )
+static GFXDECODE_START( gfx_ms32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
 GFXDECODE_END
 
-static GFXDECODE_START( f1superb )
+static GFXDECODE_START( gfx_f1superb )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
@@ -1703,14 +1703,14 @@ void ms32_state::machine_reset()
 MACHINE_CONFIG_START(ms32_state::ms32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
-	MCFG_CPU_PROGRAM_MAP(ms32_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // 20MHz
+	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
-	MCFG_CPU_PROGRAM_MAP(ms32_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
+	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
@@ -1723,17 +1723,18 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ms32_state, screen_update_ms32)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms32)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymf", YMF271, 16934400)
+	MCFG_DEVICE_ADD("ymf", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
@@ -1744,10 +1745,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ms32_state::f1superb)
 	ms32(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(f1superb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1superb_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1superb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1superb)
 
 	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 MACHINE_CONFIG_END
@@ -2507,92 +2508,92 @@ void ms32_state::configure_banks()
 
 }
 
-DRIVER_INIT_MEMBER(ms32_state,ms32_common)
+void ms32_state::init_ms32_common()
 {
 	m_nvram_8 = std::make_unique<uint8_t[]>(0x2000);
 	configure_banks();
 }
 
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */
-DRIVER_INIT_MEMBER(ms32_state,ss91022_10)
+void ms32_state::init_ss91022_10()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00000,0x35, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00000,0xa3, "gfx3");
 }
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
-DRIVER_INIT_MEMBER(ms32_state,ss92046_01)
+void ms32_state::init_ss92046_01()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx3");
 }
 
 /* SS92047-01: gratia, kirarast */
-DRIVER_INIT_MEMBER(ms32_state,ss92047_01)
+void ms32_state::init_ss92047_01()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x24000,0x18, "gfx4");
 	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
 }
 
 /* SS92048-01: p47aces, suchie2, suchie2o */
-DRIVER_INIT_MEMBER(ms32_state,ss92048_01)
+void ms32_state::init_ss92048_01()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x20400,0xd6, "gfx4");
 	decrypt_ms32_bg(machine(), 0x20400,0xd4, "gfx3");
 }
 
-DRIVER_INIT_MEMBER(ms32_state,kirarast)
+void ms32_state::init_kirarast()
 {
-	DRIVER_INIT_CALL(ss92047_01);
+	init_ss92047_01();
 }
 
-DRIVER_INIT_MEMBER(ms32_state,suchie2)
+void ms32_state::init_suchie2()
 {
-	DRIVER_INIT_CALL(ss92048_01);
+	init_ss92048_01();
 }
 
-DRIVER_INIT_MEMBER(ms32_state,f1superb)
+void ms32_state::init_f1superb()
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
 	uint32_t *pROM = (uint32_t *)memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
-	DRIVER_INIT_CALL(ss92046_01);
+	init_ss92046_01();
 }
 
-DRIVER_INIT_MEMBER(ms32_state,bnstars)
+void ms32_state::init_bnstars()
 {
-	DRIVER_INIT_CALL(ss92046_01);
+	init_ss92046_01();
 }
 
 /********** GAME DRIVERS **********/
 
 
 
-GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, ss92048_01, ROT0,   "Jaleco",         "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, kirarast,   ROT0,   "Jaleco",         "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, ss91022_10, ROT0,   "Jaleco",         "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, bnstars,    ROT0,   "Jaleco",         "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    ROT0,   "Jaleco",         "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, f1superb, ROT0,   "Jaleco",        "F1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

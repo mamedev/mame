@@ -188,6 +188,8 @@ void ccastles_state::machine_start()
 {
 	rectangle visarea;
 
+	m_led.resolve();
+
 	/* initialize globals */
 	m_syncprom = memregion("proms")->base() + 0x000;
 
@@ -250,7 +252,7 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 
 WRITE8_MEMBER(ccastles_state::led_w)
 {
-	output().set_led_value(offset, ~data & 1);
+	m_led[offset] = BIT(~data, 0);
 }
 
 
@@ -443,7 +445,7 @@ static const gfx_layout ccastles_spritelayout =
 };
 
 
-static GFXDECODE_START( ccastles )
+static GFXDECODE_START( gfx_ccastles )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ccastles_spritelayout,  0, 2 )
 GFXDECODE_END
 
@@ -457,8 +459,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ccastles_state::ccastles)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -467,7 +469,7 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ccastles)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ccastles)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -476,14 +478,14 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN1"))
@@ -665,11 +667,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ccastles,  0,        ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesg, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesp, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesf, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles3, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles2, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles1, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj,ccastles_state, 0, ROT0, "Atari", "Crystal Castles (joystick version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles,  0,        ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesg, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, German)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesp, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesf, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles3, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles2, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles1, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj, ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (joystick version)", MACHINE_SUPPORTS_SAVE )

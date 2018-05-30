@@ -55,9 +55,9 @@ public:
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
-	DECLARE_DRIVER_INIT(peyper);
-	DECLARE_DRIVER_INIT(odin);
-	DECLARE_DRIVER_INIT(wolfman);
+	void init_peyper();
+	void init_odin();
+	void init_wolfman();
 
 	void peyper(machine_config &config);
 
@@ -605,10 +605,10 @@ void peyper_state::machine_reset()
 
 MACHINE_CONFIG_START(peyper_state::peyper)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2'500'000)
-	MCFG_CPU_PROGRAM_MAP(peyper_map)
-	MCFG_CPU_IO_MAP(peyper_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'500'000)
+	MCFG_DEVICE_PROGRAM_MAP(peyper_map)
+	MCFG_DEVICE_IO_MAP(peyper_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -616,27 +616,27 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p1a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p1b_w))
+	SPEAKER(config, "ayvol").front_center();
+	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p1a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p1b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_SOUND_ADD("ay2", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p2a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p2b_w))
+	MCFG_DEVICE_ADD("ay2", AY8910, 2500000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p2a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p2b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8279", I8279, 2500000)
-	MCFG_I8279_OUT_SL_CB(WRITE8(peyper_state, col_w))             // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(peyper_state, disp_w))          // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(peyper_state, sw_r))                // kbd RL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, peyper_state, col_w))             // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, peyper_state, disp_w))          // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, peyper_state, sw_r))                // kbd RL lines
 	MCFG_I8279_IN_SHIFT_CB(VCC)                                   // Shift key
 	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END
 
 // Not allowed to set up an array all at once, so we have this mess
-DRIVER_INIT_MEMBER( peyper_state, peyper )
+void peyper_state::init_peyper()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;
@@ -676,7 +676,7 @@ DRIVER_INIT_MEMBER( peyper_state, peyper )
 	m_disp_layout[35] = 24;
 }
 
-DRIVER_INIT_MEMBER( peyper_state, odin )
+void peyper_state::init_odin()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;
@@ -716,7 +716,7 @@ DRIVER_INIT_MEMBER( peyper_state, odin )
 	m_disp_layout[35] = 24;
 }
 
-DRIVER_INIT_MEMBER( peyper_state, wolfman )
+void peyper_state::init_wolfman()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;
@@ -887,16 +887,16 @@ ROM_START(lancelot)
 	ROM_LOAD("snd_u5.bin", 0x00000, 0x20000, CRC(bf141441) SHA1(630b852bb3bba0fcdae13ae548b1e9810bc64d7d))
 ROM_END
 
-GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, odin,     ROT0, "Peyper",     "Odin",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, odin,     ROT0, "Sonic",      "Odin De Luxe",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, peyper,   ROT0, "Sonic",      "Pole Position (Sonic)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",      "Star Wars (Sonic, set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",      "Star Wars (Sonic, set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper",     "Wolf Man",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper",     "Nemesis",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, wolfman,  ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
-GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Video Dens", "Ator",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
-GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, 0,        ROT0,  "Peyper",    "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)
+GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Peyper",     "Odin",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Sonic",      "Odin De Luxe",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_peyper,  ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, init_peyper,  ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, init_peyper,  ROT0, "Sonic",      "Pole Position (Sonic)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Star Wars (Sonic, set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Star Wars (Sonic, set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_wolfman, ROT0, "Peyper",     "Wolf Man",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_wolfman, ROT0, "Peyper",     "Nemesis",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_wolfman, ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
+GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
+GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init,   ROT0,  "Peyper",    "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)

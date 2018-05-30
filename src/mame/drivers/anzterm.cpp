@@ -395,7 +395,7 @@ gfx_layout const printfont =
 	64                                          // stride
 };
 
-GFXDECODE_START( anzterm )
+GFXDECODE_START( gfx_anzterm )
 	GFXDECODE_ENTRY("crtc", 0x0000, screenfont, 0, 1)
 	GFXDECODE_ENTRY("prnt", 0x0000, printfont,  0, 1)
 GFXDECODE_END
@@ -412,8 +412,8 @@ void anzterm_state::anzterm(address_map &map)
 
 
 MACHINE_CONFIG_START(anzterm_state::anzterm)
-	MCFG_CPU_ADD("maincpu", M6809, 15974400/4)
-	MCFG_CPU_PROGRAM_MAP(anzterm)
+	MCFG_DEVICE_ADD("maincpu", M6809, 15974400/4)
+	MCFG_DEVICE_PROGRAM_MAP(anzterm)
 
 	MCFG_DEVICE_ADD("pic.ic39", I8214, 0)
 	MCFG_DEVICE_ADD("adlc.ic16", MC6854, 0)
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(anzterm_state::anzterm)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", anzterm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_anzterm)
 MACHINE_CONFIG_END
 
 
@@ -481,4 +481,4 @@ ROM_START( anzterm )
 	ROM_LOAD( "ebb-fea-v96-9-23-83-f43a.u11", 0x4000, 0x1000, CRC(0e572470) SHA1(966e5eeb0114589a7cab3c29a1db48cdd8634be5) )
 ROM_END
 
-COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, anzterm_state, 0, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision
+COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, anzterm_state, empty_init, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision

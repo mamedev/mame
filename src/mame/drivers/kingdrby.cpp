@@ -883,12 +883,12 @@ static const gfx_layout cowrace_layout16x16x2 =
 	16*16
 };
 
-static GFXDECODE_START( kingdrby )
+static GFXDECODE_START( gfx_kingdrby )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0x080, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0x000, 0x80 )
 GFXDECODE_END
 
-static GFXDECODE_START( cowrace )
+static GFXDECODE_START( gfx_cowrace )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, cowrace_layout16x16x2, 0x080, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0x000, 0x80 )
 GFXDECODE_END
@@ -958,20 +958,20 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 }
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrby)
-	MCFG_CPU_ADD("master", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("master", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("slave", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_IO_MAP(slave_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("slave", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_IO_MAP(slave_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
+	MCFG_DEVICE_ADD("soundcpu", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
@@ -979,19 +979,19 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 
 	// 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(kingdrby_state, hopper_io_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, kingdrby_state, hopper_io_r))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, hopper_io_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, hopper_io_w))
 
 	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
-	MCFG_I8255_IN_PORTB_CB(READ8(kingdrby_state, key_matrix_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(kingdrby_state, input_mux_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, outport2_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, kingdrby_state, key_matrix_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, kingdrby_state, input_mux_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, outport2_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingdrby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingdrby)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1006,18 +1006,18 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 	kingdrby(config);
 
-	MCFG_CPU_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
+	MCFG_DEVICE_MODIFY("slave")
+	MCFG_DEVICE_PROGRAM_MAP(slave_1986_map)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
@@ -1027,10 +1027,10 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	/* C as input, (all) as output */
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kingdrby_state, outportb_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kingdrby_state, outportb_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
@@ -1040,20 +1040,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	kingdrbb(config);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(cowrace_sound_map)
-	MCFG_CPU_IO_MAP(cowrace_sound_io)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(cowrace_sound_map)
+	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cowrace)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_REPLACE("aysnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("oki", okim6295_device, read))   // read B
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("oki", okim6295_device, write))   // write B
+	MCFG_DEVICE_REPLACE("aysnd", YM2203, 3000000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("oki", okim6295_device, read))   // read B
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("oki", okim6295_device, write))   // write B
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -1122,13 +1122,13 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 //  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 
 	ROM_REGION( 0x4000, "pals", 0 ) // all read protected
-	ROM_LOAD( "palce16v.u101.bin", 0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u113.bin", 0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u160.bin", 0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u2.bin",   0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u29.bin",  0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u4.bin",   0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v.u75.bin",  0x0000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u101.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u113.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u160.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u2.bin",   0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u29.bin",  0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u4.bin",   0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u75.bin",  0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
 	// jedutil just complains these are invalid..
 	ROM_LOAD( "palce16v8q.u53.jed", 0x0000, 0x892, CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) )
 	ROM_LOAD( "palce16v8q.u77.jed", 0x0000, 0x892, CRC(b7956421) SHA1(57db38b571adf6cf49d7c221cd65a068a9a3383a) )
@@ -1227,7 +1227,7 @@ ROM_START( kingdrbb2 )
 ROM_END
 
 
-GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, kingdrby_state, 0, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, kingdrby_state, 0, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
-GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, kingdrby_state, 0, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 2000, cowrace,   kingdrby, cowrace,  kingdrbb, kingdrby_state, 0, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )
+GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, kingdrby_state, empty_init, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME(  1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, kingdrby_state, empty_init, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
+GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, kingdrby_state, empty_init, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME(  2000, cowrace,   kingdrby, cowrace,  kingdrbb, kingdrby_state, empty_init, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )

@@ -37,31 +37,19 @@ class isbc_state : public driver_device
 {
 public:
 	isbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_uart8251(*this, "uart8251"),
-		m_uart8274(*this, "uart8274"),
-		m_pic_0(*this, "pic_0"),
-		m_pic_1(*this, "pic_1"),
-		m_centronics(*this, "centronics"),
-		m_cent_status_in(*this, "cent_status_in"),
-		m_statuslatch(*this, "statuslatch"),
-		m_bios(*this, "user1"),
-		m_biosram(*this, "biosram")
-	{
-	}
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<i8251_device> m_uart8251;
-//  optional_device<i8274_device> m_uart8274;
-	optional_device<i8274_new_device> m_uart8274;
-	required_device<pic8259_device> m_pic_0;
-	optional_device<pic8259_device> m_pic_1;
-	optional_device<centronics_device> m_centronics;
-	optional_device<input_buffer_device> m_cent_status_in;
-	optional_device<ls259_device> m_statuslatch;
-	optional_memory_region m_bios;
-	optional_shared_ptr<u16> m_biosram;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart8251(*this, "uart8251")
+		, m_uart8274(*this, "uart8274")
+		, m_pic_0(*this, "pic_0")
+		, m_pic_1(*this, "pic_1")
+		, m_centronics(*this, "centronics")
+		, m_cent_status_in(*this, "cent_status_in")
+		, m_statuslatch(*this, "statuslatch")
+		, m_bios(*this, "user1")
+		, m_biosram(*this, "biosram")
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
@@ -99,7 +87,22 @@ public:
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
 protected:
-	void machine_reset() override;
+	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<i8251_device> m_uart8251;
+//  optional_device<i8274_device> m_uart8274;
+	optional_device<i8274_new_device> m_uart8274;
+	required_device<pic8259_device> m_pic_0;
+	optional_device<pic8259_device> m_pic_1;
+	optional_device<centronics_device> m_centronics;
+	optional_device<input_buffer_device> m_cent_status_in;
+	optional_device<ls259_device> m_statuslatch;
+	optional_memory_region m_bios;
+	optional_shared_ptr<u16> m_biosram;
+	output_finder<2> m_led;
+
 private:
 	bool m_upperen;
 	offs_t m_megabyte_page;
@@ -337,12 +340,12 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 
 WRITE_LINE_MEMBER(isbc_state::led_ds1_w)
 {
-	machine().output().set_led_value(0, !state);
+	m_led[0] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER(isbc_state::led_ds3_w)
 {
-	machine().output().set_led_value(1, !state);
+	m_led[1] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)
@@ -352,142 +355,142 @@ WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)
 
 MACHINE_CONFIG_START(isbc_state::isbc86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
-	MCFG_CPU_IO_MAP(isbc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(isbc86_mem)
+	MCFG_DEVICE_IO_MAP(isbc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(22'118'400)/18)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
 	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir6_w))
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::rpc86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
-	MCFG_CPU_IO_MAP(rpc86_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rpc86_mem)
+	MCFG_DEVICE_IO_MAP(rpc86_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir2_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir2_w))
 	MCFG_PIT8253_CLK1(XTAL(22'118'400)/144)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
 	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir7_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir6_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir7_w))
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
-	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir3_w))
-	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir4_w))
+	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_0", pic8259_device, ir3_w))
+	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_0", pic8259_device, ir4_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
-	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
-	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_0", pic8259_device, ir5_w))
+	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::isbc8605)
 	rpc86(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(isbc8605_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(isbc8605_io)
 
 	MCFG_DEVICE_ADD("isbc_208", ISBC_208, 0)
 	MCFG_ISBC_208_MAINCPU("maincpu")
-	MCFG_ISBC_208_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+	MCFG_ISBC_208_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::isbc8630)
 	rpc86(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(isbc8630_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(isbc8630_io)
 
 	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
-	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 
 	MCFG_DEVICE_ADD("statuslatch", LS259, 0) // U14
-//  MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate0))
-//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("pit", pit8253_device, write_gate1))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(isbc_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(isbc_state, override_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(isbc_state, bus_intr_out1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(isbc_state, bus_intr_out2_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(isbc_state, led_ds1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(isbc_state, led_ds3_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(isbc_state, megabyte_select_w))
+//  MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("pit", pit8253_device, write_gate0))
+//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("pit", pit8253_device, write_gate1))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, isbc_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, isbc_state, override_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, isbc_state, bus_intr_out1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, isbc_state, bus_intr_out2_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, isbc_state, led_ds1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, isbc_state, led_ds3_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, isbc_state, megabyte_select_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::isbc286)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
-	MCFG_CPU_IO_MAP(isbc286_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(isbc286_mem)
+	MCFG_DEVICE_IO_MAP(isbc286_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(isbc_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, isbc_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir7_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic_0", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(22'118'400)/18)
-//  MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxtxcb_w))
+//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart8274", z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart8274", i8274_new_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc286_tmr2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc286_tmr2_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(isbc_state, ppi_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8("cent_status_in", input_buffer_device, read))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isbc_state, ppi_c_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(isbc_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, isbc_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -495,63 +498,63 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 
 #if 0
 	MCFG_DEVICE_ADD("uart8274", I8274, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
 #else
 	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(16'000'000)/4)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-//  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
+//  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic_0", pic8259_device, ir6_w))
 #endif
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
 #if 0
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsa_w))
 #else
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", i8274_new_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", i8274_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", i8274_new_device, ctsa_w))
 #endif
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
 #if 0
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsb_w))
 #else
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", i8274_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", i8274_new_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", i8274_new_device, ctsb_w))
 #endif
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir4_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir3_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir4_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir5_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir6_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir5_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir6_w))
 
 	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
-	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::isbc2861)
 	isbc286(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(isbc2861_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -689,11 +692,11 @@ ROM_START( rpc86 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME        FLAGS */
-COMP( 19??, rpc86,     0,      0,      rpc86,     isbc,  isbc_state,  0,    "Intel",  "RPC 86",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1978, isbc86,    0,      0,      isbc86,    isbc,  isbc_state,  0,    "Intel",  "iSBC 86/12A",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8605,  0,      0,      isbc8605,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/05",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8630,  0,      0,      isbc8630,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/30",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 19??, isbc286,   0,      0,      isbc286,   isbc,  isbc_state,  0,    "Intel",  "iSBC 286",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc2861,  0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/10",  MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc28612, 0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/12",  MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY  FULLNAME       FLAGS */
+COMP( 19??, rpc86,     0,      0,      rpc86,    isbc,  isbc_state, empty_init, "Intel", "RPC 86",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1978, isbc86,    0,      0,      isbc86,   isbc,  isbc_state, empty_init, "Intel", "iSBC 86/12A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8605,  0,      0,      isbc8605, isbc,  isbc_state, empty_init, "Intel", "iSBC 86/05",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8630,  0,      0,      isbc8630, isbc,  isbc_state, empty_init, "Intel", "iSBC 86/30",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 19??, isbc286,   0,      0,      isbc286,  isbc,  isbc_state, empty_init, "Intel", "iSBC 286",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc2861,  0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/10", MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc28612, 0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/12", MACHINE_NO_SOUND_HW)

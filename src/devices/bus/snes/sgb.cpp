@@ -154,21 +154,22 @@ WRITE8_MEMBER( sns_rom_sgb_device::gb_timer_callback )
 }
 
 
-static SLOT_INTERFACE_START(supergb_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  GB_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
-SLOT_INTERFACE_END
+static void supergb_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  GB_STD_ROM);
+	device.option_add_internal("rom_mbc1",  GB_ROM_MBC1);
+}
 
 
 MACHINE_CONFIG_START(sns_rom_sgb1_device::device_add_mconfig)
-	MCFG_CPU_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
-	MCFG_CPU_PROGRAM_MAP(supergb_map)
-	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
+	MCFG_DEVICE_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(supergb_map)
+	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
-	MCFG_SOUND_ADD("sgb_apu", DMG_APU, 4295454)
+	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, 4295454)
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END
@@ -187,14 +188,14 @@ const tiny_rom_entry *sns_rom_sgb1_device::device_rom_region() const
 
 
 MACHINE_CONFIG_START(sns_rom_sgb2_device::device_add_mconfig)
-	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL(4'194'304))   /* 4.194MHz derived from clock on sgb2 pcb */
-	MCFG_CPU_PROGRAM_MAP(supergb_map)
-	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
+	MCFG_DEVICE_ADD("sgb_cpu", LR35902, XTAL(4'194'304))   /* 4.194MHz derived from clock on sgb2 pcb */
+	MCFG_DEVICE_PROGRAM_MAP(supergb_map)
+	MCFG_LR35902_TIMER_CB(WRITE8(*this, sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
+	MCFG_DEVICE_ADD("sgb_ppu", SGB_PPU, "sgb_cpu")
 
-	MCFG_SOUND_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END

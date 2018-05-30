@@ -65,7 +65,7 @@ public:
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
 
-	DECLARE_DRIVER_INIT(europc);
+	void init_europc();
 
 	void europc_rtc_set_time();
 
@@ -359,20 +359,21 @@ WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
 	}
 }
 
-DRIVER_INIT_MEMBER(europc_pc_state,europc)
+void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
 
-	int i;
 	/*
 	  fix century rom bios bug !
 	  if year <79 month (and not CENTURY) is loaded with 0x20
 	*/
 	if (rom[0xf93e]==0xb6){ // mov dh,
-		uint8_t a;
 		rom[0xf93e]=0xb5; // mov ch,
-		for (i=0x8000, a=0; i<0xffff; i++ ) a+=rom[i];
-		rom[0xffff]=256-a;
+		uint8_t a = 0;
+		int i = 0x8000;
+		for (; i < 0xffff; i++)
+			a += rom[i];
+		rom[0xffff] = 256 - a;
 	}
 
 	memset(&m_rtc_data,0,sizeof(m_rtc_data));
@@ -521,22 +522,22 @@ void europc_pc_state::cfg_builtin_720K(device_t *device)
 
 //Euro PC
 MACHINE_CONFIG_START(europc_pc_state::europc)
-	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
-	MCFG_CPU_PROGRAM_MAP(europc_map)
-	MCFG_CPU_IO_MAP(europc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4772720*2)
+	MCFG_DEVICE_PROGRAM_MAP(europc_map)
+	MCFG_DEVICE_IO_MAP(europc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "aga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
 	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
 	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_builtin_720K)
 	MCFG_SLOT_FIXED(true)
-	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram");
 
@@ -563,9 +564,9 @@ MACHINE_CONFIG_START(europc_pc_state::euroxt)
 	MCFG_RAM_DEFAULT_SIZE("768K")
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "xtide", false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "xtide", false) // FIXME: determine ISA bus clock
 	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
@@ -602,7 +603,7 @@ ROM_START( euroxt )
 	ROM_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2))
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT   STATE                INIT        COMPANY              FULLNAME        FLAGS
-COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)
-COMP( 198?, europc2,    ibm5150,    0,         europc2,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC II", MACHINE_NOT_WORKING)
-COMP( 198?, euroxt,     ibm5150,    0,          euroxt,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO XT", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS
+COMP( 1988, europc,  ibm5150, 0,      europc,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC",    MACHINE_NOT_WORKING)
+COMP( 198?, europc2, ibm5150, 0,      europc2, europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC II", MACHINE_NOT_WORKING)
+COMP( 198?, euroxt,  ibm5150, 0,      euroxt,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO XT",    MACHINE_NOT_WORKING)

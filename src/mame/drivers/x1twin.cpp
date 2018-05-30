@@ -392,7 +392,7 @@ static const gfx_layout x1_chars_16x16 =
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( x1 )
+static GFXDECODE_START( gfx_x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
@@ -406,15 +406,16 @@ static const z80_daisy_config x1_daisy[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(x1_mem)
-	MCFG_CPU_IO_MAP(x1_io)
+	MCFG_DEVICE_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
+	MCFG_DEVICE_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
 
 	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
@@ -426,27 +427,27 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(x1_state, x1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
 
 	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
-	MCFG_CPU_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
+	MCFG_DEVICE_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
+	MCFG_DEVICE_IO_MAP(pce_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "pce_screen", 0, 1)
 	#endif
 
@@ -472,13 +473,13 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -490,24 +491,23 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SPEAKER_ADD("x1_l",-0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("x1_r",0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("pce_l",-0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("pce_r",0.2, 0.0, 1.0)
+	SPEAKER(config, "x1_l").front_left();
+	SPEAKER(config, "x1_r").front_right();
+	SPEAKER(config, "pce_l").front_left();
+	SPEAKER(config, "pce_r").front_right();
 
-//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+//  SPEAKER(config, "lspeaker").front_left();
+//  SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(0, "x1_l",  0.25)
 	MCFG_SOUND_ROUTE(0, "x1_r", 0.25)
 	MCFG_SOUND_ROUTE(1, "x1_l",  0.5)
 	MCFG_SOUND_ROUTE(2, "x1_r", 0.5)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_l", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_r", 0.10)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
 #if 0
-	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("pce_cpu")
 	MCFG_SOUND_ROUTE(0, "pce_l", 0.5)
 	MCFG_SOUND_ROUTE(1, "pce_r", 0.5)
@@ -558,4 +558,4 @@ ROM_START( x1twin )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
 
-COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1twin_state, x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    MACHINE_NOT_WORKING )
+COMP( 1986, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )

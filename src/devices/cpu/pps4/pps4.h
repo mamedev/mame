@@ -72,7 +72,6 @@ protected:
 	virtual u32 execute_min_cycles() const override { return 1; }
 	virtual u32 execute_max_cycles() const override { return 3; }
 	virtual u32 execute_input_lines() const override { return 0; }
-	virtual u32 execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -93,7 +92,7 @@ protected:
 	devcb_write8 m_do_cb;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 	int     m_icount;

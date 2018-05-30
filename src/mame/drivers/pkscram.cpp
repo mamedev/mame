@@ -279,7 +279,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( pkscram )
+static GFXDECODE_START( gfx_pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
@@ -305,9 +305,9 @@ void pkscram_state::machine_reset()
 
 MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
-	MCFG_CPU_PROGRAM_MAP(pkscramble_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000 )
+	MCFG_DEVICE_PROGRAM_MAP(pkscramble_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -325,14 +325,14 @@ MACHINE_CONFIG_START(pkscram_state::pkscramble)
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkscram)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkscram)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pkscram_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pkscram_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -348,4 +348,4 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, empty_init, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )

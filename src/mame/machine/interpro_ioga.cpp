@@ -70,7 +70,7 @@ const interpro_ioga_device::interrupt_data_t interpro_ioga_device::m_interrupt_d
 	{ INT_HARD_EX, IRQ_9,        IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 7", "?" },
 	{ INT_HARD_EX, IRQ_CBUS3,    IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 8", "cbus 3" },
 	{ INT_HARD_EX, IRQ_RTC,      IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 9", "clock/calendar" },
-	{ INT_HARD_EX, IRQ_12,       IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 10", "sga?" },
+	{ INT_HARD_EX, IRQ_60HZ,     IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 10", "60Hz" },
 
 	{ INT_HARD_IN, IRQ_MOUSE,    IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 0", "mouse" },
 	{ INT_HARD_IN, IRQ_TIMER0,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 1", "timer 0" },
@@ -114,6 +114,7 @@ void interpro_ioga_device::map(address_map &map)
 	map(0x54, 0x57).rw(this, FUNC(interpro_ioga_device::serial_dma2_ctrl_r), FUNC(interpro_ioga_device::serial_dma2_ctrl_w));
 
 	// 5a - sib control?
+	//map(0x58, 0x5b).rw(this, FUNC(interpro_ioga_device::sib_r), FUNC(interpro_ioga_device::sib_w));
 	map(0x5c, 0x7f).rw(this, FUNC(interpro_ioga_device::icr_r), FUNC(interpro_ioga_device::icr_w));
 	map(0x80, 0x81).rw(this, FUNC(interpro_ioga_device::icr18_r), FUNC(interpro_ioga_device::icr18_w));
 	map(0x82, 0x82).rw(this, FUNC(interpro_ioga_device::softint_r), FUNC(interpro_ioga_device::softint_w));
@@ -125,7 +126,7 @@ void interpro_ioga_device::map(address_map &map)
 	map(0x94, 0x97).r(this, FUNC(interpro_ioga_device::error_address_r));
 	map(0x98, 0x9b).r(this, FUNC(interpro_ioga_device::error_businfo_r));
 	map(0x9c, 0x9d).rw(this, FUNC(interpro_ioga_device::arbctl_r), FUNC(interpro_ioga_device::arbctl_w));
-	//AM_RANGE(0x9c, 0x9f) AM_READWRITE16(?, ?, 0xffff0000) // ip2000 boot code writes 0x7f18
+
 	map(0xa0, 0xa3).rw(this, FUNC(interpro_ioga_device::timer2_count_r), FUNC(interpro_ioga_device::timer2_count_w));
 	map(0xa4, 0xa7).rw(this, FUNC(interpro_ioga_device::timer2_value_r), FUNC(interpro_ioga_device::timer2_value_w));
 	map(0xa8, 0xab).rw(this, FUNC(interpro_ioga_device::timer3_r), FUNC(interpro_ioga_device::timer3_w));
@@ -141,6 +142,8 @@ void turquoise_ioga_device::map(address_map &map)
 
 	map(0x00, 0x03).rw(this, FUNC(turquoise_ioga_device::eth_base_r), FUNC(turquoise_ioga_device::eth_base_w));
 	map(0x04, 0x05).rw(this, FUNC(turquoise_ioga_device::eth_control_r), FUNC(turquoise_ioga_device::eth_control_w));
+
+	//map(0x9e, 0x9f).rw(this, FUNC(turquoise_ioga_device::?), FUNC(turquoise_ioga_device::?)); // ip2000 boot code writes 0x7f18
 }
 
 void sapphire_ioga_device::map(address_map &map)
@@ -151,18 +154,6 @@ void sapphire_ioga_device::map(address_map &map)
 	map(0x04, 0x07).rw(this, FUNC(sapphire_ioga_device::eth_mappg_r), FUNC(sapphire_ioga_device::eth_mappg_w));
 	map(0x08, 0x0b).rw(this, FUNC(sapphire_ioga_device::eth_control_r), FUNC(sapphire_ioga_device::eth_control_w));
 }
-
-static INPUT_PORTS_START(interpro_mouse)
-	PORT_START("mouse_buttons")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_button, nullptr)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_button, nullptr)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_button, nullptr)
-
-	PORT_START("mouse_x")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_x, nullptr)
-	PORT_START("mouse_y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_y, nullptr)
-INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(TURQUOISE_IOGA, turquoise_ioga_device, "ioga_t", "I/O Gate Array (Turquoise)")
 DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Array (Sapphire)")
@@ -177,9 +168,9 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device
 	, m_fdc_tc_func(*this)
 	, m_eth_ca_func(*this)
 	, m_dma_channel{
-		{ 0,0,0,0,CLEAR_LINE,IDLE, {*this}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
-		{ 0,0,0,0,CLEAR_LINE,IDLE, {*this}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
-		{ 0,0,0,0,CLEAR_LINE,IDLE, {*this}, {*this}, ARBCTL_BGR_FDC, DMA_FLOPPY, "floppy" } }
+		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
+		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
+		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_FDC, DMA_FLOPPY, "floppy" } }
 	, m_serial_dma_channel{
 		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER0, 0, "serial0" },
 		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER1, 1, "serial1" },
@@ -235,6 +226,8 @@ void interpro_ioga_device::device_start()
 	m_timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer2), this));
 	m_timer3 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer3), this));
 
+	m_timer_60hz = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer_60hz), this));
+
 	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::mouse_timer), this));
 	m_eth_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::eth_reset), this));
 }
@@ -250,10 +243,7 @@ void interpro_ioga_device::device_reset()
 
 	// initialise dma state
 	for (dma_channel_t &dma_channel : m_dma_channel)
-	{
 		dma_channel.drq_state = CLEAR_LINE;
-		dma_channel.state = IDLE;
-	}
 
 	for (serial_dma_channel_t &dma_channel : m_serial_dma_channel)
 		dma_channel.drq_state = CLEAR_LINE;
@@ -271,22 +261,15 @@ void interpro_ioga_device::device_reset()
 	m_mouse_timer->enable(false);
 	m_eth_reset_timer->enable(false);
 
-	// configure timer 0 for 60Hz
 	m_timer0_count = 0;
-	m_timer0_limit = 0;
-	m_timer0->adjust(attotime::zero, 0, attotime::from_hz(60));
-
 	m_timer1_count = 0;
 	m_timer2_count = 0;
 	m_timer2_value = 0;
 	m_timer3_count = 0;
 
-	m_prescaler = 0;
-}
+	m_timer_60hz->adjust(attotime::zero, 0, attotime::from_hz(60));
 
-ioport_constructor interpro_ioga_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(interpro_mouse);
+	m_prescaler = 0;
 }
 
 void interpro_ioga_device::set_nmi_line(int state)
@@ -461,8 +444,8 @@ bool interpro_ioga_device::irq(int state, u8 ivec)
 
 	if (m_irq_state != state)
 	{
-		LOGIRQ(m_active_interrupt->number, "%s %s number %d source %s (%s)\n",
-			state ? "asserting" : "clearing", m_active_interrupt->name, m_active_interrupt->number, m_active_interrupt->source, machine().describe_context());
+		LOGIRQ(m_active_interrupt->number, "%s %s number %d source %s\n",
+			state ? "asserting" : "clearing", m_active_interrupt->name, m_active_interrupt->number, m_active_interrupt->source);
 
 		m_irq_state = state;
 		m_out_irq_func(state);
@@ -559,25 +542,21 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 {
 	for (dma_channel_t &dma_channel : m_dma_channel)
 	{
-		// check if there's something to transfer
-		if (dma_channel.transfer_count == 0 || (dma_channel.control & DMA_CTRL_BGR) == 0)
+		// check if the channel is enabled
+		if (!(dma_channel.control & DMA_CTRL_ENABLE))
 			continue;
 
 		// check if the device is requesting a transfer
 		if (dma_channel.drq_state == CLEAR_LINE)
 			continue;
 
-		// check if the bus is available
-		if ((m_arbctl & dma_channel.arb_mask) == 0)
-		{
-			// set bus wait flag and abort
-			//dma_channel.control |= DMA_CTRL_WAIT;
-
+		// check if there's something to transfer
+		if (dma_channel.transfer_count == 0)
 			continue;
-		}
-		//else
-		//  // clear bus wait flag
-		//  dma_channel.control &= ~DMA_CTRL_WAIT;
+
+		// check if the bus is available
+		if (!(m_arbctl & dma_channel.arb_mask))
+			continue;
 
 		// translate address when DMA_CTRL_VIRTUAL is set
 		// FIXME: what happens when we span a page?
@@ -590,7 +569,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 				dma_channel.real_address = (ptde & ~0xfff) | (dma_channel.real_address & 0xfff);
 				dma_channel.control &= ~DMA_CTRL_VIRTUAL;
 
-				LOGDMA(dma_channel.channel, "dma: translated virtual address 0x%08x\n", dma_channel.real_address);
+				LOGDMA(dma_channel.channel, "dma: translated virtual 0x%08x real 0x%08x\n", dma_channel.virtual_address, dma_channel.real_address);
 
 				// FIXME: what about protection levels and system tags?
 
@@ -624,7 +603,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 			dma_channel.transfer_count--;
 
 			// check for page wrap
-			if (dma_channel.transfer_count && (dma_channel.real_address & 0xfff) == 0)
+			if ((dma_channel.real_address & 0xfff) == 0)
 			{
 				LOGDMA(dma_channel.channel, "dma: wrapped to next memory page\n");
 
@@ -650,11 +629,11 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 				m_fdc_tc_func(CLEAR_LINE);
 			}
 
-			// clear bus grant required
-			dma_channel.control &= ~DMA_CTRL_BGR;
-
 			// set transfer count zero flag
 			dma_channel.control |= DMA_CTRL_TCZERO;
+
+			// disable the channel
+			dma_channel.control &= ~DMA_CTRL_ENABLE;
 		}
 
 #if IOGA_DMA_DIAG_HACK
@@ -777,29 +756,31 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 		break;
 
 	case 1:
-		LOGDMA(channel, "dma: channel %d virtual address = 0x%08x mem_mask 0x%08x (%s)\n",
+		LOGDMA(channel, "dma: channel %d virtual address 0x%08x mem_mask 0x%08x (%s)\n",
 			channel, data, mem_mask, machine().describe_context());
 		COMBINE_DATA(&dma_channel.virtual_address);
+		dma_channel.virtual_address &= ~0x3;
+
+		dma_channel.control |= DMA_CTRL_VIRTUAL;
 		break;
 
 	case 2:
-		LOGDMA(channel, "dma: channel %d transfer count = 0x%08x mem_mask 0x%08x (%s)\n",
+		LOGDMA(channel, "dma: channel %d transfer count 0x%08x mem_mask 0x%08x (%s)\n",
 			channel, data, mem_mask, machine().describe_context());
 		COMBINE_DATA(&dma_channel.transfer_count);
+
+		dma_channel.control &= ~DMA_CTRL_TCZERO;
 		break;
 
 	case 3:
-		LOGDMA(channel, "dma: channel %d control = 0x%08x mem_mask 0x%08x (%s)\n",
-			channel, data, mem_mask, machine().describe_context());
+		dma_channel.control = (data & mem_mask & DMA_CTRL_WMASK) | (dma_channel.control & (~mem_mask | ~DMA_CTRL_WMASK));
 
-		COMBINE_DATA(&dma_channel.control);
-		// (7.0272) if bus error flag is set, clear existing bus error (otherwise retain existing state)
-		//if (data & DMA_CTRL_BERR)
-		//  dma_channel.control = data & DMA_CTRL_WMASK;
-		//else
-		//  dma_channel.control = (data & DMA_CTRL_WMASK) | (dma_channel.control & DMA_CTRL_BERR);
+		// (7.0272) if bus error flag is written, clear existing bus error (otherwise retain existing state)
+		if (data & DMA_CTRL_BERR)
+			dma_channel.control &= ~DMA_CTRL_BERR;
 
-		dma_channel.state = COMMAND;
+		LOGDMA(channel, "dma: channel %d control 0x%08x mem_mask 0x%08x result 0x%08x (%s)\n",
+			channel, data, mem_mask, dma_channel.control, machine().describe_context());
 		break;
 	}
 }
@@ -927,23 +908,37 @@ READ32_MEMBER(interpro_ioga_device::timer0_r)
 
 WRITE32_MEMBER(interpro_ioga_device::timer0_w)
 {
-	//m_timer0_limit = data;
+	LOGMASKED(LOG_TIMER0, "timer0_w data 0x%08x mask 0x%08x prescaler 0x%08x (%s)\n", data, mem_mask, m_prescaler, machine().describe_context());
+
+	// store the timer count value
 	m_timer0_count = data;
 
-	m_timer0->adjust(attotime::zero, 0, attotime::from_hz(60));
-
-	LOGMASKED(LOG_TIMER0, "timer0_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	// restart the timer
+	//if (m_prescaler & 0xffff)
+	//  m_timer0->adjust(attotime::zero, 0, attotime::from_ticks(m_prescaler & 0xffff, 60_Hz_XTAL));
+	//else
+		m_timer0->adjust(attotime::zero, 0, attotime::from_hz(60_Hz_XTAL));
 }
 
 TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer0)
 {
-	if (m_timer0_count == 0)
-		set_int_line(INT_HARD_IN, IRQ_TIMER0, ASSERT_LINE);
-	else
-		m_timer0_count++;
+	m_timer0_count++;
 
-	//m_hwicr[IRQ_VB] |= IRQ_PENDING; // this makes mouse diag countdown work (at half correct speed)
-	set_int_line(INT_HARD_EX, IRQ_12, ASSERT_LINE); // FIXME: 60Hz timer on InterPro 2000
+	// check if the timer has expired
+	if (m_timer0_count == 0)
+	{
+		// stop the timer
+		m_timer0->enable(false);
+
+		// raise an interrupt
+		if (m_hwicr[IRQ_TIMER0] & IRQ_ENABLE_EXTERNAL)
+			set_int_line(INT_HARD_IN, IRQ_TIMER0, ASSERT_LINE);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer_60hz)
+{
+	set_int_line(INT_HARD_EX, IRQ_60HZ, ASSERT_LINE);
 }
 
 READ32_MEMBER(interpro_ioga_device::timer1_r)
@@ -972,11 +967,10 @@ WRITE32_MEMBER(interpro_ioga_device::timer1_w)
 	// start the timer if necessary
 	if (data & TIMER1_START)
 	{
-		LOGMASKED(LOG_TIMER1, "timer1_w data 0x%08x mask 0x%08x prescaler 0x%04x (%s)\n", data, mem_mask, m_prescaler & 0x7fff, machine().describe_context());
+		LOGMASKED(LOG_TIMER1, "timer1_w data 0x%08x mask 0x%08x prescaler 0x%08x (%s)\n", data, mem_mask, m_prescaler, machine().describe_context());
 
-		// theory: timer 1 is 10MHz (typical prescaler value of 1000 and timer value of 100 giving a delay of 100ms)
-		// FIXME: division by 50 is sufficient to pass iogadiag timer 1 tests
-		m_timer1->adjust(attotime::zero, false, attotime::from_usec((m_prescaler & 0x7fff) / 50));
+		// theory: timer 1 is 1MHz (typical prescaler value of 1000 and timer value of 100 giving a delay of 100ms)
+		m_timer1->adjust(attotime::zero, false, attotime::from_usec((m_prescaler & 0xffff) / 50));
 	}
 }
 
@@ -995,7 +989,8 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer1)
 		m_timer1->set_param(true);
 
 		// throw an interrupt
-		set_int_line(INT_HARD_IN, IRQ_TIMER1, ASSERT_LINE);
+		if (m_hwicr[IRQ_TIMER1] & IRQ_ENABLE_EXTERNAL)
+			set_int_line(INT_HARD_IN, IRQ_TIMER1, ASSERT_LINE);
 	}
 }
 
@@ -1084,22 +1079,21 @@ READ32_MEMBER(interpro_ioga_device::prescaler_r)
 	// FIXME: prescaler only used with timer 1?
 	LOGMASKED(LOG_TIMERRD, "prescaler_r data 0x%08x mask 0x%08x (%s)\n", m_prescaler, mem_mask, machine().describe_context());
 
-	return m_prescaler;
+	return (m_prescaler ^ 0xffff0000) - 0x10000;
 }
 
 WRITE32_MEMBER(interpro_ioga_device::prescaler_w)
 {
-	LOGMASKED(LOG_TIMER1, "prescaler_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMER0 | LOG_TIMER1, "prescaler_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 
-	// this logic satisfies prescaler tests, but fails timer prescaler tests
-	if ((data & 0x7fff) < 0x100 && (data & 0x7fff) != 0)
-		m_prescaler = (data ^ 0xffff0000);
-	else
-		m_prescaler = (data ^ 0xffff0000) - 0x10000;
+	COMBINE_DATA(&m_prescaler);
 }
 
 /*
  * Mouse
+ *
+ * THEORY: mouse button state changes don't generate an interrupt, but are read
+ * when an interrupt is generated by movement or by the 60Hz timer.
  */
 READ32_MEMBER(interpro_ioga_device::mouse_status_r)
 {
@@ -1123,62 +1117,16 @@ WRITE32_MEMBER(interpro_ioga_device::mouse_status_w)
 {
 	LOGMASKED(LOG_MOUSE, "mouse_status_w status 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 
-	m_mouse_status |= (data & MOUSE_COUNTER);
+	COMBINE_DATA(&m_mouse_status);
 
-	// FIXME: diagnostic test fails with value >= 0x1000
-	if (data & MOUSE_COUNTER)
-		m_mouse_timer->adjust(attotime::from_nsec(data & MOUSE_COUNTER));
-}
-
-INPUT_CHANGED_MEMBER(interpro_ioga_device::mouse_button)
-{
-	if (newval)
-		m_mouse_status |= (field.mask() << 16);
-	else
-		m_mouse_status &= ~(field.mask() << 16);
-
-	// FIXME: this isn't right, but the rebuild code only
-	// reads the button status if the x/y status is non-zero?
-	m_mouse_status |= MOUSE_COUNTER;
-
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
-}
-
-INPUT_CHANGED_MEMBER(interpro_ioga_device::mouse_x)
-{
-	// compute x delta
-	int delta = newval - oldval;
-	if (delta > 0x80)
-		delta -= 0x100;
-	else if (delta < -0x80)
-		delta += 0x100;
-
-	// set new x delta
-	m_mouse_status &= ~MOUSE_XPOS;
-	m_mouse_status |= ((delta << 8) & MOUSE_XPOS);
-
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
-}
-
-INPUT_CHANGED_MEMBER(interpro_ioga_device::mouse_y)
-{
-	// compute y delta
-	int delta = newval - oldval;
-	if (delta > 0x80)
-		delta -= 0x100;
-	else if (delta < -0x80)
-		delta += 0x100;
-
-	// set new y delta
-	m_mouse_status &= ~MOUSE_YPOS;
-	m_mouse_status |= ((delta << 0) & MOUSE_YPOS);
-
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
+	if (data & (MOUSE_XPOS | MOUSE_YPOS))
+		m_mouse_timer->adjust(attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(interpro_ioga_device::mouse_timer)
 {
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
+	if (m_hwicr[IRQ_MOUSE] & IRQ_ENABLE_EXTERNAL)
+		set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
 }
 
 /*

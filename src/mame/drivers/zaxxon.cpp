@@ -299,7 +299,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -902,7 +902,7 @@ static const gfx_layout zaxxon_spritelayout =
 };
 
 
-static GFXDECODE_START( zaxxon )
+static GFXDECODE_START( gfx_zaxxon )
 	GFXDECODE_ENTRY( "gfx_tx", 0, gfx_8x8x2_planar,  0, 64*2 )  /* characters */
 	GFXDECODE_ENTRY( "gfx_bg", 0, gfx_8x8x3_planar,  0, 32*2 )  /* background tiles */
 	GFXDECODE_ENTRY( "gfx_spr", 0, zaxxon_spritelayout,  0, 32*2 )  /* sprites */
@@ -918,30 +918,30 @@ GFXDECODE_END
 MACHINE_CONFIG_START(zaxxon_state::root)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(zaxxon_state, zaxxon_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, zaxxon_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, zaxxon_sound_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_c_w))
 
 	MCFG_DEVICE_ADD("mainlatch1", LS259, 0) // U55 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN A
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN B
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // SERV EN
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, coin_counter_a_w)) // COUNT A
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(zaxxon_state, coin_counter_b_w)) // COUNT B
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // COIN EN A
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // COIN EN B
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // SERV EN
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, zaxxon_state, coin_counter_a_w)) // COUNT A
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, zaxxon_state, coin_counter_b_w)) // COUNT B
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, flipscreen_w)) // FLIP
 
 	MCFG_DEVICE_ADD("mainlatch2", LS259, 0) // U56 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, fg_color_w)) // CREF 1
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaxxon_state, int_enable_w)) // INTON
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaxxon_state, fg_color_w)) // CREF 1
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, bg_color_w)) // CREF 3
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, bg_enable_w)) // BEN
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaxxon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaxxon)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
 
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_zaxxon)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(zaxxon_state, vblank_int))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaxxon_state, vblank_int))
 MACHINE_CONFIG_END
 
 
@@ -957,7 +957,7 @@ MACHINE_CONFIG_START(zaxxon_state::zaxxon)
 	root(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
 MACHINE_CONFIG_END
 
@@ -965,16 +965,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::szaxxon)
 	zaxxon(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(zaxxon_state::szaxxone)
 	zaxxon(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 MACHINE_CONFIG_END
@@ -983,9 +983,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::futspye)
 	root(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
@@ -995,7 +995,7 @@ MACHINE_CONFIG_START(zaxxon_state::futspye)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_futspy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
 
 MACHINE_CONFIG_END
@@ -1005,9 +1005,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	root(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(ixion_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
@@ -1019,15 +1019,15 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_SEGAUSBROM_ADD("usbsnd")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::ixion)
 	razmataze(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(ixion_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
@@ -1038,27 +1038,27 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zaxxon_state::congo)
 	root(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(congo_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(congo_map)
 
 	MCFG_DEVICE_REPLACE("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, congo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, congo_sound_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, congo_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, congo_sound_c_w))
 
 	MCFG_DEVICE_MODIFY("mainlatch1") // U52 on Control Board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, zaxxon_state, bg_enable_w)) // BEN
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, int_enable_w)) // INTON
 
 	MCFG_DEVICE_MODIFY("mainlatch2") // U53 on Control Board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // not used
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, congo_fg_bank_w)) // BS
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, congo_color_bank_w)) // CBS
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, zaxxon_state, bg_color_w)) // CREF 3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, congo_fg_bank_w)) // BS
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, congo_color_bank_w)) // CBS
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(congo_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1070,14 +1070,14 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
+	MCFG_DEVICE_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
+	MCFG_DEVICE_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	congo_samples(config);
@@ -1511,7 +1511,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
+void zaxxon_state::init_zaxxonj()
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1559,16 +1559,13 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 	for (int A = 0x0000; A < 0x6000; A++)
 	{
-		int i,j;
-		uint8_t src;
-
-		src = rom[A];
+		uint8_t src = rom[A];
 
 		/* pick the translation table from bit 0 of the address */
-		i = A & 1;
+		int i = A & 1;
 
 		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
-		j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
+		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
 		/* the bottom half of the translation table is the mirror image of the top */
 		if (src & 0x80) j = 7 - j;
 
@@ -1584,7 +1581,7 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 
 
-DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
+void zaxxon_state::init_razmataz()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1610,25 +1607,25 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 1, rev D)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon2,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 2, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon3,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 3, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxonj,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   zaxxonj,  ROT90,  "bootleg", "Jackson",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,    zaxxon,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Zaxxon (set 1, rev D)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon2,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Zaxxon (set 2, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon3,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Zaxxon (set 3, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxonj,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   init_zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   init_zaxxonj,  ROT90,  "bootleg", "Jackson",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware but extra sound board plugged into 8255 PPI socket and encrypted cpu */
-GAME( 1982, szaxxon,  0,      szaxxone,  szaxxon,  zaxxon_state,   0,        ROT90,  "Sega",    "Super Zaxxon (315-5013)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, szaxxon,  0,      szaxxone,  szaxxon,  zaxxon_state,   empty_init,    ROT90,  "Sega",    "Super Zaxxon (315-5013)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware? but encrypted cpu */
-GAME( 1984, futspy,   0,      futspye,   futspy,   zaxxon_state,   0,        ROT90,  "Sega",    "Future Spy (315-5061)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, futspy,   0,      futspye,   futspy,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Future Spy (315-5061)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
-GAME( 1983, razmataz, 0,      razmataze, razmataz, zaxxon_state,   razmataz, ROT90,  "Sega",    "Razzmatazz",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   0,        ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, razmataz, 0,      razmataze, razmataz, zaxxon_state,   init_razmataz, ROT90,  "Sega",    "Razzmatazz",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   empty_init,    ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, congoa,   congo,  congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tiptop,   congo,  congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,     congo,   zaxxon_state,    empty_init,    ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, congoa,   congo,  congo,     congo,   zaxxon_state,    empty_init,    ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,     congo,   zaxxon_state,    empty_init,    ROT90,  "Sega",    "Tip Top (3 board stack)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

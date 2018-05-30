@@ -357,7 +357,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// rising edge
 	if (state)
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 //  has SD card slot instead?
 //  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
@@ -467,16 +467,16 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(md_cons_state, mess_md_common)
+void md_cons_state::init_mess_md_common()
 {
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_cons_state::mess_md_io_read_data_port),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_cons_state::mess_md_io_write_data_port),this);
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, genesis)
+void md_cons_state::init_genesis()
 {
-	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadriv();
+	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -495,10 +495,10 @@ DRIVER_INIT_MEMBER(md_cons_state, genesis)
 		m_version_hi_nibble |= 0x20;
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, md_eur)
+void md_cons_state::init_md_eur()
 {
-	DRIVER_INIT_CALL(megadrie);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrie();
+	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -517,10 +517,10 @@ DRIVER_INIT_MEMBER(md_cons_state, md_eur)
 		m_version_hi_nibble |= 0x20;
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
+void md_cons_state::init_md_jpn()
 {
-	DRIVER_INIT_CALL(megadrij);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrij();
+	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -613,19 +613,19 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
 
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -654,19 +654,19 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
 
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -695,19 +695,19 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
 
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -760,7 +760,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")
@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")
@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")
@@ -1075,41 +1075,41 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT     COMPAT  MACHINE          INPUT   INIT       COMPANY   FULLNAME */
-CONS( 1989, genesis,    0,         0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
-CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md, md_cons_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE          INPUT  CLASS          INIT       COMPANY   FULLNAME */
+CONS( 1989, genesis,      0,        0,      ms_megadriv,     md,    md_cons_state, init_genesis, "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, megadriv,     genesis,  0,      ms_megadpal,     md,    md_cons_state, init_md_eur,  "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, megadrij,     genesis,  0,      ms_megadriv,     md,    md_cons_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
-CONS( 1990, genesis_tmss, genesis, 0,      genesis_tmss,    md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, genesis_tmss, genesis,  0,      genesis_tmss,    md,    md_cons_state, init_genesis, "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
 
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
-CONS( 1994, 32x,        0,         0,      genesis_32x,     md, md_cons_state,     genesis,   "Sega",   "Genesis with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, 32xe,       32x,       0,      md_32x,          md, md_cons_state,     md_eur,    "Sega",   "Mega Drive with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1994, 32xj,       32x,       0,      mdj_32x,         md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x,          0,        0,      genesis_32x,     md,    md_cons_state, init_genesis, "Sega",   "Genesis with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, 32xe,         32x,      0,      md_32x,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega Drive with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1994, 32xj,         32x,      0,      mdj_32x,         md,    md_cons_state, init_md_jpn,  "Sega",   "Mega Drive with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
 
 // the SegaCD plugged into the expansion port..
-CONS( 1992, segacd,     0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, megacd,     segacd,    0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1991, megacdj,    segacd,    0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", MACHINE_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
-CONS( 1991, megacda,    segacd,    0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", MACHINE_NOT_WORKING )
-CONS( 1993, segacd2,    0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, megacd2,    segacd2,   0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1993, megacd2j,   segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, aiwamcd,    segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, laseract,   0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Pioneer","LaserActive (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, laseractj,  laseract,  0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, xeye,       0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "JVC",    "X'eye (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1992, wmega,      xeye,      0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, wmegam2,    xeye,      0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, multmega,   cdx,       0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1992, segacd,       0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Sega",   "Sega CD (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd,       segacd,   0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1991, megacdj,      segacd,   0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Sega",   "Mega-CD (Japan, NTSC)", MACHINE_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
+CONS( 1991, megacda,      segacd,   0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD (Asia, PAL)", MACHINE_NOT_WORKING )
+CONS( 1993, segacd2,      0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Sega",   "Sega CD 2 (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd2,      segacd2,  0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD 2 (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd2j,     segacd2,  0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Sega",   "Mega-CD 2 (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, aiwamcd,      segacd2,  0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseract,     0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Pioneer","LaserActive (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Pioneer","LaserActive (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, xeye,         0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "JVC",    "X'eye (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1992, wmega,        xeye,     0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Sega",   "Wondermega (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, wmegam2,      xeye,     0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Victor", "Wondermega M2 (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, cdx,          0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Sega",   "CDX (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, multmega,     cdx,      0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Multi-Mega (Europe, PAL)", MACHINE_NOT_WORKING )
 
 //32X plugged in the cart slot + SegaCD plugged into the expansion port..
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1995, 32x_mcd,    32x_scd,   0,      md_32x_scd,      md, md_cons_state,     md_eur,    "Sega",   "Mega-CD with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1994, 32x_mcdj,   32x_scd,   0,      mdj_32x_scd,     md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x_scd,      0,        0,      genesis_32x_scd, md,    md_cons_state, init_genesis, "Sega",   "Sega CD with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1995, 32x_mcd,      32x_scd,  0,      md_32x_scd,      md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x_mcdj,     32x_scd,  0,      mdj_32x_scd,     md,    md_cons_state, init_md_jpn,  "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
 
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
-CONS( 200?, dcat16,    0,         0,      dcat16_megadriv,     md, md_cons_state,     genesis,   "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,    md_cons_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )

@@ -39,7 +39,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette"),
+		m_led(*this, "led%u", 0U)
+	{ }
 
 	void boxer(machine_config &config);
 
@@ -80,6 +82,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_led;
 };
 
 /*************************************
@@ -330,8 +333,8 @@ WRITE8_MEMBER(boxer_state::crowd_w)
 
 WRITE8_MEMBER(boxer_state::led_w)
 {
-	output().set_led_value(1, !(data & 1));
-	output().set_led_value(0, !(data & 2));
+	m_led[1] = BIT(~data, 0);
+	m_led[0] = BIT(~data, 1);
 }
 
 
@@ -455,7 +458,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( boxer )
+static GFXDECODE_START( gfx_boxer )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 2, 1 )
@@ -470,6 +473,7 @@ GFXDECODE_END
 
 void boxer_state::machine_start()
 {
+	m_led.resolve();
 	m_pot_interrupt = timer_alloc(TIMER_POT_INTERRUPT);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 
@@ -489,8 +493,8 @@ void boxer_state::machine_reset()
 MACHINE_CONFIG_START(boxer_state::boxer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
-	MCFG_CPU_PROGRAM_MAP(boxer_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16)
+	MCFG_DEVICE_PROGRAM_MAP(boxer_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -502,7 +506,7 @@ MACHINE_CONFIG_START(boxer_state::boxer)
 	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boxer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_boxer)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(boxer_state, boxer)
 
@@ -551,4 +555,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, boxer, 0, boxer, boxer, boxer_state, 0, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, boxer, 0, boxer, boxer, boxer_state, empty_init, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

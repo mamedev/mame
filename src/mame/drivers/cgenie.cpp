@@ -52,8 +52,8 @@ public:
 		m_rs232_dcd(1)
 	{}
 
-	DECLARE_DRIVER_INIT(cgenie_eu);
-	DECLARE_DRIVER_INIT(cgenie_nz);
+	void init_cgenie_eu();
+	void init_cgenie_nz();
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -292,12 +292,12 @@ WRITE_LINE_MEMBER( cgenie_state::rs232_dcd_w )
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_eu )
+void cgenie_state::init_cgenie_eu()
 {
 	m_palette = &m_palette_eu[0];
 }
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_nz )
+void cgenie_state::init_cgenie_nz()
 {
 	m_palette = &m_palette_nz[0];
 }
@@ -440,9 +440,9 @@ const rgb_t cgenie_state::m_palette_nz[] =
 
 MACHINE_CONFIG_START(cgenie_state::cgenie)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
-	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
-	MCFG_CPU_IO_MAP(cgenie_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
+	MCFG_DEVICE_PROGRAM_MAP(cgenie_mem)
+	MCFG_DEVICE_IO_MAP(cgenie_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -456,12 +456,12 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_MC6845_UPDATE_ROW_CB(cgenie_state, crtc_update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pa_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pa_w))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pb_w))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("par", cg_parallel_slot_device, pa_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pa_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("par", cg_parallel_slot_device, pb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -472,9 +472,9 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(cgenie_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(cgenie_state, rs232_dcd_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, cgenie_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, cgenie_state, rs232_dcd_w))
 
 	// cartridge expansion slot
 	MCFG_CG_EXP_SLOT_ADD("exp")
@@ -524,6 +524,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE INPUT   CLASS         INIT       COMPANY FULLNAME                             FLAGS
-COMP( 1982, cgenie,   0,        0,      cgenie, cgenie, cgenie_state, cgenie_eu, "EACA", "Colour Genie EG2000",               0)
-COMP( 1982, cgenienz, cgenie,   0,      cgenie, cgenie, cgenie_state, cgenie_nz, "EACA", "Colour Genie EG2000 (New Zealand)", 0)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE INPUT   CLASS         INIT            COMPANY FULLNAME                             FLAGS
+COMP( 1982, cgenie,   0,      0,      cgenie, cgenie, cgenie_state, init_cgenie_eu, "EACA", "Colour Genie EG2000",               0)
+COMP( 1982, cgenienz, cgenie, 0,      cgenie, cgenie, cgenie_state, init_cgenie_nz, "EACA", "Colour Genie EG2000 (New Zealand)", 0)

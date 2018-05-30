@@ -221,7 +221,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( ddribble )
+static GFXDECODE_START( gfx_ddribble )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,    48,  1 )   /* colors 48-63 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout,    16,  1 )   /* colors 16-31 */
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  32,  1 )   /* colors 32-47 */
@@ -260,14 +260,14 @@ void ddribble_state::machine_reset()
 MACHINE_CONFIG_START(ddribble_state::ddribble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
 
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_ADD(m_cpu1, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
-	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
 
@@ -283,34 +283,34 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
     MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
 	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddribble_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddribble_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddribble)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_ddribble)
 	MCFG_PALETTE_ADD("palette", 64 + 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(ddribble_state, ddribble)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ddribble_state, ddribble_vlm5030_busy_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ddribble_state, ddribble_vlm5030_ctrl_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ddribble_state, ddribble_vlm5030_busy_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ddribble_state, ddribble_vlm5030_ctrl_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
 	MCFG_SOUND_ROUTE(1, "filter2", 0.25)
 	MCFG_SOUND_ROUTE(2, "filter3", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD(m_filter2, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_DEVICE_ADD(m_filter3, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -379,5 +379,5 @@ ROM_START( ddribblep )
 	ROM_LOAD( "voice_10.d7", 0x10000, 0x10000, CRC(b4c97494) SHA1(93f7c3c93f6f790c3f480e183da0105b5ac3593b) )
 ROM_END
 
-GAME( 1986, ddribble,  0,        ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ddribblep, ddribble, ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribble,  0,        ddribble, ddribble, ddribble_state, empty_init, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribblep, ddribble, ddribble, ddribble, ddribble_state, empty_init, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )

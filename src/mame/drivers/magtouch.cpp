@@ -175,9 +175,10 @@ void magtouch_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
 }
 
-static SLOT_INTERFACE_START( magtouch_isa8_cards )
-	SLOT_INTERFACE("sb15",  ISA8_SOUND_BLASTER_1_5)
-SLOT_INTERFACE_END
+static void magtouch_isa8_cards(device_slot_interface &device)
+{
+	device.option_add("sb15",  ISA8_SOUND_BLASTER_1_5);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( magtouch_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
@@ -191,10 +192,10 @@ void magtouch_state::magtouch_sb_conf(device_t *device)
 
 MACHINE_CONFIG_START(magtouch_state::magtouch)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_CPU_PROGRAM_MAP(magtouch_map)
-	MCFG_CPU_IO_MAP(magtouch_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(magtouch_map)
+	MCFG_DEVICE_IO_MAP(magtouch_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -202,30 +203,31 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 
 	pcat_common(config);
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) )
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("ns16450_0", ins8250_uart_device, rx_w) )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(magtouch_state, dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, magtouch_state, dma8237_1_dack_w))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259_2", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir3_w))
-	//MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	MCFG_ISA8_CPU("maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_2", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
+	//MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_1", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_1", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
 
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", magtouch_isa8_cards, "sb15", true)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("sb15", magtouch_sb_def)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("sb15", magtouch_sb_conf)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", magtouch_isa8_cards, "sb15", true)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", magtouch_sb_def)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", magtouch_sb_conf)
 MACHINE_CONFIG_END
 
 
@@ -250,4 +252,4 @@ ROM_START(magtouch)
 	ROM_FILL(0x511ba, 1, 0xeb) // skip csum
 ROM_END
 
-GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, 0, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, magtouch, 0, magtouch, magtouch, magtouch_state, empty_init, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )

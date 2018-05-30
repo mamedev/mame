@@ -283,14 +283,14 @@ INPUT_CHANGED_MEMBER( s4_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( s4_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if ((newval==CLEAR_LINE) && !m_chimes)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( s4_state::sol0_w )
@@ -429,8 +429,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( s4_state::irq )
 
 MACHINE_CONFIG_START(s4_state::s4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 3580000)
-	MCFG_CPU_PROGRAM_MAP(s4_main_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s4_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s4_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4)
 
@@ -442,37 +442,37 @@ MACHINE_CONFIG_START(s4_state::s4)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s4_state, sol0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s4_state, sol1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s4_state, pia22_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s4_state, pia22_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s4_state, sol0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s4_state, sol1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s4_state, pia22_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s4_state, pia22_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s4_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s4_state, lamp1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s4_state, pia24_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s4_state, pia24_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s4_state, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s4_state, lamp1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s4_state, pia24_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s4_state, pia24_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s4_state, dips_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(s4_state, pia28_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(s4_state, pia28_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s4_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s4_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s4_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s4_state, pia28_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s4_state, dips_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, s4_state, pia28_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, s4_state, pia28_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s4_state, dig0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s4_state, dig1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s4_state, pia28_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s4_state, pia28_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s4_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s4_state, switch_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s4_state, pia30_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s4_state, pia30_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s4_state, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s4_state, switch_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s4_state, pia30_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s4_state, pia30_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
@@ -482,18 +482,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(s4_state::s4a)
 	s4(config);
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, 3580000)
-	MCFG_CPU_PROGRAM_MAP(s4_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6808, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s4_audio_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4a)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(s4_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, s4_state, sound_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 MACHINE_CONFIG_END
@@ -704,21 +704,21 @@ ROM_START(tstrk_l1)
 ROM_END
 
 
-GAME( 1979, flash_l2, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Flash (L-2)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, flash_l1, flash_l2, s4a, s4, s4_state, 0, ROT0, "Williams", "Flash (L-1)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, flash_t1, flash_l2, s4a, s4, s4_state, 0, ROT0, "Williams", "Flash (T-1) Ted Estes",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, trizn_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Tri Zone (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, trizn_t1, trizn_l1, s4a, s4, s4_state, 0, ROT0, "Williams", "Tri Zone (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_l3, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Time Warp (L-3)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_l2, tmwrp_l3, s4a, s4, s4_state, 0, ROT0, "Williams", "Time Warp (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_t2, tmwrp_l3, s4a, s4, s4_state, 0, ROT0, "Williams", "Time Warp (T-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, stlwr_l2, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Stellar Wars (L-2)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_l2, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (L-2)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_l1, flash_l2, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (L-1)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_t1, flash_l2, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Flash (T-1) Ted Estes",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, trizn_l1, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Tri Zone (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, trizn_t1, trizn_l1, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Tri Zone (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_l3, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (L-3)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_l2, tmwrp_l3, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_t2, tmwrp_l3, s4a, s4, s4_state, empty_init, ROT0, "Williams", "Time Warp (T-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, stlwr_l2, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
-GAME( 1978, pomp_l1,  0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, arist_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, topaz_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Topaz (Shuffle) (L-1)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, taurs_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Taurus (Shuffle) (L-1)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, kingt_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "King Tut (Shuffle) (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, omni_l1,  0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Omni (Shuffle) (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1983, bstrk_l1, 0,        s4,  s4, s4_state, 0, ROT0, "Williams", "Big Strike (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1983, tstrk_l1, 0,        s4,  s4, s4_state, 0, ROT0, "Williams", "Triple Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1978, pomp_l1,  0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Pompeii (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, arist_l1, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, topaz_l1, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Topaz (Shuffle) (L-1)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, taurs_l1, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Taurus (Shuffle) (L-1)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, kingt_l1, 0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "King Tut (Shuffle) (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, omni_l1,  0,        s4a, s4, s4_state, empty_init, ROT0, "Williams", "Omni (Shuffle) (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1983, bstrk_l1, 0,        s4,  s4, s4_state, empty_init, ROT0, "Williams", "Big Strike (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1983, tstrk_l1, 0,        s4,  s4, s4_state, empty_init, ROT0, "Williams", "Triple Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

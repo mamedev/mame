@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crospang_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(crospang_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(crospang_bg_videoram_w);
-	DECLARE_DRIVER_INIT(crospang);
+	void init_crospang();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

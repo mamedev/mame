@@ -1468,11 +1468,12 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq4_line)
 	logerror("EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
 }
 
-static SLOT_INTERFACE_START(x68000_exp_cards)
-	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX) // Neptune-X ethernet adapter (ISA NE2000 bridge)
-	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
-	SLOT_INTERFACE("x68k_midi",X68K_MIDI)  // X68000 MIDI interface
-SLOT_INTERFACE_END
+static void x68000_exp_cards(device_slot_interface &device)
+{
+	device.option_add("neptunex", X68K_NEPTUNEX);   // Neptune-X ethernet adapter (ISA NE2000 bridge)
+	device.option_add("cz6bs1", X68K_SCSIEXT);      // Sharp CZ-6BS1 SCSI-1 controller
+	device.option_add("x68k_midi", X68K_MIDI);      // X68000 MIDI interface
+}
 
 void x68k_state::machine_reset()
 {
@@ -1567,7 +1568,7 @@ void x68k_state::machine_start()
 	m_fdc.motor = 0;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68000)
+void x68k_state::init_x68000()
 {
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
@@ -1605,16 +1606,16 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	save_item(NAME(m_spritereg));
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68kxvi)
+void x68k_state::init_x68kxvi()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68030)
+void x68k_state::init_x68030()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }
@@ -1624,19 +1625,21 @@ FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
 	FLOPPY_DIM_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( x68k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void x68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("x68k", X68K_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("x68k", X68K_KEYBOARD);
+}
 
 MACHINE_CONFIG_START(x68k_state::x68000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(x68k_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(x68k_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1645,32 +1648,32 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_MC68901_TIMER_CLOCK(4000000)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(x68k_state, mfp_irq_callback))
-	MCFG_MC68901_OUT_TBO_CB(DEVWRITELINE(MC68901_TAG, mc68901_device, clock_w))
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
+	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(*this, x68k_state, mfp_irq_callback))
+	MCFG_MC68901_OUT_TBO_CB(WRITELINE(MC68901_TAG, mc68901_device, clock_w))
+	MCFG_MC68901_OUT_SO_CB(WRITELINE("keyboard", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("keyboard", keyboard, "x68k")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "x68k")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(x68k_state, ppi_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(x68k_state, ppi_port_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(x68k_state, ppi_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(x68k_state, ppi_port_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, x68k_state, ppi_port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, x68k_state, ppi_port_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, x68k_state, ppi_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x68k_state, ppi_port_c_w))
 
 	MCFG_DEVICE_ADD("hd63450", HD63450, 0)
 	MCFG_HD63450_CPU("maincpu") // CPU - 68000
 	MCFG_HD63450_CLOCKS(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
-	MCFG_HD63450_DMA_END_CB(WRITE8(x68k_state, dma_end))
-	MCFG_HD63450_DMA_ERROR_CB(WRITE8(x68k_state, dma_error))
-	MCFG_HD63450_DMA_READ_0_CB(DEVREAD8("upd72065", upd72065_device, mdma_r))
-	MCFG_HD63450_DMA_WRITE_0_CB(DEVWRITE8("upd72065", upd72065_device, mdma_w))
+	MCFG_HD63450_DMA_END_CB(WRITE8(*this, x68k_state, dma_end))
+	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, x68k_state, dma_error))
+	MCFG_HD63450_DMA_READ_0_CB(READ8("upd72065", upd72065_device, mdma_r))
+	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8("upd72065", upd72065_device, mdma_w))
 
 	MCFG_DEVICE_ADD("scc", SCC8530, 5000000)
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
-	MCFG_RP5C15_OUT_ALARM_CB(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1679,7 +1682,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcgpalette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcgpalette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("gfxpalette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(2, x68k_state, GGGGGRRRRRBBBBBI)
@@ -1691,28 +1694,27 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_DEFAULT_LAYOUT( layout_x68000 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2151", 4000000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(x68k_state,x68k_fm_irq))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ym2151", YM2151, 4000000)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, x68k_state,x68k_fm_irq))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6258_ADD("okim6258", 4000000)
+	MCFG_DEVICE_ADD("okim6258", OKIM6258, 4000000)
 	MCFG_OKIM6258_DIVIDER(FOSC_DIV_BY_512)
 	MCFG_OKIM6258_ADPCM_TYPE(TYPE_4BITS)
 	MCFG_OKIM6258_OUT_BITS(OUTPUT_10BITS)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outl", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outr", 0.50)
 
-	MCFG_FILTER_VOLUME_ADD("adpcm_outl", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("adpcm_outr", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "adpcm_outl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "adpcm_outr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_UPD72065_ADD("upd72065", true, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(x68k_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("hd63450", hd63450_device, drq0_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, x68k_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("hd63450", hd63450_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", x68k_state::floppy_formats)
@@ -1722,8 +1724,8 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 
 	MCFG_DEVICE_ADD("exp", X68K_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(x68000_exp_cards, nullptr, false)
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(x68k_state, x68k_irq2_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(WRITELINE(x68k_state, x68k_irq4_line))
+	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(*this, x68k_state, x68k_irq2_line))
+	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(WRITELINE(*this, x68k_state, x68k_irq4_line))
 	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* internal ram */
@@ -1740,8 +1742,8 @@ MACHINE_CONFIG_START(x68k_state::x68ksupr)
 	x68000(config);
 	MCFG_DEVICE_REMOVE("x68k_hdc")
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(x68kxvi_map)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
@@ -1754,21 +1756,21 @@ MACHINE_CONFIG_START(x68k_state::x68ksupr)
 
 	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(x68k_state, x68k_scsi_irq))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_state, x68k_scsi_drq))
+	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_irq))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_drq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x68k_state::x68kxvi)
 	x68ksupr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(16000000)  /* 16 MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x68k_state::x68030)
 	x68ksupr(config);
-	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
-	MCFG_CPU_PROGRAM_MAP(x68030_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
+	MCFG_DEVICE_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
+	MCFG_DEVICE_PROGRAM_MAP(x68030_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )
@@ -1862,8 +1864,8 @@ ROM_START( x68030 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   STATE       INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1987, x68000,   0,      0,      x68000,   x68000, x68k_state, x68000, "Sharp",    "X68000",       MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, x68ksupr, x68000, 0,      x68ksupr, x68000, x68k_state, x68000, "Sharp",    "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1991, x68kxvi,  x68000, 0,      x68kxvi,  x68000, x68k_state, x68kxvi,"Sharp",    "X68000 XVI",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1993, x68030,   x68000, 0,      x68030,   x68000, x68k_state, x68030, "Sharp",    "X68030",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS       INIT         COMPANY  FULLNAME        FLAGS
+COMP( 1987, x68000,   0,      0,      x68000,   x68000, x68k_state, init_x68000, "Sharp", "X68000",       MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, x68ksupr, x68000, 0,      x68ksupr, x68000, x68k_state, init_x68000, "Sharp", "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1991, x68kxvi,  x68000, 0,      x68kxvi,  x68000, x68k_state, init_x68kxvi,"Sharp", "X68000 XVI",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1993, x68030,   x68000, 0,      x68030,   x68000, x68k_state, init_x68030, "Sharp", "X68030",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

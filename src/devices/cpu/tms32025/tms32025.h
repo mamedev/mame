@@ -141,7 +141,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_b3;
 
 	address_space *m_program;
-	direct_read_data<-1> *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 

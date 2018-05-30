@@ -109,7 +109,7 @@ WRITE8_MEMBER( c1551_device::port_w )
 	m_ga->mtr_w(BIT(data, 2));
 
 	// activity LED
-	machine().output().set_led_value(LED_ACT, BIT(data, 3));
+	m_led[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -325,9 +325,10 @@ void c1551_device::c1551_mem(address_map &map)
 //  SLOT_INTERFACE( c1551_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c1551_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void c1551_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 
 //-------------------------------------------------
@@ -345,28 +346,28 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1551_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL(16'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(c1551_mem)
-	MCFG_M6510T_PORT_CALLBACKS(READ8(c1551_device, port_r), WRITE8(c1551_device, port_w))
+	MCFG_DEVICE_ADD(M6510T_TAG, M6510T, XTAL(16'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(c1551_mem)
+	MCFG_M6510T_PORT_CALLBACKS(READ8(*this, c1551_device, port_r), WRITE8(*this, c1551_device, port_w))
 	MCFG_QUANTUM_PERFECT_CPU(M6510T_TAG)
 
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_DEVICE_ADD(M6523_0_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(c1551_device, tcbm_data_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(c1551_device, tcbm_data_w))
-	MCFG_TPI6525_IN_PB_CB(DEVREAD8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_TPI6525_OUT_PB_CB(DEVWRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(c1551_device, tpi0_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(c1551_device, tpi0_pc_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, c1551_device, tcbm_data_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c1551_device, tcbm_data_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(C64H156_TAG, c64h156_device, yb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(C64H156_TAG, c64h156_device, yb_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, c1551_device, tpi0_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, c1551_device, tpi0_pc_w))
 	MCFG_DEVICE_ADD(M6523_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(c1551_device, tcbm_data_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(c1551_device, tcbm_data_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(c1551_device, tpi1_pb_r))
-	MCFG_TPI6525_IN_PC_CB(READ8(c1551_device, tpi1_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(c1551_device, tpi1_pc_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, c1551_device, tcbm_data_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c1551_device, tcbm_data_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(*this, c1551_device, tpi1_pb_r))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, c1551_device, tpi1_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, c1551_device, tpi1_pc_w))
 
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
-	MCFG_64H156_BYTE_CALLBACK(DEVWRITELINE(C64H156_TAG, c64h156_device, atni_w))
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(C64H156_TAG, c64h156_device, atni_w))
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1551_floppies, "525ssqd", c1551_device::floppy_formats)
 
 	MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD()
@@ -415,6 +416,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
 	, m_exp(*this, PLUS4_EXPANSION_SLOT_TAG)
 	, m_jp1(*this, "JP1")
+	, m_led(*this, "led%u", 0U)
 	, m_tcbm_data(0xff)
 	, m_status(1)
 	, m_dav(1)
@@ -431,6 +433,8 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 
 void c1551_device::device_start()
 {
+	m_led.resolve();
+
 	// allocate timers
 	m_irq_timer = timer_alloc();
 	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);

@@ -25,8 +25,8 @@ DEFINE_DEVICE_TYPE(ELECTRON_SNDEXP3, electron_sndexp3_device, "electron_sndexp3"
 
 MACHINE_CONFIG_START(electron_sndexp3_device::device_add_mconfig)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489", SN76489, 16_MHz_XTAL / 4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sn76489", SN76489, 16_MHz_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -91,9 +91,9 @@ uint32_t vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(vt320_state::vt320)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(vt320_mem)
-	MCFG_CPU_IO_MAP(vt320_io)
+	MCFG_DEVICE_ADD("maincpu", I8051, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vt320_mem)
+	MCFG_DEVICE_IO_MAP(vt320_io)
 
 
 	/* video hardware */
@@ -133,8 +133,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                          FULLNAME   FLAGS */
-COMP( 1987, vt320,   0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT320",   MACHINE_IS_SKELETON )
-COMP( 1987, vt330,   0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT330",   MACHINE_IS_SKELETON )
-//COMP( 1989?, vt340,  0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340",   MACHINE_IS_SKELETON )
-//COMP( 1990?, vt340p, 0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340+",  MACHINE_IS_SKELETON )
+/*    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                          FULLNAME   FLAGS */
+COMP( 1987,  vt320,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT320",   MACHINE_IS_SKELETON )
+COMP( 1987,  vt330,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT330",   MACHINE_IS_SKELETON )
+//COMP( 1989?, vt340,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340",   MACHINE_IS_SKELETON )
+//COMP( 1990?, vt340p, 0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340+",  MACHINE_IS_SKELETON )

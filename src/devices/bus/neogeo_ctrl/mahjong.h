@@ -30,6 +30,7 @@ protected:
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
+	virtual uint8_t read_start_sel() override;
 	virtual void device_start() override;
 
 	// device_neogeo_control_port_interface overrides
@@ -37,6 +38,7 @@ protected:
 	virtual void write_ctrlsel(uint8_t data) override;
 
 	uint8_t m_ctrl_sel;
+	required_ioport m_ss;
 
 private:
 	required_ioport_array<3> m_mjpanel;
@@ -56,9 +58,6 @@ protected:
 
 	// device_neogeo_control_port_interface overrides
 	virtual uint8_t read_start_sel() override;
-
-private:
-	required_ioport m_ss;
 };
 
 

@@ -68,20 +68,20 @@ DEVICE_INPUT_DEFAULTS_END
 // XXX
 MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
-	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
-	MCFG_CPU_IO_MAP(iskr1031_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu",  I8086, 4772720)
+	MCFG_DEVICE_PROGRAM_MAP(iskr1031_map)
+	MCFG_DEVICE_IO_MAP(iskr1031_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr1030m)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", iskr103x_isa8_cards, "cga_iskr1030m", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", iskr103x_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false) // FIXME: determine IS bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 //  MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030)
@@ -121,6 +121,6 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  STATE           INIT  COMPANY       FULLNAME      FLAGS
-COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m,  0,     iskr103x_state, 0,    "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
-COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,   0,     iskr103x_state, 0,    "<unknown>", "Iskra 1031",  0 )
+//     YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS           INIT        COMPANY      FULLNAME       FLAGS
+COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m, 0,     iskr103x_state, empty_init, "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
+COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,  0,     iskr103x_state, empty_init, "<unknown>", "Iskra 1031",  0 )

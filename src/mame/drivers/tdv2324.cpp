@@ -248,9 +248,10 @@ uint32_t tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  SLOT_INTERFACE( tdv2324_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( tdv2324_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void tdv2324_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 
 
@@ -264,16 +265,16 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	// basic system hardware
-	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
-	MCFG_CPU_IO_MAP(tdv2324_io)
+	MCFG_DEVICE_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_mem)
+	MCFG_DEVICE_IO_MAP(tdv2324_io)
 
-	MCFG_CPU_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
-	MCFG_CPU_IO_MAP(tdv2324_sub_io)
+	MCFG_DEVICE_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_sub_mem)
+	MCFG_DEVICE_IO_MAP(tdv2324_sub_io)
 
-	MCFG_CPU_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
+	MCFG_DEVICE_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -354,5 +355,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY     FULLNAME    FLAGS
-COMP( 1983, tdv2324,  0,      0,      tdv2324,  tdv2324, tdv2324_state, 0,    "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
+COMP( 1983, tdv2324, 0,      0,      tdv2324, tdv2324, tdv2324_state, empty_init, "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

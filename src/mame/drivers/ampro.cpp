@@ -24,7 +24,7 @@ ToDo:
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
@@ -44,7 +44,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
-	DECLARE_DRIVER_INIT(ampro);
+	void init_ampro();
 	DECLARE_MACHINE_RESET(ampro);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -125,9 +125,10 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( ampro_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ampro_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ampro )
@@ -139,7 +140,7 @@ MACHINE_RESET_MEMBER( ampro_state, ampro )
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( ampro_state, ampro )
+void ampro_state::init_ampro()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -150,31 +151,31 @@ DRIVER_INIT_MEMBER( ampro_state, ampro )
 
 MACHINE_CONFIG_START(ampro_state::ampro)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(ampro_mem)
-	MCFG_CPU_IO_MAP(ampro_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ampro_mem)
+	MCFG_DEVICE_IO_MAP(ampro_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(16'000'000) / 8) // 2MHz
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("dart", z80dart_device, txca_w))    // Z80DART Ch A, SIO Ch A
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))   // SIO Ch B
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart", z80dart_device, txca_w))    // Z80DART Ch A, SIO Ch A
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))   // SIO Ch B
 
 	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80dart_device, rxa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
 
 	MCFG_WD1772_ADD("fdc", XTAL(16'000'000) / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -195,5 +196,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY      FULLNAME            FLAGS
-COMP( 1980, ampro,  0,      0,       ampro,     ampro,   ampro_state,   ampro,  "Ampro",     "Little Z80 Board", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME            FLAGS
+COMP( 1980, ampro, 0,      0,      ampro,   ampro, ampro_state, init_ampro, "Ampro", "Little Z80 Board", 0 )

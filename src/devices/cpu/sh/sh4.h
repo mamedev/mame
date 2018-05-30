@@ -216,7 +216,7 @@ public:
 	TIMER_CALLBACK_MEMBER( sh4_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh4_dmac_callback );
 
-	void sh4_set_frt_input(int state);
+	virtual void set_frt_input(int state) override;
 	void sh4_set_irln_input(int value);
 	//void sh4_set_ftcsr_callback(sh4_ftcsr_callback callback);
 	int sh4_dma_data(struct sh4_device_dma *s);
@@ -309,6 +309,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 5; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

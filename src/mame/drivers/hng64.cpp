@@ -1357,7 +1357,7 @@ static const gfx_layout hng64_texlayout =
 	texlayout_yoffset
 };
 
-static GFXDECODE_START( hng64 )
+static GFXDECODE_START( gfx_hng64 )
 	/* tilemap tiles */
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x4_tilelayout,  0x0, 0x100 )
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x8_tilelayout,  0x0, 0x10 )
@@ -1388,12 +1388,12 @@ static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
 	memcpy(gfxregion, &buffer[0], gfxregionsize);
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
+void hng64_state::init_hng64_reorder_gfx()
 {
 	hng64_reorder(memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64)
+void hng64_state::init_hng64()
 {
 	/* 1 meg of virtual address space for the com cpu */
 	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
@@ -1402,46 +1402,46 @@ DRIVER_INIT_MEMBER(hng64_state,hng64)
 	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
 	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
 
-	DRIVER_INIT_CALL(hng64_reorder_gfx);
+	init_hng64_reorder_gfx();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_fght)
+void hng64_state::init_hng64_fght()
 {
 	m_no_machine_error_code = 0x01000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
+void hng64_state::init_fatfurwa()
 {
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = FIGHT_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,buriki)
+void hng64_state::init_buriki()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = BURIKI_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,ss64)
+void hng64_state::init_ss64()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = SAMSHO_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_race)
+void hng64_state::init_hng64_race()
 {
 	m_no_machine_error_code = 0x02000000;
 	m_mcu_type = RACING_MCU;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
+void hng64_state::init_hng64_shoot()
 {
 	m_mcu_type = SHOOT_MCU;
 	m_no_machine_error_code = 0x03000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
 void hng64_state::set_irq(uint32_t irq_vector)
@@ -1534,22 +1534,22 @@ void hng64_state::machine_reset()
 
 MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(hng_map)
+	MCFG_DEVICE_PROGRAM_MAP(hng_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL(32'768))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hng64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hng64_state, screen_vblank_hng64))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hng64_state, screen_vblank_hng64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(XRGB)
@@ -1557,7 +1557,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	hng64_audio(config);
 	hng64_network(config);
 
-	MCFG_CPU_ADD("iomcu", TMP87PH40AN, 8000000)
+	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
 	MCFG_DEVICE_DISABLE() // work in progress
 
 MACHINE_CONFIG_END
@@ -2002,13 +2002,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,      hng64, hng64,    hng64_state,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,     hng64, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64,  hng64, hng64,    hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64,  hng64, bbust2,   hng64_state,  hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64,  hng64, hng64,    hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64,    hng64_state,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64,    hng64_state,  buriki,      ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64, hng64, roadedge, hng64_state, init_hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64, hng64, hng64,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64, hng64, roadedge, hng64_state, init_hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64, hng64, bbust2,   hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 004 */
+GAME( 1998, sams64_2, hng64, hng64, hng64,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64, hng64,    hng64_state, init_fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64, hng64,    hng64_state, init_buriki,      ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 007 */

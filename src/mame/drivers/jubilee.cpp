@@ -207,12 +207,29 @@
 class jubilee_state : public driver_device
 {
 public:
-	jubilee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jubilee_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoworkram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamp(*this, "lamp%u", 0U)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
+	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
+	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
+	void jubileep(machine_config &config);
+	void jubileep_cru_map(address_map &map);
+	void jubileep_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
 
 	uint8_t mux_sel;
 	uint8_t muxlamps;
@@ -220,19 +237,9 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
-	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void jubileep(machine_config &config);
-	void jubileep_cru_map(address_map &map);
-	void jubileep_map(address_map &map);
+	output_finder<9> m_lamp;
 };
 
 
@@ -411,19 +418,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				output().set_lamp_value(0, (data & 1));  /* lamp */
+				m_lamp[0] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 0 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 0");
 			}
 		if (muxlamps == 2)
 			{
-				output().set_lamp_value(3, (data & 1));  /* lamp */
+				m_lamp[3] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 3 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 3");
 			}
 		if (muxlamps == 3)
 			{
-				output().set_lamp_value(6, (data & 1));  /* lamp */
+				m_lamp[6] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 6 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 6");
 			}
@@ -433,19 +440,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				output().set_lamp_value(1, (data & 1));  /* lamp */
+				m_lamp[1] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 1 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 1");
 			}
 		if (muxlamps == 2)
 			{
-				output().set_lamp_value(4, (data & 1));  /* lamp */
+				m_lamp[4] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 4 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 4");
 			}
 		if (muxlamps == 3)
 			{
-				output().set_lamp_value(7, (data & 1));  /* lamp */
+				m_lamp[7] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 7 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 7");
 			}
@@ -455,19 +462,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				output().set_lamp_value(2, (data & 1));  /* lamp */
+				m_lamp[2] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 2 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 2");
 			}
 		if (muxlamps == 2)
 			{
-				output().set_lamp_value(5, (data & 1));  /* lamp */
+				m_lamp[5] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 5 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 5");
 			}
 		if (muxlamps == 3)
 			{
-				output().set_lamp_value(8, (data & 1));  /* lamp */
+				m_lamp[8] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 8 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 8");
 			}
@@ -649,7 +656,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( jubileep )      /* 4 different graphics banks */
+static GFXDECODE_START( gfx_jubileep )      /* 4 different graphics banks */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 1 )
@@ -665,7 +672,7 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 
 	// Main CPU TMS9980A, no line connections.
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("videoworkram")
 
@@ -678,7 +685,7 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jubileep)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jubileep)
 	MCFG_PALETTE_ADD("palette",8)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
@@ -711,5 +718,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT   COMPANY    FULLNAME                     FLAGS
-GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT        ROT   COMPANY    FULLNAME                     FLAGS
+GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, empty_init, ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )

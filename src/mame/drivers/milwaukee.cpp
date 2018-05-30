@@ -53,14 +53,14 @@ static INPUT_PORTS_START( milwaukee )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(milwaukee_state::milwaukee)
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(16'000'000) / 16)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(16'000'000) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000) / 16 / 4) // 250 kHz
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pit", pit8253_device, write_gate0)) MCFG_DEVCB_INVERT
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pit", pit8253_device, write_gate0)) MCFG_DEVCB_INVERT
 	MCFG_PIT8253_CLK1(XTAL(16'000'000) / 2 / 13 / 2048 / 5) // 60.09 Hz?
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk2)) MCFG_DEVCB_INVERT
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit", pit8253_device, write_clk2)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
@@ -68,16 +68,16 @@ MACHINE_CONFIG_START(milwaukee_state::milwaukee)
 	MCFG_DEVICE_ADD("ssda", MC6852, 0)
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(16'000'000) / 2 / 13 / 4)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 ROM_START( mc1200 )
@@ -86,4 +86,4 @@ ROM_START( mc1200 )
 	ROM_LOAD( "2758.u14", 0x0800, 0x0400, CRC(b20e2345) SHA1(da498cc0c746897a85d6f2d1a5bd70a726c1e4ef) ) // big white sticker, but nothing on it
 ROM_END
 
-COMP( 1980, mc1200, 0, 0, milwaukee, milwaukee, milwaukee_state, 0, "Milwaukee Computers", "MC-1200", MACHINE_IS_SKELETON )
+COMP( 1980, mc1200, 0, 0, milwaukee, milwaukee, milwaukee_state, empty_init, "Milwaukee Computers", "MC-1200", MACHINE_IS_SKELETON )

@@ -998,31 +998,31 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4p_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4p_state, interrupt_level) )
-	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(ti99_4p_state, clock_out) )
-	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4p_state, dbin_line) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4p_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4p_state, interrupt_level) )
+	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4p_state, clock_out) )
+	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4p_state, dbin_line) )
 
 	// tms9901
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4p_state, read_by_9901) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4p_state, keyC0) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_4p_state, keyC1) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_4p_state, keyC2) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( ti99_4p_state, alphaW) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_4p_state, cs_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_4p_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4p_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4p_state, tms9901_interrupt) )
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_4p_state, read_by_9901) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_4p_state, keyC0) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_4p_state, keyC1) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, ti99_4p_state, keyC2) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( *this, ti99_4p_state, alphaW) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_4p_state, cs_motor) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_4p_state, audio_gate) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_4p_state, cassette_output) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4p_state, tms9901_interrupt) )
 
 	// Peripheral expansion box (SGCPU composition)
 	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_SG, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4p_state, extint) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4p_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, ready_line) )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, ti99_4p_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, ti99_4p_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, ti99_4p_state, ready_line) )
 
 	// The SGCPU actually makes use of this pin which was unused before
-	MCFG_PERIBOX_LCP_HANDLER( WRITELINE(ti99_4p_state, video_interrupt_in) )
+	MCFG_PERIBOX_LCP_HANDLER( WRITELINE(*this, ti99_4p_state, video_interrupt_in) )
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -1035,11 +1035,10 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Cassette drives
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
@@ -1054,5 +1053,5 @@ ROM_START(ti99_4p)
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT   MACHINE       INPUT    STATE          INIT  COMPANY                 FULLNAME                 FLAGS
-COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, ti99_4p_state, 0,    "System-99 User Group", "SGCPU (aka TI-99/4P)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT    CLASS          INIT        COMPANY                 FULLNAME                FLAGS
+COMP( 1996, ti99_4p, 0,      0,      ti99_4p_60hz, ti99_4p, ti99_4p_state, empty_init, "System-99 User Group", "SGCPU (aka TI-99/4P)", MACHINE_SUPPORTS_SAVE )

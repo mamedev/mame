@@ -175,17 +175,16 @@ void pro80_state::machine_reset()
 
 MACHINE_CONFIG_START(pro80_state::pro80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(pro80_mem)
-	MCFG_CPU_IO_MAP(pro80_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pro80_mem)
+	MCFG_DEVICE_IO_MAP(pro80_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pro80)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -202,5 +201,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY   FULLNAME  FLAGS
-COMP( 1981, pro80,  0,      0,      pro80,    pro80, pro80_state, 0,    "Protec", "Pro-80", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME  FLAGS
+COMP( 1981, pro80, 0,      0,      pro80,   pro80, pro80_state, empty_init, "Protec", "Pro-80", MACHINE_NOT_WORKING )

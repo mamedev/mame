@@ -187,19 +187,20 @@ void vd_state::machine_reset()
 
 MACHINE_CONFIG_START(vd_state::vd)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(vd_map)
-	MCFG_CPU_IO_MAP(vd_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(vd_map)
+	MCFG_DEVICE_IO_MAP(vd_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", vd_state, irq, attotime::from_hz(484))
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000) //?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33/3)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000) //?
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33/3)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) //?
 
@@ -232,5 +233,5 @@ ROM_START(papillon)
 ROM_END
 
 
-GAME(1986, break86,  0,    vd,  break86,  vd_state, 0,  ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, papillon, 0,    vd,  papillon, vd_state, 0,  ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, break86,  0,    vd,  break86,  vd_state, empty_init, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, empty_init, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)

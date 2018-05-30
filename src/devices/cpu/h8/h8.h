@@ -97,6 +97,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override;
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -112,7 +113,7 @@ protected:
 
 	address_space_config program_config, io_config;
 	address_space *program, *io;
-	direct_read_data<0> *direct;
+	memory_access_cache<1, 0, ENDIANNESS_BIG> *cache;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
 	h8_dma_state *current_dma;

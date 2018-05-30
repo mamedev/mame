@@ -150,7 +150,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_DRIVER_INIT(jwildb52);
+	void init_jwildb52();
 	void jwildb52(machine_config &config);
 
 protected:
@@ -593,17 +593,17 @@ void sigmab52_state::machine_reset()
 MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jwildb52_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
 
 	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL(8'000'000)/4) // FIXME
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL(8'000'000)/8) // FIXME
-	MCFG_PTM6840_IRQ_CB(WRITELINE(sigmab52_state, ptm2_irq))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, sigmab52_state, ptm2_irq))
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
@@ -620,11 +620,11 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -730,7 +730,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(sigmab52_state, jwildb52)
+void sigmab52_state::init_jwildb52()
 {
 }
 
@@ -739,8 +739,8 @@ DRIVER_INIT_MEMBER(sigmab52_state, jwildb52)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY  FULLNAME                                                             FLAGS */
-GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  MACHINE_NOT_WORKING, layout_sigmab52 )
-GAME ( 1989, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, jwildb52, ROT0, "Sigma", "Super 8 Ways FC (DB98103-011, Fruit combination)",                   MACHINE_NOT_WORKING )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY  FULLNAME                                                              FLAGS */
+GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               MACHINE_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  MACHINE_NOT_WORKING, layout_sigmab52 )
+GAME ( 1989, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Super 8 Ways FC (DB98103-011, Fruit combination)",                   MACHINE_NOT_WORKING )

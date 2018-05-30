@@ -90,7 +90,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s6a);
-	DECLARE_DRIVER_INIT(s6a);
+	void init_s6a();
 	void s6a(machine_config &config);
 	void s6a_audio_map(address_map &map);
 	void s6a_main_map(address_map &map);
@@ -231,14 +231,14 @@ INPUT_CHANGED_MEMBER( s6a_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( s6a_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( s6a_state::sol0_w )
@@ -381,7 +381,7 @@ MACHINE_RESET_MEMBER( s6a_state, s6a )
 {
 }
 
-DRIVER_INIT_MEMBER( s6a_state, s6a )
+void s6a_state::init_s6a()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
@@ -389,8 +389,8 @@ DRIVER_INIT_MEMBER( s6a_state, s6a )
 
 MACHINE_CONFIG_START(s6a_state::s6a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, 3580000)
-	MCFG_CPU_PROGRAM_MAP(s6a_main_map)
+	MCFG_DEVICE_ADD("maincpu", M6808, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s6a_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s6a_state, s6a)
 
 	/* Video */
@@ -401,58 +401,58 @@ MACHINE_CONFIG_START(s6a_state::s6a)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6a_state, sol0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, sol1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia22_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia22_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s6a_state, sol0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s6a_state, sol1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s6a_state, pia22_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s6a_state, pia22_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6a_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, lamp1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia24_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s6a_state, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s6a_state, lamp1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s6a_state, pia24_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s6a_state, pia24_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s6a_state, dips_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6a_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s6a_state, dips_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s6a_state, dig0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s6a_state, dig1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s6a_state, pia28_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s6a_state, pia28_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s6a_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6a_state, switch_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s6a_state, pia30_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s6a_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s6a_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s6a_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s6a_state, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s6a_state, switch_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s6a_state, pia30_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s6a_state, pia30_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s6a_state, pia_irq))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
-	MCFG_CPU_PROGRAM_MAP(s6a_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 3580000)
+	MCFG_DEVICE_PROGRAM_MAP(s6a_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SPEAKER_STANDARD_MONO("speech")
-	MCFG_SOUND_ADD("hc55516", HC55516, 0)
+	SPEAKER(config, "speech").front_center();
+	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(s6a_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, digit_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, clock_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, s6a_state, sound_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("hc55516", hc55516_device, digit_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("hc55516", hc55516_device, clock_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
@@ -515,7 +515,7 @@ ROM_START(alpok_f6)
 ROM_END
 
 
-GAME( 1980, algar_l1, 0,        s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Algar (L-1)",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, alpok_l6, 0,        s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, alpok_l2, alpok_l6, s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, alpok_f6, alpok_l6, s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, algar_l1, 0,        s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Algar (L-1)",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_l6, 0,        s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_l2, alpok_l6, s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_f6, alpok_l6, s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

@@ -281,7 +281,7 @@ static const gfx_layout good_layout2 =
 };
 
 
-static GFXDECODE_START( good )
+static GFXDECODE_START( gfx_good )
 	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x100, 16  ) /* fg tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x200, 16  ) /* fg tiles */
 GFXDECODE_END
@@ -289,11 +289,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(good_state::good)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000 /2)
-	MCFG_CPU_PROGRAM_MAP(good_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000 /2)
+	MCFG_DEVICE_PROGRAM_MAP(good_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", good)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_good)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -307,9 +307,10 @@ MACHINE_CONFIG_START(good_state::good)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -330,4 +331,4 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
 
-GAME( 1998, good,   0,   good,   good, good_state,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, good, 0, good, good, good_state, empty_init, ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )

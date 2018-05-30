@@ -797,19 +797,19 @@ void thayers_state::machine_reset()
 MACHINE_CONFIG_START(thayers_state::thayers)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(thayers_map)
-	MCFG_CPU_IO_MAP(thayers_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(thayers_map)
+	MCFG_DEVICE_IO_MAP(thayers_io_map)
 
-	MCFG_CPU_ADD("mcu", COP421, XTAL(4'000'000)/2) // COP421L-PCA/N
+	MCFG_DEVICE_ADD("mcu", COP421, XTAL(4'000'000)/2) // COP421L-PCA/N
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_READ_L_CB(READ8(thayers_state, cop_l_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(thayers_state, cop_l_w))
-	MCFG_COP400_READ_G_CB(READ8(thayers_state, cop_g_r))
-	MCFG_COP400_WRITE_G_CB(WRITE8(thayers_state, cop_g_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(thayers_state, cop_d_w))
-	MCFG_COP400_READ_SI_CB(READLINE(thayers_state, kbdata_r))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(thayers_state, kbclk_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, thayers_state, cop_l_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, thayers_state, cop_l_w))
+	MCFG_COP400_READ_G_CB(READ8(*this, thayers_state, cop_g_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, thayers_state, cop_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, thayers_state, cop_d_w))
+	MCFG_COP400_READ_SI_CB(READLINE(*this, thayers_state, kbdata_r))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, thayers_state, kbclk_w))
 
 	MCFG_LASERDISC_PR7820_ADD("laserdisc")
 
@@ -819,10 +819,11 @@ MACHINE_CONFIG_START(thayers_state::thayers)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	// SSI 263 @ 2MHz
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -855,6 +856,6 @@ ROM_END
 
 /* Game Drivers */
 
-//     YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                                   LAYOUT
-GAMEL( 1984, thayers,  0,       thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
-GAMEL( 1984, thayersa, thayers, thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+//     YEAR  NAME      PARENT   MACHINE  INPUT    CLASS          INIT        MONITOR  COMPANY               FULLNAME                   FLAGS                                   LAYOUT
+GAMEL( 1984, thayers,  0,       thayers, thayers, thayers_state, empty_init, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+GAMEL( 1984, thayersa, thayers, thayers, thayers, thayers_state, empty_init, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)

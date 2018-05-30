@@ -636,7 +636,7 @@ WRITE_LINE_MEMBER(segas24_state::cnt1)
 		if (state)
 		{
 			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			//osd_printf_debug("enable 2nd cpu!\n");
 			//machine().debug_break();
 			if (m_gground_hack_timer)
@@ -1870,12 +1870,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(segas24_state::system24)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system24_cpu1_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(system24_cpu1_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", segas24_state, irq_vbl, "screen", 0, 1)
 
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
+	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(system24_cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1883,13 +1883,13 @@ MACHINE_CONFIG_START(segas24_state::system24)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas24_state, hotrod_lamps_w))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas24_state, hotrod_lamps_w))
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas24_state, cnt1))
-	MCFG_315_5296_OUT_CNT2_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas24_state, cnt1))
+	MCFG_315_5296_OUT_CNT2_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
 
 	MCFG_TIMER_DRIVER_ADD("irq_timer", segas24_state, irq_timer_cb)
 	MCFG_TIMER_DRIVER_ADD("irq_timer_clear", segas24_state, irq_timer_clear_cb)
@@ -1909,24 +1909,25 @@ MACHINE_CONFIG_START(segas24_state::system24)
 
 	MCFG_PALETTE_ADD("palette", 8192*2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(segas24_state,irq_ym))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, segas24_state,irq_ym))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas24_state::mahmajn)
 	system24(config);
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, mahmajn_input_line_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, mahmajn_inputs_r))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas24_state, mahmajn_mux_w))
+	MCFG_315_5296_IN_PORTA_CB(READ8(*this, segas24_state, mahmajn_input_line_r))
+	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segas24_state, mahmajn_inputs_r))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas24_state, mahmajn_mux_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy)
@@ -1936,10 +1937,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
 	system24_floppy(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotrod_cpu1_map)
-	MCFG_CPU_MODIFY("subcpu")
-	MCFG_CPU_PROGRAM_MAP(hotrod_cpu2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotrod_cpu1_map)
+	MCFG_DEVICE_MODIFY("subcpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotrod_cpu2_map)
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0) // IC4 on 834-6510 I/O board
 	MCFG_UPD4701_PORTX("DIAL1")
@@ -1960,17 +1961,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_fd1094)
 	system24_floppy(config);
-	MCFG_CPU_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(system24_cpu2_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_fd_upd)
 	system24_floppy_fd1094(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(roughrac_cpu1_map)
-	MCFG_CPU_MODIFY("subcpu")
-	MCFG_CPU_PROGRAM_MAP(roughrac_cpu2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(roughrac_cpu1_map)
+	MCFG_DEVICE_MODIFY("subcpu")
+	MCFG_DEVICE_PROGRAM_MAP(roughrac_cpu2_map)
 
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // IC4 on 834-6510-01 I/O board
 	MCFG_UPD4701_PORTX("DIAL1")
@@ -1980,15 +1981,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segas24_state::dcclub)
 	system24(config);
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, dcclub_p1_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, dcclub_p3_r))
+	MCFG_315_5296_IN_PORTA_CB(READ8(*this, segas24_state, dcclub_p1_r))
+	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segas24_state, dcclub_p3_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_dcclub)
 	system24_floppy_fd1094(config);
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(segas24_state, dcclub_p1_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(segas24_state, dcclub_p3_r))
+	MCFG_315_5296_IN_PORTA_CB(READ8(*this, segas24_state, dcclub_p1_r))
+	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segas24_state, dcclub_p3_r))
 MACHINE_CONFIG_END
 
 
@@ -2340,45 +2341,45 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas24_state,qgh)
+void segas24_state::init_qgh()
 {
 	mlatch_table = segas24_state::qgh_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclub)
+void segas24_state::init_dcclub()
 {
 	mlatch_table = segas24_state::dcclub_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qrouka)
+void segas24_state::init_qrouka()
 {
 	mlatch_table = segas24_state::qrouka_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,quizmeku)
+void segas24_state::init_quizmeku()
 {
 	mlatch_table = segas24_state::quizmeku_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn)
+void segas24_state::init_mahmajn()
 {
 	mlatch_table = segas24_state::mahmajn_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
+void segas24_state::init_mahmajn2()
 {
 	mlatch_table = segas24_state::mahmajn2_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,hotrod)
+void segas24_state::init_hotrod()
 {
 	mlatch_table = nullptr;
 
@@ -2393,7 +2394,7 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,bnzabros)
+void segas24_state::init_bnzabros()
 {
 	mlatch_table = segas24_state::bnzabros_mlt;
 
@@ -2409,38 +2410,38 @@ DRIVER_INIT_MEMBER(segas24_state,bnzabros)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspirits)
+void segas24_state::init_sspirits()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspiritj)
+void segas24_state::init_sspiritj()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
+void segas24_state::init_dcclubfd()
 {
 	mlatch_table = segas24_state::dcclub_mlt;
 	track_size = 0x2d00;
 }
 
 
-DRIVER_INIT_MEMBER(segas24_state,sgmast)
+void segas24_state::init_sgmast()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qsww)
+void segas24_state::init_qsww()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,gground)
+void segas24_state::init_gground()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
@@ -2448,13 +2449,13 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,crkdown)
+void segas24_state::init_crkdown()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,roughrac)
+void segas24_state::init_roughrac()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
@@ -2467,35 +2468,35 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
  *
  *************************************/
 
-//            YEAR, NAME,      PARENT,   MACHINE,                INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+//            YEAR  NAME       PARENT    MACHINE                 INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS
 /* Disk Based Games */
-/* 01 */GAME( 1988, hotrod,    0,        system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
-/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
-/* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
-/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
-/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", MACHINE_NOT_WORKING ) /* MISSING disk image */
-/* 03 */GAME( 1988, gground,   0,        system24_floppy_fd1094, gground,  segas24_state, gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
-/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy_fd1094, gground,  segas24_state, gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
-/* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   segas24_state, sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
-/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   segas24_state, sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd_upd, sgmastj,  segas24_state, sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
-/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy,        bnzabros, segas24_state, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
-/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy,        bnzabros, segas24_state, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
-/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", MACHINE_IMPERFECT_GRAPHICS ) // wrong bg colour on title
-/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_dcclub, dcclub,   segas24_state, dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
+/* 01 */GAME( 1988, hotrod,    0,        system24_floppy_hotrod, hotrod,   segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy_hotrod, hotrod,   segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
+/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
+/* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, init_sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
+/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, init_sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
+/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, init_sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", MACHINE_NOT_WORKING ) /* MISSING disk image */
+/* 03 */GAME( 1988, gground,   0,        system24_floppy_fd1094, gground,  segas24_state, init_gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
+/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy_fd1094, gground,  segas24_state, init_gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
+/* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
+/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd_upd, sgmastj,  segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, init_roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
+/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy,        bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
+/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy,        bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
+/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, init_qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", MACHINE_IMPERFECT_GRAPHICS ) // wrong bg colour on title
+/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_dcclub, dcclub,   segas24_state, init_dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
 
-//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR  NAME      PARENT    MACHINE   INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS
 /* ROM Based */
-GAME( 1991, dcclub,   0,        dcclub,   dcclub,   segas24_state, dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
-GAME( 1991, dcclubj,  dcclub,   dcclub,   dcclub,   segas24_state, dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
-GAME( 1991, qrouka,   0,        system24, qrouka,   segas24_state, qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
-GAME( 1992, quizmeku, 0,        system24, quizmeku, segas24_state, quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 ) /* Released in 05.1993 */
-GAME( 1992, mahmajn,  0,        mahmajn,  mahmajn,  segas24_state, mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )
-GAME( 1994, qgh,      0,        system24, qgh,      segas24_state, qgh,      ROT0,   "Sega", "Quiz Ghost Hunter (Japan, ROM Based)", 0 )
-GAME( 1994, mahmajn2, 0,        mahmajn,  mahmajn,  segas24_state, mahmajn2, ROT0,   "Sega", "Tokoro San no MahMahjan 2 (Japan, ROM Based)", 0 )
+GAME( 1991, dcclub,   0,        dcclub,   dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
+GAME( 1991, dcclubj,  dcclub,   dcclub,   dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
+GAME( 1991, qrouka,   0,        system24, qrouka,   segas24_state, init_qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
+GAME( 1992, quizmeku, 0,        system24, quizmeku, segas24_state, init_quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 ) /* Released in 05.1993 */
+GAME( 1992, mahmajn,  0,        mahmajn,  mahmajn,  segas24_state, init_mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )
+GAME( 1994, qgh,      0,        system24, qgh,      segas24_state, init_qgh,      ROT0,   "Sega", "Quiz Ghost Hunter (Japan, ROM Based)", 0 )
+GAME( 1994, mahmajn2, 0,        mahmajn,  mahmajn,  segas24_state, init_mahmajn2, ROT0,   "Sega", "Tokoro San no MahMahjan 2 (Japan, ROM Based)", 0 )

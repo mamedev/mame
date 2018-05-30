@@ -34,9 +34,22 @@ public:
 		m_custom(*this, "exidy"),
 		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_led(*this, "led0")
 	{ }
 
+	void berzerk(machine_config &config);
+	void frenzy(machine_config &config);
+
+	void init_moonwarp();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
 	required_device<ttl74181_device> m_ls181_10c;
@@ -46,6 +59,8 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
+
+	output_finder<> m_led;
 
 	uint8_t m_magicram_control;
 	uint8_t m_last_shift_data;
@@ -76,12 +91,6 @@ public:
 	DECLARE_READ8_MEMBER(moonwarp_p1_r);
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
 
-	DECLARE_DRIVER_INIT(moonwarp);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void sound_reset() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(irq_callback);
@@ -93,8 +102,6 @@ public:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
-	void berzerk(machine_config &config);
-	void frenzy(machine_config &config);
 	void berzerk_io_map(address_map &map);
 	void berzerk_map(address_map &map);
 	void frenzy_map(address_map &map);
@@ -125,13 +132,13 @@ static const uint8_t nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x
 
 /*************************************
  *
- *  Start LED handling
+ *  LED handling
  *
  *************************************/
 
 READ8_MEMBER(berzerk_state::led_on_r)
 {
-	output().set_led_value(0, 1);
+	m_led = 1;
 
 	return 0;
 }
@@ -139,13 +146,13 @@ READ8_MEMBER(berzerk_state::led_on_r)
 
 WRITE8_MEMBER(berzerk_state::led_on_w)
 {
-	output().set_led_value(0, 1);
+	m_led = 1;
 }
 
 
 READ8_MEMBER(berzerk_state::led_off_r)
 {
-	output().set_led_value(0, 0);
+	m_led = 0;
 
 	return 0;
 }
@@ -153,7 +160,7 @@ READ8_MEMBER(berzerk_state::led_off_r)
 
 WRITE8_MEMBER(berzerk_state::led_off_w)
 {
-	output().set_led_value(0, 0);
+	m_led = 0;
 }
 
 
@@ -305,7 +312,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 
 	/* pulse the NMI line if enabled */
 	if (m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;
@@ -342,6 +349,8 @@ void berzerk_state::machine_start()
 	create_irq_timer();
 	create_nmi_timer();
 
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));
 	save_item(NAME(m_last_shift_data));
@@ -362,7 +371,7 @@ void berzerk_state::machine_reset()
 {
 	m_irq_enabled = 0;
 	m_nmi_enabled = 0;
-	output().set_led_value(0, 0);
+	m_led = 0;
 	m_magicram_control = 0;
 
 	start_irq_timer();
@@ -1114,14 +1123,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(berzerk_map)
-	MCFG_CPU_IO_MAP(berzerk_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(berzerk_map)
+	MCFG_DEVICE_IO_MAP(berzerk_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TTL74181_ADD("ls181_10c")
-	MCFG_TTL74181_ADD("ls181_12c")
+	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
+	MCFG_DEVICE_ADD("ls181_12c", TTL74181)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1129,11 +1138,11 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 	MCFG_SCREEN_UPDATE_DRIVER(berzerk_state, screen_update)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
+	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("exidy", EXIDY, 0)
+	MCFG_DEVICE_ADD("exidy", EXIDY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
@@ -1142,8 +1151,8 @@ MACHINE_CONFIG_START(berzerk_state::frenzy)
 	berzerk(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(frenzy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(frenzy_map)
 MACHINE_CONFIG_END
 
 
@@ -1312,7 +1321,7 @@ ROM_START( moonwarp )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
 ROM_END
 
-DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
+void berzerk_state::init_moonwarp()
 {
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
@@ -1330,10 +1339,10 @@ DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
  *
  *************************************/
 
-GAME( 1980, berzerk,  0,       berzerk, berzerk,  berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (French Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (German Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerks, berzerk, berzerk, berzerks, berzerk_state, 0,        ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy,   berzerk_state, 0,        ROT0, "Stern Electronics", "Frenzy", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerk,  0,       berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (French Speech)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (German Speech)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerks, berzerk, berzerk, berzerks, berzerk_state, empty_init,    ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy,   berzerk_state, empty_init,    ROT0, "Stern Electronics", "Frenzy", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, init_moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", MACHINE_SUPPORTS_SAVE )

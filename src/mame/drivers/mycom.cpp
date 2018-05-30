@@ -94,7 +94,7 @@ public:
 	DECLARE_READ8_MEMBER(mycom_05_r);
 	DECLARE_READ8_MEMBER(mycom_06_r);
 	DECLARE_READ8_MEMBER(mycom_08_r);
-	DECLARE_DRIVER_INIT(mycom);
+	void init_mycom();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -336,7 +336,7 @@ static const gfx_layout mycom_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mycom )
+static GFXDECODE_START( gfx_mycom )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -480,9 +480,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 
 
 
-static SLOT_INTERFACE_START( mycom_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+static void mycom_floppies(device_slot_interface &device)
+{
+	device.option_add("525sd", FLOPPY_525_SD);
+}
 
 void mycom_state::machine_start()
 {
@@ -496,7 +497,7 @@ void mycom_state::machine_reset()
 	m_0a = 0;
 }
 
-DRIVER_INIT_MEMBER(mycom_state,mycom)
+void mycom_state::init_mycom()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -504,24 +505,24 @@ DRIVER_INIT_MEMBER(mycom_state,mycom)
 
 MACHINE_CONFIG_START(mycom_state::mycom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(mycom_map)
-	MCFG_CPU_IO_MAP(mycom_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mycom_map)
+	MCFG_DEVICE_IO_MAP(mycom_io)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mycom_state, mycom_04_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mycom_state, mycom_05_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(mycom_state, mycom_06_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mycom_state, mycom_06_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mycom_state, mycom_04_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mycom_state, mycom_05_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mycom_state, mycom_06_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_06_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mycom_state, mycom_08_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mycom_state, mycom_0a_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mycom_state, mycom_08_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_0a_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("rtc", msm5832_device, data_r))
-	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("rtc", msm5832_device, data_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mycom_state, mycom_rtc_w))
+	MCFG_I8255_IN_PORTB_CB(READ8("rtc", msm5832_device, data_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8("rtc", msm5832_device, data_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_rtc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -531,7 +532,7 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mycom)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
@@ -540,12 +541,11 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mycom_state, crtc_update_row)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL(10'000'000) / 4)
+	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(10'000'000) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */
@@ -582,5 +582,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                      FULLNAME      FLAGS
-COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state, mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                      FULLNAME      FLAGS
+COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

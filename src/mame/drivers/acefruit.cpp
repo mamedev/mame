@@ -43,7 +43,7 @@ public:
 		m_refresh_timer(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT(sidewndr);
+	void init_sidewndr();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
@@ -620,7 +620,7 @@ static const gfx_layout spritelayout =
 	32*32 /* every sprite takes 128 bytes */
 };
 
-static GFXDECODE_START( acefruit )
+static GFXDECODE_START( gfx_acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
@@ -628,14 +628,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(acefruit_state::acefruit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(acefruit_map)
-	MCFG_CPU_IO_MAP(acefruit_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(acefruit_map)
+	MCFG_DEVICE_IO_MAP(acefruit_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acefruit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acefruit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -655,11 +655,11 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(acefruit_state,sidewndr)
+void acefruit_state::init_sidewndr()
 {
-	uint8_t *ROM = memregion( "maincpu" )->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */
-	ROM[ 0 ] = 0xf3;
+	ROM[0] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */
 }
 
@@ -793,8 +793,8 @@ ROM_START( acefruit  )
 ROM_END
 
 
-GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, acefruit_state, sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAMEL( 1981?, spellbnd, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAME ( 1982?, starspnr, 0,        acefruit, starspnr, acefruit_state, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
+GAMEL( 1981?, sidewndr, 0, acefruit, sidewndr, acefruit_state, init_sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAMEL( 1981?, spellbnd, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAME(  1982?, starspnr, 0, acefruit, starspnr, acefruit_state, empty_init,    ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  1982?, acefruit, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
 // not dumped: Magnum?

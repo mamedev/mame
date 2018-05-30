@@ -739,9 +739,10 @@ static INPUT_PORTS_START( squale )
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( squale_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void squale_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void squale_state::machine_start()
 {
@@ -779,34 +780,34 @@ void squale_state::machine_reset()
 
 MACHINE_CONFIG_START(squale_state::squale)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(squale_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(squale_mem)
 
 	/* Cartridge pia */
 	MCFG_DEVICE_ADD("pia_u72", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(squale_state, pia_u72_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(squale_state, pia_u72_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(squale_state, pia_u72_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(squale_state, pia_u72_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(squale_state, pia_u72_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(squale_state, pia_u72_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u72_porta_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u72_portb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u72_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u72_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, squale_state, pia_u72_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u72_cb2_w))
 
 	/* Keyboard pia */
 	MCFG_DEVICE_ADD("pia_u75", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(squale_state, pia_u75_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(squale_state, pia_u75_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(squale_state, pia_u75_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(squale_state, pia_u75_portb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(squale_state, pia_u75_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u75_porta_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u75_portb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u75_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u75_portb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u75_cb2_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, AY_CLOCK)
 	// TODO : Add port I/O handler
-	MCFG_AY8910_PORT_A_READ_CB(READ8(squale_state, ay_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(squale_state, ay_portb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(squale_state, ay_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(squale_state, ay_portb_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, squale_state, ay_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, squale_state, ay_portb_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, squale_state, ay_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, squale_state, ay_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)
@@ -852,5 +853,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, 0,    "Apollo 7", "Squale", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, empty_init, "Apollo 7", "Squale", 0 )

@@ -295,10 +295,10 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
-	MCFG_CPU_PROGRAM_MAP(spectrum_128_mem)
-	MCFG_CPU_IO_MAP(spectrum_128_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_128_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_128_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spec128)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ay8912", AY8912, X1_128_SINCLAIR / 10)
+	MCFG_DEVICE_ADD("ay8912", AY8912, X1_128_SINCLAIR / 10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* expansion port */
@@ -377,8 +377,8 @@ ROM_START(hc2000)
 	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(2))
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE       INPUT      STATE           INIT  COMPANY                  FULLNAME           FLAGS
-COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, 0,    "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
-COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "Amstrad plc",           "ZX Spectrum +2",  0 )
-COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-128",          0 )
-COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE       CLASS      STATE           INIT        COMPANY                  FULLNAME           FLAGS
+COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, empty_init, "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
+COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "Amstrad plc",           "ZX Spectrum +2",  0 )
+COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "ICE-Felix",             "HC-128",          0 )
+COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )

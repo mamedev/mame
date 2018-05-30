@@ -1883,12 +1883,12 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( toaplan1 )
+static GFXDECODE_START( gfx_toaplan1 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,       0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   64*16, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( rallybik )
+static GFXDECODE_START( gfx_rallybik )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,             0, 64 )
 GFXDECODE_END
 
@@ -1912,20 +1912,20 @@ GFXDECODE_END
 MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(rallybik_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rallybik_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(rallybik_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(rallybik_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_DEVICE_ADD("coinlatch", LS259, 0) // 19L
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_lockout_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_2_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1934,21 +1934,21 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_rallybik_state, screen_update_rallybik)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_rallybik_state, screen_vblank_rallybik))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_rallybik_state, screen_vblank_rallybik))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rallybik)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallybik)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_rallybik_state,rallybik)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1957,12 +1957,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::truxton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(truxton_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(truxton_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(truxton_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(truxton_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -1973,19 +1973,19 @@ MACHINE_CONFIG_START(toaplan1_state::truxton)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1994,12 +1994,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::hellfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(hellfire_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hellfire_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(hellfire_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(hellfire_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2010,19 +2010,19 @@ MACHINE_CONFIG_START(toaplan1_state::hellfire)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2031,12 +2031,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::zerowing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(zerowing_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(zerowing_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(zerowing_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2047,19 +2047,19 @@ MACHINE_CONFIG_START(toaplan1_state::zerowing)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2068,17 +2068,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::demonwld)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(demonwld_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(demonwld_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(demonwld_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(demonwld_sound_io_map)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
-	MCFG_CPU_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(toaplan1_state, demonwld_BIO_r))
+	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
+	MCFG_DEVICE_IO_MAP(DSP_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, toaplan1_state, demonwld_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2089,19 +2089,19 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2110,12 +2110,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::samesame)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(samesame_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(samesame_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
-	MCFG_CPU_PROGRAM_MAP(samesame_hd647180_mem_map)
-	MCFG_CPU_IO_MAP(samesame_hd647180_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
+	MCFG_DEVICE_PROGRAM_MAP(samesame_hd647180_mem_map)
+	MCFG_DEVICE_IO_MAP(samesame_hd647180_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -2126,19 +2126,19 @@ MACHINE_CONFIG_START(toaplan1_state::samesame)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_samesame))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_samesame))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2147,12 +2147,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::outzone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(outzone_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(outzone_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(outzone_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(outzone_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2163,19 +2163,19 @@ MACHINE_CONFIG_START(toaplan1_state::outzone)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2184,12 +2184,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(outzonecv_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(outzonecv_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(zerowing_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2200,19 +2200,19 @@ MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2221,12 +2221,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::vimana)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(vimana_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(vimana_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
-	MCFG_CPU_PROGRAM_MAP(vimana_hd647180_mem_map)
-	MCFG_CPU_IO_MAP(vimana_hd647180_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
+	MCFG_DEVICE_PROGRAM_MAP(vimana_hd647180_mem_map)
+	MCFG_DEVICE_IO_MAP(vimana_hd647180_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600)) // GUESSED
 
@@ -2237,19 +2237,19 @@ MACHINE_CONFIG_START(toaplan1_state::vimana)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)   /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)   /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -3117,12 +3117,12 @@ ROM_START( vimanaj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(toaplan1_state,toaplan1)
+void toaplan1_state::init_toaplan1()
 {
 	toaplan1_driver_savestate();
 }
 
-DRIVER_INIT_MEMBER(toaplan1_state,demonwld)
+void toaplan1_state::init_demonwld()
 {
 	toaplan1_driver_savestate();
 	demonwld_driver_savestate();
@@ -3132,41 +3132,41 @@ DRIVER_INIT_MEMBER(toaplan1_state,demonwld)
 
 
 
-GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1_rallybik_state, toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1_rallybik_state, init_toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
 
-GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,          toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,     init_toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
 
-GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set)",        0 )
-GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set)",        0 )
-GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set, older)", 0 )
-GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set, older)", 0 )
+GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1_state,     init_toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set)",        0 )
+GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1_state,     init_toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set)",        0 )
+GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state,     init_toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set, older)", 0 )
+GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state,     init_toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set, older)", 0 )
 
-GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state,          toaplan1, ROT0,   "Toaplan",                     "Zero Wing (2P set)",                   0 )
-GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state,          toaplan1, ROT0,   "Toaplan",                     "Zero Wing (1P set)",                   0 )
-GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state,          toaplan1, ROT0,   "Toaplan (Williams license)",  "Zero Wing (2P set, Williams license)", 0 )
+GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state,     init_toaplan1, ROT0,   "Toaplan",                     "Zero Wing (2P set)",                   0 )
+GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state,     init_toaplan1, ROT0,   "Toaplan",                     "Zero Wing (1P set)",                   0 )
+GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state,     init_toaplan1, ROT0,   "Toaplan (Williams license)",  "Zero Wing (2P set, Williams license)", 0 )
 
-GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 1)", 0 )
-GAME( 1989, demonwld1,  demonwld, demonwld, demonwld,  toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 2)", 0 )
-GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 3)", 0 )
-GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 4)", 0 )
-GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 5)", 0 )
+GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_state,     init_demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 1)", 0 )
+GAME( 1989, demonwld1,  demonwld, demonwld, demonwld,  toaplan1_state,     init_demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 2)", 0 )
+GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_state,     init_demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 3)", 0 )
+GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, toaplan1_state,     init_demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 4)", 0 )
+GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, toaplan1_state,     init_demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 5)", 0 )
 
-GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Fire Shark",                                0 )
-GAME( 1989, fireshrka,  fireshrk, samesame, fireshrka, toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Fire Shark (earlier)",                      0 )
-GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_state,          toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 1, easier)",         0 )
-GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_state,          toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 2, harder)",         0 )
-GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (1P set)",                0 )
-GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (2P set)",                0 )
-GAME( 2015, samesamenh, fireshrk, samesame, samesame,  toaplan1_state,          toaplan1, ROT270, "hack (trap15)",               "Same! Same! Same! (1P set, NEW VER! hack)", 0 )
+GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Fire Shark",                                0 )
+GAME( 1989, fireshrka,  fireshrk, samesame, fireshrka, toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Fire Shark (earlier)",                      0 )
+GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_state,     init_toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 1, easier)",         0 )
+GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_state,     init_toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 2, harder)",         0 )
+GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (1P set)",                0 )
+GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (2P set)",                0 )
+GAME( 2015, samesamenh, fireshrk, samesame, samesame,  toaplan1_state,     init_toaplan1, ROT270, "hack (trap15)",               "Same! Same! Same! (1P set, NEW VER! hack)", 0 )
 
-GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone",                                   0 )
-GAME( 1990, outzoneh,   outzone,  outzone,  outzone,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (harder)",                          0 )
-GAME( 1990, outzonea,   outzone,  outzone,  outzonea,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (old set)",                         0 )
-GAME( 1990, outzoneb,   outzone,  outzone,  outzonea,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (older set)",                       0 )
-GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (oldest set)",                      MACHINE_IMPERFECT_SOUND ) // prototype?
-GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (Zero Wing TP-015 PCB conversion)", 0 )
+GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Out Zone",                                   0 )
+GAME( 1990, outzoneh,   outzone,  outzone,  outzone,   toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Out Zone (harder)",                          0 )
+GAME( 1990, outzonea,   outzone,  outzone,  outzonea,  toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Out Zone (old set)",                         0 )
+GAME( 1990, outzoneb,   outzone,  outzone,  outzonea,  toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Out Zone (older set)",                       0 )
+GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Out Zone (oldest set)",                      MACHINE_IMPERFECT_SOUND ) // prototype?
+GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Out Zone (Zero Wing TP-015 PCB conversion)", 0 )
 
 // has various licenses / regions depending on jumpers, including Tecmo
-GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Vimana (World, set 1)", 0 )
-GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Vimana (World, set 2)", 0 )
-GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Vimana (Japan)",        0 )
+GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Vimana (World, set 1)", 0 )
+GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Vimana (World, set 2)", 0 )
+GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state,     init_toaplan1, ROT270, "Toaplan",                     "Vimana (Japan)",        0 )

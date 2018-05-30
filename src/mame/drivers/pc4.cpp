@@ -184,7 +184,7 @@ static const gfx_layout pc4_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( pc4 )
+static GFXDECODE_START( gfx_pc4 )
 	GFXDECODE_ENTRY( "charset", 0x0000, pc4_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -220,9 +220,9 @@ void pc4_state::machine_start()
 
 MACHINE_CONFIG_START(pc4_state::pc4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(pc4_mem)
-	MCFG_CPU_IO_MAP(pc4_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pc4_mem)
+	MCFG_DEVICE_IO_MAP(pc4_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -235,11 +235,11 @@ MACHINE_CONFIG_START(pc4_state::pc4)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc4_state, pc4)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
@@ -252,5 +252,5 @@ ROM_START( pc4 )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY             FULLNAME     FLAGS
-COMP( 1990, pc4,   0,      0,      pc4,     pc4,   pc4_state, 0,    "Laser Computer",   "Laser PC4", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME     FLAGS
+COMP( 1990, pc4,  0,      0,      pc4,     pc4,   pc4_state, empty_init, "Laser Computer", "Laser PC4", MACHINE_NOT_WORKING )

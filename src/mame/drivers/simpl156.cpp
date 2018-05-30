@@ -369,7 +369,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( simpl156 )
+static GFXDECODE_START( gfx_simpl156 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0,     32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0,     32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32)    /* Sprites (16x16) */
@@ -404,9 +404,9 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 MACHINE_CONFIG_START(simpl156_state::chainrec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
-	MCFG_CPU_PROGRAM_MAP(chainrec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	MCFG_DEVICE_PROGRAM_MAP(chainrec_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
 
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", simpl156)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_simpl156)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -446,13 +446,14 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_DECO_SPRITE_PRIORITY_CB(simpl156_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("okisfx", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okisfx", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_OKIM6295_ADD("okimusic", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okimusic", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -461,34 +462,34 @@ MACHINE_CONFIG_START(simpl156_state::magdrop)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magdrop_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magdrop_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::magdropp)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magdropp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magdropp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::joemacr)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(joemacr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(joemacr_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::mitchell156)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mitchell156_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mitchell156_map)
 
-	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_REPLACE("okimusic", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -1045,25 +1046,22 @@ ROM_END
 */
 
 
-DRIVER_INIT_MEMBER(simpl156_state,simpl156)
+void simpl156_state::init_simpl156()
 {
 	uint8_t *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
 	std::vector<uint8_t> buf1(length);
 
-	uint32_t x;
-
 	/* hmm low address line goes to banking chip instead? */
-	for (x = 0; x < length; x++)
+	for (uint32_t x = 0; x < length; x++)
 	{
-		uint32_t addr;
-
-		addr = bitswap<24> (x,23,22,21,0, 20,
+		uint32_t addr = bitswap<24> (x,23,
+							22,21, 0,20,
 							19,18,17,16,
 							15,14,13,12,
-							11,10,9, 8,
-							7, 6, 5, 4,
-							3, 2, 1 );
+							11,10, 9, 8,
+							 7, 6, 5, 4,
+							 3, 2, 1 );
 
 		buf1[addr] = rom[x];
 	}
@@ -1083,10 +1081,10 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(simpl156_state,joemacr)
+void simpl156_state::init_joemacr()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::chainrec_speedup_r)
@@ -1096,10 +1094,10 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 	return m_systemram[0x18/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,chainrec)
+void simpl156_state::init_chainrec()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::prtytime_speedup_r)
@@ -1109,10 +1107,10 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 	return m_systemram[0xae0/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,prtytime)
+void simpl156_state::init_prtytime()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 
@@ -1123,10 +1121,10 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,charlien)
+void simpl156_state::init_charlien()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::osman_speedup_r)
@@ -1136,24 +1134,24 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,osman)
+void simpl156_state::init_osman()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 
 }
 
 /* Data East games running on the DE-0409-1 or DE-0491-1 PCB */
-GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
-GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
+GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
 
 /* Mitchell games running on the DEC-22VO / MT5601-0 PCB */
-GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1995, prtytime, 0,        mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1995, gangonta, prtytime, mitchell156, simpl156, simpl156_state, prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
-GAME( 1996, osman,    0,        mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell", "Osman (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, candance, osman,    mitchell156, simpl156, simpl156_state, osman,    ROT0,  "Mitchell (Atlus license)", "Cannon Dancer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, init_charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, prtytime, 0,        mitchell156, simpl156, simpl156_state, init_prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1995, gangonta, prtytime, mitchell156, simpl156, simpl156_state, init_prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", MACHINE_SUPPORTS_SAVE ) /* language in service mode */
+GAME( 1996, osman,    0,        mitchell156, simpl156, simpl156_state, init_osman,    ROT0,  "Mitchell", "Osman (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, candance, osman,    mitchell156, simpl156, simpl156_state, init_osman,    ROT0,  "Mitchell (Atlus license)", "Cannon Dancer (Japan)", MACHINE_SUPPORTS_SAVE )

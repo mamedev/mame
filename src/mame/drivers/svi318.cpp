@@ -315,7 +315,7 @@ static INPUT_PORTS_START( svi328 )
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)  PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)    PORT_NAME("Keypad ,")
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
 INPUT_PORTS_END
 
 
@@ -530,9 +530,9 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 
 MACHINE_CONFIG_START(svi3x8_state::svi318)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635) / 3)
-	MCFG_CPU_PROGRAM_MAP(svi3x8_mem)
-	MCFG_CPU_IO_MAP(svi3x8_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(svi3x8_mem)
+	MCFG_DEVICE_IO_MAP(svi3x8_io)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -544,26 +544,24 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(svi3x8_state, ppi_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(svi3x8_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(svi3x8_state, ppi_port_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, svi3x8_state, ppi_port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, svi3x8_state, ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, svi3x8_state, ppi_port_c_w))
 
 	// video hardware
 	MCFG_DEVICE_ADD("vdp", TMS9929A, XTAL(10'738'635) / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi3x8_state, intvdp_w))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, svi3x8_state, intvdp_w))
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9929a_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("psg", AY8910, XTAL(10'738'635) / 6)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("psg", AY8910, XTAL(10'738'635) / 6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi3x8_state, bank_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, svi3x8_state, bank_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	// cassette
@@ -581,12 +579,12 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 
 	// expander bus
 	MCFG_SVI_EXPANDER_BUS_ADD("exp")
-	MCFG_SVI_EXPANDER_INT_HANDLER(WRITELINE(svi3x8_state, intexp_w))
-	MCFG_SVI_EXPANDER_ROMDIS_HANDLER(WRITELINE(svi3x8_state, romdis_w))
-	MCFG_SVI_EXPANDER_RAMDIS_HANDLER(WRITELINE(svi3x8_state, ramdis_w))
-	MCFG_SVI_EXPANDER_CTRL1_HANDLER(WRITELINE(svi3x8_state, ctrl1_w))
-	MCFG_SVI_EXPANDER_EXCSR_HANDLER(READ8(svi3x8_state, excs_r))
-	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(svi3x8_state, excs_w))
+	MCFG_SVI_EXPANDER_INT_HANDLER(WRITELINE(*this, svi3x8_state, intexp_w))
+	MCFG_SVI_EXPANDER_ROMDIS_HANDLER(WRITELINE(*this, svi3x8_state, romdis_w))
+	MCFG_SVI_EXPANDER_RAMDIS_HANDLER(WRITELINE(*this, svi3x8_state, ramdis_w))
+	MCFG_SVI_EXPANDER_CTRL1_HANDLER(WRITELINE(*this, svi3x8_state, ctrl1_w))
+	MCFG_SVI_EXPANDER_EXCSR_HANDLER(READ8(*this, svi3x8_state, excs_r))
+	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(*this, svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svi3x8_state::svi318n)
@@ -595,7 +593,7 @@ MACHINE_CONFIG_START(svi3x8_state::svi318n)
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL(10'738'635) / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi3x8_state, intvdp_w))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, svi3x8_state, intvdp_w))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -639,8 +637,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY         FULLNAME          FLAGS
-COMP( 1983, svi318,  0,        0,      svi318,  svi318, svi3x8_state, 0,    "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi318n, svi318,   0,      svi318n, svi318, svi3x8_state, 0,    "Spectravideo", "SVI-318 (NTSC)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi328,  0,        0,      svi328,  svi328, svi3x8_state, 0,    "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi328n, svi328,   0,      svi328n, svi328, svi3x8_state, 0,    "Spectravideo", "SVI-328 (NTSC)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME          FLAGS
+COMP( 1983, svi318,  0,      0,      svi318,  svi318, svi3x8_state, empty_init, "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi318n, svi318, 0,      svi318n, svi318, svi3x8_state, empty_init, "Spectravideo", "SVI-318 (NTSC)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328,  0,      0,      svi328,  svi328, svi3x8_state, empty_init, "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328n, svi328, 0,      svi328n, svi328, svi3x8_state, empty_init, "Spectravideo", "SVI-328 (NTSC)", MACHINE_SUPPORTS_SAVE )

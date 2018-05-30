@@ -318,7 +318,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( atetris )
+static GFXDECODE_START( gfx_atetris )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -332,8 +332,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(atetris_state::atetris)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502,MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 101)
 
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(atetris_state::atetris)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atetris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atetris)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)
@@ -356,13 +356,13 @@ MACHINE_CONFIG_START(atetris_state::atetris)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -371,8 +371,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atetris_state::atetrisb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(atetrisb2_map)
+	MCFG_DEVICE_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(atetrisb2_map)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 101)
 
@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(atetris_state::atetrisb2)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atetris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atetris)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)
@@ -395,15 +395,15 @@ MACHINE_CONFIG_START(atetris_state::atetrisb2)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76496, BOOTLEG_CLOCK/8)
+	MCFG_DEVICE_ADD("sn1", SN76496, BOOTLEG_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76496, BOOTLEG_CLOCK/8)
+	MCFG_DEVICE_ADD("sn2", SN76496, BOOTLEG_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76496, BOOTLEG_CLOCK/8)
+	MCFG_DEVICE_ADD("sn3", SN76496, BOOTLEG_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -411,18 +411,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atetris_state::atetrisb3)
 	atetrisb2(config);
 
-	MCFG_CPU_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(atetrisb3_map)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(atetrisb3_map)
 
 	//8749 at 10 MHz instead of slapstic
 
-	MCFG_SOUND_REPLACE("sn1", SN76489, 4000000)
+	MCFG_DEVICE_REPLACE("sn1", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_REPLACE("sn2", SN76489, 4000000)
+	MCFG_DEVICE_REPLACE("sn2", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_REPLACE("sn3", SN76489, 4000000)
+	MCFG_DEVICE_REPLACE("sn3", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -570,7 +570,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atetris_state,atetris)
+void atetris_state::init_atetris()
 {
 	uint8_t *rgn = memregion("maincpu")->base();
 
@@ -587,10 +587,10 @@ DRIVER_INIT_MEMBER(atetris_state,atetris)
  *
  *************************************/
 
-GAME( 1988, atetris,  0,       atetris,   atetris,  atetris_state, atetris, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisa, atetris, atetris,   atetris,  atetris_state, atetris, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb, atetris, atetris,   atetris,  atetris_state, atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb2,atetris, atetrisb2, atetris,  atetris_state, atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb3,atetris, atetrisb3, atetris,  atetris_state, atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, atetrisc, atetris, atetris,   atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, atetrisc2,atetris, atetris,   atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetris,   0,       atetris,   atetris,  atetris_state, init_atetris, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state, init_atetris, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state, init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state, init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

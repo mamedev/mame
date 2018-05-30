@@ -570,13 +570,13 @@ void ep64_state::machine_reset()
 
 MACHINE_CONFIG_START(ep64_state::ep64)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(ep64_mem)
-	MCFG_CPU_IO_MAP(ep64_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ep64_mem)
+	MCFG_DEVICE_IO_MAP(ep64_io)
 
 	// video hardware
 	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL(8'000'000))
-	MCFG_NICK_VIRQ_CALLBACK(DEVWRITELINE(DAVE_TAG, dave_device, int1_w))
+	MCFG_NICK_VIRQ_CALLBACK(WRITELINE(DAVE_TAG, dave_device, int1_w))
 
 	// sound hardware
 	MCFG_DAVE_ADD(DAVE_TAG, XTAL(8'000'000), dave_64k_mem, dave_io)
@@ -590,11 +590,11 @@ MACHINE_CONFIG_START(ep64_state::ep64)
 	MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(ep64_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ep64_state, write_centronics_busy))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(DAVE_TAG, dave_device, int2_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(DAVE_TAG, dave_device, int2_w))
 
 	MCFG_CASSETTE_ADD(CASSETTE1_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
@@ -666,7 +666,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                 FULLNAME                     FLAGS
-COMP( 1985, ep64,  0,      0,      ep64,    ep64,  ep64_state, 0,     "Enterprise Computers", "Enterprise Sixty Four",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1985, phc64, ep64,   0,      ep64,    ep64,  ep64_state, 0,     "Hegener & Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1986, ep128, ep64,   0,      ep128,   ep64,  ep64_state, 0,     "Enterprise Computers", "Enterprise One Two Eight",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                 FULLNAME                     FLAGS
+COMP( 1985, ep64,  0,      0,      ep64,    ep64,  ep64_state, empty_init, "Enterprise Computers", "Enterprise Sixty Four",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1985, phc64, ep64,   0,      ep64,    ep64,  ep64_state, empty_init, "Hegener & Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, ep128, ep64,   0,      ep128,   ep64,  ep64_state, empty_init, "Enterprise Computers", "Enterprise One Two Eight",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

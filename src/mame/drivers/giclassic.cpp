@@ -297,9 +297,9 @@ void giclassicsvr_state::machine_reset()
 MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
-	MCFG_CPU_PROGRAM_MAP(satellite_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_DEVICE_PROGRAM_MAP(satellite_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -323,9 +323,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
-	MCFG_CPU_PROGRAM_MAP(server_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
+	MCFG_DEVICE_PROGRAM_MAP(server_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -379,5 +379,5 @@ ROM_START( giclassvr )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END
 
-GAME( 1998, giclasex,  0, giclassic, giclassic, giclassic_state,    0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
-GAME( 1998, giclassvr, 0, giclassvr, giclassvr, giclassicsvr_state, 0, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclasex, 0, giclassic, giclassic, giclassic_state,    empty_init, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclassvr,0, giclassvr, giclassvr, giclassicsvr_state, empty_init, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)

@@ -445,9 +445,10 @@ static INPUT_PORTS_START( goupil_g1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( goupil_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void goupil_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void goupil_g1_state::machine_start()
 {
@@ -527,8 +528,8 @@ READ8_MEMBER( goupil_g2_state::visu24x80_ram_r )
 
 MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goupil_mem)
+	MCFG_DEVICE_ADD("maincpu",M6808, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(goupil_mem)
 
 	/* sound hardware */
 	// TODO !
@@ -550,9 +551,9 @@ MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("goupil_sl", goupil_g1_state, goupil_scanline, "screen", 0, 10)
 
 	MCFG_DEVICE_ADD("m_via_video", VIA6522, CPU_CLOCK / 4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(goupil_g1_state, via_video_pba_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(goupil_g1_state, via_video_pbb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g1_state, via_video_ca2_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, goupil_g1_state, via_video_pba_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, goupil_g1_state, via_video_pbb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, goupil_g1_state, via_video_ca2_w))
 
 	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
@@ -566,24 +567,24 @@ MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("i8279_kb1", I8279, CPU_CLOCK)
-	MCFG_I8279_OUT_SL_CB(WRITE8(goupil_g1_state, scanlines_kbd1_w))           // scan SL lines
-	MCFG_I8279_IN_RL_CB(READ8(goupil_g1_state, kbd1_r))                         // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(READ8(goupil_g1_state, shift_kb1_r))
-	MCFG_I8279_IN_CTRL_CB(READ8(goupil_g1_state, ctrl_kb1_r))
-	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("m_via_keyb", via6522_device, write_ca1))
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, goupil_g1_state, scanlines_kbd1_w))           // scan SL lines
+	MCFG_I8279_IN_RL_CB(READ8(*this, goupil_g1_state, kbd1_r))                         // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(READ8(*this, goupil_g1_state, shift_kb1_r))
+	MCFG_I8279_IN_CTRL_CB(READ8(*this, goupil_g1_state, ctrl_kb1_r))
+	MCFG_I8279_OUT_IRQ_CB(WRITELINE("m_via_keyb", via6522_device, write_ca1))
 
 	MCFG_DEVICE_ADD("i8279_kb2", I8279, CPU_CLOCK)
-	MCFG_I8279_OUT_SL_CB(WRITE8(goupil_g1_state, scanlines_kbd2_w))           // scan SL lines
-	MCFG_I8279_IN_RL_CB(READ8(goupil_g1_state, kbd2_r))                         // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(READ8(goupil_g1_state, shift_kb2_r))
-	MCFG_I8279_IN_CTRL_CB(READ8(goupil_g1_state, ctrl_kb2_r))
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, goupil_g1_state, scanlines_kbd2_w))           // scan SL lines
+	MCFG_I8279_IN_RL_CB(READ8(*this, goupil_g1_state, kbd2_r))                         // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(READ8(*this, goupil_g1_state, shift_kb2_r))
+	MCFG_I8279_IN_CTRL_CB(READ8(*this, goupil_g1_state, ctrl_kb2_r))
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goupil_g2_mem)
+	MCFG_DEVICE_ADD("maincpu",M6808, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(goupil_g2_mem)
 
 	/* sound hardware */
 	// TODO !
@@ -612,9 +613,9 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_MC6845_ADDR_CHANGED_CB(goupil_g2_state, crtc_update_addr_changed)
 
 	MCFG_DEVICE_ADD("m_via_video", VIA6522, CPU_CLOCK / 4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(goupil_g2_state, via_video_pba_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(goupil_g2_state, via_video_pbb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g2_state, via_video_ca2_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, goupil_g2_state, via_video_pba_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, goupil_g2_state, via_video_pbb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, goupil_g2_state, via_video_ca2_w))
 
 	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
@@ -628,17 +629,17 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("i8279_kb1", I8279, CPU_CLOCK)
-	MCFG_I8279_OUT_SL_CB(WRITE8(goupil_g2_state, scanlines_kbd1_w))           // scan SL lines
-	MCFG_I8279_IN_RL_CB(READ8(goupil_g2_state, kbd1_r))                         // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(READ8(goupil_g2_state, shift_kb1_r))
-	MCFG_I8279_IN_CTRL_CB(READ8(goupil_g2_state, ctrl_kb1_r))
-	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("m_via_keyb", via6522_device, write_ca1))
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, goupil_g2_state, scanlines_kbd1_w))           // scan SL lines
+	MCFG_I8279_IN_RL_CB(READ8(*this, goupil_g2_state, kbd1_r))                         // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(READ8(*this, goupil_g2_state, shift_kb1_r))
+	MCFG_I8279_IN_CTRL_CB(READ8(*this, goupil_g2_state, ctrl_kb1_r))
+	MCFG_I8279_OUT_IRQ_CB(WRITELINE("m_via_keyb", via6522_device, write_ca1))
 
 	MCFG_DEVICE_ADD("i8279_kb2", I8279, CPU_CLOCK)
-	MCFG_I8279_OUT_SL_CB(WRITE8(goupil_g2_state, scanlines_kbd2_w))           // scan SL lines
-	MCFG_I8279_IN_RL_CB(READ8(goupil_g2_state, kbd2_r))                       // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(READ8(goupil_g2_state, shift_kb2_r))
-	MCFG_I8279_IN_CTRL_CB(READ8(goupil_g2_state, ctrl_kb2_r))
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, goupil_g2_state, scanlines_kbd2_w))           // scan SL lines
+	MCFG_I8279_IN_RL_CB(READ8(*this, goupil_g2_state, kbd2_r))                       // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(READ8(*this, goupil_g2_state, shift_kb2_r))
+	MCFG_I8279_IN_CTRL_CB(READ8(*this, goupil_g2_state, ctrl_kb2_r))
 
 MACHINE_CONFIG_END
 
@@ -689,6 +690,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, goupilg1,   0,   0,      goupil_g1,  goupil_g1,goupil_g1_state,   0,     "SMT", "Goupil G1", MACHINE_NO_SOUND )
-COMP( 1981, goupilg2,   0,   0,      goupil_g2,  goupil_g1,goupil_g2_state,   0,     "SMT", "Goupil G2", MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME     FLAGS */
+COMP( 1979, goupilg1, 0,      0,      goupil_g1, goupil_g1, goupil_g1_state, empty_init, "SMT",   "Goupil G1", MACHINE_NO_SOUND )
+COMP( 1981, goupilg2, 0,      0,      goupil_g2, goupil_g1, goupil_g2_state, empty_init, "SMT",   "Goupil G2", MACHINE_NO_SOUND )

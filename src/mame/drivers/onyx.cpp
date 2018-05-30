@@ -38,7 +38,7 @@ To Do:
 #include "cpu/z8000/z8000.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
-//#include "cpu/z80/z80daisy.h"
+//#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -133,21 +133,21 @@ void onyx_state::subio(address_map &map)
 
 MACHINE_CONFIG_START(onyx_state::c8002)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8002, XTAL(4'000'000) )
+	MCFG_DEVICE_ADD("maincpu", Z8002, XTAL(4'000'000) )
 	//MCFG_Z80_DAISY_CHAIN(main_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(c8002_mem)
-	//MCFG_CPU_DATA_MAP(c8002_data)
-	MCFG_CPU_IO_MAP(c8002_io)
+	MCFG_DEVICE_PROGRAM_MAP(c8002_mem)
+	//MCFG_DEVICE_DATA_MAP(c8002_data)
+	MCFG_DEVICE_IO_MAP(c8002_io)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(4'000'000) )
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(4'000'000) )
 	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(submem)
-	MCFG_CPU_IO_MAP(subio)
+	MCFG_DEVICE_PROGRAM_MAP(submem)
+	MCFG_DEVICE_IO_MAP(subio)
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1" ,z80sio_device, txca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio1", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1" ,z80sio_device, txca_w))
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000)/4)
@@ -158,35 +158,35 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) /4)
 	MCFG_DEVICE_ADD("ctc3", Z80CTC, XTAL(16'000'000) /4)
 	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(16'000'000) /4)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(16'000'000) /4)
 	MCFG_DEVICE_ADD("sio3", Z80SIO, XTAL(16'000'000) /4)
 	MCFG_DEVICE_ADD("sio4", Z80SIO, XTAL(16'000'000) /4)
 	MCFG_DEVICE_ADD("sio5", Z80SIO, XTAL(16'000'000) /4)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("pio1s", Z80PIO, XTAL(16'000'000)/4)
 	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("subcpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("sio1s_clock", CLOCK, 614400)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio1s", z80sio_device, rxtxcb_w))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1s" ,z80sio_device, txca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio1s", z80sio_device, rxtxcb_w))
+	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1s" ,z80sio_device, txca_w))
 
 	MCFG_DEVICE_ADD("sio1s", Z80SIO, XTAL(16'000'000) /4)
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232s", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232s", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232s", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232s", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232s", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232s", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232s", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1s", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1s", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1s", z80sio_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232s", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1s", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1s", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1s", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -215,8 +215,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY          FULLNAME  FLAGS
-COMP( 1982, c8002, 0,      0,       c8002,     c8002, onyx_state, 0,    "Onyx Systems",  "C8002",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY         FULLNAME  FLAGS
+COMP( 1982, c8002, 0,      0,      c8002,   c8002, onyx_state, empty_init, "Onyx Systems", "C8002",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 
 
 
@@ -245,15 +245,15 @@ void onyx_state::c5000_io(address_map &map)
 
 MACHINE_CONFIG_START(onyx_state::c5000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4 )
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4 )
 	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(c5000_mem)
-	MCFG_CPU_IO_MAP(c5000_io)
+	MCFG_DEVICE_PROGRAM_MAP(c5000_mem)
+	MCFG_DEVICE_IO_MAP(c5000_io)
 	//MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 614400)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxtxcb_w))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1" ,z80sio_device, txca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio1", z80sio_device, rxtxcb_w))
+	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1" ,z80sio_device, txca_w))
 
 	/* peripheral hardware */
 	//MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000)/4)
@@ -264,14 +264,14 @@ MACHINE_CONFIG_START(onyx_state::c5000)
 	//MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) /4)
 	//MCFG_DEVICE_ADD("ctc3", Z80CTC, XTAL(16'000'000) /4)
 	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(16'000'000) /4)
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80sio_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsb_w))
 
 	//MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(16'000'000) /4)
 MACHINE_CONFIG_END
@@ -285,5 +285,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY          FULLNAME  FLAGS
-COMP( 1981, c5000, 0,      0,       c5000,     c8002, onyx_state, 0,    "Onyx Systems",  "C5000",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT        COMPANY          FULLNAME  FLAGS
+COMP( 1981, c5000, 0,      0,       c5000,     c8002, onyx_state, empty_init, "Onyx Systems",  "C5000",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

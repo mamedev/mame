@@ -321,7 +321,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( koikoi )
+static GFXDECODE_START( gfx_koikoi )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
 GFXDECODE_END
 
@@ -355,9 +355,9 @@ void koikoi_state::machine_reset()
 MACHINE_CONFIG_START(koikoi_state::koikoi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
-	MCFG_CPU_PROGRAM_MAP(koikoi_map)
-	MCFG_CPU_IO_MAP(koikoi_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(koikoi_map)
+	MCFG_DEVICE_IO_MAP(koikoi_io_map)
 
 
 	/* video hardware */
@@ -370,17 +370,17 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koikoi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koikoi)
 	MCFG_PALETTE_ADD("palette", 8*32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(koikoi_state, koikoi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(koikoi_state, input_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(koikoi_state, unknown_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, koikoi_state, input_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, koikoi_state, unknown_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -437,4 +437,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, koikoi,   0,      koikoi, koikoi, koikoi_state, 0, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, koikoi, 0, koikoi, koikoi, koikoi_state, empty_init, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -338,11 +338,11 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 
 MACHINE_CONFIG_START(ravens_state::ravens)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_CPU_PROGRAM_MAP(ravens_mem)
-	MCFG_CPU_IO_MAP(ravens_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
@@ -352,18 +352,17 @@ MACHINE_CONFIG_START(ravens_state::ravens)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ravens_state::ravens2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_CPU_PROGRAM_MAP(ravens_mem)
-	MCFG_CPU_IO_MAP(ravens2_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens2_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
@@ -376,9 +375,8 @@ MACHINE_CONFIG_START(ravens_state::ravens2)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -397,6 +395,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS         INIT  COMPANY                            FULLNAME                               FLAGS */
-COMP( 1984, ravens,  0,       0,       ravens,  ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
-COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                            FULLNAME                               FLAGS */
+COMP( 1984, ravens,  0,      0,      ravens,  ravens, ravens_state, empty_init, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
+COMP( 1985, ravens2, ravens, 0,      ravens2, ravens, ravens_state, empty_init, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )

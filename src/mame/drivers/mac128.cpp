@@ -235,9 +235,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
-	DECLARE_DRIVER_INIT(mac128k512k);
-	DECLARE_DRIVER_INIT(mac512ke);
-	DECLARE_DRIVER_INIT(macplus);
+	void init_mac128k512k();
+	void init_mac512ke();
+	void init_macplus();
 	DECLARE_VIDEO_START(mac);
 	DECLARE_PALETTE_INIT(mac);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1262,7 +1262,7 @@ uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bi
 }
 
 #define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(mac128_state,label)     \
+void mac128_state::init_##label()     \
 {   \
 	mac_driver_init(model); \
 }
@@ -1326,8 +1326,8 @@ static const floppy_interface mac_floppy_interface =
 
 MACHINE_CONFIG_START(mac128_state::mac512ke)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mac512ke_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -1344,10 +1344,10 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac128_state, mac_scanline, "screen", 0, 1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(DAC_TAG, DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD(DAC_TAG, DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
@@ -1355,20 +1355,20 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC85C30_ADD("scc", C7M, C3_7M, 0, C3_7M, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(mac128_state, set_scc_interrupt))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, mac128_state, set_scc_interrupt))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac128_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac128_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac128_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac128_state,mac_via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac128_state,mac_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac128_state,mac_via_irq))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, mac128_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, mac128_state,mac_via_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, mac128_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, mac128_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, mac128_state,mac_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, mac128_state,mac_via_irq))
 
 	MCFG_MACKBD_ADD(MACKBD_TAG)
 #ifdef MAC_USE_EMULATED_KBD
-	MCFG_MACKBD_DATAOUT_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac128_state, mac_kbd_clk_in))
+	MCFG_MACKBD_DATAOUT_HANDLER(WRITELINE("via6522_0", via6522_device, write_cb2))
+	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(*this, mac128_state, mac_kbd_clk_in))
 #endif
 
 	/* internal ram */
@@ -1391,8 +1391,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mac128_state::macplus)
 	mac512ke(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(macplus_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(macplus_map)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
@@ -1400,7 +1400,7 @@ MACHINE_CONFIG_START(mac128_state::macplus)
 
 	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac128_state, mac_scsi_irq))
+	MCFG_NCR5380_IRQ_CB(WRITELINE(*this, mac128_state, mac_scsi_irq))
 
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 
@@ -1503,8 +1503,8 @@ static INPUT_PORTS_START( macplus )
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT(0x0038, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 	PORT_BIT(0x0E00, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
@@ -1706,12 +1706,12 @@ ROM_START( macplus ) // same notes as above apply here as well
 	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(5) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
-//COMP( 1983, mactw,    0,        0,  mac128k,  macplus, mac128_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1984, mac128k,  0,        0,  mac128k,  macplus, mac128_state,  mac128k512k,  "Apple Computer", "Macintosh 128k",  MACHINE_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k,  0,  mac512ke, macplus, mac128_state,  mac128k512k,  "Apple Computer", "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus,  0,  mac512ke, macplus, mac128_state,  mac512ke,     "Apple Computer", "Macintosh 512ke", 0 )
-COMP( 1985, unitron,  macplus,  0,  mac512ke, macplus, mac128_state,  mac512ke,     "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1986, macplus,  0,        0,  macplus,  macplus, mac128_state,  macplus,      "Apple Computer", "Macintosh Plus",  0 )
-COMP( 1985, utrn1024, macplus,  0,  macplus,  macplus, mac128_state,  macplus,      "bootleg (Unitron)", "Unitron 1024",  0 )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
+//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
+COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
+COMP( 1984, mac512k,  mac128k, 0,      mac512ke, macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 512k",  MACHINE_NOT_WORKING )
+COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", 0 )
+COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
+COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  0 )
+COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  0 )
 

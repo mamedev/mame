@@ -55,7 +55,7 @@ public:
 
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	DECLARE_DRIVER_INIT(gizmondo);
+	void init_gizmondo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
@@ -181,14 +181,14 @@ void gizmondo_state::gizmondo_map(address_map &map)
     MACHINE DRIVERS
 *******************************************************************************/
 
-DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
+void gizmondo_state::init_gizmondo()
 {
 	// do nothing
 }
 
 MACHINE_CONFIG_START(gizmondo_state::gizmondo)
-	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
-	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(gizmondo_map)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
@@ -206,8 +206,8 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_S3C2440_PALETTE("palette")
 	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(gizmondo_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(gizmondo_state, s3c2440_gpio_port_w))
+	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, gizmondo_state, s3c2440_gpio_port_r))
+	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, gizmondo_state, s3c2440_gpio_port_w))
 
 	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
 
@@ -251,4 +251,4 @@ ROM_START( gizmondo )
 	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(1) )
 ROM_END
 
-CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, init_gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

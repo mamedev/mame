@@ -502,45 +502,47 @@ static INPUT_PORTS_START( apfimag )
 INPUT_PORTS_END
 
 
-static SLOT_INTERFACE_START( apf_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void apf_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_SSDD);
+}
 
 
-static SLOT_INTERFACE_START(apf_cart)
-	SLOT_INTERFACE_INTERNAL("std",       APF_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("basic",     APF_ROM_BASIC)
-	SLOT_INTERFACE_INTERNAL("spacedst",  APF_ROM_SPACEDST)
-SLOT_INTERFACE_END
+static void apf_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",       APF_ROM_STD);
+	device.option_add_internal("basic",     APF_ROM_BASIC);
+	device.option_add_internal("spacedst",  APF_ROM_SPACEDST);
+}
 
 
 MACHINE_CONFIG_START(apf_state::apfm1000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545) / 4 )  // divided by 4 in external clock circuit
-	MCFG_CPU_PROGRAM_MAP(apfm1000_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545) / 4 )  // divided by 4 in external clock circuit
+	MCFG_DEVICE_PROGRAM_MAP(apfm1000_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
 	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(apf_state, videoram_r))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE("pia0", pia6821_device, cb1_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, apf_state, videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
 	// INTEXT = GND
 	// other lines not connected
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(apf_state, pia0_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, pia0_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(apf_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia0_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apf_state, pia0_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, apf_state, pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
@@ -552,21 +554,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apf_state::apfimag)
 	apfm1000(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( apfimag_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( apfimag_map)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(apf_state, pia1_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(apf_state, pia1_portb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, pia1_portb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia1_porta_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, apf_state, pia1_portb_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apf_state, pia1_portb_w))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(apf_cassette_formats)
@@ -613,6 +614,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT     COMPAT  MACHINE     INPUT      CLASS       INIT  COMPANY                 FULLNAME */
-COMP( 1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   apf_state,  0,    "APF Electronics Inc.", "APF Imagination Machine", 0 )
-CONS( 1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  apf_state,  0,    "APF Electronics Inc.", "APF M-1000", 0 )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME */
+COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
+CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )

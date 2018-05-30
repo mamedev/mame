@@ -94,7 +94,7 @@ public:
 	}
 
 	required_device<m68000_base_device> m_maincpu;
-	DECLARE_DRIVER_INIT(symbolics);
+	void init_symbolics();
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
 	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
@@ -297,7 +297,7 @@ TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
 */
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT_MEMBER(symbolics_state,symbolics)
+void symbolics_state::init_symbolics()
 {
 }
 
@@ -321,8 +321,8 @@ MACHINE_CONFIG_START(symbolics_state::symbolics)
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
-	MCFG_CPU_PROGRAM_MAP(m68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
 
 	//ADD ME:
 	// Framebuffer
@@ -397,5 +397,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1984, s3670,      0,      0,      symbolics,  symbolics,  symbolics_state, symbolics,  "Symbolics", "3670",   MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT            COMPANY      FULLNAME  FLAGS
+COMP( 1984, s3670, 0,      0,      symbolics, symbolics, symbolics_state, init_symbolics, "Symbolics", "3670",   MACHINE_IS_SKELETON )

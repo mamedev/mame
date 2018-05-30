@@ -233,24 +233,22 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dauphin_state::dauphin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(dauphin_mem)
-	MCFG_CPU_IO_MAP(dauphin_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(dauphin_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dauphin_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(dauphin_mem)
+	MCFG_DEVICE_IO_MAP(dauphin_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, dauphin_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dauphin_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dolphunk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dauphin_c", dauphin_state, dauphin_c, attotime::from_hz(4000))
 MACHINE_CONFIG_END
 
@@ -272,5 +270,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY              FULLNAME   FLAGS
-COMP( 1979, dauphin,  0,      0,      dauphin,  dauphin, dauphin_state, 0,    "LCD EPFL Stoppani", "Dauphin", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME   FLAGS
+COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", 0 )

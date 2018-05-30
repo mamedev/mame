@@ -358,14 +358,14 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x92:
 			//ST 1 = "Se T=1, Pula"
 			//       If T is one, skip the next instruction
-						if ((FLAGS & T) == 1)
+						if ((FLAGS & T) == T)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x93:
 			//STM 1 = "Se T=1, Pula e muda"
 			//        If T is one, skip the next instruction
 			//        and toggle T.
-			if ((FLAGS & T) == 1){
+			if ((FLAGS & T) == T){
 				INCREMENT_PC_4K; //skip
 				FLAGS &= ~T; //set T=0
 			}

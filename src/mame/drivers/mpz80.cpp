@@ -664,15 +664,16 @@ WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
 //#include "bus/s100/nsmdsad.h"
 #include "bus/s100/wunderbus.h"
 
-static SLOT_INTERFACE_START( mpz80_s100_cards )
-	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
-	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)
-	SLOT_INTERFACE("dj2db", S100_DJ2DB)
-	SLOT_INTERFACE("djdma", S100_DJDMA)
-//  SLOT_INTERFACE("multio", S100_MULTIO)
-//  SLOT_INTERFACE("hdcdma", S100_HDCDMA)
-//  SLOT_INTERFACE("hdca", S100_HDCA)
-SLOT_INTERFACE_END
+static void mpz80_s100_cards(device_slot_interface &device)
+{
+	device.option_add("mm65k16s", S100_MM65K16S);
+	device.option_add("wunderbus", S100_WUNDERBUS);
+	device.option_add("dj2db", S100_DJ2DB);
+	device.option_add("djdma", S100_DJDMA);
+//  device.option_add("multio", S100_MULTIO);
+//  device.option_add("hdcdma", S100_HDCDMA);
+//  device.option_add("hdca", S100_HDCA);
+}
 
 
 
@@ -713,14 +714,14 @@ void mpz80_state::machine_reset()
 
 MACHINE_CONFIG_START(mpz80_state::mpz80)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mpz80_mem)
-	MCFG_CPU_IO_MAP(mpz80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mpz80_mem)
+	MCFG_DEVICE_IO_MAP(mpz80_io)
 
 	// S-100
 	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL(4'000'000) / 2)
-	MCFG_S100_IRQ_CALLBACK(WRITELINE(mpz80_state, s100_pint_w))
-	MCFG_S100_NMI_CALLBACK(WRITELINE(mpz80_state, s100_nmi_w))
+	MCFG_S100_IRQ_CALLBACK(WRITELINE(*this, mpz80_state, s100_pint_w))
+	MCFG_S100_NMI_CALLBACK(WRITELINE(*this, mpz80_state, s100_nmi_w))
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_S100_SLOT_ADD(S100_TAG ":1", mpz80_s100_cards, "mm65k16s")
 	MCFG_S100_SLOT_ADD(S100_TAG ":2", mpz80_s100_cards, "wunderbus")
@@ -780,5 +781,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY            FULLNAME    FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,   mpz80, mpz80_state,  0,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME    FLAGS
+COMP( 1980, mpz80, 0,      0,      mpz80,   mpz80, mpz80_state, empty_init, "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

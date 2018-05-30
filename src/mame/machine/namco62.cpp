@@ -58,11 +58,11 @@ void namco_62xx_device::device_start()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(namco_62xx_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 (TODO: Correct?) */
-//  MCFG_MB88XX_READ_K_CB(READ8(namco_62xx_device, namco_62xx_K_r))
-//  MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_62xx_device, namco_62xx_O_w))
-//  MCFG_MB88XX_READ_R0_CB(READ8(namco_62xx_device, namco_62xx_R0_r))
-//  MCFG_MB88XX_READ_R2_CB(READ8(namco_62xx_device, namco_62xx_R2_r))
+	MCFG_DEVICE_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 (TODO: Correct?) */
+//  MCFG_MB88XX_READ_K_CB(READ8(*this, namco_62xx_device, namco_62xx_K_r))
+//  MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, namco_62xx_device, namco_62xx_O_w))
+//  MCFG_MB88XX_READ_R0_CB(READ8(*this, namco_62xx_device, namco_62xx_R0_r))
+//  MCFG_MB88XX_READ_R2_CB(READ8(*this, namco_62xx_device, namco_62xx_R2_r))
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 

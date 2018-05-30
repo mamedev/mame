@@ -178,9 +178,9 @@ void palm_state::palm_map(address_map &map)
 
 MACHINE_CONFIG_START(palm_state::palm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
-	MCFG_CPU_PROGRAM_MAP( palm_map)
-	MCFG_CPU_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
+	MCFG_DEVICE_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
+	MCFG_DEVICE_PROGRAM_MAP( palm_map)
+	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
 
 	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
 
@@ -199,20 +199,20 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_DEVICE_ADD( MC68328_TAG, MC68328, 0 ) // lsi device
 	MCFG_MC68328_CPU("maincpu")
-	MCFG_MC68328_OUT_PORT_F_CB(WRITE8(palm_state, palm_port_f_out)) // Port F Output
-	MCFG_MC68328_IN_PORT_C_CB(READ8(palm_state, palm_port_c_in)) // Port C Input
-	MCFG_MC68328_IN_PORT_F_CB(READ8(palm_state, palm_port_f_in)) // Port F Input
-	MCFG_MC68328_OUT_PWM_CB(DEVWRITELINE("dac", dac_bit_interface, write))
-	MCFG_MC68328_OUT_SPIM_CB(WRITE16(palm_state, palm_spim_out))
-	MCFG_MC68328_IN_SPIM_CB(READ16(palm_state, palm_spim_in))
-	MCFG_MC68328_SPIM_XCH_TRIGGER_CB(WRITELINE(palm_state, palm_spim_exchange))
+	MCFG_MC68328_OUT_PORT_F_CB(WRITE8(*this, palm_state, palm_port_f_out)) // Port F Output
+	MCFG_MC68328_IN_PORT_C_CB(READ8(*this, palm_state, palm_port_c_in)) // Port C Input
+	MCFG_MC68328_IN_PORT_F_CB(READ8(*this, palm_state, palm_port_f_in)) // Port F Input
+	MCFG_MC68328_OUT_PWM_CB(WRITELINE("dac", dac_bit_interface, write))
+	MCFG_MC68328_OUT_SPIM_CB(WRITE16(*this, palm_state, palm_spim_out))
+	MCFG_MC68328_IN_SPIM_CB(READ16(*this, palm_state, palm_spim_in))
+	MCFG_MC68328_SPIM_XCH_TRIGGER_CB(WRITELINE(*this, palm_state, palm_spim_exchange))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palm )
@@ -480,22 +480,22 @@ MACHINE_CONFIG_START(palm_state::palmvx)
 	MCFG_RAM_DEFAULT_SIZE("8M")
 MACHINE_CONFIG_END
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE      INPUT STATE       INIT   COMPANY          FULLNAME               FLAGS
-COMP( 1996, pilot1k,  0,        0,       pilot1k,     palm, palm_state, 0,     "U.S. Robotics", "Pilot 1000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1996, pilot5k,  pilot1k,  0,       pilot5k,     palm, palm_state, 0,     "U.S. Robotics", "Pilot 5000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1997, palmpers, pilot1k,  0,       pilot5k,     palm, palm_state, 0,     "U.S. Robotics", "Palm Pilot Personal", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1997, palmpro,  pilot1k,  0,       palmpro,     palm, palm_state, 0,     "U.S. Robotics", "Palm Pilot Pro",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1998, palmiii,  pilot1k,  0,       palmiii,     palm, palm_state, 0,     "3Com",          "Palm III",            MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1998, palmiiic, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm IIIc",           MACHINE_NOT_WORKING )
-COMP( 2000, palmm100, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m100",           MACHINE_NOT_WORKING )
-COMP( 2000, palmm130, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m130",           MACHINE_NOT_WORKING )
-COMP( 2001, palmm505, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m505",           MACHINE_NOT_WORKING )
-COMP( 2001, palmm515, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m515",           MACHINE_NOT_WORKING )
-COMP( 1999, palmv,    pilot1k,  0,       palmv,       palm, palm_state, 0,     "3Com",          "Palm V",              MACHINE_NOT_WORKING )
-COMP( 1999, palmvx,   pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Palm Inc",      "Palm Vx",             MACHINE_NOT_WORKING )
-COMP( 2001, visor,    pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Handspring",    "Visor Edge",          MACHINE_NOT_WORKING )
-COMP( 19??, spt1500,  pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Symbol",        "SPT 1500",            MACHINE_NOT_WORKING )
-COMP( 19??, spt1700,  pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Symbol",        "SPT 1700",            MACHINE_NOT_WORKING )
-COMP( 19??, spt1740,  pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Symbol",        "SPT 1740",            MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY          FULLNAME               FLAGS
+COMP( 1996, pilot1k,  0,       0,      pilot1k, palm, palm_state, empty_init, "U.S. Robotics", "Pilot 1000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1996, pilot5k,  pilot1k, 0,      pilot5k, palm, palm_state, empty_init, "U.S. Robotics", "Pilot 5000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1997, palmpers, pilot1k, 0,      pilot5k, palm, palm_state, empty_init, "U.S. Robotics", "Palm Pilot Personal", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1997, palmpro,  pilot1k, 0,      palmpro, palm, palm_state, empty_init, "U.S. Robotics", "Palm Pilot Pro",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1998, palmiii,  pilot1k, 0,      palmiii, palm, palm_state, empty_init, "3Com",          "Palm III",            MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1998, palmiiic, pilot1k, 0,      palmiii, palm, palm_state, empty_init, "Palm Inc",      "Palm IIIc",           MACHINE_NOT_WORKING )
+COMP( 2000, palmm100, pilot1k, 0,      palmiii, palm, palm_state, empty_init, "Palm Inc",      "Palm m100",           MACHINE_NOT_WORKING )
+COMP( 2000, palmm130, pilot1k, 0,      palmiii, palm, palm_state, empty_init, "Palm Inc",      "Palm m130",           MACHINE_NOT_WORKING )
+COMP( 2001, palmm505, pilot1k, 0,      palmiii, palm, palm_state, empty_init, "Palm Inc",      "Palm m505",           MACHINE_NOT_WORKING )
+COMP( 2001, palmm515, pilot1k, 0,      palmiii, palm, palm_state, empty_init, "Palm Inc",      "Palm m515",           MACHINE_NOT_WORKING )
+COMP( 1999, palmv,    pilot1k, 0,      palmv,   palm, palm_state, empty_init, "3Com",          "Palm V",              MACHINE_NOT_WORKING )
+COMP( 1999, palmvx,   pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "Palm Inc",      "Palm Vx",             MACHINE_NOT_WORKING )
+COMP( 2001, visor,    pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "Handspring",    "Visor Edge",          MACHINE_NOT_WORKING )
+COMP( 19??, spt1500,  pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "Symbol",        "SPT 1500",            MACHINE_NOT_WORKING )
+COMP( 19??, spt1700,  pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "Symbol",        "SPT 1700",            MACHINE_NOT_WORKING )
+COMP( 19??, spt1740,  pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "Symbol",        "SPT 1740",            MACHINE_NOT_WORKING )
 
 #include "palm_dbg.hxx"

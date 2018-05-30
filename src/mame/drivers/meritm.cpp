@@ -175,7 +175,7 @@ Not all regional versions are available for each Megatouch series
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/ds1204.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
@@ -251,7 +251,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_b_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
-	DECLARE_DRIVER_INIT(megat3te);
+	void init_megat3te();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(meritm_crt250_questions);
@@ -1104,28 +1104,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 }
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250)
-	MCFG_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
-	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
-	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SYSTEM_CLK/6)
+	MCFG_DEVICE_PROGRAM_MAP(meritm_crt250_map)
+	MCFG_DEVICE_IO_MAP(meritm_crt250_io_map)
 	MCFG_Z80_DAISY_CHAIN(meritm_daisy_chain)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
-	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, meritm_8255_port_c_r))
 
 	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, SYSTEM_CLK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(meritm_state, meritm_audio_pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_audio_pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(meritm_state, meritm_audio_pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_audio_pio_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, meritm_state, meritm_audio_pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, meritm_audio_pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, meritm_state, meritm_audio_pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, meritm_audio_pio_port_b_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, SYSTEM_CLK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(IOPORT("PIO1_PORTA"))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_io_pio_port_a_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, meritm_io_pio_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(IOPORT("PIO1_PORTB"))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_io_pio_port_b_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, meritm_io_pio_port_b_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)
@@ -1135,58 +1135,58 @@ MACHINE_CONFIG_START(meritm_state::meritm_crt250)
 	MCFG_DS1204_ADD("ds1204")
 
 	MCFG_V9938_ADD("v9938_0", "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp0_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state,meritm_vdp0_interrupt))
 
 	MCFG_V9938_ADD("v9938_1", "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp1_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state,meritm_vdp1_interrupt))
 
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938_0", SYSTEM_CLK)
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8930, SYSTEM_CLK/12)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8930, SYSTEM_CLK/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250_questions)
 	meritm_crt250(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritm_crt250_questions_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_questions)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250_crt252_crt258)
 	meritm_crt250_questions(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt260)
 	meritm_crt250(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meritm_map)
-	MCFG_CPU_IO_MAP(meritm_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritm_map)
+	MCFG_DEVICE_IO_MAP(meritm_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, meritm_8255_port_c_r))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
@@ -1339,6 +1339,25 @@ ROM_START( pbss330 ) /* Dallas DS1204V security key attached to CRT-254 connecte
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
 	ROM_LOAD( "9233-01_u1-r01_c1993_mii", 0x000000, 0x000022, BAD_DUMP CRC(93459659) SHA1(73ad4c3a7c52d3db3acb43662c535f8c2ed2376a) )
+
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
+	ROM_LOAD( "qs9233-01_u7-r0",  0x00000, 0x40000, CRC(176dd688) SHA1(306cf78101219ef1122023a01d16dff5e9f2aecf) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9233-01_u6-r0",  0x40000, 0x40000, CRC(59c85a0a) SHA1(ef7f45c4e032d9dd14c4f5237f5b3c487be0cb2f) )
+	ROM_LOAD( "qs9233-01_u5-r0",  0x80000, 0x40000, CRC(740b1274) SHA1(14eab68fc137b905a5a2739c7081900a48cba562) )
+ROM_END
+
+ROM_START( pbss330ca ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9233-06 U1-RO C1993 MII - California version */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9233-00-06_u9-r0a",  0x00000, 0x10000, CRC(0aaa94e3) SHA1(915a0d4643a781b39730c64dfcaa7599e5a0c447) ) /* 9233-00-06  081293 */
+	ROM_LOAD( "9233-00-06_u10-r0a", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u11-r0a", 0x20000, 0x10000, CRC(94cfb8b1) SHA1(bf2baf1fe9bd87abec353ec8402370e12809030a) )
+	ROM_LOAD( "9233-00-06_u12-r0a", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u13-r0a", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u14-r0a", 0x50000, 0x10000, CRC(2aa38f55) SHA1(c1d80b619b7b6506d457ceb6aa267e5ef7c3bdf2) )
+	ROM_LOAD( "9233-00-06_u15-r0a", 0x60000, 0x10000, CRC(e3ce9cde) SHA1(54b25e0f2715e2b112916b80b918a0191bf87a48) )
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9233-06_u1-r0_c1993_mii", 0x000000, 0x000022, BAD_DUMP CRC(93459659) SHA1(73ad4c3a7c52d3db3acb43662c535f8c2ed2376a) )
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
 	ROM_LOAD( "qs9233-01_u7-r0",  0x00000, 0x40000, CRC(176dd688) SHA1(306cf78101219ef1122023a01d16dff5e9f2aecf) ) /* These 3 roms are on CRT-256 sattalite PCB */
@@ -2319,70 +2338,71 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(meritm_state,megat3te)
+void meritm_state::init_megat3te()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 }
 
 /* CRT-250 */
-GAME( 1987, americna,  0,        meritm_crt250, americna,  meritm_state, 0,        ROT0, "Merit", "Americana (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1987, americnaa, americna, meritm_crt250, americna,  meritm_state, 0,        ROT0, "Merit", "Americana (9131-00)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, meritjp,   0,        meritm_crt250, americna,  meritm_state, 0,        ROT0, "Merit", "Merit Joker Poker (9131-09)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty,  meritm_state, 0,        ROT0, "Merit", "Dodge City (9131-02)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, pitboss2,  0,        meritm_crt250, pitboss2,  meritm_state, 0,        ROT0, "Merit", "Pit Boss II (9221-01C)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, spitboss,  0,        meritm_crt250, spitboss,  meritm_state, 0,        ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosss,  0,        meritm_crt250, pitbosss,  meritm_state, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosssa, pitbosss, meritm_crt250, pitbosss,  meritm_state, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, pitbosssc, pitbosss, meritm_crt250, pitbosss,  meritm_state, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, americna,  0,        meritm_crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Americana (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, americnaa, americna, meritm_crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Americana (9131-00)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, meritjp,   0,        meritm_crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Merit Joker Poker (9131-09)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty,  meritm_state, empty_init, ROT0, "Merit", "Dodge City (9131-02)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, pitboss2,  0,        meritm_crt250, pitboss2,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss II (9221-01C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, spitboss,  0,        meritm_crt250, spitboss,  meritm_state, empty_init, ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosss,  0,        meritm_crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosssa, pitbosss, meritm_crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssc, pitbosss, meritm_crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-250 + CRT-252 + CRT-256 + CRT-258 */
-GAME( 1994, mtjpoker,  0,        meritm_crt250_crt252_crt258, mtjpoker,   meritm_state, 0,  ROT0, "Merit", "Merit Touch Joker Poker (9132-00)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, megat,     0,        meritm_crt250_crt252_crt258, pbst30,     meritm_state, 0,  ROT0, "Merit", "Pit Boss Megatouch (9234-20-01)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, pbst30,    0,        meritm_crt250_crt252_crt258, pbst30,     meritm_state, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, pbst30a,   pbst30,   meritm_crt250_crt252_crt258, pbst30,     meritm_state, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, mtjpoker,  0,        meritm_crt250_crt252_crt258, mtjpoker,   meritm_state, empty_init, ROT0, "Merit", "Merit Touch Joker Poker (9132-00)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat,     0,        meritm_crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megatouch (9234-20-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, pbst30,    0,        meritm_crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, pbst30a,   pbst30,   meritm_crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-250 + CRT-254 + CRT-256 */
-GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  meritm_state, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, meritm_state, 0, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, meritm_state, 0, ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss330,   0,        meritm_crt250_questions,     pbss330,    meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss330ca, pbss330,  meritm_crt250_questions,     pbss330,    meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-06, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossm,  0,        meritm_crt250_questions,     pitbossm,   meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions,     pitbossa,   meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-260 NON-touchscreen based */
-GAME( 1996, realbrod,  0,        meritm_crt260, realbrod,    meritm_state, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0C)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, realbroda, realbrod, meritm_crt260, realbrod,    meritm_state, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, realbrod,  0,        meritm_crt260, realbrod,    meritm_state, empty_init,    ROT0, "Merit", "The Real Broadway (9131-20-00 R0C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, realbroda, realbrod, meritm_crt260, realbrod,    meritm_state, empty_init,    ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-260 */
-GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, megat2a ,  megat2, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, megat2b ,  megat2, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROD, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, megat2mn,  megat2, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-02 ROG, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, megat2ca,  megat2, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROG, California version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, megat2caa, megat2, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROE, California version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-01 RON, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, megat3a,   megat3, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-01 ROK, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, megat3b,   megat3, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-01 ROF, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, megat3c,   megat3, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-01 ROB, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, megat3d,   megat3, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat3ca,  megat3, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-06 RON, California version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, megat3caa, megat3, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-06 ROD, California version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, megat3nj,  megat3, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch III (9255-20-07 ROG, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat3te,  megat3, meritm_crt260, meritm_crt260, meritm_state, megat3te, ROT0, "Merit", "Megatouch III Tournament Edition (9255-30-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4,    0,      meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch IV (9255-40-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4a,   megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch IV (9255-40-01 ROD, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4b,   megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch IV (9255-40-01 ROB, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4c,   megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch IV (9255-40-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4d,   megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch IV (9255-40-01 RO, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4s,   megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Super Megatouch IV (9255-41-01 ROG, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4sa,  megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Super Megatouch IV (9255-41-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4sb,  megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Super Megatouch IV (9255-41-01 ROC, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4smn, megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Super Megatouch IV (9255-41-02 ROC, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4snj, megat4, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Super Megatouch IV (9255-41-07 ROG, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, meritm_state, megat3te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4tea, megat4, meritm_crt260, meritm_crt260, meritm_state, megat3te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4st,  megat4, meritm_crt260, meritm_crt260, meritm_state, megat3te, ROT0, "Merit", "Super Megatouch IV Tournament Edition (9255-51-01 ROB, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4stg, megat4, meritm_crt260, meritm_crt260, meritm_state, megat3te, ROT0, "Merit", "Super Megatouch IV Turnier Version (9255-51-50 ROA, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch 5 (9255-60-01 ROI, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, megat5a,   megat5, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING )
-GAME( 1998, megat5nj,  megat5, meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch 5 (9255-60-07 RON, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, megat5t,   megat5, meritm_crt260, meritm_crt260, meritm_state, megat3te, ROT0, "Merit", "Megatouch 5 Tournament Edition (9255-70-01 ROC, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, megat5tg,  megat5, meritm_crt260, meritm_crt260, meritm_state, megat3te, ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 ROD, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2a ,  megat2, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2b ,  megat2, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROD, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2mn,  megat2, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Pit Boss Megatouch II (9255-10-02 ROG, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2ca,  megat2, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROG, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2caa, megat2, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROE, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-01 RON, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3a,   megat3, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-01 ROK, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3b,   megat3, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-01 ROF, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3c,   megat3, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-01 ROB, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3d,   megat3, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat3ca,  megat3, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-06 RON, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3caa, megat3, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-06 ROD, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3nj,  megat3, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-07 ROG, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat3te,  megat3, meritm_crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch III Tournament Edition (9255-30-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4,    0,      meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4a,   megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 ROD, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4b,   megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 ROB, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4c,   megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4d,   megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 RO, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4s,   megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Super Megatouch IV (9255-41-01 ROG, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4sa,  megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Super Megatouch IV (9255-41-01 ROE, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4sb,  megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Super Megatouch IV (9255-41-01 ROC, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4smn, megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Super Megatouch IV (9255-41-02 ROC, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4snj, megat4, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Super Megatouch IV (9255-41-07 ROG, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4tea, megat4, meritm_crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4st,  megat4, meritm_crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Super Megatouch IV Tournament Edition (9255-51-01 ROB, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4stg, megat4, meritm_crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Super Megatouch IV Turnier Version (9255-51-50 ROA, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-01 ROI, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, megat5a,   megat5, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING )
+GAME( 1998, megat5nj,  megat5, meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-07 RON, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, megat5t,   megat5, meritm_crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch 5 Tournament Edition (9255-70-01 ROC, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, megat5tg,  megat5, meritm_crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 ROD, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )

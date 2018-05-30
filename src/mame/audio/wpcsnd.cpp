@@ -12,7 +12,9 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-#define LOG_WPCSND (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(WPCSND, wpcsnd_device, "wpcsnd", "Williams WPC Sound")
 
@@ -46,7 +48,7 @@ void wpcsnd_device::wpcsnd_map(address_map &map)
 
 void wpcsnd_device::ctrl_w(uint8_t data)
 {
-	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void wpcsnd_device::data_w(uint8_t data)
@@ -68,20 +70,20 @@ uint8_t wpcsnd_device::data_r()
 }
 
 MACHINE_CONFIG_START(wpcsnd_device::device_add_mconfig)
-	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_CPU_PROGRAM_MAP(wpcsnd_map)
+	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
+	MCFG_DEVICE_PROGRAM_MAP(wpcsnd_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_YM2151_ADD("ym2151", 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(wpcsnd_device, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
+	MCFG_DEVICE_ADD("ym2151", YM2151, 3580000)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, wpcsnd_device, ym2151_irq_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
 
-	MCFG_SOUND_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
+	MCFG_DEVICE_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("hc55516", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
+	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.5)
 MACHINE_CONFIG_END
 
 
@@ -100,7 +102,7 @@ void wpcsnd_device::device_reset()
 	m_fixedbank->set_entry(0);
 
 	// reset the CPU again, so that the CPU is starting with the right vectors (otherwise sound may die on reset)
-	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	m_reply_available = false;
 }
@@ -140,7 +142,7 @@ WRITE8_MEMBER( wpcsnd_device::rombank_w )
 
 	m_cpubank->set_entry(bank);
 
-	if(LOG_WPCSND) logerror("WPCSND: Bank set to %02x\n",bank);
+	LOG("WPCSND: Bank set to %02x\n",bank);
 }
 
 READ8_MEMBER(wpcsnd_device::latch_r)

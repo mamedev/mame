@@ -243,19 +243,19 @@ void votrpss_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(votrpss_state::votrpss)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)  /* 4.000 MHz, verified */
-	MCFG_CPU_PROGRAM_MAP(votrpss_mem)
-	MCFG_CPU_IO_MAP(votrpss_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)  /* 4.000 MHz, verified */
+	MCFG_DEVICE_PROGRAM_MAP(votrpss_mem)
+	MCFG_DEVICE_IO_MAP(votrpss_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_votrpss)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("votrax", votrax_sc01_device, write))     // port A write
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("votrax", votrax_sc01_device, write))     // port A write
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720 kHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -265,30 +265,30 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
 	// when serial is chosen, and you select terminal, nothing shows (by design). You can only type commands in.
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(XTAL(8'000'000) / 256) /* Timer 1: Pitch */
 	MCFG_PIT8253_CLK2(XTAL(8'000'000) / 4096) /* Timer 2: Volume */
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(votrpss_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(votrpss_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(votrpss_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(votrpss_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(votrpss_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(votrpss_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, votrpss_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, votrpss_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, votrpss_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, votrpss_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, votrpss_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, votrpss_state, ppi_pc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))
 MACHINE_CONFIG_END
@@ -324,5 +324,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY   FULLNAME                  FLAGS
-COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, 0,    "Votrax", "Personal Speech System", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT        COMPANY   FULLNAME                  FLAGS
+COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, empty_init, "Votrax", "Personal Speech System", 0 )

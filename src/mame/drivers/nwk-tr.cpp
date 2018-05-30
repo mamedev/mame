@@ -277,6 +277,7 @@ public:
 		m_k001604(*this, "k001604"),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
+		m_voodoo(*this, "voodoo%u", 0U),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -303,6 +304,7 @@ public:
 	required_device<k001604_device> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
+	required_device_array<voodoo_device, 2> m_voodoo;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
@@ -332,10 +334,11 @@ public:
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(nwktr);
+	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void lanc2_init();
 	void thrilld(machine_config &config);
@@ -365,32 +368,32 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_1)
 }
 
 
-uint32_t nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nwktr_state::screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if (strcmp(screen.tag(), ":lscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
+	m_voodoo[0]->voodoo_update(bitmap, cliprect);
 
-		voodoo->voodoo_update(bitmap, cliprect);
+	const rectangle &visarea = screen.visible_area();
+	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
 
-		const rectangle &visarea = screen.visible_area();
-		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
-		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
-	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
+	return 0;
+}
 
-		voodoo->voodoo_update(bitmap, cliprect);
+uint32_t nwktr_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->pen(0), cliprect);
 
-		const rectangle &visarea = screen.visible_area();
-		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+	m_voodoo[1]->voodoo_update(bitmap, cliprect);
 
-		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
-	}
+	const rectangle &visarea = screen.visible_area();
+	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+
+	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -825,19 +828,19 @@ void nwktr_state::machine_reset()
 MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(nwktr_map)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(nwktr_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc0_map)
+	MCFG_DEVICE_DATA_MAP(sharc0_map)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc1_map)
+	MCFG_DEVICE_DATA_MAP(sharc1_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
@@ -858,26 +861,26 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_VOODOO_TMUMEM(2,2)
 	MCFG_VOODOO_SCREEN_TAG("lscreen")
 	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(nwktr_state,voodoo_vblank_0))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state,voodoo_vblank_0))
 
 	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
 	MCFG_VOODOO_TMUMEM(2, 2)
 	MCFG_VOODOO_SCREEN_TAG("rscreen")
 	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(nwktr_state, voodoo_vblank_1))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state, voodoo_vblank_1))
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
+	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_lscreen)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
+	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_rscreen)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
@@ -888,12 +891,13 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_K001604_ROZ_OFFSET(0)  // correct?
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // as per Guru readme above
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -916,10 +920,10 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(nwktr_state, nwktr)
+void nwktr_state::init_nwktr()
 {
-	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
+	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
+	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
 
 	m_sharc0_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
 	m_sharc1_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
@@ -1072,9 +1076,9 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -164,16 +164,17 @@ MC6847_GET_CHARROM_MEMBER( dragon200e_state::char_rom_r )
 	return m_char_rom->base()[(ch * 12 + line) & 0xfff];
 }
 
-SLOT_INTERFACE_START( dragon_cart )
-	SLOT_INTERFACE("dragon_fdc", DRAGON_FDC)
-	SLOT_INTERFACE("premier_fdc", PREMIER_FDC)
-	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)
-	SLOT_INTERFACE("jcbsnd", DRAGON_JCBSND)     MCFG_SLOT_OPTION_CLOCK("jcbsnd", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("ssc", COCO_SSC)             MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("orch90", COCO_ORCH90)
-	SLOT_INTERFACE("gmc", COCO_PAK_GMC)
-	SLOT_INTERFACE("pak", COCO_PAK)
-SLOT_INTERFACE_END
+void dragon_cart(device_slot_interface &device)
+{
+	device.option_add("dragon_fdc", DRAGON_FDC);
+	device.option_add("premier_fdc", PREMIER_FDC);
+	device.option_add("sdtandy_fdc", SDTANDY_FDC);
+	device.option_add("jcbsnd", DRAGON_JCBSND);
+	device.option_add("ssc", COCO_SSC);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("gmc", COCO_PAK_GMC);
+	device.option_add("pak", COCO_PAK);
+}
 
 FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
 	FLOPPY_VDK_FORMAT,
@@ -181,39 +182,40 @@ FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
 	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( dragon_alpha_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void dragon_alpha_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_DEVICE_MODIFY(":")
 	MCFG_DEVICE_CLOCK(XTAL(14'218'000) / 16)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dragon_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
 
 	// devices
 	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia0_irq_b))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia0_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia0_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia0_irq_b))
 
 	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(coco_state, pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(coco_state, pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia1_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, coco_state, pia1_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, coco_state, pia1_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia1_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
 
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL(14'218'000), MAINCPU_TAG, AS_PROGRAM)
-	MCFG_SAM6883_RES_CALLBACK(READ8(dragon_state, sam_read))
+	MCFG_SAM6883_RES_CALLBACK(READ8(*this, dragon_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
@@ -225,9 +227,9 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
 
 	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(dragon_state, horizontal_sync))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(dragon_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(DEVREAD8(SAM_TAG, sam6883_device, display_read))
+	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, dragon_state, horizontal_sync))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, dragon_state, field_sync))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(SAM_TAG, sam6883_device, display_read))
 
 	// sound hardware
 	coco_sound(config);
@@ -251,7 +253,7 @@ MACHINE_CONFIG_START(dragon_state::dragon32)
 
 	// cartridge
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, "dragon_fdc")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 MACHINE_CONFIG_END
@@ -264,7 +266,7 @@ MACHINE_CONFIG_START(dragon64_state::dragon64)
 
 	// cartridge
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, "dragon_fdc")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 
@@ -280,8 +282,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::dragon64h)
 	dragon64(config);
 	// Replace M6809 with HD6309
-	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dragon_mem)
+	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
@@ -319,7 +321,7 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 
 	// cartridge
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 
@@ -329,8 +331,8 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 
 	// floppy
 	MCFG_WD2797_ADD(WD2797_TAG, XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -342,16 +344,16 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// sound hardware
-	MCFG_SOUND_ADD(AY8912_TAG, AY8912, 1000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dragon_alpha_state, psg_porta_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(dragon_alpha_state, psg_porta_write))
+	MCFG_DEVICE_ADD(AY8912_TAG, AY8912, 1000000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dragon_alpha_state, psg_porta_read))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, dragon_alpha_state, psg_porta_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
 	// pia 2
 	MCFG_DEVICE_ADD( PIA2_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dragon_alpha_state, pia2_pa_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(dragon_alpha_state, pia2_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(dragon_alpha_state, pia2_firq_b))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dragon_alpha_state, pia2_pa_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dragon_alpha_state, pia2_firq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dragon_alpha_state, pia2_firq_b))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dgnalpha_flop_list", "dgnalpha_flop")
@@ -376,8 +378,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::tanodr64h)
 	tanodr64(config);
 	// Replace M6809 CPU with HD6309 CPU
-	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dragon_mem)
+	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
@@ -442,13 +444,13 @@ ROM_END
 #define rom_dragon64h rom_dragon64
 #define rom_tanodr64h rom_tanodr64
 
-//    YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT    COMPANY                          FULLNAME                       FLAGS
-COMP( 1982,    dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       0,      "Dragon Data Ltd",               "Dragon 32",                   0 )
-COMP( 1983,    dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64",                   0 )
-COMP( 19??,    dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64 (HD6309E CPU)",                   MACHINE_UNOFFICIAL )
-COMP( 1985,    dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Eurohard S.A.",                 "Dragon 200",                  0 )
-COMP( 1985,    dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   0,      "Eurohard S.A.",                 "Dragon 200-E",                MACHINE_NOT_WORKING )
-COMP( 1985,    d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      0,      "Dragon Data Ltd / Compusense",  "Dragon 64 Plus",              0 )
-COMP( 1983,    tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       0 )
-COMP( 19??,    tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC; HD6309E CPU)",       MACHINE_UNOFFICIAL )
-COMP( 1984,    dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, 0,      "Dragon Data Ltd",               "Dragon Professional (Alpha)", 0 )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY                         FULLNAME                       FLAGS
+COMP( 1982, dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       empty_init, "Dragon Data Ltd",              "Dragon 32",                   0 )
+COMP( 1983, dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64",                   0 )
+COMP( 19??, dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64 (HD6309E CPU)",     MACHINE_UNOFFICIAL )
+COMP( 1985, dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Eurohard S.A.",                "Dragon 200",                  0 )
+COMP( 1985, dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   empty_init, "Eurohard S.A.",                "Dragon 200-E",                MACHINE_NOT_WORKING )
+COMP( 1985, d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      empty_init, "Dragon Data Ltd / Compusense", "Dragon 64 Plus",              0 )
+COMP( 1983, tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC)",       0 )
+COMP( 19??, tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC; HD6309E CPU)",       MACHINE_UNOFFICIAL )
+COMP( 1984, dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, empty_init, "Dragon Data Ltd",              "Dragon Professional (Alpha)", 0 )

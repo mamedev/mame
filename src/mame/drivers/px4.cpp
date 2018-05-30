@@ -23,6 +23,7 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "diserial.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -82,7 +83,7 @@ public:
 		m_centronics_busy(0), m_centronics_perror(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4 );
+	void init_px4();
 
 	DECLARE_PALETTE_INIT( px4 );
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -260,7 +261,7 @@ public:
 	m_ramdisk(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4p );
+	void init_px4p();
 
 	DECLARE_PALETTE_INIT( px4p );
 
@@ -1214,16 +1215,16 @@ uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitma
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( px4_state, px4 )
+void px4_state::init_px4()
 {
 	// map os rom and last half of memory
 	membank("bank1")->set_base(memregion("os")->base());
 	membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 }
 
-DRIVER_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::init_px4p()
 {
-	DRIVER_INIT_CALL(px4);
+	init_px4();
 
 	// reserve memory for external ram-disk
 	m_ramdisk = std::make_unique<uint8_t[]>(0x20000);
@@ -1482,9 +1483,9 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 
 MACHINE_CONFIG_START(px4_state::px4)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'372'800) / 2)    // uPD70008
-	MCFG_CPU_PROGRAM_MAP(px4_mem)
-	MCFG_CPU_IO_MAP(px4_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'372'800) / 2)    // uPD70008
+	MCFG_DEVICE_PROGRAM_MAP(px4_mem)
+	MCFG_DEVICE_IO_MAP(px4_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1500,8 +1501,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_PALETTE_INIT_OWNER(px4_state, px4)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
@@ -1514,8 +1515,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 
 	// centronics printer
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(px4_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(px4_state, centronics_perror_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, px4_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, px4_state, centronics_perror_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -1527,15 +1528,15 @@ MACHINE_CONFIG_START(px4_state::px4)
 
 	// sio port
 	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(WRITELINE(px4_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(px4_state, sio_pin_w))
+	MCFG_EPSON_SIO_RX(WRITELINE(*this, px4_state, sio_rx_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(*this, px4_state, sio_pin_w))
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(px4_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(px4_state, rs232_dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(px4_state, rs232_dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(px4_state, rs232_cts_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, px4_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, px4_state, rs232_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, px4_state, rs232_dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, px4_state, rs232_cts_w))
 
 	// rom capsules
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px4_cart")
@@ -1548,8 +1549,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(px4p_state::px4p)
 	px4(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(px4p_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(px4p_io)
 
 	MCFG_NVRAM_ADD_0FILL("rdnvram")
 
@@ -1593,6 +1594,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  px4,  "Epson", "PX-4",   0 )
-COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, px4p, "Epson", "PX-4+",  0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT       COMPANY  FULLNAME  FLAGS
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  init_px4,  "Epson", "PX-4",   0 )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, init_px4p, "Epson", "PX-4+",  0 )

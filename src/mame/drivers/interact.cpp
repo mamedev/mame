@@ -127,9 +127,9 @@ uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_in
 MACHINE_CONFIG_START(interact_state::interact)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(interact_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
@@ -164,9 +164,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(interact_state::hector1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(interact_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
@@ -300,6 +300,6 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME      PARENT     COMPA   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME       FLAGS */
-COMP(1979, interact, 0,         0,      interact,  interact, interact_state, 0,    "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
-COMP(1983, hector1,  interact,  0,      hector1,   interact, interact_state, 0,    "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)
+/*   YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME       FLAGS */
+COMP(1979, interact, 0,        0,      interact, interact, interact_state, empty_init, "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
+COMP(1983, hector1,  interact, 0,      hector1,  interact, interact_state, empty_init, "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)

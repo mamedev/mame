@@ -189,7 +189,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( toobin )
+static GFXDECODE_START( gfx_toobin )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,   512, 64 )
@@ -206,8 +206,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(toobin_state::toobin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -226,13 +226,14 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toobin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toobin)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(toobin_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(*this, toobin_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -583,9 +584,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (German, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (German, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 1)", MACHINE_SUPPORTS_SAVE )

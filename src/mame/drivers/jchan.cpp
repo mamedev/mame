@@ -205,7 +205,7 @@ public:
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_w);
 
-	DECLARE_DRIVER_INIT(jchan);
+	void init_jchan();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -509,7 +509,7 @@ static const gfx_layout tilelayout =
 
 // we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.cpp */
 
-static GFXDECODE_START( jchan )
+static GFXDECODE_START( gfx_jchan )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
 GFXDECODE_END
 
@@ -602,16 +602,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(jchan_state::jchan)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(jchan_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(jchan_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jchan_state, vblank, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(jchan_sub)
+	MCFG_DEVICE_ADD("sub", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(jchan_sub)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jchan)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -637,9 +637,10 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -725,7 +726,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-DRIVER_INIT_MEMBER( jchan_state, jchan )
+void jchan_state::init_jchan()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
@@ -733,5 +734,5 @@ DRIVER_INIT_MEMBER( jchan_state, jchan )
 
 
 /* game drivers */
-GAME( 1995, jchan,     0,        jchan,    jchan,  jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2,    0,        jchan,    jchan2, jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,  0, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2, 0, jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

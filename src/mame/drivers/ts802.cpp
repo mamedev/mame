@@ -23,7 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/terminal.h"
 #include "machine/z80dma.h"
 #include "machine/z80ctc.h"
@@ -39,7 +39,7 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	DECLARE_DRIVER_INIT(ts802);
+	void init_ts802();
 	DECLARE_MACHINE_RESET(ts802);
 	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
 	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
@@ -138,9 +138,10 @@ WRITE8_MEMBER( ts802_state::io_write_byte )
 	m_io->write_byte(offset, data);
 }
 
-static SLOT_INTERFACE_START( ts802_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ts802_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_RESET_MEMBER( ts802_state, ts802 )
 {
@@ -172,7 +173,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 #endif
 
-DRIVER_INIT_MEMBER( ts802_state, ts802 )
+void ts802_state::init_ts802()
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
@@ -186,9 +187,9 @@ DRIVER_INIT_MEMBER( ts802_state, ts802 )
 
 MACHINE_CONFIG_START(ts802_state::ts802)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(ts802_mem)
-	MCFG_CPU_IO_MAP(ts802_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ts802_mem)
+	MCFG_DEVICE_IO_MAP(ts802_io)
 	//MCFG_Z80_DAISY_CHAIN(daisy_chain_intf) // causes problems
 	MCFG_MACHINE_RESET_OVERRIDE(ts802_state, ts802)
 
@@ -199,10 +200,10 @@ MACHINE_CONFIG_START(ts802_state::ts802)
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(ts802_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(ts802_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(ts802_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(ts802_state, io_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, ts802_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, ts802_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, ts802_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, ts802_state, io_write_byte))
 
 	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(16'000'000) / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -239,6 +240,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT    COMPANY      FULLNAME  FLAGS
-COMP( 1982, ts802,   0,       0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802",  MACHINE_IS_SKELETON )
-COMP( 1982, ts802h,  ts802,   0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802H", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1982, ts802,  0,      0,      ts802,   ts802, ts802_state, init_ts802, "Televideo", "TS802",  MACHINE_IS_SKELETON )
+COMP( 1982, ts802h, ts802,  0,      ts802,   ts802, ts802_state, init_ts802, "Televideo", "TS802H", MACHINE_IS_SKELETON )

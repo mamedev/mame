@@ -189,15 +189,16 @@ void mtxl_state::machine_reset()
 }
 
 #ifndef REAL_PCI_CHIPSET
-static SLOT_INTERFACE_START(mt6k_ata_devices)
-	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
-SLOT_INTERFACE_END
+static void mt6k_ata_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+}
 
 void mtxl_state::cdrom(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
 	ide0->option_reset();
-	SLOT_INTERFACE_NAME(mt6k_ata_devices)(device->subdevice("ide:0"));
+	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("cdrom");
 	ide0->set_fixed(true);
 
@@ -208,31 +209,31 @@ MACHINE_CONFIG_END
 #endif
 
 MACHINE_CONFIG_START(mtxl_state::at486)
-	MCFG_CPU_ADD("maincpu", I486DX4, 33000000)
-	MCFG_CPU_PROGRAM_MAP(at32_map)
-	MCFG_CPU_IO_MAP(at32_io)
+	MCFG_DEVICE_ADD("maincpu", I486DX4, 33000000)
+	MCFG_DEVICE_PROGRAM_MAP(at32_map)
+	MCFG_DEVICE_IO_MAP(at32_io)
 #ifndef REAL_PCI_CHIPSET
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true) // FIXME: determine ISA bus clock
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
 
-	MCFG_SOUND_ADD("cs4231", AD1848, 0)
-	MCFG_AD1848_IRQ_CALLBACK(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
-	MCFG_AD1848_DRQ_CALLBACK(DEVWRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+	MCFG_DEVICE_ADD("cs4231", AD1848, 0)
+	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
+	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
 
 	MCFG_DEVICE_MODIFY("mb:dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("^cs4231", ad1848_device, dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8("cs4231", ad1848_device, dack_w))
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");
@@ -241,10 +242,10 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
 	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
 	MCFG_DEVICE_REMOVE("mb:rtc")
 	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 #endif
 	/* internal ram */
@@ -266,7 +267,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
-	MCFG_PCI_ROOT_ADD( ":pci")
+	MCFG_PCI_ROOT_ADD(":pci")
 	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
 MACHINE_CONFIG_END
@@ -412,14 +413,14 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT           DEVICE              INIT    COMPANY              FULLNAME */
+/*    YEAR  NAME        PARENT     COMPAT  MACHINE  INPUT     CLASS       INIT        COMPANY             FULLNAME */
 // Any indicates this is from a CD-R at a trade show that was claimed to be a prototype, but R1 is several versions in?
-COMP ( 1997, mtouchxl,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL (Version R1, prototype?)", 0 )
-COMP ( 1998, mtchxl5k,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko,  mtchxl5k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko2, mtchxl5k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
-COMP ( 1999, mtchxl6k,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r07)",       0 )
-COMP ( 1999, mtchxl6ko4, mtchxl6k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r04)",       0 )
-COMP ( 1999, mtchxl6ko,  mtchxl6k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r02)",       0 )
-COMP ( 2000, mtchxlgld,  0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Gold (Version r01)",       MACHINE_NOT_WORKING )
-COMP ( 2000, mtchxlgldo, mtchxlgld, 0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Gold (Version r00)",       MACHINE_NOT_WORKING )
+COMP( 1997, mtouchxl,   0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL (Version R1, prototype?)", 0 )
+COMP( 1998, mtchxl5k,   0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
+COMP( 1998, mtchxl5ko,  mtchxl5k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
+COMP( 1998, mtchxl5ko2, mtchxl5k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
+COMP( 1999, mtchxl6k,   0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL 6000 (Version r07)",       0 )
+COMP( 1999, mtchxl6ko4, mtchxl6k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL 6000 (Version r04)",       0 )
+COMP( 1999, mtchxl6ko,  mtchxl6k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL 6000 (Version r02)",       0 )
+COMP( 2000, mtchxlgld,  0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Gold (Version r01)",       MACHINE_NOT_WORKING )
+COMP( 2000, mtchxlgldo, mtchxlgld, 0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Gold (Version r00)",       MACHINE_NOT_WORKING )

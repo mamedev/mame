@@ -374,7 +374,7 @@ static const gfx_layout tilelayout =
 	16*8
 };
 
-static GFXDECODE_START( kingobox )
+static GFXDECODE_START( gfx_kingobox )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   256,  8 )   /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x01000, charlayout,   256,  8 )   /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,   0, 32 )   /* sprites */
@@ -444,7 +444,7 @@ static const gfx_layout rk_bglayout =
 };
 
 
-static GFXDECODE_START( rk )
+static GFXDECODE_START( gfx_rk )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rk_charlayout1,  256,  8 )    /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rk_charlayout2,  256,  8 )    /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rk_spritelayout,   0, 32 )    /* sprites */
@@ -465,23 +465,23 @@ void kingofb_state::machine_reset()
 MACHINE_CONFIG_START(kingofb_state::kingofb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kingobox_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kingobox_map)
 
-	MCFG_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kingobox_video_map)
+	MCFG_DEVICE_ADD("video", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kingobox_video_map)
 
-	MCFG_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kingobox_sprite_map)
+	MCFG_DEVICE_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kingobox_sprite_map)
 
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("video", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sprite", INPUT_LINE_NMI))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kingobox_sound_map)
-	MCFG_CPU_IO_MAP(kingobox_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kingobox_sound_map)
+	MCFG_DEVICE_IO_MAP(kingobox_sound_io_map)
 
 	MCFG_DEVICE_ADD("soundnmi", CLOCK, 6000)  /* Hz */
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -497,26 +497,26 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_kingofb)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("nmigate", input_merger_device, in_w<0>))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingobox)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingobox)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 100K (R30-44 even)/200K (R31-45 odd) ladder network
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 100K (R30-44 even)/200K (R31-45 odd) ladder network
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -524,23 +524,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kingofb_state::ringking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(ringking_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ringking_map)
 
-	MCFG_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(ringking_video_map)
+	MCFG_DEVICE_ADD("video", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ringking_video_map)
 
-	MCFG_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(ringking_sprite_map)
+	MCFG_DEVICE_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ringking_sprite_map)
 
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("video", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sprite", INPUT_LINE_NMI))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kingobox_sound_map)
-	MCFG_CPU_IO_MAP(ringking_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kingobox_sound_map)
+	MCFG_DEVICE_IO_MAP(ringking_sound_io_map)
 
 	MCFG_DEVICE_ADD("soundnmi", CLOCK, 6000)  /* Hz */
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -556,26 +556,26 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_ringking)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("nmigate", input_merger_device, in_w<0>))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rk)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -837,30 +837,28 @@ ROM_START( ringking3 )
 	ROM_LOAD( "82s129.1a",    0x0200, 0x0100, CRC(d345cbb3) SHA1(6318022ebbbe59d4c0a207801fffed1167b98a66) )    /* blue component */
 ROM_END
 
-DRIVER_INIT_MEMBER(kingofb_state,ringking3)
+void kingofb_state::init_ringking3()
 {
-	int i;
 	uint8_t *RAM = memregion("proms")->base();
 
 	/* expand the first color PROM to look like the kingofb ones... */
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		RAM[i] = RAM[i + 0x100] >> 4;
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
+void kingofb_state::init_ringkingw()
 {
-	int i,j,k;
 	uint8_t *PROMS = memregion("proms")->base();
 	uint8_t *USER1 = memregion("user1")->base();
 
 	/* change the PROMs encode in a simple format to use kingofb decode */
-	for(i = 0, j = 0; j < 0x40; i++, j++)
+	for (int i = 0, j = 0; j < 0x40; i++, j++)
 	{
 		if((i & 0xf) == 8)
 			i += 8;
 
-		for(k = 0; k <= 3; k++)
+		for (int k = 0; k <= 3; k++)
 		{
 			PROMS[j + 0x000 + 0x40 * k] = USER1[i + 0x000 + 0x100 * k]; /* R */
 			PROMS[j + 0x100 + 0x40 * k] = USER1[i + 0x400 + 0x100 * k]; /* G */
@@ -871,9 +869,9 @@ DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
 }
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, 0,         ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, 0,         ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, ringkingw, ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, ringking3, ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, init_ringkingw, ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, init_ringking3, ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )

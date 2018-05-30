@@ -510,7 +510,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jr200 )
+static GFXDECODE_START( gfx_jr200 )
 	GFXDECODE_ENTRY( "gfx_ram", 0, tiles8x8_layout, 0, 1 )
 	GFXDECODE_ENTRY( "pcg", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
@@ -537,10 +537,10 @@ void jr200_state::machine_reset()
 
 MACHINE_CONFIG_START(jr200_state::jr200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(14'318'181) / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
-	MCFG_CPU_PROGRAM_MAP(jr200_mem)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(14'318'181) / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
+	MCFG_DEVICE_PROGRAM_MAP(jr200_mem)
 
-//  MCFG_CPU_ADD("mn1544", MN1544, ?)
+//  MCFG_DEVICE_ADD("mn1544", MN1544, ?)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -551,14 +551,14 @@ MACHINE_CONFIG_START(jr200_state::jr200)
 	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr200)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr200)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// AY-8910 ?
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_DEVICE_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
@@ -599,6 +599,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME   FLAGS
-COMP( 1982, jr200,  0,      0,      jr200,   jr200, jr200_state, 0,    "National",  "JR-200",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1982, jr200u, jr200,  0,      jr200,   jr200, jr200_state, 0,    "Panasonic", "JR-200U", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME   FLAGS
+COMP( 1982, jr200,  0,      0,      jr200,   jr200, jr200_state, empty_init, "National",  "JR-200",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, jr200u, jr200,  0,      jr200,   jr200, jr200_state, empty_init, "Panasonic", "JR-200U", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

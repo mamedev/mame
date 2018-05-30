@@ -239,7 +239,7 @@ static const gfx_layout irisha_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( irisha )
+static GFXDECODE_START( gfx_irisha )
 	GFXDECODE_ENTRY( "maincpu", 0x3800, irisha_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -364,9 +364,9 @@ void irisha_state::machine_reset()
 /* Machine driver */
 MACHINE_CONFIG_START(irisha_state::irisha)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(irisha_mem)
-	MCFG_CPU_IO_MAP(irisha_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(irisha_mem)
+	MCFG_DEVICE_IO_MAP(irisha_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -377,12 +377,12 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 	MCFG_SCREEN_UPDATE_DRIVER(irisha_state, screen_update_irisha)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irisha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_irisha)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -390,19 +390,19 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000) / 9)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(16'000'000) / 9 / 8 / 8)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(irisha_state, speaker_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, irisha_state, speaker_w))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(irisha_state, irisha_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(irisha_state, irisha_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(irisha_state, irisha_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(irisha_state, irisha_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(irisha_state, irisha_8255_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, irisha_state, irisha_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, irisha_state, irisha_8255_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, irisha_state, irisha_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, irisha_state, irisha_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, irisha_state, irisha_8255_portc_w))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
@@ -417,5 +417,5 @@ ROM_START( irisha )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS          INIT    COMPANY  FULLNAME   FLAGS
-COMP( 1983, irisha,      0,      0, irisha,     irisha, irisha_state,  0,      "MGU",   "Irisha",  MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1983, irisha,      0,      0, irisha,  irisha, irisha_state, empty_init, "MGU",   "Irisha", MACHINE_NOT_WORKING)

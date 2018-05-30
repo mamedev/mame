@@ -267,7 +267,7 @@ static const gfx_layout spectrum_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pentagon )
+static GFXDECODE_START( gfx_pentagon )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -275,12 +275,12 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pentagon_state::pentagon)
 	spectrum_128(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(14'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
-	MCFG_CPU_IO_MAP(pentagon_io)
-	MCFG_CPU_OPCODES_MAP(pentagon_switch)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(14'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(pentagon_mem)
+	MCFG_DEVICE_IO_MAP(pentagon_io)
+	MCFG_DEVICE_OPCODES_MAP(pentagon_switch)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -289,11 +289,12 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pentagon)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
+	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
@@ -385,6 +386,6 @@ ROM_START(pent1024)
 	ROMX_LOAD( "gluk51.rom",   0x018000, 0x4000, CRC(ea8c760b) SHA1(adaab28066ca46fbcdcf084c3b53d5a1b82d94a9), ROM_BIOS(9))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT      STATE            INIT    COMPANY       FULLNAME         FLAGS
-COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, pentagon_state,  0,      "<unknown>",  "Pentagon",      0 )
-COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, pentagon_state,  0,      "<unknown>",  "Pentagon 1024", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY      FULLNAME         FLAGS
+COMP( 1989, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon",      0 )
+COMP( 19??, pent1024, spec128, 0,      pent1024, spec_plus, pentagon_state, empty_init, "<unknown>", "Pentagon 1024", 0 )

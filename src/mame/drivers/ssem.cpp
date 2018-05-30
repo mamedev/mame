@@ -630,8 +630,8 @@ void ssem_state::machine_reset()
 
 MACHINE_CONFIG_START(ssem_state::ssem)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SSEMCPU, 700)
-	MCFG_CPU_PROGRAM_MAP(ssem_map)
+	MCFG_DEVICE_ADD("maincpu", SSEMCPU, 700)
+	MCFG_DEVICE_PROGRAM_MAP(ssem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -652,5 +652,5 @@ ROM_START( ssem )
 ROM_END
 
 
-//   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY                  FULLNAME
-COMP(1948, ssem,    0,        0,       ssem,    ssem,  ssem_state,  0,    "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME
+COMP(1948, ssem, 0,      0,      ssem,    ssem,  ssem_state, empty_init, "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

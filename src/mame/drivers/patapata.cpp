@@ -273,7 +273,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( patapata )
+static GFXDECODE_START( gfx_patapata )
 	GFXDECODE_ENTRY( "tilesa", 0, tilelayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "tilesb", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
@@ -286,12 +286,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 
 MACHINE_CONFIG_START(patapata_state::patapata)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) // 16 MHz XTAL, 16 MHz CPU
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) // 16 MHz XTAL, 16 MHz CPU
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", patapata)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_patapata)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -304,12 +304,12 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)
@@ -345,4 +345,4 @@ ROM_START( patapata )
 ROM_END
 
 // cabinet shows Atlus logo, though there's no copyright on the title screen and PCB is NTC / NMK
-GAME( 1993, patapata, 0, patapata, patapata, patapata_state, 0, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, patapata, 0, patapata, patapata, patapata_state, empty_init, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )

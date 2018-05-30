@@ -1055,8 +1055,8 @@ void cxhumax_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(cxhumax_state::cxhumax)
-	MCFG_CPU_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
-	MCFG_CPU_PROGRAM_MAP(cxhumax_map)
+	MCFG_DEVICE_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
+	MCFG_DEVICE_PROGRAM_MAP(cxhumax_map)
 
 
 	MCFG_INTEL_28F320J3D_ADD("flash")
@@ -1085,5 +1085,5 @@ ROM_START( hxhdci2k )
 	ROM_LOAD( "24lc64.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY   FULLNAME           FLAGS
-SYST( 2008, hxhdci2k, 0,      0,      cxhumax, cxhumax, cxhumax_state, 0,    "HUMAX",  "HUMAX HDCI-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME           FLAGS
+SYST( 2008, hxhdci2k, 0,      0,      cxhumax, cxhumax, cxhumax_state, empty_init, "HUMAX", "HUMAX HDCI-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
-	DECLARE_DRIVER_INIT(upscope);
+	void init_upscope();
 
 	void upscope(machine_config &config);
 	void a500_mem(address_map &map);
@@ -266,8 +266,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(upscope_state::upscope)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
@@ -287,40 +287,41 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
+	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
-	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
+	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
 
 	/* cia */
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_0_portb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_0_portb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_0_portb_w))
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(upscope_state, upscope_cia_1_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(upscope_state, upscope_cia_1_porta_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_1_porta_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_1_porta_w))
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(WRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
 
 	// i/o extension
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IO0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(upscope_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(upscope_state, coin_counter_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, upscope_state, lamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, upscope_state, coin_counter_w))
 MACHINE_CONFIG_END
 
 
@@ -361,7 +362,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(upscope_state, upscope)
+void upscope_state::init_upscope()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
@@ -378,4 +379,4 @@ DRIVER_INIT_MEMBER(upscope_state, upscope)
  *
  *************************************/
 
-GAME( 1986, upscope, 0, upscope, upscope, upscope_state, upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", MACHINE_IMPERFECT_SOUND )
+GAME( 1986, upscope, 0, upscope, upscope, upscope_state, init_upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", MACHINE_IMPERFECT_SOUND )

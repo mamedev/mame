@@ -273,7 +273,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( gunsmoke )
+static GFXDECODE_START( gfx_gunsmoke )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         32*4, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 32*4+16*16, 16 )
@@ -304,13 +304,13 @@ void gunsmoke_state::machine_reset()
 MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(gunsmoke_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunsmoke_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(gunsmoke_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunsmoke_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(gunsmoke_state, irq0_line_hold,  4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(gunsmoke_state, irq0_line_hold,  4*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -323,24 +323,24 @@ MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 	MCFG_SCREEN_UPDATE_DRIVER(gunsmoke_state, screen_update_gunsmoke)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunsmoke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunsmoke)
 
 	MCFG_PALETTE_ADD("palette", 32*4+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gunsmoke_state, gunsmoke)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.22)
 	MCFG_SOUND_ROUTE(1, "mono", 0.22)
 	MCFG_SOUND_ROUTE(2, "mono", 0.22)
 	MCFG_SOUND_ROUTE(3, "mono", 0.14)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.22)
 	MCFG_SOUND_ROUTE(1, "mono", 0.22)
 	MCFG_SOUND_ROUTE(2, "mono", 0.22)
@@ -651,9 +651,9 @@ ROM_END
 
 // this information is not displayed onscreen
 
-GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,   gunsmoke_state, 0, ROT270, "Capcom",                   "Gun.Smoke (World, 851115)", MACHINE_SUPPORTS_SAVE ) // GSE_03
-GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,   gunsmoke_state, 0, ROT270, "bootleg",                  "Gun.Smoke (World, 851115) (bootleg)", MACHINE_SUPPORTS_SAVE ) // based  on above version, warning message patched out
-GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,   gunsmoke_state, 0, ROT270, "Capcom",                   "Gun.Smoke (Japan, 851115)", MACHINE_SUPPORTS_SAVE ) // GSJ_03
-GAME( 1986, gunsmokeu,  gunsmoke, gunsmoke, gunsmokeu,  gunsmoke_state, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 860408)", MACHINE_SUPPORTS_SAVE ) // GSA_03
-GAME( 1985, gunsmokeua, gunsmoke, gunsmoke, gunsmoke,   gunsmoke_state, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 1)", MACHINE_SUPPORTS_SAVE ) // GSR_03 (03A on the chip)
-GAME( 1986, gunsmokeub, gunsmoke, gunsmoke, gunsmoke,   gunsmoke_state, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 2)", MACHINE_SUPPORTS_SAVE ) // GSR_03
+GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (World, 851115)", MACHINE_SUPPORTS_SAVE ) // GSE_03
+GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "bootleg",                  "Gun.Smoke (World, 851115) (bootleg)", MACHINE_SUPPORTS_SAVE ) // based  on above version, warning message patched out
+GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Japan, 851115)", MACHINE_SUPPORTS_SAVE ) // GSJ_03
+GAME( 1986, gunsmokeu,  gunsmoke, gunsmoke, gunsmokeu, gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 860408)", MACHINE_SUPPORTS_SAVE ) // GSA_03
+GAME( 1985, gunsmokeua, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 1)", MACHINE_SUPPORTS_SAVE ) // GSR_03 (03A on the chip)
+GAME( 1986, gunsmokeub, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 2)", MACHINE_SUPPORTS_SAVE ) // GSR_03

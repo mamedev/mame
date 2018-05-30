@@ -228,7 +228,7 @@ public:
 	DECLARE_READ8_MEMBER(cybertnk_mux_r);
 	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cybertnk_cnt_w);
-	DECLARE_DRIVER_INIT(cybertnk);
+	void init_cybertnk();
 	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
@@ -819,7 +819,7 @@ static const gfx_layout roadlayout =
 	xoffsets
 };
 
-static GFXDECODE_START( cybertnk )
+static GFXDECODE_START( gfx_cybertnk )
 	GFXDECODE_ENTRY( "tilemap0_gfx", 0, tile_8x8x4,     0x1400, 64 ) /*Pal offset???*/
 	GFXDECODE_ENTRY( "tilemap1_gfx", 0, tile_8x8x4,     0x1800, 64 )
 	GFXDECODE_ENTRY( "tilemap2_gfx", 0, tile_8x8x4,     0x1c00, 64 )
@@ -839,16 +839,16 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(cybertnk_state::cybertnk)
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(master_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(master_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("slave", M68000,XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(slave_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("slave", M68000,XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(slave_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_mem)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
 
@@ -871,20 +871,21 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_right)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cybertnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybertnk)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", Y8950, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym1", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ym2", Y8950, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym2", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -980,10 +981,9 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
+void cybertnk_state::init_cybertnk()
 {
 	uint32_t *spr = (uint32_t*)memregion("spr_gfx")->base();
-
 	for (int x = 0; x< 0x200000/4;x++)
 	{
 		// reorder the data to simplify sprite drawing
@@ -994,4 +994,4 @@ DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
 
 }
 
-GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk, cybertnk_state,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.4)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, cybertnk, 0, cybertnk, cybertnk, cybertnk_state, init_cybertnk, ROT0, "Coreland", "Cyber Tank (v1.4)", MACHINE_IMPERFECT_GRAPHICS )

@@ -275,9 +275,11 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 
 READ8_MEMBER(xain_state::mcu_comm_reset_r)
 {
-	if (m_mcu)
-		m_mcu->reset_w(PULSE_LINE);
-
+	if (m_mcu.found() && !machine().side_effects_disabled())
+	{
+		m_mcu->reset_w(ASSERT_LINE);
+		m_mcu->reset_w(CLEAR_LINE);
+	}
 	return 0xff;
 }
 
@@ -434,7 +436,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( xain )
+static GFXDECODE_START( gfx_xain )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )    /* 8x8 text */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 256, 8 )    /* 16x16 Background */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 384, 8 )    /* 16x16 Background */
@@ -455,15 +457,15 @@ void xain_state::machine_start()
 MACHINE_CONFIG_START(xain_state::xsleena)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, CPU_CLOCK) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, CPU_CLOCK) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", MC6809E, CPU_CLOCK) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(cpu_map_B)
+	MCFG_DEVICE_ADD("sub", MC6809E, CPU_CLOCK) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map_B)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, PIXEL_CLOCK) // 68A09
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, PIXEL_CLOCK) // 68A09
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, MCU_CLOCK)
 
@@ -475,24 +477,24 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xain)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xain)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_SOUND_ADD("ym1", YM2203, MCU_CLOCK)
+	MCFG_DEVICE_ADD("ym1", YM2203, MCU_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, MCU_CLOCK)
+	MCFG_DEVICE_ADD("ym2", YM2203, MCU_CLOCK)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -502,8 +504,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xain_state::xsleenab)
 	xsleena(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
@@ -780,8 +782,8 @@ ROM_START( xsleenaba )
 ROM_END
 
 
-GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one
+GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one

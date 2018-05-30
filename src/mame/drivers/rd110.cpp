@@ -236,9 +236,9 @@ void d110_state::d110_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(d110_state::d110)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_CPU_PROGRAM_MAP( d110_map )
-	MCFG_CPU_IO_MAP( d110_io )
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( d110_map )
+	MCFG_DEVICE_IO_MAP( d110_io )
 
 // Battery-backed main ram
 	MCFG_RAM_ADD( "ram" )
@@ -290,4 +290,4 @@ ROM_START( d110 )
 	ROM_LOAD(  "r15179879.ic6.bin",            0,   0x8000, CRC(5d34174e) SHA1(17bd2887711c5c5458aba6d3be5972b2096eb450) )
 ROM_END
 
-CONS( 1988, d110,  0, 0, d110, d110, d110_state, 0, "Roland", "D110",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1988, d110, 0, 0, d110, d110, d110_state, empty_init, "Roland", "D110", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

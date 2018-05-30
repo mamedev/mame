@@ -229,7 +229,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_DRIVER_INIT(bus);
+	void init_bus();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -546,7 +546,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( tmspoker )
+static GFXDECODE_START( gfx_tmspoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tmspoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmspoker)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
@@ -606,7 +606,7 @@ ROM_END
 *       Driver Init        *
 ***************************/
 
-DRIVER_INIT_MEMBER(tmspoker_state,bus)
+void tmspoker_state::init_bus()
 {
 	/* still need to decode the addressing lines */
 	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
@@ -631,5 +631,5 @@ DRIVER_INIT_MEMBER(tmspoker_state,bus)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY      FULLNAME                      FLAGS
-GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, bus,  ROT0, "<unknown>", "unknown TMS9980 Poker Game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY      FULLNAME                      FLAGS
+GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "<unknown>", "unknown TMS9980 Poker Game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

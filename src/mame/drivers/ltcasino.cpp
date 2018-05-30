@@ -13,6 +13,45 @@ inputs
 colours
 etc.
 
+Mini Vegas
+CC-089  (c) Entertainment Enterprises Ltd. 1983
+ +---------------------------------------------------------------------+
+ |        +-+                  M2114          A.IC19         18.432MHz |
+ |        |H|                                                      D1  |
+ |        |D|                  M2114  M2114                            |
+++  2003C |6|                                 B.IC18               +-+ |
+|         |8|                  M2114  M2114                        | | |
+|         |2|                                                      |9| |
+|         |1|                  M2114  M2114   C.IC17               |9| |
+|         +-+                                                      |3| |
+|         +-+                         M2114                        |7| |
+|   DSW3  |H|                         TC5514  D.IC16               | | |
+|         |D|       +-+                                            +-+ |
+|         |6|       | |                                            +-+ |
+|         |8|       |8|               TC5514  E.IC15               |R| |
+|         |2|       |9|                                            |6| |
+|         |1|       |1|                                            |5| |
+++        +-+       |0|               TC5514  F.IC14               |0| |
+ |                  | |                                            |2| |
+ |    VR1     DSW2  +-+                                            +-+ |
+ |  MB3712    DSW1  BAT               TC5514  G.IC13                   |
+ +---------------------------------------------------------------------+
+
+  CPU: Rockwell R6502AP 2MHz
+Video: TMS9937 NL CRT5037 NMOS Single chip Video Timer/Controller (VTC)
+Sound: AY-3-8910
+       MB3712 5.7W Amp
+  OSC: 18.432MHz
+  RAM: M2114-3 1KBx4 SRAM x 8
+       TC5514P-1 1KBx4 SRAM x 4
+  DSW: 3 8-switch dipswitches
+  VR1: Volume pot
+Other: Hitatchi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
+       NEC uPA2003C Darlington Array
+       3.6v Battery
+       D1 - Power On Diode
+       44 pin edge connector
+
 */
 
 #include "emu.h"
@@ -37,9 +76,10 @@ public:
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
-	DECLARE_DRIVER_INIT(mv4in1);
+	void init_mv4in1();
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(ltcasino);
 	uint32_t screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -50,16 +90,32 @@ public:
 
 /* Video */
 
+PALETTE_INIT_MEMBER(ltcasino_state, ltcasino)
+{
+	for (int i = 0; i < 64; i++)
+	{
+		palette.set_pen_color(2*i+0, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		palette.set_pen_color(2*i+1, pal1bit(i >> 3), pal1bit(i >> 5), pal1bit(i >> 4));
+	}
+}
+
+/*
+ x--- ---- tile bank
+ -xxx ---- foreground color
+ ---- x--- unknown (used by ltcasino)
+ ---- -xxx background color
+ */
 TILE_GET_INFO_MEMBER(ltcasino_state::get_ltcasino_tile_info)
 {
 	int tileno, colour;
 
 	tileno = m_tile_num_ram[tile_index];
-	colour = m_tile_atr_ram[tile_index];
+	// TODO: wtf +1 on attribute offset otherwise glitches occurs on left side of objects?
+	colour = m_tile_atr_ram[(tile_index+1) & 0x7ff];
 
 	tileno += (colour & 0x80) << 1;
 
-	SET_TILE_INFO_MEMBER(0,tileno,0,0);
+	SET_TILE_INFO_MEMBER(0,tileno,((colour & 0x70) >> 1) | (colour & 7),0);
 }
 
 void ltcasino_state::video_start()
@@ -67,6 +123,11 @@ void ltcasino_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ltcasino_state::get_ltcasino_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,64,32);
 }
 
+uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	return 0;
+}
 
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 {
@@ -77,7 +138,7 @@ WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 {
 	m_tile_atr_ram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty((offset + 1) & 0x7ff);
 }
 
 
@@ -113,13 +174,13 @@ static INPUT_PORTS_START( ltcasino )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) //off to enter service
+	PORT_DIPNAME( 0x20, 0x00, "Enable Craps" ) //off to enter service
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) //off to enter service
+	PORT_DIPNAME( 0x40, 0x00, "Enable Poker" ) //off to enter service
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) //off to enter service
+	PORT_DIPNAME( 0x80, 0x00, "Enable Black Jack" ) //off to enter service
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -217,7 +278,7 @@ static INPUT_PORTS_START( ltcasino )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH ) //service?
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -484,13 +545,13 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-	PORT_DIPNAME( 0x20, 0x00, "Dice" )
+	PORT_DIPNAME( 0x20, 0x00, "Enable Dice" ) // must be off to enter service
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Poker" )
+	PORT_DIPNAME( 0x40, 0x00, "Enable Poker" ) // must be off to enter service
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "21" )
+	PORT_DIPNAME( 0x80, 0x00, "Enable 21" ) // must be off to enter service
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -518,7 +579,7 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("IN2")
+	PORT_START("IN2") // Shows as "R" in service mode
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -568,7 +629,7 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("IN4")
+	PORT_START("IN4") // Shows as "S" in service mode
 	PORT_DIPNAME( 0x01, 0x01, "Keyboard" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -588,11 +649,11 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH ) //service?
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN5")
+	PORT_START("IN5") // Shows as "T" in service mode
 	PORT_DIPNAME( 0x01, 0x00, "5" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -642,23 +703,16 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( ltcasino )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+static GFXDECODE_START( gfx_ltcasino )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 64 )
 GFXDECODE_END
-
-
-uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	return 0;
-}
 
 
 MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,2000000)       /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(ltcasino_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(18'432'000)/9) /* 2.048MHz ?? (or 18.432MHz/8 = 2.304MHz) - not verified */
+	MCFG_DEVICE_PROGRAM_MAP(ltcasino_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -669,14 +723,15 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update_ltcasino)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ltcasino)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ltcasino)
+	MCFG_PALETTE_ADD("palette", 2*64)
+	MCFG_PALETTE_INIT_OWNER(ltcasino_state, ltcasino)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/18) /* 1.024MHz ?? (or 18.432MHz/16 = 1.152MHz) - not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
@@ -721,16 +776,15 @@ ROM_START( mv4in1 )
 	ROM_LOAD( "a.ic19",   0x0000, 0x1000, CRC(a25c125e) SHA1(e0ba83ccddbd82a2bf52585ae0accb9192cbb00e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
+void ltcasino_state::init_mv4in1()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
-	for(i=0;i<0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 		rom[i]=bitswap<8>(rom[i],7,6,5,4,3,1,2,0);
 }
 
 
 
-GAME( 1982, ltcasino, 0,         ltcasino, ltcasino, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (older)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mv4in1,   ltcasino,  ltcasino, mv4in1,   ltcasino_state, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, ltcasinn, 0,         ltcasino, ltcasinn, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (newer)", MACHINE_NOT_WORKING )
+GAME( 1982, ltcasino, 0,        ltcasino, ltcasino, ltcasino_state, empty_init,  ROT0, "Digital Controls Inc.",           "Little Casino (older)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mv4in1,   ltcasino, ltcasino, mv4in1,   ltcasino_state, init_mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, ltcasinn, 0,        ltcasino, ltcasinn, ltcasino_state, empty_init,  ROT0, "Digital Controls Inc.",           "Little Casino (newer)", MACHINE_NOT_WORKING )

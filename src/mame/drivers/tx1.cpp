@@ -42,6 +42,7 @@
 
 #include "emu.h"
 #include "includes/tx1.h"
+#include "audio/tx1.h"
 
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
@@ -617,28 +618,28 @@ void tx1_state::buggyboy_sound_io(address_map &map)
  *************************************/
 
 MACHINE_CONFIG_START(tx1_state::tx1)
-	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_CPU_PROGRAM_MAP(tx1_main)
+	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
+	MCFG_DEVICE_PROGRAM_MAP(tx1_main)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
-	MCFG_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_CPU_PROGRAM_MAP(tx1_math)
+	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
+	MCFG_DEVICE_PROGRAM_MAP(tx1_math)
 
-	MCFG_CPU_ADD("audio_cpu", Z80, TX1_PIXEL_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(tx1_sound_prg)
-	MCFG_CPU_IO_MAP(tx1_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tx1_state, irq0_line_hold,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
+	MCFG_DEVICE_ADD("audio_cpu", Z80, TX1_PIXEL_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tx1_sound_prg)
+	MCFG_DEVICE_IO_MAP(tx1_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, irq0_line_hold,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(tx1_state, tx1_ppi_porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(tx1_state, tx1_ppi_portb_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, tx1_state, tx1_ppi_porta_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, tx1_state, tx1_ppi_portb_r))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tx1_state, tx1_coin_cnt_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tx1_state, tx1_coin_cnt_w))
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,tx1)
@@ -658,41 +659,42 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_tx1_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_tx1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_tx1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
 
-	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
-//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright") /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-
-	MCFG_SOUND_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("tx1", tx1_sound_device, ay8910_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("tx1", tx1_sound_device, ay8910_b_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("tx1", tx1_sound_device, ay8910_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("tx1", tx1_sound_device, ay8910_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
 
-	MCFG_SOUND_ADD("tx1", TX1, 0)
+	MCFG_DEVICE_ADD("tx1", TX1_SOUND, TX1_PIXEL_CLOCK)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(tx1_state::buggyboy)
-	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_CPU_PROGRAM_MAP(buggyboy_main)
+	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
+	MCFG_DEVICE_PROGRAM_MAP(buggyboy_main)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
-	MCFG_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_CPU_PROGRAM_MAP(buggyboy_math)
+	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
+	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
-	MCFG_CPU_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
-	MCFG_CPU_PROGRAM_MAP(buggyboy_sound_prg)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
-	MCFG_CPU_IO_MAP(buggyboy_sound_io)
+	MCFG_DEVICE_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(buggyboy_sound_prg)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
+	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -700,7 +702,7 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("PPI_PORTA"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(tx1_state, bb_coin_cnt_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, tx1_state, bb_coin_cnt_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
 
 	MCFG_DEFAULT_LAYOUT(layout_triphsxs)
@@ -718,45 +720,47 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggyboy_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_buggyboy))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
-	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
-//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-	MCFG_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym1_a_w))
+	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym1_a_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
+	MCFG_DEVICE_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
-	MCFG_SOUND_ADD("buggyboy", BUGGYBOY, 0)
+	MCFG_DEVICE_ADD("buggyboy", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(tx1_state::buggybjr)
-	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_CPU_PROGRAM_MAP(buggybjr_main)
+	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
+	MCFG_DEVICE_PROGRAM_MAP(buggybjr_main)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
-	MCFG_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MCFG_CPU_PROGRAM_MAP(buggyboy_math)
+	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
+	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
-	MCFG_CPU_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
-	MCFG_CPU_PROGRAM_MAP(buggybjr_sound_prg)
-	MCFG_CPU_IO_MAP(buggyboy_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
+	MCFG_DEVICE_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(buggybjr_sound_prg)
+	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -764,27 +768,29 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggybjr)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_buggyboy))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
-	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
-//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5);
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-	MCFG_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
+	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2149_IC19_A"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM2149_IC19_B"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
+	MCFG_DEVICE_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
-	MCFG_SOUND_ADD("buggyboy", BUGGYBOY, 0)
+	MCFG_DEVICE_ADD("buggyboy", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END
@@ -1253,8 +1259,8 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1983, tx1,        0,        tx1,      tx1,      tx1_state, 0,     ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jb,      tx1,      tx1,      tx1j,     tx1_state, 0,     ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jc,      tx1,      tx1,      tx1j,     tx1_state, 0,     ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, tx1_state, 0,     ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
-GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, tx1_state, 0,     ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )
+GAMEL( 1983, tx1,        0,        tx1,      tx1,      tx1_state, empty_init, ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jb,      tx1,      tx1,      tx1j,     tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jc,      tx1,      tx1,      tx1j,     tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
+GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )

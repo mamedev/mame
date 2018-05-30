@@ -66,7 +66,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gl8008cx_state::gl8008cx)
 	/* basic machine hardware */
-	// MCFG_CPU_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
+	// MCFG_DEVICE_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -94,5 +94,5 @@ ROM_START( bs9009cx )
 ROM_END
 
 
-COMP( 1999, gl8008cx,   0,      0,      gl8008cx,  gl8008cx,    gl8008cx_state, 0,    "Video Technology", "Genius Leader 8008 CX (Germany)",           MACHINE_IS_SKELETON)
-COMP( 1999, bs9009cx,   0,      0,      gl8008cx,  gl8008cx,    gl8008cx_state, 0,    "Video Technology", "BrainStation 9009 CXL (Germany)",           MACHINE_IS_SKELETON)
+COMP( 1999, gl8008cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
+COMP( 1999, bs9009cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)

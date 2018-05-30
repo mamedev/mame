@@ -41,7 +41,7 @@
 #include <zlib.h>
 
 #define AS_IO16             1
-#define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
+#define MCFG_CPU_IO16_MAP   MCFG_DEVICE_DATA_MAP
 
 class vgmplay_disassembler : public util::disasm_interface
 {
@@ -1315,13 +1315,13 @@ void vgmplay_state::machine_start()
 					m_okim6295_clock[0] &= ~0x80000000;
 					m_okim6295_pin7[0] = 1;
 				}
-				m_okim6295[0]->config_pin7(m_okim6295_pin7[0]);
+				m_okim6295[0]->config_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
 				m_okim6295[0]->set_unscaled_clock(m_okim6295_clock[0] & ~0xc0000000);
 				if (m_okim6295_clock[0] & 0x40000000) {
 					m_okim6295_clock[0] &= ~0x40000000;
 					m_okim6295_clock[1] = m_okim6295_clock[0];
 					m_okim6295_pin7[1] = m_okim6295_pin7[0];
-					m_okim6295[1]->config_pin7(m_okim6295_pin7[1]);
+					m_okim6295[1]->config_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
 					m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
 				}
 			}
@@ -1417,7 +1417,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
 	if ((data & mem_mask) != (m_okim6295_pin7[Chip] & mem_mask))
 	{
 		COMBINE_DATA(&m_okim6295_pin7[Chip]);
-		m_okim6295[Chip]->config_pin7(m_okim6295_pin7[Chip]);
+		m_okim6295[Chip]->set_pin7(m_okim6295_pin7[Chip]);
 	}
 }
 
@@ -1620,78 +1620,79 @@ void vgmplay_state::h6280_io_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(vgmplay_state::vgmplay)
-	MCFG_CPU_ADD("vgmplay", VGMPLAY, 44100)
-	MCFG_CPU_PROGRAM_MAP( file_map )
-	MCFG_CPU_IO_MAP( soundchips_map )
+	MCFG_DEVICE_ADD("vgmplay", VGMPLAY, 44100)
+	MCFG_DEVICE_PROGRAM_MAP( file_map )
+	MCFG_DEVICE_IO_MAP( soundchips_map )
 	MCFG_CPU_IO16_MAP( soundchips16_map )
 
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
 	MCFG_BITBANGER_READONLY(true)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ym2612", YM2612, 7670454)
+	MCFG_DEVICE_ADD("ym2612", YM2612, 7670454)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("ym2151", YM2151, 3579545)
+	MCFG_DEVICE_ADD("ym2151", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("sn76496", SN76496, 3579545)
+	MCFG_DEVICE_ADD("sn76496", SN76496, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.5)
 
-	MCFG_SOUND_ADD("segapcm", SEGAPCM, 4000000)
+	MCFG_DEVICE_ADD("segapcm", SEGAPCM, 4000000)
 	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
 	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("multipcma", MULTIPCM, 8000000)
+	MCFG_DEVICE_ADD("multipcma", MULTIPCM, 8000000)
 	MCFG_DEVICE_ADDRESS_MAP(0, multipcma_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("multipcmb", MULTIPCM, 8000000)
+	MCFG_DEVICE_ADD("multipcmb", MULTIPCM, 8000000)
 	MCFG_DEVICE_ADDRESS_MAP(0, multipcmb_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("dmg", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("dmg", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("ay8910a", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay8910a", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_SOUND_ADD("ay8910b", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay8910b", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_SOUND_ADD("ym2203a", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2203a", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ym2203b", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2203b", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ym3526", YM3526, 4000000)
+	MCFG_DEVICE_ADD("ym3526", YM3526, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_SOUND_ADD("ym3812", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ym3812", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_CPU_ADD("nescpu", N2A03, 1000000)
-	MCFG_CPU_PROGRAM_MAP(nescpu_map)
+	MCFG_DEVICE_ADD("nescpu", N2A03, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(nescpu_map)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_MODIFY("nescpu:nesapu")
@@ -1699,12 +1700,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.50)
 
-	MCFG_CPU_ADD("h6280", H6280, 1000000)
-	MCFG_CPU_PROGRAM_MAP(h6280_map)
-	MCFG_CPU_IO_MAP(h6280_io_map)
+	MCFG_DEVICE_ADD("h6280", H6280, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_map)
+	MCFG_DEVICE_IO_MAP(h6280_io_map)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_SOUND_ADD("c6280", C6280, 3579545)
+	MCFG_DEVICE_ADD("c6280", C6280, 3579545)
 	MCFG_C6280_CPU("h6280")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
@@ -1714,11 +1715,11 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("pokeya", POKEY, 1789772)
+	MCFG_DEVICE_ADD("pokeya", POKEY, 1789772)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_SOUND_ADD("pokeyb", POKEY, 1789772)
+	MCFG_DEVICE_ADD("pokeyb", POKEY, 1789772)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
@@ -1727,27 +1728,27 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_OKIM6295_ADD("okim6295a", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295a", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295a_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("okim6295b", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295b", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295b_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ymf271", YMF271, 16934400)
+	MCFG_DEVICE_ADD("ymf271", YMF271, 16934400)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf271_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("ymz280b", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz280b", YMZ280B, 16934400)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("ym2608", YM2608, 8000000)
+	MCFG_DEVICE_ADD("ym2608", YM2608, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
@@ -1763,7 +1764,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
@@ -1777,4 +1778,4 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
 ROM_END
 
-CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )
+CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", 0 )

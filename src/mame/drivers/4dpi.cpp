@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ip6_unk2_w);
 	DECLARE_READ32_MEMBER(ip6_unk3_r);
 	DECLARE_WRITE32_MEMBER(ip6_unk3_w);
-	DECLARE_DRIVER_INIT(sgi_ip6);
+	void init_sgi_ip6();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -231,10 +231,10 @@ void sgi_ip6_state::sgi_ip6_map(address_map &map)
 ***************************************************************************/
 
 MACHINE_CONFIG_START(sgi_ip6_state::sgi_ip6)
-	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
+	MCFG_DEVICE_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
+	MCFG_DEVICE_PROGRAM_MAP( sgi_ip6_map )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
 
 
 	/* video hardware */
@@ -253,7 +253,7 @@ static INPUT_PORTS_START( sgi_ip6 )
 	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(sgi_ip6_state,sgi_ip6)
+void sgi_ip6_state::init_sgi_ip6()
 {
 }
 
@@ -268,5 +268,5 @@ ROM_START( sgi_ip6 )
 	ROM_LOAD( "4d202031.bin", 0x000000, 0x040000, CRC(065a290a) SHA1(6f5738e79643f94901e6efe3612468d14177f65b) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT    STATE           INIT      COMPANY                 FULLNAME                FLAGS
-COMP( 1988, sgi_ip6,  0,        0,        sgi_ip6,  sgi_ip6, sgi_ip6_state,  sgi_ip6,  "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME                FLAGS
+COMP( 1988, sgi_ip6, 0,      0,      sgi_ip6, sgi_ip6, sgi_ip6_state, init_sgi_ip6, "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

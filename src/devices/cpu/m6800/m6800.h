@@ -55,7 +55,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 12; }
 	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -84,8 +84,8 @@ protected:
 	uint8_t   m_irq_state[3];   /* IRQ line state [IRQ1,TIN,SC1] */
 
 	/* Memory spaces */
-	address_space *m_program, *m_decrypted_opcodes;
-	direct_read_data<0> *m_direct, *m_decrypted_opcodes_direct;
+	address_space *m_program, *m_opcodes;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_opcodes_cache;
 
 	const op_func *m_insn;
 	const uint8_t *m_cycles;            /* clock cycle of instruction table */

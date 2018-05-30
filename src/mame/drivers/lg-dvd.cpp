@@ -32,8 +32,8 @@ void lg_dvd_state::lg_dvd_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(lg_dvd_state::lg)
-	MCFG_CPU_ADD( "maincpu", I80C52, XTAL(16'000'000) )
-	MCFG_CPU_PROGRAM_MAP( lg_dvd_map )
+	MCFG_DEVICE_ADD( "maincpu", I80C52, XTAL(16'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( lg_dvd_map )
 MACHINE_CONFIG_END
 
 ROM_START( lggp40 )
@@ -44,4 +44,4 @@ ROM_START( lggp40 )
 	ROMX_LOAD( "firm-1.01.bin", 0x000000, 0x100000, CRC(28820e0c) SHA1(c5f2c1e14e6cff2e57c5196cabcebfaaff7284ce), ROM_BIOS(2) )
 ROM_END
 
-SYST( 2011, lggp40, 0, 0, lg, lg, lg_dvd_state, 0, "LG", "GP40NW10 dvd writer", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW )
+SYST( 2011, lggp40, 0, 0, lg, lg, lg_dvd_state, empty_init, "LG", "GP40NW10 dvd writer", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW )

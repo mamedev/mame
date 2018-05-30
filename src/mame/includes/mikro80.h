@@ -55,8 +55,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mikro80_keyboard_w);
 	DECLARE_WRITE8_MEMBER(mikro80_tape_w);
 	DECLARE_READ8_MEMBER(mikro80_tape_r);
-	DECLARE_DRIVER_INIT(radio99);
-	DECLARE_DRIVER_INIT(mikro80);
+	void init_radio99();
+	void init_mikro80();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

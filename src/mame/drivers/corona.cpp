@@ -324,21 +324,15 @@
 class corona_state : public driver_device
 {
 public:
-	corona_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	corona_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	uint8_t m_blitter_x_reg;
-	uint8_t m_blitter_y_reg;
-	uint8_t m_blitter_aux_reg;
-	uint8_t m_blitter_unk_reg;
-	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp;
-	uint8_t m_lamp_old;
-	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
 	DECLARE_WRITE8_MEMBER(blitter_x_w);
@@ -356,10 +350,6 @@ public:
 	DECLARE_PALETTE_INIT(corona);
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
 	void winner81(machine_config &config);
 	void winner82(machine_config &config);
 	void rcirulet(machine_config &config);
@@ -381,6 +371,23 @@ public:
 	void winner82_map(address_map &map);
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	uint8_t m_blitter_x_reg;
+	uint8_t m_blitter_y_reg;
+	uint8_t m_blitter_aux_reg;
+	uint8_t m_blitter_unk_reg;
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp;
+	uint8_t m_lamp_old;
+	int m_input_selector;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<256> m_lamps;
 };
 
 
@@ -536,8 +543,8 @@ WRITE8_MEMBER(corona_state::ball_w)
 {
 	m_lamp = data;
 
-	output().set_lamp_value(data, 1);
-	output().set_lamp_value(m_lamp_old, 0);
+	m_lamps[data] = 1;
+	m_lamps[m_lamp_old] = 0;
 	m_lamp_old = m_lamp;
 }
 
@@ -1382,14 +1389,14 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(corona_state::winner81)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner81_map)
-	MCFG_CPU_IO_MAP(winner81_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner81_map)
+	MCFG_DEVICE_IO_MAP(winner81_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)    /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner81_sound_map)
-	MCFG_CPU_IO_MAP(winner81_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)    /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner81_sound_map)
+	MCFG_DEVICE_IO_MAP(winner81_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1406,24 +1413,24 @@ MACHINE_CONFIG_START(corona_state::winner81)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::winner82)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner82_map)
-	MCFG_CPU_IO_MAP(winner82_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_map)
+	MCFG_DEVICE_IO_MAP(winner82_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8) /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
-	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8) /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
+	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1440,25 +1447,25 @@ MACHINE_CONFIG_START(corona_state::winner82)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::re800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_map)
-	MCFG_CPU_IO_MAP(re800_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_map)
+	MCFG_DEVICE_IO_MAP(re800_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
-	MCFG_CPU_IO_MAP(re800_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_sound_map)
+	MCFG_DEVICE_IO_MAP(re800_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1475,24 +1482,24 @@ MACHINE_CONFIG_START(corona_state::re800)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::rcirulet)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_map)
-	MCFG_CPU_IO_MAP(re800_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_map)
+	MCFG_DEVICE_IO_MAP(re800_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
-	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
+	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1509,25 +1516,25 @@ MACHINE_CONFIG_START(corona_state::rcirulet)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::luckyrlt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
-	MCFG_CPU_IO_MAP(luckyrlt_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(luckyrlt_map)
+	MCFG_DEVICE_IO_MAP(luckyrlt_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(luckyrlt_sound_map)
-	MCFG_CPU_IO_MAP(luckyrlt_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(luckyrlt_sound_map)
+	MCFG_DEVICE_IO_MAP(luckyrlt_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1544,11 +1551,11 @@ MACHINE_CONFIG_START(corona_state::luckyrlt)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1751,13 +1758,13 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
-GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
-GAME(  1982, winner82,  0,        winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
-GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
-GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
-GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT        ROT     COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
+GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
+GAME(  1982, winner82,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
+GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
+GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )

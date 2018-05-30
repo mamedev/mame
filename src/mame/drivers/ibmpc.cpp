@@ -295,19 +295,19 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(ibmpc_state::ibm5150)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(pc8_map)
-	MCFG_CPU_IO_MAP(pc8_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_PROGRAM_MAP(pc8_map)
+	MCFG_DEVICE_IO_MAP(pc8_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hdc", false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
@@ -333,22 +333,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ibmpc_state::ibm5160)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(pc8_map)
-	MCFG_CPU_IO_MAP(pc8_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_PROGRAM_MAP(pc8_map)
+	MCFG_DEVICE_IO_MAP(pc8_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hdc", false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa8", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
@@ -563,8 +563,8 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT    STATE        INIT  COMPANY                             FULLNAME                    FLAGS
-COMP( 1981,    ibm5150,    0,          0,      ibm5150,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5150",              0 )
-COMP( 1982,    ibm5155,    ibm5150,    0,      ibm5150,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5155",              0 )
-COMP( 1985,    ibm5140,    ibm5150,    0,      ibm5140,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5140 Convertible",  MACHINE_NOT_WORKING )
-COMP( 1982,    ibm5160,    ibm5150,    0,      ibm5160,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM XT 5160",              0 )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                            FULLNAME                   FLAGS
+COMP( 1981, ibm5150, 0,       0,      ibm5150, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5150",             0 )
+COMP( 1982, ibm5155, ibm5150, 0,      ibm5150, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5155",             0 )
+COMP( 1985, ibm5140, ibm5150, 0,      ibm5140, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5140 Convertible", MACHINE_NOT_WORKING )
+COMP( 1982, ibm5160, ibm5150, 0,      ibm5160, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM XT 5160",             0 )

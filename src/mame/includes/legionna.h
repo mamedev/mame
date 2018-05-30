@@ -69,11 +69,12 @@ public:
 	DECLARE_WRITE16_MEMBER(grainbow_layer_config_w);
 	DECLARE_WRITE16_MEMBER(palette_swap_w);
 
-	DECLARE_DRIVER_INIT(legiongfx);
-	DECLARE_DRIVER_INIT(cupsoc_debug);
-	DECLARE_DRIVER_INIT(cupsoc);
-	DECLARE_DRIVER_INIT(cupsocs);
-	DECLARE_DRIVER_INIT(olysoc92);
+	void init_legiongfx();
+	void init_godzilla();
+	void init_cupsoc_debug();
+	void init_cupsoc();
+	void init_cupsocs();
+	void init_olysoc92();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info_denji);

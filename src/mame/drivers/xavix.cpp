@@ -96,7 +96,7 @@
             3   e-kara Web /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
             4   Doraemon TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
             5   Exciting stadium DX, Hansin Tigers version /EPOCH/Japan                                         -           -               -           -               -                   -                       -
-            6   Dragon Quest /SQUARE ENIX/Japan                                                                 -           -               -           -               -                   -                       -
+            6   Dragon Quest /SQUARE ENIX/Japan                                                                 -           -               -           8M              -                   SSD 2000?               dumped
             7   Croquette! Win a medal! /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
             8   Taiko Popira /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
             9   Together Minimoni, Dancing' Stage! plus /EPOCH/Japan                                            -           -               -           -               -                   -                       -
@@ -233,11 +233,54 @@ WRITE8_MEMBER(xavix_state::main_w)
 	}
 }
 
+/* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
+   the CPU 0 page memory and stack are still at 0 but ROM must be in the 3xxx range (game hasn't got far enough to call this yet to help either)
+
+   the maximum romsize appears to be 0x800000 so presumably the high bit being set has some additional meaning
+
+   for now treat it as a swapped arrangement vs. the reads from the lower range, except where page 0 ram would map, it's also possible that
+   vram etc. is completely unavailable if executing from these addresses, there isn't much evidence at the moment
+
+   note, many DMA operations and tile bank redirects etc. have the high bit set too, so that could be significant if it defines how it accesses
+   memory in those cases too
+
+*/
+READ8_MEMBER(xavix_state::main2_r)
+{
+	if (offset & 0x8000)
+	{
+		return m_lowbus->read8(space, offset&0x7fff);
+	}
+	else
+	{
+		if (offset>0x200)
+			return  m_rgn[(offset) & (m_rgnlen - 1)];
+		else
+			return m_lowbus->read8(space, offset&0x7fff);
+	}
+}
+
+WRITE8_MEMBER(xavix_state::main2_w)
+{
+	if (offset & 0x8000)
+	{
+		m_lowbus->write8(space, offset & 0x7fff, data);
+	}
+	else
+	{
+		if (offset>0x200)
+			logerror("write to ROM area?\n");
+		else
+			m_lowbus->write8(space, offset & 0x7fff, data);
+	}
+}
+
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(this, FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x000000, 0x7fffff).rw(this, FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x800000, 0xffffff).rw(this, FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
 }
 
 void xavix_state::xavix_lowbus_map(address_map &map)
@@ -576,7 +619,7 @@ static const gfx_layout char16layout8bpp =
 	16*16*8
 };
 
-static GFXDECODE_START( xavix )
+static GFXDECODE_START( gfx_xavix )
 	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
@@ -587,10 +630,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",XAVIX,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(xavix_map)
-	MCFG_M6502_DISABLE_DIRECT()
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu",XAVIX,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
+	MCFG_M6502_DISABLE_CACHE()
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
@@ -612,12 +655,12 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xavix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	// sound is PCM
 MACHINE_CONFIG_END
 
@@ -629,21 +672,35 @@ MACHINE_CONFIG_START(xavix_state::xavixp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(xavix_state, xavix)
+MACHINE_CONFIG_START(xavix_state::xavix2000)
+	xavix(config);
+
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
+	MCFG_M6502_DISABLE_CACHE()
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+
+MACHINE_CONFIG_END
+
+
+void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
 	m_rgn = memregion("bios")->base();
 }
 
-DRIVER_INIT_MEMBER(xavix_state, taitons1)
+void xavix_state::init_taitons1()
 {
-	DRIVER_INIT_CALL(xavix);
+	init_xavix();
 	m_alt_addressing = 1;
 }
 
-DRIVER_INIT_MEMBER(xavix_state, rad_box)
+void xavix_state::init_rad_box()
 {
-	DRIVER_INIT_CALL(xavix);
+	init_xavix();
 	m_alt_addressing = 2;
 }
 
@@ -790,51 +847,51 @@ ROM_END
 
 /* Standalone TV Games */
 
-CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, init_taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
-CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
+CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
 
-CONS( 2006, namcons1,  0,          0,  xavix,  namcons2, xavix_state, taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, namcons1,  0,          0,  xavix,  namcons2, xavix_state, init_taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
 
-CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
+CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, init_taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
 
-CONS( 2000, rad_ping,  0,          0,  xavix,  xavix,    xavix_state, xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2000, rad_ping,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
-CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_IS_SKELETON )
-CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_IS_SKELETON )
+CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_IS_SKELETON )
+CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_IS_SKELETON )
 
-CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Boxing (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Boxing (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Boxing (NTSC)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Boxing (PAL)", MACHINE_IS_SKELETON)
 
-CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
 
-CONS( 2002, rad_bb2,   0,          0,  xavix,  xavix,    xavix_state, xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
+CONS( 2002, rad_bb2,   0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
-CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
 
-CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
+CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
 
-CONS( 200?, rad_rh,    0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
+CONS( 200?, rad_rh,    0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
 
-CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
+CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
 
-CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,  xavix_state, rad_box,   "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
+CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,  xavix_state, init_rad_box,   "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
-CONS (200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, xavix,     "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, init_xavix,     "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
 
-CONS (200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
 
-CONS (200?, eka_vol1,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
+CONS( 200?, eka_vol1,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
 
-CONS (200?, eka_vol2,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
+CONS( 200?, eka_vol2,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
@@ -863,9 +920,15 @@ ROM_START( ttv_mx )
 	ROM_LOAD( "mxdirtrebel.bin", 0x000000, 0x800000, CRC(e64bf1a1) SHA1(137f97d7d857697a13e0c8984509994dc7bc5fc5) )
 ROM_END
 
+ROM_START( drgqst )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )
+ROM_END
 
-CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
 
-CONS( 2005, ttv_sw,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_lotr,  0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_mx,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
+CONS( 2004, xavtenni, 0, 0, xavix2000, xavix, xavix_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+
+CONS( 2005, ttv_sw,   0, 0, xavix2000, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_lotr, 0, 0, xavix2000, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_mx,   0, 0, xavix2000, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
+CONS( 2003, drgqst,   0, 0, xavix2000, xavix, xavix_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )

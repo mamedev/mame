@@ -305,7 +305,7 @@ public:
 	std::unique_ptr<rollext_renderer> m_renderer;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	DECLARE_DRIVER_INIT(rollext);
+	void init_rollext();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -541,14 +541,14 @@ void rollext_state::machine_start()
 
 
 MACHINE_CONFIG_START(rollext_state::rollext)
-	MCFG_CPU_ADD("maincpu", TMS32082_MP, 60000000)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(rollext_state, irq1_line_assert, 60)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(rollext_state, irq3_line_assert, 500)
+	MCFG_DEVICE_ADD("maincpu", TMS32082_MP, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(rollext_state, irq1_line_assert, 60)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(rollext_state, irq3_line_assert, 500)
 
-	MCFG_CPU_ADD("pp0", TMS32082_PP, 60000000)
-	MCFG_CPU_PROGRAM_MAP(memmap);
+	MCFG_DEVICE_ADD("pp0", TMS32082_PP, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(memmap);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
@@ -566,7 +566,7 @@ INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
 	m_maincpu->set_input_line(tms32082_mp_device::INPUT_X1, ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(rollext_state, rollext)
+void rollext_state::init_rollext()
 {
 	m_maincpu->set_command_callback(write32_delegate(FUNC(rollext_state::cmd_callback),this));
 }
@@ -588,4 +588,4 @@ ROM_START(rollext)
 ROM_END
 
 
-GAME( 1999, rollext, 0, rollext, rollext, rollext_state, rollext, ROT0, "Gaelco", "ROLLing eX.tre.me", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, rollext, 0, rollext, rollext, rollext_state, init_rollext, ROT0, "Gaelco", "ROLLing eX.tre.me", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

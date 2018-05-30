@@ -212,7 +212,7 @@ static const gfx_layout tilelayout16 =
 	32*8
 };
 
-static GFXDECODE_START( drtomy )
+static GFXDECODE_START( gfx_drtomy )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout8,  0x100, 16 ) /* Sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16, 0x000, 16 ) /* BG */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16, 0x200, 16 ) /* FG */
@@ -305,9 +305,9 @@ void drtomy_state::machine_reset()
 MACHINE_CONFIG_START(drtomy_state::drtomy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(drtomy_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drtomy_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
 
 
 	/* video hardware */
@@ -319,15 +319,15 @@ MACHINE_CONFIG_START(drtomy_state::drtomy)
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drtomy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drtomy)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 26000000/16, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 26000000/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -358,4 +358,4 @@ ROM_START( drtomy )
 ROM_END
 
 
-GAME( 1993, drtomy, 0, drtomy, drtomy, drtomy_state, 0, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, drtomy, 0, drtomy, drtomy, drtomy_state, empty_init, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )

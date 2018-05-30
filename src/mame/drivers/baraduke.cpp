@@ -154,8 +154,8 @@ READ8_MEMBER(baraduke_state::inputport_r)
 
 WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_lamp[0] = BIT(data, 3);
+	m_lamp[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
@@ -364,7 +364,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( baraduke )
+static GFXDECODE_START( gfx_baraduke )
 	GFXDECODE_ENTRY( "gfx1", 0,      text_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,  0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0x4000, tile_layout,  0, 256 )
@@ -372,16 +372,21 @@ static GFXDECODE_START( baraduke )
 GFXDECODE_END
 
 
+void baraduke_state::machine_start()
+{
+	m_lamp.resolve();
+}
+
 
 MACHINE_CONFIG_START(baraduke_state::baraduke)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) // 68A09E
-	MCFG_CPU_PROGRAM_MAP(baraduke_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) // 68A09E
+	MCFG_DEVICE_PROGRAM_MAP(baraduke_map)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* we need heavy synch */
 
@@ -391,17 +396,17 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 0, 36*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(baraduke_state, screen_vblank_baraduke))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, baraduke_state, screen_vblank_baraduke))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", baraduke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_baraduke)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_INIT_OWNER(baraduke_state, baraduke)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -525,19 +530,16 @@ ROM_START( metrocrsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(baraduke_state,baraduke)
+void baraduke_state::init_baraduke()
 {
-	uint8_t *rom;
-	int i;
-
 	/* unpack the third tile ROM */
-	rom = memregion("gfx2")->base() + 0x8000;
-	for (i = 0x2000;i < 0x4000;i++)
+	uint8_t *rom = memregion("gfx2")->base() + 0x8000;
+	for (int i = 0x2000; i < 0x4000; i++)
 	{
 		rom[i + 0x2000] = rom[i];
 		rom[i + 0x4000] = rom[i] << 4;
 	}
-	for (i = 0;i < 0x2000;i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i + 0x2000] = rom[i] << 4;
 	}
@@ -545,7 +547,7 @@ DRIVER_INIT_MEMBER(baraduke_state,baraduke)
 
 
 
-GAME( 1985, metrocrs, 0,        baraduke, metrocrs, baraduke_state, baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 )
-GAME( 1985, metrocrsa,metrocrs, baraduke, metrocrs, baraduke_state, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
-GAME( 1985, aliensec, 0,        baraduke, baraduke, baraduke_state, baraduke, ROT0, "Namco", "Alien Sector", 0 )
-GAME( 1985, baraduke, aliensec, baraduke, baraduke, baraduke_state, baraduke, ROT0, "Namco", "Baraduke", 0 )
+GAME( 1985, metrocrs,  0,        baraduke, metrocrs, baraduke_state, init_baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 )
+GAME( 1985, metrocrsa, metrocrs, baraduke, metrocrs, baraduke_state, init_baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
+GAME( 1985, aliensec,  0,        baraduke, baraduke, baraduke_state, init_baraduke, ROT0, "Namco", "Alien Sector", 0 )
+GAME( 1985, baraduke,  aliensec, baraduke, baraduke, baraduke_state, init_baraduke, ROT0, "Namco", "Baraduke", 0 )

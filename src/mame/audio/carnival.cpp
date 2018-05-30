@@ -200,17 +200,17 @@ void vicdual_state::mboard_map(address_map &map)
 MACHINE_CONFIG_START(vicdual_state::carnival_audio)
 
 	/* music board */
-	MCFG_CPU_ADD("audiocpu", I8039, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(mboard_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vicdual_state, carnival_music_port_1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vicdual_state, carnival_music_port_2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(vicdual_state, carnival_music_port_t1_r))
+	MCFG_DEVICE_ADD("audiocpu", I8039, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(mboard_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vicdual_state, carnival_music_port_1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vicdual_state, carnival_music_port_2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, vicdual_state, carnival_music_port_t1_r))
 
-	MCFG_SOUND_ADD("psg", AY8912, XTAL(3'579'545)/3)
+	MCFG_DEVICE_ADD("psg", AY8912, XTAL(3'579'545)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* samples */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(10)
 	MCFG_SAMPLES_NAMES(carnival_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

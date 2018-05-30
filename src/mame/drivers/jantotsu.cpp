@@ -502,11 +502,9 @@ void jantotsu_state::machine_reset()
 MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(jantotsu_map)
-	MCFG_CPU_IO_MAP(jantotsu_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jantotsu_state,  nmi_line_pulse)
-
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(jantotsu_map)
+	MCFG_DEVICE_IO_MAP(jantotsu_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -515,21 +513,22 @@ MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jantotsu_state, screen_update_jantotsu)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(jantotsu_state, jantotsu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MAIN_CLOCK/4)
+	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/4)
+	MCFG_DEVICE_ADD("sn2", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(jantotsu_state, jan_adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, jantotsu_state, jan_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -567,4 +566,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, jantotsu,  0,    jantotsu, jantotsu, jantotsu_state,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jantotsu, 0, jantotsu, jantotsu, jantotsu_state, empty_init, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", MACHINE_SUPPORTS_SAVE )

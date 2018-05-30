@@ -160,7 +160,7 @@ READ8_MEMBER(djboy_state::beast_status_r)
 
 WRITE8_MEMBER(djboy_state::trigger_nmi_on_mastercpu)
 {
-	m_mastercpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_mastercpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(djboy_state::mastercpu_bankswitch_w)
@@ -429,7 +429,7 @@ static const gfx_layout tile_layout =
 	16*16*4
 };
 
-static GFXDECODE_START( djboy )
+static GFXDECODE_START( gfx_djboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
@@ -481,30 +481,30 @@ void djboy_state::machine_reset()
 
 MACHINE_CONFIG_START(djboy_state::djboy)
 
-	MCFG_CPU_ADD("mastercpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(mastercpu_am)
-	MCFG_CPU_IO_MAP(mastercpu_port_am)
+	MCFG_DEVICE_ADD("mastercpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(mastercpu_am)
+	MCFG_DEVICE_IO_MAP(mastercpu_port_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", djboy_state, djboy_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slavecpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(slavecpu_am)
-	MCFG_CPU_IO_MAP(slavecpu_port_am)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("slavecpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(slavecpu_am)
+	MCFG_DEVICE_IO_MAP(slavecpu_port_am)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(soundcpu_am)
-	MCFG_CPU_IO_MAP(soundcpu_port_am)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(soundcpu_am)
+	MCFG_DEVICE_IO_MAP(soundcpu_port_am)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("beast", I80C51, 6000000)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(djboy_state, beast_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(djboy_state, beast_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(djboy_state, beast_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(djboy_state, beast_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(djboy_state, beast_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(djboy_state, beast_p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(djboy_state, beast_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(djboy_state, beast_p3_w))
+	MCFG_DEVICE_ADD("beast", I80C51, 6000000)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, djboy_state, beast_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, djboy_state, beast_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, djboy_state, beast_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, djboy_state, beast_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, djboy_state, beast_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, djboy_state, beast_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, djboy_state, beast_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, djboy_state, beast_p3_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -520,29 +520,30 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(djboy_state, screen_update_djboy)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(djboy_state, screen_vblank_djboy))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, djboy_state, screen_vblank_djboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki_l", 12000000 / 8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki_l", OKIM6295, 12000000 / 8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki_r", 12000000 / 8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki_r", OKIM6295, 12000000 / 8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -639,17 +640,17 @@ ROM_START( djboyj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(djboy_state,djboy)
+void djboy_state::init_djboy()
 {
 	m_bankxor = 0x00;
 }
 
-DRIVER_INIT_MEMBER(djboy_state,djboyj)
+void djboy_state::init_djboyj()
 {
 	m_bankxor = 0x1f;
 }
 
-/*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */
-GAME( 1989, djboy,  0,      djboy,   djboy, djboy_state, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboya, djboy,  djboy,   djboy, djboy_state, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboyj, djboy,  djboy,   djboy, djboy_state, djboyj,   ROT0, "Kaneko (Sega license)", "DJ Boy (Japan)", MACHINE_SUPPORTS_SAVE ) // Sega logo in FG ROM
+/*     YEAR, NAME,  PARENT, MACHINE, INPUT, STATE,       INIT,          MNTR, COMPANY,                           FULLNAME,         FLAGS */
+GAME( 1989, djboy,  0,      djboy,   djboy, djboy_state, init_djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboya, djboy,  djboy,   djboy, djboy_state, init_djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboyj, djboy,  djboy,   djboy, djboy_state, init_djboyj,   ROT0, "Kaneko (Sega license)",           "DJ Boy (Japan)", MACHINE_SUPPORTS_SAVE ) // Sega logo in FG ROM

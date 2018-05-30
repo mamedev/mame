@@ -147,7 +147,6 @@ DECLARE_DEVICE_TYPE(CBM2_USER_PORT, cbm2_user_port_device)
 
 
 // slot devices
-SLOT_INTERFACE_EXTERN( cbm2_user_port_cards );
-
+void cbm2_user_port_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_CBM2_USER_H

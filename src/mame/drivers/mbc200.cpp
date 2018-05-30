@@ -257,9 +257,10 @@ void mbc200_state::machine_reset()
 	memcpy(main, roms, 0x1000);
 }
 
-static SLOT_INTERFACE_START( mbc200_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mbc200_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 MC6845_UPDATE_ROW( mbc200_state::update_row )
 {
@@ -294,20 +295,20 @@ static const gfx_layout mbc200_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( mbc200 )
+static GFXDECODE_START( gfx_mbc200 )
 	GFXDECODE_ENTRY( "subcpu", 0x1800, mbc200_chars_8x8, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(mbc200_state::mbc200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
-	MCFG_CPU_PROGRAM_MAP(mbc200_mem)
-	MCFG_CPU_IO_MAP(mbc200_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
+	MCFG_DEVICE_PROGRAM_MAP(mbc200_mem)
+	MCFG_DEVICE_IO_MAP(mbc200_io)
 
-	MCFG_CPU_ADD("subcpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
-	MCFG_CPU_PROGRAM_MAP(mbc200_sub_mem)
-	MCFG_CPU_IO_MAP(mbc200_sub_io)
+	MCFG_DEVICE_ADD("subcpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
+	MCFG_DEVICE_PROGRAM_MAP(mbc200_sub_mem)
+	MCFG_DEVICE_IO_MAP(mbc200_sub_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,7 +317,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbc200)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mbc200)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(8'000'000) / 4) // HD46505SP
@@ -325,21 +326,21 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1000) // frequency unknown
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 1000) // frequency unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ppi_1", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mbc200_state, p1_portc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc200_state, p1_portc_w))
 
 	MCFG_DEVICE_ADD("ppi_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mbc200_state, p2_porta_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mbc200_state, p2_porta_r))
 
 	MCFG_DEVICE_ADD("ppi_m", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mbc200_state, pm_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mbc200_state, pm_portb_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mbc200_state, pm_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mbc200_state, pm_portb_w))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0) // INS8251N
 
@@ -370,5 +371,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY   FULLNAME   FLAGS
-COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, mbc200_state,  0,    "Sanyo",  "MBC-200", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1982, mbc200, 0,      0,      mbc200,  mbc200, mbc200_state, empty_init, "Sanyo", "MBC-200", 0 )

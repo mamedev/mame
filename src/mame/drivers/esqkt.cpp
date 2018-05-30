@@ -133,7 +133,7 @@ public:
 	bool  m_bCalibSecondByte;
 
 public:
-	DECLARE_DRIVER_INIT(kt);
+	void init_kt();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 	void kt(machine_config &config);
@@ -215,65 +215,66 @@ WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
 }
 
 MACHINE_CONFIG_START(esqkt_state::kt)
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(kt_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(kt_map)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X16_SQ1_ADD("sq1panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", scn2681_device, rx_b_w))
+	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", scn2681_device, rx_b_w))
 
 	MCFG_DEVICE_ADD("duart", SCN2681, 4000000)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_a))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_b))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esqkt_state, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, esqkt_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, esqkt_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, esqkt_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, esqkt_state, duart_output))
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ensoniq1", ES5506, XTAL(16'000'000))
+	MCFG_DEVICE_ADD("ensoniq1", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
 	MCFG_ES5506_CHANNELS(4)          /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(esqkt_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(esqkt_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_ES5506_IRQ_CB(WRITELINE(*this, esqkt_state, esq5506_otto_irq)) /* irq */
+	MCFG_ES5506_READ_PORT_CB(READ16(*this, esqkt_state, esq5506_read_adc))
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
-	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL(16'000'000))
+	MCFG_DEVICE_ADD("ensoniq2", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
 	MCFG_ES5506_CHANNELS(4)          /* channels */
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
 MACHINE_CONFIG_END
 
@@ -297,9 +298,9 @@ ROM_START( kt76 )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqkt_state, kt)
+void esqkt_state::init_kt()
 {
 	m_duart_io = 0;
 }
 
-CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, kt, "Ensoniq", "KT-76", MACHINE_IMPERFECT_SOUND )
+CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, init_kt, "Ensoniq", "KT-76", MACHINE_IMPERFECT_SOUND )

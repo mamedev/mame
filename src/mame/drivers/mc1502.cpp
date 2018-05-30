@@ -10,6 +10,7 @@
     - fix video errors caused by 465caf8038a120b4c1ffad9df67a1dc7474e5bb1
       "cga: treat as fixed sync monitor (nw)"
     - debug video init in BIOS 7.2
+    - pk88 (video, keyboard, etc.)
 
 ***************************************************************************/
 
@@ -25,17 +26,18 @@
 #include "speaker.h"
 
 
-#define VERBOSE_DBG 0
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_PPI       (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_VRAM)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGPPI(...) LOGMASKED(LOG_PPI, __VA_ARGS__)
+
 
 /*
  * onboard devices:
@@ -54,8 +56,7 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 		key |= m_kbdio[i]->read();
 	}
 
-//  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
-//      (key || m_kbd.pulsing) ? " will IRQ" : ""));
+	LOGKBD("k_s_c = %02X (%d) %s\n", key, m_kbd.pulsing, (key || m_kbd.pulsing) ? " will IRQ" : "");
 
 	/*
 	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
@@ -79,7 +80,6 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 {
-//  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	m_pit8253->write_gate2(BIT(data, 0));
 	mc1502_speaker_set_spkrdata(BIT(data, 1));
@@ -93,7 +93,6 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 // bit 3: i8251 SYNDET pin triggers NMI (default = 1 = no)
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 {
-//  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
 }
 
@@ -110,8 +109,8 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	data = (data & ~0x20) | (m_pit_out2 ? 0x20 : 0x00);
 	data = (data & ~0x10) | ((BIT(m_ppi_portb, 1) && m_pit_out2) ? 0x10 : 0x00);
 
-//  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//      data, tap_val, m_pit_out2, machine().describe_context()));
+	LOGPPI("mc1502_ppi_portc_r = %02X (tap_val %f t2out %d) at %s\n",
+		data, tap_val, m_pit_out2, machine().describe_context());
 	return data;
 }
 
@@ -128,7 +127,7 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 	}
 
 	key ^= 0xff;
-//  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
+	LOGPPI("mc1502_kppi_porta_r = %02X\n", key);
 	return key;
 }
 
@@ -140,14 +139,14 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
 		m_kbd.mask |= 1 << 11;
 	else
 		m_kbd.mask &= ~(1 << 11);
-//  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+	LOGPPI("mc1502_kppi_portb_w ( %02X -> %04X )\n", data, m_kbd.mask);
 }
 
 WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 {
 	m_kbd.mask &= ~(7 << 8);
 	m_kbd.mask |= ((data ^ 7) & 7) << 8;
-//  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+	LOGPPI("mc1502_kppi_portc_w ( %02X -> %04X )\n", data, m_kbd.mask);
 }
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
@@ -175,11 +174,9 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 }
 
-DRIVER_INIT_MEMBER(mc1502_state, mc1502)
+void mc1502_state::init_mc1502()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	DBG_LOG(0, "init", ("driver_init()\n"));
 
 	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
 	membank("bank10")->set_base(m_ram->pointer());
@@ -187,8 +184,6 @@ DRIVER_INIT_MEMBER(mc1502_state, mc1502)
 
 MACHINE_START_MEMBER(mc1502_state, mc1502)
 {
-	DBG_LOG(0, "init", ("machine_start()\n"));
-
 	/*
 	       Keyboard polling circuit holds IRQ1 high until a key is
 	       pressed, then it starts a timer that pulses IRQ1 low each
@@ -204,8 +199,6 @@ MACHINE_START_MEMBER(mc1502_state, mc1502)
 
 MACHINE_RESET_MEMBER(mc1502_state, mc1502)
 {
-	DBG_LOG(0, "init", ("machine_reset()\n"));
-
 	m_spkrdata = 0;
 	m_pit_out2 = 1;
 	m_ppi_portb = 0;
@@ -238,74 +231,73 @@ static INPUT_PORTS_START( mc1502 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mc1502_state::mc1502)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(16'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(mc1502_map)
-	MCFG_CPU_IO_MAP(mc1502_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(16'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(mc1502_map)
+	MCFG_DEVICE_IO_MAP(mc1502_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE( mc1502_state, mc1502 )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(16'000'000)/12) /* serial port */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out1_changed))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, mc1502_state, mc1502_pit8253_out1_changed))
 	MCFG_PIT8253_CLK2(XTAL(16'000'000)/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mc1502_state, mc1502_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mc1502_state, mc1502_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mc1502_state, mc1502_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mc1502_state, mc1502_ppi_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mc1502_state, mc1502_ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255n2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mc1502_state, mc1502_kppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mc1502_state, mc1502_kppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mc1502_state, mc1502_kppi_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mc1502_state, mc1502_kppi_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, read))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portc_w))
 
 	MCFG_DEVICE_ADD("upd8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 	/* XXX RxD data are accessible via PPI port C, bit 7 */
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(mc1502_state, mc1502_i8251_syndet))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, mc1502_state, mc1502_i8251_syndet))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_ISA8_CPU("maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
 
-	MCFG_ISA8_SLOT_ADD("isa", "board0", mc1502_isa8_cards, "cga_mc1502", true)
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", mc1502_isa8_cards, "fdc", false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa2", mc1502_isa8_cards, "rom", false)
+	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "cga_mc1502", true) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "fdc", false)
+	MCFG_DEVICE_ADD("isa2",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "rom", false)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette"); // FIXME: really no output routes for the cassette sound?
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -385,6 +377,7 @@ ROM_END
 ROM_START( pk88 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 
+	// datecode 07.23.87
 	ROM_LOAD( "b0.064", 0x0000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
 	ROM_LOAD( "b1.064", 0x2000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731))
 	ROM_LOAD( "b2.064", 0x4000, 0x2000, CRC(1ee66152) SHA1(7ed8c4c6c582487e802beabeca5b86702e5083e8))
@@ -399,6 +392,6 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       STATE         INIT      COMPANY               FULLNAME               FLAGS
-COMP ( 1989, mc1502, 0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", 0 )
-COMP ( 1988, pk88,   0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//     YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT         COMPANY               FULLNAME               FLAGS
+COMP ( 1989, mc1502, 0,      0,      mc1502,  mc1502,  mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika MS 1502", MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1988, pk88,   0,      0,      mc1502,  mc1502,  mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -156,9 +156,10 @@ FLOPPY_FORMATS_MEMBER( pt68k4_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pt68k_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void pt68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 // XT keyboard interface - done in TTL instead of an 804x
 WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
@@ -389,31 +390,32 @@ WRITE_LINE_MEMBER(pt68k4_state::duart2_irq)
 }
 
 // these are cards supported by the HUMBUG and Monk BIOSes
-SLOT_INTERFACE_START( pt68k4_isa8_cards )
-	SLOT_INTERFACE("mda", ISA8_MDA)
-	SLOT_INTERFACE("cga", ISA8_CGA)
-	SLOT_INTERFACE("ega", ISA8_EGA) // Monk only
-	SLOT_INTERFACE("vga", ISA8_VGA) // Monk only
-	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
-	SLOT_INTERFACE("wdxt_gen", ISA8_WDXT_GEN)
-	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
-SLOT_INTERFACE_END
+void pt68k4_isa8_cards(device_slot_interface &device)
+{
+	device.option_add("mda", ISA8_MDA);
+	device.option_add("cga", ISA8_CGA);
+	device.option_add("ega", ISA8_EGA); // Monk only
+	device.option_add("vga", ISA8_VGA); // Monk only
+	device.option_add("fdc_at", ISA8_FDC_AT);
+	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
+	device.option_add("lpt", ISA8_LPT);
+	device.option_add("xtide", ISA8_XTIDE); // Monk only
+}
 
 MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(16'000'000)/2)    // 68k2 came in 8, 10, and 12 MHz versions
-	MCFG_CPU_PROGRAM_MAP(pt68k2_mem)
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(16'000'000)/2)    // 68k2 came in 8, 10, and 12 MHz versions
+	MCFG_DEVICE_PROGRAM_MAP(pt68k2_mem)
 
 	MCFG_DEVICE_ADD("duart1", MC68681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(pt68k4_state, duart1_irq))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(pt68k4_state, duart1_out))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, pt68k4_state, duart1_irq))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, pt68k4_state, duart1_out))
 
 	MCFG_DEVICE_ADD("duart2", MC68681, XTAL(3'686'400))
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(pt68k4_state, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(pt68k4_state, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, pt68k4_state, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, pt68k4_state, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
@@ -423,18 +425,18 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":1", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(":" M68K_TAG)
+	MCFG_ISA8_CPU(M68K_TAG)
 	MCFG_ISA8_BUS_CUSTOM_SPACES()
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(pt68k4_state, irq5_w))
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa1", pt68k4_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa2", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa3", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa4", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa5", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa6", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(*this, pt68k4_state, irq5_w))
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "cga", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "pt68k2")
@@ -442,36 +444,36 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(pt68k4_mem)
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pt68k4_mem)
 
 	// add the DUARTS.  first one has the console on channel A at 19200.
 	MCFG_DEVICE_ADD("duart1", MC68681, XTAL(16'000'000) / 4)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(pt68k4_state, duart1_irq))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(pt68k4_state, duart1_out))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, pt68k4_state, duart1_irq))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, pt68k4_state, duart1_out))
 
 	MCFG_DEVICE_ADD("duart2", MC68681, XTAL(16'000'000) / 4)
 
 	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(pt68k4_state, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(pt68k4_state, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, pt68k4_state, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, pt68k4_state, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(":" M68K_TAG)
+	MCFG_ISA8_CPU(M68K_TAG)
 	MCFG_ISA8_BUS_CUSTOM_SPACES()
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa1", pt68k4_isa8_cards, "fdc_at", false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa2", pt68k4_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa3", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa4", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa5", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa6", pt68k4_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa7", pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "fdc_at", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "cga", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "pt68k2")
@@ -507,6 +509,6 @@ ROM_START( pt68k4 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1988, pt68k2, 0,      0,      pt68k2,  pt68k4, pt68k4_state, 0,    "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
-COMP( 1990, pt68k4, 0,      0,      pt68k4,  pt68k4, pt68k4_state, 0,    "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                  FULLNAME  FLAGS
+COMP( 1988, pt68k2, 0,      0,      pt68k2,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
+COMP( 1990, pt68k4, 0,      0,      pt68k4,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )

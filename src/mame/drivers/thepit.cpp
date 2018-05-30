@@ -692,19 +692,19 @@ static const gfx_layout suprmous_spritelayout =
 };
 
 
-static GFXDECODE_START( thepit )
+static GFXDECODE_START( gfx_thepit )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( intrepid )
+static GFXDECODE_START( gfx_intrepid )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( suprmous )
+static GFXDECODE_START( gfx_suprmous )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, suprmous_charlayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, suprmous_spritelayout, 0, 4 )
 GFXDECODE_END
@@ -719,26 +719,26 @@ INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 MACHINE_CONFIG_START(thepit_state::thepit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(thepit_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thepit_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thepit_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC42
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(thepit_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, thepit_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // marked "LOCK OUT" on Centuri schematic but never written
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(thepit_state, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(thepit_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(thepit_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, thepit_state, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thepit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)
 	MCFG_PALETTE_ADD("palette", 32+8)
 	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
 
@@ -748,50 +748,50 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay1", AY8910, PIXEL_CLOCK/4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)
+	MCFG_DEVICE_ADD("ay2", AY8910, PIXEL_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::fitter)
 	thepit(config);
 	MCFG_DEVICE_MODIFY("mainlatch") // IC42
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thepit_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, thepit_state, coin_lockout_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::desertdn)
 	fitter(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(desertdan_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(desertdan_main_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::intrepid)
 	fitter(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(intrepid_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(intrepid_main_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch") // 2F on Funny Mouse main board; IC46 on Port Man main board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(thepit_state, intrepid_graphics_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, thepit_state, intrepid_graphics_bank_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
 MACHINE_CONFIG_END
 
 
@@ -803,7 +803,7 @@ MACHINE_CONFIG_START(thepit_state::suprmous)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", suprmous)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
 MACHINE_CONFIG_END
 
 
@@ -1303,7 +1303,7 @@ READ8_MEMBER(thepit_state::rtriv_question_r)
 	return 0; // the value read from the configuration reads is discarded
 }
 
-DRIVER_INIT_MEMBER(thepit_state,rtriv)
+void thepit_state::init_rtriv()
 {
 	// Set-up the weirdest questions read ever done
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));
@@ -1314,33 +1314,33 @@ DRIVER_INIT_MEMBER(thepit_state,rtriv)
 }
 
 
-GAME( 1981, roundup,    0,        fitter,   roundup,  thepit_state, 0,     ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fitter,     roundup,  fitter,   fitter,   thepit_state, 0,     ROT90, "Taito Corporation",                           "Fitter", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fitterbl,   roundup,  fitter,   fitter,   thepit_state, 0,     ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ttfitter,   roundup,  fitter,   fitter,   thepit_state, 0,     ROT90, "Taito Corporation",                           "T.T Fitter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, roundup,    0,        fitter,   roundup,  thepit_state, empty_init, ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fitter,     roundup,  fitter,   fitter,   thepit_state, empty_init, ROT90, "Taito Corporation",                           "Fitter", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fitterbl,   roundup,  fitter,   fitter,   thepit_state, empty_init, ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttfitter,   roundup,  fitter,   fitter,   thepit_state, empty_init, ROT90, "Taito Corporation",                           "T.T Fitter (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, thepit,     0,        thepit,   thepit,   thepit_state, 0,     ROT90, "Zilec Electronics",                           "The Pit", MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
-GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, 0,     ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, 0,     ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
-GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, 0,     ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepit,     0,        thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics",                           "The Pit", MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
+GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
+GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, 0,     ROT90, "Taito Corporation",                           "Dock Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, 0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, 0,     ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, suprmous,   0,        suprmous, suprmous, thepit_state, 0,     ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, funnymou,   suprmous, suprmous, suprmous, thepit_state, 0,     ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB
+GAME( 1982, suprmous,   0,        suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funnymou,   suprmous, suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB
 
-GAME( 1982, machomou,   0,        suprmous, suprmous, thepit_state, 0,     ROT90, "Techstar",                                    "Macho Mouse", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, machomou,   0,        suprmous, suprmous, thepit_state, empty_init, ROT90, "Techstar",                                    "Macho Mouse", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, 0,     ROT0,  "Video Optics",                                "Desert Dan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, empty_init, ROT0,  "Video Optics",                                "Desert Dan", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, intrepid,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, intrepid,   0,        intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,thepit_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,thepit_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,thepit_state, empty_init, ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, zaryavos,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, zaryavos,   0,        intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, rtriv,      0,        intrepid, rtriv,    thepit_state, rtriv, ROT90, "Romar",                                       "Romar Triv", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, rtriv,      0,        intrepid, rtriv,    thepit_state, init_rtriv,  ROT90, "Romar",                                       "Romar Triv", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -184,9 +184,9 @@ protected:
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
 
 MACHINE_CONFIG_START(galgames_starpak2_cart_device::device_add_mconfig)
-	MCFG_CPU_ADD("pic", PIC16C56, XTAL(4'000'000))  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
-	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
+	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
+	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
@@ -215,10 +215,10 @@ protected:
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
 
 MACHINE_CONFIG_START(galgames_starpak3_cart_device::device_add_mconfig)
-	MCFG_CPU_ADD("pic", PIC16C56, XTAL(4'000'000))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(galgames_cart_device, int_pic_bank_w))
-	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
+	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, galgames_cart_device, int_pic_bank_w))
+	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
@@ -978,8 +978,8 @@ int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 }
 
 MACHINE_CONFIG_START(galgames_state::galgames_base)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(galgames_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -998,14 +998,14 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(24'000'000))
 	MCFG_CESBLIT_MAP(blitter_map)
 	MCFG_CESBLIT_COMPUTE_ADDR(galgames_compute_addr)
-	MCFG_CESBLIT_IRQ_CB(WRITELINE(galgames_state, blitter_irq_callback))
+	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, galgames_state, blitter_irq_callback))
 
 	MCFG_PALETTE_ADD("palette", 0x1000) // only 0x100 used
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000) / 16, PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1226,7 +1226,7 @@ ROM_START( galgame4 )
 ROM_END
 
 
-GAME( 1998, galgbios, 0,        galgbios, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 1998, galgame2, galgbios, galgame2, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
-GAME( 1998, galgame3, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
-GAME( 1998, galgame4, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 1998, galgame2, galgbios, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
+GAME( 1998, galgame3, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
+GAME( 1998, galgame4, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )

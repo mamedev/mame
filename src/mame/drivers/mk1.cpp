@@ -55,7 +55,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+		, m_led(*this, "led%u", 0U)
+	{ }
 
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
@@ -64,12 +65,16 @@ public:
 	void mk1(machine_config &config);
 	void mk1_io(address_map &map);
 	void mk1_mem(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	uint8_t m_f8[2];
-	uint8_t m_led[4];
-	virtual void machine_start() override;
+	uint8_t m_led_data[4];
 	required_device<cpu_device> m_maincpu;
 	output_finder<4> m_digits;
+	output_finder<4> m_led;
 };
 
 
@@ -106,10 +111,10 @@ WRITE8_MEMBER( mk1_state::mk1_f8_w )
 	/* 0 is high and allows also input */
 	m_f8[offset] = data;
 
-	if ( ! ( m_f8[1] & 1 ) ) m_led[0] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 2 ) ) m_led[1] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 4 ) ) m_led[2] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 8 ) ) m_led[3] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 1 ) ) m_led_data[0] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 2 ) ) m_led_data[1] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 4 ) ) m_led_data[2] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 8 ) ) m_led_data[3] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
 }
 
 void mk1_state::mk1_mem(address_map &map)
@@ -166,9 +171,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_digits[i] = m_led[i] >> 1;
-		output().set_led_value(i, m_led[i] & 0x01);
-		m_led[i] = 0;
+		m_digits[i] = m_led_data[i] >> 1;
+		m_led[i] = m_led_data[i] & 0x01;
+		m_led_data[i] = 0;
 	}
 }
 
@@ -176,6 +181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 void mk1_state::machine_start()
 {
 	m_digits.resolve();
+	m_led.resolve();
 }
 
 
@@ -187,9 +193,9 @@ F3853_INTERRUPT_REQ_CB(mk1_state::mk1_interrupt)
 
 MACHINE_CONFIG_START(mk1_state::mk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
-	MCFG_CPU_PROGRAM_MAP(mk1_mem)
-	MCFG_CPU_IO_MAP(mk1_io)
+	MCFG_DEVICE_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
+	MCFG_DEVICE_PROGRAM_MAP(mk1_mem)
+	MCFG_DEVICE_IO_MAP(mk1_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
@@ -216,5 +222,5 @@ ROM_END
 ***************************************************************************/
 
 // seams to be developed by mostek (MK)
-//    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY  FULLNAME                FLAGS
-CONS( 1979,  ccmk1,  0,      0,      mk1,     mk1,   mk1_state, 0,    "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME                FLAGS
+CONS( 1979, ccmk1, 0,      0,      mk1,     mk1,   mk1_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )

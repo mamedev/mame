@@ -103,24 +103,24 @@ void mfabfz_state::machine_reset()
 
 MACHINE_CONFIG_START(mfabfz_state::mfabfz)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
-	MCFG_CPU_IO_MAP(mfabfz_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mfabfz_mem)
+	MCFG_DEVICE_IO_MAP(mfabfz_io)
 
 	// uart1 - terminal - clock hardware unknown
 	MCFG_DEVICE_ADD("uart1_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
 
 	// uart2 - cassette - clock comes from 2MHz through a divider consisting of 4 chips and some jumpers.
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
@@ -137,13 +137,13 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(mfabfz_state::mfabfz85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
-	MCFG_CPU_IO_MAP(mfabfz85_io)
-	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_I8085A_SOD(DEVWRITELINE("rs232", rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mfabfz_mem)
+	MCFG_DEVICE_IO_MAP(mfabfz85_io)
+	MCFG_I8085A_SID(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_I8085A_SOD(WRITELINE("rs232", rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
 MACHINE_CONFIG_END
 
@@ -185,6 +185,6 @@ ROM_START( mfabfz85 )
 	ROMX_LOAD( "mfa_mat85_sp1_ed_kpl_dtp_terminal.bin", 0x0000, 0x8000, CRC(ed432c19) SHA1(31cbc06d276dbb201d50967f4ddba26a42560753), ROM_BIOS(5) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS,        INIT   COMPANY                                FULLNAME                       FLAGS */
-COMP( 1979, mfabfz,   0,      0,       mfabfz,    mfabfz,   mfabfz_state,   0, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1979, mfabfz85, mfabfz, 0,       mfabfz85,  mfabfz,   mfabfz_state,   0, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung MAT85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS,        INIT        COMPANY                         FULLNAME                               FLAGS */
+COMP( 1979, mfabfz,   0,      0,      mfabfz,   mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1979, mfabfz85, mfabfz, 0,      mfabfz85, mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung MAT85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

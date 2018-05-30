@@ -1297,12 +1297,12 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( arkanoid )
+static GFXDECODE_START( gfx_arkanoid )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 64 )
 	// sprites use the same characters above, but are 16x8
 GFXDECODE_END
 
-static GFXDECODE_START( hexa )
+static GFXDECODE_START( gfx_hexa )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,  0 , 32 )
 GFXDECODE_END
 
@@ -1343,9 +1343,9 @@ Pixel clock: 3 MHz = 192 HTotal, assuming it's 6 MHz
 MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(arkanoid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(arkanoid_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
@@ -1365,13 +1365,13 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(12'000'000)/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000)/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW) // all outputs are tied together with no resistors, and pin 26 is low
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -1393,7 +1393,7 @@ MACHINE_CONFIG_START(arkanoid_state::p3mcuay)
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
 	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
 
-	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4) // AY-3-8910A
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4) // AY-3-8910A
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -1404,15 +1404,15 @@ MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	arkanoid(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::aysnd)
 	bootleg(config);
-	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -1423,9 +1423,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(arkanoid_state::hexa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* Imported from arkanoid - correct? */
-	MCFG_CPU_PROGRAM_MAP(hexa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* Imported from arkanoid - correct? */
+	MCFG_DEVICE_PROGRAM_MAP(hexa_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1439,12 +1439,12 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexa)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1452,22 +1452,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::hexaa)
 	hexa(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hexaa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hexaa_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(12'000'000)/2) // ?
-	MCFG_CPU_PROGRAM_MAP(hexaa_sub_map)
-	MCFG_CPU_IO_MAP(hexaa_sub_iomap)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(12'000'000)/2) // ?
+	MCFG_DEVICE_PROGRAM_MAP(hexaa_sub_map)
+	MCFG_DEVICE_IO_MAP(hexaa_sub_iomap)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(arkanoid_state::brixian)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(brixian_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(brixian_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
 	/* there is a 68705 but it's only role appears to be to copy data to RAM at startup */
 	/* the RAM is also battery backed, making the 68705 almost redundant as long as the battery doesn't die(!) */
@@ -1482,12 +1482,12 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -2104,39 +2104,36 @@ void arkanoid_state::arkanoid_bootleg_init(  )
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),this) );
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkangc)
+void arkanoid_state::init_arkangc()
 {
 	m_bootleg_id = ARKANGC;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkangc2)
+void arkanoid_state::init_arkangc2()
 {
 	m_bootleg_id = ARKANGC2;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,block2)
+void arkanoid_state::init_block2()
 {
 	// the graphics on this bootleg have the data scrambled
-	int tile;
 	uint8_t* srcgfx = memregion("gfx1")->base();
 	std::vector<uint8_t> buffer(0x18000);
 
-	for (tile = 0; tile < 0x3000; tile++)
+	for (int tile = 0; tile < 0x3000; tile++)
 	{
-		int srctile;
-
 		// combine these into a single swap..
-		srctile = bitswap<16>(tile,15,14,13,12,
-						11,10,9,8,
-						7,5,6,3,
-						1,2,4,0);
+		int srctile = bitswap<16>(tile,15,14,13,12,
+									   11,10, 9, 8,
+										7, 5, 6, 3,
+										1, 2, 4, 0);
 
 		srctile = bitswap<16>(srctile,15,14,13,12,
-						11,9,10,5,
-						7,6,8,4,
-						3,2,1,0);
+									  11, 9,10, 5,
+									   7, 6, 8, 4,
+									   3, 2, 1, 0);
 
 		srctile = srctile ^ 0xd4;
 
@@ -2149,37 +2146,35 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkblock)
+void arkanoid_state::init_arkblock()
 {
 	m_bootleg_id = ARKBLOCK;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkbloc2)
+void arkanoid_state::init_arkbloc2()
 {
 	m_bootleg_id = ARKBLOC2;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkgcbl)
+void arkanoid_state::init_arkgcbl()
 {
 	m_bootleg_id = ARKGCBL;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,paddle2)
+void arkanoid_state::init_paddle2()
 {
 	m_bootleg_id = PADDLE2;
 	arkanoid_bootleg_init();
 }
 
 
-DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
+void arkanoid_state::init_tetrsark()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int x;
-
-	for (x = 0; x < 0x8000; x++)
+	for (int x = 0; x < 0x8000; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x94;
 	}
@@ -2188,12 +2183,10 @@ DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 }
 
 
-DRIVER_INIT_MEMBER(arkanoid_state,hexa)
+void arkanoid_state::init_hexa()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 #if 0
-
-
 	/* Hexa is not protected or anything, but it keeps writing 0x3f to register */
 	/* 0x07 of the AY8910, to read the input ports. This causes clicks in the */
 	/* music since the output channels are continuously disabled and reenabled. */
@@ -2207,9 +2200,9 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 	membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
+void arkanoid_state::init_hexaa()
 {
-	DRIVER_INIT_CALL(hexa);
+	init_hexa();
 
 	m_hexaa_from_main = 0;
 	m_hexaa_from_sub = 0;
@@ -2218,7 +2211,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
 	save_item(NAME(m_hexaa_from_sub));
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,brixian)
+void arkanoid_state::init_brixian()
 {
 	uint8_t *RAM = memregion("protdata")->base();
 
@@ -2230,34 +2223,34 @@ DRIVER_INIT_MEMBER(arkanoid_state,brixian)
 /* Game Drivers */
 
 // original sets of Arkanoid
-//    YEAR, NAME,        PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR,COMPANY,                                       FULLNAME,                                      FLAGS
-GAME( 1986, arkanoid,    0,        arkanoid, arkanoid,  arkanoid_state, 0,        ROT90,  "Taito Corporation Japan",                     "Arkanoid (World, older)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkanoidu,   arkanoid, arkanoid, arkanoid,  arkanoid_state, 0,        ROT90,  "Taito America Corporation (Romstar license)", "Arkanoid (US, newer)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkanoiduo,  arkanoid, arkanoid, arkanoid,  arkanoid_state, 0,        ROT90,  "Taito America Corporation (Romstar license)", "Arkanoid (US, older)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkanoidj,   arkanoid, arkanoid, arkanoidj, arkanoid_state, 0,        ROT90,  "Taito Corporation",                           "Arkanoid (Japan, newer)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkanoidja,  arkanoid, arkanoid, arkanoidj, arkanoid_state, 0,        ROT90,  "Taito Corporation",                           "Arkanoid (Japan, newer w/level select)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjb,  arkanoid, arkanoid, arkanoidj, arkanoid_state, 0,        ROT90,  "Taito Corporation",                           "Arkanoid (Japan, older)",                     MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,         PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR,COMPANY,                                       FULLNAME,                                      FLAGS
+GAME( 1986, arkanoid,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,    ROT90, "Taito Corporation Japan",                     "Arkanoid (World, older)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidu,    arkanoid, arkanoid, arkanoid,  arkanoid_state, empty_init,    ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, newer)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoiduo,   arkanoid, arkanoid, arkanoid,  arkanoid_state, empty_init,    ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidj,    arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,    ROT90, "Taito Corporation",                           "Arkanoid (Japan, newer)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidja,   arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,    ROT90, "Taito Corporation",                           "Arkanoid (Japan, newer w/level select)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjb,   arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,    ROT90, "Taito Corporation",                           "Arkanoid (Japan, older)",                     MACHINE_SUPPORTS_SAVE )
 // bootlegs of Arkanoid
-GAME( 1986, arkanoidjbl, arkanoid, p3mcu,    arkanoidj, arkanoid_state, 0,        ROT90,  "bootleg",                                     "Arkanoid (bootleg with MCU, set 1)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjbl2,arkanoid, p3mcu,    arkanoidj, arkanoid_state, 0,        ROT90,  "bootleg (Beta)",                              "Arkanoid (bootleg with MCU, set 2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ark1ball,    arkanoid, p3mcuay,  ark1ball,  arkanoid_state, 0,        ROT90,  "bootleg",                                     "Arkanoid (bootleg with MCU, harder)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkangc,     arkanoid, bootleg,  arkangc,   arkanoid_state, arkangc,  ROT90,  "bootleg (Game Corporation)",                  "Arkanoid (Game Corporation bootleg, set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkangc2,    arkanoid, bootleg,  arkangc2,  arkanoid_state, arkangc2, ROT90,  "bootleg (Game Corporation)",                  "Arkanoid (Game Corporation bootleg, set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkblock,    arkanoid, bootleg,  arkangc,   arkanoid_state, arkblock, ROT90,  "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkbloc2,    arkanoid, bootleg,  arkangc,   arkanoid_state, arkbloc2, ROT90,  "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkbloc3,    arkanoid, bootleg,  block2,    arkanoid_state, block2,   ROT90,  "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 3)",     MACHINE_SUPPORTS_SAVE ) // Both these sets (arkblock3, block2) have an extra unknown rom
-GAME( 1986, block2,      arkanoid, bootleg,  block2,    arkanoid_state, block2,   ROT90,  "bootleg (S.P.A. Co.)",                        "Block 2 (S.P.A. Co. bootleg)",                MACHINE_SUPPORTS_SAVE ) //  and scrambled gfx roms with 'space invader' themed gfx
-GAME( 1986, arkgcbl,     arkanoid, aysnd,    arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkgcbla,    arkanoid, aysnd,    arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, paddle2,     arkanoid, bootleg,  paddle2,   arkanoid_state, paddle2,  ROT90,  "bootleg",                                     "Paddle 2 (bootleg on Block hardware)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkatayt,    arkanoid, aysnd,    arkatayt,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arktayt2,    arkanoid, aysnd,    arktayt2,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjbl,  arkanoid, p3mcu,    arkanoidj, arkanoid_state, empty_init,    ROT90, "bootleg",                                     "Arkanoid (bootleg with MCU, set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjbl2, arkanoid, p3mcu,    arkanoidj, arkanoid_state, empty_init,    ROT90, "bootleg (Beta)",                              "Arkanoid (bootleg with MCU, set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ark1ball,     arkanoid, p3mcuay,  ark1ball,  arkanoid_state, empty_init,    ROT90, "bootleg",                                     "Arkanoid (bootleg with MCU, harder)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkangc,      arkanoid, bootleg,  arkangc,   arkanoid_state, init_arkangc,  ROT90, "bootleg (Game Corporation)",                  "Arkanoid (Game Corporation bootleg, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkangc2,     arkanoid, bootleg,  arkangc2,  arkanoid_state, init_arkangc2, ROT90, "bootleg (Game Corporation)",                  "Arkanoid (Game Corporation bootleg, set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkblock,     arkanoid, bootleg,  arkangc,   arkanoid_state, init_arkblock, ROT90, "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkbloc2,     arkanoid, bootleg,  arkangc,   arkanoid_state, init_arkbloc2, ROT90, "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkbloc3,     arkanoid, bootleg,  block2,    arkanoid_state, init_block2,   ROT90, "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 3)",     MACHINE_SUPPORTS_SAVE ) // Both these sets (arkblock3, block2) have an extra unknown rom
+GAME( 1986, block2,       arkanoid, bootleg,  block2,    arkanoid_state, init_block2,   ROT90, "bootleg (S.P.A. Co.)",                        "Block 2 (S.P.A. Co. bootleg)",                MACHINE_SUPPORTS_SAVE ) //  and scrambled gfx roms with 'space invader' themed gfx
+GAME( 1986, arkgcbl,      arkanoid, aysnd,    arkgcbl,   arkanoid_state, init_arkgcbl,  ROT90, "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkgcbla,     arkanoid, aysnd,    arkgcbl,   arkanoid_state, init_arkgcbl,  ROT90, "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, paddle2,      arkanoid, bootleg,  paddle2,   arkanoid_state, init_paddle2,  ROT90, "bootleg",                                     "Paddle 2 (bootleg on Block hardware)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkatayt,     arkanoid, aysnd,    arkatayt,  arkanoid_state, empty_init,    ROT90, "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arktayt2,     arkanoid, aysnd,    arktayt2,  arkanoid_state, empty_init,    ROT90, "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
 // Other games
-GAME( 1987, arkatour,    0,        arkanoid, arkanoid,  arkanoid_state, 0,        ROT90,  "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arkatour,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,    ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)",                    MACHINE_SUPPORTS_SAVE )
 
-GAME( 19??, tetrsark,    0,        bootleg,  tetrsark,  arkanoid_state, tetrsark, ROT0,   "D.R. Korea",                                  "Tetris (D.R. Korea)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 19??, tetrsark,     0,        bootleg,  tetrsark,  arkanoid_state, init_tetrsark, ROT0,  "D.R. Korea",                                  "Tetris (D.R. Korea)",                         MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, hexa,        0,        hexa,     hexa,      arkanoid_state, hexa,     ROT0,   "D.R. Korea",                                  "Hexa",                                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, hexaa,       hexa,     hexaa,    hexa,      arkanoid_state, hexaa,    ROT0,   "D.R. Korea",                                  "Hexa (with 2xZ80, protected)",                MACHINE_NOT_WORKING )
+GAME( 199?, hexa,         0,        hexa,     hexa,      arkanoid_state, init_hexa,     ROT0,  "D.R. Korea",                                  "Hexa",                                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, hexaa,        hexa,     hexaa,    hexa,      arkanoid_state, init_hexaa,    ROT0,  "D.R. Korea",                                  "Hexa (with 2xZ80, protected)",                MACHINE_NOT_WORKING )
 
-GAME( 1993, brixian,     0,        brixian,  brixian,   arkanoid_state, brixian,  ROT0,   "Cheil Computer System",                       "Brixian",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, brixian,      0,        brixian,  brixian,   arkanoid_state, init_brixian,  ROT0,  "Cheil Computer System",                       "Brixian",                                     MACHINE_SUPPORTS_SAVE )

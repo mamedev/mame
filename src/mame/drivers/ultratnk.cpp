@@ -70,7 +70,7 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x40);
 
 	if (ioport("IN0")->read() & 0x40)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_nmi_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
@@ -132,16 +132,6 @@ WRITE8_MEMBER(ultratnk_state::collision_reset_w)
 WRITE8_MEMBER(ultratnk_state::da_latch_w)
 {
 	m_da_latch = data & 15;
-}
-
-
-WRITE_LINE_MEMBER(ultratnk_state::led_1_w)
-{
-	output().set_led_value(0, state); /* left player start */
-}
-WRITE_LINE_MEMBER(ultratnk_state::led_2_w)
-{
-	output().set_led_value(1, state); /* right player start */
 }
 
 
@@ -293,7 +283,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( ultratnk )
+static GFXDECODE_START( gfx_ultratnk )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 5 )
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 5 )
 GFXDECODE_END
@@ -302,15 +292,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(ultratnk_cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(ultratnk_cpu_map)
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // E11
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ultratnk_state, lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ultratnk_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ultratnk_state, led_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_2>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_1>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ultratnk_state, lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) // LED1 (left player start)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) // LED2 (right player start)
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_2>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_1>))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -319,19 +309,18 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ultratnk_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ultratnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ultratnk)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(ultratnk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, ultratnk_discrete)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -362,4 +351,4 @@ ROM_START( ultratnk )
 ROM_END
 
 
-GAME( 1978, ultratnk, 0, ultratnk, ultratnk, ultratnk_state, 0, 0, "Atari (Kee Games)", "Ultra Tank", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, ultratnk, 0, ultratnk, ultratnk, ultratnk_state, empty_init, ROT0, "Atari (Kee Games)", "Ultra Tank", MACHINE_SUPPORTS_SAVE )

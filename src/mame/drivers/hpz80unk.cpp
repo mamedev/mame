@@ -162,34 +162,34 @@ void hpz80unk_state::machine_reset()
 
 MACHINE_CONFIG_START(hpz80unk_state::hpz80unk)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hpz80unk_mem)
-	MCFG_CPU_IO_MAP(hpz80unk_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hpz80unk_mem)
+	MCFG_DEVICE_IO_MAP(hpz80unk_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart1", AY51013, 0) // COM2502
 	MCFG_AY51013_TX_CLOCK(153600)
 	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232a", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232a", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_AY51013_AUTO_RDAV(true)
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
 
 	MCFG_DEVICE_ADD("uart2", AY51013, 0) // COM2502
 	MCFG_AY51013_TX_CLOCK(153600)
 	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232b", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232b", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_AY51013_AUTO_RDAV(true)
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
 
 	MCFG_DEVICE_ADD("uart3", AY51013, 0) // COM2502
 	MCFG_AY51013_TX_CLOCK(153600)
 	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232c", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232c", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232c", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232c", rs232_port_device, write_txd))
 	MCFG_AY51013_AUTO_RDAV(true)
-	MCFG_RS232_PORT_ADD("rs232c", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -217,5 +217,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY            FULLNAME                       FLAGS
-COMP( 1977, hpz80unk, 0,      0,       hpz80unk,  hpz80unk, hpz80unk_state, 0,    "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME                       FLAGS
+COMP( 1977, hpz80unk, 0,      0,      hpz80unk, hpz80unk, hpz80unk_state, empty_init, "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

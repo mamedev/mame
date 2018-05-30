@@ -411,7 +411,7 @@ static const gfx_layout projectile_layout =
 	1
 };
 
-static GFXDECODE_START( istrebiteli )
+static GFXDECODE_START( gfx_istrebiteli )
 	GFXDECODE_ENTRY( "chars", 0x0000, char_layout, 0, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 2, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 0, 2 )
@@ -420,18 +420,18 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(istrebiteli_state, sound_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, istrebiteli_state, sound_w))
 
 	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(istrebiteli_state, spr0_ctrl_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(istrebiteli_state, spr1_ctrl_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, istrebiteli_state, spr0_ctrl_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, istrebiteli_state, spr1_ctrl_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -440,13 +440,13 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istrebiteli)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istrebiteli)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, istrebiteli)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -471,4 +471,25 @@ ROM_START( istreb )
 	ROM_LOAD( "003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-GAME( 198?, istreb,  0,        istreb,  istreb,  istrebiteli_state,  0, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+// hardware is similar to Istrebiteli, but RAM location and IO is different
+ROM_START( motogonki )
+	ROM_REGION( 0x2000, I8080_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "005_mb3.b2",   0x000, 0x2000, CRC(4dd35ed6) SHA1(6a0ee9e370634e501b6ee15a9747a491b745a205) )
+
+	ROM_REGION( 0x200, "chars", 0 )
+	ROM_LOAD( "003_ig8.g8", 0x000, 0x200, CRC(9af1e9de) SHA1(4bc89bc0c1f229ca3ebee983ae2fb3910d8ca599) )
+
+	ROM_REGION( 0x1000, "sprite", 0 ) // gfx layout is not correct
+	ROM_LOAD( "006_b1.b1",  0x000, 0x200, CRC(ae9820fb) SHA1(7727d20e314aee670ba36ca6ea7ca5a4da0fc1cd) )
+	ROM_LOAD( "006_02.b5",  0x200, 0x200, CRC(e5c17daf) SHA1(1b6ffeba7dd98da11e5eb953280dd53f0f77fa7f) )
+	ROM_LOAD( "006_03.b7",  0x400, 0x200, CRC(e1731d8d) SHA1(744fd768754a65a66bfcdb1959b4d6796bff4fcb) )
+	ROM_LOAD( "006_05.b3",  0x600, 0x100, CRC(7dc4f9c9) SHA1(8a40f9f021b1662b1c638c7fdcefead1687ca4f1) )
+	ROM_LOAD( "006_01.d3",  0x700, 0x100, CRC(b53b83c9) SHA1(8f9733c827cc9aacc7c182585dcbc5da01357468) )
+	ROM_LOAD( "006_04.w13", 0x800, 0x100, CRC(6d6441f6) SHA1(999356e5b31a03c667d6cb975210e058e340509e) )
+
+	ROM_REGION(0x200, "soundrom", 0)
+	ROM_LOAD( "003_iw3.w3", 0x000, 0x200, CRC(814854ba) SHA1(2cbfd60df01f00d7659393efa58547de660bf201) )
+ROM_END
+
+GAME( 198?, istreb,    0, istreb, istreb, istrebiteli_state, empty_init, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 198?, motogonki, 0, istreb, istreb, istrebiteli_state, empty_init, ROT0, "Terminal", "Motogonki", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

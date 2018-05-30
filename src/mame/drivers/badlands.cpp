@@ -427,7 +427,7 @@ static const gfx_layout badlands_molayout =
 	64*8
 };
 
-static GFXDECODE_START( badlands )
+static GFXDECODE_START( gfx_badlands )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,           0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
@@ -443,12 +443,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(badlands_state::badlands)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
 
-	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlands_state, sound_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlands)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -481,9 +481,9 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -536,7 +536,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(badlands_state,badlands)
+void badlands_state::init_badlands()
 {
 	/* initialize the audio system */
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x01000);
@@ -550,4 +550,4 @@ DRIVER_INIT_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "Atari Games", "Bad Lands", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, badlands, 0, badlands, badlands, badlands_state, init_badlands, ROT0, "Atari Games", "Bad Lands", MACHINE_SUPPORTS_SAVE )

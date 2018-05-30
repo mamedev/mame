@@ -80,8 +80,8 @@ void ms9540_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(ms9540_state::ms9540)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -103,5 +103,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY               FULLNAME  FLAGS
-COMP( 198?, ms9540, 0,      0,      ms9540,  ms9540, ms9540_state, 0,    "Millennium Systems", "ms9540", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY               FULLNAME  FLAGS
+COMP( 198?, ms9540, 0,      0,      ms9540,  ms9540, ms9540_state, empty_init, "Millennium Systems", "ms9540", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -73,7 +73,7 @@ static INPUT_PORTS_START( blocktax )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(blocktax_state::blocktax)
-	MCFG_CPU_ADD("maincpu", I80C51, 30_MHz_XTAL/2) /* P89C51RD2HBA (80C51 with internal flash rom) */
+	MCFG_DEVICE_ADD("maincpu", I80C51, 30_MHz_XTAL/2) /* P89C51RD2HBA (80C51 with internal flash rom) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -86,9 +86,9 @@ MACHINE_CONFIG_START(blocktax_state::blocktax)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 30_MHz_XTAL/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 30_MHz_XTAL/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.00)
 MACHINE_CONFIG_END
 
@@ -108,4 +108,4 @@ ROM_START( blocktax )
 ROM_END
 
 
-GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, 0, ROT0,  "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )
+GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, empty_init, ROT0, "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )

@@ -164,15 +164,15 @@ static const gfx_layout tk80bs_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( tk80bs )
+static GFXDECODE_START( gfx_tk80bs )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tk80bs_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000)) //unknown clock
-	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(1'000'000)) //unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(tk80bs_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -184,12 +184,12 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk80bs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk80bs)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(tk80bs_state, port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(tk80bs_state, port_b_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, tk80bs_state, port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, tk80bs_state, port_b_r))
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(tk80bs_state, kbd_put))
@@ -223,5 +223,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS        INIT  COMPANY  FULLNAME   FLAGS
-COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   tk80bs_state, 0,   "NEC",   "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1980, tk80bs, tk80,   0,      tk80bs,  tk80bs, tk80bs_state, empty_init, "NEC",   "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

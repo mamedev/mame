@@ -97,7 +97,7 @@ WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 
 WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -494,7 +494,7 @@ static const gfx_layout sprite_layout =
 
 
 
-static GFXDECODE_START( cabal )
+static GFXDECODE_START( gfx_cabal )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, text_layout,   0, 1024/4 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,   32*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x000000, sprite_layout, 16*16, 16 )
@@ -504,13 +504,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cabal_state::cabal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
@@ -524,33 +524,33 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
+	MCFG_DEVICE_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
+	MCFG_DEVICE_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cabal_state::cabalt)
 	cabal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trackball_main_map)
 
 	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("IN0")
@@ -566,8 +566,8 @@ MACHINE_CONFIG_START(cabal_state::cabalbl2)
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(cabalbl2_sound_map)
-	MCFG_CPU_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl2_sound_map)
+	MCFG_DEVICE_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -575,23 +575,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cabal_state::cabalbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_sound_map)
 
 	/* there are 2x z80s for the ADPCM */
-	MCFG_CPU_ADD("adpcm_1", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_talk1_map)
-	MCFG_CPU_IO_MAP(cabalbl_talk1_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
+	MCFG_DEVICE_ADD("adpcm_1", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_talk1_map)
+	MCFG_DEVICE_IO_MAP(cabalbl_talk1_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
 
-	MCFG_CPU_ADD("adpcm_2", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cabalbl_talk2_map)
-	MCFG_CPU_IO_MAP(cabalbl_talk2_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
+	MCFG_DEVICE_ADD("adpcm_2", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cabalbl_talk2_map)
+	MCFG_DEVICE_IO_MAP(cabalbl_talk2_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -607,26 +607,26 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator) */
+	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator) */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator)*/
+	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator)*/
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -967,19 +967,19 @@ ROM_START( cabalbl2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cabal_state,cabal)
+void cabal_state::init_cabal()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
 
-GAME( 1988, cabal,    0,     cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabala,   cabal, cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
-GAME( 1989, cabalukj, cabal, cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl,  cabal, cabalbl, cabalbl, cabal_state,  0,      ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl2, cabal, cabalbl2,cabalj,  cabal_state,  cabal,  ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabal,    0,     cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabala,   cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
+GAME( 1989, cabalukj, cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl,  cabal, cabalbl,  cabalbl, cabal_state, empty_init, ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2, cabal, cabalbl2, cabalj,  cabal_state, init_cabal, ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cabalus,  cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalus2, cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabaluk,  cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus2, cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabaluk,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )

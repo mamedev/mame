@@ -1113,8 +1113,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 				m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
-			output().set_led_value(1, data & 0x08);
-			output().set_led_value(0, data & 0x04);
+			m_lamp[1] = BIT(data, 3);
+			m_lamp[0] = BIT(data, 2);
 			machine().bookkeeping().coin_counter_w(1, data & 0x02);
 			machine().bookkeeping().coin_counter_w(0, data & 0x01);
 			return;
@@ -1237,7 +1237,7 @@ READ8_MEMBER( segas16b_state::upd7759_status_r )
 WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
 {
 	if (state)
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -3703,11 +3703,11 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segas16b )
+static GFXDECODE_START( gfx_segas16b )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 1024 )
 GFXDECODE_END
 
-static GFXDECODE_START( lockonph )
+static GFXDECODE_START( gfx_lockonph )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   0, 1024 )
 GFXDECODE_END
 
@@ -3718,13 +3718,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segas16b_state::system16b)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3734,7 +3734,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas16b)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3747,44 +3747,44 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ym2151", MASTER_CLOCK_8MHz/2)
+	MCFG_DEVICE_ADD("ym2151", YM2151, MASTER_CLOCK_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas16b_state,upd7759_generate_nmi))
+	MCFG_DEVICE_ADD("upd", UPD7759)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas16b_state,upd7759_generate_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_mc8123)
 	system16b(config);
-	MCFG_CPU_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_fd1089a)
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_fd1089b)
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_fd1094)
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
@@ -3800,13 +3800,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, i8751_main_cpu_vblank)
 
-	MCFG_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SERVICE"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(segas16b_state, spin_68k_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16b_state, spin_68k_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
@@ -3837,15 +3837,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_split)
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(system16b_bootleg_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_x)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(system16b_bootleg_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map_x)
 
 	MCFG_DEVICE_REMOVE("mapper")
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
-	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
@@ -3883,12 +3883,12 @@ MACHINE_CONFIG_START(segas16b_state::fpointbl)
 	MCFG_DEVICE_REMOVE("sprites")
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fpointbl_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_sound_map)
-	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(fpointbl_sound_map)
+	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
@@ -3904,12 +3904,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::fpointbla)
 	fpointbl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(map_fpointbla)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
@@ -3918,19 +3918,19 @@ MACHINE_CONFIG_START(segas16b_state::fpointbla)
 MACHINE_CONFIG_START(segas16b_state::lockonph)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
-	MCFG_CPU_PROGRAM_MAP(lockonph_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
+	MCFG_DEVICE_PROGRAM_MAP(lockonph_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
-	MCFG_CPU_PROGRAM_MAP(lockonph_sound_map)
-	MCFG_CPU_IO_MAP(lockonph_sound_iomap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(lockonph_sound_map)
+	MCFG_DEVICE_IO_MAP(lockonph_sound_iomap)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockonph)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)
 	MCFG_PALETTE_ADD("palette", 0x2000*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3943,17 +3943,17 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) // ??
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) // ??
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // clock / pin not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
@@ -3977,7 +3977,7 @@ MACHINE_CONFIG_START(segas16b_state::atomicp) // 10MHz CPU Clock verified
 
 	// sound hardware
 	MCFG_DEVICE_REMOVE("ym2151")
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("upd")
@@ -3986,8 +3986,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16c)
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(system16c_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(system16c_map)
 MACHINE_CONFIG_END
 
 
@@ -8937,12 +8937,12 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 //  initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16b_state,generic_5358_small) { init_generic(ROM_BOARD_171_5358_SMALL); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5358) { init_generic(ROM_BOARD_171_5358); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5521) { init_generic(ROM_BOARD_171_5521); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5704) { init_generic(ROM_BOARD_171_5704); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5797) { init_generic(ROM_BOARD_171_5797); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
+void segas16b_state::init_generic_5358_small() { init_generic(ROM_BOARD_171_5358_SMALL); }
+void segas16b_state::init_generic_5358() { init_generic(ROM_BOARD_171_5358); }
+void segas16b_state::init_generic_5521() { init_generic(ROM_BOARD_171_5521); }
+void segas16b_state::init_generic_5704() { init_generic(ROM_BOARD_171_5704); }
+void segas16b_state::init_generic_5797() { init_generic(ROM_BOARD_171_5797); }
+void segas16b_state::init_generic_korean()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
@@ -8955,7 +8955,7 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
-DRIVER_INIT_MEMBER(segas16b_state, lockonph)
+void segas16b_state::init_lockonph()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
@@ -8966,7 +8966,7 @@ DRIVER_INIT_MEMBER(segas16b_state, lockonph)
 
 	m_spritepalbase = 0x800; // tiles are 4bpp so sprite base is 0x800 instead of 0x400
 }
-DRIVER_INIT_MEMBER(segas16b_state, generic_bootleg)
+void segas16b_state::init_generic_bootleg()
 {
 	init_generic(ROM_BOARD_KOREAN);
 	m_disable_screen_blanking = true;
@@ -8978,78 +8978,78 @@ DRIVER_INIT_MEMBER(segas16b_state, generic_bootleg)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16b_state,aceattac_5358)
+void segas16b_state::init_aceattac_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::aceattac_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::aceattac_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
+void segas16b_state::init_aliensyn7_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeasj_5521)
+void segas16b_state::init_altbeasj_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeasj_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeas5_5521)
+void segas16b_state::init_altbeas5_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeas5_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeas4_5521)
+void segas16b_state::init_altbeas4_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,ddux_5704)
+void segas16b_state::init_ddux_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::ddux_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,dunkshot_5358_small)
+void segas16b_state::init_dunkshot_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::dunkshot_custom_io_r), this);
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,exctleag_5358)
+void segas16b_state::init_exctleag_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,hwchamp_5521)
+void segas16b_state::init_hwchamp_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::hwchamp_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::hwchamp_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,passshtj_5358)
+void segas16b_state::init_passshtj_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::passshtj_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,cencourt_5358)
+void segas16b_state::init_cencourt_5358()
 {
-	DRIVER_INIT_CALL(passshtj_5358);
+	init_passshtj_5358();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
+void segas16b_state::init_sdi_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 
 	if (memregion("maincpux") != nullptr)
@@ -9059,9 +9059,9 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	}
 }
 
-DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
+void segas16b_state::init_fpointbla()
 {
-	DRIVER_INIT_CALL(generic_bootleg);
+	init_generic_bootleg();
 
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -9071,53 +9071,53 @@ DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
 	}
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,defense_5358_small)
+void segas16b_state::init_defense_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,shinobi4_5521)
+void segas16b_state::init_shinobi4_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,shinobi3_5358)
+void segas16b_state::init_shinobi3_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,sjryuko_5358_small)
+void segas16b_state::init_sjryuko_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sjryuko_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::sjryuko_custom_io_w), this);
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,timescan_5358_small)
+void segas16b_state::init_timescan_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,tturf_5704)
+void segas16b_state::init_tturf_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::tturf_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,wb3_5704)
+void segas16b_state::init_wb3_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::wb3_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,snapper)
+void segas16b_state::init_snapper()
 {
-	DRIVER_INIT_CALL(generic_korean);
+	init_generic_korean();
 	m_atomicp_sound_divisor = 4;
 }
 
@@ -9128,208 +9128,208 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 //**************************************************************************
 
 //    YEAR, NAME,       PARENT,   MACHINE,             INPUT,    INIT,               MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, aceattac,   0,        aceattacb_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
+GAME( 1988, aceattac,   0,        aceattacb_fd1094,      aceattac, segas16b_state, init_aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
 
-GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
-GAME( 1987, aliensyn7,  aliensyn, system16b_mc8123,    aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
-GAME( 1987, aliensyn3,  aliensyn, system16b_fd1089a,   aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
-GAME( 1987, aliensynj,  aliensyn, system16b_fd1089a,   aliensynj,segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
+GAME( 1987, aliensyn,   0,        system16b,             aliensyn, segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
+GAME( 1987, aliensyn7,  aliensyn, system16b_mc8123,      aliensyn, segas16b_state, init_aliensyn7_5358_small, ROT0, "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
+GAME( 1987, aliensyn3,  aliensyn, system16b_fd1089a,     aliensyn, segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
+GAME( 1987, aliensynj,  aliensyn, system16b_fd1089a,     aliensynj,segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
 
-GAME( 1986, afightere,  afighter, system16b,           afighter_analog,afighter_16b_analog_state,generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, unprotected, analog controls)", 0 )
-GAME( 1986, afighterf,  afighter, system16b_fd1089b,   afighter_analog,afighter_16b_analog_state,generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown, analog controls)", 0 ) // encrypted version of afightere
-GAME( 1986, afighterg,  afighter, system16b_fd1089b,   afighter,       segas16b_state,           generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown)", 0 ) // same encryption as afighterf
-GAME( 1986, afighterh,  afighter, system16b_fd1089a,   afighter,       segas16b_state,           generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089A 317-0018)", 0 ) // same rev as afighterg
+GAME( 1986, afightere,  afighter, system16b,             afighter_analog, afighter_16b_analog_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, unprotected, analog controls)", 0 )
+GAME( 1986, afighterf,  afighter, system16b_fd1089b,     afighter_analog, afighter_16b_analog_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown, analog controls)", 0 ) // encrypted version of afightere
+GAME( 1986, afighterg,  afighter, system16b_fd1089b,     afighter, segas16b_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown)", 0 ) // same encryption as afighterf
+GAME( 1986, afighterh,  afighter, system16b_fd1089a,     afighter, segas16b_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089A 317-0018)", 0 ) // same rev as afighterg
 
-GAME( 1988, altbeast,   0,        system16b_i8751,     altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Altered Beast (set 8) (8751 317-0078)", 0 )
-GAME( 1988, altbeastj,  altbeast, system16b_i8751,     altbeast, segas16b_state,altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
-GAME( 1988, altbeast6,  altbeast, system16b_i8751,     altbeast, segas16b_state,altbeas5_5521,      ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
-GAME( 1988, altbeast5,  altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Altered Beast (set 5) (FD1094 317-0069)", 0 )
-GAME( 1988, altbeast4,  altbeast, system16b_mc8123,    altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4) (MC-8123B 317-0066)", 0 )
-GAME( 1988, altbeastj3, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan) (FD1094 317-0068)", 0 )
-GAME( 1988, altbeast2,  altbeast, system16b_mc8123,    altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2) (MC-8123B 317-0066)", 0 )
-GAME( 1988, altbeastj1, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan) (FD1094 317-0065)", 0 )
+GAME( 1988, altbeast,   0,        system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 8) (8751 317-0078)", 0 )
+GAME( 1988, altbeastj,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
+GAME( 1988, altbeast6,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeas5_5521,      ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
+GAME( 1988, altbeast5,  altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 5) (FD1094 317-0069)", 0 )
+GAME( 1988, altbeast4,  altbeast, system16b_mc8123,      altbeast, segas16b_state, init_altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4) (MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeastj3, altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan) (FD1094 317-0068)", 0 )
+GAME( 1988, altbeast2,  altbeast, system16b_mc8123,      altbeast, segas16b_state, init_altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2) (MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeastj1, altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan) (FD1094 317-0065)", 0 )
 
-GAME( 1990, aurail,     0,        system16b,           aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 3, US) (unprotected)", 0 )
-GAME( 1990, aurail1,    aurail,   system16b_fd1089b,   aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 2, World) (FD1089B 317-0168)", 0 )
-GAME( 1990, aurailj,    aurail,   system16b_fd1089a,   aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 1, Japan) (FD1089A 317-0167)", 0 )
+GAME( 1990, aurail,     0,        system16b,             aurail,   segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 3, US) (unprotected)", 0 )
+GAME( 1990, aurail1,    aurail,   system16b_fd1089b,     aurail,   segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 2, World) (FD1089B 317-0168)", 0 )
+GAME( 1990, aurailj,    aurail,   system16b_fd1089a,     aurail,   segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 1, Japan) (FD1089A 317-0167)", 0 )
 
-GAME( 1989, bayroute,   0,        system16b_fd1094,    bayroute, segas16b_state,generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World) (FD1094 317-0116)", 0 )
-GAME( 1989, bayroutej,  bayroute, system16b_fd1094,    bayroute, segas16b_state,generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan) (FD1094 317-0115)", 0 )
-GAME( 1989, bayroute1,  bayroute, system16b,           bayroute, segas16b_state,generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", 0 )
+GAME( 1989, bayroute,   0,        system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World) (FD1094 317-0116)", 0 )
+GAME( 1989, bayroutej,  bayroute, system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan) (FD1094 317-0115)", 0 )
+GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", 0 )
 
-GAME( 1987, bullet,     0,        system16b_fd1094,    bullet,   segas16b_state,generic_5358_small, ROT0,   "Sega", "Bullet (FD1094 317-0041)", 0 )
+GAME( 1987, bullet,     0,        system16b_fd1094,      bullet,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Bullet (FD1094 317-0041)", 0 )
 
 // Charon
 
-GAME( 1991, cotton,     0,        system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 4, World) (FD1094 317-0181a)", 0 )
-GAME( 1991, cottonu,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 3, US) (FD1094 317-0180)", 0 )
-GAME( 1991, cottonj,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 2, Japan, Rev B) (FD1094 317-0179b)", 0 )
-GAME( 1991, cottonja,   cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 1, Japan, Rev A) (FD1094 317-0179a)", 0 )
+GAME( 1991, cotton,     0,        system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 4, World) (FD1094 317-0181a)", 0 )
+GAME( 1991, cottonu,    cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 3, US) (FD1094 317-0180)", 0 )
+GAME( 1991, cottonj,    cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 2, Japan, Rev B) (FD1094 317-0179b)", 0 )
+GAME( 1991, cottonja,   cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 1, Japan, Rev A) (FD1094 317-0179a)", 0 )
 
-GAME( 1988, ddux,       0,        system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 3, World) (FD1094 317-0096)", 0 )
-GAME( 1988, dduxj,      ddux,     system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan) (FD1094 317-0094)", 0 )
-GAME( 1988, ddux1,      ddux,     system16b_i8751,     ddux,     segas16b_state,ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1) (8751 317-0095)", 0 )
+GAME( 1988, ddux,       0,        system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 3, World) (FD1094 317-0096)", 0 )
+GAME( 1988, dduxj,      ddux,     system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan) (FD1094 317-0094)", 0 )
+GAME( 1988, ddux1,      ddux,     system16b_i8751,       ddux,     segas16b_state, init_ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1) (8751 317-0095)", 0 )
 
-GAME( 1987, dunkshot,   0,        system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
-GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
-GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
+GAME( 1987, dunkshot,   0,        system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
+GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
+GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
-GAME( 1989, eswat,      0,        system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World) (FD1094 317-0130)", 0 )
-GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US) (FD1094 317-0129)", 0 )
-GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, Japan) (FD1094 317-0128)", 0 )
-GAME( 1989, eswatj1,    eswat,    system16b_fd1094,     eswat,   segas16b_state,generic_5704,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan) (FD1094 317-0131)", 0 )
+GAME( 1989, eswat,      0,        system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World) (FD1094 317-0130)", 0 )
+GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US) (FD1094 317-0129)", 0 )
+GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, Japan) (FD1094 317-0128)", 0 )
+GAME( 1989, eswatj1,    eswat,    system16b_fd1094,      eswat,    segas16b_state, init_generic_5704,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan) (FD1094 317-0131)", 0 )
 
-GAME( 1988, exctleag,   0,        system16b_fd1094,    exctleag, segas16b_state,exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
+GAME( 1988, exctleag,   0,        system16b_fd1094,      exctleag, segas16b_state, init_exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
 
-GAME( 1989, fpoint,     0,        system16b_fd1094,    fpoint,   segas16b_state,generic_5358,       ROT0,   "Sega", "Flash Point (set 2, Japan) (FD1094 317-0127A)", 0 )
-GAME( 1989, fpoint1,    fpoint,   system16b_fd1094,    fpoint,   segas16b_state,generic_5704,       ROT0,   "Sega", "Flash Point (set 1, Japan) (FD1094 317-0127A)", 0 )
+GAME( 1989, fpoint,     0,        system16b_fd1094,      fpoint,   segas16b_state, init_generic_5358,       ROT0,   "Sega", "Flash Point (set 2, Japan) (FD1094 317-0127A)", 0 )
+GAME( 1989, fpoint1,    fpoint,   system16b_fd1094,      fpoint,   segas16b_state, init_generic_5704,       ROT0,   "Sega", "Flash Point (set 1, Japan) (FD1094 317-0127A)", 0 )
 
-GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,goldnaxe, segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 6, US) (8751 317-123A)", 0 )
-GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US) (FD1094 317-0122)", 0 )
-GAME( 1989, goldnaxej,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 4, Japan) (FD1094 317-0121)", 0 )
-GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 3, World) (FD1094 317-0120)", 0)
-GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,     goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
-GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
+GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,  goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 6, US) (8751 317-123A)", 0 )
+GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5797, goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US) (FD1094 317-0122)", 0 )
+GAME( 1989, goldnaxej,  goldnaxe, system16b_fd1094,      goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 4, Japan) (FD1094 317-0121)", 0 )
+GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,      goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 3, World) (FD1094 317-0120)", 0)
+GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,       goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
+GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797, goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
 
-GAME( 1987, hwchamp,    0,        system16b,           hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )
-GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,    hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
+GAME( 1987, hwchamp,    0,        system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )
+GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,      hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
 
-GAME( 1989, mvp,        0,        system16b_fd1094_5797,mvp,     segas16b_state,generic_5797,       ROT0,   "Sega", "MVP (set 2, US) (FD1094 317-0143)", 0 )
-GAME( 1989, mvpj,       mvp,      system16b_fd1094,     mvp,     segas16b_state,generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan) (FD1094 317-0142)", 0 )
+GAME( 1989, mvp,        0,        system16b_fd1094_5797, mvp,      segas16b_state, init_generic_5797,       ROT0,   "Sega", "MVP (set 2, US) (FD1094 317-0143)", 0 )
+GAME( 1989, mvpj,       mvp,      system16b_fd1094,      mvp,      segas16b_state, init_generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan) (FD1094 317-0142)", 0 )
 
-GAME( 1988, passsht,    0,        system16b_fd1094,    passsht,  segas16b_state,generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players) (FD1094 317-0080)", 0 )
-GAME( 1988, passshta,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players) (FD1094 317-0074)", 0 )
-GAME( 1988, passshtj,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (Japan, 4 Players) (FD1094 317-0070)", 0 )
-GAME( 1988, cencourt,   passsht,  system16b_mc8123,    cencourt, segas16b_state,cencourt_5358,      ROT270, "Sega", "Center Court (World, 4 Players, prototype) (MC-8123B)", 0 )
+GAME( 1988, passsht,    0,        system16b_fd1094,      passsht,  segas16b_state, init_generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players) (FD1094 317-0080)", 0 )
+GAME( 1988, passshta,   passsht,  system16b_fd1094,      passshtj, segas16b_state, init_passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players) (FD1094 317-0074)", 0 )
+GAME( 1988, passshtj,   passsht,  system16b_fd1094,      passshtj, segas16b_state, init_passshtj_5358,      ROT270, "Sega", "Passing Shot (Japan, 4 Players) (FD1094 317-0070)", 0 )
+GAME( 1988, cencourt,   passsht,  system16b_mc8123,      cencourt, segas16b_state, init_cencourt_5358,      ROT270, "Sega", "Center Court (World, 4 Players, prototype) (MC-8123B)", 0 )
 
-GAME( 1991, riotcity,   0,        system16b,           riotcity, segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
+GAME( 1991, riotcity,   0,        system16b,             riotcity, segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
-GAME( 1990, ryukyu,     0,        system16b_fd1094,    ryukyu,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
+GAME( 1990, ryukyu,     0,        system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
 
-GAME( 1987, defense,    sdi,      system16b_fd1089a,   sdi,      segas16b_state,defense_5358_small, ROT0,   "Sega", "Defense (System 16B, FD1089A 317-0028)", 0 )
-GAME( 1987, sdib,       sdi,      system16b_fd1089a,   sdi,      segas16b_state,defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
-GAME( 1987, sdibl,      sdi,      system16b,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, original hardware)", 0 ) // seems to be a bootleg of an older version of the game than any supported original sets
+GAME( 1987, defense,    sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "Defense (System 16B, FD1089A 317-0028)", 0 )
+GAME( 1987, sdib,       sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
+GAME( 1987, sdibl,      sdi,      system16b,             sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, original hardware)", 0 ) // seems to be a bootleg of an older version of the game than any supported original sets
 
-GAME( 1987, shinobi5,   shinobi,  system16b,           shinobi,  segas16b_state,generic_5521,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
-GAME( 1987, shinobi4,   shinobi,  system16b_mc8123,    shinobi,  segas16b_state,shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B) (MC-8123B 317-0054)", 0 )
-GAME( 1987, shinobi3,   shinobi,  system16b_mc8123,    shinobi,  segas16b_state,shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B) (MC-8123B 317-0054)", 0 )
-GAME( 1987, shinobi2,   shinobi,  system16b_fd1094,    shinobi,  segas16b_state,generic_5358,       ROT0,   "Sega", "Shinobi (set 2, System 16B) (FD1094 317-0049)", 0 )
+GAME( 1987, shinobi5,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5521,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
+GAME( 1987, shinobi4,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B) (MC-8123B 317-0054)", 0 )
+GAME( 1987, shinobi3,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B) (MC-8123B 317-0054)", 0 )
+GAME( 1987, shinobi2,   shinobi,  system16b_fd1094,      shinobi,  segas16b_state, init_generic_5358,       ROT0,   "Sega", "Shinobi (set 2, System 16B) (FD1094 317-0049)", 0 )
 
-GAME( 1987, sonicbom,   0,        system16b_fd1094,    sonicbom, segas16b_state,generic_5358,       ROT270, "Sega", "Sonic Boom (FD1094 317-0053)", 0 )
+GAME( 1987, sonicbom,   0,        system16b_fd1094,      sonicbom, segas16b_state, init_generic_5358,       ROT270, "Sega", "Sonic Boom (FD1094 317-0053)", 0 )
 
-GAME( 1988, sjryuko,    0,        system16b_fd1089b,   sjryuko,  segas16b_state,sjryuko_5358_small, ROT0,   "White Board", "Sukeban Jansi Ryuko (set 2, System 16B, FD1089B 317-5021)", 0 )
+GAME( 1988, sjryuko,    0,        system16b_fd1089b,     sjryuko,  segas16b_state, init_sjryuko_5358_small, ROT0,   "White Board", "Sukeban Jansi Ryuko (set 2, System 16B, FD1089B 317-5021)", 0 )
 
-GAME( 1987, suprleag,   0,        system16b_fd1094,    exctleag, segas16b_state,exctleag_5358,      ROT0,   "Sega", "Super League (FD1094 317-0045)", 0 )
+GAME( 1987, suprleag,   0,        system16b_fd1094,      exctleag, segas16b_state, init_exctleag_5358,      ROT0,   "Sega", "Super League (FD1094 317-0045)", 0 )
 
-GAME( 1988, tetris2,    tetris,   system16b_fd1094,    tetris,   segas16b_state,generic_5704,       ROT0,   "Sega", "Tetris (set 2, Japan, System 16B) (FD1094 317-0092)", 0 )
-GAME( 1988, tetris1,    tetris,   system16b_fd1094,    tetris,   segas16b_state,generic_5358_small, ROT0,   "Sega", "Tetris (set 1, Japan, System 16B) (FD1094 317-0091)", 0 )
+GAME( 1988, tetris2,    tetris,   system16b_fd1094,      tetris,   segas16b_state, init_generic_5704,       ROT0,   "Sega", "Tetris (set 2, Japan, System 16B) (FD1094 317-0092)", 0 )
+GAME( 1988, tetris1,    tetris,   system16b_fd1094,      tetris,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Tetris (set 1, Japan, System 16B) (FD1094 317-0091)", 0 )
 
-GAME( 1987, timescan,   0,        system16b,           timescan, segas16b_state,timescan_5358_small, ROT270, "Sega", "Time Scanner (set 2, System 16B)", 0 )
+GAME( 1987, timescan,   0,        system16b,             timescan, segas16b_state, init_timescan_5358_small, ROT270, "Sega", "Time Scanner (set 2, System 16B)", 0 )
 
-GAME( 1994, toryumon,   0,        system16b_5797,      toryumon, segas16b_state,generic_5797,       ROT0,   "Sega", "Toryumon", 0 )
+GAME( 1994, toryumon,   0,        system16b_5797,        toryumon, segas16b_state, init_generic_5797,        ROT0,   "Sega", "Toryumon", 0 )
 
-GAME( 1989, tturf,      0,        system16b_i8751,     tturf,    segas16b_state,tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan) (8751 317-0104)", 0 )
-GAME( 1989, tturfu,     tturf,    system16b_i8751,     tturf,    segas16b_state,generic_5358,       ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US) (8751 317-0099)", 0)
+GAME( 1989, tturf,      0,        system16b_i8751,       tturf,    segas16b_state, init_tturf_5704,          ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan) (8751 317-0104)", 0 )
+GAME( 1989, tturfu,     tturf,    system16b_i8751,       tturf,    segas16b_state, init_generic_5358,        ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US) (8751 317-0099)", 0)
 
-GAME( 1996, ultracin,   0,        system16b_5797, system16b_generic, segas16b_state, generic_5797,  ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
+GAME( 1996, ultracin,   0,        system16b_5797,        system16b_generic, segas16b_state, init_generic_5797, ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
 
-GAME( 1988, wb3,        0,        system16b_i8751,     wb3,      segas16b_state,wb3_5704,           ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B) (8751 317-0098)", 0 )
-GAME( 1988, wb34,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (FD1094 317-0087)", 0 )
-GAME( 1988, wb33,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (FD1094 317-0089)", 0 )
-GAME( 1988, wb32,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5358,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (FD1094 317-0085)", 0 )
+GAME( 1988, wb3,        0,        system16b_i8751,       wb3,      segas16b_state, init_wb3_5704,            ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B) (8751 317-0098)", 0 )
+GAME( 1988, wb34,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (FD1094 317-0087)", 0 )
+GAME( 1988, wb33,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (FD1094 317-0089)", 0 )
+GAME( 1988, wb32,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5358,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (FD1094 317-0085)", 0 )
 
-GAME( 1989, wrestwar,   0,        system16b_i8751,     wrestwar, segas16b_state,generic_5704,       ROT270, "Sega", "Wrestle War (set 3, World) (8751 317-0103)", 0 )
-GAME( 1989, wrestwar2,  wrestwar, system16b_fd1094,    wrestwar, segas16b_state,generic_5704,       ROT270, "Sega", "Wrestle War (set 2, World) (FD1094 317-0102)", 0 )
-GAME( 1989, wrestwar1,  wrestwar, system16b_fd1094,    wrestwar, segas16b_state,generic_5704,       ROT270, "Sega", "Wrestle War (set 1, Japan) (FD1094 317-0090)", 0 )
+GAME( 1989, wrestwar,   0,        system16b_i8751,       wrestwar, segas16b_state, init_generic_5704,        ROT270, "Sega", "Wrestle War (set 3, World) (8751 317-0103)", 0 )
+GAME( 1989, wrestwar2,  wrestwar, system16b_fd1094,      wrestwar, segas16b_state, init_generic_5704,        ROT270, "Sega", "Wrestle War (set 2, World) (FD1094 317-0102)", 0 )
+GAME( 1989, wrestwar1,  wrestwar, system16b_fd1094,      wrestwar, segas16b_state, init_generic_5704,        ROT270, "Sega", "Wrestle War (set 1, Japan) (FD1094 317-0090)", 0 )
 
 // Extra RAM, dubbed by M2 as 'System 16C'
-GAME( 2008, fantzn2x,   0,        system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
-GAME( 2008, fantzn2xp,  fantzn2x, system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version, prototype)", 0 ) // "
+GAME( 2008, fantzn2x,   0,        system16c,             fz2,      segas16b_state, init_generic_5704,        ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
+GAME( 2008, fantzn2xp,  fantzn2x, system16c,             fz2,      segas16b_state, init_generic_5704,        ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version, prototype)", 0 ) // "
 
-GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state,generic_5704,       ROT0,  "bootleg", "Fantasy Zone (Time Attack, bootleg)", 0 ) // based on the PS2 version, unlicensed PCB conversion
+GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta, segas16b_state, init_generic_5704,        ROT0,  "bootleg", "Fantasy Zone (Time Attack, bootleg)", 0 ) // based on the PS2 version, unlicensed PCB conversion
 
 
 // Custom Korean Board - these probably belong with the bootlegs...
-GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
-GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
+GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_state, init_generic_korean,      ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
+GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,             ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
-GAME( 1991, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
+GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,            ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
 
 // decrypted bootleg / 'suicide repair' sets
 
-GAME( 1987, shinobi2d,  shinobi,  system16b,    shinobi,  segas16b_state,generic_5358,       ROT0,   "bootleg", "Shinobi (set 2, System 16B) (bootleg of FD1094 317-0049 set)", 0 )
+GAME( 1987, shinobi2d,  shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5358,        ROT0,   "bootleg", "Shinobi (set 2, System 16B) (bootleg of FD1094 317-0049 set)", 0 )
 
-GAME( 1989, fpointd,    fpoint,   system16b,    fpoint,   segas16b_state,generic_5358,       ROT0,   "bootleg", "Flash Point (set 2, Japan) (bootleg of FD1094 317-0127A set)", 0 )
-GAME( 1989, fpoint1d,   fpoint,   system16b,    fpoint,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Flash Point (set 1, Japan) (bootleg of FD1094 317-0127A set)", 0 )
+GAME( 1989, fpointd,    fpoint,   system16b,             fpoint,   segas16b_state, init_generic_5358,        ROT0,   "bootleg", "Flash Point (set 2, Japan) (bootleg of FD1094 317-0127A set)", 0 )
+GAME( 1989, fpoint1d,   fpoint,   system16b,             fpoint,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Flash Point (set 1, Japan) (bootleg of FD1094 317-0127A set)", 0 )
 
-GAME( 1988, tetris2d,   tetris,   system16b,    tetris,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Tetris (set 2, Japan, System 16B) (bootleg of FD1094 317-0092 set)", 0 )
-GAME( 1988, tetris1d,   tetris,   system16b,    tetris,   segas16b_state,generic_5358_small, ROT0,   "bootleg", "Tetris (set 1, Japan, System 16B) (bootleg of FD1094 317-0091 set)", 0 )
+GAME( 1988, tetris2d,   tetris,   system16b,             tetris,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Tetris (set 2, Japan, System 16B) (bootleg of FD1094 317-0092 set)", 0 )
+GAME( 1988, tetris1d,   tetris,   system16b,             tetris,   segas16b_state, init_generic_5358_small,  ROT0,   "bootleg", "Tetris (set 1, Japan, System 16B) (bootleg of FD1094 317-0091 set)", 0 )
 
-GAME( 1988, dduxd,      ddux,     system16b,    ddux,     segas16b_state,generic_5521,       ROT0,   "bootleg", "Dynamite Dux (set 3, World) (bootleg of FD1094 317-0096 set)", 0 )
-GAME( 1988, dduxjd,     ddux,     system16b,    ddux,     segas16b_state,generic_5521,       ROT0,   "bootleg", "Dynamite Dux (set 2, Japan) (bootleg of FD1094 317-0094 set)", 0 )
+GAME( 1988, dduxd,      ddux,     system16b,             ddux,     segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Dynamite Dux (set 3, World) (bootleg of FD1094 317-0096 set)", 0 )
+GAME( 1988, dduxjd,     ddux,     system16b,             ddux,     segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Dynamite Dux (set 2, Japan) (bootleg of FD1094 317-0094 set)", 0 )
 
-GAME( 1988, altbeast5d, altbeast, system16b,    altbeast, segas16b_state,generic_5521,       ROT0,   "bootleg", "Altered Beast (set 5) (bootleg of FD1094 317-0069 set)", 0 )
-GAME( 1988, altbeastj3d,altbeast, system16b,    altbeast, segas16b_state,generic_5521,       ROT0,   "bootleg", "Juuouki (set 3, Japan) (bootleg of FD1094 317-0068 set)", 0 )
+GAME( 1988, altbeast5d, altbeast, system16b,             altbeast, segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Altered Beast (set 5) (bootleg of FD1094 317-0069 set)", 0 )
+GAME( 1988, altbeastj3d,altbeast, system16b,             altbeast, segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Juuouki (set 3, Japan) (bootleg of FD1094 317-0068 set)", 0 )
 
-GAME( 1990, aurail1d,   aurail,   system16b,    aurail,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Aurail (set 2, World) (bootleg of FD1089B 317-0168 set)", 0 )
-GAME( 1990, aurailjd,   aurail,   system16b,    aurail,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Aurail (set 1, Japan) (bootleg of FD1089A 317-0167 set)", 0 )
+GAME( 1990, aurail1d,   aurail,   system16b,             aurail,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Aurail (set 2, World) (bootleg of FD1089B 317-0168 set)", 0 )
+GAME( 1990, aurailjd,   aurail,   system16b,             aurail,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Aurail (set 1, Japan) (bootleg of FD1089A 317-0167 set)", 0 )
 
-GAME( 1989, mvpd,       mvp,      system16b_5797,mvp,     segas16b_state,generic_5797,       ROT0,   "bootleg", "MVP (set 2, US) (bootleg of FD1094 317-0143 set)", 0 )
-GAME( 1989, mvpjd,      mvp,      system16b,    mvp,      segas16b_state,generic_5704,       ROT0,   "bootleg", "MVP (set 1, Japan) (bootleg of FD1094 317-0142 set)", 0 )
+GAME( 1989, mvpd,       mvp,      system16b_5797,        mvp,      segas16b_state, init_generic_5797,        ROT0,   "bootleg", "MVP (set 2, US) (bootleg of FD1094 317-0143 set)", 0 )
+GAME( 1989, mvpjd,      mvp,      system16b,             mvp,      segas16b_state, init_generic_5704,        ROT0,   "bootleg", "MVP (set 1, Japan) (bootleg of FD1094 317-0142 set)", 0 )
 
-GAME( 1991, cottond,    cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 4, World) (bootleg of FD1094 317-0181a set)", 0 )
-GAME( 1991, cottonud,   cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 3, US) (bootleg of FD1094 317-0180 set)", 0 )
-GAME( 1991, cottonjad,  cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 1, Japan, Rev A) (bootleg of FD1094 317-0179a set)", 0 )
-GAME( 1991, cottonjd,   cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 2, Japan, Rev B) (bootleg of FD1094 317-0179b set)", 0 )
-
-
-GAME( 1989, bayrouted,  bayroute, system16b,    bayroute, segas16b_state,generic_5704,       ROT0,   "bootleg", "Bay Route (set 3, World) (bootleg of FD1094 317-0116 set)", 0 )
-GAME( 1989, bayroutejd, bayroute, system16b,    bayroute, segas16b_state,generic_5704,       ROT0,   "bootleg", "Bay Route (set 2, Japan) (bootleg of FD1094 317-0115 set)", 0 )
-
-GAME( 1988, exctleagd,  exctleag, system16b,    exctleag, segas16b_state,exctleag_5358,      ROT0,   "bootleg", "Excite League (bootleg of FD1094 317-0079 set)", 0 )
-
-GAME( 1987, sonicbomd,  sonicbom, system16b,    sonicbom, segas16b_state,generic_5358,       ROT270, "bootleg", "Sonic Boom (bootleg of FD1094 317-0053 set)", 0 )
-
-GAME( 1990, ryukyud,    ryukyu,   system16b,    ryukyu,   segas16b_state,generic_5704,       ROT0,   "bootleg", "RyuKyu (Japan) (bootleg of FD1094 317-5023 set)", 0 )
-
-GAME( 1987, hwchampjd,  hwchamp,  system16b,    hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "bootleg", "Heavyweight Champ (Japan) (bootleg of FD1094 317-0046 set)", 0 )
-
-GAME( 1987, bulletd,    bullet,   system16b,    bullet,   segas16b_state,generic_5358_small, ROT0,   "bootleg", "Bullet (bootleg of FD1094 317-0041 set)", 0 )
-
-GAME( 1989, eswatd,     eswat,    system16b_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
-GAME( 1989, eswatud,    eswat,    system16b_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
-GAME( 1989, eswatjd,    eswat,    system16b_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
-GAME( 1989, eswatj1d,   eswat,    system16b,    eswat,    segas16b_state,generic_5704,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
+GAME( 1991, cottond,    cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 4, World) (bootleg of FD1094 317-0181a set)", 0 )
+GAME( 1991, cottonud,   cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 3, US) (bootleg of FD1094 317-0180 set)", 0 )
+GAME( 1991, cottonjad,  cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 1, Japan, Rev A) (bootleg of FD1094 317-0179a set)", 0 )
+GAME( 1991, cottonjd,   cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 2, Japan, Rev B) (bootleg of FD1094 317-0179b set)", 0 )
 
 
-GAME( 1989, goldnaxeud, goldnaxe, system16b_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "bootleg", "Golden Axe (set 5, US) (bootleg of FD1094 317-0122 set)", 0 )
-GAME( 1989, goldnaxe3d, goldnaxe, system16b,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "bootleg", "Golden Axe (set 3, World) (bootleg of FD1094 317-0120 set)", 0)
-GAME( 1989, goldnaxe1d, goldnaxe, system16b_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "bootleg", "Golden Axe (set 1, World) (bootleg of FD1094 317-0110 set)", 0 )
-GAME( 1989, goldnaxejd, goldnaxe, system16b,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "bootleg", "Golden Axe (set 4, Japan) (bootleg of FD1094 317-0121 set)", 0 )
+GAME( 1989, bayrouted,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Bay Route (set 3, World) (bootleg of FD1094 317-0116 set)", 0 )
+GAME( 1989, bayroutejd, bayroute, system16b,             bayroute, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Bay Route (set 2, Japan) (bootleg of FD1094 317-0115 set)", 0 )
+
+GAME( 1988, exctleagd,  exctleag, system16b,             exctleag, segas16b_state, init_exctleag_5358,       ROT0,   "bootleg", "Excite League (bootleg of FD1094 317-0079 set)", 0 )
+
+GAME( 1987, sonicbomd,  sonicbom, system16b,             sonicbom, segas16b_state, init_generic_5358,        ROT270, "bootleg", "Sonic Boom (bootleg of FD1094 317-0053 set)", 0 )
+
+GAME( 1990, ryukyud,    ryukyu,   system16b,             ryukyu,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "RyuKyu (Japan) (bootleg of FD1094 317-5023 set)", 0 )
+
+GAME( 1987, hwchampjd,  hwchamp,  system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,        ROT0,   "bootleg", "Heavyweight Champ (Japan) (bootleg of FD1094 317-0046 set)", 0 )
+
+GAME( 1987, bulletd,    bullet,   system16b,             bullet,   segas16b_state, init_generic_5358_small,  ROT0,   "bootleg", "Bullet (bootleg of FD1094 317-0041 set)", 0 )
+
+GAME( 1989, eswatd,     eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
+GAME( 1989, eswatud,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
+GAME( 1989, eswatjd,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
+GAME( 1989, eswatj1d,   eswat,    system16b,             eswat,    segas16b_state, init_generic_5704,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
 
 
-GAME( 1988, passshtd,   passsht,  system16b,    passsht,  segas16b_state,generic_5358,       ROT270, "bootleg", "Passing Shot (World, 2 Players) (bootleg of FD1094 317-0080 set)", 0 )
-GAME( 1988, passshtad,  passsht,  system16b,    passshtj, segas16b_state,passshtj_5358,      ROT270, "bootleg", "Passing Shot (World, 4 Players) (bootleg of FD1094 317-0074 set)", 0 )
-GAME( 1988, passshtjd,  passsht,  system16b,    passshtj, segas16b_state,passshtj_5358,      ROT270, "bootleg", "Passing Shot (Japan, 4 Players) (bootleg of FD1094 317-0070 set)", 0 )
+GAME( 1989, goldnaxeud, goldnaxe, system16b_5797,        goldnaxe, segas16b_state, init_generic_5797,        ROT0,   "bootleg", "Golden Axe (set 5, US) (bootleg of FD1094 317-0122 set)", 0 )
+GAME( 1989, goldnaxe3d, goldnaxe, system16b,             goldnaxe, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Golden Axe (set 3, World) (bootleg of FD1094 317-0120 set)", 0)
+GAME( 1989, goldnaxe1d, goldnaxe, system16b_5797,        goldnaxe, segas16b_state, init_generic_5797,        ROT0,   "bootleg", "Golden Axe (set 1, World) (bootleg of FD1094 317-0110 set)", 0 )
+GAME( 1989, goldnaxejd, goldnaxe, system16b,             goldnaxe, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Golden Axe (set 4, Japan) (bootleg of FD1094 317-0121 set)", 0 )
 
-GAME( 1988, wb34d,      wb3,      system16b,    wb3,      segas16b_state,generic_5704,       ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (bootleg of FD1094 317-0087 set)", 0 )
-GAME( 1988, wb33d,      wb3,      system16b,    wb3,      segas16b_state,generic_5704,       ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (bootleg of FD1094 317-0089 set)", 0 )
-GAME( 1988, wb32d,      wb3,      system16b,    wb3,      segas16b_state,generic_5358,       ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (bootleg of FD1094 317-0085 set)", 0 )
 
-GAME( 1989, wrestwar2d, wrestwar, system16b,    wrestwar, segas16b_state,generic_5704,       ROT270, "bootleg", "Wrestle War (set 2, World) (bootleg of FD1094 317-0102 set)", 0 )
-GAME( 1989, wrestwar1d, wrestwar, system16b,    wrestwar, segas16b_state,generic_5704,       ROT270, "bootleg", "Wrestle War (set 1, Japan) (bootleg of FD1094 317-0090 set)", 0 )
+GAME( 1988, passshtd,   passsht,  system16b,             passsht,  segas16b_state, init_generic_5358,        ROT270, "bootleg", "Passing Shot (World, 2 Players) (bootleg of FD1094 317-0080 set)", 0 )
+GAME( 1988, passshtad,  passsht,  system16b,             passshtj, segas16b_state, init_passshtj_5358,       ROT270, "bootleg", "Passing Shot (World, 4 Players) (bootleg of FD1094 317-0074 set)", 0 )
+GAME( 1988, passshtjd,  passsht,  system16b,             passshtj, segas16b_state, init_passshtj_5358,       ROT270, "bootleg", "Passing Shot (Japan, 4 Players) (bootleg of FD1094 317-0070 set)", 0 )
+
+GAME( 1988, wb34d,      wb3,      system16b,             wb3,      segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (bootleg of FD1094 317-0087 set)", 0 )
+GAME( 1988, wb33d,      wb3,      system16b,             wb3,      segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (bootleg of FD1094 317-0089 set)", 0 )
+GAME( 1988, wb32d,      wb3,      system16b,             wb3,      segas16b_state, init_generic_5358,        ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (bootleg of FD1094 317-0085 set)", 0 )
+
+GAME( 1989, wrestwar2d, wrestwar, system16b,             wrestwar, segas16b_state, init_generic_5704,        ROT270, "bootleg", "Wrestle War (set 2, World) (bootleg of FD1094 317-0102 set)", 0 )
+GAME( 1989, wrestwar1d, wrestwar, system16b,             wrestwar, segas16b_state, init_generic_5704,        ROT270, "bootleg", "Wrestle War (set 1, Japan) (bootleg of FD1094 317-0090 set)", 0 )
 
 // bootlegs with split code/data, no memory mapper
-GAME( 1987, sdibl2,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
-GAME( 1987, sdibl3,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
-GAME( 1987, sdibl4,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
-GAME( 1987, sdibl5,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
-GAME( 1987, sdibl6,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
+GAME( 1987, sdibl2,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
+GAME( 1987, sdibl3,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
+GAME( 1987, sdibl4,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
+GAME( 1987, sdibl5,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
+GAME( 1987, sdibl6,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
 
 // bootlegs with modified hardware
-GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
-GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
-GAME( 1989, fpointbla,   fpoint,    fpointbla,   fpointbl, segas16b_state,  fpointbla,         ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1989, fpointbl,    fpoint,    fpointbl,            fpointbl, segas16b_state, init_generic_bootleg,     ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
+GAME( 1989, fpointbj,    fpoint,    fpointbl,            fpointbl, segas16b_state, init_generic_bootleg,     ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
+GAME( 1989, fpointbla,   fpoint,    fpointbla,           fpointbl, segas16b_state, init_fpointbla,           ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
 
 
 
@@ -9768,20 +9768,20 @@ MACHINE_CONFIG_START(isgsm_state::isgsm)
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_DEVICE_REMOVE("mapper")
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
-	MCFG_CPU_PROGRAM_MAP(isgsm_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	MCFG_DEVICE_PROGRAM_MAP(isgsm_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
-	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(isgsm_state,isgsm)
+void isgsm_state::init_isgsm()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 
 	// decrypt the bios...
 	std::vector<uint16_t> temp(0x20000/2);
@@ -9791,7 +9791,7 @@ DRIVER_INIT_MEMBER(isgsm_state,isgsm)
 	memcpy(rom, &temp[0], 0x20000);
 }
 
-DRIVER_INIT_MEMBER(isgsm_state,shinfz)
+void isgsm_state::init_shinfz()
 {
 	init_isgsm();
 
@@ -9805,7 +9805,7 @@ DRIVER_INIT_MEMBER(isgsm_state,shinfz)
 	m_security_callback = security_callback_delegate(&isgsm_state::shinfz_security, this);
 }
 
-DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
+void isgsm_state::init_tetrbx()
 {
 	init_isgsm();
 
@@ -9850,9 +9850,9 @@ ROM_END
 
 
 
-//             YEAR, NAME,   PARENT, MACHINE,INPUT,  INIT,                       MONITOR, COMPANY,         FULLNAME, FLAGS
-GAME(          2006, isgsm,  0,      isgsm,  isgsm,  isgsm_state,isgsm,  ROT0,   "bootleg (ISG)", "ISG Selection Master Type 2006 BIOS", MACHINE_IS_BIOS_ROOT )
+//             YEAR, NAME,   PARENT  MACHINE  INPUT   CLASS        INIT         MONITOR  COMPANY          FULLNAME, FLAGS
+GAME(          2006, isgsm,  0,      isgsm,   isgsm,  isgsm_state, init_isgsm,  ROT0,    "bootleg (ISG)", "ISG Selection Master Type 2006 BIOS", MACHINE_IS_BIOS_ROOT )
 
 /* 01 */ // ?? unknown
-/* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm,  tetrbx, isgsm_state,tetrbx, ROT0,   "bootleg (ISG)", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
-/* 03 */ GAME( 2008, shinfz, isgsm,  isgsm,  shinfz, isgsm_state,shinfz, ROT0,   "bootleg (ISG)", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 ) // claims it's released in 2006, but set includes the PS2/S16 remake of Fantasy Zone II which is clearly from 2008
+/* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm,   tetrbx, isgsm_state, init_tetrbx, ROT0,    "bootleg (ISG)", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
+/* 03 */ GAME( 2008, shinfz, isgsm,  isgsm,   shinfz, isgsm_state, init_shinfz, ROT0,    "bootleg (ISG)", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 ) // claims it's released in 2006, but set includes the PS2/S16 remake of Fantasy Zone II which is clearly from 2008

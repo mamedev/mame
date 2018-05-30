@@ -56,9 +56,9 @@ uint32_t dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind1
 
 MACHINE_CONFIG_START(dct11em_state::dct11em)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
+	MCFG_DEVICE_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
 	MCFG_T11_INITIAL_MODE(0x1403)  /* according to specs */
-	MCFG_CPU_PROGRAM_MAP(dct11em_mem)
+	MCFG_DEVICE_PROGRAM_MAP(dct11em_mem)
 
 
 	/* video hardware */
@@ -84,5 +84,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                          FULLNAME    FLAGS */
-COMP( 1983, dct11em,  0,      0,       dct11em,   dct11em, dct11em_state, 0,    "Digital Equipment Corporation", "DCT11-EM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME    FLAGS */
+COMP( 1983, dct11em, 0,      0,      dct11em, dct11em, dct11em_state, empty_init, "Digital Equipment Corporation", "DCT11-EM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

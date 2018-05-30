@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(tape_stop_r);
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
-	DECLARE_DRIVER_INIT(bmjr);
+	void init_bmjr();
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bmjr(machine_config &config);
@@ -321,7 +321,7 @@ static const gfx_layout bmjr_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( bmjr )
+static GFXDECODE_START( gfx_bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -338,9 +338,9 @@ void bmjr_state::machine_reset()
 
 MACHINE_CONFIG_START(bmjr_state::bmjr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
-	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
+	MCFG_DEVICE_PROGRAM_MAP(bmjr_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -353,14 +353,12 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmjr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200) // guesswork
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -378,9 +376,9 @@ ROM_START( bmjr )
 ROM_END
 
 /* Driver */
-DRIVER_INIT_MEMBER(bmjr_state,bmjr)
+void bmjr_state::init_bmjr()
 {
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY    FULLNAME           FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr,  bmjr_state,  bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME           FLAGS */
+COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, init_bmjr, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

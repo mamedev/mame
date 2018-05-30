@@ -244,7 +244,7 @@ public:
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
-	DECLARE_DRIVER_INIT(vk100);
+	void init_vk100();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(execute_vg);
@@ -988,7 +988,7 @@ WRITE_LINE_MEMBER(vk100_state::i8251_rts)
 	m_ACTS = state;
 }
 
-DRIVER_INIT_MEMBER(vk100_state,vk100)
+void vk100_state::init_vk100()
 {
 	// figure out how the heck to initialize the timers here
 	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
@@ -1039,9 +1039,9 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 
 MACHINE_CONFIG_START(vk100_state::vk100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'068'800))
-	MCFG_CPU_PROGRAM_MAP(vk100_mem)
-	MCFG_CPU_IO_MAP(vk100_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'068'800))
+	MCFG_DEVICE_PROGRAM_MAP(vk100_mem)
+	MCFG_DEVICE_IO_MAP(vk100_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1052,28 +1052,28 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(vk100_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(vk100_state, crtc_vsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, vk100_state, crtc_vsync))
 
 	/* i8251 uart */
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vk100_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vk100_state, i8251_txrdy_int))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vk100_state, i8251_rxrdy_int))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vk100_state, i8251_txrdy_int))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("i8251", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("i8251", i8251_device, write_txc))
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
 
@@ -1271,5 +1271,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY                          FULLNAME        FLAGS */
-COMP( 1980, vk100,  0,      0,       vk100,     vk100, vk100_state,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME        FLAGS */
+COMP( 1980, vk100, 0,      0,      vk100,   vk100, vk100_state, init_vk100, "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

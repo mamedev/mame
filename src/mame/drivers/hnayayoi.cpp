@@ -546,20 +546,20 @@ void hnayayoi_state::machine_reset()
 MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(hnayayoi_map)
-	MCFG_CPU_IO_MAP(hnayayoi_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(hnayayoi_map)
+	MCFG_DEVICE_IO_MAP(hnayayoi_io_map)
 
 	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(hnayayoi_state, nmi_clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, hnayayoi_state, nmi_clock_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(hnayayoi_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, hnayayoi_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w)) MCFG_DEVCB_INVERT
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -576,10 +576,10 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, hnayayoi_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 20000000/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(hnayayoi_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 20000000/8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, hnayayoi_state, irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -587,31 +587,31 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hnayayoi_state::hnfubuki)
 	hnayayoi(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hnfubuki_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hnfubuki_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_DEVICE_MODIFY("mainlatch") // D5
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	hnayayoi(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(untoucha_map)
-	MCFG_CPU_IO_MAP(untoucha_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(untoucha_map)
+	MCFG_DEVICE_IO_MAP(untoucha_io_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ?
 
 	MCFG_DEVICE_MODIFY("crtc")
@@ -685,18 +685,16 @@ ROM_START( untoucha )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
+void hnayayoi_state::init_hnfubuki()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
-	int i, j;
 
 	/* interestingly, the blitter data has a slight encryption */
-
 	/* swap address bits 4 and 5 */
-	for (i = 0; i < len; i += 0x40)
+	for (int i = 0; i < len; i += 0x40)
 	{
-		for (j = 0; j < 0x10; j++)
+		for (int j = 0; j < 0x10; j++)
 		{
 			uint8_t t = rom[i + j + 0x10];
 			rom[i + j + 0x10] = rom[i + j + 0x20];
@@ -705,13 +703,13 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 	}
 
 	/* swap data bits 0 and 1 */
-	for (i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
 		rom[i] = bitswap<8>(rom[i],7,6,5,4,3,2,0,1);
 	}
 }
 
 
-GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, 0,        ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, empty_init,    ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, init_hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, empty_init,    ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

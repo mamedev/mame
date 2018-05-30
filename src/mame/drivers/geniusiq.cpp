@@ -695,9 +695,9 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 
 MACHINE_CONFIG_START(geniusiq_state::iq128)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
-	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
+	MCFG_DEVICE_PROGRAM_MAP(geniusiq_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -754,8 +754,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT        STATE           INIT  COMPANY             FULLNAME                                     FLAGS
-COMP( 1997, iq128,      0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (Germany)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1997, iq128_fr,   iq128,  0,      iq128,     geniusiq,    geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (France)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, iqtv512,    0,      0,      iqtv512,   geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ TV 512 (Germany)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, itunlim,    0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "VTech IT Unlimited (UK)",                   MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT        CLASS           INIT        COMPANY             FULLNAME                      FLAGS
+COMP( 1997, iq128,    0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, iq128_fr, iq128,  0,      iq128,   geniusiq,    geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (France)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, iqtv512,  0,      0,      iqtv512, geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ TV 512 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, itunlim,  0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "VTech IT Unlimited (UK)",    MACHINE_NO_SOUND)

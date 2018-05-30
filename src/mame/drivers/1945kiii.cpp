@@ -132,16 +132,15 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	while (source < finish)
 	{
-		int xpos, ypos;
-		int tileno;
-		xpos = (source[0] & 0xff00) >> 8;
-		ypos = (source[0] & 0x00ff) >> 0;
-		tileno = (source2[0] & 0x7ffe) >> 1;
-		xpos |=  (source2[0] & 0x0001) << 8;
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos, 0);
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
-			gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
+		int xpos = (source[0] & 0xff00) >> 8 | (source2[0] & 0x0001) << 8;
+		int ypos = (source[0] & 0x00ff) >> 0;
+		int tileno = (source2[0] & 0x7ffe) >> 1;
+		int color = BIT(source2[0], 15) ? 0 : 1;
+
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos, 0);
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos - 0x100, 0); // wrap
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos, 0); // wrap
+		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
 
 		source++;
 		source2++;
@@ -198,11 +197,12 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 void k3_state::k3_base_map(address_map &map)
 {
 	map(0x0009ce, 0x0009cf).nopw();    // k3 - bug in code? (clean up log)
+	map(0x0009d0, 0x0009d1).nopw();
 	map(0x0009d2, 0x0009d3).nopw();    // l3 - bug in code? (clean up log)
 
 	map(0x000000, 0x0fffff).rom(); // ROM
 	map(0x100000, 0x10ffff).ram(); // Main Ram
-	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x240000, 0x240fff).ram().share("spritera1");
 	map(0x280000, 0x280fff).ram().share("spritera2");
 	map(0x2c0000, 0x2c07ff).ram().w(this, FUNC(k3_state::k3_bgram_w)).share("bgram");
@@ -220,8 +220,8 @@ void k3_state::k3_map(address_map &map)
 
 	map(0x3c0000, 0x3c0001).w(this, FUNC(k3_state::k3_soundbanks_w));
 
-	map(0x4c0000, 0x4c0000).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x500000, 0x500000).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x4c0001, 0x4c0001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
+	map(0x500001, 0x500001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
 	map(0x8c0000, 0x8cffff).ram(); // not used? (bug in code?)
 }
 
@@ -372,7 +372,7 @@ static const gfx_layout k3_layout =
 };
 
 
-static GFXDECODE_START( 1945kiii )
+static GFXDECODE_START( gfx_1945kiii )
 	GFXDECODE_ENTRY( "gfx1", 0, k3_layout,   0x0, 2  ) /* bg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, k3_layout,   0x0, 2  ) /* bg tiles */
 GFXDECODE_END
@@ -384,11 +384,11 @@ void k3_state::machine_start()
 
 MACHINE_CONFIG_START(k3_state::flagrall)
 
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
-	MCFG_CPU_PROGRAM_MAP(flagrall_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
+	MCFG_DEVICE_PROGRAM_MAP(flagrall_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1945kiii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1945kiii)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -398,12 +398,12 @@ MACHINE_CONFIG_START(k3_state::flagrall)
 	MCFG_SCREEN_UPDATE_DRIVER(k3_state, screen_update_k3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/16, PIN7_HIGH)  /* dividers? */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -411,10 +411,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(k3_state::k3)
 	flagrall(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(k3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(k3_map)
 
-	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/16, PIN7_HIGH) /* dividers? */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -528,8 +528,8 @@ ROM_START( flagrall )
 ROM_END
 
 
-GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, 0, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, empty_init, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )

@@ -132,11 +132,11 @@ public:
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(rom_r);
 
-	DECLARE_DRIVER_INIT(walle);
-	DECLARE_DRIVER_INIT(batman);
-	DECLARE_DRIVER_INIT(wirels60);
-	DECLARE_DRIVER_INIT(rad_skat);
-	DECLARE_DRIVER_INIT(rad_crik);
+	void init_walle();
+	void init_batman();
+	void init_wirels60();
+	void init_rad_skat();
+	void init_rad_crik();
 
 	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -225,8 +225,8 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	DECLARE_DRIVER_INIT(vii);
-	DECLARE_DRIVER_INIT(vsmile);
+	void init_vii();
+	void init_vsmile();
 
 	uint16_t do_spg243_vsmile_io(uint16_t what, int index);
 	uint16_t do_spg243_vii_io(uint16_t what, int index);
@@ -1289,8 +1289,8 @@ void spg2xx_cart_state::machine_start()
 
 void spg2xx_game_state::machine_start()
 {
-	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
-	memset(m_io_regs, 0, 0x100 * sizeof(uint16_t));
+		memset(m_video_regs, 0, 0x100 * sizeof(m_video_regs[0]));
+	memset(m_io_regs, 0, 0x200 * sizeof(m_io_regs[0]));
 	m_current_bank = 0;
 
 	m_controller_input[0] = 0;
@@ -1412,9 +1412,9 @@ DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vsmile_cart)
 }
 
 MACHINE_CONFIG_START(spg2xx_game_state::spg2xx_base)
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
-	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spg2xx_game_state,  vii_vblank)
+	MCFG_DEVICE_ADD( "maincpu", UNSP, XTAL(27'000'000))
+	MCFG_DEVICE_PROGRAM_MAP( vii_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spg2xx_game_state,  vii_vblank)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1457,25 +1457,25 @@ MACHINE_CONFIG_START(spg2xx_game_state::batman)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(spg2xx_cart_state, vii)
+void spg2xx_cart_state::init_vii()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vii_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_cart_state, vsmile)
+void spg2xx_cart_state::init_vsmile()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vsmile_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, batman)
+void spg2xx_game_state::init_batman()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, rad_skat)
+void spg2xx_game_state::init_rad_skat()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg240_rad_skat_io, this);
 	m_centered_coordinates = 1;
@@ -1490,7 +1490,7 @@ READ16_MEMBER(spg2xx_game_state::rad_crik_hack_r)
 		return 0xf854;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, rad_crik)
+void spg2xx_game_state::init_rad_crik()
 {
 	m_maincpu->space(AS_PROGRAM).install_writeonly(0x5800, 0x5bff, m_p_spriteram); // is this due to a CPU or DMA bug? 5800 == 2c00 << 1
 
@@ -1501,13 +1501,13 @@ DRIVER_INIT_MEMBER(spg2xx_game_state, rad_crik)
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, walle)
+void spg2xx_game_state::init_walle()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 0;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, wirels60)
+void spg2xx_game_state::init_wirels60()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_wireless60_io, this);
 	m_centered_coordinates = 1;
@@ -1700,35 +1700,35 @@ ROM_START( wireless )
 	ROM_LOAD16_WORD_SWAP( "wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
+//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     CLASS              INIT           COMPANY                                              FULLNAME             FLAGS
 
 // VTech systems
-CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileg,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileb,  0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb,  0,        0,        vsmile,      vsmile,   spg2xx_cart_state, init_vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // Jungle Soft TV games
-CONS( 2007, vii,      0,        0,        vii,         vii,      spg2xx_cart_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some games run, others crash
+CONS( 2007, vii,      0,        0,        vii,         vii,      spg2xx_cart_state, init_vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some games run, others crash
 
-CONS( 2010, zone60,   0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, wirels60, 0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, zone60,   0,        0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, wirels60, 0,        0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
-CONS( 2004, batmantv, 0,        0,        batman,      batman,   spg2xx_game_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, walle,    0,        0,        batman,      walle,    spg2xx_game_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, batmantv, 0,        0,        batman,      batman,   spg2xx_game_state, init_batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, walle,    0,        0,        batman,      walle,    spg2xx_game_state, init_walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_state, rad_skat, "Radica",                                            "Play TV Skateboarder (NTSC)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_state, init_rad_skat, "Radica",                                            "Play TV Skateboarder (NTSC)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, init_rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, rad_crik,  0,       0,        spg2xx_basep,rad_crik, spg2xx_game_state, rad_crik, "Radica",                                            "Connectv Cricket (PAL)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2006, rad_crik,  0,       0,        spg2xx_basep,rad_crik, spg2xx_game_state, init_rad_crik, "Radica",                                            "Connectv Cricket (PAL)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
 
-CONS( 2007, rad_sktv,  0,       0,        spg2xx_base, rad_sktv, spg2xx_game_state, rad_skat, "Radica",                                            "Skannerz TV",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2007, rad_sktv,  0,       0,        spg2xx_base, rad_sktv, spg2xx_game_state, init_rad_skat, "Radica",                                            "Skannerz TV",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
-CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // might not fit here, NAND dump, has internal bootstrap at least, see above.
-CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2011, wireless,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Hamy / Kids Station Toys Inc",                      "Wireless",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, wireless,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, init_wirels60, "Hamy / Kids Station Toys Inc",                      "Wireless",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

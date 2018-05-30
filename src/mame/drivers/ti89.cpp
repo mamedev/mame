@@ -522,8 +522,8 @@ PALETTE_INIT_MEMBER(ti68k_state, ti68k)
 
 MACHINE_CONFIG_START(ti68k_state::ti89)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(ti89_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ti89_mem)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -548,8 +548,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti68k_state::ti92)
 	ti89(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ti92_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ti92_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -559,22 +559,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti68k_state::ti92p)
 	ti92(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(ti92p_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ti92p_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ti68k_state::v200)
 	ti92(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(v200_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(v200_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ti68k_state::ti89t)
 	ti89(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(ti89t_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ti89t_mem)
 MACHINE_CONFIG_END
 
 
@@ -678,9 +678,9 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY              FULLNAME          FLAGS
-COMP( 1998, ti89,  0,       0,      ti89,    ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
-COMP( 1995, ti92,  0,       0,      ti92,    ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
-COMP( 1999, ti92p, 0,       0,      ti92p,   ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
-COMP( 2002, v200,  0,       0,      v200,    ti9x,  ti68k_state, 0,    "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
-COMP( 2004, ti89t, 0,       0,      ti89t,   ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME          FLAGS
+COMP( 1998, ti89,  0,       0,     ti89,    ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
+COMP( 1995, ti92,  0,       0,     ti92,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
+COMP( 1999, ti92p, 0,       0,     ti92p,   ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
+COMP( 2002, v200,  0,       0,     v200,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
+COMP( 2004, ti89t, 0,       0,     ti89t,   ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )

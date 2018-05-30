@@ -132,25 +132,25 @@ void konin_state::machine_start()
 
 MACHINE_CONFIG_START(konin_state::konin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(konin_mem)
-	MCFG_CPU_IO_MAP(konin_io)
-	MCFG_I8085A_INTE(DEVWRITELINE("picu", i8214_device, inte_w))
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(konin_mem)
+	MCFG_DEVICE_IO_MAP(konin_io)
+	MCFG_I8085A_INTE(WRITELINE("picu", i8214_device, inte_w))
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
 	MCFG_DEVICE_ADD("intlatch", I8212, 0)
 	MCFG_I8212_MD_CALLBACK(GND)
-	MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
+	MCFG_I8212_DI_CALLBACK(READ8("picu", i8214_device, vector_r))
 	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
 
 	MCFG_DEVICE_ADD("picu", I8214, XTAL(4'000'000))
-	MCFG_I8214_INT_CALLBACK(DEVWRITELINE("intlatch", i8212_device, stb_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE("intlatch", i8212_device, stb_w))
 
 	MCFG_DEVICE_ADD("mainpit", PIT8253, 0)
 	// wild guess at UART clock and source
 	MCFG_PIT8253_CLK0(1536000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("mainppi", I8255, 0)
 
@@ -159,15 +159,15 @@ MACHINE_CONFIG_START(konin_state::konin)
 	MCFG_DEVICE_ADD("ioppi", I8255, 0)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(konin_state, picu_r3_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, konin_state, picu_r3_w))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -187,5 +187,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY       FULLNAME  FLAGS
-COMP( 198?, konin,  0,      0,       konin,     konin, konin_state, 0,    "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME  FLAGS
+COMP( 198?, konin, 0,      0,      konin,   konin, konin_state, empty_init, "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON )

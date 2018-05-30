@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(jailbrek_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -243,7 +243,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( jailbrek )
+static GFXDECODE_START( gfx_jailbrek )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 ) /* sprites */
 GFXDECODE_END
@@ -264,14 +264,14 @@ void jailbrek_state::machine_reset()
 MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
-	MCFG_CPU_PROGRAM_MAP(jailbrek_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
+	MCFG_DEVICE_PROGRAM_MAP(jailbrek_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jailbrek)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jailbrek)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)
@@ -280,15 +280,15 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jailbrek_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jailbrek_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, MASTER_CLOCK/12)
+	MCFG_DEVICE_ADD("snsnd", SN76489A, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
+	MCFG_DEVICE_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 MACHINE_CONFIG_END
@@ -423,6 +423,6 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )

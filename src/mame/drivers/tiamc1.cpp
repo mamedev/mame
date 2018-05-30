@@ -316,12 +316,12 @@ static const gfx_layout char_rom_layout =
 	8*8
 };
 
-static GFXDECODE_START( tiamc1 )
+static GFXDECODE_START( gfx_tiamc1 )
 	GFXDECODE_ENTRY( nullptr, 0x0000, char_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( kot )
+static GFXDECODE_START( gfx_kot )
 	GFXDECODE_ENTRY( nullptr, 0x0000, char_rom_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
@@ -329,15 +329,15 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(tiamc1_map)
-	MCFG_CPU_IO_MAP(tiamc1_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(tiamc1_map)
+	MCFG_DEVICE_IO_MAP(tiamc1_io_map)
 
 	MCFG_DEVICE_ADD("kr580vv55a", I8255A, 0)  /* soviet clone of i8255 */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tiamc1_state, tiamc1_control_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tiamc1_state, tiamc1_control_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -345,37 +345,37 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tiamc1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tiamc1)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(tiamc1_state, tiamc1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("2x8253", TIAMC1, SND_CLOCK)
+	MCFG_DEVICE_ADD("2x8253", TIAMC1, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tiamc1_state::kot)
 	tiamc1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
-	MCFG_CPU_IO_MAP(kotrybolov_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kotrybolov_map)
+	MCFG_DEVICE_IO_MAP(kotrybolov_io_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", kot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_kot)
 
 	MCFG_DEVICE_REMOVE("2x8253")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
 	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tiamc1_state, pit8253_2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, tiamc1_state, pit8253_2_w))
 MACHINE_CONFIG_END
 
 
@@ -549,9 +549,9 @@ ROM_START( kot )
 ROM_END
 
 
-GAME( 1988, konek,    0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gorodki,  0, tiamc1, gorodki, tiamc1_state, 0, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kot,      0, kot,    kot,     tiamc1_state, 0, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1988, konek,    0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
+GAME( 1988, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gorodki,  0, tiamc1, gorodki, tiamc1_state, empty_init, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kot,      0, kot,    kot,     tiamc1_state, empty_init, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

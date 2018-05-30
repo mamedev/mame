@@ -131,6 +131,6 @@ protected:
 DECLARE_DEVICE_TYPE(TATUNG_PIPE, tatung_pipe_device)
 
 // supported devices
-SLOT_INTERFACE_EXTERN(tatung_pipe_cards);
+void tatung_pipe_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_EINSTEIN_PIPE_PIPE_H

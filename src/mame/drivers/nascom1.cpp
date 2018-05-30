@@ -77,7 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_01_r);
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
-	DECLARE_DRIVER_INIT(nascom);
+	void init_nascom();
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
@@ -121,8 +121,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
-	DECLARE_DRIVER_INIT(nascom2);
-	DECLARE_DRIVER_INIT(nascom2c);
+	void init_nascom2();
+	void init_nascom2c();
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
@@ -346,7 +346,7 @@ void nascom_state::machine_reset()
 	m_hd6402->write_cs(1);
 }
 
-DRIVER_INIT_MEMBER( nascom_state, nascom )
+void nascom_state::init_nascom()
 {
 	// install extra memory
 	if (m_ram->size() > 0)
@@ -364,9 +364,9 @@ void nascom2_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascom2 )
+void nascom2_state::init_nascom2()
 {
-	DRIVER_INIT_CALL(nascom);
+	init_nascom();
 
 	// setup nasbus
 	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
@@ -384,7 +384,7 @@ WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascom2c )
+void nascom2_state::init_nascom2c()
 {
 	// install memory
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
@@ -420,7 +420,7 @@ static const gfx_layout nascom1_charlayout =
 	8 * 16
 };
 
-static GFXDECODE_START( nascom1 )
+static GFXDECODE_START( gfx_nascom1 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom1_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -442,7 +442,7 @@ static const gfx_layout nascom2_charlayout =
 	8 * 16
 };
 
-static GFXDECODE_START( nascom2 )
+static GFXDECODE_START( gfx_nascom2 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom2_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -668,15 +668,15 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nascom1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nascom1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// uart
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 	MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-	MCFG_AY31015_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
+	MCFG_AY31015_READ_SI_CB(READLINE(*this, nascom_state, nascom1_hd6402_si))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(*this, nascom_state, nascom1_hd6402_so))
 
 	// cassette is connected to the uart
 	MCFG_CASSETTE_ADD("cassette")
@@ -695,16 +695,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nascom1_state::nascom1)
 	nascom(config);
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
-	MCFG_CPU_IO_MAP(nascom1_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(nascom1_mem)
+	MCFG_DEVICE_IO_MAP(nascom1_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nascom2_state::nascom2)
 	nascom(config);
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(nascom2_mem)
-	MCFG_CPU_IO_MAP(nascom2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(nascom2_mem)
+	MCFG_DEVICE_IO_MAP(nascom2_io)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom2_state, screen_update_nascom)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", nascom2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nascom2)
 
 	// generic sockets for ram/rom (todo: support ram here)
 	MCFG_GENERIC_SOCKET_ADD("socket1", generic_plain_slot, "nascom_socket")
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 
 	// nasbus expansion bus
 	MCFG_NASBUS_ADD(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_w))
+	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_w))
 	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, nullptr)
 	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, nullptr)
 	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, nullptr)
@@ -737,15 +737,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nascom2_state::nascom2c)
 	nascom2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nascom2c_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nascom2c_mem)
 
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("60K")
 
 	MCFG_DEVICE_MODIFY(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_cpm_w))
+	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_cpm_w))
 MACHINE_CONFIG_END
 
 
@@ -797,7 +797,7 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT      COMPANY                  FULLNAME           FLAGS
-COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom1_state, nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
-COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
-COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT           COMPANY                  FULLNAME           FLAGS
+COMP( 1977, nascom1,  0,       0,      nascom1,  nascom1,  nascom1_state, init_nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
+COMP( 1980, nascom2c, nascom2, 0,      nascom2c, nascom2c, nascom2_state, init_nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )

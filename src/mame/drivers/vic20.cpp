@@ -798,30 +798,30 @@ WRITE_LINE_MEMBER(vic20_state::write_user_cassette_switch)
 
 MACHINE_CONFIG_START(vic20_state::vic20)
 	// devices
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(M6522_2_TAG, via6522_device, write_ca1))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(M6522_2_TAG, via6522_device, write_ca1))
 	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(M6522_2_TAG, via6522_device, write_cb1))
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(M6522_2_TAG, via6522_device, write_cb1))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(vic20_state, write_light_pen))
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(*this, vic20_state, write_light_pen))
 
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, vic20_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(vic20_state, exp_reset_w))
-	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(vic20_state, write_user_joy0))
-	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(vic20_state, write_user_joy1))
-	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(vic20_state, write_user_joy2))
-	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(vic20_state, write_user_light_pen))
-	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(vic20_state, write_user_cassette_switch))
-	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_cb1))
-	MCFG_PET_USER_PORT_C_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb0))
-	MCFG_PET_USER_PORT_D_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb1))
-	MCFG_PET_USER_PORT_E_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb2))
-	MCFG_PET_USER_PORT_F_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb3))
-	MCFG_PET_USER_PORT_H_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb4))
-	MCFG_PET_USER_PORT_J_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb5))
-	MCFG_PET_USER_PORT_K_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb6))
-	MCFG_PET_USER_PORT_L_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb7))
-	MCFG_PET_USER_PORT_M_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_cb2))
+	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, vic20_state, exp_reset_w))
+	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(*this, vic20_state, write_user_joy0))
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(*this, vic20_state, write_user_joy1))
+	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(*this, vic20_state, write_user_joy2))
+	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(*this, vic20_state, write_user_light_pen))
+	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(*this, vic20_state, write_user_cassette_switch))
+	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_cb1))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb0))
+	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb1))
+	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb2))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb3))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb4))
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb5))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb6))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb7))
+	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_cb2))
 
 	MCFG_QUICKLOAD_ADD("quickload", vic20_state, cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -843,39 +843,39 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vic20_state::ntsc)
 	vic20(config);
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6560_CLOCK)
-	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via1_pa_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vic20_state, via1_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via1_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, vic20_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via1_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
 
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, MOS6560_CLOCK)
-	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via2_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(vic20_state, via2_pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via2_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vic20_state, via2_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vic20_state, via2_cb2_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via2_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, vic20_state, via2_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via2_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, vic20_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, vic20_state, via2_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_videoram_map, vic_colorram_map)
-	MCFG_MOS6560_POTX_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
-	MCFG_MOS6560_POTY_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
+	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
+	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6560_CLOCK, vic20_expansion_cards, nullptr)
+	MCFG_DEVICE_ADD(VIC20_EXPANSION_SLOT_TAG, VIC20_EXPANSION_SLOT, MOS6560_CLOCK, vic20_expansion_cards, nullptr)
 	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
-	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(vic20_state, exp_reset_w))
+	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic20_state, exp_reset_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
@@ -891,39 +891,39 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vic20_state::pal)
 	vic20(config);
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6561_CLOCK)
-	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via1_pa_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vic20_state, via1_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via1_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, vic20_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via1_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
 
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, MOS6561_CLOCK)
-	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via2_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(vic20_state, via2_pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via2_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vic20_state, via2_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vic20_state, via2_cb2_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via2_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, vic20_state, via2_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via2_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, vic20_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, vic20_state, via2_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_videoram_map, vic_colorram_map)
-	MCFG_MOS6560_POTX_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
-	MCFG_MOS6560_POTY_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
+	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
+	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6561_CLOCK, vic20_expansion_cards, nullptr)
+	MCFG_DEVICE_ADD(VIC20_EXPANSION_SLOT_TAG, VIC20_EXPANSION_SLOT, MOS6561_CLOCK, vic20_expansion_cards, nullptr)
 	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
-	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(vic20_state, exp_reset_w))
+	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic20_state, exp_reset_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
@@ -1012,8 +1012,8 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE         INIT        COMPANY                             FULLNAME                    FLAGS
-COMP( 1980, vic1001,    0,          0,      ntsc,       vic1001,    vic20_state,  0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20,      vic1001,    0,      ntsc,       vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20p,     vic1001,    0,      pal,        vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20_se,   vic1001,    0,      pal,        vic20s,     vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY                        FULLNAME                   FLAGS
+COMP( 1980, vic1001,  0,       0,      ntsc,    vic1001, vic20_state, empty_init, "Commodore Business Machines", "VIC-1001 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20,    vic1001, 0,      ntsc,    vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (NTSC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20p,   vic1001, 0,      pal,     vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 / VC-20 (PAL)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20_se, vic1001, 0,      pal,     vic20s,  vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (Sweden/Finland)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

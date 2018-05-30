@@ -580,13 +580,13 @@ INPUT_PORTS_END
 void indigo_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^mono", 1.0)
 }
 
 MACHINE_CONFIG_START(indigo_state::indigo3k)
-	MCFG_CPU_ADD("maincpu", R3041, 33000000)
+	MCFG_DEVICE_ADD("maincpu", R3041, 33000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(indigo3k_map)
+	MCFG_DEVICE_PROGRAM_MAP(indigo3k_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -599,7 +599,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("scc", SCC8530, 7000000)
 
@@ -609,17 +609,17 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(WRITELINE(indigo_state, scsi_irq))      /* command completion IRQ */
+	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)
 	indigo3k(config);
-	MCFG_CPU_REPLACE("maincpu", R4600BE, 150000000) // Should be R4400
+	MCFG_DEVICE_REPLACE("maincpu", R4600BE, 150000000) // Should be R4400
 	MCFG_MIPS3_ICACHE_SIZE(32768)
 	MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_CPU_PROGRAM_MAP(indigo4k_map)
+	MCFG_DEVICE_PROGRAM_MAP(indigo4k_map)
 
 	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 MACHINE_CONFIG_END
@@ -637,6 +637,6 @@ ROM_START( indigo4k )
 	ROM_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT   COMPANY                 FULLNAME                                          FLAGS
-COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY                 FULLNAME                                          FLAGS
+COMP( 1991, indigo3k, 0,      0,      indigo3k, indigo, indigo_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,      0,      indigo4k, indigo, indigo_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

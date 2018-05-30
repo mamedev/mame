@@ -2220,23 +2220,23 @@ static const gfx_layout rockclim_charlayout =
 	8*8*2
 };
 
-static GFXDECODE_START( rockclim )
+static GFXDECODE_START( gfx_rockclim )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   32, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 32, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, rockclim_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( galaxian )
+static GFXDECODE_START( gfx_galaxian )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( gmgalax )
+static GFXDECODE_START( gfx_gmgalax )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( _4in1 )
+static GFXDECODE_START( gfx_4in1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, _4in1_charlayout,      0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x4000, _4in1_spritelayout,    0, 8 )
 GFXDECODE_END
@@ -2245,23 +2245,23 @@ GFXDECODE_END
 MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(galaxold_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2) /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(galaxold_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(galaxold_state,galaxold_7474_9m_1_callback))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_1_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(galaxold_state,galaxold_7474_9m_2_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
 	MCFG_PALETTE_ADD("palette", 32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 
@@ -2273,7 +2273,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
@@ -2291,8 +2291,8 @@ MACHINE_CONFIG_START(galaxold_state::mooncrst)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mooncrst_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
@@ -2311,8 +2311,8 @@ MACHINE_CONFIG_START(galaxold_state::videotron)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hustlerb3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hustlerb3_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
@@ -2331,8 +2331,8 @@ MACHINE_CONFIG_START(galaxold_state::scramblb)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scramblb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scramblb_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2347,8 +2347,8 @@ MACHINE_CONFIG_START(galaxold_state::scramb2)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scramb2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scramb2_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2363,8 +2363,8 @@ MACHINE_CONFIG_START(galaxold_state::scrambler)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scrambler_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scrambler_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2379,8 +2379,8 @@ MACHINE_CONFIG_START(galaxold_state::guttang)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(guttang_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(guttang_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2396,11 +2396,11 @@ MACHINE_CONFIG_START(galaxold_state::_4in1)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(_4in1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(_4in1_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", _4in1)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_4in1)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,pisces)
 MACHINE_CONFIG_END
@@ -2410,8 +2410,8 @@ MACHINE_CONFIG_START(galaxold_state::bagmanmc)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bagmanmc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bagmanmc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state, devilfsg )
 
@@ -2424,8 +2424,8 @@ MACHINE_CONFIG_START(galaxold_state::dkongjrm)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dkongjrm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dkongjrm_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrm)
@@ -2434,8 +2434,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxold_state::dkongjrmc)
 	mooncrst(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dkongjrmc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dkongjrmc_map)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrmc)
 MACHINE_CONFIG_END
@@ -2445,9 +2445,9 @@ MACHINE_CONFIG_START(galaxold_state::rockclim)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rockclim_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", rockclim)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rockclim_map)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_rockclim)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
@@ -2464,10 +2464,10 @@ MACHINE_CONFIG_START(galaxold_state::ozon1)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ozon1_map)
-	MCFG_CPU_IO_MAP(ozon1_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ozon1_map)
+	MCFG_DEVICE_IO_MAP(ozon1_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
 
 	MCFG_MACHINE_RESET_REMOVE()
 
@@ -2477,7 +2477,7 @@ MACHINE_CONFIG_START(galaxold_state::ozon1)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
-	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
@@ -2485,11 +2485,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(drivfrcg)
-	MCFG_CPU_IO_MAP(drivfrcg_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) // ???
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(drivfrcg)
+	MCFG_DEVICE_IO_MAP(drivfrcg_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) // ???
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2503,12 +2503,12 @@ MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gmgalax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gmgalax)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	galaxian_audio(config);
 MACHINE_CONFIG_END
@@ -2518,9 +2518,9 @@ MACHINE_CONFIG_START(galaxold_state::bongo)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bongo)
-	MCFG_CPU_IO_MAP(bongo_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bongo)
+	MCFG_DEVICE_IO_MAP(bongo_io)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,bongo)
@@ -2528,7 +2528,7 @@ MACHINE_CONFIG_START(galaxold_state::bongo)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -2538,11 +2538,11 @@ MACHINE_CONFIG_START(galaxold_state::hunchbkg)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
+	MCFG_DEVICE_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
 
-	MCFG_CPU_PROGRAM_MAP(hunchbkg)
-	MCFG_CPU_DATA_MAP(hunchbkg_data)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
+	MCFG_DEVICE_PROGRAM_MAP(hunchbkg)
+	MCFG_DEVICE_DATA_MAP(hunchbkg_data)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
 
 	MCFG_DEVICE_MODIFY("7474_9m_1")
 	/* the nmi line seems to be inverted on the cpu plugin board */
@@ -2558,8 +2558,8 @@ MACHINE_CONFIG_START(galaxold_state::spcwarp)
 	hunchbkg(config);
 	/* hunchbkg, but with a different memory map */
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spcwarp)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spcwarp)
 MACHINE_CONFIG_END
 
 
@@ -2567,22 +2567,22 @@ MACHINE_CONFIG_START(galaxold_state::tazzmang)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tazzmang)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tazzmang)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(galaxold_state::racknrol)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(racknrol)
-	MCFG_CPU_IO_MAP(racknrol_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
+	MCFG_DEVICE_ADD("maincpu", S2650, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(racknrol)
+	MCFG_DEVICE_IO_MAP(racknrol_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
@@ -2594,8 +2594,8 @@ MACHINE_CONFIG_START(galaxold_state::racknrol)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("snsnd", SN76489A, PIXEL_CLOCK/2) // SN76489AN
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("snsnd", SN76489A, PIXEL_CLOCK/2) // SN76489AN
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -2603,14 +2603,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::hexpoola)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(racknrol)
-	MCFG_CPU_IO_MAP(hexpoola_io)
-	MCFG_CPU_DATA_MAP(hexpoola_data)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_DEVICE_ADD("maincpu", S2650, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(racknrol)
+	MCFG_DEVICE_IO_MAP(hexpoola_io)
+	MCFG_DEVICE_DATA_MAP(hexpoola_data)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
@@ -2622,8 +2622,8 @@ MACHINE_CONFIG_START(galaxold_state::hexpoola)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -2632,10 +2632,10 @@ MACHINE_CONFIG_START(galaxold_state::ckongg)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ckongg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ckongg_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END
@@ -2645,10 +2645,10 @@ MACHINE_CONFIG_START(galaxold_state::ckongmc)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ckongmc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ckongmc_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END
@@ -2657,8 +2657,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::bullsdrtg)
 	hexpoola(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DATA_MAP(bullsdrtg_data_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_DATA_MAP(bullsdrtg_data_map)
 MACHINE_CONFIG_END
 
 
@@ -2841,7 +2841,7 @@ ROM_START( ckongmc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
+void galaxold_state::init_ckonggx()
 {
 	uint16_t ckonggx_remap[88] = {
 		0x5000, 0x0d00, 0x0e00, 0x0f00, 0x0c00, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800, 0x0900, 0x0a00, 0x0b00,
@@ -2856,7 +2856,7 @@ DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 	uint8_t *rom = memregion("maincpu")->base();
 	std::vector<uint8_t> buffer(0x5800);
 
-	for (int i=0;i<88;i++)
+	for (int i = 0; i < 88; i++)
 	{
 		memcpy(&buffer[i*0x100], rom+ckonggx_remap[i], 0x100);
 
@@ -3585,7 +3585,7 @@ ROM_START( bullsdrtg )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0020, CRC(16b19bfa) SHA1(a0e9217f9bc5b06212d5f22dcc3dc4b2838788ba) )
 ROM_END
 
-DRIVER_INIT_MEMBER(galaxold_state,guttangt)
+void galaxold_state::init_guttangt()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_bank( 0x2000, 0x27ff, "cpubank" );
@@ -3595,43 +3595,43 @@ DRIVER_INIT_MEMBER(galaxold_state,guttangt)
 
 
 /* Z80 games */
-//    YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT       ROT     COMPANY, FULLNAME, FLAGS, LAYOUT
-GAME( 1981, vpool,     hustler,  mooncrst,  vpool,     galaxold_state, 0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rockclim,  0,        rockclim,  rockclim,  galaxold_state, 0,        ROT180, "Taito", "Rock Climber", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongg,    ckong,    ckongg,    ckongg,    galaxold_state, 0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongmc,   ckong,    ckongmc,   ckongmc,   galaxold_state, 0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
-GAME( 1981, ckonggx,   ckong,    ckongg,    ckonggx,   galaxold_state, ckonggx,  ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, ckongcv,   ckong,    ckongg,    ckonggx,   galaxold_state, ckonggx,  ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 2)", MACHINE_NOT_WORKING )
-GAME( 1982, ckongis,   ckong,    ckongg,    ckonggx,   galaxold_state, ckonggx,  ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 3)", MACHINE_NOT_WORKING )
-GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, 0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, 0,        ROT90,  "bootleg", "Scramble (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, 0,        ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, 4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, 0,        ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, 0,        ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, 0,        ROT90,  "bootleg (Centromatic)", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
-GAME( 1982, porter,    dockman,  porter,    porter,    galaxold_state, 0,        ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, 0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, 0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bongo,     0,        bongo,     bongo,     galaxold_state, 0,        ROT90,  "Jetsoft", "Bongo", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ozon1,     0,        ozon1,     ozon1,     galaxold_state, 0,        ROT90,  "Proma", "Ozon I", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, guttangt,  locomotn, guttang,   guttangt,  galaxold_state, guttangt, ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
+//    YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT             ROT     COMPANY, FULLNAME, FLAGS, LAYOUT
+GAME( 1981, vpool,     hustler,  mooncrst,  vpool,     galaxold_state, empty_init,     ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rockclim,  0,        rockclim,  rockclim,  galaxold_state, empty_init,     ROT180, "Taito", "Rock Climber", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongg,    ckong,    ckongg,    ckongg,    galaxold_state, empty_init,     ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongmc,   ckong,    ckongmc,   ckongmc,   galaxold_state, empty_init,     ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
+GAME( 1981, ckonggx,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, ckongcv,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 2)", MACHINE_NOT_WORKING )
+GAME( 1982, ckongis,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 3)", MACHINE_NOT_WORKING )
+GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, init_4in1,      ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_init,     ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_init,     ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
+GAME( 1982, porter,    dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bongo,     0,        bongo,     bongo,     galaxold_state, empty_init,     ROT90,  "Jetsoft", "Bongo", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ozon1,     0,        ozon1,     ozon1,     galaxold_state, empty_init,     ROT90,  "Proma", "Ozon I", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, guttangt,  locomotn, guttang,   guttangt,  galaxold_state, init_guttangt,  ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
 
 // Videotron cartridge system
-GAME( 1981, hustlerb3, hustler,  videotron, hustlerb3, galaxold_state, 0,        ROT90,  "bootleg (Videotron)", "Video Pool (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, froggerv,  frogger,  videotron, froggerv,  galaxold_state, 0,        ROT90,  "bootleg (Videotron / Gamepack)", "Frogger (Videotron bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb3, hustler,  videotron, hustlerb3, galaxold_state, empty_init,     ROT90,  "bootleg (Videotron)", "Video Pool (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggerv,  frogger,  videotron, froggerv,  galaxold_state, empty_init,     ROT90,  "bootleg (Videotron / Gamepack)", "Frogger (Videotron bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* S2650 games */
-//    YEAR  NAME       PARENT    MACHINE    INPUT      STATE           INIT       ROT     COMPANY, FULLNAME, FLAGS, LAYOUT
-GAME( 1983, hunchbkg,  hunchbak, hunchbkg,  hunchbkg,  galaxold_state, 0,         ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  galaxold_state, 0,         ROT90,  "Century Electronics", "Space Warp? (Cosmos conversion on Galaxian hardware)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // bad dump
-GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
-GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, drivfrcsg, drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "Seatongrove UK", "Driving Force (Galaxian conversion, Seatongrove UK)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, racknrol,  0,        racknrol,  racknrol,  galaxold_state, 0,         ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, hexpool,   racknrol, racknrol,  racknrol,  galaxold_state, 0,         ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", MACHINE_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
-GAME( 1985, hexpoola,  racknrol, hexpoola,  racknrol,  galaxold_state, 0,         ROT90,  "Senko Industries", "Hex Pool (Senko)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvchlng,  0,        racknrol,  trvchlng,  galaxold_state, 0,         ROT90,  "Joyland (Senko license)", "Trivia Challenge", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bullsdrtg, bullsdrt, bullsdrtg, racknrol,  galaxold_state, bullsdrtg, ROT90,  "Senko Industries", "Bulls Eye Darts (Galaxian conversion)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS )
+//    YEAR  NAME       PARENT    MACHINE    INPUT      STATE           INIT            ROT     COMPANY, FULLNAME, FLAGS, LAYOUT
+GAME( 1983, hunchbkg,  hunchbak, hunchbkg,  hunchbkg,  galaxold_state, empty_init,     ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  galaxold_state, empty_init,     ROT90,  "Century Electronics", "Space Warp? (Cosmos conversion on Galaxian hardware)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // bad dump
+GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
+GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, drivfrcsg, drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Seatongrove UK", "Driving Force (Galaxian conversion, Seatongrove UK)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, racknrol,  0,        racknrol,  racknrol,  galaxold_state, empty_init,     ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hexpool,   racknrol, racknrol,  racknrol,  galaxold_state, empty_init,     ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", MACHINE_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
+GAME( 1985, hexpoola,  racknrol, hexpoola,  racknrol,  galaxold_state, empty_init,     ROT90,  "Senko Industries", "Hex Pool (Senko)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvchlng,  0,        racknrol,  trvchlng,  galaxold_state, empty_init,     ROT90,  "Joyland (Senko license)", "Trivia Challenge", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bullsdrtg, bullsdrt, bullsdrtg, racknrol,  galaxold_state, init_bullsdrtg, ROT90,  "Senko Industries", "Bulls Eye Darts (Galaxian conversion)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS )

@@ -137,8 +137,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(cvicny_state::cvicny)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(cvicny_mem)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cvicny_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_cvicny)
@@ -152,5 +152,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY      FULLNAME        FLAGS
-COMP( 1984, cvicny, 0,      0,       cvicny,    cvicny, cvicny_state,  0,     "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME        FLAGS
+COMP( 1984, cvicny, 0,      0,      cvicny,  cvicny, cvicny_state, empty_init, "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW)

@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_last_nmi_state = state;
 }
@@ -377,22 +377,23 @@ void coleco_state::machine_reset()
 MACHINE_CONFIG_START(coleco_state::coleco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
-	MCFG_CPU_PROGRAM_MAP(coleco_map)
-	MCFG_CPU_IO_MAP(coleco_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
+	MCFG_DEVICE_PROGRAM_MAP(coleco_map)
+	MCFG_DEVICE_IO_MAP(coleco_io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SN76496_READY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
+	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
+	//MCFG_SN76496_READY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	/* cartridge */
 	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, nullptr)
@@ -412,7 +413,7 @@ MACHINE_CONFIG_START(coleco_state::colecop)
 
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -421,8 +422,8 @@ MACHINE_CONFIG_START(coleco_state::czz50)
 	coleco(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
-	MCFG_CPU_PROGRAM_MAP(czz50_map)
+	MCFG_DEVICE_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
+	MCFG_DEVICE_PROGRAM_MAP(czz50_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coleco_state::dina)
@@ -434,7 +435,7 @@ MACHINE_CONFIG_START(coleco_state::dina)
 
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -494,10 +495,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco, coleco_state, 0,    "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, coleco_state, 0,    "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
-CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, coleco_state, 0,    "Coleco",           "ColecoVision (PAL)",               0 )
-CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  coleco_state, 0,    "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,     czz50,  coleco_state, 0,    "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  coleco_state, 0,    "Telegames",        "Personal Arcade",                  0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                            FLAGS
+CONS( 1982, coleco,   0,      0,      coleco,   coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco, 0,      coleco,   coleco, coleco_state, empty_init, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, colecop,  coleco, 0,      colecop,  coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )

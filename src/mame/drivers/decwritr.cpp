@@ -415,9 +415,9 @@ void decwriter_state::machine_reset()
 
 MACHINE_CONFIG_START(decwriter_state::la120)
 
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(18'000'000) / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
-	MCFG_CPU_PROGRAM_MAP(la120_mem)
-	MCFG_CPU_IO_MAP(la120_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(18'000'000) / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
+	MCFG_DEVICE_PROGRAM_MAP(la120_mem)
+	MCFG_DEVICE_IO_MAP(la120_io)
 
 	/* video hardware */
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
@@ -430,24 +430,24 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	//MCFG_DEFAULT_LAYOUT( layout_la120 )
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 786) // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 786) // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* i8251 */
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	/*
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("i8251", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("i8251", i8251_device, write_txc))
 	*/
 
 	MCFG_DEVICE_ADD("nvm", ER1400, 0)
@@ -472,5 +472,5 @@ ROM_END
 //**************************************************************************
 //  DRIVERS
 //**************************************************************************
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT  COMPANY                          FULLNAME       FLAGS */
-COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_IS_SKELETON )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT        COMPANY                          FULLNAME                 FLAGS */
+COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, empty_init, "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_IS_SKELETON )

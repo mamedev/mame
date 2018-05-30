@@ -44,7 +44,7 @@ WRITE8_MEMBER(pcktgal_state::sound_bank_w)
 WRITE8_MEMBER(pcktgal_state::sound_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -199,12 +199,12 @@ static const gfx_layout bootleg_spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( pcktgal )
+static GFXDECODE_START( gfx_pcktgal )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   256, 16 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,   0,  8 ) /* sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, bootleg_charlayout,   256, 16 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bootleg_spritelayout,   0,  8 ) /* sprites */
 GFXDECODE_END
@@ -226,11 +226,11 @@ void pcktgal_state::machine_start()
 MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(pcktgal_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(pcktgal_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
-	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(pcktgal_sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcktgal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcktgal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(pcktgal_state, pcktgal)
 
@@ -254,18 +254,18 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(pcktgal_state, adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pcktgal_state, adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -273,7 +273,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcktgal_state::bootleg)
 	pcktgal(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bootleg)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bootleg)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgalb)
 MACHINE_CONFIG_END
@@ -281,8 +281,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pcktgal_state::pcktgal2)
 	pcktgal(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
-	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
+	MCFG_DEVICE_PROGRAM_MAP(pcktgal_sound_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -430,16 +430,16 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
+void pcktgal_state::init_pcktgal()
 {
 	uint8_t *rom = memregion("gfx1")->base();
-	int len = memregion("gfx1")->bytes();
-	int i,j,temp[16];
+	const int len = memregion("gfx1")->bytes();
 
 	/* Tile graphics roms have some swapped lines, original version only */
-	for (i = 0x00000;i < len;i += 32)
+	for (int i = 0x00000; i < len; i += 32)
 	{
-		for (j=0; j<16; j++)
+		int temp[16];
+		for (int j = 0; j < 16; j++)
 		{
 			temp[j] = rom[i+j+16];
 			rom[i+j+16] = rom[i+j];
@@ -452,9 +452,9 @@ DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
 
 /***************************************************************************/
 
-GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, 0,        ROT0, "bootleg", "Pocket Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Super Pool III (English)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spool3i,  pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, empty_init,    ROT0, "bootleg", "Pocket Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Super Pool III (English)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spool3i,  pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", MACHINE_SUPPORTS_SAVE )

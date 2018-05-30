@@ -100,30 +100,30 @@ static const floppy_interface lisa_floppy_interface =
 /* Lisa1 and Lisa 2 machine */
 MACHINE_CONFIG_START(lisa_state::lisa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
-	MCFG_CPU_PROGRAM_MAP(lisa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, lisa_state,  lisa_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
+	MCFG_DEVICE_PROGRAM_MAP(lisa_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER(SCREEN_TAG, lisa_state,  lisa_interrupt)
 
-	MCFG_CPU_ADD(COP421_TAG, COP421, 3900000)
+	MCFG_DEVICE_ADD(COP421_TAG, COP421, 3900000)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
 
-	MCFG_CPU_ADD(KB_COP421_TAG, COP421, 3900000) // ?
+	MCFG_DEVICE_ADD(KB_COP421_TAG, COP421, 3900000) // ?
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
 
-	MCFG_CPU_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
-	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
+	MCFG_DEVICE_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
+	MCFG_DEVICE_PROGRAM_MAP(lisa_fdc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // U4E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(lisa_state, diag1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(lisa_state, diag2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(lisa_state, seg1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(lisa_state, seg2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(lisa_state, setup_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(lisa_state, sfmsk_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(lisa_state, vtmsk_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(lisa_state, hdmsk_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, lisa_state, diag1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, lisa_state, diag2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, lisa_state, seg1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, lisa_state, seg2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, lisa_state, setup_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, lisa_state, sfmsk_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, lisa_state, vtmsk_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, lisa_state, hdmsk_w))
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -138,8 +138,8 @@ MACHINE_CONFIG_START(lisa_state::lisa)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* nvram */
@@ -154,11 +154,11 @@ MACHINE_CONFIG_START(lisa_state::lisa)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 500000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(lisa_state, COPS_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(lisa_state, COPS_via_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(lisa_state, COPS_via_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(lisa_state, COPS_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(lisa_state, COPS_via_irq_func))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, lisa_state, COPS_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, lisa_state, COPS_via_out_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, lisa_state, COPS_via_out_ca2))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, lisa_state, COPS_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, lisa_state, COPS_via_irq_func))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 500000)
 
@@ -168,8 +168,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lisa_state::lisa210)
 	lisa(config);
-	MCFG_CPU_MODIFY( "fdccpu" )
-	MCFG_CPU_PROGRAM_MAP(lisa210_fdc_map)
+	MCFG_DEVICE_MODIFY( "fdccpu" )
+	MCFG_DEVICE_PROGRAM_MAP(lisa210_fdc_map)
 
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */
 	MCFG_IWM_MODIFY("fdc", lisa210_fdc_interface)
@@ -192,8 +192,7 @@ MACHINE_CONFIG_END
 /* 2008-05 FP:
 Small note about natural keyboard support: currently,
 - "Clear" (on the Keypad) is mapped to 'F1'
-- "Enter" (different from Return) is mapped to 'F2'
-- "Keypad ," is currently unmapped                   */
+- "Enter" (different from Return) is mapped to 'F2' */
 
 static INPUT_PORTS_START( lisa )
 	PORT_START("MOUSE_X") /* Mouse - X AXIS */
@@ -211,18 +210,18 @@ static INPUT_PORTS_START( lisa )
 	PORT_BIT(0xFFFF, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("LINE2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad + [\xe2\x97\x80]") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad * [\xe2\x96\xb6]") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)             PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad / [\xe2\x96\xb2]") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)             PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)             PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)             PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad ,")    // this one would be between '+' and 'Enter' on a modern keypad.
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad , [\xe2\x96\xbc]") PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))    // this one would be between '+' and 'Enter' on a modern keypad.
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)           PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)             PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
@@ -494,8 +493,9 @@ ROM_END
     Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
     the MACHINE_NOT_WORKING flag...
 */
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE        INIT     COMPANY            FULLNAME */
-COMP( 1983, lisa,     0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa",         MACHINE_NOT_WORKING )
-COMP( 1984, lisa2,    0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa2",        MACHINE_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,   0,      lisa210,  lisa,  lisa_state,  lisa210, "Apple Computer",  "Lisa2/10",     MACHINE_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,   0,      macxl,    lisa,  lisa_state,  mac_xl,  "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY           FULLNAME */
+COMP( 1983, lisa,    0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa",         MACHINE_NOT_WORKING )
+COMP( 1984, lisa2,   0,      0,      lisa,    lisa,  lisa_state, init_lisa2,   "Apple Computer", "Lisa2",        MACHINE_NOT_WORKING )
+COMP( 1984, lisa210, lisa2,  0,      lisa210, lisa,  lisa_state, init_lisa210, "Apple Computer", "Lisa2/10",     MACHINE_NOT_WORKING )
+COMP( 1985, macxl,   lisa2,  0,      macxl,   lisa,  lisa_state, init_mac_xl,  "Apple Computer", "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+

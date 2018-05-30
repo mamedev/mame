@@ -303,15 +303,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(starwars_state::starwars)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
@@ -319,23 +319,23 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_ADC0808_IN2_CB(GND) // thrust (unused)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK / 8)
-	MCFG_RIOT6532_IN_PA_CB(READ8(starwars_state, r6532_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(starwars_state, r6532_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("tms", tms5220_device, status_r))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("tms", tms5220_device, data_w))
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, starwars_state, r6532_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, starwars_state, r6532_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8("tms", tms5220_device, status_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("tms", tms5220_device, data_w))
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
 	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 9L/M
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(starwars_state, coin1_counter_w)) // Coin counter 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(starwars_state, coin2_counter_w)) // Coin counter 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(starwars_state, led3_w)) // LED 3
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(starwars_state, led2_w)) // LED 2
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, starwars_state, coin1_counter_w)) // Coin counter 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, starwars_state, coin2_counter_w)) // Coin counter 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT // LED 3
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1")) // bank switch
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(starwars_state, prng_reset_w)) // reset PRNG
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(starwars_state, led1_w)) // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(starwars_state, recall_w)) // NVRAM array recall
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, starwars_state, prng_reset_w)) // reset PRNG
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, starwars_state, recall_w)) // NVRAM array recall
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -349,37 +349,37 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey3", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey4", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
+	MCFG_DEVICE_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa7_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(starwars_state, boost_interleave_hack))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("riot", riot6532_device, pa7_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, starwars_state, boost_interleave_hack))
 
 	MCFG_GENERIC_LATCH_8_ADD("mainlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa6_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(starwars_state, boost_interleave_hack))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("riot", riot6532_device, pa6_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, starwars_state, boost_interleave_hack))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(starwars_state::esb)
 	starwars(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(esb_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 101)
 
@@ -399,149 +399,149 @@ MACHINE_CONFIG_END
 
 ROM_START( starwars )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021.105",   0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
-	ROM_LOAD( "136021.214.1f",   0x6000, 0x2000, CRC(04f1876e) SHA1(c1d3637cb31ece0890c25f6122d6bcd27e6ffe0c) )   /* ROM 0 bank pages 0 and 1 */
-	ROM_CONTINUE(               0x10000, 0x2000 )
-	ROM_LOAD( "136021.102.1hj",  0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
-	ROM_LOAD( "136021.203.1jk",  0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
-	ROM_LOAD( "136021.104.1kl",  0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
-	ROM_LOAD( "136021.206.1m",   0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+	ROM_LOAD( "136021-105.1l", 0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
+	ROM_LOAD( "136021.214.1f", 0x6000, 0x2000, CRC(04f1876e) SHA1(c1d3637cb31ece0890c25f6122d6bcd27e6ffe0c) ) /* ROM 0 bank pages 0 and 1 */
+	ROM_CONTINUE(              0x10000, 0x2000 )
+	ROM_LOAD( "136021.102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
+	ROM_LOAD( "136021.203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
+	ROM_LOAD( "136021.104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
+	ROM_LOAD( "136021.206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "136021.107",   0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xc000, 0x2000 )
-	ROM_LOAD( "136021.208",   0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xe000, 0x2000 )
+	ROM_LOAD( "136021-107.1jk",0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xc000, 0x2000 )
+	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xe000, 0x2000 )
 
 	ROM_REGION( 0x100, "user1", 0)
-	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
+	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136021.110",   0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021.111",   0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021.112",   0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021.113",   0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
+	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
+	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
+	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
 ROM_END
 
 ROM_START( starwars1 )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021.105",   0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
-	ROM_LOAD( "136021.114.1f",   0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) )   /* ROM 0 bank pages 0 and 1 */
-	ROM_CONTINUE(               0x10000, 0x2000 )
-	ROM_LOAD( "136021.102.1hj",  0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
-	ROM_LOAD( "136021.203.1jk",  0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
-	ROM_LOAD( "136021.104.1kl",  0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
-	ROM_LOAD( "136021.206.1m",   0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+	ROM_LOAD( "136021-105.1l", 0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
+	ROM_LOAD( "136021.114.1f", 0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) ) /* ROM 0 bank pages 0 and 1 */
+	ROM_CONTINUE(              0x10000, 0x2000 )
+	ROM_LOAD( "136021.102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
+	ROM_LOAD( "136021.203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
+	ROM_LOAD( "136021.104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
+	ROM_LOAD( "136021.206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "136021.107",   0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xc000, 0x2000 )
-	ROM_LOAD( "136021.208",   0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xe000, 0x2000 )
+	ROM_LOAD( "136021-107.1jk",0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xc000, 0x2000 )
+	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xe000, 0x2000 )
 
 	ROM_REGION( 0x100, "user1", 0)
-	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
+	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0)
-	ROM_LOAD( "136021.110",   0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021.111",   0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021.112",   0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021.113",   0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
+	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
+	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
+	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
 ROM_END
 
 ROM_START( starwarso )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021.105",   0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
-	ROM_LOAD( "136021-114.1f",   0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) )   /* ROM 0 bank pages 0 and 1 */
-	ROM_CONTINUE(            0x10000, 0x2000 )
-	ROM_LOAD( "136021-102.1hj",  0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
-	ROM_LOAD( "136021-103.1jk",  0xa000, 0x2000, CRC(3fde9ccb) SHA1(8d88fc7a28ac8f189f8aba08598732ac8c5491aa) ) /*  8k ROM 2 bank */
-	ROM_LOAD( "136021-104.1kl",  0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
-	ROM_LOAD( "136021-206.1m",   0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+	ROM_LOAD( "136021-105.1l", 0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
+	ROM_LOAD( "136021-114.1f", 0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) ) /* ROM 0 bank pages 0 and 1 */
+	ROM_CONTINUE(              0x10000, 0x2000 )
+	ROM_LOAD( "136021-102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
+	ROM_LOAD( "136021-103.1jk",0xa000, 0x2000, CRC(3fde9ccb) SHA1(8d88fc7a28ac8f189f8aba08598732ac8c5491aa) ) /*  8k ROM 2 bank */
+	ROM_LOAD( "136021-104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
+	ROM_LOAD( "136021-206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "136021.107",   0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xc000, 0x2000 )
-	ROM_LOAD( "136021.208",   0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xe000, 0x2000 )
+	ROM_LOAD( "136021-107.1jk",0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xc000, 0x2000 )
+	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xe000, 0x2000 )
 
 	ROM_REGION( 0x100, "user1", 0)
-	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
+	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136021.110",   0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021.111",   0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021.112",   0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021.113",   0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
+	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
+	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
+	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
 ROM_END
 
 
 
 ROM_START( tomcatsw )
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "tcavg3.1l",    0x3000, 0x1000, CRC(27188aa9) SHA1(5d9a978a7ac1913b57586e81045a1b955db27b48) )
-	ROM_LOAD( "tc6.1f",       0x6000, 0x2000, CRC(56e284ff) SHA1(a5fda9db0f6b8f7d28a4a607976fe978e62158cf) )
-	ROM_LOAD( "tc8.1hj",      0x8000, 0x2000, CRC(7b7575e3) SHA1(bdb838603ffb12195966d0ce454900253bc0f43f) )
-	ROM_LOAD( "tca.1jk",      0xa000, 0x2000, CRC(a1020331) SHA1(128745a2ec771ac818a8fbba59a08f0cf5f28e8f) )
-	ROM_LOAD( "tce.1m",       0xe000, 0x2000, CRC(4a3de8a3) SHA1(e48fc17201326358317f6b428e583ecaa3ecb881) )
+	ROM_LOAD( "tcavg3.1l",     0x3000, 0x1000, CRC(27188aa9) SHA1(5d9a978a7ac1913b57586e81045a1b955db27b48) )
+	ROM_LOAD( "tc6.1f",        0x6000, 0x2000, CRC(56e284ff) SHA1(a5fda9db0f6b8f7d28a4a607976fe978e62158cf) )
+	ROM_LOAD( "tc8.1hj",       0x8000, 0x2000, CRC(7b7575e3) SHA1(bdb838603ffb12195966d0ce454900253bc0f43f) )
+	ROM_LOAD( "tca.1jk",       0xa000, 0x2000, CRC(a1020331) SHA1(128745a2ec771ac818a8fbba59a08f0cf5f28e8f) )
+	ROM_LOAD( "tce.1m",        0xe000, 0x2000, CRC(4a3de8a3) SHA1(e48fc17201326358317f6b428e583ecaa3ecb881) )
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "136021.107",   0x4000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xc000, 0x2000 )
-	ROM_LOAD( "136021.208",   0x6000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
-	ROM_RELOAD(               0xe000, 0x2000 )
+	ROM_LOAD( "136021-107.1jk",0x4000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xc000, 0x2000 )
+	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
+	ROM_RELOAD(                0xe000, 0x2000 )
 
 	ROM_REGION( 0x100, "user1", 0)
-	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
+	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136021.110",   0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
-	ROM_LOAD( "136021.111",   0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
-	ROM_LOAD( "136021.112",   0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
-	ROM_LOAD( "136021.113",   0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
+	ROM_LOAD( "136021-110.7h", 0x0000, 0x0400, CRC(810e040e) SHA1(d247cbb0afb4538d5161f8ce9eab337cdb3f2da4) ) /* PROM 0 */
+	ROM_LOAD( "136021-111.7j", 0x0400, 0x0400, CRC(ae69881c) SHA1(f3420c6e15602956fd94982a5d8d4ddd015ed977) ) /* PROM 1 */
+	ROM_LOAD( "136021-112.7k", 0x0800, 0x0400, CRC(ecf22628) SHA1(4dcf5153221feca329b8e8d199bd4fc00b151d9c) ) /* PROM 2 */
+	ROM_LOAD( "136021-113.7l", 0x0c00, 0x0400, CRC(83febfde) SHA1(e13541b09d1724204fdb171528e9a1c83c799c1c) ) /* PROM 3 */
 ROM_END
 
 
 ROM_START( esb )
 	ROM_REGION( 0x22000, "maincpu", 0 )     /* 64k for code and a buttload for the banked ROMs */
-	ROM_LOAD( "136031.111",   0x03000, 0x1000, CRC(b1f9bd12) SHA1(76f15395c9fdcd80dd241307a377031a1f44e150) )    /* 3000-3fff is 4k vector rom */
-	ROM_LOAD( "136031.101",   0x06000, 0x2000, CRC(ef1e3ae5) SHA1(d228ff076faa7f9605badeee3b827adb62593e0a) )
-	ROM_CONTINUE(             0x10000, 0x2000 )
+	ROM_LOAD( "136031-111.1l", 0x3000, 0x1000, CRC(b1f9bd12) SHA1(76f15395c9fdcd80dd241307a377031a1f44e150) ) /* 3000-3fff is 4k vector rom */
+	ROM_LOAD( "136031-101.1f", 0x6000, 0x2000, CRC(ef1e3ae5) SHA1(d228ff076faa7f9605badeee3b827adb62593e0a) )
+	ROM_CONTINUE(              0x10000, 0x2000 )
 	/* $8000 - $9fff : slapstic page */
-	ROM_LOAD( "136031.102",   0x0a000, 0x2000, CRC(62ce5c12) SHA1(976256acf4499dc396542a117910009a8808f448) )
-	ROM_CONTINUE(             0x1c000, 0x2000 )
-	ROM_LOAD( "136031.203",   0x0c000, 0x2000, CRC(27b0889b) SHA1(a13074e83f0f57d65096d7f49ae78f33ab00c479) )
-	ROM_CONTINUE(             0x1e000, 0x2000 )
-	ROM_LOAD( "136031.104",   0x0e000, 0x2000, CRC(fd5c725e) SHA1(541cfd004b1736b6cec13836dfa813f00eedeed0) )
-	ROM_CONTINUE(             0x20000, 0x2000 )
+	ROM_LOAD( "136031-102.1jk",0xa000, 0x2000, CRC(62ce5c12) SHA1(976256acf4499dc396542a117910009a8808f448) )
+	ROM_CONTINUE(              0xc000, 0x2000 )
+	ROM_LOAD( "136031-203.1kl",0xc000, 0x2000, CRC(27b0889b) SHA1(a13074e83f0f57d65096d7f49ae78f33ab00c479) )
+	ROM_CONTINUE(              0x1e000, 0x2000 )
+	ROM_LOAD( "136031-104.1m", 0xe000, 0x2000, CRC(fd5c725e) SHA1(541cfd004b1736b6cec13836dfa813f00eedeed0) )
+	ROM_CONTINUE(              0x20000, 0x2000 )
 
-	ROM_LOAD( "136031.105",   0x14000, 0x4000, CRC(ea9e4dce) SHA1(9363fd5b1fce62c2306b448a7766eaf7ec97cdf5) ) /* slapstic 0, 1 */
-	ROM_LOAD( "136031.106",   0x18000, 0x4000, CRC(76d07f59) SHA1(44dd018b406f95e1512ce92923c2c87f1458844f) ) /* slapstic 2, 3 */
+	ROM_LOAD( "136031-105.3u", 0x14000, 0x4000, CRC(ea9e4dce) SHA1(9363fd5b1fce62c2306b448a7766eaf7ec97cdf5) ) /* slapstic 0, 1 */
+	ROM_LOAD( "136031-106.2u", 0x18000, 0x4000, CRC(76d07f59) SHA1(44dd018b406f95e1512ce92923c2c87f1458844f) ) /* slapstic 2, 3 */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "136031.113",   0x4000, 0x2000, CRC(24ae3815) SHA1(b1a93af76de79b902317eebbc50b400b1f8c1e3c) ) /* Sound ROM 0 */
-	ROM_CONTINUE(             0xc000, 0x2000 )
-	ROM_LOAD( "136031.112",   0x6000, 0x2000, CRC(ca72d341) SHA1(52de5b82bb85d7c9caad2047e540d0748aa93ba5) ) /* Sound ROM 1 */
-	ROM_CONTINUE(             0xe000, 0x2000 )
+	ROM_LOAD( "136031-113.1jk",0x4000, 0x2000, CRC(24ae3815) SHA1(b1a93af76de79b902317eebbc50b400b1f8c1e3c) ) /* Sound ROM 0 */
+	ROM_CONTINUE(              0xc000, 0x2000 )
+	ROM_LOAD( "136031-112.1h", 0x6000, 0x2000, CRC(ca72d341) SHA1(52de5b82bb85d7c9caad2047e540d0748aa93ba5) ) /* Sound ROM 1 */
+	ROM_CONTINUE(              0xe000, 0x2000 )
 
 	ROM_REGION( 0x100, "user1", 0)
-	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
+	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x1000, "user2", 0 )
-	ROM_LOAD( "136031.110",   0x0000, 0x0400, CRC(b8d0f69d) SHA1(c196f1a592bd1ac482a81e23efa224d9dfaefc0a) ) /* PROM 0 */
-	ROM_LOAD( "136031.109",   0x0400, 0x0400, CRC(6a2a4d98) SHA1(cefca71f025f92a193c5a7d8b5ab8be10db2fd44) ) /* PROM 1 */
-	ROM_LOAD( "136031.108",   0x0800, 0x0400, CRC(6a76138f) SHA1(9ef7af898a3e29d03f35045901023615a6a55205) ) /* PROM 2 */
-	ROM_LOAD( "136031.107",   0x0c00, 0x0400, CRC(afbf6e01) SHA1(0a6438e6c106d98e5d67a019751e1584324f5e5c) ) /* PROM 3 */
+	ROM_LOAD( "136031-110.7h", 0x0000, 0x0400, CRC(b8d0f69d) SHA1(c196f1a592bd1ac482a81e23efa224d9dfaefc0a) ) /* PROM 0 */
+	ROM_LOAD( "136031-109.7j", 0x0400, 0x0400, CRC(6a2a4d98) SHA1(cefca71f025f92a193c5a7d8b5ab8be10db2fd44) ) /* PROM 1 */
+	ROM_LOAD( "136031-108.7k", 0x0800, 0x0400, CRC(6a76138f) SHA1(9ef7af898a3e29d03f35045901023615a6a55205) ) /* PROM 2 */
+	ROM_LOAD( "136031-107.7l", 0x0c00, 0x0400, CRC(afbf6e01) SHA1(0a6438e6c106d98e5d67a019751e1584324f5e5c) ) /* PROM 3 */
 ROM_END
 
 
@@ -552,7 +552,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(starwars_state,starwars)
+void starwars_state::init_starwars()
 {
 	/* prepare the mathbox */
 	starwars_mproc_init();
@@ -563,7 +563,7 @@ DRIVER_INIT_MEMBER(starwars_state,starwars)
 }
 
 
-DRIVER_INIT_MEMBER(starwars_state,esb)
+void starwars_state::init_esb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -593,11 +593,11 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
  *
  *************************************/
 
-GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, starwars, ROT0, "Atari", "Star Wars (set 1)", 0 ) // newest
-GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, starwars, ROT0, "Atari", "Star Wars (set 2)", 0 )
-GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, starwars, ROT0, "Atari", "Star Wars (set 3)", 0 ) // oldest
+GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 1)", 0 ) // newest
+GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 2)", 0 )
+GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 3)", 0 ) // oldest
 // is there an even older starwars set with 136021-106.1m ?
 
-GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )
+GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )
 
-GAME( 1985, esb,      0,        esb,      esb,      starwars_state, esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )
+GAME( 1985, esb,      0,        esb,      esb,      starwars_state, init_esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )

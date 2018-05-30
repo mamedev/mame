@@ -83,7 +83,8 @@ public:
 		m_io2(*this, "io2"),
 		m_upd(*this, "upd"),
 		m_counters(*this, "counter%u", 0U),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	void ufomini(machine_config &config);
@@ -145,6 +146,7 @@ private:
 	optional_device<upd7759_device> m_upd;
 	output_finder<2 * 4> m_counters;
 	output_finder<2> m_digits;
+	output_finder<28> m_lamp;
 };
 
 
@@ -212,7 +214,7 @@ WRITE_LINE_MEMBER(ufo_state::pit_out1)
 {
 	// NMI?
 	if (state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(ufo_state::pit_out2)
@@ -293,7 +295,7 @@ WRITE8_MEMBER(ufo_state::cp_lamps_w)
 	// d0-d3: p1/p2 button lamps
 	// other bits: ?
 	for (int i = 0; i < 4; i++)
-		output().set_lamp_value(i, ~data >> i & 1);
+		m_lamp[i] = BIT(~data, i);
 }
 
 WRITE8_MEMBER(ufo_state::cp_digits_w)
@@ -332,8 +334,8 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 	// 11 = red,   red
 	// 01 = green, red
 	// 10 = red,   green
-	output().set_lamp_value(10, data & 3);
-	output().set_lamp_value(11, data >> 2 & 3);
+	m_lamp[10] = data & 0x03;
+	m_lamp[11] = (data >> 2) & 0x03;
 
 	// d4,d5: ?
 	// d6,d7: coincounters
@@ -400,7 +402,7 @@ WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
 {
 	// d0,d1,d4,d5: p1/p2 button lamps
 	for (int i = 0; i < 4; i++)
-		output().set_lamp_value(i, ~data >> ((i&1) + (i&2) * 2) & 1);
+		m_lamp[i] = BIT(~data, ((i&1) + (i&2) * 2));
 
 	// d2,d3,d6,d7: p1/p2 coincounters
 	for (int i = 0; i < 4; i++)
@@ -431,7 +433,7 @@ WRITE8_MEMBER(ufo_state::ex_ufo800_lamps_w)
 	// d0-d4: 5 red leds on ufo
 	// other bits: ?
 	for (int i = 0; i < 5; i++)
-		output().set_lamp_value(10 + i, data >> i & 1);
+		m_lamp[10 + i] = BIT(data, i);
 }
 
 /* 315-5338A */
@@ -442,13 +444,13 @@ WRITE8_MEMBER(ufo_state::ex_ufo21_lamps1_w)
 	// d1-d6 are the 6 red leds on each ufo
 	// d7: ?
 	for (int i = 1; i < 7; i++)
-		output().set_lamp_value(10 + i, data >> i & 1);
+		m_lamp[10 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(ufo_state::ex_ufo21_lamps2_w)
 {
 	for (int i = 1; i < 7; i++)
-		output().set_lamp_value(20 + i, data >> i & 1);
+		m_lamp[20 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(ufo_state::ex_upd_start_w)
@@ -747,6 +749,7 @@ void ufo_state::machine_start()
 {
 	m_counters.resolve();
 	m_digits.resolve();
+	m_lamp.resolve();
 
 	// init/zerofill/register for savestates
 	static const float motor_speeds[4] =
@@ -778,17 +781,17 @@ void ufo_state::machine_start()
 MACHINE_CONFIG_START(ufo_state::newufo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(ufo_map)
-	MCFG_CPU_IO_MAP(ufo_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ufo_map)
+	MCFG_DEVICE_IO_MAP(ufo_portmap)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor_timer", ufo_state, simulate_xyz, attotime::from_hz(MOTOR_SPEED))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("update_timer", ufo_state, update_info, attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("io1", SEGA_315_5296, XTAL(16'000'000))
 	// all ports set to input
-	MCFG_315_5296_IN_PORTA_CB(READ8(ufo_state, crane_limits_r))
-	MCFG_315_5296_IN_PORTB_CB(READ8(ufo_state, crane_limits_r))
+	MCFG_315_5296_IN_PORTA_CB(READ8(*this, ufo_state, crane_limits_r))
+	MCFG_315_5296_IN_PORTB_CB(READ8(*this, ufo_state, crane_limits_r))
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("IN1"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW1"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW2"))
@@ -796,28 +799,28 @@ MACHINE_CONFIG_START(ufo_state::newufo)
 
 	MCFG_DEVICE_ADD("io2", SEGA_315_5296, XTAL(16'000'000))
 	// all ports set to output
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(ufo_state, stepper_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(ufo_state, cp_lamps_w))
-	MCFG_315_5296_OUT_PORTC_CB(WRITE8(ufo_state, cp_digits_w))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(ufo_state, cp_digits_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(ufo_state, crane_xyz_w))
-	MCFG_315_5296_OUT_PORTF_CB(WRITE8(ufo_state, crane_xyz_w))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(ufo_state, ufo_lamps_w))
+	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, ufo_state, stepper_w))
+	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, ufo_state, cp_lamps_w))
+	MCFG_315_5296_OUT_PORTC_CB(WRITE8(*this, ufo_state, cp_digits_w))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, ufo_state, cp_digits_w))
+	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, ufo_state, crane_xyz_w))
+	MCFG_315_5296_OUT_PORTF_CB(WRITE8(*this, ufo_state, crane_xyz_w))
+	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, ufo_state, ufo_lamps_w))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, XTAL(16'000'000)/2) // uPD71054C, configuration is unknown
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ufo_state, pit_out0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ufo_state, pit_out0))
 	MCFG_PIT8253_CLK1(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ufo_state, pit_out1))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, ufo_state, pit_out1))
 	MCFG_PIT8253_CLK2(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ufo_state, pit_out2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ufo_state, pit_out2))
 
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym", YM3438, XTAL(16'000'000)/2)
+	MCFG_DEVICE_ADD("ym", YM3438, XTAL(16'000'000)/2)
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
@@ -838,29 +841,29 @@ MACHINE_CONFIG_START(ufo_state::ufo21)
 	newufo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(ex_ufo21_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ex_ufo21_portmap)
 
 	MCFG_DEVICE_MODIFY("io1")
-	MCFG_315_5296_IN_PORTA_CB(READ8(ufo_state, ex_crane_limits_r))
-	MCFG_315_5296_IN_PORTB_CB(READ8(ufo_state, ex_crane_limits_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(ufo_state, ex_crane_open_r))
+	MCFG_315_5296_IN_PORTA_CB(READ8(*this, ufo_state, ex_crane_limits_r))
+	MCFG_315_5296_IN_PORTB_CB(READ8(*this, ufo_state, ex_crane_limits_r))
+	MCFG_315_5296_IN_PORTC_CB(READ8(*this, ufo_state, ex_crane_open_r))
 
 	MCFG_DEVICE_MODIFY("io2")
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(ufo_state, ex_stepper_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(ufo_state, ex_cp_lamps_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(ufo_state, ex_crane_xyz_w))
-	MCFG_315_5296_OUT_PORTF_CB(WRITE8(ufo_state, ex_crane_xyz_w))
+	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, ufo_state, ex_stepper_w))
+	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, ufo_state, ex_cp_lamps_w))
+	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, ufo_state, ex_crane_xyz_w))
+	MCFG_315_5296_OUT_PORTF_CB(WRITE8(*this, ufo_state, ex_crane_xyz_w))
 	MCFG_315_5296_OUT_PORTG_CB(NOOP)
 
 	MCFG_DEVICE_ADD("io3", SEGA_315_5338A, 0)
-	MCFG_315_5338A_OUT0_CB(WRITE8(ufo_state, ex_upd_start_w))
-	MCFG_315_5338A_IN1_CB(READ8(ufo_state, ex_upd_busy_r))
-	MCFG_315_5338A_OUT4_CB(WRITE8(ufo_state, ex_ufo21_lamps1_w))
-	MCFG_315_5338A_OUT5_CB(WRITE8(ufo_state, ex_ufo21_lamps2_w))
+	MCFG_315_5338A_OUT_PA_CB(WRITE8(*this, ufo_state, ex_upd_start_w))
+	MCFG_315_5338A_IN_PB_CB(READ8(*this, ufo_state, ex_upd_busy_r))
+	MCFG_315_5338A_OUT_PE_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps1_w))
+	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, ufo_state, ex_ufo21_lamps2_w))
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -868,22 +871,22 @@ MACHINE_CONFIG_START(ufo_state::ufo800)
 	newufo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(ex_ufo800_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ex_ufo800_portmap)
 
 	MCFG_DEVICE_MODIFY("io1")
-	MCFG_315_5296_IN_PORTA_CB(READ8(ufo_state, ex_crane_limits_r))
+	MCFG_315_5296_IN_PORTA_CB(READ8(*this, ufo_state, ex_crane_limits_r))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_315_5296_IN_PORTC_CB(READ8(ufo_state, ex_crane_open_r))
+	MCFG_315_5296_IN_PORTC_CB(READ8(*this, ufo_state, ex_crane_open_r))
 	MCFG_315_5296_IN_PORTD_CB(IOPORT("IN1"))
 	MCFG_315_5296_IN_PORTE_CB(NOOP)
 	MCFG_315_5296_IN_PORTH_CB(NOOP)
 
 	MCFG_DEVICE_MODIFY("io2")
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(ufo_state, ex_stepper_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(ufo_state, ex_cp_lamps_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(ufo_state, ex_crane_xyz_w))
-	MCFG_315_5296_OUT_PORTF_CB(WRITE8(ufo_state, ex_ufo800_lamps_w))
+	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, ufo_state, ex_stepper_w))
+	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, ufo_state, ex_cp_lamps_w))
+	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, ufo_state, ex_crane_xyz_w))
+	MCFG_315_5296_OUT_PORTF_CB(WRITE8(*this, ufo_state, ex_ufo800_lamps_w))
 	MCFG_315_5296_OUT_PORTG_CB(NOOP)
 MACHINE_CONFIG_END
 
@@ -936,10 +939,10 @@ ROM_START( ufo800 )
 ROM_END
 
 
-GAMEL( 1991, newufo,       0,      newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, ufomini,      0,      ufomini, ufomini, ufo_state, 0, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
-GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   ufo_state, 0, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
-GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  ufo_state, 0, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )
+GAMEL( 1991, newufo,       0,      newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, ufomini,      0,      ufomini, ufomini, ufo_state, empty_init, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
+GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
+GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )

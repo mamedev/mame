@@ -626,7 +626,7 @@ WRITE8_MEMBER( st_state::ikbd_port3_w )
 	*/
 
 	// caps lock led
-	output().set_led_value(1, BIT(data, 0));
+	m_led = BIT(data, 0);
 
 	// keyboard row select
 	m_ikbd_keylatch = (m_ikbd_keylatch & 0xff00) | data;
@@ -1701,9 +1701,9 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	// drive select
 	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
-		floppy = floppy_devices[0];
+		floppy = m_floppy[0]->get_device();
 	else if(!BIT(data, 2))
-		floppy = floppy_devices[1];
+		floppy = m_floppy[1]->get_device();
 
 	// side select
 	if(floppy)
@@ -1745,9 +1745,9 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	// drive select
 	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
-		floppy = floppy_devices[0];
+		floppy = m_floppy[0]->get_device();
 	else if(!BIT(data, 2))
-		floppy = floppy_devices[1];
+		floppy = m_floppy[1]->get_device();
 
 	// side select
 	if(floppy)
@@ -1890,6 +1890,8 @@ void st_state::state_save()
 
 void st_state::machine_start()
 {
+	m_led.resolve();
+
 	// configure RAM banking
 	configure_memory();
 
@@ -1905,15 +1907,6 @@ void st_state::machine_start()
 
 	// register for state saving
 	state_save();
-
-	static const char *names[] = { WD1772_TAG ":0", WD1772_TAG ":1" };
-	for(int i=0; i != 2; i++) {
-		floppy_connector *con = machine().device<floppy_connector>(names[i]);
-		if(con)
-			floppy_devices[i] = con->get_device();
-		else
-			floppy_devices[i] = nullptr;
-	}
 
 	/// TODO: get callbacks to trigger these.
 	m_mfp->i0_w(1);
@@ -1952,6 +1945,8 @@ void ste_state::state_save()
 
 void ste_state::machine_start()
 {
+	m_led.resolve();
+
 	/* configure RAM banking */
 	configure_memory();
 
@@ -1990,6 +1985,8 @@ void megaste_state::machine_start()
 
 void stbook_state::machine_start()
 {
+	m_led.resolve();
+
 	/* configure RAM banking */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -2015,9 +2012,10 @@ FLOPPY_FORMATS_MEMBER( st_state::floppy_formats )
 	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( atari_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void atari_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 
@@ -2031,13 +2029,13 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(st_state::st)
 	// basic machine hardware
-	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_CPU_PROGRAM_MAP(st_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
+	MCFG_DEVICE_PROGRAM_MAP(st_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
-	MCFG_CPU_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_CPU_PROGRAM_MAP(ikbd_map)
-	MCFG_CPU_IO_MAP(ikbd_io_map)
+	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
+	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
+	MCFG_DEVICE_IO_MAP(ikbd_io_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -2047,24 +2045,24 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 
 	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -2073,30 +2071,30 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
@@ -2121,13 +2119,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megast_state::megast)
 	// basic machine hardware
-	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_CPU_PROGRAM_MAP(megast_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
+	MCFG_DEVICE_PROGRAM_MAP(megast_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
-	MCFG_CPU_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_CPU_PROGRAM_MAP(ikbd_map)
-	MCFG_CPU_IO_MAP(ikbd_io_map)
+	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
+	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
+	MCFG_DEVICE_IO_MAP(ikbd_io_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -2137,25 +2135,25 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 
 	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -2164,30 +2162,30 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
@@ -2212,13 +2210,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ste_state::ste)
 	// basic machine hardware
-	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_CPU_PROGRAM_MAP(ste_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
+	MCFG_DEVICE_PROGRAM_MAP(ste_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
-	MCFG_CPU_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_CPU_PROGRAM_MAP(ikbd_map)
-	MCFG_CPU_IO_MAP(ikbd_io_map)
+	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
+	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
+	MCFG_DEVICE_IO_MAP(ikbd_io_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -2228,17 +2226,18 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
+	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 /*
-    MCFG_SOUND_ADD("custom", CUSTOM, 0) // DAC
+    MCFG_DEVICE_ADD("custom", CUSTOM, 0) // DAC
     MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
     MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
 */
@@ -2247,13 +2246,13 @@ MACHINE_CONFIG_START(ste_state::ste)
 	// devices
 
 	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -2262,30 +2261,30 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
@@ -2310,8 +2309,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megaste_state::megaste)
 	ste(config);
-	MCFG_CPU_MODIFY(M68000_TAG)
-	MCFG_CPU_PROGRAM_MAP(megaste_map)
+	MCFG_DEVICE_MODIFY(M68000_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(megaste_map)
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
 
@@ -2328,11 +2327,11 @@ MACHINE_CONFIG_END
 #if 0
 static MACHINE_CONFIG_START(stbook_state::stbook)
 	// basic machine hardware
-	MCFG_CPU_ADD(M68000_TAG, M68000, U517/2)
-	MCFG_CPU_PROGRAM_MAP(stbook_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, U517/2)
+	MCFG_DEVICE_PROGRAM_MAP(stbook_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
-	//MCFG_CPU_ADD(COP888_TAG, COP888, Y700)
+	//MCFG_DEVICE_ADD(COP888_TAG, COP888, Y700)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -2344,12 +2343,12 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(YM3439_TAG, YM3439, U517/8)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(YM3439_TAG, YM3439, U517/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(stbook_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, stbook_state, psg_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, U517/8)
@@ -2357,42 +2356,42 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_WD1772_ADD(WD1772_TAG, U517/2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_OUT_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	// device hardware
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
 
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, U517/2/16) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(st_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
@@ -3168,44 +3167,44 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE          INIT    COMPANY    FULLNAME                FLAGS
-COMP( 1985, st,         0,          0,      st,         st,     st_state,      0,      "Atari",    "ST (USA)",             MACHINE_NOT_WORKING )
-COMP( 1985, st_uk,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (UK)",              MACHINE_NOT_WORKING )
-COMP( 1985, st_de,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Germany)",         MACHINE_NOT_WORKING )
-COMP( 1985, st_es,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Spain)",           MACHINE_NOT_WORKING )
-COMP( 1985, st_fr,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (France)",          MACHINE_NOT_WORKING )
-COMP( 1985, st_nl,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Netherlands)",     MACHINE_NOT_WORKING )
-COMP( 1985, st_se,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Sweden)",          MACHINE_NOT_WORKING )
-COMP( 1985, st_sg,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Switzerland)",     MACHINE_NOT_WORKING )
-COMP( 1987, megast,     st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (USA)",        MACHINE_NOT_WORKING )
-COMP( 1987, megast_uk,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (UK)",         MACHINE_NOT_WORKING )
-COMP( 1987, megast_de,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (Germany)",    MACHINE_NOT_WORKING )
-COMP( 1987, megast_fr,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (France)",     MACHINE_NOT_WORKING )
-COMP( 1987, megast_se,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (Sweden)",     MACHINE_NOT_WORKING )
-COMP( 1987, megast_sg,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (Switzerland)",MACHINE_NOT_WORKING )
-COMP( 1989, ste,        0,          0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (USA)",            MACHINE_NOT_WORKING )
-COMP( 1989, ste_uk,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (UK)",             MACHINE_NOT_WORKING )
-COMP( 1989, ste_de,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Germany)",        MACHINE_NOT_WORKING )
-COMP( 1989, ste_es,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Spain)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_fr,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (France)",         MACHINE_NOT_WORKING )
-COMP( 1989, ste_it,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Italy)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_se,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Sweden)",         MACHINE_NOT_WORKING )
-COMP( 1989, ste_sg,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Switzerland)",    MACHINE_NOT_WORKING )
-//COMP( 1990, stbook,     ste,        0,      stbook,     stbook, stbook_state,  0,      "Atari",    "STBook",               MACHINE_NOT_WORKING )
-COMP( 1990, tt030,      0,          0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (USA)",          MACHINE_NOT_WORKING )
-COMP( 1990, tt030_uk,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (UK)",           MACHINE_NOT_WORKING )
-COMP( 1990, tt030_de,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (Germany)",      MACHINE_NOT_WORKING )
-COMP( 1990, tt030_fr,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (France)",       MACHINE_NOT_WORKING )
-COMP( 1990, tt030_pl,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (Poland)",       MACHINE_NOT_WORKING )
-COMP( 1991, megaste,    ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (USA)",       MACHINE_NOT_WORKING )
-COMP( 1991, megaste_uk, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (UK)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste_de, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Germany)",   MACHINE_NOT_WORKING )
-COMP( 1991, megaste_es, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Spain)",     MACHINE_NOT_WORKING )
-COMP( 1991, megaste_fr, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (France)",    MACHINE_NOT_WORKING )
-COMP( 1991, megaste_it, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Italy)",     MACHINE_NOT_WORKING )
-COMP( 1991, megaste_se, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Sweden)",    MACHINE_NOT_WORKING )
-COMP( 1992, falcon30,   0,          0,      falcon,     falcon, ste_state,     0,      "Atari",    "Falcon030",            MACHINE_NOT_WORKING )
-COMP( 1992, falcon40,   falcon30,   0,      falcon40,   falcon, ste_state,     0,      "Atari",    "Falcon040 (prototype)",MACHINE_NOT_WORKING )
-//COMP( 1989, stacy,      st,         0,      stacy,      stacy,  st_state,      0,     "Atari", "Stacy", MACHINE_NOT_WORKING )
-//COMP( 1991, stpad,      ste,        0,      stpad,      stpad,  st_state,      0,     "Atari", "STPad (prototype)", MACHINE_NOT_WORKING )
-//COMP( 1992, fx1,        0,          0,      falcon,     falcon, ste_state,     0,      "Atari", "FX-1 (prototype)", MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT   CLASS          INIT        COMPANY  FULLNAME                 FLAGS
+COMP( 1985, st,         0,        0,      st,       st,     st_state,      empty_init, "Atari", "ST (USA)",              MACHINE_NOT_WORKING )
+COMP( 1985, st_uk,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (UK)",               MACHINE_NOT_WORKING )
+COMP( 1985, st_de,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Germany)",          MACHINE_NOT_WORKING )
+COMP( 1985, st_es,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Spain)",            MACHINE_NOT_WORKING )
+COMP( 1985, st_fr,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (France)",           MACHINE_NOT_WORKING )
+COMP( 1985, st_nl,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Netherlands)",      MACHINE_NOT_WORKING )
+COMP( 1985, st_se,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Sweden)",           MACHINE_NOT_WORKING )
+COMP( 1985, st_sg,      st,       0,      st,       st,     st_state,      empty_init, "Atari", "ST (Switzerland)",      MACHINE_NOT_WORKING )
+COMP( 1987, megast,     st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (USA)",         MACHINE_NOT_WORKING )
+COMP( 1987, megast_uk,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (UK)",          MACHINE_NOT_WORKING )
+COMP( 1987, megast_de,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Germany)",     MACHINE_NOT_WORKING )
+COMP( 1987, megast_fr,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (France)",      MACHINE_NOT_WORKING )
+COMP( 1987, megast_se,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Sweden)",      MACHINE_NOT_WORKING )
+COMP( 1987, megast_sg,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Switzerland)", MACHINE_NOT_WORKING )
+COMP( 1989, ste,        0,        0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (USA)",             MACHINE_NOT_WORKING )
+COMP( 1989, ste_uk,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (UK)",              MACHINE_NOT_WORKING )
+COMP( 1989, ste_de,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Germany)",         MACHINE_NOT_WORKING )
+COMP( 1989, ste_es,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Spain)",           MACHINE_NOT_WORKING )
+COMP( 1989, ste_fr,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (France)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_it,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Italy)",           MACHINE_NOT_WORKING )
+COMP( 1989, ste_se,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Sweden)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_sg,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Switzerland)",     MACHINE_NOT_WORKING )
+//COMP( 1990, stbook,     ste,      0,      stbook,   stbook, stbook_state,  empty_init, "Atari", "STBook",                MACHINE_NOT_WORKING )
+COMP( 1990, tt030,      0,        0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (USA)",           MACHINE_NOT_WORKING )
+COMP( 1990, tt030_uk,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (UK)",            MACHINE_NOT_WORKING )
+COMP( 1990, tt030_de,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Germany)",       MACHINE_NOT_WORKING )
+COMP( 1990, tt030_fr,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (France)",        MACHINE_NOT_WORKING )
+COMP( 1990, tt030_pl,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Poland)",        MACHINE_NOT_WORKING )
+COMP( 1991, megaste,    ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (USA)",        MACHINE_NOT_WORKING )
+COMP( 1991, megaste_uk, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (UK)",         MACHINE_NOT_WORKING )
+COMP( 1991, megaste_de, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Germany)",    MACHINE_NOT_WORKING )
+COMP( 1991, megaste_es, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Spain)",      MACHINE_NOT_WORKING )
+COMP( 1991, megaste_fr, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (France)",     MACHINE_NOT_WORKING )
+COMP( 1991, megaste_it, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Italy)",      MACHINE_NOT_WORKING )
+COMP( 1991, megaste_se, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Sweden)",     MACHINE_NOT_WORKING )
+COMP( 1992, falcon30,   0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "Falcon030",             MACHINE_NOT_WORKING )
+COMP( 1992, falcon40,   falcon30, 0,      falcon40, falcon, ste_state,     empty_init, "Atari", "Falcon040 (prototype)", MACHINE_NOT_WORKING )
+//COMP( 1989, stacy,      st,       0,      stacy,    stacy,  st_state,      empty_init, "Atari", "Stacy",                 MACHINE_NOT_WORKING )
+//COMP( 1991, stpad,      ste,      0,      stpad,    stpad,  st_state,      empty_init, "Atari", "STPad (prototype)",     MACHINE_NOT_WORKING )
+//COMP( 1992, fx1,        0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "FX-1 (prototype)",      MACHINE_NOT_WORKING )

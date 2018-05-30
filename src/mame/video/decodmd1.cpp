@@ -45,7 +45,7 @@ WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
 		m_blank = 0;
 		m_frameswap = false;
 		m_status = 0;
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	m_ctrl = data;
 }
@@ -185,7 +185,7 @@ void decodmd_type1_device::set_busy(uint8_t input, uint8_t val)
 
 TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
 {
-	m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void decodmd_type1_device::decodmd1_map(address_map &map)
@@ -203,9 +203,9 @@ void decodmd_type1_device::decodmd1_io_map(address_map &map)
 
 MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(decodmd1_map)
-	MCFG_CPU_IO_MAP(decodmd1_io_map)
+	MCFG_DEVICE_ADD("dmdcpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(decodmd1_map)
+	MCFG_DEVICE_IO_MAP(decodmd1_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
@@ -224,11 +224,11 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("bitlatch", HC259, 0) // U4
 	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(MEMBANK("dmdbank1")) MCFG_DEVCB_MASK(0x07) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(decodmd_type1_device, blank_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(decodmd_type1_device, status_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(decodmd_type1_device, rowdata_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(decodmd_type1_device, rowclock_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(decodmd_type1_device, test_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, decodmd_type1_device, blank_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, decodmd_type1_device, status_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, decodmd_type1_device, rowdata_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, decodmd_type1_device, rowclock_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, decodmd_type1_device, test_w))
 MACHINE_CONFIG_END
 
 

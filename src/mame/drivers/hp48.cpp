@@ -1261,12 +1261,12 @@ void hp48_state::hp48(address_map &map)
 MACHINE_CONFIG_START(hp48_state::hp48_common)
 
 	/* cpu */
-	MCFG_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
-	MCFG_CPU_PROGRAM_MAP ( hp48)
-	MCFG_SATURN_CONFIG( WRITE32(hp48_state, reg_out), READ32(hp48_state, reg_in),
-						WRITELINE(hp48_state, mem_reset), WRITE32(hp48_state, mem_config),
-						WRITE32(hp48_state, mem_unconfig), READ32(hp48_state, mem_id),
-						WRITE32(hp48_state, mem_crc), WRITELINE(hp48_state, rsi) )
+	MCFG_DEVICE_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP ( hp48)
+	MCFG_SATURN_CONFIG( WRITE32(*this, hp48_state, reg_out), READ32(*this, hp48_state, reg_in),
+						WRITELINE(*this, hp48_state, mem_reset), WRITE32(*this, hp48_state, mem_config),
+						WRITE32(*this, hp48_state, mem_unconfig), READ32(*this, hp48_state, mem_id),
+						WRITE32(*this, hp48_state, mem_crc), WRITELINE(*this, hp48_state, rsi) )
 
 	/* memory */
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1284,10 +1284,10 @@ MACHINE_CONFIG_START(hp48_state::hp48_common)
 	MCFG_PALETTE_INIT_OWNER(hp48_state, hp48)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp48_state::hp48gx)
@@ -1325,8 +1325,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp48_state::hp48sx)
 	hp48_common(config);
-	MCFG_CPU_MODIFY     ( "maincpu" )
-	MCFG_CPU_CLOCK      ( 2000000 )
+	MCFG_DEVICE_MODIFY     ( "maincpu" )
+	MCFG_DEVICE_CLOCK      ( 2000000 )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48sx )
 
 	/* expansion ports */
@@ -1339,8 +1339,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp48_state::hp48s)
 	hp48_common(config);
-	MCFG_CPU_MODIFY     ( "maincpu" )
-	MCFG_CPU_CLOCK      ( 2000000 )
+	MCFG_DEVICE_MODIFY     ( "maincpu" )
+	MCFG_DEVICE_CLOCK      ( 2000000 )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48s )
 
 	/* serial I/O */
@@ -1349,7 +1349,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp48_state::hp49g)
 	hp48_common(config);
-	MCFG_CPU_MODIFY     ( "maincpu" )
+	MCFG_DEVICE_MODIFY     ( "maincpu" )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp49g )
 
 	/* serial I/O */
@@ -1358,11 +1358,11 @@ MACHINE_CONFIG_START(hp48_state::hp49g)
 MACHINE_CONFIG_END
 
 
-COMP ( 1990, hp48sx, 0     , 0, hp48sx, hp48sx, hp48_state, hp48, "Hewlett Packard", "HP48SX", 0 )
-COMP ( 1991, hp48s , hp48sx, 0, hp48s,  hp48sx, hp48_state, hp48, "Hewlett Packard", "HP48S",  0 )
-COMP ( 1993, hp48gx, 0     , 0, hp48gx, hp48gx, hp48_state, hp48, "Hewlett Packard", "HP48GX", 0 )
-COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP48G",  0 )
-COMP ( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48_state, hp48, "Hewlett Packard", "HP48G+", 0 )
-COMP ( 1999, hp49g , 0,      0, hp49g,  hp49g,  hp48_state, hp48, "Hewlett Packard", "HP49G",  0 )
-COMP ( 1995, hp38g , 0,      0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP38G",  0 )
-COMP ( 2000, hp39g , 0,      0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP39G",  MACHINE_NOT_WORKING )
+COMP( 1990, hp48sx, 0,      0, hp48sx, hp48sx, hp48_state, init_hp48, "Hewlett Packard", "HP48SX", 0 )
+COMP( 1991, hp48s,  hp48sx, 0, hp48s,  hp48sx, hp48_state, init_hp48, "Hewlett Packard", "HP48S",  0 )
+COMP( 1993, hp48gx, 0,      0, hp48gx, hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP48GX", 0 )
+COMP( 1993, hp48g,  hp48gx, 0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP48G",  0 )
+COMP( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP48G+", 0 )
+COMP( 1999, hp49g,  0,      0, hp49g,  hp49g,  hp48_state, init_hp48, "Hewlett Packard", "HP49G",  0 )
+COMP( 1995, hp38g,  0,      0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP38G",  0 )
+COMP( 2000, hp39g,  0,      0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP39G",  MACHINE_NOT_WORKING )

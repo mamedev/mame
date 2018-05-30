@@ -823,30 +823,30 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tubep_state::tubep)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(tubep_main_map)
-	MCFG_CPU_IO_MAP(tubep_main_portmap)
+	MCFG_DEVICE_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tubep_main_map)
+	MCFG_DEVICE_IO_MAP(tubep_main_portmap)
 
-	MCFG_CPU_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(tubep_second_map)
-	MCFG_CPU_IO_MAP(tubep_second_portmap)
+	MCFG_DEVICE_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tubep_second_map)
+	MCFG_DEVICE_IO_MAP(tubep_second_portmap)
 
-	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
-	MCFG_CPU_PROGRAM_MAP(tubep_sound_map)
-	MCFG_CPU_IO_MAP(tubep_sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_DEVICE_PROGRAM_MAP(tubep_sound_map)
+	MCFG_DEVICE_IO_MAP(tubep_sound_portmap)
 
-	MCFG_CPU_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
-	MCFG_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
+	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tubep_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tubep_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tubep_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tubep_state, coin2_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) //something...
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tubep_state, screen_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(tubep_state, background_romselect_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tubep_state, colorproms_A4_line_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tubep_state, screen_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tubep_state, background_romselect_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tubep_state, colorproms_A4_line_w))
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,tubep)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
@@ -864,21 +864,21 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 	MCFG_PALETTE_INIT_OWNER(tubep_state,tubep)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_0_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_0_w)) /* write port B */
+	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_0_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_1_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_1_w)) /* write port B */
+	MCFG_DEVICE_ADD("ay2", AY8910, 19968000 / 8 / 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_1_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_1_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_2_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_2_w)) /* write port B */
+	MCFG_DEVICE_ADD("ay3", AY8910, 19968000 / 8 / 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_2_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_2_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -886,8 +886,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tubep_state::tubepb)
 	tubep(config);
 
-	MCFG_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
-	MCFG_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_DEVICE_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
+	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
 	//MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_NMI))
@@ -897,28 +897,28 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tubep_state::rjammer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(rjammer_main_map)
-	MCFG_CPU_IO_MAP(rjammer_main_portmap)
+	MCFG_DEVICE_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rjammer_main_map)
+	MCFG_DEVICE_IO_MAP(rjammer_main_portmap)
 
-	MCFG_CPU_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(rjammer_second_map)
-	MCFG_CPU_IO_MAP(rjammer_second_portmap)
+	MCFG_DEVICE_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rjammer_second_map)
+	MCFG_DEVICE_IO_MAP(rjammer_second_portmap)
 
-	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
-	MCFG_CPU_PROGRAM_MAP(rjammer_sound_map)
-	MCFG_CPU_IO_MAP(rjammer_sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_DEVICE_PROGRAM_MAP(rjammer_sound_map)
+	MCFG_DEVICE_IO_MAP(rjammer_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_CPU_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
-	MCFG_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
+	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tubep_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tubep_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tubep_state, screen_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tubep_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tubep_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tubep_state, screen_flip_w))
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,rjammer)
@@ -937,25 +937,25 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_PALETTE_INIT_OWNER(tubep_state,rjammer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_0_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_0_w)) /* write port B */
+	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_0_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_1_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_1_w)) /* write port B */
+	MCFG_DEVICE_ADD("ay2", AY8910, 19968000 / 8 / 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_1_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_1_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tubep_state, ay8910_portA_2_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tubep_state, ay8910_portB_2_w)) /* write port B */
+	MCFG_DEVICE_ADD("ay3", AY8910, 19968000 / 8 / 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_2_w)) /* write port A */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_2_w)) /* write port B */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tubep_state, rjammer_adpcm_vck))          /* VCK function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tubep_state, rjammer_adpcm_vck))          /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz (changes at run time) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1157,6 +1157,6 @@ ROM_END
  *************************************/
 
 //    year  rom      parent  machine  inp      state        init
-GAME( 1984, tubep,   0,      tubep,   tubep,   tubep_state, 0,    ROT0, "Nichibutsu / Fujitek", "Tube Panic",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, tubepb,  tubep,  tubepb,  tubepb,  tubep_state, 0,    ROT0, "bootleg",              "Tube Panic (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, rjammer, 0,      rjammer, rjammer, tubep_state, 0,    ROT0, "Nichibutsu / Alice",   "Roller Jammer",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tubep,   0,      tubep,   tubep,   tubep_state, empty_init, ROT0, "Nichibutsu / Fujitek", "Tube Panic",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tubepb,  tubep,  tubepb,  tubepb,  tubep_state, empty_init, ROT0, "bootleg",              "Tube Panic (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, rjammer, 0,      rjammer, rjammer, tubep_state, empty_init, ROT0, "Nichibutsu / Alice",   "Roller Jammer",        MACHINE_SUPPORTS_SAVE )

@@ -461,7 +461,7 @@ if (LOG_PROTECTION)
 		case 0x275bc:
 			break;
 		case 0x275cc:
-			a6 = space.device().state().state_int(M68K_A6);
+			a6 = m_maincpu->state_int(M68K_A6);
 			p1 = (space.read_word(a6+8) << 16) | space.read_word(a6+10);
 			p2 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
@@ -479,7 +479,7 @@ if (LOG_PROTECTION)
 
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
-			a6 = space.device().state().state_int(M68K_A6);
+			a6 = m_maincpu->state_int(M68K_A6);
 			p1 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
@@ -490,7 +490,7 @@ if (LOG_PROTECTION)
 
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
-			a6 = space.device().state().state_int(M68K_A6);
+			a6 = m_maincpu->state_int(M68K_A6);
 			p1 = space.read_dword(a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
@@ -759,7 +759,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarigt )
+static GFXDECODE_START( gfx_atarigt )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
@@ -794,9 +794,9 @@ static const atari_rle_objects_config modesc =
 MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
 	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* the board uses a pair of GALs to determine H and V parameters */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigt_state, screen_update_atarigt)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarigt_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigt_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
@@ -835,7 +835,7 @@ MACHINE_CONFIG_START(atarigt_state::tmek)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarigt_state::primrage)
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(atarigt_state::primrage)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(atarigt_state::primrage20)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -1306,7 +1306,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	m_playfield_tilemap->write32(space, offset, data, mem_mask);
 }
 
-DRIVER_INIT_MEMBER(atarigt_state,tmek)
+void atarigt_state::init_tmek()
 {
 	m_is_primrage = 0;
 
@@ -1319,7 +1319,7 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 }
 
 
-DRIVER_INIT_MEMBER(atarigt_state,primrage)
+void atarigt_state::init_primrage()
 {
 	m_is_primrage = 1;
 
@@ -1334,10 +1334,10 @@ DRIVER_INIT_MEMBER(atarigt_state,primrage)
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
-GAME( 1994, primrage,   0,        primrage,  primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, primrage20, primrage, primrage20,primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )

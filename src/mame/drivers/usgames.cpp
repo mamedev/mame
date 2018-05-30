@@ -38,6 +38,8 @@ Sound: AY-3-8912A
 
 void usgames_state::machine_start()
 {
+	m_leds.resolve();
+
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
@@ -49,11 +51,8 @@ WRITE8_MEMBER(usgames_state::rombank_w)
 WRITE8_MEMBER(usgames_state::lamps1_w)
 {
 	/* button lamps */
-	output().set_led_value(0,data & 0x01);
-	output().set_led_value(1,data & 0x02);
-	output().set_led_value(2,data & 0x04);
-	output().set_led_value(3,data & 0x08);
-	output().set_led_value(4,data & 0x10);
+	for (int i = 0; i < 4; i++)
+		m_leds[i] = BIT(data, i);
 
 	/* bit 5 toggles all the time - extra lamp? */
 }
@@ -214,7 +213,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( usgames )
+static GFXDECODE_START( gfx_usgames )
 	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -222,9 +221,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(usgames_state::usg32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
-	MCFG_CPU_PROGRAM_MAP(usgames_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
+	MCFG_DEVICE_ADD("maincpu", M6809, 2000000) /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(usgames_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -237,7 +236,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usgames)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usgames)
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 
@@ -246,16 +245,16 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8912, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(usgames_state::usg185)
 	usg32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(usg185_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(usg185_map)
 MACHINE_CONFIG_END
 
 
@@ -408,11 +407,11 @@ ROM_START( usg182 ) /* Version 18.2 */
 ROM_END
 
 
-GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
-GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, empty_init, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
+GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )

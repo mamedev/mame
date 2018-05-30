@@ -86,13 +86,15 @@ class gei_state : public driver_device
 {
 public:
 	gei_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
-		m_ticket(*this, "ticket"),
-		m_screen(*this, "screen"),
-		m_signature(*this, "signature"),
-		m_rombank(*this, "rombank") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dac(*this, "dac")
+		, m_ticket(*this, "ticket")
+		, m_screen(*this, "screen")
+		, m_signature(*this, "signature")
+		, m_rombank(*this, "rombank")
+		, m_lamp(*this, "lamp%u", 0U)
+	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -111,10 +113,10 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_w);
 	DECLARE_READ8_MEMBER(portC_r);
 
-	DECLARE_DRIVER_INIT(setbank);
-	DECLARE_DRIVER_INIT(bank2k);
-	DECLARE_DRIVER_INIT(bank8k);
-	DECLARE_DRIVER_INIT(geimulti);
+	void init_setbank();
+	void init_bank2k();
+	void init_bank8k();
+	void init_geimulti();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -138,6 +140,7 @@ public:
 	void sprtauth_map(address_map &map);
 	void suprpokr_map(address_map &map);
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void video_start() override;
 
 private:
@@ -157,6 +160,7 @@ private:
 	required_device<screen_device> m_screen;
 	optional_region_ptr<uint8_t> m_signature;
 	optional_memory_bank m_rombank;
+	output_finder<13> m_lamp;
 };
 
 
@@ -211,24 +215,24 @@ uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 WRITE8_MEMBER(gei_state::lamps_w)
 {
 	/* 5 button lamps */
-	output().set_led_value(0, BIT(data, 0));
-	output().set_led_value(1, BIT(data, 1));
-	output().set_led_value(2, BIT(data, 2));
-	output().set_led_value(3, BIT(data, 3));
-	output().set_led_value(4, BIT(data, 4));
+	m_lamp[0] = BIT(data, 0);
+	m_lamp[1] = BIT(data, 1);
+	m_lamp[2] = BIT(data, 2);
+	m_lamp[3] = BIT(data, 3);
+	m_lamp[4] = BIT(data, 4);
 
 	/* 3 button lamps for deal, cancel, stand in poker games;
 	lamp order verified in poker and selection self tests */
-	output().set_led_value(7, BIT(data, 5));
-	output().set_led_value(5, BIT(data, 6));
-	output().set_led_value(6, BIT(data, 7));
+	m_lamp[7] = BIT(data, 5);
+	m_lamp[5] = BIT(data, 6);
+	m_lamp[6] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(gei_state::sound_w)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 3));
-	output().set_led_value(9, BIT(data, 3));
+	m_lamp[9] = BIT(data, 3);
 
 	/* bit 5 - ticket out in trivia games */
 	if (m_ticket.found())
@@ -246,13 +250,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	/* bit 3,6 - coin lockout, lamp 10 + 11 in selection test mode */
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));
 	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 6));
-	output().set_led_value(9, BIT(data, 3));
-	output().set_led_value(10, BIT(data, 6));
+	m_lamp[9] = BIT(data, 3);
+	m_lamp[10] = BIT(data, 6);
 
 	/* bit 4,5 - lamps 12, 13 in selection test mode;
 	12 lights up if dsw maximum bet = 30 an bet > 15 or if dsw maximum bet = 10 an bet = 10 */
-	output().set_led_value(11, BIT(data, 4));
-	output().set_led_value(12, BIT(data, 5));
+	m_lamp[11] = BIT(data, 4);
+	m_lamp[12] = BIT(data, 5);
 
 	/* bit 7 goes directly to the sound amplifier */
 	m_dac->write(BIT(data, 7));
@@ -261,13 +265,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 WRITE8_MEMBER(gei_state::lamps2_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
-	output().set_led_value(8, BIT(data, 4));
+	m_lamp[8] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(gei_state::nmi_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
-	output().set_led_value(8, BIT(data, 4));
+	m_lamp[8] = BIT(data, 4);
 
 	/* bit 6 enables NMI */
 	m_nmi_mask = data & 0x40;
@@ -966,14 +970,14 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 {
 	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 MACHINE_CONFIG_START(gei_state::getrivia)
-	MCFG_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(getrivia_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gei_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu",Z80,4000000) /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(getrivia_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gei_state, vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -991,40 +995,40 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, sound_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, sound_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, lamps2_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, lamps2_w))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::findout)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(findout_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(findout_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(gei_state, portC_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, gei_state, portC_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::quizvid)
 	findout(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(quizvid_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(quizvid_map)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_3BIT_GRB("palette")
@@ -1037,8 +1041,8 @@ MACHINE_CONFIG_START(gei_state::gselect)
 
 	MCFG_DEVICE_REMOVE("ticket")
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gselect_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
@@ -1046,13 +1050,13 @@ MACHINE_CONFIG_START(gei_state::gselect)
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, sound2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, sound2_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, nmi_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, nmi_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::jokpokera)
@@ -1062,8 +1066,8 @@ MACHINE_CONFIG_START(gei_state::jokpokera)
 
 	MCFG_DEVICE_REMOVE("ticket")
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gselect_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::amuse)
@@ -1071,8 +1075,8 @@ MACHINE_CONFIG_START(gei_state::amuse)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amuse_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amuse_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::gepoker)
@@ -1080,29 +1084,29 @@ MACHINE_CONFIG_START(gei_state::gepoker)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gepoker_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gepoker_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::amuse1)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amuse1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amuse1_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::suprpokr)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(suprpokr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(suprpokr_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::sprtauth)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sprtauth_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sprtauth_map)
 MACHINE_CONFIG_END
 
 
@@ -1906,91 +1910,91 @@ ROM_START( sprtauth )
 	ROM_LOAD( "sprtauth.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
 
-DRIVER_INIT_MEMBER(gei_state, setbank)
+void gei_state::init_setbank()
 {
 	m_rombank->set_base(memregion("maincpu")->base() + 0x2000);
 }
 
-DRIVER_INIT_MEMBER(gei_state, bank2k)
+void gei_state::init_bank2k()
 {
 	m_rombank->configure_entries(0, 10, memregion("maincpu")->base() + 0x10000, 0x2000);
 	m_rombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(gei_state, bank8k)
+void gei_state::init_bank8k()
 {
 	m_rombank->configure_entries(0, 6, memregion("maincpu")->base() + 0x8000, 0x8000);
 	m_rombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(gei_state, geimulti)
+void gei_state::init_geimulti()
 {
 	m_rombank->configure_entries(0, 14, memregion("bank")->base(), 0x8000);
 	m_rombank->set_entry(0);
 }
 
-GAME( 1982, jokpoker,  0,        gselect,   gselect,  gei_state, setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jokpokera, jokpoker, jokpokera, gselect,  gei_state, setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Joker Poker ICB 9-30-86)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jokpokerb, jokpoker, jokpokera, gselect,  gei_state, setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jokpokerc, jokpoker, jokpokera, gselect,  gei_state, setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Poker No Raise ICB 9-30-86)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, superbwl,  0,        gselect,   gselect,  gei_state, setbank,  ROT0, "Greyhound Electronics", "Super Bowl (Version 16.03B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jokpoker,  0,        gselect,   gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jokpokera, jokpoker, jokpokera, gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Joker Poker ICB 9-30-86)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jokpokerb, jokpoker, jokpokera, gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jokpokerc, jokpoker, jokpokera, gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Poker No Raise ICB 9-30-86)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superbwl,  0,        gselect,   gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Super Bowl (Version 16.03B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, gs4002,    0,        gselect,   gselect,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gs4002a,   gs4002,   gselect,   gselect,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 2)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gs4002,    0,        gselect,   gselect,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gs4002a,   gs4002,   gselect,   gselect,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 2)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, amuse,     0,        amuse,     gepoker,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amuse1,    amuse,    amuse1,    gepoker,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Amuse (Version 30.08 IBA)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, amuse1a,   amuse,    amuse1,    gepoker,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Amuse (Version 30.08A)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amuse,     0,        amuse,     gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amuse1,    amuse,    amuse1,    gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Amuse (Version 30.08 IBA)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, amuse1a,   amuse,    amuse1,    gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Amuse (Version 30.08A)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, gepoker,   0,        gepoker,   gepoker,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gepoker1,  gepoker,  gepoker,   gepoker,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gepoker2,  gepoker,  gepoker,   gepoker,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gepoker3,  gepoker,  gepoker,   gepoker,  gei_state, bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 4)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gepoker,   0,        gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gepoker1,  gepoker,  gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gepoker2,  gepoker,  gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gepoker3,  gepoker,  gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 4)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, gtsers1,   0,        getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 1)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers2,   gtsers1,  getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 2)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers3,   gtsers1,  getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 3)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers4,   gtsers1,  getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 4)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers5,   gtsers1,  getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 5)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers7,   gtsers1,  getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 7)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsersa,   gtsers1,  getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsersb,   gtsers1,  getrivia,  getrivia, gei_state, bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers8,   0,        findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers8a,  gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers9,   gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers10,  gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers11,  gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers11a, gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers12,  gtsers8,  findout,   gt103,    gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gtsers14,  gtsers8,  findout,   gt103,    gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gtsers15,  gtsers8,  findout,   gt103,    gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103a1,   gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103aa,   gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103ab,   gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103asx,  gtsers8,  findout,   getrivia, gei_state, bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers1,   0,        getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 1)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers2,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 2)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers3,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 3)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers4,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 4)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers5,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 5)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers7,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 7)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsersa,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsersb,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers8,   0,        findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers8a,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers9,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers10,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers11,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers11a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers12,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gtsers14,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gtsers15,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103a1,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103aa,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103ab,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103asx,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, sextriv1,  0,        getrivia,  sextriv1, gei_state, bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sextriv2,  sextriv1, getrivia,  sextriv1, gei_state, bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sextriv1,  0,        getrivia,  sextriv1, gei_state, init_bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sextriv2,  sextriv1, getrivia,  sextriv1, gei_state, init_bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, gt507uk,   0,        findout,   gt507uk,  gei_state, bank8k,   ROT0, "Grayhound Electronics",  "Trivia (UK Version 5.07)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gt507uk,   0,        findout,   gt507uk,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Trivia (UK Version 5.07)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, quiz,      0,        findout,   quiz,     gei_state, bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quiz,      0,        findout,   quiz,     gei_state, init_bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, quizvid,   0,        quizvid,   quiz,     gei_state, bank8k,   ROT0, "bootleg",                "Video Quiz",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quizvid,   0,        quizvid,   quiz,     gei_state, init_bank8k,   ROT0, "bootleg",                "Video Quiz",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, reelfun,   0,        findout,   reelfun,  gei_state, bank8k,   ROT0, "Grayhound Electronics",  "Reel Fun (Version 7.03)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, reelfun1,  reelfun,  findout,   reelfun,  gei_state, bank8k,   ROT0, "Grayhound Electronics",  "Reel Fun (Version 7.01)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, findout,   0,        findout,   findout,  gei_state, bank8k,   ROT0, "Elettronolo",            "Find Out (Version 4.04)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, reelfun,   0,        findout,   reelfun,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Reel Fun (Version 7.03)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, reelfun1,  reelfun,  findout,   reelfun,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Reel Fun (Version 7.01)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, findout,   0,        findout,   findout,  gei_state, init_bank8k,   ROT0, "Elettronolo",            "Find Out (Version 4.04)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, suprpokr,  0,        suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.19S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, suprpokra, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.15S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, suprpokrb, suprpokr, suprpokr,  suprpokr, gei_state, 0,        ROT0, "Grayhound Electronics",  "Super Poker (Version 10.10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, suprpokr,  0,        suprpokr,  suprpokr, gei_state, empty_init,    ROT0, "Grayhound Electronics",  "Super Poker (Version 10.19S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, suprpokra, suprpokr, suprpokr,  suprpokr, gei_state, empty_init,    ROT0, "Grayhound Electronics",  "Super Poker (Version 10.15S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, suprpokrb, suprpokr, suprpokr,  suprpokr, gei_state, empty_init,    ROT0, "Grayhound Electronics",  "Super Poker (Version 10.10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bigjoke,   0,        findout,   bigjoke,  gei_state, bank8k,   ROT0, "Grayhound Electronics",  "The Big Joke (Version 0.00)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bigjoke,   0,        findout,   bigjoke,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "The Big Joke (Version 0.00)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2.11)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, init_bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2.11)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, sexappl,   0,        findout,   sexappl,  gei_state, bank8k,   ROT0, "Grayhound Electronics",  "Sex Appeal (Version 6.02)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sexappl,   0,        findout,   sexappl,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Sex Appeal (Version 6.02)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, geimulti,  0,        sprtauth,  geimulti, gei_state, geimulti, ROT0, "Grayhound Electronics",  "GEI Multi Game",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sprtauth,  0,        sprtauth,  sprtauth, gei_state, geimulti, ROT0, "Classic Games",          "Sports Authority",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, geimulti,  0,        sprtauth,  geimulti, gei_state, init_geimulti, ROT0, "Grayhound Electronics",  "GEI Multi Game",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sprtauth,  0,        sprtauth,  sprtauth, gei_state, init_geimulti, ROT0, "Classic Games",          "Sports Authority",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

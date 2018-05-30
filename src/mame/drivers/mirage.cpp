@@ -86,7 +86,7 @@ public:
 	DECLARE_READ16_MEMBER(mjmux_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
 	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -266,7 +266,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( mirage )
+static GFXDECODE_START( gfx_mirage )
 	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)  /* Tiles (8x8) */
 	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)  /* Tiles (16x16) */
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)  /* Sprites (16x16) */
@@ -291,14 +291,14 @@ void miragemj_state::machine_reset()
 MACHINE_CONFIG_START(miragemj_state::mirage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(mirage_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -306,10 +306,10 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -334,12 +334,12 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki_bgm", 2000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki_bgm", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki_sfx", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki_sfx", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -369,9 +369,9 @@ ROM_START( mirage )
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(miragemj_state,mirage)
+void miragemj_state::init_mirage()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
-GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, init_mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )

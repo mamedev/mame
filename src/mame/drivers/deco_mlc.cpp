@@ -489,15 +489,15 @@ static const gfx_layout spritelayout_6bpp =
 	16*32
 };
 
-static GFXDECODE_START( deco_mlc )
+static GFXDECODE_START( gfx_deco_mlc )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout_4bpp,   0, 256 )
 GFXDECODE_END
 
-static GFXDECODE_START( 5bpp )
+static GFXDECODE_START( gfx_5bpp )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout_5bpp,   0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( 6bpp )
+static GFXDECODE_START( gfx_6bpp )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout_6bpp,   0,  64 )
 GFXDECODE_END
 
@@ -512,8 +512,8 @@ MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
-	MCFG_CPU_PROGRAM_MAP(avengrgs_map)
+	MCFG_DEVICE_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
+	MCFG_DEVICE_PROGRAM_MAP(avengrgs_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
@@ -526,10 +526,10 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
@@ -537,9 +537,10 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -547,8 +548,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(deco_mlc_state::mlc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
-	MCFG_CPU_PROGRAM_MAP(decomlc_map)
+	MCFG_DEVICE_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
+	MCFG_DEVICE_PROGRAM_MAP(decomlc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
@@ -561,10 +562,10 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
@@ -575,24 +576,25 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(deco_mlc_state::mlc_6bpp)
 	mlc(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 6bpp)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_6bpp)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(deco_mlc_state::mlc_5bpp)
 	mlc(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_5bpp)
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
-	MCFG_SOUND_MODIFY("ymz")
+	MCFG_DEVICE_MODIFY("ymz")
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -923,7 +925,7 @@ READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 	return a;
 }
 
-DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
+void deco_mlc_state::init_avengrgs()
 {
 	// init options
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -942,7 +944,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 	descramble_sound();
 }
 
-DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
+void deco_mlc_state::init_mlc()
 {
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
 	    effective clock rate here to compensate otherwise we have slowdowns in
@@ -955,14 +957,14 @@ DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
 
 /***************************************************************************/
 
-GAME( 1995, avengrgs, 0,        avengrgs, mlc, deco_mlc_state, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, avengrgsj,avengrgs, avengrgs, mlc, deco_mlc_state, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan 1.2)",     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stadhr96, 0,        mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ)",             MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
-GAME( 1996, stadhr96u,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
-GAME( 1996, stadhr96j,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",              MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
-GAME( 1996, skullfng, 0,        mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Europe, Master 96.02.19 13:45 */
-GAME( 1996, skullfngj,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan 1.09)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.09, Japan, Master 96.02.08 14:39 */
-GAME( 1996, skullfnga,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia 1.13)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Asia, Master 96.02.19 13:49 */
-GAME( 1996, hoops96,  0,        mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, ddream95, hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, hoops95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, avengrgs,  0,        avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, avengrgsj, avengrgs, avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan 1.2)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stadhr96,  0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ)",             MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
+GAME( 1996, stadhr96u, stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
+GAME( 1996, stadhr96j, stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",              MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
+GAME( 1996, skullfng,  0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Europe, Master 96.02.19 13:45 */
+GAME( 1996, skullfngj, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan 1.09)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.09, Japan, Master 96.02.08 14:39 */
+GAME( 1996, skullfnga, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia 1.13)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Asia, Master 96.02.19 13:49 */
+GAME( 1996, hoops96,   0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, ddream95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, hoops95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )

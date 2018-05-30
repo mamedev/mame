@@ -134,7 +134,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
-	DECLARE_DRIVER_INIT(applix);
+	void init_applix();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
@@ -743,9 +743,10 @@ FLOPPY_FORMATS_MEMBER( applix_state::floppy_formats )
 	FLOPPY_APPLIX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( applix_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void applix_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 PALETTE_INIT_MEMBER(applix_state, applix)
@@ -843,20 +844,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 
 MACHINE_CONFIG_START(applix_state::applix)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 4) // MC68000-P10 @ 7.5 MHz
-	MCFG_CPU_PROGRAM_MAP(applix_mem)
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(16'000'000) / 2) // Z80H
-	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
-	MCFG_CPU_IO_MAP(subcpu_io)
-	MCFG_CPU_ADD("kbdcpu", I8051, 11060250)
-	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
-	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(applix_state, p1_read))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(applix_state, p1_write))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(applix_state, p2_read))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(applix_state, p2_write))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(applix_state, p3_read))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(applix_state, p3_write))
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'000'000) / 4) // MC68000-P10 @ 7.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(applix_mem)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(16'000'000) / 2) // Z80H
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
+	MCFG_DEVICE_IO_MAP(subcpu_io)
+	MCFG_DEVICE_ADD("kbdcpu", I8051, 11060250)
+	MCFG_DEVICE_PROGRAM_MAP(keytronic_pc3270_program)
+	MCFG_DEVICE_IO_MAP(keytronic_pc3270_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, applix_state, p1_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, applix_state, p1_write))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, applix_state, p2_read))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, applix_state, p2_write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, applix_state, p3_read))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, applix_state, p3_write))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -869,35 +870,35 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_PALETTE_INIT_OWNER(applix_state, applix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
-	MCFG_SOUND_ADD("rdac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
+	MCFG_DEVICE_ADD("rdac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(30'000'000) / 16) // MC6545 @ 1.875 MHz
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(applix_state, vsync_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, applix_state, vsync_w))
 
 	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(30'000'000) / 4 / 10) // VIA uses 68000 E clock
-	MCFG_VIA6522_READPB_HANDLER(READ8(applix_state, applix_pb_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, applix_state, applix_pb_r))
 	// in CB1 kbd clk
 	// in CA2 vsync
 	// in CB2 kdb data
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(applix_state, applix_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(applix_state, applix_pb_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, applix_state, applix_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, applix_state, applix_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via6522", via6522_device, write_pa0))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("via6522", via6522_device, write_pa0))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -946,7 +947,7 @@ ROM_START( applix )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(applix_state, applix)
+void applix_state::init_applix()
 {
 	uint8_t *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
@@ -955,8 +956,8 @@ DRIVER_INIT_MEMBER(applix_state, applix)
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY           FULLNAME       FLAGS
-COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME       FLAGS
+COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, "Applix Pty Ltd", "Applix 1616", 0 )
 
 
 

@@ -118,7 +118,7 @@ static const discrete_555_desc abc77_ne556_a =
 };
 
 
-static DISCRETE_SOUND_START( abc77 )
+static DISCRETE_SOUND_START( abc77_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_555_ASTABLE(NODE_02, NODE_01, (int) RES_K(2.7), (int) RES_K(15), (int) CAP_N(22), &abc77_ne556_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
@@ -131,22 +131,21 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	// keyboard cpu
-	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL(4'608'000))
-	MCFG_CPU_PROGRAM_MAP(abc77_map)
-	MCFG_CPU_IO_MAP(abc77_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc77_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc77_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc77_device, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(abc77_device, prog_w))
+	MCFG_DEVICE_ADD(I8035_TAG, I8035, XTAL(4'608'000))
+	MCFG_DEVICE_PROGRAM_MAP(abc77_map)
+	MCFG_DEVICE_IO_MAP(abc77_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, abc77_device, p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, abc77_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, abc77_device, t1_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, abc77_device, prog_w))
 
 	// watchdog
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL(4'608'000)/3/5/4096))
 
 	// discrete sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(abc77)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc77_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

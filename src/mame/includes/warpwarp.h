@@ -66,9 +66,6 @@ public:
 	//geebee and navarone
 	DECLARE_READ8_MEMBER(geebee_in_r);
 	DECLARE_WRITE8_MEMBER(geebee_out6_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_1_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_2_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_3_w);
 	DECLARE_WRITE_LINE_MEMBER(counter_w);
 	DECLARE_WRITE_LINE_MEMBER(lock_out_w);
 	DECLARE_WRITE_LINE_MEMBER(geebee_bgw_w);
@@ -78,13 +75,13 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(kaitei);
-	DECLARE_DRIVER_INIT(navarone);
-	DECLARE_DRIVER_INIT(geebee);
-	DECLARE_DRIVER_INIT(kaitein);
-	DECLARE_DRIVER_INIT(warpwarp);
-	DECLARE_DRIVER_INIT(sos);
-	DECLARE_DRIVER_INIT(kaitei);
-	DECLARE_DRIVER_INIT(bombbee);
+	void init_navarone();
+	void init_geebee();
+	void init_kaitein();
+	void init_warpwarp();
+	void init_sos();
+	void init_kaitei();
+	void init_bombbee();
 	DECLARE_VIDEO_START(geebee);
 	DECLARE_PALETTE_INIT(geebee);
 	DECLARE_VIDEO_START(warpwarp);

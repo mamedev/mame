@@ -306,12 +306,12 @@ public:
 	DECLARE_WRITE32_MEMBER(DMA0_w);
 	DECLARE_READ32_MEMBER(DMA1_r);
 	DECLARE_WRITE32_MEMBER(DMA1_w);
-	DECLARE_DRIVER_INIT(topbladv);
-	DECLARE_DRIVER_INIT(officeye);
-	DECLARE_DRIVER_INIT(crysking);
-	DECLARE_DRIVER_INIT(evosocc);
-	DECLARE_DRIVER_INIT(donghaer);
-	DECLARE_DRIVER_INIT(psattack);
+	void init_topbladv();
+	void init_officeye();
+	void init_crysking();
+	void init_evosocc();
+	void init_donghaer();
+	void init_psattack();
 
 	DECLARE_READ32_MEMBER(trivrus_input_r);
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
@@ -1487,10 +1487,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(crystal_state::crystal)
 
-	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
-	MCFG_CPU_PROGRAM_MAP(crystal_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(crystal_state, icallback)
+	MCFG_DEVICE_ADD("maincpu", SE3208, 43000000)
+	MCFG_DEVICE_PROGRAM_MAP(crystal_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(crystal_state, icallback)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1500,7 +1500,7 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(crystal_state, screen_vblank_crystal))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, crystal_state, screen_vblank_crystal))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)
@@ -1510,7 +1510,8 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 
 	MCFG_DS1302_ADD("rtc", XTAL(32'768))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_SOUND_VRENDER0_ADD("vrender", 0)
 	MCFG_VR0_REGBASE(0x04800000)
@@ -1521,20 +1522,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(crystal_state::trivrus)
 	crystal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(crystal_state::crospuzl)
 	crystal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crospuzl_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(crystal_state::crzyddz2)
 	crystal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crzyddz2_mem)
 MACHINE_CONFIG_END
 
 
@@ -1789,7 +1790,7 @@ ROM_START( menghong )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(crystal_state,crysking)
+void crystal_state::init_crysking()
 {
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 
@@ -1808,7 +1809,7 @@ DRIVER_INIT_MEMBER(crystal_state,crysking)
 	Rom[WORD_XOR_LE(0x8a54/2)] = 0x403c;    //NOP
 }
 
-DRIVER_INIT_MEMBER(crystal_state,evosocc)
+void crystal_state::init_evosocc()
 {
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
@@ -1835,7 +1836,7 @@ also it seems that bit 0x40000000 is the PIC reset.
 
 */
 
-DRIVER_INIT_MEMBER(crystal_state,topbladv)
+void crystal_state::init_topbladv()
 {
 	// patches based on analysis of PIC dump
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
@@ -1862,7 +1863,7 @@ DRIVER_INIT_MEMBER(crystal_state,topbladv)
 
 }
 
-DRIVER_INIT_MEMBER(crystal_state,officeye)
+void crystal_state::init_officeye()
 {
 	// patches based on analysis of PIC dump
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
@@ -1889,7 +1890,7 @@ DRIVER_INIT_MEMBER(crystal_state,officeye)
 	Rom[WORD_XOR_LE(0xDAD0/2)]=0x9001;  //PUSH R0
 }
 
-DRIVER_INIT_MEMBER(crystal_state, donghaer)
+void crystal_state::init_donghaer()
 {
 	uint16_t *Rom = (uint16_t*)memregion("user1")->base();
 
@@ -1906,23 +1907,23 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
-DRIVER_INIT_MEMBER(crystal_state,psattack)
+void crystal_state::init_psattack()
 {
 }
 
 
-GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, 0,        ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
-GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
-GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
-GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, 0,        ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, 0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, 0,        ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 ) // has a CF card instead of flash roms
-GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, 0,        ROT0, "<unknown>",           "Cross Puzzle",                         MACHINE_NOT_WORKING )
+GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
+GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
+GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
+GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
+GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 ) // has a CF card instead of flash roms
+GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle",                         MACHINE_NOT_WORKING )
 
-GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON )
+GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, init_psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON )
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
-GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, 0,        ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )
-GAME( 200?, crzclass, 0,        crystal,  crystal,  crystal_state, 0,        ROT0, "TJF",                 "Zhaoji Fengdou",                       MACHINE_IS_SKELETON ) // 'Crazy Class'
+GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )
+GAME( 200?, crzclass, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "TJF",                 "Zhaoji Fengdou",                       MACHINE_IS_SKELETON ) // 'Crazy Class'

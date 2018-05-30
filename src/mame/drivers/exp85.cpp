@@ -182,28 +182,28 @@ void exp85_state::machine_start()
 
 MACHINE_CONFIG_START(exp85_state::exp85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(exp85_mem)
-	MCFG_CPU_IO_MAP(exp85_io)
-	MCFG_I8085A_SID(READLINE(exp85_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(exp85_state, sod_w))
+	MCFG_DEVICE_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(exp85_mem)
+	MCFG_DEVICE_IO_MAP(exp85_io)
+	MCFG_I8085A_SID(READLINE(*this, exp85_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, exp85_state, sod_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD(I8155_TAG, I8155, 6.144_MHz_XTAL/2)
 
 	MCFG_DEVICE_ADD(I8355_TAG, I8355, 6.144_MHz_XTAL/2)
-	MCFG_I8355_IN_PA_CB(READ8(exp85_state, i8355_a_r))
-	MCFG_I8355_OUT_PA_CB(WRITE8(exp85_state, i8355_a_w))
+	MCFG_I8355_IN_PA_CB(READ8(*this, exp85_state, i8355_a_r))
+	MCFG_I8355_OUT_PA_CB(WRITE8(*this, exp85_state, i8355_a_w))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -235,5 +235,5 @@ ROM_START( exp85 )
 ROM_END
 
 /* System Drivers */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY         FULLNAME       FLAGS
-COMP( 1979, exp85,  0,      0,      exp85,   exp85, exp85_state, 0,    "Netronics",    "Explorer/85", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME       FLAGS
+COMP( 1979, exp85, 0,      0,      exp85,   exp85, exp85_state, empty_init, "Netronics", "Explorer/85", 0 )

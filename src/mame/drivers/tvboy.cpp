@@ -79,15 +79,15 @@ void tvboy_state::tvboy_mem(address_map &map)
 
 MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
-	MCFG_CPU_PROGRAM_MAP(tvboy_mem)
-	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(tvboy_mem)
+	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(tvboy_state, a2600_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(tvboy_state, a2600_get_databus_contents))
-	MCFG_TIA_VSYNC_CB(WRITE16(tvboy_state, a2600_tia_vsync_callback_pal))
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tvboy_state, a2600_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tvboy_state, a2600_get_databus_contents))
+	MCFG_TIA_VSYNC_CB(WRITE16(*this, tvboy_state, a2600_tia_vsync_callback_pal))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
@@ -95,25 +95,25 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	/* devices */
 #if USE_NEW_RIOT
 	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_PAL / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(tvboy_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(tvboy_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(tvboy_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(tvboy_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(tvboy_state, irq_callback))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, tvboy_state, switch_A_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, tvboy_state, switch_A_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, tvboy_state, riot_input_port_8_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, tvboy_state, switch_B_w))
+	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, tvboy_state, irq_callback))
 #else
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(tvboy_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(tvboy_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(tvboy_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tvboy_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(tvboy_state, irq_callback))
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, tvboy_state, switch_A_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, tvboy_state, switch_A_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(*this, tvboy_state, riot_input_port_8_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, tvboy_state, switch_B_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, tvboy_state, irq_callback))
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
@@ -154,6 +154,6 @@ ROM_START( stvboy )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE        INIT  COMPANY    FULLNAME
-CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
-CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY    FULLNAME
+CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )

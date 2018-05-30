@@ -37,7 +37,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/ldv1000.h"
 #include "machine/ldstub.h"
 #include "machine/watchdog.h"
@@ -70,8 +70,8 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
-	DECLARE_DRIVER_INIT(fixed);
-	DECLARE_DRIVER_INIT(variable);
+	void init_fixed();
+	void init_variable();
 
 	void dlair_base(machine_config &config);
 	void dlair_pr7820(machine_config &config);
@@ -718,7 +718,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( dlair )
+static GFXDECODE_START( gfx_dlair )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -732,14 +732,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(dlair_state::dlair_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
-	MCFG_CPU_PROGRAM_MAP(dlus_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
+	MCFG_DEVICE_PROGRAM_MAP(dlus_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
@@ -767,14 +768,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
 	MCFG_Z80_DAISY_CHAIN(dleuro_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(dleuro_map)
-	MCFG_CPU_IO_MAP(dleuro_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(dleuro_map)
+	MCFG_DEVICE_IO_MAP(dleuro_io_map)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, dlair_state, write_speaker))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -790,19 +791,20 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dlair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_SOUND_MODIFY("ld_22vp932")
+	MCFG_DEVICE_MODIFY("ld_22vp932")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1023,13 +1025,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(dlair_state,fixed)
+void dlair_state::init_fixed()
 {
 //  m_laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
-DRIVER_INIT_MEMBER(dlair_state,variable)
+void dlair_state::init_variable()
 {
 //  m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
@@ -1042,21 +1044,21 @@ DRIVER_INIT_MEMBER(dlair_state,variable)
  *
  *************************************/
 
-GAMEL( 1983, dlair,    0,        dlair_ldv1000, dlaire, dlair_state, variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F2)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairf,   dlair,    dlair_ldv1000, dlaire, dlair_state, variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaire,   dlair,    dlair_ldv1000, dlaire, dlair_state, variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. E)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaird,   dlair,    dlair_ldv1000, dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. D, Pioneer LD-V1000)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairc,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairb,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaira,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlair_2,  dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 2?, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlair_1,  dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 1, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair,        0,        dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F2)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlairf,       dlair,    dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlaire,       dlair,    dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. E)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlaird,       dlair,    dlair_ldv1000, dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. D, Pioneer LD-V1000)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlairc,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlairb,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlaira,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_2,      dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 2?, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_1,      dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 1, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
 
-GAMEL( 1983, dleuro,   dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dleuroalt,dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European, alternate)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlital,   dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuro,       dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuroalt,    dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European, alternate)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlital,       dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  MACHINE_NOT_WORKING, layout_dlair )
 
-GAMEL( 1983, spaceace,     0,        dlair_ldv1000, spaceace, dlair_state, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceacea2,   spaceace, dlair_ldv1000, spaceace, dlair_state, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceacea,    spaceace, dlair_ldv1000, spaceace, dlair_state, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceaceeuro, spaceace, dleuro,        spaceace, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceace,     0,        dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea2,   spaceace, dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea,    spaceace, dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceaceeuro, spaceace, dleuro,        spaceace, dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  MACHINE_NOT_WORKING, layout_dlair )

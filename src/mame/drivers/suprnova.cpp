@@ -788,8 +788,8 @@ GFXDECODE_END
 /***** MACHINE DRIVER *****/
 
 MACHINE_CONFIG_START(skns_state::skns)
-	MCFG_CPU_ADD("maincpu", SH2,28638000)
-	MCFG_CPU_PROGRAM_MAP(skns_map)
+	MCFG_DEVICE_ADD("maincpu", SH2,28638000)
+	MCFG_DEVICE_PROGRAM_MAP(skns_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
@@ -812,15 +812,16 @@ MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_SCREEN_UPDATE_DRIVER(skns_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skns_bg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", skns_bg)
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 33333333 / 2)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 33333333 / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1006,25 +1007,25 @@ void skns_state::set_drc_pcflush(uint32_t addr)
 	m_maincpu->sh2drc_add_pcflush(addr);
 }
 
-DRIVER_INIT_MEMBER(skns_state,galpani4)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_drc();  }
-DRIVER_INIT_MEMBER(skns_state,galpanis)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_drc();  }
-DRIVER_INIT_MEMBER(skns_state,cyvern)     { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+2); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x604d3c8, 0x604d3cb, read32_delegate(FUNC(skns_state::cyvern_speedup_r),this) );  set_drc_pcflush(0x402ebd2);  }
-DRIVER_INIT_MEMBER(skns_state,galpans2)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60fb6bc, 0x60fb6bf, read32_delegate(FUNC(skns_state::galpans2_speedup_r),this) ); set_drc_pcflush(0x4049ae2); }
-DRIVER_INIT_MEMBER(skns_state,gutsn)      { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+0); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x600c780, 0x600c783, read32_delegate(FUNC(skns_state::gutsn_speedup_r),this) ); set_drc_pcflush(0x402206e); }
-DRIVER_INIT_MEMBER(skns_state,panicstr)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60f19e4, 0x60f19e7, read32_delegate(FUNC(skns_state::panicstr_speedup_r),this) ); set_drc_pcflush(0x404e68a);  }
-DRIVER_INIT_MEMBER(skns_state,senknow)    { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+1,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60000dc, 0x60000df, read32_delegate(FUNC(skns_state::senknow_speedup_r),this) ); set_drc_pcflush(0x4017dce);  }
-DRIVER_INIT_MEMBER(skns_state,puzzloope)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6081d38, 0x6081d3b, read32_delegate(FUNC(skns_state::puzzloope_speedup_r),this) ); set_drc_pcflush(0x401da14); }
-DRIVER_INIT_MEMBER(skns_state,puzzloopj)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6086714, 0x6086717, read32_delegate(FUNC(skns_state::puzzloopj_speedup_r),this) ); set_drc_pcflush(0x401dca0); }
-DRIVER_INIT_MEMBER(skns_state,puzzloopa)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085bcc, 0x6085bcf, read32_delegate(FUNC(skns_state::puzzloopa_speedup_r),this) ); set_drc_pcflush(0x401d9d4); }
-DRIVER_INIT_MEMBER(skns_state,puzzloopu)  { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085cec, 0x6085cef, read32_delegate(FUNC(skns_state::puzzloopu_speedup_r),this) ); set_drc_pcflush(0x401dab0); }
-DRIVER_INIT_MEMBER(skns_state,jjparads)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000994, 0x6000997, read32_delegate(FUNC(skns_state::jjparads_speedup_r),this) ); set_drc_pcflush(0x4015e84); }
-DRIVER_INIT_MEMBER(skns_state,jjparad2)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000984, 0x6000987, read32_delegate(FUNC(skns_state::jjparad2_speedup_r),this) ); set_drc_pcflush(0x401620a); }
-DRIVER_INIT_MEMBER(skns_state,ryouran)    { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000a14, 0x6000a17, read32_delegate(FUNC(skns_state::ryouran_speedup_r),this) );  set_drc_pcflush(0x40182ce); }
-DRIVER_INIT_MEMBER(skns_state,teljan)     { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6002fb4, 0x6002fb7, read32_delegate(FUNC(skns_state::teljan_speedup_r),this) ); set_drc_pcflush(0x401ba32); }
-DRIVER_INIT_MEMBER(skns_state,sengekis)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b74bc, 0x60b74bf, read32_delegate(FUNC(skns_state::sengekis_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
-DRIVER_INIT_MEMBER(skns_state,sengekij)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b7380, 0x60b7383, read32_delegate(FUNC(skns_state::sengekij_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
-DRIVER_INIT_MEMBER(skns_state,sarukani)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc(); set_drc_pcflush(0x4013b42); } // Speedup is in io_w()
-DRIVER_INIT_MEMBER(skns_state,galpans3)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_drc();  }
+void skns_state::init_galpani4()   { m_spritegen->skns_sprite_kludge(-5,-1); init_drc();  }
+void skns_state::init_galpanis()   { m_spritegen->skns_sprite_kludge(-5,-1); init_drc();  }
+void skns_state::init_cyvern()     { m_spritegen->skns_sprite_kludge(+0,+2); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x604d3c8, 0x604d3cb, read32_delegate(FUNC(skns_state::cyvern_speedup_r),this) );  set_drc_pcflush(0x402ebd2);  }
+void skns_state::init_galpans2()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60fb6bc, 0x60fb6bf, read32_delegate(FUNC(skns_state::galpans2_speedup_r),this) ); set_drc_pcflush(0x4049ae2); }
+void skns_state::init_gutsn()      { m_spritegen->skns_sprite_kludge(+0,+0); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x600c780, 0x600c783, read32_delegate(FUNC(skns_state::gutsn_speedup_r),this) ); set_drc_pcflush(0x402206e); }
+void skns_state::init_panicstr()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60f19e4, 0x60f19e7, read32_delegate(FUNC(skns_state::panicstr_speedup_r),this) ); set_drc_pcflush(0x404e68a);  }
+void skns_state::init_senknow()    { m_spritegen->skns_sprite_kludge(+1,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60000dc, 0x60000df, read32_delegate(FUNC(skns_state::senknow_speedup_r),this) ); set_drc_pcflush(0x4017dce);  }
+void skns_state::init_puzzloope()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6081d38, 0x6081d3b, read32_delegate(FUNC(skns_state::puzzloope_speedup_r),this) ); set_drc_pcflush(0x401da14); }
+void skns_state::init_puzzloopj()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6086714, 0x6086717, read32_delegate(FUNC(skns_state::puzzloopj_speedup_r),this) ); set_drc_pcflush(0x401dca0); }
+void skns_state::init_puzzloopa()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085bcc, 0x6085bcf, read32_delegate(FUNC(skns_state::puzzloopa_speedup_r),this) ); set_drc_pcflush(0x401d9d4); }
+void skns_state::init_puzzloopu()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085cec, 0x6085cef, read32_delegate(FUNC(skns_state::puzzloopu_speedup_r),this) ); set_drc_pcflush(0x401dab0); }
+void skns_state::init_jjparads()   { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000994, 0x6000997, read32_delegate(FUNC(skns_state::jjparads_speedup_r),this) ); set_drc_pcflush(0x4015e84); }
+void skns_state::init_jjparad2()   { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000984, 0x6000987, read32_delegate(FUNC(skns_state::jjparad2_speedup_r),this) ); set_drc_pcflush(0x401620a); }
+void skns_state::init_ryouran()    { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000a14, 0x6000a17, read32_delegate(FUNC(skns_state::ryouran_speedup_r),this) );  set_drc_pcflush(0x40182ce); }
+void skns_state::init_teljan()     { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6002fb4, 0x6002fb7, read32_delegate(FUNC(skns_state::teljan_speedup_r),this) ); set_drc_pcflush(0x401ba32); }
+void skns_state::init_sengekis()   { m_spritegen->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b74bc, 0x60b74bf, read32_delegate(FUNC(skns_state::sengekis_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
+void skns_state::init_sengekij()   { m_spritegen->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b7380, 0x60b7383, read32_delegate(FUNC(skns_state::sengekij_speedup_r),this) ); set_drc_pcflush(0x60006ec); }
+void skns_state::init_sarukani()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc(); set_drc_pcflush(0x4013b42); } // Speedup is in io_w()
+void skns_state::init_galpans3()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();  }
 
 
 
@@ -1889,53 +1890,53 @@ ROM_END
 
 /***** GAME DRIVERS *****/
 
-GAME( 1996, skns,      0,        skns,  skns,     skns_state, 0,         ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1996, skns,      0,        skns,  skns,     skns_state, empty_init,     ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, galpani4,  skns,     sknsj, cyvern,   skns_state, galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)", MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?
+GAME( 1996, galpani4,  skns,     sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)", MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?
 // there is a Gals Panic 4 version with 'Gals Panic SU' title as well, seen for sale in Korea (different to the Gals Panic SU clone of galpans2)
 
-GAME( 1996, jjparads,  skns,     sknsj, skns_1p,  skns_state, jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jjparads,  skns,     sknsj, skns_1p,  skns_state, init_jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanise, galpanis, sknse, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 2)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanisj, galpanis, sknsj, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanisk, galpanis, sknsk, galpanis, skns_state, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanise, galpanis, sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanisj, galpanis, sknsj, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanisk, galpanis, sknsk, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, jjparad2,  skns,     sknsj, skns_1p,  skns_state, jjparad2,  ROT0,  "Electro Design", "Jan Jan Paradise 2", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jjparad2,  skns,     sknsj, skns_1p,  skns_state, init_jjparad2,  ROT0,  "Electro Design", "Jan Jan Paradise 2", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, sengekis,  skns,     sknsa, skns,     skns_state, sengekis,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sengekisj, sengekis, sknsj, skns,     skns_state, sengekij,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sengekis,  skns,     sknsa, skns,     skns_state, init_sengekis,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sengekisj, sengekis, sknsj, skns,     skns_state, init_sengekij,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, vblokbrk,  skns,     sknse, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Europe)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, vblokbrka, vblokbrk, sknsa, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sarukani,  vblokbrk, sknsj, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, vblokbrk,  skns,     sknse, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, vblokbrka, vblokbrk, sknsa, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sarukani,  vblokbrk, sknsj, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, cyvern,    skns,     sknsu, cyvern,   skns_state, cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, cyvernj,   cyvern,   sknsj, cyvern,   skns_state, cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvern,    skns,     sknsu, cyvern,   skns_state, init_cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvernj,   cyvern,   sknsj, cyvern,   skns_state, init_cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, puzzloop,  skns,     sknse, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.94)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
-GAME( 1998, puzzloope, puzzloop, sknse, puzzloop, skns_state, puzzloope, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.93)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopj, puzzloop, sknsj, puzzloop, skns_state, puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopa, puzzloop, sknsa, puzzloop, skns_state, puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopk, puzzloop, sknsk, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
-GAME( 1998, puzzloopu, puzzloop, sknsu, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (USA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloop,  skns,     sknse, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.94)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
+GAME( 1998, puzzloope, puzzloop, sknse, puzzloop, skns_state, init_puzzloope, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.93)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopj, puzzloop, sknsj, puzzloop, skns_state, init_puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopa, puzzloop, sknsa, puzzloop, skns_state, init_puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopk, puzzloop, sknsk, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
+GAME( 1998, puzzloopu, puzzloop, sknsu, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (USA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, ryouran ,  skns,     sknsj, skns_1p,  skns_state, ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, ryourano,  ryouran,  sknsj, skns_1p,  skns_state, ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, ryouran ,  skns,     sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, ryourano,  ryouran,  sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, galpans2,  skns,     sknse, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpans2j, galpans2, sknsj, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpans2a, galpans2, sknsa, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpansu,  galpans2, sknsk, galpanis, skns_state, galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // official or hack?
+GAME( 1999, galpans2,  skns,     sknse, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpans2j, galpans2, sknsj, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpans2a, galpans2, sknsa, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpansu,  galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // official or hack?
 
-GAME( 1999, panicstr,  skns,     sknsj, galpanis, skns_state, panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, panicstr,  skns,     sknsj, galpanis, skns_state, init_panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, senknow ,  skns,     sknsj, skns,     skns_state, senknow,   ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, senknow ,  skns,     sknsj, skns,     skns_state, init_senknow,   ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, teljan  ,  skns,     sknsj, skns_1p,  skns_state, teljan,    ROT0,  "Electro Design", "Tel Jan", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, teljan  ,  skns,     sknsj, skns_1p,  skns_state, init_teljan,    ROT0,  "Electro Design", "Tel Jan", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 2000, gutsn,     skns,     sknsj, skns,     skns_state, gutsn,     ROT0,  "Kaneko / Kouyousha", "Guts'n (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, gutsn,     skns,     sknsj, skns,     skns_state, init_gutsn,     ROT0,  "Kaneko / Kouyousha", "Guts'n (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 2002, galpans3,  skns,     sknsj, galpanis, skns_state, galpans3,  ROT0,  "Kaneko", "Gals Panic S3 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, galpans3,  skns,     sknsj, galpanis, skns_state, init_galpans3,  ROT0,  "Kaneko", "Gals Panic S3 (Japan)", MACHINE_IMPERFECT_GRAPHICS )

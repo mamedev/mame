@@ -811,8 +811,8 @@ void riscpc_state::machine_reset()
 
 MACHINE_CONFIG_START(riscpc_state::rpc600)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, 60_MHz_XTAL/2) // ARM610
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	MCFG_DEVICE_ADD( "maincpu", ARM7, 60_MHz_XTAL/2) // ARM610
+	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -826,8 +826,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(riscpc_state::rpc700)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, 80_MHz_XTAL/2) // ARM710
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	MCFG_DEVICE_ADD( "maincpu", ARM7, 80_MHz_XTAL/2) // ARM710
+	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -841,8 +841,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(riscpc_state::a7000)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(32'000'000) ) // ARM7500
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	MCFG_DEVICE_ADD( "maincpu", ARM7, XTAL(32'000'000) ) // ARM7500
+	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -856,14 +856,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(riscpc_state::a7000p)
 	a7000(config);
-	MCFG_CPU_MODIFY("maincpu") // ARM7500FE
-	MCFG_CPU_CLOCK(XTAL(48'000'000))
+	MCFG_DEVICE_MODIFY("maincpu") // ARM7500FE
+	MCFG_DEVICE_CLOCK(XTAL(48'000'000))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(riscpc_state::sarpc)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	MCFG_DEVICE_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
+	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -877,8 +877,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(riscpc_state::sarpc_j233)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	MCFG_DEVICE_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
+	MCFG_DEVICE_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -958,10 +958,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE         INIT  COMPANY   FULLNAME                  FLAGS */
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, 0,    "Acorn",  "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, 0,    "Acorn",  "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  CLASS         INIT        COMPANY  FULLNAME                  FLAGS */
+COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

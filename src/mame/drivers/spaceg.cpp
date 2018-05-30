@@ -509,8 +509,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(spaceg_state::spaceg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(spaceg_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spaceg_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -526,10 +526,10 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// HACK: SN76477 parameters copied from space invaders
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -546,7 +546,7 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	// HACK: samples copied from space invaders
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(invaders_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -586,4 +586,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, empty_init, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

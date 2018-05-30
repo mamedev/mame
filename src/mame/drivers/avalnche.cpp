@@ -97,21 +97,6 @@ WRITE8_MEMBER(avalnche_state::catch_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE_LINE_MEMBER(avalnche_state::credit_1_lamp_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(avalnche_state::credit_2_lamp_w)
-{
-	output().set_led_value(1, state);
-}
-
-WRITE_LINE_MEMBER(avalnche_state::start_lamp_w)
-{
-	output().set_led_value(2, state);
-}
-
 void avalnche_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
@@ -235,15 +220,15 @@ void avalnche_state::machine_start()
 MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
+	MCFG_DEVICE_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(avalnche_state, credit_1_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(avalnche_state, video_invert_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(avalnche_state, credit_2_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(avalnche_state, start_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // 1 CREDIT LAMP
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, avalnche_state, video_invert_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 CREDIT LAMP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led2")) // START LAMP
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -267,8 +252,8 @@ MACHINE_CONFIG_START(avalnche_state::acatch)
 	avalnche_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(catch_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(catch_map)
 
 	/* sound hardware... */
 	acatch_sound(config);
@@ -319,6 +304,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, 0, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, 0, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAME ( 1977, catchp,   0,        acatch,   catch,    avalnche_state, 0, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche
+GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, empty_init, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, empty_init, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAME(  1977, catchp,   0,        acatch,   catch,    avalnche_state, empty_init, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche

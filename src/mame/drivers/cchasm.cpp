@@ -18,7 +18,7 @@
 #include "includes/cchasm.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
@@ -150,18 +150,18 @@ static const z80_daisy_config daisy_chain[] =
 MACHINE_CONFIG_START(cchasm_state::cchasm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
-	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3584229)       /* 3.58  MHz (from schematics) */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3584229)       /* 3.58  MHz (from schematics) */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 3584229 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(cchasm_state, ctc_timer_1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(cchasm_state, ctc_timer_2_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, cchasm_state, ctc_timer_1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, cchasm_state, ctc_timer_2_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -174,24 +174,24 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1818182)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1818182)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1818182)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1818182)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
-	MCFG_SOUND_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, CCHASM_68K_CLOCK/10)
@@ -266,5 +266,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, empty_init, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, empty_init, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )

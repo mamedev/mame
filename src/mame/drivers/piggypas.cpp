@@ -203,13 +203,13 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 MACHINE_CONFIG_START(piggypas_state::piggypas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(8'448'000)) // OKI M80C31F or M80C154S
-	MCFG_CPU_PROGRAM_MAP(piggypas_map)
-	MCFG_CPU_IO_MAP(piggypas_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(piggypas_state, led_strobe_w))
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(8'448'000)) // OKI M80C31F or M80C154S
+	MCFG_DEVICE_PROGRAM_MAP(piggypas_map)
+	MCFG_DEVICE_IO_MAP(piggypas_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, piggypas_state, led_strobe_w))
 	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("IN2"))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, piggypas_state, mcs51_tx_callback))
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // DS1220AD
 
@@ -228,14 +228,14 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 	MCFG_HD44780_PIXEL_UPDATE_CB(piggypas_state, piggypas_pixel_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'448'000) / 8, PIN7_HIGH) // clock and pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'448'000) / 8, okim6295_device::PIN7_HIGH) // clock and pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0) // OKI M82C55A-2
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(piggypas_state, ctrl_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, piggypas_state, ctrl_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -244,12 +244,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(piggypas_state::fidlstix)
 	piggypas(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(fidlstix_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(fidlstix_io)
 	MCFG_MCS51_SERIAL_TX_CB(NOOP)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(piggypas_state, lcd_latch_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(piggypas_state, lcd_latch_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(piggypas_state, lcd_control_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, piggypas_state, lcd_latch_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, piggypas_state, lcd_latch_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, piggypas_state, lcd_control_w))
 MACHINE_CONFIG_END
 
 
@@ -322,16 +322,16 @@ ROM_END
 
 
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40
-GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 05.22
-GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
 // Quick $ilver   Development Co.    10/08/96      ROUND  REV 6
-GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
 //  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
-GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )

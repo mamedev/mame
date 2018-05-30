@@ -544,15 +544,15 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(0, data & 0x0100);    // 3 buttons
-		output().set_led_value(1, data & 0x0200);
-		output().set_led_value(2, data & 0x0400);
+		m_led[0] = BIT(data, 8);    // 3 buttons
+		m_led[1] = BIT(data, 9);
+		m_led[2] = BIT(data, 10);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-//      output().set_led_value(3, data & 0x0010);   // if we had more leds..
-//      output().set_led_value(4, data & 0x0020);
+		m_led[3] = BIT(data, 4);
+		m_led[4] = BIT(data, 5);
 	}
 }
 
@@ -647,10 +647,10 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(0, data & 0x0100);
-		output().set_led_value(1, data & 0x1000);
-		output().set_led_value(2, data & 0x2000);
-		output().set_led_value(3, data & 0x4000);
+		m_led[0] = BIT(data, 8);
+		m_led[1] = BIT(data, 12);
+		m_led[2] = BIT(data, 13);
+		m_led[3] = BIT(data, 14);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -694,9 +694,9 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
-		output().set_led_value(0, data & 0x0200);    // decide
+		m_led[0] = BIT(data, 8);    // decide
 		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
-		output().set_led_value(1, data & 0x2000);    // select
+		m_led[1] = BIT(data, 13);    // select
 
 		int power = (data & 0x1000);
 		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
@@ -1844,7 +1844,7 @@ static const gfx_layout road_layout =
                                 Big Run
 **************************************************************************/
 
-static GFXDECODE_START( bigrun )
+static GFXDECODE_START( gfx_bigrun )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x0e00/2 , 16 ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
@@ -1857,7 +1857,7 @@ GFXDECODE_END
                                 Cisco Heat
 **************************************************************************/
 
-static GFXDECODE_START( cischeat )
+static GFXDECODE_START( gfx_cischeat )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1c00/2, 32  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2c00/2, 32  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6c00/2, 32  ) // Scroll 2
@@ -1870,7 +1870,7 @@ GFXDECODE_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static GFXDECODE_START( f1gpstar )
+static GFXDECODE_START( gfx_f1gpstar )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1e00/2, 16  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2e00/2, 16  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6e00/2, 16  ) // Scroll 2
@@ -1883,7 +1883,7 @@ GFXDECODE_END
                                 Scud Hammer
 **************************************************************************/
 
-static GFXDECODE_START( scudhamm )
+static GFXDECODE_START( gfx_scudhamm )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x1e00/2, 16  )   // Scroll 0
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x0000/2, 16  )   // UNUSED
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,          0x4e00/2, 16  )   // Scroll 2
@@ -1933,21 +1933,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map)
+	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, bigrun_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("cpu2", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("cpu3", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu3", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map3)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", M68000, 6000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -1961,7 +1961,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigrun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigrun)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -1971,20 +1971,21 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x3600/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", STD_FM_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, STD_FM_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, STD_OKI_CLOCK, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, STD_OKI_CLOCK, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1994,24 +1995,24 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(cischeat_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cischeat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cischeat)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2032,23 +2033,23 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gpstar)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2070,14 +2071,14 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_sound_map)
 
-	MCFG_CPU_ADD("cpu5", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_io_map)
+	MCFG_DEVICE_ADD("cpu5", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 MACHINE_CONFIG_END
@@ -2085,8 +2086,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cischeat_state::wildplt)
 	f1gpstr2(config);
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(wildplt_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
 
 
@@ -2115,8 +2116,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 MACHINE_CONFIG_START(cischeat_state::scudhamm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(scudhamm_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2131,7 +2132,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2140,13 +2141,14 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -2171,8 +2173,8 @@ MACHINE_CONFIG_START(cischeat_state::armchmp2)
 	scudhamm(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(armchmp2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
 MACHINE_CONFIG_END
@@ -2203,8 +2205,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
-	MCFG_CPU_PROGRAM_MAP(captflag_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
+	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
@@ -2221,7 +2223,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2237,14 +2239,15 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_DEFAULT_LAYOUT(layout_captflag)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
@@ -2423,7 +2426,7 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,bigrun)
+void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2542,7 +2545,7 @@ ROM_START( cischeat )
 	ROM_LOAD( "ch9072.03",  0x000000, 0x040000, CRC(7e79151a) SHA1(5a305cff8600446be426641ce112208b379094b9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,cischeat)
+void cischeat_state::init_cischeat()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2840,7 +2843,7 @@ ROM_START( f1gpstaro )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,f1gpstar)
+void cischeat_state::init_f1gpstar()
 {
 	cischeat_untangle_sprites("sprites");
 }
@@ -3613,7 +3616,7 @@ ROM_START( captflag )
 	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) ) // 1 on the PCB
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state, captflag)
+void cischeat_state::init_captflag()
 {
 	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
 	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
@@ -3628,13 +3631,13 @@ DRIVER_INIT_MEMBER(cischeat_state, captflag)
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   cischeat_state, bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
-GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstaro,f1gpstar, f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, wildplt,  0,        wildplt,  wildplt,  cischeat_state, f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
-GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, cischeat_state, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1991, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstaro, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, wildplt,   0,        wildplt,  wildplt,  cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1993, captflag,  0,        captflag, captflag, cischeat_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

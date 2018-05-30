@@ -249,15 +249,15 @@ INPUT_PORTS_END
 ******************************************************************************/
 MACHINE_CONFIG_START(pes_state::pes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(i80c31_mem)
-	MCFG_CPU_IO_MAP(i80c31_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pes_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(pes_state, data_to_i8031))
+	MCFG_DEVICE_ADD("maincpu", I80C31, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_mem)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, pes_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pes_state, data_to_i8031))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
@@ -280,5 +280,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                        FULLNAME             FLAGS
-COMP( 1987, pes,    0,      0,      pes,        pes,   pes_state,  0,    "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME             FLAGS
+COMP( 1987, pes,  0,      0,      pes,     pes,   pes_state, empty_init, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

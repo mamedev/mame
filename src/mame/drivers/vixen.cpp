@@ -486,7 +486,7 @@ uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //  DISCRETE_SOUND( vixen )
 //-------------------------------------------------
 
-static DISCRETE_SOUND_START( vixen )
+static DISCRETE_SOUND_START( vixen_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_SQUAREWAVE(NODE_02, NODE_01, (XTAL(23'961'600)/15360).dvalue(), 100, 50, 0, 90)
 	DISCRETE_OUTPUT(NODE_02, 2000)
@@ -667,9 +667,10 @@ WRITE_LINE_MEMBER( vixen_state::atn_w )
 	update_interrupt();
 }
 
-static SLOT_INTERFACE_START( vixen_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void vixen_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE_LINE_MEMBER( vixen_state::fdc_intrq_w )
 {
@@ -742,11 +743,11 @@ void vixen_state::machine_reset()
 
 MACHINE_CONFIG_START(vixen_state::vixen)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL(23'961'600)/6)
-	MCFG_CPU_PROGRAM_MAP(vixen_mem)
-	MCFG_CPU_OPCODES_MAP(bios_mem)
-	MCFG_CPU_IO_MAP(vixen_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
+	MCFG_DEVICE_ADD(Z8400A_TAG, Z80, XTAL(23'961'600)/6)
+	MCFG_DEVICE_PROGRAM_MAP(vixen_mem)
+	MCFG_DEVICE_OPCODES_MAP(bios_mem)
+	MCFG_DEVICE_IO_MAP(vixen_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
@@ -758,43 +759,42 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(vixen)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vixen_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	// devices
 	MCFG_DEVICE_ADD(P8155H_TAG, I8155, XTAL(23'961'600)/6)
-	MCFG_I8155_IN_PORTA_CB(READ8(vixen_state, i8155_pa_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(vixen_state, i8155_pb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(vixen_state, i8155_pc_w))
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, vixen_state, i8155_pa_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, vixen_state, i8155_pb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, i8155_pc_w))
 
 	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, XTAL(23'961'600)/6)
-	MCFG_I8155_OUT_PORTA_CB(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(vixen_state, io_i8155_pb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(vixen_state, io_i8155_pc_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(vixen_state, io_i8155_to_w))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, vixen_state, io_i8155_pb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, io_i8155_pc_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, vixen_state, io_i8155_to_w))
 
 	MCFG_DEVICE_ADD(P8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vixen_state, rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vixen_state, txrdy_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vixen_state, rxrdy_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vixen_state, txrdy_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_dsr))
 
 	MCFG_FD1797_ADD(FDC1797_TAG, XTAL(23'961'600)/24)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(vixen_state, fdc_intrq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, vixen_state, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(vixen_state, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(vixen_state, atn_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(*this, vixen_state, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(*this, vixen_state, atn_w))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")
@@ -836,7 +836,7 @@ ROM_END
 //-------------------------------------------------
 
 
-DRIVER_INIT_MEMBER(vixen_state,vixen)
+void vixen_state::init_vixen()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }
@@ -847,5 +847,5 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME      FLAGS
-COMP( 1984, vixen,  0,       0,     vixen,     vixen,   vixen_state,  vixen,  "Osborne",   "Vixen",      0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY    FULLNAME  FLAGS
+COMP( 1984, vixen, 0,       0,     vixen,   vixen,  vixen_state, init_vixen, "Osborne", "Vixen",  0 )

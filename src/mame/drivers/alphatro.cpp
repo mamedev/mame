@@ -580,7 +580,7 @@ static const gfx_layout charlayout =
 	8*16
 };
 
-static GFXDECODE_START( alphatro )
+static GFXDECODE_START( gfx_alphatro )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -693,15 +693,16 @@ FLOPPY_FORMATS_MEMBER( alphatro_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( alphatro_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void alphatro_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(alphatro_map)
-	MCFG_CPU_IO_MAP(alphatro_io)
+	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(alphatro_map)
+	MCFG_DEVICE_IO_MAP(alphatro_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -710,32 +711,30 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatro)
 	MCFG_PALETTE_ADD("palette", 9) // 8 colours + amber
 	MCFG_PALETTE_INIT_OWNER(alphatro_state, alphatro)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(alphatro_state, fdc_irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", i8257_device, dreq2_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, alphatro_state, fdc_irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dmac", i8257_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 
 	MCFG_DEVICE_ADD("dmac" , I8257, MAIN_CLOCK)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(alphatro_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(alphatro_state, ram0000_r))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(alphatro_state, ram0000_w))
-	MCFG_I8257_IN_IOR_2_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, alphatro_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, alphatro_state, ram0000_r))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, alphatro_state, ram0000_w))
+	MCFG_I8257_IN_IOR_2_CB(READ8("fdc", upd765a_device, mdma_r))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8("fdc", upd765a_device, mdma_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE("fdc", upd765a_device, tc_line_w))
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'288'000) / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -743,11 +742,11 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_MC6845_UPDATE_ROW_CB(alphatro_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("usart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, alphatro_state, txdata_callback))
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19218) // 19218 to load a real tape, 19222 to load a tape made by this driver
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("usart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("usart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -817,4 +816,4 @@ ROM_START( alphatro )
 	ROMX_LOAD( "b40r_ic1067.bin",   0x0000, 0x1000, CRC(543e3ee8) SHA1(3e6c6f8c85d3a5d0735edfec52709c5670ff1646), ROM_BIOS(3) )
 ROM_END
 
-COMP( 1983, alphatro,   0,        0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alphatro, 0, 0, alphatro, alphatro, alphatro_state, empty_init, "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )

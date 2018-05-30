@@ -217,9 +217,9 @@ void selz80_state::machine_start()
 
 MACHINE_CONFIG_START(selz80_state::selz80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
-	MCFG_CPU_PROGRAM_MAP(selz80_mem)
-	MCFG_CPU_IO_MAP(selz80_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	MCFG_DEVICE_PROGRAM_MAP(selz80_mem)
+	MCFG_DEVICE_IO_MAP(selz80_io)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
@@ -227,31 +227,31 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("i8279", I8279, 5000000 / 2) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(selz80_state, scanlines_w))         // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(selz80_state, digit_w))           // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(selz80_state, kbd_r))                 // kbd RL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, selz80_state, scanlines_w))         // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, selz80_state, digit_w))           // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, selz80_state, kbd_r))                 // kbd RL lines
 	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
 	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(selz80_state::dagz80)
 	selz80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dagz80_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dagz80_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
 MACHINE_CONFIG_END
 
@@ -275,6 +275,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY  FULLNAME           FLAGS
-COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, 0,    "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
-COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, 0,    "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
+COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
+COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)

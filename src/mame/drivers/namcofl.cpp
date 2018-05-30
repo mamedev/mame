@@ -508,7 +508,7 @@ static const gfx_layout roz_layout =
 	16*128
 };
 
-static GFXDECODE_START( 2 )
+static GFXDECODE_START( gfx_2 )
 	GFXDECODE_ENTRY( NAMCOFL_TILEGFXREGION, 0, tile_layout, 0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCOFL_SPRITEGFXREGION,   0, obj_layout,      0x0000, 0x10 )
 	GFXDECODE_ENTRY( NAMCOFL_ROTGFXREGION,      0, roz_layout,      0x1800, 0x08 )
@@ -581,12 +581,12 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 
 
 MACHINE_CONFIG_START(namcofl_state::namcofl)
-	MCFG_CPU_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
-	MCFG_CPU_PROGRAM_MAP(namcofl_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
+	MCFG_DEVICE_PROGRAM_MAP(namcofl_mem)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, 48384000/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C75, 48384000/3)
+	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
+	MCFG_DEVICE_IO_MAP(namcoc75_io)
 	/* TODO: irq generation for these */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcofl_state, mcu_irq0_cb, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcofl_state, mcu_irq2_cb, attotime::from_hz(60))
@@ -605,14 +605,15 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2)
 
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", 48384000/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -800,19 +801,19 @@ void namcofl_state::common_init()
 	save_item(NAME(m_sprbank));
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
+void namcofl_state::init_speedrcr()
 {
 	common_init();
 	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,finalapr)
+void namcofl_state::init_finalapr()
 {
 	common_init();
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAME(  1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, init_speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )

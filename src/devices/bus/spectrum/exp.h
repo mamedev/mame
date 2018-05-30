@@ -62,8 +62,8 @@
 
 #define MCFG_SPECTRUM_PASSTHRU_EXPANSION_SLOT_ADD() \
 	MCFG_SPECTRUM_EXPANSION_SLOT_ADD(SPECTRUM_EXPANSION_SLOT_TAG, spectrum_expansion_devices, nullptr) \
-	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w)) \
-	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
+	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w)) \
+	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
 
 #define MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
 	devcb = &downcast<spectrum_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
@@ -137,9 +137,9 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_EXPANSION_SLOT, spectrum_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( spectrum_expansion_devices );
-SLOT_INTERFACE_EXTERN( spec128_expansion_devices );
-SLOT_INTERFACE_EXTERN( specpls3_expansion_devices );
+void spectrum_expansion_devices(device_slot_interface &device);
+void spec128_expansion_devices(device_slot_interface &device);
+void specpls3_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SPECTRUM_EXP_H

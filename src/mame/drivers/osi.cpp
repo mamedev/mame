@@ -686,9 +686,10 @@ void c1pmf_state::machine_start()
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
 // 10 sectors, 256 byte sector length, first sector id 0
-static SLOT_INTERFACE_START( osi_floppies )
-	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
-SLOT_INTERFACE_END
+static void osi_floppies(device_slot_interface &device)
+{
+	device.option_add("ssdd", FLOPPY_525_SSDD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout osi_charlayout =
@@ -704,7 +705,7 @@ static const gfx_layout osi_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( osi )
+static GFXDECODE_START( gfx_osi )
 	GFXDECODE_ENTRY( "chargen", 0x0000, osi_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -712,25 +713,25 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(sb2m600_state::osi600)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
-	MCFG_CPU_PROGRAM_MAP(osi600_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
+	MCFG_DEVICE_PROGRAM_MAP(osi600_mem)
 
 	/* video hardware */
 	osi600_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
 	MCFG_DISCRETE_INTF(osi600_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cassette ACIA */
 	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(sb2m600_state, cassette_tx))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette")
@@ -743,19 +744,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(uk101_state::uk101)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
-	MCFG_CPU_PROGRAM_MAP(uk101_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(uk101_mem)
 
 	/* video hardware */
 	uk101_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* cassette ACIA */
 	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(sb2m600_state, cassette_tx))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 500000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette")
@@ -768,19 +769,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c1p_state::c1p)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
-	MCFG_CPU_PROGRAM_MAP(c1p_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
+	MCFG_DEVICE_PROGRAM_MAP(c1p_mem)
 
 	/* video hardware */
 	osi630_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
 	MCFG_DISCRETE_INTF(osi600c_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("beeper", BEEP, 300)
+	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
@@ -789,10 +790,10 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 
 	/* cassette ACIA */
 	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(sb2m600_state, cassette_tx))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette")
@@ -805,20 +806,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c1pmf_state::c1pmf)
 	c1p(config);
-	MCFG_CPU_MODIFY(M6502_TAG)
-	MCFG_CPU_PROGRAM_MAP(c1pmf_mem)
+	MCFG_DEVICE_MODIFY(M6502_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(c1pmf_mem)
 
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(c1pmf_state, osi470_pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c1pmf_state, osi470_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c1pmf_state, osi470_pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(c1pmf_state, osi470_pia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, c1pmf_state, osi470_pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, c1pmf_state, osi470_pia_cb2_w))
 
 	/* floppy ACIA */
 	MCFG_DEVICE_ADD("acia_1", ACIA6850, 0)
 
 	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL(4'000'000)/8) // 250 kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia_1", acia6850_device, write_txc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia_1", acia6850_device, write_txc))
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats)
@@ -888,7 +889,7 @@ void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-DRIVER_INIT_MEMBER(c1p_state,c1p)
+void c1p_state::init_c1p()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
@@ -896,9 +897,9 @@ DRIVER_INIT_MEMBER(c1p_state,c1p)
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   STATE          INIT  COMPANY            FULLNAME                            FLAGS
-COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600, c1p_state,     c1p,  "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
-COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600, c1pmf_state,   c1p,  "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101,  uk101_state,   0,    "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY            FULLNAME                            FLAGS
+COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
+COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
+COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
+COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

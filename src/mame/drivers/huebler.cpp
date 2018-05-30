@@ -306,16 +306,16 @@ static const gfx_layout amu880_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( amu880 )
+static GFXDECODE_START( gfx_amu880 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, amu880_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(amu880_state::amu880)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'000'000)/4) // U880D
-	MCFG_CPU_PROGRAM_MAP(amu880_mem)
-	MCFG_CPU_IO_MAP(amu880_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'000'000)/4) // U880D
+	MCFG_DEVICE_PROGRAM_MAP(amu880_mem)
+	MCFG_DEVICE_IO_MAP(amu880_io)
 	MCFG_Z80_DAISY_CHAIN(amu880_daisy_chain)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
@@ -325,15 +325,15 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	MCFG_SCREEN_UPDATE_DRIVER(amu880_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amu880)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amu880)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(10'000'000)/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(amu880_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(amu880_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, amu880_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, amu880_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, XTAL(10'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(10'000'000)/4) // U856
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(amu880_state, cassette_w))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, amu880_state, cassette_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -380,5 +380,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT           INIT  COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state,  0,    "Militaerverlag der DDR",   "Ausbaufaehiger Mikrocomputer mit dem U 880",   MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY                   FULLNAME                                      FLAGS */
+COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state, empty_init, "Militaerverlag der DDR", "Ausbaufaehiger Mikrocomputer mit dem U 880", MACHINE_NO_SOUND )

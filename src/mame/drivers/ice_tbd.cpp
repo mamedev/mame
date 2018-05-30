@@ -67,9 +67,9 @@ void ice_tbd_state::machine_reset()
 MACHINE_CONFIG_START(ice_tbd_state::ice_tbd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(ice_tbd_map)
-	MCFG_CPU_IO_MAP(ice_tbd_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ice_tbd_map)
+	MCFG_DEVICE_IO_MAP(ice_tbd_io_map)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(NOOP) // ?
@@ -84,4 +84,4 @@ ROM_START( ice_tbd )
 ROM_END
 
 
-GAME( 1988, ice_tbd,  0,    ice_tbd, ice_tbd, ice_tbd_state,  0, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, ice_tbd, 0, ice_tbd, ice_tbd, ice_tbd_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )

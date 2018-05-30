@@ -508,18 +508,18 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
-	MCFG_CPU_IO_MAP(cosmicos_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(cosmicos_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cosmicos_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(cosmicos_state, ef1_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(cosmicos_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(cosmicos_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(cosmicos_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cosmicos_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(cosmicos_state, dma_r))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(cosmicos_state, sc_w))
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(cosmicos_mem)
+	MCFG_DEVICE_IO_MAP(cosmicos_io)
+	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, cosmicos_state, wait_r))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cosmicos_state, clear_r))
+	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, cosmicos_state, ef1_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, cosmicos_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, cosmicos_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, cosmicos_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cosmicos_state, q_w))
+	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, cosmicos_state, dma_r))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, cosmicos_state, sc_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
@@ -531,12 +531,12 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(cosmicos_state, dmaout_w), WRITELINE(cosmicos_state, efx_w), NOOP, VCC, VCC, VCC)
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(*this, cosmicos_state, dmaout_w), WRITELINE(*this, cosmicos_state, efx_w), NOOP, VCC, VCC, VCC)
 	MCFG_CDP1864_CHROMINANCE(RES_K(2), 0, 0, 0) // R2
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -565,5 +565,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME    FLAGS
-COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, cosmicos_state, 0,    "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME    FLAGS
+COMP( 1979, cosmicos, 0,      0,      cosmicos, cosmicos, cosmicos_state, empty_init, "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

@@ -298,8 +298,8 @@ static constexpr XTAL CLOCK_3KHZ   = MASTER_CLOCK / 4096;
 class tempest_state : public driver_device
 {
 public:
-	tempest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tempest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
 		m_watchdog(*this, "watchdog"),
@@ -310,7 +310,8 @@ public:
 		m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
 		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
 		m_in1(*this, "IN1/DSW0"),
-		m_in2(*this, "IN2")
+		m_in2(*this, "IN2"),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
@@ -343,6 +344,7 @@ private:
 	required_ioport m_buttons_p2;
 	required_ioport m_in1;
 	required_ioport m_in2;
+	output_finder<2> m_led;
 
 	uint8_t m_player_select;
 };
@@ -350,6 +352,7 @@ private:
 
 void tempest_state::machine_start()
 {
+	m_led.resolve();
 	save_item(NAME(m_player_select));
 }
 
@@ -410,8 +413,8 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
 
 WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	output().set_led_value(0, ~data & 0x02);
-	output().set_led_value(1, ~data & 0x01);
+	m_led[0] = BIT(~data, 1);
+	m_led[1] = BIT(~data, 0);
 	/* FLIP is bit 0x04 */
 	m_player_select = data & 0x04;
 }
@@ -599,9 +602,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tempest_state::tempest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
@@ -623,30 +626,30 @@ MACHINE_CONFIG_START(tempest_state::tempest)
 	MCFG_MATHBOX_ADD("mathbox")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT1_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT2_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT3_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT4_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT5_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT6_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT7_R_CB(READ8(tempest_state, input_port_1_bit_r))
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT1_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT2_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT3_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT4_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT5_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT6_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT7_R_CB(READ8(tempest_state, input_port_2_bit_r))
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -870,9 +873,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, tempest,   0,       tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 3, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest3,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest2,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest1,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest1r, tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 1, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, temptube,  tempest, tempest, tempest, tempest_state, 0, ROT270, "hack (Duncan Brown)", "Tempest Tubes", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest,   0,       tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 3, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest3,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest2,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest1,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest1r, tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 1, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, temptube,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "hack (Duncan Brown)", "Tempest Tubes", MACHINE_SUPPORTS_SAVE )

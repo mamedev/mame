@@ -406,18 +406,6 @@ READ8_MEMBER(atarisy1_state::via_pb_r)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(atarisy1_state::led_1_w)
-{
-	machine().output().set_led_value(0, !state);
-}
-
-
-WRITE_LINE_MEMBER(atarisy1_state::led_2_w)
-{
-	machine().output().set_led_value(1, !state);
-}
-
-
 WRITE_LINE_MEMBER(atarisy1_state::coin_counter_right_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -707,7 +695,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarisy1 )
+static GFXDECODE_START( gfx_atarisy1 )
 	GFXDECODE_ENTRY( "alpha", 0x00000, anlayout,       0, 64 )
 GFXDECODE_END
 
@@ -722,17 +710,17 @@ GFXDECODE_END
 MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_EOC_CB(DEVWRITELINE("ajsint", input_merger_device, in_w<1>))
+	MCFG_ADC0808_EOC_CB(WRITELINE("ajsint", input_merger_device, in_w<1>))
 	// IN7 = J102 pin 2
 	// IN6 = J102 pin 3
 	// IN5 = J102 pin 4
@@ -743,17 +731,17 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	// IN0 = J102 pin 5
 
 	MCFG_INPUT_MERGER_ALL_HIGH("ajsint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(atarisy1_state, joystick_int))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, atarisy1_state, joystick_int))
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(atarisy1_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(atarisy1_state, led_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(atarisy1_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(atarisy1_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // J106 pin 4
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // J106 pin 3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_left_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -762,7 +750,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
@@ -780,33 +768,34 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy1_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11)
+	MCFG_DEVICE_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, ATARI_CLOCK_14MHz/8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(atarisy1_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(atarisy1_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atarisy1_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(atarisy1_state, via_pb_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, atarisy1_state, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, atarisy1_state, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, atarisy1_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, atarisy1_state, via_pb_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::marble)
@@ -824,10 +813,10 @@ MACHINE_CONFIG_START(atarisy1_state::peterpak)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(atarisy1_state, digital_joystick_r<3>))
+	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
+	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
+	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
+	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::indytemp)
@@ -836,10 +825,10 @@ MACHINE_CONFIG_START(atarisy1_state::indytemp)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(atarisy1_state, digital_joystick_r<3>))
+	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
+	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
+	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
+	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadrunn)
@@ -2498,7 +2487,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarisy1_state,marble)
+void atarisy1_state::init_marble()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2506,7 +2495,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
+void atarisy1_state::init_peterpak()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2514,7 +2503,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
+void atarisy1_state::init_indytemp()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2522,7 +2511,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
+void atarisy1_state::init_roadrunn()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2530,7 +2519,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,roadblst)
+void atarisy1_state::init_roadblst()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2545,35 +2534,35 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadblst)
  *
  *************************************/
 
-GAME( 1984, atarisy1,   0,        peterpak, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Atari System 1 BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1984, atarisy1,   0,        peterpak, peterpak, atarisy1_state, init_peterpak, ROT0, "Atari Games", "Atari System 1 BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1984, marble,     atarisy1, marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 1)", 0 )
-GAME( 1984, marble2,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 2)", 0 )
-GAME( 1984, marble3,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 3)", 0 )
-GAME( 1984, marble4,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 4)", 0 )
-GAME( 1984, marble5,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 5 - LSI Cartridge)", 0 )
+GAME( 1984, marble,     atarisy1, marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 1)", 0 )
+GAME( 1984, marble2,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 2)", 0 )
+GAME( 1984, marble3,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 3)", 0 )
+GAME( 1984, marble4,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 4)", 0 )
+GAME( 1984, marble5,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 5 - LSI Cartridge)", 0 )
 
-GAME( 1984, peterpak,   atarisy1, peterpak, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Peter Pack Rat", 0 )
+GAME( 1984, peterpak,   atarisy1, peterpak, peterpak, atarisy1_state, init_peterpak, ROT0, "Atari Games", "Peter Pack Rat", 0 )
 
-GAME( 1985, indytemp,   atarisy1, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 )
-GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
-GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
-GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
-GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
-GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, indytemp,   atarisy1, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 )
+GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
+GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
+GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
+GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
+GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
-GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
-GAME( 1985, roadrunn1,  roadrunn, roadrunn, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
+GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
+GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
+GAME( 1985, roadrunn1,  roadrunn, roadrunn, roadrunn, atarisy1_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
 
-GAME( 1987, roadblst,   atarisy1, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 4)", 0 )
-GAME( 1987, roadblstg,  roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 3)", 0 )
-GAME( 1987, roadblst3,  roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 3)", 0 )
-GAME( 1987, roadblstg2, roadblst, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 2)", 0 )
-GAME( 1987, roadblst2,  roadblst, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 2)", 0 )
-GAME( 1987, roadblstg1, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 1)", 0 )
-GAME( 1987, roadblst1,  roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 1)", 0 )
-GAME( 1987, roadblstc,  roadblst, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
-GAME( 1987, roadblstcg, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
+GAME( 1987, roadblst,   atarisy1, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 4)", 0 )
+GAME( 1987, roadblstg,  roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 3)", 0 )
+GAME( 1987, roadblst3,  roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 3)", 0 )
+GAME( 1987, roadblstg2, roadblst, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 2)", 0 )
+GAME( 1987, roadblst2,  roadblst, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 2)", 0 )
+GAME( 1987, roadblstg1, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 1)", 0 )
+GAME( 1987, roadblst1,  roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 1)", 0 )
+GAME( 1987, roadblstc,  roadblst, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
+GAME( 1987, roadblstcg, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )

@@ -236,7 +236,7 @@ static const gfx_layout tilelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-DRIVER_INIT_MEMBER(aquarium_state,aquarium)
+void aquarium_state::init_aquarium()
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
@@ -280,7 +280,7 @@ DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 }
 
 
-static GFXDECODE_START( aquarium )
+static GFXDECODE_START( gfx_aquarium )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,       0x300, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, char5bpplayout,   0x400, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_8x8_layout,  0x200, 32 )
@@ -290,13 +290,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(aquarium_state::aquarium)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(snd_map)
-	MCFG_CPU_IO_MAP(snd_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_IO_MAP(snd_portmap)
 
 	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
@@ -310,25 +310,26 @@ MACHINE_CONFIG_START(aquarium_state::aquarium)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarium)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarium)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) // clock not verified on pcb
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) // clock not verified on pcb
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'056'000), PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -391,5 +392,5 @@ ROM_START( aquariumj )
 	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-GAME( 1996, aquarium,  0,        aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, aquariumj, aquarium, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquarium,  0,        aquarium, aquarium, aquarium_state, init_aquarium, ROT0, "Excellent System", "Aquarium (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquariumj, aquarium, aquarium, aquarium, aquarium_state, init_aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

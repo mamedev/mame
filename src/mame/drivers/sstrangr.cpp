@@ -193,10 +193,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(sstrangr_state::sstrangr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
-	MCFG_CPU_PROGRAM_MAP(sstrangr_map)
-	MCFG_CPU_IO_MAP(sstrangr_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
+	MCFG_DEVICE_PROGRAM_MAP(sstrangr_map)
+	MCFG_DEVICE_IO_MAP(sstrangr_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -296,5 +296,5 @@ ROM_START( sstrangr2 )
 ROM_END
 
 
-GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
-GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
+GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

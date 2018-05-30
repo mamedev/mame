@@ -28,6 +28,8 @@
     Big Fight/Cyclewarriors - misc graphics problems.
     Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
 
+    reference of bigfight : https://youtu.be/aUUoUCr6yhk
+
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
 
@@ -147,7 +149,6 @@
 #include "machine/adc0808.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -159,6 +160,14 @@
 
 
 /***************************************************************************/
+
+
+WRITE8_MEMBER(cyclwarr_state::cyclwarr_sound_w)
+{
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
 
 READ16_MEMBER(cyclwarr_state::cyclwarr_sprite_r)
 {
@@ -185,10 +194,21 @@ WRITE16_MEMBER(cyclwarr_state::bigfight_a60000_w)
 	COMBINE_DATA(&m_bigfight_a60000[offset]);
 }
 
-WRITE16_MEMBER(cyclwarr_state::cyclwarr_sound_w)
+template<int Bank>
+READ16_MEMBER(cyclwarr_state::cyclwarr_videoram_r)
 {
-	m_soundlatch->write(space, 0, data >> 8);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	return m_cyclwarr_videoram[Bank][offset];
+}
+
+template<int Bank>
+WRITE16_MEMBER(cyclwarr_state::cyclwarr_videoram_w)
+{
+	COMBINE_DATA(&m_cyclwarr_videoram[Bank][offset]);
+	if (offset>=0x400)
+	{
+		m_layer[(Bank<<1)|0]->mark_tile_dirty(offset-0x400);
+		m_layer[(Bank<<1)|1]->mark_tile_dirty(offset-0x400);
+	}
 }
 
 /***************************************************************************/
@@ -226,7 +246,7 @@ void apache3_state::apache3_v20_map(address_map &map)
 	map(0x00000, 0x01fff).ram();
 	map(0x04000, 0x04003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x06000, 0x06001).portr("IN0"); // esw
-	map(0x08000, 0x08001).r(this, FUNC(apache3_state::tatsumi_hack_ym2151_r)).w("ymsnd", FUNC(ym2151_device::write));
+	map(0x08000, 0x08001).r(this, FUNC(apache3_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
 	map(0x0a000, 0x0a000).r(this, FUNC(apache3_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0x0e000, 0x0e007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0xf0000, 0xfffff).rom();
@@ -274,7 +294,7 @@ void roundup5_state::roundup5_z80_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffef).ram();
-	map(0xfff0, 0xfff1).r(this, FUNC(roundup5_state::tatsumi_hack_ym2151_r)).w("ymsnd", FUNC(ym2151_device::write));
+	map(0xfff0, 0xfff1).r(this, FUNC(roundup5_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
 	map(0xfff4, 0xfff4).r(this, FUNC(roundup5_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0xfff8, 0xfffb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfffc, 0xfffc).portr("STICKX");
@@ -287,14 +307,14 @@ void cyclwarr_state::cyclwarr_68000a_map(address_map &map)
 	map(0x000000, 0x00ffff).ram().share("cw_cpua_ram");
 	map(0x03e000, 0x03efff).ram();
 	map(0x040000, 0x04ffff).ram().share("cw_cpub_ram");
-	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w)).share("cw_videoram1");
-	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w)).share("cw_videoram0");
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<1>), FUNC(cyclwarr_state::cyclwarr_videoram_w<1>)).share("cw_videoram1");
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<0>), FUNC(cyclwarr_state::cyclwarr_videoram_w<0>)).share("cw_videoram0");
 
 	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
 	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
 	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
 
-	map(0x0b8000, 0x0b8001).w(this, FUNC(cyclwarr_state::cyclwarr_sound_w));
+	map(0x0b8000, 0x0b8001).w(this, FUNC(cyclwarr_state::cyclwarr_sound_w)).umask16(0xff00);
 	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
@@ -308,8 +328,8 @@ void cyclwarr_state::cyclwarr_68000b_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).ram().share("cw_cpub_ram");
 
-	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w));
-	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w));
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<1>), FUNC(cyclwarr_state::cyclwarr_videoram_w<1>));
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<0>), FUNC(cyclwarr_state::cyclwarr_videoram_w<0>));
 
 	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
 	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
@@ -328,7 +348,7 @@ void cyclwarr_state::cyclwarr_z80_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffef).ram();
-	map(0xfff0, 0xfff1).r(this, FUNC(cyclwarr_state::tatsumi_hack_ym2151_r)).w("ymsnd", FUNC(ym2151_device::write));
+	map(0xfff0, 0xfff1).r(this, FUNC(cyclwarr_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
 	map(0xfff4, 0xfff4).r(this, FUNC(cyclwarr_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0xfffc, 0xfffc).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xfffe, 0xfffe).nopw();
@@ -343,14 +363,14 @@ void cyclwarr_state::bigfight_68000a_map(address_map &map)
 	map(0x03e000, 0x03efff).ram();
 	map(0x040000, 0x04ffff).ram().share("cw_cpub_ram");
 
-	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w)).share("cw_videoram1");
-	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w)).share("cw_videoram0");
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<1>), FUNC(cyclwarr_state::cyclwarr_videoram_w<1>)).share("cw_videoram1");
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<0>), FUNC(cyclwarr_state::cyclwarr_videoram_w<0>)).share("cw_videoram0");
 
 	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
 	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
 	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
 
-	map(0x0b8000, 0x0b8001).w(this, FUNC(cyclwarr_state::cyclwarr_sound_w));
+	map(0x0b8000, 0x0b8001).w(this, FUNC(cyclwarr_state::cyclwarr_sound_w)).umask16(0xff00);
 	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
@@ -363,8 +383,8 @@ void cyclwarr_state::bigfight_68000a_map(address_map &map)
 void cyclwarr_state::bigfight_68000b_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).ram().share("cw_cpub_ram");
-	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w));
-	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w));
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<1>), FUNC(cyclwarr_state::cyclwarr_videoram_w<1>));
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<0>), FUNC(cyclwarr_state::cyclwarr_videoram_w<0>));
 	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
 	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
 	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
@@ -615,8 +635,8 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_DIPNAME( 0x04, 0x04, "Ticket Dispenser" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "10000" )
 	PORT_DIPSETTING(    0x00, "15000" )
-	PORT_DIPNAME( 0x18, 0x00, "Machine Type" ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x00, "2 Players" )
+	PORT_DIPNAME( 0x18, 0x08, "Machine Type" ) PORT_DIPLOCATION("SW2:4,5")
+//  PORT_DIPSETTING(    0x00, "2 Players" ) // same as 4 players but text layout is 2p (invalid setting)
 	PORT_DIPSETTING(    0x08, "2 Players" )
 	PORT_DIPSETTING(    0x10, "3 Players" )
 	PORT_DIPSETTING(    0x18, "4 Players" )
@@ -792,9 +812,9 @@ static const gfx_layout spritelayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 8,12,0,4, 24,28, 16,20},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32},
+	{ STEP4(0,1) },
+	{ 8,12,0,4, 24,28,16,20 },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
@@ -804,24 +824,24 @@ static const gfx_layout roundup5_vramlayout =
 	4096 + 2048,
 	3,
 	{ 0x30000 * 8, 0x18000 * 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7},
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16},
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	8*16
 };
 
-static GFXDECODE_START( apache3 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 1024, 128)
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x3_planar, 768, 16)
+static GFXDECODE_START( gfx_apache3 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    1024, 128)
+	GFXDECODE_ENTRY( "text",    0, gfx_8x8x3_planar, 768,  16)
 GFXDECODE_END
 
-static GFXDECODE_START( roundup5 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 1024, 256)
-	GFXDECODE_ENTRY( nullptr, 0, roundup5_vramlayout, 0, 16)
+static GFXDECODE_START( gfx_roundup5 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     1024, 256)
+	GFXDECODE_ENTRY(  nullptr,  0, roundup5_vramlayout, 0,  16)
 GFXDECODE_END
 
-static GFXDECODE_START( cyclwarr )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 8192, 512)
-	GFXDECODE_ENTRY( "gfx5", 0, gfx_8x8x3_planar, 0, 512)
+static GFXDECODE_START( gfx_cyclwarr )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,  8192, 512)
+	GFXDECODE_ENTRY( "tilerom", 0, gfx_8x8x3_planar, 0,  16)
 GFXDECODE_END
 
 /******************************************************************************/
@@ -833,7 +853,7 @@ INTERRUPT_GEN_MEMBER(tatsumi_state::v30_interrupt)
 
 WRITE_LINE_MEMBER(apache3_state::apache3_68000_reset)
 {
-	m_subcpu2->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu2->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(apache3_state,apache3)
@@ -848,20 +868,20 @@ MACHINE_RESET_MEMBER(apache3_state,apache3)
 MACHINE_CONFIG_START(apache3_state::apache3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
-	MCFG_CPU_PROGRAM_MAP(apache3_v30_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state, v30_interrupt)
+	MCFG_DEVICE_ADD("maincpu", V30, CLOCK_1 / 2)
+	MCFG_DEVICE_PROGRAM_MAP(apache3_v30_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tatsumi_state, v30_interrupt)
 
-	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_CPU_PROGRAM_MAP(apache3_68000_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", apache3_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(apache3_68000_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apache3_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", V20, CLOCK_1 / 2)
-	MCFG_CPU_PROGRAM_MAP(apache3_v20_map)
+	MCFG_DEVICE_ADD("audiocpu", V20, CLOCK_1 / 2)
+	MCFG_DEVICE_PROGRAM_MAP(apache3_v20_map)
 
-	MCFG_CPU_ADD("sub2", Z80, CLOCK_2 / 8)
-	MCFG_CPU_PROGRAM_MAP(apache3_z80_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", apache3_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("sub2", Z80, CLOCK_2 / 8)
+	MCFG_DEVICE_PROGRAM_MAP(apache3_z80_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apache3_state, irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -871,7 +891,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_ADC0808_IN0_CB(IOPORT("STICK_X"))
 	MCFG_ADC0808_IN1_CB(IOPORT("STICK_Y"))
 	MCFG_ADC0808_IN2_CB(GND) // VSP1
-	MCFG_ADC0808_IN4_CB(READ8(apache3_state, apache3_vr1_r))
+	MCFG_ADC0808_IN4_CB(READ8(*this, apache3_state, apache3_vr1_r))
 	MCFG_ADC0808_IN5_CB(IOPORT("THROTTLE"))
 	MCFG_ADC0808_IN6_CB(GND) // RPSNC
 	MCFG_ADC0808_IN7_CB(GND) // LPSNC
@@ -883,7 +903,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(apache3_state, screen_update_apache3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apache3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apache3)
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -898,14 +918,15 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_VIDEO_START_OVERRIDE(apache3_state, apache3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -913,15 +934,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(roundup5_state::roundup5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
-	MCFG_CPU_PROGRAM_MAP(roundup5_v30_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state, v30_interrupt)
+	MCFG_DEVICE_ADD("maincpu", V30, CLOCK_1 / 2)
+	MCFG_DEVICE_PROGRAM_MAP(roundup5_v30_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tatsumi_state, v30_interrupt)
 
-	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_CPU_PROGRAM_MAP(roundup5_68000_map)
+	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(roundup5_68000_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_CPU_PROGRAM_MAP(roundup5_z80_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(roundup5_z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -937,7 +958,7 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(roundup5_state, screen_update_roundup5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", roundup5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_roundup5)
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -946,14 +967,15 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -961,16 +983,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MCFG_CPU_PROGRAM_MAP(cyclwarr_68000a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, CLOCK_2 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_68000a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_CPU_PROGRAM_MAP(cyclwarr_68000b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_68000b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_CPU_PROGRAM_MAP(cyclwarr_z80_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -985,7 +1007,7 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW2"))
 	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P3"))
 	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P4"))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(cyclwarr_state, cyclwarr_control_w))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, cyclwarr_state, cyclwarr_control_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -995,23 +1017,25 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_cyclwarr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclwarr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -1019,16 +1043,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MCFG_CPU_PROGRAM_MAP(bigfight_68000a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, CLOCK_2 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(bigfight_68000a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MCFG_CPU_PROGRAM_MAP(bigfight_68000b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, CLOCK_2 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(bigfight_68000b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyclwarr_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MCFG_CPU_PROGRAM_MAP(cyclwarr_z80_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, CLOCK_1 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cyclwarr_z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -1043,7 +1067,7 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW2"))
 	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P3"))
 	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P4"))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(cyclwarr_state, cyclwarr_control_w))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, cyclwarr_state, cyclwarr_control_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1053,23 +1077,25 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclwarr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8 / 2, PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8 / 2, okim6295_device::PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -1092,10 +1118,10 @@ ROM_START( apache3 )
 	ROM_REGION( 0x100000, "audiocpu", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x0f0000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, "gfx2", 0)
+	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
 	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
@@ -1105,7 +1131,7 @@ ROM_START( apache3 )
 	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
 	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
 
-	ROM_REGION( 0x100000, "gfx3", 0)
+	ROM_REGION( 0x100000, "sprites_h", 0)
 	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
 	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
 	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )
@@ -1115,7 +1141,7 @@ ROM_START( apache3 )
 	ROM_LOAD32_BYTE( "ap-14c.70",   0x080002, 0x20000, CRC(58f7fe16) SHA1(a5b87b42b85808c226df0d2a7b7cdde12d474a41) )
 	ROM_LOAD32_BYTE( "ap-15c.74",   0x080003, 0x20000, CRC(1ffd5496) SHA1(25efb568957fc9441a40a7d64cc6afe1a14b392b) )
 
-	ROM_REGION( 0x18000, "gfx4", 0 )
+	ROM_REGION( 0x18000, "text", 0 )
 	ROM_LOAD( "ap-18d.73",   0x000000, 0x8000, CRC(55e664bf) SHA1(505bec8b5ff3f9fa2c5fb1213d54683347905be1) )
 	ROM_LOAD( "ap-17d.68",   0x008000, 0x8000, CRC(6199afe4) SHA1(ad8c0ed6c33d984bb29c89f2e7fc7e5a923cefe3) )
 	ROM_LOAD( "ap-16d.63",   0x010000, 0x8000, CRC(f115656d) SHA1(61798858dc0172192d89e666696b2c7642756899) )
@@ -1144,10 +1170,10 @@ ROM_START( apache3a )
 	ROM_REGION( 0x100000, "audiocpu", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x0f0000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, "gfx2", 0)
+	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
 	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
@@ -1157,7 +1183,7 @@ ROM_START( apache3a )
 	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
 	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
 
-	ROM_REGION( 0x100000, "gfx3", 0)
+	ROM_REGION( 0x100000, "sprites_h", 0)
 	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
 	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
 	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )
@@ -1167,7 +1193,7 @@ ROM_START( apache3a )
 	ROM_LOAD32_BYTE( "ap-14c.70",   0x080002, 0x20000, CRC(58f7fe16) SHA1(a5b87b42b85808c226df0d2a7b7cdde12d474a41) )
 	ROM_LOAD32_BYTE( "ap-15c.74",   0x080003, 0x20000, CRC(1ffd5496) SHA1(25efb568957fc9441a40a7d64cc6afe1a14b392b) )
 
-	ROM_REGION( 0x18000, "gfx4", 0 )
+	ROM_REGION( 0x18000, "text", 0 )
 	ROM_LOAD( "ap-18e.73",   0x000000, 0x10000, CRC(d7861a26) SHA1(b1a1e089a293a5536d342c9edafbea303f4f128c) )
 	ROM_LOAD( "ap-16e.63",   0x008000, 0x10000, CRC(d3251965) SHA1(aef4f58a6f773060434abda9d7f5f003693577bf) )
 	ROM_LOAD( "ap-17e.68",   0x008000, 0x08000, CRC(4509c2ed) SHA1(97a6a6710e83aca212ce43d06c3f26c35f9782b8) )
@@ -1196,10 +1222,10 @@ ROM_START( roundup5 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "ru-28d",   0x000000, 0x10000, CRC(df36c6c5) SHA1(c046482043f6b54c55696ba3d339ffb11d78f674) )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x180000, "sprites", ROMREGION_ERASE00 )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x0c0000, "gfx2", 0)
+	ROM_REGION( 0x0c0000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "ru-00b",   0x000000, 0x20000, CRC(388a0647) SHA1(e4ab43832872f44c0fe1aaede4372cc00ca7d32b) )
 	ROM_LOAD32_BYTE( "ru-02b",   0x000001, 0x20000, CRC(eff33945) SHA1(3f4c3aaa11ccf945c2f898dfdf815705d8539e21) )
 	ROM_LOAD32_BYTE( "ru-04b",   0x000002, 0x20000, CRC(40fda247) SHA1(f5fbc07fda024baedf35ac209210e94df9f15065) )
@@ -1209,7 +1235,7 @@ ROM_START( roundup5 )
 	ROM_LOAD32_BYTE( "ru-05b",   0x080002, 0x10000, CRC(23dd10e1) SHA1(f30ff1a8c7ed9bc567b901cbdd202028fffb9f80) )
 	ROM_LOAD32_BYTE( "ru-07b",   0x080003, 0x10000, CRC(bb40f46e) SHA1(da694e16d19f60a0dee47551f00f3e50b2d5dcaf) )
 
-	ROM_REGION( 0x0c0000, "gfx3", 0)
+	ROM_REGION( 0x0c0000, "sprites_h", 0)
 	ROM_LOAD32_BYTE( "ru-08b",   0x000000, 0x20000, CRC(01729e3c) SHA1(1445287fde0b993d053aab73efafc902a6b7e2cc) )
 	ROM_LOAD32_BYTE( "ru-10b",   0x000001, 0x20000, CRC(cd2357a7) SHA1(313460a74244325ce2c659816f2b738f3dc5358a) )
 	ROM_LOAD32_BYTE( "ru-12b",   0x000002, 0x20000, CRC(ca63b1f8) SHA1(a50ef8259745dc166eb0a1b2c812ff620818a755) )
@@ -1240,10 +1266,10 @@ ROM_START( cyclwarr )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, "gfx2", 0)
+	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00a",   0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
 	ROM_LOAD32_BYTE( "cw08a",   0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
 	ROM_LOAD32_BYTE( "cw02a",   0x000002, 0x20000, CRC(4dadf3cb) SHA1(e42c56e295a443cb605d48eba23a16fab3c86525) )
@@ -1253,7 +1279,7 @@ ROM_START( cyclwarr )
 	ROM_LOAD32_BYTE( "cw03a",   0x080002, 0x20000, CRC(3ca6f98e) SHA1(8526fe38d3b4c66e09049ba18651a9e7255d85d6) )
 	ROM_LOAD32_BYTE( "cw11a",   0x080003, 0x20000, CRC(5d760392) SHA1(7bbda2880af4659c267193ce10ed887a1b54a981) )
 
-	ROM_REGION( 0x100000, "gfx3", 0)
+	ROM_REGION( 0x100000, "sprites_h", 0)
 	ROM_LOAD32_BYTE( "cw04a",   0x000000, 0x20000, CRC(f05f594d) SHA1(80effaa517b2154c013419e0bc05fd0797b74c8d) )
 	ROM_LOAD32_BYTE( "cw12a",   0x000001, 0x20000, CRC(4ac07e8b) SHA1(f9de96fba39d5752d61b8f6be87fb605694624ed) )
 	ROM_LOAD32_BYTE( "cw06a",   0x000002, 0x20000, CRC(f628edc9) SHA1(473f7ec28000e6bf72782c1c3f4afb5e021bd430) )
@@ -1263,10 +1289,10 @@ ROM_START( cyclwarr )
 	ROM_LOAD32_BYTE( "cw07a",   0x080002, 0x20000, CRC(314579b5) SHA1(3c10ec490f7821a5b5412295232bbb104d0e4b83) )
 	ROM_LOAD32_BYTE( "cw15a",   0x080003, 0x20000, CRC(7ed4b721) SHA1(b87865effeff77a9ea74354ef2b5911a5102a647) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_REGION( 0x20000, "cw_tileclut", 0 )
 	ROM_LOAD( "cw27",   0x000000, 0x20000, CRC(2db48a9e) SHA1(16c307340d17cd3b5455ebcee681fbe0335dec58) )
 
-	ROM_REGION( 0x60000, "gfx5", 0 )
+	ROM_REGION( 0x60000, "tilerom", 0 )
 	ROM_LOAD( "cw30",   0x000000, 0x20000, CRC(331d0711) SHA1(82251fe1f1d36f079080943ab1fd04a60077c353) )
 	ROM_LOAD( "cw29",   0x020000, 0x20000, CRC(64dd519c) SHA1(e23611fc2be896861997063546c3eb03527eaf8e) )
 	ROM_LOAD( "cw28",   0x040000, 0x20000, CRC(3fc568ed) SHA1(91125c9deddc659449ca6791a847fe908c2818b2) )
@@ -1292,10 +1318,10 @@ ROM_START( cyclwarra )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, "gfx2", 0)
+	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00a",   0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
 	ROM_LOAD32_BYTE( "cw08a",   0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
 	ROM_LOAD32_BYTE( "cw02a",   0x000002, 0x20000, CRC(4dadf3cb) SHA1(e42c56e295a443cb605d48eba23a16fab3c86525) )
@@ -1305,7 +1331,7 @@ ROM_START( cyclwarra )
 	ROM_LOAD32_BYTE( "cw03a",   0x080002, 0x20000, CRC(3ca6f98e) SHA1(8526fe38d3b4c66e09049ba18651a9e7255d85d6) )
 	ROM_LOAD32_BYTE( "cw11a",   0x080003, 0x20000, CRC(5d760392) SHA1(7bbda2880af4659c267193ce10ed887a1b54a981) )
 
-	ROM_REGION( 0x100000, "gfx3", 0)
+	ROM_REGION( 0x100000, "sprites_h", 0)
 	ROM_LOAD32_BYTE( "cw04a",   0x000000, 0x20000, CRC(f05f594d) SHA1(80effaa517b2154c013419e0bc05fd0797b74c8d) )
 	ROM_LOAD32_BYTE( "cw12a",   0x000001, 0x20000, CRC(4ac07e8b) SHA1(f9de96fba39d5752d61b8f6be87fb605694624ed) )
 	ROM_LOAD32_BYTE( "cw06a",   0x000002, 0x20000, CRC(f628edc9) SHA1(473f7ec28000e6bf72782c1c3f4afb5e021bd430) )
@@ -1315,10 +1341,10 @@ ROM_START( cyclwarra )
 	ROM_LOAD32_BYTE( "cw07a",   0x080002, 0x20000, CRC(314579b5) SHA1(3c10ec490f7821a5b5412295232bbb104d0e4b83) )
 	ROM_LOAD32_BYTE( "cw15a",   0x080003, 0x20000, CRC(7ed4b721) SHA1(b87865effeff77a9ea74354ef2b5911a5102a647) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_REGION( 0x20000, "cw_tileclut", 0 )
 	ROM_LOAD( "cw27",   0x000000, 0x20000, CRC(2db48a9e) SHA1(16c307340d17cd3b5455ebcee681fbe0335dec58) )
 
-	ROM_REGION( 0x60000, "gfx5", 0 )
+	ROM_REGION( 0x60000, "tilerom", 0 )
 	ROM_LOAD( "cw30",   0x000000, 0x20000, CRC(331d0711) SHA1(82251fe1f1d36f079080943ab1fd04a60077c353) )
 	ROM_LOAD( "cw29",   0x020000, 0x20000, CRC(64dd519c) SHA1(e23611fc2be896861997063546c3eb03527eaf8e) )
 	ROM_LOAD( "cw28",   0x040000, 0x20000, CRC(3fc568ed) SHA1(91125c9deddc659449ca6791a847fe908c2818b2) )
@@ -1340,25 +1366,25 @@ ROM_START( bigfight )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites_l", 0 )
 	ROM_LOAD32_BYTE( "rom0.ic26",   0x000000, 0x80000, CRC(a4a3c8d6) SHA1(b5365d9bc6068260c23ba9d5971c7c7d7cc07a97) )
 	ROM_LOAD32_BYTE( "rom8.ic45",   0x000001, 0x80000, CRC(220956ed) SHA1(68e0ba1e850101b4cc2778819dfa76f04d88d2d6) )
 	ROM_LOAD32_BYTE( "rom2.ic28",   0x000002, 0x80000, CRC(c4f6d243) SHA1(e23b241b5a40b332165a34e2f1bc4366973b2070) )
 	ROM_LOAD32_BYTE( "rom10.ic47",  0x000003, 0x80000, CRC(0212d472) SHA1(5549461195fd7b6b43c0174462d7fe1a1bac24e9) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
+	ROM_REGION( 0x200000, "sprites_h", 0 )
 	ROM_LOAD32_BYTE( "rom4.ic30",   0x000000, 0x80000, CRC(999ff7e9) SHA1(a53b06ad084722d7a52fcf01c52967f68620e609) )
 	ROM_LOAD32_BYTE( "rom12.ic49",  0x000001, 0x80000, CRC(cb4c1f0b) SHA1(32d64b78ed3d5971eb5d25be2c38e6f2c9048f74) )
 	ROM_LOAD32_BYTE( "rom6.ic32",   0x000002, 0x80000, CRC(f70e2d47) SHA1(00517b5f3b2deb6f3f3bd12df421e63884c22b2e) )
 	ROM_LOAD32_BYTE( "rom14.ic51",  0x000003, 0x80000, CRC(77430bc9) SHA1(0b1fd54ace84a9fb5b44d5600de8089a20bcbd47) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_REGION( 0x20000, "cw_tileclut", 0 )
 	ROM_LOAD( "rom21.ic128",   0x000000, 0x20000, CRC(da027dcf) SHA1(47d18a8a273fea72cb3ad3d58166fe38ca28a860) )
 
-	ROM_REGION( 0x60000, "gfx5", 0 )
+	ROM_REGION( 0x60000, "tilerom", 0 )
 	ROM_LOAD( "rom24.ic73",   0x000000, 0x20000, CRC(c564185d) SHA1(e9b5fc10a5a5014735852c22db2a054d5787d8cb) )
 	ROM_LOAD( "rom23.ic72",   0x020000, 0x20000, CRC(f8bb340b) SHA1(905a1ec778d6ed5c6f53d9d08cd105eed7e307ca) )
 	ROM_LOAD( "rom22.ic71",   0x040000, 0x20000, CRC(fb505074) SHA1(b6d9b20be7c3e971e5a4392736f087e807b9c850) )
@@ -1369,13 +1395,13 @@ ROM_END
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(apache3_state,apache3)
+void apache3_state::init_apache3()
 {
-	uint8_t *dst = memregion("gfx1")->base();
-	uint8_t *src1 = memregion("gfx2")->base();
-	uint8_t *src2 = memregion("gfx3")->base();
+	uint8_t *dst = memregion("sprites")->base();
+	uint8_t *src1 = memregion("sprites_l")->base();
+	uint8_t *src2 = memregion("sprites_h")->base();
 
-	for (int i=0; i<0x100000; i+=32)
+	for (int i = 0; i < 0x100000; i += 32)
 	{
 		memcpy(dst,src1,32);
 		src1+=32;
@@ -1386,10 +1412,10 @@ DRIVER_INIT_MEMBER(apache3_state,apache3)
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup1 = memregion("gfx2")->base();
-	m_rom_sprite_lookup2 = memregion("gfx3")->base();
-	m_rom_clut0 = memregion("gfx2")->base()+ 0x100000 - 0x800;
-	m_rom_clut1 = memregion("gfx3")->base()+ 0x100000 - 0x800;
+	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
+	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
+	m_rom_clut[0] = memregion("sprites_l")->base()+ 0x100000 - 0x800;
+	m_rom_clut[1] = memregion("sprites_h")->base()+ 0x100000 - 0x800;
 
 	tatsumi_reset();
 
@@ -1401,13 +1427,13 @@ DRIVER_INIT_MEMBER(apache3_state,apache3)
 	// TODO: ym2151_set_port_write_handler for CT1/CT2 outputs
 }
 
-DRIVER_INIT_MEMBER(roundup5_state,roundup5)
+void roundup5_state::init_roundup5()
 {
-	uint8_t *dst = memregion("gfx1")->base();
-	uint8_t *src1 = memregion("gfx2")->base();
-	uint8_t *src2 = memregion("gfx3")->base();
+	uint8_t *dst = memregion("sprites")->base();
+	uint8_t *src1 = memregion("sprites_l")->base();
+	uint8_t *src2 = memregion("sprites_h")->base();
 
-	for (int i=0; i<0xc0000; i+=32)
+	for (int i = 0; i < 0xc0000; i += 32)
 	{
 		memcpy(dst,src1,32);
 		src1+=32;
@@ -1418,23 +1444,23 @@ DRIVER_INIT_MEMBER(roundup5_state,roundup5)
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup1 = memregion("gfx2")->base();
-	m_rom_sprite_lookup2 = memregion("gfx3")->base();
-	m_rom_clut0 = memregion("gfx2")->base()+ 0xc0000 - 0x800;
-	m_rom_clut1 = memregion("gfx3")->base()+ 0xc0000 - 0x800;
+	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
+	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
+	m_rom_clut[0] = memregion("sprites_l")->base()+ 0xc0000 - 0x800;
+	m_rom_clut[1] = memregion("sprites_h")->base()+ 0xc0000 - 0x800;
 
 	tatsumi_reset();
 }
 
-DRIVER_INIT_MEMBER(cyclwarr_state,cyclwarr)
+void cyclwarr_state::init_cyclwarr()
 {
-	uint8_t *dst = memregion("gfx1")->base();
-	uint8_t *src1 = memregion("gfx2")->base();
-	int len1 = memregion("gfx2")->bytes();
-	uint8_t *src2 = memregion("gfx3")->base();
-	int len2 = memregion("gfx3")->bytes();
+	uint8_t *dst = memregion("sprites")->base();
+	uint8_t *src1 = memregion("sprites_l")->base();
+	int len1 = memregion("sprites_l")->bytes();
+	uint8_t *src2 = memregion("sprites_h")->base();
+	int len2 = memregion("sprites_h")->bytes();
 
-	for (int i=0; i<len1; i+=32)
+	for (int i = 0; i < len1; i += 32)
 	{
 		memcpy(dst,src1,32);
 		src1+=32;
@@ -1444,19 +1470,19 @@ DRIVER_INIT_MEMBER(cyclwarr_state,cyclwarr)
 		src2+=32;
 	}
 
-	dst = memregion("maincpu")->base();
+	dst = m_mainregion->base();
 	memcpy(m_cyclwarr_cpua_ram,dst,8);
 	membank("bank1")->set_base(dst);
 
-	dst = memregion("sub")->base();
+	dst = m_subregion->base();
 	memcpy(m_cyclwarr_cpub_ram,dst,8);
 	membank("bank2")->set_base(dst);
 
 	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup1 = memregion("gfx2")->base();
-	m_rom_sprite_lookup2 = memregion("gfx3")->base();
-	m_rom_clut0 = memregion("gfx2")->base() + len1 - 0x1000;
-	m_rom_clut1 = memregion("gfx3")->base() + len2 - 0x1000;
+	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
+	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
+	m_rom_clut[0] = memregion("sprites_l")->base() + len1 - 0x1000;
+	m_rom_clut[1] = memregion("sprites_h")->base() + len2 - 0x1000;
 
 	tatsumi_reset();
 }
@@ -1466,9 +1492,9 @@ DRIVER_INIT_MEMBER(cyclwarr_state,cyclwarr)
 /* http://www.tatsu-mi.co.jp/game/trace/index.html */
 
 /* ** 1987  grayout    - Gray Out (not dumped yet) */
-GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  apache3,  ROT0, "Tatsumi", "Apache 3", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS, layout_roundup5 )
-GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev C)", MACHINE_IMPERFECT_GRAPHICS ) // Rev C & B CPU code
-GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS ) // Rev B & A CPU code
-GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS, layout_roundup5 )
+GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & B CPU code
+GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev B & A CPU code
+GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )

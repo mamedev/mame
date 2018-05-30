@@ -213,7 +213,7 @@ public:
 	floppy_image_device *m_floppy;
 
 	mc6845_device *m_mc6845;
-	DECLARE_DRIVER_INIT(z100);
+	void init_z100();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -666,16 +666,17 @@ void z100_state::machine_reset()
 	}
 }
 
-static SLOT_INTERFACE_START( z100_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void z100_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(z100_mem)
-	MCFG_CPU_IO_MAP(z100_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu",I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_PROGRAM_MAP(z100_mem)
+	MCFG_DEVICE_IO_MAP(z100_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -696,17 +697,17 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(z100_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, z100_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(z100_state, video_pia_A_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(z100_state, video_pia_B_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(z100_state, video_pia_CA2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(z100_state, video_pia_CB2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, z100_state, video_pia_A_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, z100_state, video_pia_B_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, z100_state, video_pia_CA2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, z100_state, video_pia_CB2_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
@@ -727,7 +728,7 @@ ROM_START( z100 )
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(z100_state,z100)
+void z100_state::init_z100()
 {
 	uint8_t *ROM = memregion("ipl")->base();
 
@@ -740,5 +741,5 @@ DRIVER_INIT_MEMBER(z100_state,z100)
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME  FLAGS
-COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, z100, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT       COMPANY   FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, init_z100, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

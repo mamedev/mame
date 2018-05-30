@@ -96,12 +96,12 @@ void tekxp330_state::machine_start()
 
 MACHINE_CONFIG_START(tekxp330_state::tekxp330)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3052, XTAL(20'000'000)) /* IDT 79R3052E, clock unknown */
+	MCFG_DEVICE_ADD("maincpu", R3052, XTAL(20'000'000)) /* IDT 79R3052E, clock unknown */
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
-	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
+	MCFG_DEVICE_PROGRAM_MAP(tms_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -124,5 +124,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, 0,    "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, empty_init, "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )

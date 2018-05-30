@@ -427,14 +427,15 @@ FLOPPY_FORMATS_MEMBER( eurocom2_state::floppy_formats )
 	FLOPPY_PPG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( eurocom_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void eurocom_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(eurocom2_state::eurocom2)
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
-	MCFG_CPU_PROGRAM_MAP(eurocom2_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
+	MCFG_DEVICE_PROGRAM_MAP(eurocom2_map)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'717'200), VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
@@ -447,12 +448,12 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(eurocom2_state, kbd_put))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(eurocom2_state, pia1_ca1_r))  // keyboard strobe
-	MCFG_PIA_READCA2_HANDLER(READLINE(eurocom2_state, pia1_ca2_r))  // SST output Q14
-	MCFG_PIA_READCB1_HANDLER(READLINE(eurocom2_state, pia1_cb1_r))  // SST output Q6
-	MCFG_PIA_CB2_HANDLER(WRITELINE(eurocom2_state, pia1_cb2_w)) // SST reset input
-	MCFG_PIA_READPA_HANDLER(READ8(eurocom2_state, kbd_get))
-//  MCFG_PIA_READPB_HANDLER(READ8(eurocom2_state, kbd_get))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, eurocom2_state, pia1_ca1_r))  // keyboard strobe
+	MCFG_PIA_READCA2_HANDLER(READLINE(*this, eurocom2_state, pia1_ca2_r))  // SST output Q14
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, eurocom2_state, pia1_cb1_r))  // SST output Q6
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, eurocom2_state, pia1_cb2_w)) // SST reset input
+	MCFG_PIA_READPA_HANDLER(READ8(*this, eurocom2_state, kbd_get))
+//  MCFG_PIA_READPB_HANDLER(READ8(*this, eurocom2_state, kbd_get))
 //  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 //  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -461,11 +462,11 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 //  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE ("rs232", rs232_port_device, write_rts))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_cts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE ("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE ("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE ("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE ("acia", acia6850_device, write_cts))
 
 	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)/2)
 //  MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
@@ -477,24 +478,24 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(waveterm_state::waveterm)
 	eurocom2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(waveterm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(waveterm_map)
 
 	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(waveterm_state, waveterm_kbh_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(waveterm_state, waveterm_kb_w))
-	MCFG_PIA_READPB_HANDLER(READ8(waveterm_state, waveterm_kb_r))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, waveterm_state, waveterm_kbh_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, waveterm_state, waveterm_kb_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, waveterm_state, waveterm_kb_r))
 
 	// ports A(in/out), B(out), CA1(in), CA2(in), and CB2(out) = interface to PPG bus via DIL socket on WTI board
 	// CB1 -- front panel "End" button
 	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
-//  MCFG_PIA_READPA_HANDLER(READ8(waveterm_state, pia3_pa_r))
-//  MCFG_PIA_WRITEPA_HANDLER(WRITE8(waveterm_state, pia3_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(waveterm_state, pia3_pb_w))
-//  MCFG_PIA_READCA1_HANDLER(READLINE(waveterm_state, pia3_ca1_r))
-//  MCFG_PIA_READCA2_HANDLER(READLINE(waveterm_state, pia3_ca2_r))
+//  MCFG_PIA_READPA_HANDLER(READ8(*this, waveterm_state, pia3_pa_r))
+//  MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, waveterm_state, pia3_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, waveterm_state, pia3_pb_w))
+//  MCFG_PIA_READCA1_HANDLER(READLINE(*this, waveterm_state, pia3_ca1_r))
+//  MCFG_PIA_READCA2_HANDLER(READLINE(*this, waveterm_state, pia3_ca2_r))
 	MCFG_PIA_READCB1_HANDLER(IOPORT("FP"))
-//  MCFG_PIA_CB2_HANDLER(WRITELINE(waveterm_state, pia3_cb2_w))
+//  MCFG_PIA_CB2_HANDLER(WRITELINE(*this, waveterm_state, pia3_cb2_w))
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 
@@ -524,6 +525,6 @@ ROM_START(waveterm)
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME         FLAGS
-COMP( 1981, eurocom2, 0,        0,      eurocom2, eurocom2, eurocom2_state, 0,    "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON )
-COMP( 1982, waveterm, eurocom2, 0,      waveterm, waveterm, waveterm_state, 0,    "PPG",   "Waveterm A",    MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME         FLAGS
+COMP( 1981, eurocom2, 0,        0,      eurocom2, eurocom2, eurocom2_state, empty_init, "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON )
+COMP( 1982, waveterm, eurocom2, 0,      waveterm, waveterm, waveterm_state, empty_init, "PPG",   "Waveterm A",    MACHINE_IS_SKELETON )

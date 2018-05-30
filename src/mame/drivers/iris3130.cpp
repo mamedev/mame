@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
-	DECLARE_DRIVER_INIT(sgi_ip2);
+	void init_sgi_ip2();
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
@@ -423,21 +423,21 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sgi_ip2_state::sgi_ip2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020, 16000000)
-	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
+	MCFG_DEVICE_ADD("maincpu", M68020, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(sgi_ip2_map)
 
 	MCFG_DEVICE_ADD( "duart68681a", MC68681, XTAL(3'686'400) ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duarta_irq_handler))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, sgi_ip2_state, duarta_irq_handler))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD( "duart68681b", MC68681, XTAL(3'686'400) ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duartb_irq_handler))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, sgi_ip2_state, duartb_irq_handler))
 
 	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", mc68681_device, rx_b_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681a", mc68681_device, rx_b_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( sgi_ip2 )
 
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
+void sgi_ip2_state::init_sgi_ip2()
 {
 	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
 	uint32_t *dst = m_mainram;
@@ -510,5 +510,5 @@ ROM_START( sgi_ip2 )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT    STATE           INIT     COMPANY                 FULLNAME           FLAGS
-COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2, sgi_ip2_state,  sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME           FLAGS
+COMP( 1985, sgi_ip2, 0,      0,      sgi_ip2, sgi_ip2, sgi_ip2_state, init_sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )

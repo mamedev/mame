@@ -37,7 +37,9 @@ public:
 		m_drivedge_zbuf_control(*this, "drivedge_zctl"),
 		m_tms1_boot(*this, "tms1_boot"),
 		m_tms1_ram(*this, "tms1_ram"),
-		m_tms2_ram(*this, "tms2_ram") { }
+		m_tms2_ram(*this, "tms2_ram"),
+		m_led(*this, "led%u", 0U)
+	{ }
 
 
 	required_device<cpu_device> m_maincpu;
@@ -56,6 +58,7 @@ public:
 	optional_shared_ptr<uint32_t> m_tms1_boot;
 	optional_shared_ptr<uint32_t> m_tms1_ram;
 	optional_shared_ptr<uint32_t> m_tms2_ram;
+	output_finder<4> m_led;
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 
@@ -155,24 +158,24 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drivedge_turbo_light);
 	DECLARE_WRITE8_MEMBER(pia_portb_out);
 
-	DECLARE_DRIVER_INIT(gtclasscp);
-	DECLARE_DRIVER_INIT(shufshot);
-	DECLARE_DRIVER_INIT(wcbowlt);
-	DECLARE_DRIVER_INIT(hardyard);
-	DECLARE_DRIVER_INIT(s_ver);
-	DECLARE_DRIVER_INIT(sftm110);
-	DECLARE_DRIVER_INIT(wcbowln);
-	DECLARE_DRIVER_INIT(gt2kp);
-	DECLARE_DRIVER_INIT(sftm);
-	DECLARE_DRIVER_INIT(drivedge);
-	DECLARE_DRIVER_INIT(wcbowl);
-	DECLARE_DRIVER_INIT(wcbowlj);
-	DECLARE_DRIVER_INIT(aamat);
-	DECLARE_DRIVER_INIT(bloodstm);
-	DECLARE_DRIVER_INIT(aama);
-	DECLARE_DRIVER_INIT(timekill);
-	DECLARE_DRIVER_INIT(gt3d);
-	DECLARE_DRIVER_INIT(gt3dl);
+	void init_gtclasscp();
+	void init_shufshot();
+	void init_wcbowlt();
+	void init_hardyard();
+	void init_s_ver();
+	void init_sftm110();
+	void init_wcbowln();
+	void init_gt2kp();
+	void init_sftm();
+	void init_drivedge();
+	void init_wcbowl();
+	void init_wcbowlj();
+	void init_aamat();
+	void init_bloodstm();
+	void init_aama();
+	void init_timekill();
+	void init_gt3d();
+	void init_gt3dl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

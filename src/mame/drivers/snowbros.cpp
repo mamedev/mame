@@ -1623,7 +1623,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( snowbros )
+static GFXDECODE_START( gfx_snowbros )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
 GFXDECODE_END
 
@@ -1640,13 +1640,13 @@ static const gfx_layout honeydol_tilelayout8bpp =
 	32*32
 };
 
-static GFXDECODE_START( honeydol )
+static GFXDECODE_START( gfx_honeydol )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 ) // how does it use 0-15
 	GFXDECODE_ENTRY( "gfx2", 0, honeydol_tilelayout8bpp,  0, 4 )
 
 GFXDECODE_END
 
-static GFXDECODE_START( twinadv )
+static GFXDECODE_START( gfx_twinadv )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 )
 GFXDECODE_END
 
@@ -1663,7 +1663,7 @@ static const gfx_layout tilelayout_wb =
 	16*64
 };
 
-static GFXDECODE_START( wb )
+static GFXDECODE_START( gfx_wb )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_wb,  0, 16 )
 GFXDECODE_END
 
@@ -1697,12 +1697,12 @@ static const gfx_layout sb3_tilebglayout =
 };
 
 
-static GFXDECODE_START( sb3 )
+static GFXDECODE_START( gfx_sb3 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sb3_tilebglayout,  0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( hyperpac )
+static GFXDECODE_START( gfx_hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
@@ -1727,14 +1727,14 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 MACHINE_CONFIG_START(snowbros_state::snowbros)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 Mhz - confirmed */
-	MCFG_CPU_PROGRAM_MAP(snowbros_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 Mhz - confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(snowbros_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6 MHz - confirmed */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6 MHz - confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1743,10 +1743,10 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_snowbros)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1754,14 +1754,14 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3 MHz - confirmed */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3 MHz - confirmed */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1771,14 +1771,14 @@ MACHINE_CONFIG_START(snowbros_state::wintbob)
 	snowbros(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
-	MCFG_CPU_PROGRAM_MAP(wintbob_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(10000000) /* 10mhz - Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(wintbob_map)
 
 	MCFG_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
@@ -1789,16 +1789,16 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	snowbros(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(12'000'000)) /* 12MHz - Confirmed */
-	MCFG_CPU_PROGRAM_MAP(hyperpac_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000)) /* 12MHz - Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(hyperpac_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL(16'000'000)/4) /* 4MHz - Confirmed */
-	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/4) /* 4MHz - Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(hyperpac_sound_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", hyperpac)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hyperpac)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(NOOP)
@@ -1806,12 +1806,12 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	MCFG_DEVICE_REMOVE("soundlatch2")
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, XTAL(16'000'000)/4) /* 4MHz - Confirmed */
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(16'000'000)/4) /* 4MHz - Confirmed */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1821,10 +1821,10 @@ MACHINE_CONFIG_START(snowbros_state::semicom_mcu)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("protection", I80C52, XTAL(16'000'000))  // AT89C52
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(snowbros_state, prot_p0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(snowbros_state, prot_p1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(snowbros_state, prot_p2_w))
+	MCFG_DEVICE_ADD("protection", I80C52, XTAL(16'000'000))  // AT89C52
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, snowbros_state, prot_p0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, snowbros_state, prot_p1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, snowbros_state, prot_p2_w))
 MACHINE_CONFIG_END
 
 
@@ -1837,13 +1837,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snowbros_state::honeydol)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P12 @ 12MHz */
-	MCFG_CPU_PROGRAM_MAP(honeydol_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P12 @ 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(honeydol_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
-	MCFG_CPU_PROGRAM_MAP(honeydol_sound_map)
-	MCFG_CPU_IO_MAP(honeydol_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
+	MCFG_DEVICE_PROGRAM_MAP(honeydol_sound_map)
+	MCFG_DEVICE_IO_MAP(honeydol_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1854,37 +1854,37 @@ MACHINE_CONFIG_START(snowbros_state::honeydol)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", honeydol)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_honeydol)
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3Mhz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3Mhz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* freq? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snowbros_state::twinadv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12MHz like Honey Dolls ? */
-	MCFG_CPU_PROGRAM_MAP(twinadv_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12MHz like Honey Dolls ? */
+	MCFG_DEVICE_PROGRAM_MAP(twinadv_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(twinadv_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snowbros_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(twinadv_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snowbros_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1895,12 +1895,12 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twinadv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twinadv)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
@@ -1908,7 +1908,7 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* sound hardware */
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* freq? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1934,21 +1934,21 @@ Intel P8752 (mcu)
 MACHINE_CONFIG_START(snowbros_state::finalttr)
 	semicom(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(finalttr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(finalttr_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL(3'579'545))
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_CLOCK(XTAL(3'579'545))
 
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, XTAL(3'579'545)) /* possible but less likely 4MHz (12MHz/3) */
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(3'579'545)) /* possible but less likely 4MHz (12MHz/3) */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 
-	MCFG_OKIM6295_REPLACE("oki", 999900, PIN7_HIGH)
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, 999900, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -1957,14 +1957,14 @@ MACHINE_CONFIG_START(snowbros_state::_4in1)
 	semicom(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_snowbros)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
-	MCFG_CPU_PROGRAM_MAP(snowbros3_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
+	MCFG_DEVICE_PROGRAM_MAP(snowbros3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros3_irq, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1977,14 +1977,14 @@ MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sb3)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1993,8 +1993,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snowbros_state::yutnori)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(yutnori_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(yutnori_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
 //  MCFG_WATCHDOG_ADD("watchdog") // maybe
@@ -2006,10 +2006,10 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperpac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hyperpac)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2017,12 +2017,12 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2782,7 +2782,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
+void snowbros_state::init_cookbib2()
 {
 }
 
@@ -2792,7 +2792,7 @@ READ16_MEMBER(snowbros_state::_4in1_02_read)
 	return 0x0202;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
+void snowbros_state::init_4in1boot()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -2800,12 +2800,11 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 	/* strange order */
 	{
 		std::vector<uint8_t> buffer(len);
-		int i;
-		for (i = 0;i < len; i++)
-			if (i&1) buffer[i] = bitswap<8>(src[i],6,7,5,4,3,2,1,0);
+		for (int i = 0;i < len; i++)
+			if (i & 1) buffer[i] = bitswap<8>(src[i],6,7,5,4,3,2,1,0);
 			else buffer[i] = src[i];
 
-		memcpy(src,&buffer[0],len);
+		memcpy(src, &buffer[0], len);
 	}
 
 	src = memregion("soundcpu")->base();
@@ -2814,15 +2813,14 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 	/* strange order */
 	{
 		std::vector<uint8_t> buffer(len);
-		int i;
-		for (i = 0;i < len; i++)
+		for (int i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
 		memcpy(src,&buffer[0],len);
 	}
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
+void snowbros_state::init_snowbro3()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -2830,8 +2828,7 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 	/* strange order */
 	{
 		std::vector<uint8_t> buffer(len);
-		int i;
-		for (i = 0;i < len; i++)
+		for (int i = 0;i < len; i++)
 			buffer[i] = src[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
 		memcpy(src,&buffer[0],len);
 	}
@@ -2845,7 +2842,7 @@ READ16_MEMBER(snowbros_state::_3in1_read)
 	return 0x000a;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,3in1semi)
+void snowbros_state::init_3in1semi()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
 }
@@ -2856,19 +2853,19 @@ READ16_MEMBER(snowbros_state::cookbib3_read)
 	return 0x2a2a;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,cookbib3)
+void snowbros_state::init_cookbib3()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
+void snowbros_state::init_pzlbreak()
 {
 	m_pandora->set_bg_pen(0xc0);
 }
 
 
 
-DRIVER_INIT_MEMBER(snowbros_state,toto)
+void snowbros_state::init_toto()
 {
 	// every single rom has bits 0x10 and 0x08 swapped
 	uint8_t *src = memregion("maincpu")->base();
@@ -2899,13 +2896,13 @@ DRIVER_INIT_MEMBER(snowbros_state,toto)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(FUNC(snowbros_state::toto_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state, hyperpac)
+void snowbros_state::init_hyperpac()
 {
 	save_item(NAME(m_semicom_prot_offset));
 }
 
 
-DRIVER_INIT_MEMBER(snowbros_state, yutnori)
+void snowbros_state::init_yutnori()
 {
 	// presumably related to the PIC protection
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -2916,49 +2913,49 @@ DRIVER_INIT_MEMBER(snowbros_state, yutnori)
 	m_pandora->set_bg_pen(0xf0);
 }
 
-GAME( 1990, snowbros,   0,        snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosa,  snowbros, snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosb,  snowbros, snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosc,  snowbros, snowbros,    snowbros, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosj,  snowbros, snowbros,    snowbroj, snowbros_state, 0,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbrosd,  snowbros, snowbros,    snowbroj, snowbros_state, 0,    ROT0, "Toaplan (Dooyong license)",      "Snow Bros. - Nick & Tom (Dooyong license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wintbob,    snowbros, wintbob,     snowbros, snowbros_state, 0,    ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, snowbroswb, snowbros, wintbob,     snowbros, snowbros_state, 0,    ROT0, "bootleg",                        "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", MACHINE_SUPPORTS_SAVE ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
+GAME( 1990, snowbros,   0,        snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosa,  snowbros, snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosb,  snowbros, snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosc,  snowbros, snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosj,  snowbros, snowbros,    snowbroj, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbrosd,  snowbros, snowbros,    snowbroj, snowbros_state, empty_init,    ROT0, "Toaplan (Dooyong license)",      "Snow Bros. - Nick & Tom (Dooyong license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wintbob,    snowbros, wintbob,     snowbros, snowbros_state, empty_init,    ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, snowbroswb, snowbros, wintbob,     snowbros, snowbros_state, empty_init,    ROT0, "bootleg",                        "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", MACHINE_SUPPORTS_SAVE ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
 
-GAME( 1996, toto,       0,        snowbros,    snowbros, snowbros_state, toto, ROT0, "SoftClub",                       "Come Back Toto", MACHINE_SUPPORTS_SAVE ) // modified from 'snowbros' code
+GAME( 1996, toto,       0,        snowbros,    snowbros, snowbros_state, init_toto,     ROT0, "SoftClub",                       "Come Back Toto", MACHINE_SUPPORTS_SAVE ) // modified from 'snowbros' code
 
 // none of the games below are on genuine SnowBros hardware, but they clone the functionality of it.
 
 // SemiCom / Jeil titles are protected, a dumb MCU copies code into RAM at startup, some also check for a specific return value from an address on startup.
-GAME( 1993, finalttr,   0,        finalttr,    finalttr, snowbros_state, 0,        ROT0, "Jeil Computer System", "Final Tetris", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hyperpac,   0,        semicom_mcu, hyperpac, snowbros_state, hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hyperpacb,  hyperpac, semicom,     hyperpac, snowbros_state, 0,        ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2,   0,        semiprot,    cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2a,  cookbib2, semiprot,    cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
-GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, 0,        ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, suhosong,   0,        semiprot,    suhosong, snowbros_state, 0,        ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, 0,        ROT0, "SemiCom / Tirano",     "Twinkle", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mcheonru,   0,        semiprot,    mcheonru, snowbros_state, 3in1semi, ROT0, "SemiCom / AceVer",     "Ma Cheon Ru", MACHINE_SUPPORTS_SAVE ) // a flyer exists for an English version called Arirang, AceVer team logo is displayed on it
-GAME( 1999, moremore,   0,        semiprot,    moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, moremorp,   0,        semiprot,    moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, finalttr,   0,        finalttr,    finalttr, snowbros_state, empty_init,    ROT0, "Jeil Computer System", "Final Tetris", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hyperpac,   0,        semicom_mcu, hyperpac, snowbros_state, init_hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hyperpacb,  hyperpac, semicom,     hyperpac, snowbros_state, empty_init,    ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2,   0,        semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2a,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
+GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, empty_init,    ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, init_cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, suhosong,   0,        semiprot,    suhosong, snowbros_state, empty_init,    ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mcheonru,   0,        semiprot,    mcheonru, snowbros_state, init_3in1semi, ROT0, "SemiCom / AceVer",     "Ma Cheon Ru", MACHINE_SUPPORTS_SAVE ) // a flyer exists for an English version called Arirang, AceVer team logo is displayed on it
+GAME( 1999, moremore,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / Exit",       "More More", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, moremorp,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", MACHINE_SUPPORTS_SAVE )
 // This is very similar to the SemiCom titles, but unprotected.
-GAME( 2002, 4in1boot,   0,        _4in1,       4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , MACHINE_SUPPORTS_SAVE )
+GAME( 2002, 4in1boot,   0,        _4in1,       4in1boot, snowbros_state, init_4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, honeydol,   0,        honeydol,    honeydol, snowbros_state, 0,        ROT0, "Barko Corp.", "Honey Dolls", MACHINE_SUPPORTS_SAVE ) // based on snowbros code..
+GAME( 1995, honeydol,   0,        honeydol,    honeydol, snowbros_state, empty_init,    ROT0, "Barko Corp.", "Honey Dolls", MACHINE_SUPPORTS_SAVE ) // based on snowbros code..
 
-GAME( 1995, twinadv,    0,        twinadv,     twinadv,  snowbros_state, 0,        ROT0, "Barko Corp.", "Twin Adventure (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, twinadvk,   twinadv,  twinadv,     twinadv,  snowbros_state, 0,        ROT0, "Barko Corp.", "Twin Adventure (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, multi96,    twinadv,  twinadv,     twinadv,  snowbros_state, 0,        ROT0, "Barko Corp.", "Multi Game '96 (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinadv,    0,        twinadv,     twinadv,  snowbros_state, empty_init,    ROT0, "Barko Corp.", "Twin Adventure (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinadvk,   twinadv,  twinadv,     twinadv,  snowbros_state, empty_init,    ROT0, "Barko Corp.", "Twin Adventure (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, multi96,    twinadv,  twinadv,     twinadv,  snowbros_state, empty_init,    ROT0, "Barko Corp.", "Multi Game '96 (Italy)", MACHINE_SUPPORTS_SAVE )
 
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg
 // it is possible this 'ball boy' is the original bootleg, with snwobro3 being a hack of that, and the ballboy set we have a further hack of that
 // there is also a later 2004 version with 3 player support
 // these use an MCU to drive the sound
-GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
-GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj, snowbros_state, init_snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
+GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj, snowbros_state, init_snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // protection appears to handle the sound, should check if it's just a block of code that is conditionally executed like some of the Semicom titles.
-GAME( 1999, yutnori,    0,        yutnori,     yutnori,  snowbros_state, yutnori,  ROT0, "Nunal",   "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer
+GAME( 1999, yutnori,    0,        yutnori,     yutnori,  snowbros_state, init_yutnori,  ROT0, "Nunal",   "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer

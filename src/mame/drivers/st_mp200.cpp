@@ -51,9 +51,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(st_mp200);
-	DECLARE_DRIVER_INIT(st_mp201);
-	DECLARE_DRIVER_INIT(st_mp202);
+	void init_st_mp200();
+	void init_st_mp201();
+	void init_st_mp202();
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -314,7 +314,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( st_mp200_state::activity_test )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( st_mp200_state::self_test )
@@ -545,17 +545,17 @@ void st_mp200_state::machine_reset()
 	m_u11b = 0;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp200 )
+void st_mp200_state::init_st_mp200()
 {
 	m_7d = 1;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp201 )
+void st_mp200_state::init_st_mp201()
 {
 	m_7d = 1;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp202 )
+void st_mp200_state::init_st_mp202()
 {
 	m_7d = 0;
 }
@@ -576,8 +576,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::u11_timer )
 
 MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
-	MCFG_CPU_PROGRAM_MAP(st_mp200_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
+	MCFG_DEVICE_PROGRAM_MAP(st_mp200_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -589,22 +589,22 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(st_mp200_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(st_mp200_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(st_mp200_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u10_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u10_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u10_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u10_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, st_mp200_state, u10_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u10_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u10_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", st_mp200_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(st_mp200_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(st_mp200_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u11_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u11_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u11_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u11_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u11_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u11_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
@@ -612,8 +612,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(st_mp200_state::st_mp201)
 	st_mp200(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -943,33 +943,33 @@ ROM_START(st_game)
 ROM_END
 
 // 6-digit
-GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Bug fix release)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (First release)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Galaxy",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Ali",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Galaxy",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                    MACHINE_IS_SKELETON_MECHANICAL)
 
 // 7-digit
-GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Big Game",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Cheetah (Black Cabinet)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Cheetah (Blue Cabinet)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Quicksilver",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Seawitch",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Nine Ball",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Lightning",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Stargazer",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Split Second (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Catacomb (Pinball)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Dragonfist",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Lazer Lord",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Big Game",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cheetah (Black Cabinet)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Cheetah (Blue Cabinet)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Quicksilver",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Seawitch",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Nine Ball",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Lightning",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Stargazer",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Split Second (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Catacomb (Pinball)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Dragonfist",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Lazer Lord",             MACHINE_IS_SKELETON_MECHANICAL)
 
 // hang after boot
-GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Flight 2000",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Freefall",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Viper (Pinball)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Iron Maiden",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Orbitor 1",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Flight 2000",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Freefall",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Viper (Pinball)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Iron Maiden",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Orbitor 1",              MACHINE_IS_SKELETON_MECHANICAL)
 
 // other manufacturer
-GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Pinstar",   "Gamatron",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  blkshpsq,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Astro",     "Black Sheep Squadron",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "<unknown>", "unknown pinball game",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  blkshpsq,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Astro",     "Black Sheep Squadron",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown pinball game",   MACHINE_IS_SKELETON_MECHANICAL)

@@ -310,7 +310,7 @@ public:
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
-		config.device_add(this, "eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
+		EEPROM_SERIAL_93C46_8BIT(config, "eeprom");
 	}
 
 protected:
@@ -569,7 +569,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( popeye )
+static GFXDECODE_START( gfx_popeye )
 	GFXDECODE_SCALE( "gfx1", 0, charlayout,   16, 16, 2, 2 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 8 ) /* sprites */
 GFXDECODE_END
@@ -588,10 +588,10 @@ WRITE8_MEMBER(tnx1_state::popeye_portB_w)
 
 MACHINE_CONFIG_START(tnx1_state::config)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(maincpu_program_map)
-	MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(tnx1_state, refresh_w))
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_program_map)
+	MCFG_DEVICE_IO_MAP(maincpu_io_map)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, tnx1_state, refresh_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -601,34 +601,34 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tnx1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tnx1_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnx1_state, screen_vblank))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
 	MCFG_PALETTE_INIT_OWNER(tnx1_state, palette_init)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tnx1_state, popeye_portB_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tnx1_state, popeye_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tpp2_state::config)
 	tpp1_state::config(config);
-	MCFG_SOUND_MODIFY("aysnd")
+	MCFG_DEVICE_MODIFY("aysnd")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT) /* Does tnx1, tpp1 & popeyebl have the same filtering? */
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
 	MCFG_NETLIST_SETUP(nl_popeye)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -965,13 +965,13 @@ ROM_START( popeyehs )
 ROM_END
 
 
-GAME( 1981, skyskipr, 0,        config,  skyskipr, tnx1_state,       0, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeye,   0,        config,  popeye,   tpp2_state,       0, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeu,  popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyef,  popeye,   config,  popeyef,  tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyebl, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb2, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb3, popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyej,  popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyejo, popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyehs, popeye,   config,  popeye,   brazehs<tpp2_noalu_state>, 0, ROT0, "hack (Braze Technologies)", "Popeye (Braze High Score Kit P1.00D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, skyskipr, 0,        config,  skyskipr, tnx1_state,       empty_init, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeye,   0,        config,  popeye,   tpp2_state,       empty_init, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeu,  popeye,   config,  popeye,   tpp2_noalu_state, empty_init, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyef,  popeye,   config,  popeyef,  tpp2_noalu_state, empty_init, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye,   config,  popeye,   popeyebl_state,   empty_init, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb2, popeye,   config,  popeye,   popeyebl_state,   empty_init, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb3, popeye,   config,  popeye,   tpp2_noalu_state, empty_init, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyej,  popeye,   config,  popeye,   tpp1_state,       empty_init, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyejo, popeye,   config,  popeye,   tpp1_state,       empty_init, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyehs, popeye,   config,  popeye,   brazehs<tpp2_noalu_state>, empty_init, ROT0, "hack (Braze Technologies)", "Popeye (Braze High Score Kit P1.00D)", MACHINE_SUPPORTS_SAVE )

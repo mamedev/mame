@@ -17,7 +17,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -296,9 +296,9 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(mc8020_state::mc8020)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
@@ -314,17 +314,17 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 
 	/* devices */
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(2'457'600))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8020_state, port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mc8020_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8020_state, port_b_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8020_state, port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8020_state, port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8020_state, port_b_w))
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(2'457'600) / 64) // guess
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg0))
 MACHINE_CONFIG_END
 
 
@@ -369,5 +369,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE       INIT     COMPANY                FULLNAME       FLAGS
-COMP( 198?, mc8020, 0,      0,       mc8020,    mc8020, mc8020_state, 0,    "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME       FLAGS
+COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND )

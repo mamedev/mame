@@ -37,7 +37,7 @@ class williams_cvsd_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -76,7 +76,7 @@ class williams_narc_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	DECLARE_READ16_MEMBER(read);
@@ -135,7 +135,7 @@ class williams_adpcm_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -150,6 +150,9 @@ public:
 
 	void williams_adpcm_map(address_map &map);
 	void williams_adpcm_oki_map(address_map &map);
+
+	mc6809e_device *get_cpu() { return m_cpu; }
+
 protected:
 	// timer IDs
 	enum

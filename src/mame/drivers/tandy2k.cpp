@@ -700,9 +700,10 @@ FLOPPY_FORMATS_MEMBER( tandy2k_state::floppy_formats )
 	FLOPPY_TANDY_2000_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( tandy2k_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void tandy2k_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 // Keyboard
 
@@ -770,10 +771,10 @@ void tandy2k_state::device_reset_after_children()
 
 MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	// basic machine hardware
-	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(tandy2k_mem)
-	MCFG_CPU_IO_MAP(tandy2k_io)
-	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, tandy2k_state, irq_callback))
+	MCFG_DEVICE_ADD(I80186_TAG, I80186, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(tandy2k_mem)
+	MCFG_DEVICE_IO_MAP(tandy2k_io)
+	MCFG_80186_IRQ_SLAVE_ACK(READ8(DEVICE_SELF, tandy2k_state, irq_callback))
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -789,24 +790,24 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL(16'000'000)*28/20/8)
 	MCFG_DEVICE_ADDRESS_MAP(0, vpac_mem)
 	MCFG_CRT9007_CHARACTER_WIDTH(8)
-	MCFG_CRT9007_INT_CALLBACK(DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
-	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_device, vsync_w))
-	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(tandy2k_state, vpac_vlt_w))
-	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_device, cursor_w))
-	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(tandy2k_state, vpac_drb_w))
-	MCFG_CRT9007_WBEN_CALLBACK(WRITELINE(tandy2k_state, vpac_wben_w))
-	MCFG_CRT9007_CBLANK_CALLBACK(WRITELINE(tandy2k_state, vpac_cblank_w))
-	MCFG_CRT9007_SLG_CALLBACK(WRITELINE(tandy2k_state, vpac_slg_w))
-	MCFG_CRT9007_SLD_CALLBACK(WRITELINE(tandy2k_state, vpac_sld_w))
+	MCFG_CRT9007_INT_CALLBACK(WRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
+	MCFG_CRT9007_VS_CALLBACK(WRITELINE(CRT9021B_TAG, crt9021_device, vsync_w))
+	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_vlt_w))
+	MCFG_CRT9007_CURS_CALLBACK(WRITELINE(CRT9021B_TAG, crt9021_device, cursor_w))
+	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_drb_w))
+	MCFG_CRT9007_WBEN_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_wben_w))
+	MCFG_CRT9007_CBLANK_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_cblank_w))
+	MCFG_CRT9007_SLG_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_slg_w))
+	MCFG_CRT9007_SLD_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_sld_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(CRT9212_0_TAG, CRT9212, 0)
 	MCFG_CRT9212_WEN2_VCC()
-	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(tandy2k_state, vidla_w))
+	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(*this, tandy2k_state, vidla_w))
 
 	MCFG_DEVICE_ADD(CRT9212_1_TAG, CRT9212, 0)
 	MCFG_CRT9212_WEN2_VCC()
-	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(tandy2k_state, drb_attr_w))
+	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(*this, tandy2k_state, drb_attr_w))
 
 	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, XTAL(16'000'000)*28/20)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -814,66 +815,66 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_TIMER_DRIVER_ADD("vidldsh", tandy2k_state, vidldsh_tick)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTB_CB(READ8(tandy2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tandy2k_state, ppi_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, tandy2k_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tandy2k_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(tandy2k_state, rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(tandy2k_state, txrdy_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tandy2k_state, rxrdy_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tandy2k_state, txrdy_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_dsr))
 	// TODO pin 15 external transmit clock
 	// TODO pin 17 external receiver clock
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/16)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(tandy2k_state, outspkr_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, tandy2k_state, outspkr_w))
 	MCFG_PIT8253_CLK1(XTAL(16'000'000)/8)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(tandy2k_state, intbrclk_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, tandy2k_state, intbrclk_w))
 	//MCFG_PIT8253_CLK2(XTAL(16'000'000)/8)
-	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
+	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, tandy2k_state, rfrqpulse_w))
 
 	MCFG_DEVICE_ADD(I8259A_0_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
 
 	MCFG_DEVICE_ADD(I8259A_1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
 
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	downcast<i8272a_device *>(device)->set_select_lines_connected(true);
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(tandy2k_state, fdc_drq_w))
-	MCFG_UPD765_HDL_CALLBACK(WRITELINE(tandy2k_state, fdc_hdl_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, tandy2k_state, fdc_drq_w))
+	MCFG_UPD765_HDL_CALLBACK(WRITELINE(*this, tandy2k_state, fdc_hdl_w))
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tandy2k_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tandy2k_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(tandy2k_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(tandy2k_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(tandy2k_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_fault))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_DEVICE_ADD(TANDY2K_KEYBOARD_TAG, TANDY2K_KEYBOARD, 0)
-	MCFG_TANDY2000_KEYBOARD_CLOCK_CALLBACK(WRITELINE(tandy2k_state, kbdclk_w))
-	MCFG_TANDY2000_KEYBOARD_DATA_CALLBACK(WRITELINE(tandy2k_state, kbddat_w))
+	MCFG_TANDY2000_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, tandy2k_state, kbdclk_w))
+	MCFG_TANDY2000_KEYBOARD_DATA_CALLBACK(WRITELINE(*this, tandy2k_state, kbddat_w))
 
 	// temporary until the tandy keyboard has a rom dump
-	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir0_w))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(I8259A_1_TAG, pic8259_device, ir0_w))
 
 
 	// software lists
@@ -888,8 +889,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tandy2k_state::tandy2k_hd)
 	tandy2k(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY(I80186_TAG)
-	MCFG_CPU_IO_MAP(tandy2k_hd_io)
+	MCFG_DEVICE_MODIFY(I80186_TAG)
+	MCFG_DEVICE_IO_MAP(tandy2k_hd_io)
 
 	// Tandon TM502 hard disk
 	MCFG_HARDDISK_ADD("harddisk0")
@@ -919,6 +920,6 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY              FULLNAME        FLAGS
-COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
-COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    CLASS          INIT        COMPANY              FULLNAME        FLAGS
+COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
+COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )

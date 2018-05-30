@@ -47,7 +47,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/z8000/z8000.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
@@ -93,7 +93,7 @@ public:
 
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
-	DECLARE_DRIVER_INIT(p8k);
+	void init_p8k();
 	DECLARE_MACHINE_RESET(p8k);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
@@ -259,9 +259,10 @@ DECLARE_WRITE_LINE_MEMBER( p8k_state::fdc_irq )
 	m_pio2->port_b_write(state ? 0x10 : 0x00);
 }
 
-static SLOT_INTERFACE_START( p8k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void p8k_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( p8k )
@@ -293,7 +294,7 @@ MACHINE_RESET_MEMBER(p8k_state,p8k)
 	membank("bank15")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(p8k_state,p8k)
+void p8k_state::init_p8k()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
@@ -413,24 +414,24 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(p8k_state::p8k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000) )
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000) )
 	MCFG_Z80_DAISY_CHAIN(p8k_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(p8k_memmap)
-	MCFG_CPU_IO_MAP(p8k_iomap)
+	MCFG_DEVICE_PROGRAM_MAP(p8k_memmap)
+	MCFG_DEVICE_IO_MAP(p8k_iomap)
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k)
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(4'000'000))
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(p8k_state, p8k_dma_irq_w))
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, p8k_state, p8k_dma_irq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(p8k_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(p8k_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(p8k_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(p8k_state, io_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, p8k_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, p8k_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, p8k_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, p8k_state, io_write_byte))
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxcb_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxcb_w))
 
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, 1229000)    /* 1.22MHz clock */
 	// to implement: callbacks!
@@ -445,14 +446,14 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
 	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -468,64 +469,64 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	MCFG_Z80PIO_IN_PA_CB(IOPORT("DSW"))
 
 	MCFG_I8272A_ADD("i8272", true)
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(p8k_state::p8k_16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8001, XTAL(4'000'000) )
-	MCFG_CPU_PROGRAM_MAP(p8k_16_memmap)
-	MCFG_CPU_DATA_MAP(p8k_16_datamap)
-	MCFG_CPU_IO_MAP(p8k_16_iomap)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("p8k_16_daisy", p8k_16_daisy_device, irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z8001, XTAL(4'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(p8k_16_memmap)
+	MCFG_DEVICE_DATA_MAP(p8k_16_datamap)
+	MCFG_DEVICE_IO_MAP(p8k_16_iomap)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("p8k_16_daisy", p8k_16_daisy_device, irq_callback)
 
 	MCFG_DEVICE_ADD("p8k_16_daisy", P8K_16_DAISY, 0)
 	MCFG_Z80_DAISY_CHAIN(p8k_16_daisy_chain)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxcb_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxcb_w))
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
 	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
 	MCFG_DEVICE_ADD("pio0", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
 	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(p8k_state, p8k_16_daisy_interrupt))
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -560,6 +561,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT  STATE      INIT    COMPANY                   FULLNAME               FLAGS
-COMP( 1989, p8000,      0,      0,       p8k,       p8k,   p8k_state, p8k,    "EAW electronic Treptow", "P8000 (8bit Board)",  MACHINE_NOT_WORKING)
-COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k,   p8k_state, 0,      "EAW electronic Treptow", "P8000 (16bit Board)", MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                   FULLNAME               FLAGS
+COMP( 1989, p8000,    0,      0,      p8k,     p8k,   p8k_state, init_p8k,   "EAW electronic Treptow", "P8000 (8bit Board)",  MACHINE_NOT_WORKING)
+COMP( 1989, p8000_16, p8000,  0,      p8k_16,  p8k,   p8k_state, empty_init, "EAW electronic Treptow", "P8000 (16bit Board)", MACHINE_NOT_WORKING)

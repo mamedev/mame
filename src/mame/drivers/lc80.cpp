@@ -332,34 +332,34 @@ void lc80_state::machine_start()
 
 MACHINE_CONFIG_START(lc80_state::lc80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 900000) /* UD880D */
-	MCFG_CPU_PROGRAM_MAP(lc80_mem)
-	MCFG_CPU_IO_MAP(lc80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 900000) /* UD880D */
+	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
+	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_lc80 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(lc80_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, lc80_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(lc80_state, pio1_pb_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, lc80_state, pio1_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio1_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, lc80_state, pio1_pb_w))
 
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio2_pb_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio2_pb_r))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
@@ -371,34 +371,34 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lc80_state::lc80_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
-	MCFG_CPU_PROGRAM_MAP(lc80_mem)
-	MCFG_CPU_IO_MAP(lc80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
+	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
+	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_lc80 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(lc80_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, lc80_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(lc80_state, pio1_pb_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, lc80_state, pio1_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio1_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, lc80_state, pio1_pb_w))
 
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio2_pb_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio2_pb_r))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
@@ -413,8 +413,8 @@ static MACHINE_CONFIG_START( sc80 )
 	lc80_2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_PROGRAM_MAP(sc80_mem)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(sc80_mem)
 MACHINE_CONFIG_END
 #endif
 
@@ -443,7 +443,7 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME                FLAGS
-COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME                FLAGS
+COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )

@@ -279,12 +279,12 @@ void magnum_state::magnum_lcdc(address_map &map)
 }
 
 MACHINE_CONFIG_START(magnum_state::magnum)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(magnum_map)
-	MCFG_CPU_IO_MAP(magnum_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(magnum_map)
+	MCFG_DEVICE_IO_MAP(magnum_io)
 
 	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
-	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(magnum_state, rtcirq_w))
+	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(*this, magnum_state, rtcirq_w))
 
 	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -314,8 +314,8 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 
 	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("beep", BEEP, 500) /// frequency is guessed
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("beep", BEEP, 500) /// frequency is guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -334,4 +334,4 @@ ROM_START( magnum )
 	ROM_LOAD("dulmontcharrom.bin", 0x0000, 0x1000, CRC(9dff89bf) SHA1(d359aeba7f0b0c81accf3bca25e7da636c033721))
 ROM_END
 
-COMP( 1983, magnum, 0, 0, magnum, magnum, magnum_state, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1983, magnum, 0, 0, magnum, magnum, magnum_state, empty_init, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

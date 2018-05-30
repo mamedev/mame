@@ -916,7 +916,7 @@ static const gfx_layout shape_layout =
 	8*8
 };
 
-static GFXDECODE_START( namcona1 )
+static GFXDECODE_START( gfx_namcona1 )
 	GFXDECODE_RAM( "cgram", 0, cg_layout_8bpp, 0, 0x2000/256 )
 	GFXDECODE_RAM( "cgram", 0, cg_layout_4bpp, 0, 0x2000/16  )
 	GFXDECODE_RAM(  nullptr,   0, shape_layout,   0, 0x2000/2   )
@@ -961,12 +961,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::interrupt)
 MACHINE_CONFIG_START(namcona1_state::namcona1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(namcona1_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_main_map)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C69, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
-	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C69, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_mcu_map)
+	MCFG_DEVICE_IO_MAP( namcona1_mcu_io_map)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, interrupt, "screen", 0, 1)
 
@@ -985,10 +985,11 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcona1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcona1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 44100)
 	MCFG_C140_BANK_TYPE(ASIC219)
@@ -1000,18 +1001,18 @@ MACHINE_CONFIG_START(namcona2_state::namcona2)
 	namcona1(config);
 
 	/* basic machine hardware */
-//  MCFG_CPU_MODIFY("maincpu")
-//  MCFG_CPU_PROGRAM_MAP(namcona2_main_map)
+//  MCFG_DEVICE_MODIFY("maincpu")
+//  MCFG_DEVICE_PROGRAM_MAP(namcona2_main_map)
 
-	MCFG_CPU_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
-	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
+	MCFG_DEVICE_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_mcu_map)
+	MCFG_DEVICE_IO_MAP( namcona1_mcu_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xday2_namcona2_state::xday2)
 	namcona2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xday2_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xday2_main_map)
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_2864_ADD("eeprom")
@@ -1021,21 +1022,21 @@ MACHINE_CONFIG_START(xday2_namcona2_state::xday2)
 MACHINE_CONFIG_END
 
  /* NA-1 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)         { m_gametype = NAMCO_BKRTMAQ; }
-DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)        { m_gametype = NAMCO_CGANGPZL; }
-DRIVER_INIT_MEMBER(namcona1_state,emeraldj)        { m_gametype = NAMCO_EMERALDA; }
-DRIVER_INIT_MEMBER(namcona1_state,exvania)         { m_gametype = NAMCO_EXVANIA; }
-DRIVER_INIT_MEMBER(namcona1_state,fa)              { m_gametype = NAMCO_FA; }
-DRIVER_INIT_MEMBER(namcona1_state,swcourt)         { m_gametype = NAMCO_SWCOURT; }
-DRIVER_INIT_MEMBER(namcona1_state,swcourtb)        { m_gametype = NAMCO_SWCOURTB; }
-DRIVER_INIT_MEMBER(namcona1_state,tinklpit)        { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
+void namcona1_state::init_bkrtmaq()         { m_gametype = NAMCO_BKRTMAQ; }
+void namcona1_state::init_cgangpzl()        { m_gametype = NAMCO_CGANGPZL; }
+void namcona1_state::init_emeraldj()        { m_gametype = NAMCO_EMERALDA; }
+void namcona1_state::init_exvania()         { m_gametype = NAMCO_EXVANIA; }
+void namcona1_state::init_fa()              { m_gametype = NAMCO_FA; }
+void namcona1_state::init_swcourt()         { m_gametype = NAMCO_SWCOURT; }
+void namcona1_state::init_swcourtb()        { m_gametype = NAMCO_SWCOURTB; }
+void namcona1_state::init_tinklpit()        { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
 
  /* NA-2 Hardware */
-DRIVER_INIT_MEMBER(namcona2_state,emeralda)        { m_gametype = NAMCO_EMERALDA; }
-DRIVER_INIT_MEMBER(namcona2_state,knckhead)        { m_gametype = NAMCO_KNCKHEAD; }
-DRIVER_INIT_MEMBER(namcona2_state,numanath)        { m_gametype = NAMCO_NUMANATH; }
-DRIVER_INIT_MEMBER(namcona2_state,quiztou)         { m_gametype = NAMCO_QUIZTOU; }
-DRIVER_INIT_MEMBER(xday2_namcona2_state,xday2)     { m_gametype = NAMCO_XDAY2; }
+void namcona2_state::init_emeralda()        { m_gametype = NAMCO_EMERALDA; }
+void namcona2_state::init_knckhead()        { m_gametype = NAMCO_KNCKHEAD; }
+void namcona2_state::init_numanath()        { m_gametype = NAMCO_NUMANATH; }
+void namcona2_state::init_quiztou()         { m_gametype = NAMCO_QUIZTOU; }
+void xday2_namcona2_state::init_xday2()     { m_gametype = NAMCO_XDAY2; }
 
 ROM_START( bkrtmaq )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -1378,26 +1379,26 @@ ROM_START( xday2 )
 ROM_END
 
 // NA-1 (C69 MCU)
-GAME( 1992, bkrtmaq,    0,        namcona1, namcona1_quiz, namcona1_state, bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, cgangpzl,   0,        namcona1,  namcona1_joy,  namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, cgangpzlj,  cgangpzl, namcona1,  namcona1_joy,  namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, exvania,    0,        namcona1,  namcona1_joy,  namcona1_state, exvania,  ROT0, "Namco", "Exvania (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, exvaniaj,   exvania,  namcona1,  namcona1_joy,  namcona1_state, exvania,  ROT0, "Namco", "Exvania (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, fghtatck,   0,        namcona1,  namcona1_joy,  namcona1_state, fa,       ROT90,"Namco", "Fighter & Attacker (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, fa,         fghtatck, namcona1,  namcona1_joy,  namcona1_state, fa,       ROT90,"Namco", "F/A (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, swcourt,    0,        namcona1,  namcona1_joy,  namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, swcourtj,   swcourt,  namcona1,  namcona1_joy,  namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1994, swcourtb,   swcourt,  namcona1,  namcona1_joy,  namcona1_state, swcourtb, ROT0, "bootleg (Playmark?)", "Super World Court (World, bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, emeraldaj,  emeralda, namcona1,  namcona1_joy,  namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan Version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) /* Parent is below on NA-2 Hardware */
-GAME( 1993, emeraldaja, emeralda, namcona1,  namcona1_joy,  namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) /* Parent is below on NA-2 Hardware */
-GAME( 1993, tinklpit,   0,        namcona1,  namcona1_joy,  namcona1_state, tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, bkrtmaq,    0,        namcona1, namcona1_quiz,  namcona1_state, init_bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, cgangpzl,   0,        namcona1,  namcona1_joy,  namcona1_state, init_cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, cgangpzlj,  cgangpzl, namcona1,  namcona1_joy,  namcona1_state, init_cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, exvania,    0,        namcona1,  namcona1_joy,  namcona1_state, init_exvania,  ROT0, "Namco", "Exvania (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, exvaniaj,   exvania,  namcona1,  namcona1_joy,  namcona1_state, init_exvania,  ROT0, "Namco", "Exvania (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, fghtatck,   0,        namcona1,  namcona1_joy,  namcona1_state, init_fa,       ROT90,"Namco", "Fighter & Attacker (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, fa,         fghtatck, namcona1,  namcona1_joy,  namcona1_state, init_fa,       ROT90,"Namco", "F/A (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, swcourt,    0,        namcona1,  namcona1_joy,  namcona1_state, init_swcourt,  ROT0, "Namco", "Super World Court (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, swcourtj,   swcourt,  namcona1,  namcona1_joy,  namcona1_state, init_swcourt,  ROT0, "Namco", "Super World Court (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, swcourtb,   swcourt,  namcona1,  namcona1_joy,  namcona1_state, init_swcourtb, ROT0, "bootleg (Playmark?)", "Super World Court (World, bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, emeraldaj,  emeralda, namcona1,  namcona1_joy,  namcona1_state, init_emeraldj, ROT0, "Namco", "Emeraldia (Japan Version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) /* Parent is below on NA-2 Hardware */
+GAME( 1993, emeraldaja, emeralda, namcona1,  namcona1_joy,  namcona1_state, init_emeraldj, ROT0, "Namco", "Emeraldia (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) /* Parent is below on NA-2 Hardware */
+GAME( 1993, tinklpit,   0,        namcona1,  namcona1_joy,  namcona1_state, init_tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // NA-2 (C70 MCU)
-GAME( 1992, knckhead,   0,        namcona2,  namcona1_joy,  namcona2_state, knckhead, ROT0, "Namco", "Knuckle Heads (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, knckheadj,  knckhead, namcona2,  namcona1_joy,  namcona2_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, knckheadjp, knckhead, namcona2,  namcona1_joy,  namcona2_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan, Prototype?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, emeralda,   0,        namcona2,  namcona1_joy,  namcona2_state, emeralda, ROT0, "Namco", "Emeraldia (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, numanath,   0,        namcona2,  namcona1_joy,  namcona2_state, numanath, ROT0, "Namco", "Numan Athletics (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, numanathj,  numanath, namcona2,  namcona1_joy,  namcona2_state, numanath, ROT0, "Namco", "Numan Athletics (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, knckhead,   0,        namcona2,  namcona1_joy,  namcona2_state, init_knckhead, ROT0, "Namco", "Knuckle Heads (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, knckheadj,  knckhead, namcona2,  namcona1_joy,  namcona2_state, init_knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, knckheadjp, knckhead, namcona2,  namcona1_joy,  namcona2_state, init_knckhead, ROT0, "Namco", "Knuckle Heads (Japan, Prototype?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, emeralda,   0,        namcona2,  namcona1_joy,  namcona2_state, init_emeralda, ROT0, "Namco", "Emeraldia (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, numanath,   0,        namcona2,  namcona1_joy,  namcona2_state, init_numanath, ROT0, "Namco", "Numan Athletics (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, numanathj,  numanath, namcona2,  namcona1_joy,  namcona2_state, init_numanath, ROT0, "Namco", "Numan Athletics (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, init_quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, init_xday2, ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

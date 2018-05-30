@@ -137,7 +137,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)
 {
 	if (m_nmienable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(bottom9_state::nmi_enable_w)
@@ -303,12 +303,12 @@ void bottom9_state::machine_reset()
 MACHINE_CONFIG_START(bottom9_state::bottom9)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bottom9_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bottom9_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -340,17 +340,17 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_K051316_CB(bottom9_state, zoom_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback0))
+	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback1))
+	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END
@@ -536,6 +536,6 @@ ROM_END
 
 
 
-GAME( 1989, bottom9,  0,       bottom9, bottom9,  bottom9_state, 0, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  bottom9_state, 0, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9_state, 0, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9,  0,       bottom9, bottom9,  bottom9_state, empty_init, ROT0, "Konami", "Bottom of the Ninth (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  bottom9_state, empty_init, ROT0, "Konami", "Bottom of the Ninth (version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9_state, empty_init, ROT0, "Konami", "Main Stadium (Japan)", MACHINE_SUPPORTS_SAVE )

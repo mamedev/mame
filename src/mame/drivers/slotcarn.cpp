@@ -521,7 +521,7 @@ static const gfx_layout slotcarntiles8x8x1_layout =
 *          Graphics Decode          *
 ************************************/
 
-static GFXDECODE_START( slotcarn )
+static GFXDECODE_START( gfx_slotcarn )
 	GFXDECODE_ENTRY( "gfx1", 0, slotcarntiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 8, slotcarntiles8x8x3_layout, 0, 16 ) // flipped
 	GFXDECODE_ENTRY( "gfx2", 0, slotcarntiles8x8x1_layout, 0, 4 )
@@ -543,9 +543,9 @@ void slotcarn_state::machine_start()
 MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
-	MCFG_CPU_PROGRAM_MAP(slotcarn_map)
-	MCFG_CPU_IO_MAP(spielbud_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
+	MCFG_DEVICE_PROGRAM_MAP(slotcarn_map)
+	MCFG_DEVICE_IO_MAP(spielbud_io_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -569,16 +569,16 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(slotcarn_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(slotcarn_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(slotcarn_state, hsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, slotcarn_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotcarn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd",AY8910, SND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd",AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -706,6 +706,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT   ROT   COMPANY           FULLNAME                FLAGS
-GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
-GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT        ROT   COMPANY           FULLNAME                FLAGS
+GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, empty_init, ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
+GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, empty_init, ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )

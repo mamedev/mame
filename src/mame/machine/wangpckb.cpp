@@ -111,18 +111,18 @@ void wangpc_keyboard_device::wangpc_keyboard_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(wangpc_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL(4'000'000))
-	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(wangpc_keyboard_device, kb_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(wangpc_keyboard_device, kb_p1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(wangpc_keyboard_device, kb_p2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(wangpc_keyboard_device, kb_p3_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(wangpc_keyboard_device, mcs51_rx_callback))
+	MCFG_DEVICE_ADD(I8051_TAG, I8051, XTAL(4'000'000))
+	MCFG_DEVICE_IO_MAP(wangpc_keyboard_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, wangpc_keyboard_device, kb_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, wangpc_keyboard_device, kb_p1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, wangpc_keyboard_device, kb_p2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, wangpc_keyboard_device, kb_p3_w))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, wangpc_keyboard_device, mcs51_tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, wangpc_keyboard_device, mcs51_rx_callback))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76496_TAG, SN76496, 2000000) // ???
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76496_TAG, SN76496, 2000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -371,6 +371,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 	m_maincpu(*this, I8051_TAG),
 	m_y(*this, "Y%u", 0),
 	m_txd_handler(*this),
+	m_led(*this, "led%u", 0U),
 	m_keylatch(0),
 	m_rxd(1)
 {
@@ -384,6 +385,7 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 void wangpc_keyboard_device::device_start()
 {
 	m_txd_handler.resolve_safe();
+	m_led.resolve();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 
@@ -533,7 +535,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 
 	for (int i = 0; i < 6; i++)
 	{
-		machine().output().set_led_value(i, !BIT(data, i));
+		m_led[i] = BIT(~data, i);
 	}
 
 	//if (LOG) logerror("P1 %02x\n", data);

@@ -691,7 +691,7 @@ static const gfx_layout spritelayout =
 	16*8    /* offset to next sprite */
 };
 
-static GFXDECODE_START( gaiden )
+static GFXDECODE_START( gfx_gaiden )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x100, 16 )  /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x000, 0x1000 ) /* tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used) */
@@ -720,7 +720,7 @@ static const gfx_layout mastninj_spritelayout =
 	32*8 /* offset to next tile */
 };
 
-static GFXDECODE_START( mastninj )
+static GFXDECODE_START( gfx_mastninj )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x000, 16 )  /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,       0x300, 16 ) /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,       0x200, 16 ) /* tiles 16x16 */
@@ -749,7 +749,7 @@ static const gfx_layout drgnbowl_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( drgnbowl )
+static GFXDECODE_START( gfx_drgnbowl )
 	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout,                0, 16 )    /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, drgnbowl_tile2layout,  0x300, 16 )    /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0x20000, drgnbowl_tile2layout,  0x200, 16 )    /* tiles 16x16 */
@@ -760,12 +760,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gaiden_state::shadoww)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
-	MCFG_CPU_PROGRAM_MAP(gaiden_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gaiden_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_gaiden)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiden)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiden)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -796,38 +796,38 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::wildfang)
 	shadoww(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wildfang_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wildfang_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::raiga)
 	shadoww(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(raiga_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(raiga_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
@@ -837,13 +837,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(drgnbowl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drgnbowl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(drgnbowl_sound_map)
-	MCFG_CPU_IO_MAP(drgnbowl_sound_port_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drgnbowl_sound_map)
+	MCFG_DEVICE_IO_MAP(drgnbowl_sound_port_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -854,7 +854,7 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnbowl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnbowl)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -863,15 +863,15 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -992,12 +992,12 @@ void gaiden_state::mastninj_map(address_map &map)
 MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mastninj_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(mastninj_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
-	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mastninj_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 
@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastninj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastninj)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1021,37 +1021,37 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	// YM2203 clocks chosen by analogy with Automat; actual rate unknown, but 4 MHz is obviously too fast
-	MCFG_SOUND_ADD("ym1", YM2203, 1250000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1250000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
 	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm1", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm2", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("msm2", msm5205_device, vclk_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gaiden_state, vck_flipflop_w))
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("msm2", msm5205_device, vclk_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaiden_state, vck_flipflop_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -1595,21 +1595,21 @@ ROM_START( drgnbowla )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gaiden_state,shadoww)
+void gaiden_state::init_shadoww()
 {
 	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,wildfang)
+void gaiden_state::init_wildfang()
 {
 	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,raiga)
+void gaiden_state::init_raiga()
 {
 	m_jumppoints = raiga_jumppoints_00;
 	/* sprite size Y independent from sprite size X */
@@ -1656,13 +1656,13 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
+void gaiden_state::init_drgnbowl()
 {
 	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(1);
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
+void gaiden_state::init_drgnbowla()
 {
 	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(0);
@@ -1706,27 +1706,27 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,mastninj)
+void gaiden_state::init_mastninj()
 {
 	// rearrange the graphic roms into a format that MAME can decode
 	descramble_mastninj_gfx(memregion("gfx2")->base());
 	descramble_mastninj_gfx(memregion("gfx3")->base());
-	DRIVER_INIT_CALL(shadoww);
+	init_shadoww();
 }
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,        INIT,     MONITOR,COMPANY,   FULLNAME,FLAGS
-GAME( 1988, shadoww,   0,        shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, shadowwa,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gaiden,    shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Gaiden (US)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendn,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendna, shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
-GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
-GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,        INIT,           MONITOR,COMPANY,   FULLNAME,FLAGS
+GAME( 1988, shadoww,   0,        shadoww,  common,   gaiden_state, init_shadoww,   ROT0,   "Tecmo",   "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shadowwa,  shadoww,  shadoww,  common,   gaiden_state, init_shadoww,   ROT0,   "Tecmo",   "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gaiden,    shadoww,  shadoww,  common,   gaiden_state, init_shadoww,   ROT0,   "Tecmo",   "Ninja Gaiden (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendn,  shadoww,  shadoww,  common,   gaiden_state, init_shadoww,   ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendna, shadoww,  shadoww,  common,   gaiden_state, init_shadoww,   ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, init_mastninj,  ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
+GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, init_drgnbowl,  ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
+GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, init_drgnbowla, ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, wildfang,  0,        wildfang, wildfang, gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wildfangs, wildfang, wildfang, tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tknight,   wildfang, wildfang, tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfang,  0,        wildfang, wildfang, gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfangs, wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tknight,   wildfang, wildfang, tknight,  gaiden_state, init_wildfang,  ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

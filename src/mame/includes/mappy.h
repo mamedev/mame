@@ -25,7 +25,9 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_leds(*this, "led%u", 0U)
+	{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -39,6 +41,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_leds;
 
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_sprite_bitmap;
@@ -75,8 +78,8 @@ public:
 	uint32_t screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_DRIVER_INIT(grobda);
-	DECLARE_DRIVER_INIT(digdug2);
+	void init_grobda();
+	void init_digdug2();
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 

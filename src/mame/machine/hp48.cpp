@@ -917,11 +917,10 @@ void hp48_state::encode_nibble(uint8_t* dst, uint8_t* src, int size)
     MACHINES
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp48_state,hp48)
+void hp48_state::init_hp48()
 {
-	int i;
 	LOG(( "hp48: driver init called\n" ));
-	for ( i = 0; i < 6; i++ )
+	for (int i = 0; i < 6; i++)
 	{
 		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
 		m_modules[i].read     = read8_delegate();

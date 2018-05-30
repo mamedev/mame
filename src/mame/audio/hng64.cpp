@@ -389,20 +389,21 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 MACHINE_CONFIG_START(hng64_state::hng64_audio)
-	MCFG_CPU_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
-	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
-	MCFG_CPU_IO_MAP(hng_sound_io)
-	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(hng64_state, dma_hreq_cb))
-	MCFG_V53_DMAU_IN_MEMR_CB(READ8(hng64_state, dma_memr_cb))
-	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(hng64_state,dma_iow3_cb))
+	MCFG_DEVICE_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
+	MCFG_DEVICE_PROGRAM_MAP(hng_sound_map)
+	MCFG_DEVICE_IO_MAP(hng_sound_io)
+	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(*this, hng64_state, dma_hreq_cb))
+	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, hng64_state, dma_memr_cb))
+	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(*this, hng64_state,dma_iow3_cb))
 
-	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(hng64_state, tcu_tm0_cb))
-	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(hng64_state, tcu_tm1_cb))
-	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(hng64_state, tcu_tm2_cb))
+	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(*this, hng64_state, tcu_tm0_cb))
+	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(*this, hng64_state, tcu_tm1_cb))
+	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(*this, hng64_state, tcu_tm2_cb))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
+	MCFG_DEVICE_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

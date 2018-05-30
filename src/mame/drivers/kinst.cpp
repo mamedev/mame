@@ -190,11 +190,6 @@ Notes:
 class kinst_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IRQ0_STOP
-	};
-
 	kinst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
@@ -207,33 +202,44 @@ public:
 	{
 	}
 
+	void init_kinst();
+	void init_kinst2();
+
+	void kinst(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	required_shared_ptr<uint32_t> m_rambase;
 	required_shared_ptr<uint32_t> m_rambase2;
 	required_shared_ptr<uint32_t> m_control;
 	required_shared_ptr<uint32_t> m_rombase;
+	required_device<mips3_device> m_maincpu;
+	required_device<ata_interface_device> m_ata;
+	required_device<dcs_audio_2k_device> m_dcs;
+
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
 	emu_timer *m_irq0_stop_timer;
+
+	enum
+	{
+		TIMER_IRQ0_STOP
+	};
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(irq0_start);
 	DECLARE_READ32_MEMBER(control_r);
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_READ32_MEMBER(ide_r);
 	DECLARE_WRITE32_MEMBER(ide_w);
 	DECLARE_READ32_MEMBER(ide_extra_r);
 	DECLARE_WRITE32_MEMBER(ide_extra_w);
-	DECLARE_DRIVER_INIT(kinst);
-	DECLARE_DRIVER_INIT(kinst2);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(irq0_start);
-	required_device<mips3_device> m_maincpu;
-	required_device<ata_interface_device> m_ata;
-	required_device<dcs_audio_2k_device> m_dcs;
 
-	void kinst(machine_config &config);
 	void main_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -286,17 +292,14 @@ void kinst_state::machine_reset()
 
 uint32_t kinst_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
 	/* loop over rows and copy to the destination */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *src = &m_video_base[640/4 * y];
 		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
-		int x;
 
 		/* loop over columns */
-		for (x = cliprect.min_x; x < cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x < cliprect.max_x; x += 2)
 		{
 			uint32_t data = *src++;
 
@@ -410,11 +413,9 @@ READ32_MEMBER(kinst_state::control_r)
 
 WRITE32_MEMBER(kinst_state::control_w)
 {
-	uint32_t olddata;
-
 	/* apply shuffling */
 	offset = m_control_map[offset / 2];
-	olddata = m_control[offset];
+	uint32_t olddata = m_control[offset];
 	COMBINE_DATA(&m_control[offset]);
 
 	switch (offset)
@@ -697,15 +698,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kinst_state::kinst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
+	MCFG_DEVICE_ADD(m_maincpu, R4600LE, MASTER_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(INPUTLINE("maincpu", 1))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(INPUTLINE(m_maincpu, 1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -720,7 +721,7 @@ MACHINE_CONFIG_START(kinst_state::kinst)
 	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
+	MCFG_DEVICE_ADD(m_dcs, DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
 
 
@@ -735,15 +736,15 @@ ROM_START( kinst )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_DEFAULT_BIOS("v1.5d")
 	ROM_SYSTEM_BIOS(0, "v1.5d", "Killer Instinct (v1.5d)")
-	ROM_LOAD( "ki-l15d.u98", 0x00000, 0x80000, CRC(7b65ca3d) SHA1(607394d4ba1713f38c2cb5159303cace9cde991e) )
+	ROMX_LOAD( "ki-l15d.u98", 0x00000, 0x80000, CRC(7b65ca3d) SHA1(607394d4ba1713f38c2cb5159303cace9cde991e), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "v1.4", "Killer Instinct (v1.4)")
-	ROM_LOAD( "ki-l14.u98", 0x00000, 0x80000, CRC(afedb75f) SHA1(07254f20707377f7195e64675eb6458e663c1a9a) )
+	ROMX_LOAD( "ki-l14.u98", 0x00000, 0x80000, CRC(afedb75f) SHA1(07254f20707377f7195e64675eb6458e663c1a9a), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "v1.3", "Killer Instinct (v1.3)")
-	ROM_LOAD( "ki-l13.u98", 0x00000, 0x80000, CRC(65f7ea31) SHA1(7f21620a512549db6821a0b4fa53681a767b7974) )
+	ROMX_LOAD( "ki-l13.u98", 0x00000, 0x80000, CRC(65f7ea31) SHA1(7f21620a512549db6821a0b4fa53681a767b7974), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "proto-v4.7", "Killer Instinct (proto v4.7)")
-	ROM_LOAD( "ki-p47.u98", 0x00000, 0x80000, CRC(05e67bcb) SHA1(501e69b3026394f69229a6e9866c1037502b86bb) )
+	ROMX_LOAD( "ki-p47.u98", 0x00000, 0x80000, CRC(05e67bcb) SHA1(501e69b3026394f69229a6e9866c1037502b86bb), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "v1.5d-anyide", "Killer Instinct (v1.5d AnyIDE)") // unofficial version, allows use of alternate hard drives or CF cards
-	ROM_LOAD( "ki_l15di.u98", 0x00000, 0x80000, CRC(230f55fb) SHA1(f5f12311aae922d12f98d72ac8fdd77b7b084af2) )
+	ROMX_LOAD( "ki_l15di.u98", 0x00000, 0x80000, CRC(230f55fb) SHA1(f5f12311aae922d12f98d72ac8fdd77b7b084af2), ROM_BIOS(5) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
@@ -764,15 +765,15 @@ ROM_START( kinst2 )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_DEFAULT_BIOS("v1.4")
 	ROM_SYSTEM_BIOS(0, "v1.4", "Killer Instinct 2 (v1.4)")
-	ROM_LOAD( "ki2-l14.u98", 0x00000, 0x80000, CRC(27d0285e) SHA1(aa7a2a9d72a47dd0ea2ee7b2776b79288060b179) )
+	ROMX_LOAD( "ki2-l14.u98", 0x00000, 0x80000, CRC(27d0285e) SHA1(aa7a2a9d72a47dd0ea2ee7b2776b79288060b179), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "v1.3", "Killer Instinct 2 (v1.3)")
-	ROM_LOAD( "ki2-l13.u98", 0x00000, 0x80000, CRC(25ebde3b) SHA1(771d150fb4de0a2ceb279954b9545458e93e2405) )
+	ROMX_LOAD( "ki2-l13.u98", 0x00000, 0x80000, CRC(25ebde3b) SHA1(771d150fb4de0a2ceb279954b9545458e93e2405), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "v1.1", "Killer Instinct 2 (v1.1)")
-	ROM_LOAD( "ki2-l11.u98", 0x00000, 0x80000, CRC(0cb8de1e) SHA1(fe447f4b1d29b524f57c5ba1890652ef6afff88a) )
+	ROMX_LOAD( "ki2-l11.u98", 0x00000, 0x80000, CRC(0cb8de1e) SHA1(fe447f4b1d29b524f57c5ba1890652ef6afff88a), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "v1.0", "Killer Instinct 2 (v1.0)")
-	ROM_LOAD( "ki2-l10.u98", 0x00000, 0x80000, CRC(b17b4b3d) SHA1(756629cd1b51ae50f2b9818765dd3d277c3019b3) )
+	ROMX_LOAD( "ki2-l10.u98", 0x00000, 0x80000, CRC(b17b4b3d) SHA1(756629cd1b51ae50f2b9818765dd3d277c3019b3), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "v1.4-anyide", "Killer Instinct 2 (v1.4 AnyIDE)")
-	ROM_LOAD( "ki2_l14p.u98", 0x00000, 0x80000, CRC(d80c937a) SHA1(85a009638f2eada4c63240fc30a9e7be59afab7f) )
+	ROMX_LOAD( "ki2_l14p.u98", 0x00000, 0x80000, CRC(d80c937a) SHA1(85a009638f2eada4c63240fc30a9e7be59afab7f), ROM_BIOS(5) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
@@ -793,11 +794,11 @@ ROM_START( kinst2uk )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_DEFAULT_BIOS("v1.4k")
 	ROM_SYSTEM_BIOS(0, "v1.4k", "Killer Instinct 2 (v1.4k, upgrade kit)")
-	ROM_LOAD( "ki2-l14k.u98", 0x00000, 0x80000, CRC(9cbd00a8) SHA1(926dce4bb9016331ea40d3c337a9ace896f07493) )
+	ROMX_LOAD( "ki2-l14k.u98", 0x00000, 0x80000, CRC(9cbd00a8) SHA1(926dce4bb9016331ea40d3c337a9ace896f07493), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "v1.3k", "Killer Instinct 2 (v1.3k, upgrade kit)")
-	ROM_LOAD( "ki2-l13k.u98", 0x00000, 0x80000, CRC(3b4f16fc) SHA1(c28416f94453fd1f73ba01025276a04610569d12) )
+	ROMX_LOAD( "ki2-l13k.u98", 0x00000, 0x80000, CRC(3b4f16fc) SHA1(c28416f94453fd1f73ba01025276a04610569d12), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "v1.4-anyide", "Killer Instinct 2 (v1.4k, upgrade kit AnyIDE)")
-	ROM_LOAD( "ki2_d14p.u98", 0x00000, 0x80000, CRC(d716d428) SHA1(1a3b000fdc35b3824a0c8142ba9b496490894543) )
+	ROMX_LOAD( "ki2_d14p.u98", 0x00000, 0x80000, CRC(d716d428) SHA1(1a3b000fdc35b3824a0c8142ba9b496490894543), ROM_BIOS(3) )
 
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
@@ -819,7 +820,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(kinst_state,kinst)
+void kinst_state::init_kinst()
 {
 	static const uint8_t kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
@@ -838,7 +839,7 @@ DRIVER_INIT_MEMBER(kinst_state,kinst)
 }
 
 
-DRIVER_INIT_MEMBER(kinst_state,kinst2)
+void kinst_state::init_kinst2()
 {
 	static const uint8_t kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
 
@@ -873,8 +874,6 @@ DRIVER_INIT_MEMBER(kinst_state,kinst2)
 
  // versions selectable by changing bioses
 
-GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, kinst,   ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, init_kinst,  ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

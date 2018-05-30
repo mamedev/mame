@@ -1239,11 +1239,11 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
     flags for the given device
 -------------------------------------------------*/
 
-void rom_load_manager::normalize_flags_for_device(running_machine &machine, const char *rgntag, u8 &width, endianness_t &endian)
+void rom_load_manager::normalize_flags_for_device(const char *rgntag, u8 &width, endianness_t &endian)
 {
-	device_t *device = machine.device(rgntag);
+	device_t *device = machine().root_device().subdevice(rgntag);
 	device_memory_interface *memory;
-	if (device->interface(memory))
+	if (device != nullptr && device->interface(memory))
 	{
 		const address_space_config *spaceconfig = memory->space_config();
 		if (spaceconfig != nullptr)
@@ -1341,8 +1341,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		memory_region *memregion = machine().root_device().memregion(regiontag.c_str());
 		if (memregion != nullptr)
 		{
-			if (machine().device(regiontag.c_str()) != nullptr)
-				normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);
+			normalize_flags_for_device(regiontag.c_str(), width, endianness);
 
 			/* clear old region (todo: should be moved to an image unload function) */
 			machine().memory().region_free(memregion->name());
@@ -1418,8 +1417,7 @@ void rom_load_manager::process_region_list()
 				/* if this is a device region, override with the device width and endianness */
 				u8 width = ROMREGION_GETWIDTH(region) / 8;
 				endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
-				if (machine().device(regiontag.c_str()) != nullptr)
-					normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);
+				normalize_flags_for_device(regiontag.c_str(), width, endianness);
 
 				/* remember the base and length */
 				m_region = machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);

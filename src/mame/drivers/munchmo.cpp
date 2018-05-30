@@ -297,7 +297,7 @@ static const gfx_layout sprite_layout2 =
 	256
 };
 
-static GFXDECODE_START( mnchmobl )
+static GFXDECODE_START( gfx_mnchmobl )
 	GFXDECODE_ENTRY( "gfx1", 0,      char_layout,      0,  4 )  /* colors   0- 63 */
 	GFXDECODE_ENTRY( "gfx2", 0x1000, tile_layout,     64,  4 )  /* colors  64-127 */
 	GFXDECODE_ENTRY( "gfx3", 0,      sprite_layout1, 128, 16 )  /* colors 128-255 */
@@ -320,22 +320,22 @@ void munchmo_state::machine_start()
 MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(15'000'000)/4) // from pin 13 of XTAL-driven 163
-	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-2C
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(15'000'000)/4) // from pin 13 of XTAL-driven 163
+	MCFG_DEVICE_PROGRAM_MAP(mnchmobl_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-2C
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(15'000'000)/8) // from pin 12 of XTAL-driven 163
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(15'000'000)/8) // from pin 12 of XTAL-driven 163
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 12E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(munchmo_state, palette_bank_0_w)) // BCL0 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(munchmo_state, palette_bank_1_w)) // BCL1 2-11E
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, munchmo_state, palette_bank_0_w)) // BCL0 2-11E
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, munchmo_state, palette_bank_1_w)) // BCL1 2-11E
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // CL2 2-11E
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // CL3 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(munchmo_state, flipscreen_w)) // INV
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, munchmo_state, flipscreen_w)) // INV
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // DISP
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(munchmo_state, nmi_enable_w)) // ENI 1-10C
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, munchmo_state, nmi_enable_w)) // ENI 1-10C
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -344,25 +344,25 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	MCFG_SCREEN_SIZE(256+32+32, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(munchmo_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, munchmo_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mnchmobl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mnchmobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(munchmo_state, munchmo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(15'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(15'000'000)/8)
 	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(15'000'000)/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(15'000'000)/8)
 	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -437,5 +437,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

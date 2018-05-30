@@ -20,7 +20,7 @@ driver by Mirko Buffoni
 WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* this is checked on the title screen and when you reach certain scores in the game
@@ -195,7 +195,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( solomon )
+static GFXDECODE_START( gfx_solomon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )  /* colors   0-127 */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   128, 8 )  /* colors 128-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 8 )  /* colors   0-127 */
@@ -204,7 +204,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -212,14 +212,14 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 MACHINE_CONFIG_START(solomon_state::solomon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", solomon_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", solomon_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(solomon_state, irq0_line_hold, 2*60)   /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(solomon_state, irq0_line_hold, 2*60)   /* ??? */
 						/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -231,22 +231,22 @@ MACHINE_CONFIG_START(solomon_state::solomon)
 	MCFG_SCREEN_UPDATE_DRIVER(solomon_state, screen_update_solomon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", solomon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_solomon)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay3", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_CONFIG_END
 
@@ -310,5 +310,5 @@ ROM_END
 
 
 
-GAME( 1986, solomon,  0,       solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon's Key (US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solomonj, solomon, solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomon,  0,       solomon, solomon, solomon_state, empty_init, ROT0, "Tecmo", "Solomon's Key (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomonj, solomon, solomon, solomon, solomon_state, empty_init, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )

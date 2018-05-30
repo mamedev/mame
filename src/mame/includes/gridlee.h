@@ -47,8 +47,6 @@ protected:
 	DECLARE_READ8_MEMBER(analog_port_r);
 	DECLARE_READ8_MEMBER(random_num_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led_0_w);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(cocktail_flip_w);
 	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);

@@ -896,13 +896,13 @@ void hx20_state::machine_start()
 
 MACHINE_CONFIG_START(hx20_state::hx20)
 	// basic machine hardware
-	MCFG_CPU_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(hx20_mem)
-	MCFG_CPU_IO_MAP(hx20_io)
+	MCFG_DEVICE_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(hx20_mem)
+	MCFG_DEVICE_IO_MAP(hx20_io)
 
-	MCFG_CPU_ADD(HD6301V1_SLAVE_TAG, HD63701, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(hx20_sub_mem)
-	MCFG_CPU_IO_MAP(hx20_sub_io)
+	MCFG_DEVICE_ADD(HD6301V1_SLAVE_TAG, HD63701, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(hx20_sub_mem)
+	MCFG_DEVICE_IO_MAP(hx20_sub_io)
 
 	// video hardware
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -925,18 +925,18 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_UPD7227_ADD(UPD7227_5_TAG, 80, 16)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_MC146818_ADD(MC146818_TAG, XTAL(4'194'304))
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(hx20_state, rtc_irq_w))
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, hx20_state, rtc_irq_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
-	MCFG_EPSON_SIO_RX(WRITELINE(hx20_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(hx20_state, sio_pin_w))
+	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -961,9 +961,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hx20_state::cm6000)
 	hx20(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY(HD6301V1_MAIN_TAG)
-	MCFG_CPU_PROGRAM_MAP(cm6000_mem)
-	MCFG_CPU_IO_MAP(hx20_io)
+	MCFG_DEVICE_MODIFY(HD6301V1_MAIN_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(cm6000_mem)
+	MCFG_DEVICE_IO_MAP(hx20_io)
 
 	// optional rom
 	MCFG_DEVICE_REMOVE("optrom")
@@ -1037,7 +1037,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME                 FLAGS
-COMP( 1983, ehx20,   0,      0,       hx20,      hx20,    hx20_state,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
-COMP( 1983, ehx20e,  ehx20,  0,       hx20,      hx20e,   hx20_state,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )
-COMP( 1989, ecm6000, ehx20,  0,       cm6000,    cm6000,  hx20_state,    0,     "Epson",  "Epson CM6000",          MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY  FULLNAME                FLAGS
+COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "Epson HX-20",          MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "Epson HX-20 (Europe)", MACHINE_NOT_WORKING )
+COMP( 1989, ecm6000, ehx20,  0,      cm6000,  cm6000, hx20_state, empty_init, "Epson", "Epson CM6000",         MACHINE_NOT_WORKING )

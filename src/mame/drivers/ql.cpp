@@ -897,16 +897,16 @@ void ql_state::machine_reset()
 
 MACHINE_CONFIG_START(ql_state::ql)
 	// basic machine hardware
-	MCFG_CPU_ADD(M68008_TAG, M68008, X1/2)
-	MCFG_CPU_PROGRAM_MAP(ql_mem)
+	MCFG_DEVICE_ADD(M68008_TAG, M68008, X1/2)
+	MCFG_DEVICE_PROGRAM_MAP(ql_mem)
 
-	MCFG_CPU_ADD(I8749_TAG, I8749, X4)
-	MCFG_CPU_IO_MAP(ipc_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ql_state, ipc_port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(ql_state, ipc_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ql_state, ipc_port2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ql_state, ipc_t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ql_state, ipc_bus_r))
+	MCFG_DEVICE_ADD(I8749_TAG, I8749, X4)
+	MCFG_DEVICE_IO_MAP(ipc_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ql_state, ipc_port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ql_state, ipc_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ql_state, ipc_port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ql_state, ipc_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ql_state, ipc_bus_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -917,52 +917,52 @@ MACHINE_CONFIG_START(ql_state::ql)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1)
 	MCFG_ZX8301_CPU(M68008_TAG)
-	MCFG_ZX8301_VSYNC_CALLBACK(DEVWRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
+	MCFG_ZX8301_VSYNC_CALLBACK(WRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
 
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(ZX8302_TAG, ZX8302, X1)
 	MCFG_ZX8302_RTC_CLOCK(X2)
 	MCFG_ZX8302_OUT_IPL1L_CB(INPUTLINE(M68008_TAG, M68K_IRQ_2))
-	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(ql_state, ql_baudx4_w))
-	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(ql_state, ql_comdata_w))
+	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(*this, ql_state, ql_baudx4_w))
+	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(*this, ql_state, ql_comdata_w))
 	// TXD1
-	MCFG_ZX8302_OUT_TXD2_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_ZX8302_OUT_TXD2_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	// NETOUT
-	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(ql_state, zx8302_mdselck_w))
-	MCFG_ZX8302_OUT_MDSELD_CB(DEVWRITELINE(MDV_1, microdrive_image_device, comms_in_w))
-	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(ql_state, zx8302_mdrdw_w))
-	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(ql_state, zx8302_erase_w))
-	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(ql_state, zx8302_raw1_w))
-	MCFG_ZX8302_IN_RAW1_CB(READLINE(ql_state, zx8302_raw1_r))
-	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(ql_state, zx8302_raw2_w))
-	MCFG_ZX8302_IN_RAW2_CB(READLINE(ql_state, zx8302_raw2_r))
+	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(*this, ql_state, zx8302_mdselck_w))
+	MCFG_ZX8302_OUT_MDSELD_CB(WRITELINE(MDV_1, microdrive_image_device, comms_in_w))
+	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(*this, ql_state, zx8302_mdrdw_w))
+	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(*this, ql_state, zx8302_erase_w))
+	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(*this, ql_state, zx8302_raw1_w))
+	MCFG_ZX8302_IN_RAW1_CB(READLINE(*this, ql_state, zx8302_raw1_r))
+	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(*this, ql_state, zx8302_raw2_w))
+	MCFG_ZX8302_IN_RAW2_CB(READLINE(*this, ql_state, zx8302_raw2_r))
 
 	MCFG_MICRODRIVE_ADD(MDV_1)
-	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
+	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr) // wired as DCE
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr) // wired as DTE
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DCE
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DTE
+	MCFG_RS232_CTS_HANDLER(WRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp", ql_expansion_cards, nullptr)
+	MCFG_DEVICE_ADD("exp", QL_EXPANSION_SLOT, 0, ql_expansion_cards, nullptr) // FIXME: what's the clock on the slot?
 	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK()
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(ql_state, exp_extintl_w))
+	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, ql_state, exp_extintl_w))
 
-	MCFG_QL_ROM_CARTRIDGE_SLOT_ADD("rom", ql_rom_cartridge_cards, nullptr)
+	MCFG_DEVICE_ADD("rom", QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_cards, nullptr)
 
 	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
-	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(ql_state, qimi_extintl_w))
+	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(*this, ql_state, qimi_extintl_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")
@@ -1269,15 +1269,15 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE      INIT    COMPANY                             FULLNAME              FLAGS
-COMP( 1984, ql,     0,      0,      ql,         ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (UK)",            MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (USA)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Spain)",         MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr,  ql_state,  0,      "Sinclair Research Ltd",            "QL (France)",        MACHINE_NOT_WORKING )
-COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Germany)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Italy)",         MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Sweden)",        MACHINE_NOT_WORKING )
-COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Denmark)",       MACHINE_NOT_WORKING )
-COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (Greece)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tonto,  0,      0,      opd,        ql,     ql_state,  0,      "British Telecom Business Systems", "Merlin M1800 Tonto", MACHINE_NOT_WORKING )
-//COMP( 1986, megaopd,tonto,    0,      megaopd,    ql, ql_state,  0,      "International Computer Limited", "MegaOPD (USA)", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   CLASS     INIT        COMPANY                             FULLNAME              FLAGS
+COMP( 1984, ql,      0,      0,      ql,         ql,     ql_state, empty_init, "Sinclair Research Ltd",            "QL (UK)",            MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_us,   ql,     0,      ql_ntsc,    ql,     ql_state, empty_init, "Sinclair Research Ltd",            "QL (USA)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_es,   ql,     0,      ql,         ql_es,  ql_state, empty_init, "Sinclair Research Ltd",            "QL (Spain)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_fr,   ql,     0,      ql,         ql_fr,  ql_state, empty_init, "Sinclair Research Ltd",            "QL (France)",        MACHINE_NOT_WORKING )
+COMP( 1985, ql_de,   ql,     0,      ql,         ql_de,  ql_state, empty_init, "Sinclair Research Ltd",            "QL (Germany)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_it,   ql,     0,      ql,         ql_it,  ql_state, empty_init, "Sinclair Research Ltd",            "QL (Italy)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_se,   ql,     0,      ql,         ql_se,  ql_state, empty_init, "Sinclair Research Ltd",            "QL (Sweden)",        MACHINE_NOT_WORKING )
+COMP( 1985, ql_dk,   ql,     0,      ql,         ql_dk,  ql_state, empty_init, "Sinclair Research Ltd",            "QL (Denmark)",       MACHINE_NOT_WORKING )
+COMP( 1985, ql_gr,   ql,     0,      ql,         ql,     ql_state, empty_init, "Sinclair Research Ltd",            "QL (Greece)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tonto,   0,      0,      opd,        ql,     ql_state, empty_init, "British Telecom Business Systems", "Merlin M1800 Tonto", MACHINE_NOT_WORKING )
+//COMP( 1986, megaopd, tonto,  0,      megaopd,    ql,     ql_state, empty_init, "International Computer Limited",   "MegaOPD (USA)",      MACHINE_NOT_WORKING )

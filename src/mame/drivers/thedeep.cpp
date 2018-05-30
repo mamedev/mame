@@ -355,7 +355,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16
 };
 
-static GFXDECODE_START( thedeep )
+static GFXDECODE_START( gfx_thedeep )
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4,  0x080,  8 ) // [0] Sprites
 	GFXDECODE_ENTRY( "bg_gfx", 0, layout_16x16x4,   0x100, 16 ) // [1] Background Layer
 	GFXDECODE_ENTRY( "text", 0, layout_8x8x2,   0x000, 16 ) // [2] Text Layer
@@ -404,22 +404,22 @@ INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
 MACHINE_CONFIG_START(thedeep_state::thedeep)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedeep_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M65C02, XTAL(12'000'000)/8)      /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M65C02, XTAL(12'000'000)/8)      /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(thedeep_state, p0_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(thedeep_state, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(thedeep_state, from_main_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(thedeep_state, to_main_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(thedeep_state, p3_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedeep_state, mcu_irq) // unknown source, but presumably vblank
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, thedeep_state, p0_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, thedeep_state, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, thedeep_state, from_main_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, thedeep_state, to_main_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, thedeep_state, p3_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thedeep_state, mcu_irq) // unknown source, but presumably vblank
 	MCFG_DEVICE_DISABLE()
 
 
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(thedeep_state::thedeep)
 	MCFG_SCREEN_UPDATE_DRIVER(thedeep_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedeep)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedeep)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(thedeep_state, thedeep)
 
@@ -442,12 +442,12 @@ MACHINE_CONFIG_START(thedeep_state::thedeep)
 	MCFG_DECO_MXC06_RAMSIZE(0x400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)  /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -543,5 +543,5 @@ ROM_START( rundeep )
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 
-GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, 0, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, 0, ROT270, "bootleg (Cream)", "Run Deep",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, empty_init, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, empty_init, ROT270, "bootleg (Cream)", "Run Deep",         MACHINE_SUPPORTS_SAVE )

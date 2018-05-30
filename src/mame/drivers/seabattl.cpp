@@ -53,24 +53,13 @@ public:
 		m_digits(*this, { "sc_thousand", "sc_hundred", "sc_half", "sc_unity", "tm_half", "tm_unity" }),
 		m_s2636(*this, "s2636"),
 		m_7segs(*this, "digit%u", 0U),
+		m_lamp(*this, "lamp0"),
 		m_waveenable(false),
 		m_collision(0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-	{
-	}
-
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_objram;
-	required_device_array<dm9368_device, 6> m_digits;
-	required_device<s2636_device> m_s2636;
-	output_finder<6> m_7segs;
-
-	tilemap_t *m_bg_tilemap;
-	bitmap_ind16 m_collision_bg;
+	{ }
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
@@ -88,19 +77,35 @@ public:
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
+	DECLARE_PALETTE_INIT(seabattl);
+	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void seabattl(machine_config &config);
+	void seabattl_data_map(address_map &map);
+	void seabattl_map(address_map &map);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(seabattl);
-	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_objram;
+	required_device_array<dm9368_device, 6> m_digits;
+	required_device<s2636_device> m_s2636;
+	output_finder<6> m_7segs;
+	output_finder<> m_lamp;
+
+	tilemap_t *m_bg_tilemap;
+	bitmap_ind16 m_collision_bg;
+
 	bool m_waveenable;
 	uint8_t m_collision;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void seabattl(machine_config &config);
-	void seabattl_data_map(address_map &map);
-	void seabattl_map(address_map &map);
 };
 
 
@@ -286,7 +291,7 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	// bit 4: lamp
 	// bit 5: enable wave
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
-	output().set_lamp_value(0, BIT(data,4));
+	m_lamp = BIT(data,4);
 	m_waveenable = BIT(data, 5);
 }
 
@@ -432,6 +437,7 @@ INPUT_PORTS_END
 
 void seabattl_state::machine_start()
 {
+	m_lamp.resolve();
 }
 
 void seabattl_state::machine_reset()
@@ -466,7 +472,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( seabattl )
+static GFXDECODE_START( gfx_seabattl )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles32x16x3_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 8, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 24, 1 )
@@ -475,28 +481,28 @@ GFXDECODE_END
 MACHINE_CONFIG_START(seabattl_state::seabattl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)
-	MCFG_CPU_PROGRAM_MAP(seabattl_map)
-	MCFG_CPU_DATA_MAP(seabattl_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_ADD("maincpu", S2650, 14318180/4/2)
+	MCFG_DEVICE_PROGRAM_MAP(seabattl_map)
+	MCFG_DEVICE_DATA_MAP(seabattl_data_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
 	MCFG_S2636_OFFSETS(-13, -29)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("sc_thousand", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<0>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<0>))
 	MCFG_DEVICE_ADD("sc_hundred", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<1>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<1>))
 	MCFG_DEVICE_ADD("sc_half", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<2>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<2>))
 	MCFG_DEVICE_ADD("sc_unity", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<3>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<3>))
 	MCFG_DEVICE_ADD("tm_half", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<4>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<4>))
 	MCFG_DEVICE_ADD("tm_unity", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<5>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<5>))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -508,12 +514,12 @@ MACHINE_CONFIG_START(seabattl_state::seabattl)
 	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seabattl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seabattl)
 	MCFG_PALETTE_ADD("palette", 26)
 	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* discrete sound */
 MACHINE_CONFIG_END
@@ -564,5 +570,5 @@ ROM_START( seabattla ) // this was a very different looking PCB (bootleg called 
 ROM_END
 
 
-GAMEL(1980, seabattl,  0,        seabattl, seabattl, seabattl_state, 0, ROT0, "Zaccaria", "Sea Battle (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_seabattl )
-GAMEL(1980, seabattla, seabattl, seabattl, seabattl, seabattl_state, 0, ROT0, "Zaccaria", "Sea Battle (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_seabattl ) // incomplete dump
+GAMEL(1980, seabattl,  0,        seabattl, seabattl, seabattl_state, empty_init, ROT0, "Zaccaria", "Sea Battle (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_seabattl )
+GAMEL(1980, seabattla, seabattl, seabattl, seabattl, seabattl_state, empty_init, ROT0, "Zaccaria", "Sea Battle (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_seabattl ) // incomplete dump

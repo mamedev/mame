@@ -10,6 +10,7 @@
         * Speed Up
         * Surf Planet
         * Radikal Bikers
+        * Football Power
 
     Known bugs:
         * EEPROM interface not right
@@ -926,19 +927,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 15000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
+	MCFG_DEVICE_ADD("maincpu", M68000, 15000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
 
-	MCFG_CPU_ADD("tms", TMS32031, 60000000)
-	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_DEVICE_ADD("tms", TMS32031, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(tms_map)
 	MCFG_TMS3203X_MCBL(true)
-	MCFG_TMS3203X_IACK_CB(WRITE8(gaelco3d_state, tms_iack_w))
+	MCFG_TMS3203X_IACK_CB(WRITE8(*this, gaelco3d_state, tms_iack_w))
 
-	MCFG_CPU_ADD("adsp", ADSP2115, 16000000)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(gaelco3d_state, adsp_tx_callback))
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2115, 16000000)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, gaelco3d_state, adsp_tx_callback))
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -948,26 +949,26 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_TIMER_DRIVER_ADD("adsp_timer", gaelco3d_state, adsp_autobuffer_irq)
 
 	MCFG_DEVICE_ADD("serial", GAELCO_SERIAL, 0)
-	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(gaelco3d_state, ser_irq))
+	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(*this, gaelco3d_state, ser_irq))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC5 on bottom board next to EEPROM
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, tr_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, rts_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, tms_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(gaelco3d_state, tms_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gaelco3d_state, unknown_13a_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("serial", gaelco_serial_device, tr_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("serial", gaelco_serial_device, rts_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gaelco3d_state, unknown_13a_w))
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC2 on top board near edge connector
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco3d_state, tms_control3_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco3d_state, radikalb_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco3d_state, unknown_137_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, irq_enable))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, analog_port_clock_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(gaelco3d_state, analog_port_latch_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, unknown_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_control3_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco3d_state, radikalb_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco3d_state, unknown_137_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("serial", gaelco_serial_device, irq_enable))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, analog_port_clock_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, gaelco3d_state, analog_port_latch_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("serial", gaelco_serial_device, unknown_w))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("adsp", ADSP2115_IRQ2))
@@ -984,18 +985,18 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: front mono */
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: left rear */
 
-	MCFG_SOUND_ADD("dac3", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac3", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: right rear */
 
-	MCFG_SOUND_ADD("dac4", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac4", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: seat speaker */
 MACHINE_CONFIG_END
 
@@ -1004,12 +1005,12 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d2)
 	gaelco3d(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68EC020, 25000000)
-	MCFG_CPU_PROGRAM_MAP(main020_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
+	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(main020_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
 
-	MCFG_CPU_MODIFY("tms")
-	MCFG_CPU_CLOCK(50000000)
+	MCFG_DEVICE_MODIFY("tms")
+	MCFG_DEVICE_CLOCK(50000000)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 MACHINE_CONFIG_END
@@ -1017,7 +1018,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco3d_state::footbpow)
 	gaelco3d2(config);
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, fp_analog_clock_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, fp_analog_clock_w))
 MACHINE_CONFIG_END
 
 
@@ -1259,7 +1260,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(gaelco3d_state,gaelco3d)
+void gaelco3d_state::init_gaelco3d()
 {
 }
 
@@ -1271,13 +1272,13 @@ DRIVER_INIT_MEMBER(gaelco3d_state,gaelco3d)
  *
  *************************************/
 
-GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Speed Up (Version 1.20)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Speed Up (Version 1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, init_gaelco3d, ROT0, "Gaelco",                 "Speed Up (Version 1.20)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, init_gaelco3d, ROT0, "Gaelco",                 "Speed Up (Version 1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, init_gaelco3d, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, init_gaelco3d, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, init_gaelco3d, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, init_gaelco3d, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Football Power", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, init_gaelco3d, ROT0, "Gaelco",                 "Football Power", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )

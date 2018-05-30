@@ -172,14 +172,14 @@ class a7800_ntsc_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	DECLARE_DRIVER_INIT(a7800_ntsc);
+	void init_a7800_ntsc();
 };
 
 class a7800_pal_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	DECLARE_DRIVER_INIT(a7800_pal);
+	void init_a7800_pal();
 	void a7800_pal(machine_config &config);
 
 protected:
@@ -1377,8 +1377,8 @@ void a7800_state::machine_reset()
 
 MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
-	MCFG_CPU_PROGRAM_MAP(a7800_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
+	MCFG_DEVICE_PROGRAM_MAP(a7800_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, interrupt, "screen", 0, 1)
 
 	/* video hardware */
@@ -1395,15 +1395,15 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	MCFG_MARIA_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", 31400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, A7800_NTSC_Y1/8)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a7800_state, riot_joystick_r))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a7800_state, riot_console_button_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a7800_state, riot_button_pullup_w))
 
 	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, nullptr)
 
@@ -1417,8 +1417,8 @@ MACHINE_CONFIG_START(a7800_pal_state::a7800_pal)
 	a7800_ntsc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(CLK_PAL)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(CLK_PAL)
 //  MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY( "screen" )
@@ -1430,9 +1430,9 @@ MACHINE_CONFIG_START(a7800_pal_state::a7800_pal)
 	/* devices */
 	MCFG_DEVICE_REMOVE("riot")
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, CLK_PAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_pal_state, riot_joystick_r))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_pal_state, riot_console_button_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_pal_state, riot_button_pullup_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a7800_pal_state, riot_joystick_r))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a7800_pal_state, riot_console_button_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a7800_pal_state, riot_button_pullup_w))
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -1463,7 +1463,7 @@ ROM_END
  DRIVER INIT
  ***************************************************************************/
 
-DRIVER_INIT_MEMBER(a7800_ntsc_state, a7800_ntsc)
+void a7800_ntsc_state::init_a7800_ntsc()
 {
 	m_ispal = false;
 	m_lines = 263;
@@ -1472,7 +1472,7 @@ DRIVER_INIT_MEMBER(a7800_ntsc_state, a7800_ntsc)
 }
 
 
-DRIVER_INIT_MEMBER(a7800_pal_state, a7800_pal)
+void a7800_pal_state::init_a7800_pal()
 {
 	m_ispal = true;
 	m_lines = 313;
@@ -1485,6 +1485,6 @@ DRIVER_INIT_MEMBER(a7800_pal_state, a7800_pal)
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT  STATE              INIT        COMPANY   FULLNAME             FLAGS
-CONS( 1986, a7800,    0,        0,      a7800_ntsc, a7800, a7800_ntsc_state,  a7800_ntsc, "Atari",  "Atari 7800 (NTSC)", 0 )
-CONS( 1986, a7800p,   a7800,    0,      a7800_pal,  a7800, a7800_pal_state,   a7800_pal,  "Atari",  "Atari 7800 (PAL)",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT             COMPANY   FULLNAME             FLAGS
+CONS( 1986, a7800,  0,      0,      a7800_ntsc, a7800, a7800_ntsc_state, init_a7800_ntsc, "Atari",  "Atari 7800 (NTSC)", 0 )
+CONS( 1986, a7800p, a7800,  0,      a7800_pal,  a7800, a7800_pal_state,  init_a7800_pal,  "Atari",  "Atari 7800 (PAL)",  0 )

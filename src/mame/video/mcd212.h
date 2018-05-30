@@ -210,6 +210,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	required_device<screen_device> m_lcd;
+
 	// internal state
 	channel_t m_channel[2];
 	emu_timer *m_scan_timer;

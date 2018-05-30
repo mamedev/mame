@@ -148,7 +148,7 @@
 
 #define LS629_FREQ_R_IN     RES_K(90)
 
-static DISCRETE_SOUND_START(mario)
+static DISCRETE_SOUND_START(mario_discrete)
 
 	/************************************************
 	 * Input register mapping for mario
@@ -405,7 +405,7 @@ DISCRETE_SOUND_END
 void mario_state::set_ea(int ea)
 {
 	//printf("ea: %d\n", ea);
-	//machine().device("audiocpu")->execute().set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
+	//m_audiocpu->set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_eabank != nullptr)
 		membank(m_eabank)->set_entry(ea);
 }
@@ -639,20 +639,20 @@ void mario_state::masao_sound_map(address_map &map)
 MACHINE_CONFIG_START(mario_state::mario_audio)
 
 #if USE_8039
-	MCFG_CPU_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
+	MCFG_DEVICE_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
 #else
-	MCFG_CPU_ADD("audiocpu", M58715, I8035_CLOCK)        /* 730 kHz */
+	MCFG_DEVICE_ADD("audiocpu", M58715, I8035_CLOCK)        /* 730 kHz */
 #endif
-	MCFG_CPU_PROGRAM_MAP(mario_sound_map)
-	MCFG_CPU_IO_MAP(mario_sound_io_map)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(mario_state, mario_sh_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(mario_state, mario_sh_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(mario_state, mario_sh_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(mario_state, mario_sh_p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(mario_state, mario_sh_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(mario_state, mario_sh_t1_r))
+	MCFG_DEVICE_PROGRAM_MAP(mario_sound_map)
+	MCFG_DEVICE_IO_MAP(mario_sound_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, mario_state, mario_sh_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, mario_state, mario_sh_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, mario_state, mario_sh_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, mario_state, mario_sh_p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, mario_state, mario_sh_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, mario_state, mario_sh_t1_r))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -660,11 +660,11 @@ MACHINE_CONFIG_START(mario_state::mario_audio)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
 #if OLD_SOUND
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(mario)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 #else
-	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
 	MCFG_NETLIST_SETUP(mario)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -681,15 +681,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mario_state::masao_audio)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 24576000/16)  /* ???? */
-	MCFG_CPU_PROGRAM_MAP(masao_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 24576000/16)  /* ???? */
+	MCFG_DEVICE_PROGRAM_MAP(masao_sound_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/6)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 14318000/6)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END

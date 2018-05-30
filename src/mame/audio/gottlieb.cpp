@@ -101,7 +101,7 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -111,18 +111,18 @@ INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 
 MACHINE_CONFIG_START(gottlieb_sound_r0_device::device_add_mconfig)
 	// audio CPU
-	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // M6503 - clock is a gate, a resistor and a capacitor. Freq unknown.
-	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r0_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // M6503 - clock is a gate, a resistor and a capacitor. Freq unknown.
+	MCFG_DEVICE_PROGRAM_MAP(gottlieb_sound_r0_map)
 
 	// I/O configuration
 	MCFG_DEVICE_ADD("r6530", MOS6530, SOUND1_CLOCK/4) // unknown - same as cpu
-	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MOS6530_IN_PB_CB(READ8(gottlieb_sound_r0_device, r6530b_r))
+	MCFG_MOS6530_OUT_PA_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MOS6530_IN_PB_CB(READ8(*this, gottlieb_sound_r0_device, r6530b_r))
 
 	// sound devices
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -310,19 +310,19 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gottlieb_sound_r1_device::device_add_mconfig)
 	// audio CPU
-	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
-	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r1_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
+	MCFG_DEVICE_PROGRAM_MAP(gottlieb_sound_r1_map)
 
 	// I/O configuration
 	MCFG_DEVICE_ADD("riot", RIOT6532, SOUND1_CLOCK/4)
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("SB1"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gottlieb_sound_r1_device, r6532_portb_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(gottlieb_sound_r1_device, snd_interrupt))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gottlieb_sound_r1_device, r6532_portb_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, gottlieb_sound_r1_device, snd_interrupt))
 
 	// sound devices
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -371,8 +371,8 @@ MACHINE_CONFIG_START(gottlieb_sound_r1_with_votrax_device::device_add_mconfig)
 
 	// add the VOTRAX
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
-	MCFG_VOTRAX_SC01_REQUEST_CB(DEVWRITELINE(DEVICE_SELF, gottlieb_sound_r1_device, votrax_request))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
+	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(DEVICE_SELF, gottlieb_sound_r1_device, votrax_request))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.5)
 MACHINE_CONFIG_END
 
 
@@ -659,27 +659,27 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gottlieb_sound_r2_device::device_add_mconfig)
 	// audio CPUs
-	MCFG_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r2_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(gottlieb_sound_r2_map)
 
-	MCFG_CPU_ADD("speechcpu", M6502, SOUND2_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(gottlieb_speech_r2_map)
+	MCFG_DEVICE_ADD("speechcpu", M6502, SOUND2_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(gottlieb_speech_r2_map)
 
 	// sound hardware
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.075) // unknown DAC
-	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.075) // unknown DAC
+	MCFG_DEVICE_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("ay1", AY8913, SOUND2_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)
+	MCFG_DEVICE_ADD("ay1", AY8913, SOUND2_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8913, SOUND2_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)
+	MCFG_DEVICE_ADD("ay2", AY8913, SOUND2_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.15)
 
-	MCFG_SOUND_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
+	MCFG_DEVICE_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
 MACHINE_CONFIG_END
 
 

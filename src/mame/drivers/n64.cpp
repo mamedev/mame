@@ -429,22 +429,22 @@ INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 MACHINE_CONFIG_START(n64_mess_state::n64)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, 93750000)
 	MCFG_CPU_FORCE_NO_DRC()
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* ?? */
 	//MCFG_MIPS3_DCACHE_SIZE(8192) /* ?? */
 	//MCFG_MIPS3_SYSTEM_CLOCK(62500000) /* ?? */
-	MCFG_CPU_PROGRAM_MAP(n64_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", n64_mess_state, n64_reset_poll)
+	MCFG_DEVICE_PROGRAM_MAP(n64_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", n64_mess_state, n64_reset_poll)
 
-	MCFG_CPU_ADD("rsp", RSP, 62500000)
+	MCFG_DEVICE_ADD("rsp", RSP, 62500000)
 	MCFG_CPU_FORCE_NO_DRC()
-	MCFG_RSP_DP_REG_R_CB(DEVREAD32("rcp",n64_periphs, dp_reg_r))
-	MCFG_RSP_DP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, dp_reg_w))
-	MCFG_RSP_SP_REG_R_CB(DEVREAD32("rcp",n64_periphs, sp_reg_r))
-	MCFG_RSP_SP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, sp_reg_w))
-	MCFG_RSP_SP_SET_STATUS_CB(DEVWRITE32("rcp",n64_periphs, sp_set_status))
-	MCFG_CPU_PROGRAM_MAP(rsp_map)
+	MCFG_RSP_DP_REG_R_CB(READ32("rcp",n64_periphs, dp_reg_r))
+	MCFG_RSP_DP_REG_W_CB(WRITE32("rcp",n64_periphs, dp_reg_w))
+	MCFG_RSP_SP_REG_R_CB(READ32("rcp",n64_periphs, sp_reg_r))
+	MCFG_RSP_SP_REG_W_CB(WRITE32("rcp",n64_periphs, sp_reg_w))
+	MCFG_RSP_SP_SET_STATUS_CB(WRITE32("rcp",n64_periphs, sp_set_status))
+	MCFG_DEVICE_PROGRAM_MAP(rsp_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(500000))
 	//MCFG_QUANTUM_TIME(attotime::from_hz(1200))
@@ -458,15 +458,16 @@ MACHINE_CONFIG_START(n64_mess_state::n64)
 	//MCFG_SCREEN_SIZE(640, 525)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(n64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(n64_state, screen_vblank_n64))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, n64_state, screen_vblank_n64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_N64_PERIPHS_ADD("rcp");
@@ -483,8 +484,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(n64_mess_state::n64dd)
 	n64(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(n64dd_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(n64dd_map)
 
 	MCFG_MACHINE_START_OVERRIDE(n64_mess_state, n64dd)
 
@@ -536,5 +537,6 @@ ROM_START( n64dd )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
-CONS(1996, n64,     0,      0,      n64,    n64, n64_mess_state, 0,  "Nintendo", "Nintendo 64",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS(1996, n64dd,   n64,    0,      n64dd,  n64, n64_mess_state, 0,  "Nintendo", "Nintendo 64DD", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1996, n64,   0,   0, n64,   n64, n64_mess_state, empty_init, "Nintendo", "Nintendo 64",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1996, n64dd, n64, 0, n64dd, n64, n64_mess_state, empty_init, "Nintendo", "Nintendo 64DD", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+

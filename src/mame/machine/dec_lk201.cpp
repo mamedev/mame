@@ -212,11 +212,11 @@ void lk201_device::lk201_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(lk201_device::device_add_mconfig)
-	MCFG_CPU_ADD(LK201_CPU_TAG, M68HC05EG, XTAL(4'000'000)) // actually 68HC05C4, clock verified by Lord_Nightmare
-	MCFG_CPU_PROGRAM_MAP(lk201_map)
+	MCFG_DEVICE_ADD(LK201_CPU_TAG, M68HC05EG, XTAL(4'000'000)) // actually 68HC05C4, clock verified by Lord_Nightmare
+	MCFG_DEVICE_PROGRAM_MAP(lk201_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(LK201_SPK_TAG, BEEP, 2000) // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(LK201_SPK_TAG, BEEP, 2000) // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

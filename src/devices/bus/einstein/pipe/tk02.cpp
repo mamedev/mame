@@ -87,7 +87,7 @@ static const gfx_layout tk02_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( tk02 )
+static GFXDECODE_START( gfx_tk02 )
 	GFXDECODE_ENTRY("gfx", 0x0000, tk02_charlayout, 0, 1)
 	GFXDECODE_ENTRY("gfx", 0x1000, tk02_charlayout, 0, 1)
 GFXDECODE_END
@@ -103,13 +103,13 @@ MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk02)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk02)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "mono", XTAL(8'000'000) / 4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(tk02_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(tk02_device, de_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, tk02_device, de_w))
 
 	MCFG_TATUNG_PIPE_ADD("pipe")
 MACHINE_CONFIG_END

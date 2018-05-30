@@ -1109,7 +1109,7 @@ READ_LINE_MEMBER( c128_state::mmu_sense40_r )
 //  mc6845
 //-------------------------------------------------
 
-static GFXDECODE_START( c128 )
+static GFXDECODE_START( gfx_c128 )
 	GFXDECODE_ENTRY( "charom", 0x0000, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
@@ -1599,19 +1599,21 @@ WRITE_LINE_MEMBER( c128_state::exp_reset_w )
 //  SLOT_INTERFACE( c128dcr_iec_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( c128dcr_iec_devices )
-	SLOT_INTERFACE("c1571", C1571)
-	SLOT_INTERFACE("c1571cr", C1571CR)
-SLOT_INTERFACE_END
+void c128dcr_iec_devices(device_slot_interface &device)
+{
+	device.option_add("c1571", C1571);
+	device.option_add("c1571cr", C1571CR);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( c128d81_iec_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( c128d81_iec_devices )
-	SLOT_INTERFACE("c1563", C1563)
-SLOT_INTERFACE_END
+void c128d81_iec_devices(device_slot_interface &device)
+{
+	device.option_add("c1563", C1563);
+}
 
 
 
@@ -1693,16 +1695,16 @@ void c128_state::machine_reset()
 
 MACHINE_CONFIG_START(c128_state::ntsc)
 	// basic hardware
-	MCFG_CPU_ADD(Z80A_TAG, Z80, XTAL(14'318'181)*2/3.5/2)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD(Z80A_TAG, Z80, XTAL(14'318'181)*2/3.5/2)
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
-	MCFG_CPU_ADD(M8502_TAG, M8502, XTAL(14'318'181)*2/3.5/8)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M8502_PORT_CALLBACKS(READ8(c128_state, cpu_r), WRITE8(c128_state, cpu_w))
+	MCFG_DEVICE_ADD(M8502_TAG, M8502, XTAL(14'318'181)*2/3.5/8)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M8502_PORT_CALLBACKS(READ8(*this, c128_state, cpu_r), WRITE8(*this, c128_state, cpu_w))
 	MCFG_M8502_PORT_PULLS(0x07, 0x20)
-	MCFG_CPU_PROGRAM_MAP(m8502_mem)
+	MCFG_DEVICE_PROGRAM_MAP(m8502_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
 	// video hardware
@@ -1717,8 +1719,8 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 
 	MCFG_DEVICE_ADD(MOS8564_TAG, MOS8564, XTAL(14'318'181)*2/3.5)
 	MCFG_MOS6566_CPU(M8502_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(c128_state, vic_irq_w))
-	MCFG_MOS8564_K_CALLBACK(WRITE8(c128_state, vic_k_w))
+	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c128_state, vic_irq_w))
+	MCFG_MOS8564_K_CALLBACK(WRITE8(*this, c128_state, vic_k_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
@@ -1728,71 +1730,71 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8564_TAG, mos8564_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)*2/3.5/8)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(c128_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(c128_state, sid_poty_r))
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)*2/3.5/8)
+	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c128_state, sid_potx_r))
+	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c128_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	// devices
 	MCFG_DEVICE_ADD(MOS8722_TAG, MOS8722, XTAL(14'318'181)*2/3.5/8)
-	MCFG_MOS8722_Z80EN_CALLBACK(WRITELINE(c128_state, mmu_z80en_w))
-	MCFG_MOS8722_FSDIR_CALLBACK(WRITELINE(c128_state, mmu_fsdir_w))
-	MCFG_MOS8722_GAME_CALLBACK(READLINE(c128_state, mmu_game_r))
-	MCFG_MOS8722_EXROM_CALLBACK(READLINE(c128_state, mmu_exrom_r))
-	MCFG_MOS8722_SENSE40_CALLBACK(READLINE(c128_state, mmu_sense40_r))
+	MCFG_MOS8722_Z80EN_CALLBACK(WRITELINE(*this, c128_state, mmu_z80en_w))
+	MCFG_MOS8722_FSDIR_CALLBACK(WRITELINE(*this, c128_state, mmu_fsdir_w))
+	MCFG_MOS8722_GAME_CALLBACK(READLINE(*this, c128_state, mmu_game_r))
+	MCFG_MOS8722_EXROM_CALLBACK(READLINE(*this, c128_state, mmu_exrom_r))
+	MCFG_MOS8722_SENSE40_CALLBACK(READLINE(*this, c128_state, mmu_sense40_r))
 	MCFG_MOS8721_ADD(MOS8721_TAG)
 	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(14'318'181)*2/3.5/8)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c128_state, cia1_irq_w))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(c128_state, cia1_cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(c128_state, cia1_sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c128_state, cia1_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c128_state, cia1_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia1_irq_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c128_state, cia1_cnt_w))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c128_state, cia1_sp_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia1_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia1_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c128_state, cia1_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia1_pb_w))
 	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(14'318'181)*2/3.5/8)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c128_state, cia2_irq_w))
-	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c128_state, cia2_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c128_state, cia2_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c128_state, cia2_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia2_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia2_irq_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia2_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia2_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c128_state, cia2_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia2_pb_w))
+	MCFG_MOS6526_PC_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS8564_TAG, mos8564_device, lp_w))
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS8564_TAG, mos8564_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL(14'318'181)*2/3.5/8, c64_expansion_cards, nullptr)
-	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(c128_state, exp_irq_w))
-	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(c128_state, exp_nmi_w))
-	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(c128_state, exp_reset_w))
-	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(c128_state, exp_dma_cd_r))
-	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(c128_state, exp_dma_cd_w))
-	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(c128_state, exp_dma_w))
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, c128_state, exp_irq_w))
+	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(*this, c128_state, exp_nmi_w))
+	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(*this, c128_state, exp_reset_w))
+	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, c128_state, exp_dma_cd_r))
+	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c128_state, exp_dma_cd_w))
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c128_state, exp_dma_w))
 
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(c128_state, exp_reset_w))
-	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_7_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(DEVWRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
-	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(c128_state, write_user_pb0))
-	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(c128_state, write_user_pb1))
-	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(c128_state, write_user_pb2))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(c128_state, write_user_pb3))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(c128_state, write_user_pb4))
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(c128_state, write_user_pb5))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(c128_state, write_user_pb6))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(c128_state, write_user_pb7))
-	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(c128_state, write_user_pa2))
+	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c128_state, exp_reset_w))
+	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c128_state, write_user_pb0))
+	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c128_state, write_user_pb1))
+	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(*this, c128_state, write_user_pb2))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(*this, c128_state, write_user_pb3))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(*this, c128_state, write_user_pb4))
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(*this, c128_state, write_user_pb5))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(*this, c128_state, write_user_pb6))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(*this, c128_state, write_user_pb7))
+	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(*this, c128_state, write_user_pa2))
 
 	MCFG_QUICKLOAD_ADD("quickload", c128_state, cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1829,8 +1831,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(c128_state::c128)
 	ntsc(config);
 	MCFG_CBM_IEC_ADD("c1571")
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
-	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(*this, c128_state, iec_srq_w))
+	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(*this, c128_state, iec_data_w))
 MACHINE_CONFIG_END
 
 
@@ -1841,8 +1843,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(c128_state::c128dcr)
 	ntsc(config);
 	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
-	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(*this, c128_state, iec_srq_w))
+	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(*this, c128_state, iec_data_w))
 MACHINE_CONFIG_END
 
 
@@ -1853,8 +1855,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(c128_state::c128d81)
 	ntsc(config);
 	MCFG_CBM_IEC_ADD(nullptr)
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
-	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(*this, c128_state, iec_srq_w))
+	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(*this, c128_state, iec_data_w))
 
 	MCFG_DEVICE_MODIFY("iec8")
 	MCFG_DEVICE_SLOT_INTERFACE(c128d81_iec_devices, "c1563", false)
@@ -1867,16 +1869,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c128_state::pal)
 	// basic hardware
-	MCFG_CPU_ADD(Z80A_TAG, Z80, XTAL(17'734'472)*2/4.5/2)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD(Z80A_TAG, Z80, XTAL(17'734'472)*2/4.5/2)
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
-	MCFG_CPU_ADD(M8502_TAG, M8502, XTAL(17'734'472)*2/4.5/8)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M8502_PORT_CALLBACKS(READ8(c128_state, cpu_r), WRITE8(c128_state, cpu_w))
+	MCFG_DEVICE_ADD(M8502_TAG, M8502, XTAL(17'734'472)*2/4.5/8)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M8502_PORT_CALLBACKS(READ8(*this, c128_state, cpu_r), WRITE8(*this, c128_state, cpu_w))
 	MCFG_M8502_PORT_PULLS(0x07, 0x20)
-	MCFG_CPU_PROGRAM_MAP(m8502_mem)
+	MCFG_DEVICE_PROGRAM_MAP(m8502_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
 	// video hardware
@@ -1891,8 +1893,8 @@ MACHINE_CONFIG_START(c128_state::pal)
 
 	MCFG_DEVICE_ADD(MOS8566_TAG, MOS8566, XTAL(17'734'472)*2/4.5)
 	MCFG_MOS6566_CPU(M8502_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(c128_state, vic_irq_w))
-	MCFG_MOS8564_K_CALLBACK(WRITE8(c128_state, vic_k_w))
+	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c128_state, vic_irq_w))
+	MCFG_MOS8564_K_CALLBACK(WRITE8(*this, c128_state, vic_k_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
@@ -1902,71 +1904,71 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8566_TAG, mos8566_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)*2/4.5/8)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(c128_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(c128_state, sid_poty_r))
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)*2/4.5/8)
+	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c128_state, sid_potx_r))
+	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c128_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	// devices
 	MCFG_DEVICE_ADD(MOS8722_TAG, MOS8722, XTAL(17'734'472)*2/4.5/8)
-	MCFG_MOS8722_Z80EN_CALLBACK(WRITELINE(c128_state, mmu_z80en_w))
-	MCFG_MOS8722_FSDIR_CALLBACK(WRITELINE(c128_state, mmu_fsdir_w))
-	MCFG_MOS8722_GAME_CALLBACK(READLINE(c128_state, mmu_game_r))
-	MCFG_MOS8722_EXROM_CALLBACK(READLINE(c128_state, mmu_exrom_r))
-	MCFG_MOS8722_SENSE40_CALLBACK(READLINE(c128_state, mmu_sense40_r))
+	MCFG_MOS8722_Z80EN_CALLBACK(WRITELINE(*this, c128_state, mmu_z80en_w))
+	MCFG_MOS8722_FSDIR_CALLBACK(WRITELINE(*this, c128_state, mmu_fsdir_w))
+	MCFG_MOS8722_GAME_CALLBACK(READLINE(*this, c128_state, mmu_game_r))
+	MCFG_MOS8722_EXROM_CALLBACK(READLINE(*this, c128_state, mmu_exrom_r))
+	MCFG_MOS8722_SENSE40_CALLBACK(READLINE(*this, c128_state, mmu_sense40_r))
 	MCFG_MOS8721_ADD(MOS8721_TAG)
 	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(17'734'472)*2/4.5/8)
 	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c128_state, cia1_irq_w))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(c128_state, cia1_cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(c128_state, cia1_sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c128_state, cia1_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c128_state, cia1_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia1_pb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia1_irq_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c128_state, cia1_cnt_w))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c128_state, cia1_sp_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia1_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia1_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c128_state, cia1_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia1_pb_w))
 	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(17'734'472)*2/4.5/8)
 	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c128_state, cia2_irq_w))
-	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c128_state, cia2_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c128_state, cia2_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c128_state, cia2_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c128_state, cia2_pb_w))
-	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia2_irq_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia2_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia2_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c128_state, cia2_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia2_pb_w))
+	MCFG_MOS6526_PC_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS8566_TAG, mos8566_device, lp_w))
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS8566_TAG, mos8566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL(17'734'472)*2/4.5/8, c64_expansion_cards, nullptr)
-	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(c128_state, exp_irq_w))
-	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(c128_state, exp_nmi_w))
-	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(c128_state, exp_reset_w))
-	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(c128_state, exp_dma_cd_r))
-	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(c128_state, exp_dma_cd_w))
-	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(c128_state, exp_dma_w))
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, c128_state, exp_irq_w))
+	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(*this, c128_state, exp_nmi_w))
+	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(*this, c128_state, exp_reset_w))
+	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, c128_state, exp_dma_cd_r))
+	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c128_state, exp_dma_cd_w))
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c128_state, exp_dma_w))
 
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(c128_state, exp_reset_w))
-	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_7_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(DEVWRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
-	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(c128_state, write_user_pb0))
-	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(c128_state, write_user_pb1))
-	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(c128_state, write_user_pb2))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(c128_state, write_user_pb3))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(c128_state, write_user_pb4))
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(c128_state, write_user_pb5))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(c128_state, write_user_pb6))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(c128_state, write_user_pb7))
-	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(c128_state, write_user_pa2))
+	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c128_state, exp_reset_w))
+	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c128_state, write_user_pb0))
+	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c128_state, write_user_pb1))
+	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(*this, c128_state, write_user_pb2))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(*this, c128_state, write_user_pb3))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(*this, c128_state, write_user_pb4))
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(*this, c128_state, write_user_pb5))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(*this, c128_state, write_user_pb6))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(*this, c128_state, write_user_pb7))
+	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(*this, c128_state, write_user_pa2))
 
 	MCFG_QUICKLOAD_ADD("quickload", c128_state, cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -2003,8 +2005,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(c128_state::c128pal)
 	pal(config);
 	MCFG_CBM_IEC_ADD("c1571")
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
-	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(*this, c128_state, iec_srq_w))
+	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(*this, c128_state, iec_data_w))
 MACHINE_CONFIG_END
 
 
@@ -2015,8 +2017,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(c128_state::c128dcrp)
 	pal(config);
 	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
-	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
-	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(*this, c128_state, iec_srq_w))
+	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(*this, c128_state, iec_data_w))
 MACHINE_CONFIG_END
 
 
@@ -2201,22 +2203,22 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            COMPANY                        FULLNAME                                 FLAGS
-COMP( 1985, c128,       0,      0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128 (NTSC)",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128p,      0,      0,      c128pal,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128 (PAL)",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128_de,    c128,   0,      c128pal,    c128_de,    c128_state,  0,  "Commodore Business Machines", "Commodore 128 (Germany)",               MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_fr,   c128,  0,   c128pal,  c128_fr, c128_state, 0,  "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_no,   c128,  0,   c128pal,  c128_it, c128_state, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128_se,    c128,   0,      c128pal,    c128_se,    c128_state,  0,  "Commodore Business Machines", "Commodore 128 (Sweden/Finland)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c128d,      c128,   0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D (NTSC, prototype)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c128dp,     c128,   0,      c128pal,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D (PAL)",                  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT        COMPANY                        FULLNAME                               FLAGS
+COMP( 1985, c128,       0,      0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (NTSC)",                MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128p,      0,      0,      c128pal,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (PAL)",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_de,    c128,   0,      c128pal,  c128_de, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Germany)",             MACHINE_SUPPORTS_SAVE )
+//COMP( 1985, c128_fr,    c128,   0,      c128pal,  c128_fr, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
+//COMP( 1985, c128_no,    c128,   0,      c128pal,  c128_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_se,    c128,   0,      c128pal,  c128_se, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Sweden/Finland)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128d,      c128,   0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D (NTSC, prototype)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128dp,     c128,   0,      c128pal,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D (PAL)",                MACHINE_SUPPORTS_SAVE )
 
-COMP( 1986, c128cr,     c128,   0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128cr,     c128,   0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",   MACHINE_SUPPORTS_SAVE )
 
-COMP( 1987, c128dcr,    c128,   0,      c128dcr,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (NTSC)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcrp,   c128,   0,      c128dcrp,   c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (PAL)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_de, c128,   0,      c128dcrp,   c128_de,    c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (Germany)",            MACHINE_SUPPORTS_SAVE )
-//COMP( 1986, c128dcr_it,  c128,  0,   c128dcrp, c128_it, c128_state, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_se, c128,   0,      c128dcrp,   c128_se,    c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr,    c128,   0,      c128dcr,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (NTSC)",             MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcrp,   c128,   0,      c128dcrp, c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (PAL)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_de, c128,   0,      c128dcrp, c128_de, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Germany)",          MACHINE_SUPPORTS_SAVE )
+//COMP( 1986, c128dcr_it, c128,   0,      c128dcrp, c128_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Italy)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_se, c128,   0,      c128dcrp, c128_se, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",   MACHINE_SUPPORTS_SAVE )
 
-COMP( 1986, c128d81,    c128,   0,      c128d81,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128d81,    c128,   0,      c128d81,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)", MACHINE_SUPPORTS_SAVE )

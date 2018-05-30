@@ -63,8 +63,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
 	DECLARE_WRITE16_MEMBER(main_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
 	DECLARE_WRITE_LINE_MEMBER(lnkmode_w);
 	DECLARE_WRITE_LINE_MEMBER(err_w);
 	DECLARE_WRITE_LINE_MEMBER(ack_w);
@@ -117,18 +115,6 @@ WRITE16_MEMBER(tomcat_state::main_latch_w)
 {
 	// A1-A3 = address, A4 = data
 	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
-}
-
-WRITE_LINE_MEMBER(tomcat_state::led1_w)
-{
-	// Low = ON, High = OFF
-	output().set_led_value(1, !state);
-}
-
-WRITE_LINE_MEMBER(tomcat_state::led2_w)
-{
-	// Low = ON, High = OFF
-	output().set_led_value(2, !state);
 }
 
 WRITE_LINE_MEMBER(tomcat_state::lnkmode_w)
@@ -324,18 +310,18 @@ void tomcat_state::machine_start()
 }
 
 MACHINE_CONFIG_START(tomcat_state::tomcat)
-	MCFG_CPU_ADD("maincpu", M68010, 12.096_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(tomcat_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert, 12.096_MHz_XTAL / 16 / 16 / 16 / 12)
+	MCFG_DEVICE_ADD("maincpu", M68010, 12.096_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tomcat_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert, 12.096_MHz_XTAL / 16 / 16 / 16 / 12)
 
-	MCFG_CPU_ADD("dsp", TMS32010, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP( dsp_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(tomcat_state, dsp_BIO_r))
+	MCFG_DEVICE_ADD("dsp", TMS32010, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP( dsp_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, tomcat_state, dsp_BIO_r))
 
-	MCFG_CPU_ADD("soundcpu", M6502, 14.318181_MHz_XTAL / 8 )
+	MCFG_DEVICE_ADD("soundcpu", M6502, 14.318181_MHz_XTAL / 8 )
 	MCFG_DEVICE_DISABLE()
-	MCFG_CPU_PROGRAM_MAP( sound_map)
+	MCFG_DEVICE_PROGRAM_MAP( sound_map)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 12.096_MHz_XTAL / 16)
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY"))
@@ -360,14 +346,14 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tomcat_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tomcat_state, led2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tomcat_state, mres_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tomcat_state, sndres_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tomcat_state, lnkmode_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tomcat_state, err_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(tomcat_state, ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tomcat_state, txbuff_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tomcat_state, mres_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tomcat_state, sndres_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tomcat_state, lnkmode_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tomcat_state, err_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tomcat_state, ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tomcat_state, txbuff_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -386,18 +372,19 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_DEVICE_ADD("avg", AVG_TOMCAT, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(14'318'181) / 8)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(14'318'181) / 8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("tms", TMS5220, 325000)
+	MCFG_DEVICE_ADD("tms", TMS5220, 325000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
@@ -411,4 +398,4 @@ ROM_START( tomcat )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
 
-GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, 0, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, empty_init, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )

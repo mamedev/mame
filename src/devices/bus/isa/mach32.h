@@ -39,7 +39,6 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
 
 	uint16_t m_chip_ID;
 	uint16_t m_membounds;
@@ -198,7 +197,6 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
 };
 
 // main SVGA device

@@ -104,7 +104,7 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
-	DECLARE_DRIVER_INIT(vt240);
+	void init_vt240();
 	virtual void machine_reset() override;
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_draw);
 	void irq_encoder(int irq, int state);
@@ -250,7 +250,7 @@ READ8_MEMBER(vt240_state::i8085_comm_r)
 			return m_i8085_out;
 		case 2:
 			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
-			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_i8085->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_t11 = 1;
 			break;
 	}
@@ -268,7 +268,7 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 			break;
 		case 2:
 			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
-			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_i8085->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_t11 = 1;
 			break;
 	}
@@ -639,7 +639,7 @@ static const gfx_layout vt240_chars_8x10 =
 	8*10
 };
 
-static GFXDECODE_START( vt240 )
+static GFXDECODE_START( gfx_vt240 )
 	GFXDECODE_ENTRY( "charcpu", 0x338*10-3, vt240_chars_8x10, 0, 8 )
 GFXDECODE_END
 
@@ -651,16 +651,16 @@ static INPUT_PORTS_START( vt240 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vt240_state::vt240)
-	MCFG_CPU_ADD("maincpu", T11, XTAL(7'372'800)) // confirm
-	MCFG_CPU_PROGRAM_MAP(vt240_mem)
+	MCFG_DEVICE_ADD("maincpu", T11, XTAL(7'372'800)) // confirm
+	MCFG_DEVICE_PROGRAM_MAP(vt240_mem)
 	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_T11_RESET(WRITELINE(vt240_state, t11_reset_w))
+	MCFG_T11_RESET(WRITELINE(*this, vt240_state, t11_reset_w))
 
-	MCFG_CPU_ADD("charcpu", I8085A, XTAL(16'097'280) / 2)
-	MCFG_CPU_PROGRAM_MAP(vt240_char_mem)
-	MCFG_CPU_IO_MAP(vt240_char_io)
-	MCFG_I8085A_SOD(WRITELINE(vt240_state, i8085_rdy_w))
-	MCFG_I8085A_SID(READLINE(vt240_state, i8085_sid_r))
+	MCFG_DEVICE_ADD("charcpu", I8085A, XTAL(16'097'280) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(vt240_char_mem)
+	MCFG_DEVICE_IO_MAP(vt240_char_io)
+	MCFG_I8085A_SOD(WRITELINE(*this, vt240_state, i8085_rdy_w))
+	MCFG_I8085A_SID(READLINE(*this, vt240_state, i8085_sid_r))
 
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vt240)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(16'097'280) / 16) // actually /8?
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
@@ -683,31 +683,31 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(7'372'800) / 2)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(vt240_state, irq13_w))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(vt240_state, duartout_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, vt240_state, irq13_w))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("host", rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, vt240_state, duartout_w))
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(vt240_state, tx_w))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(vt240_state, lben_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vt240_state, irq9_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vt240_state, irq7_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, vt240_state, tx_w))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, vt240_state, lben_w))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vt240_state, irq9_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vt240_state, irq7_w))
 
 	MCFG_DEVICE_ADD("lk201", LK201, 0)
-	MCFG_LK201_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
+	MCFG_LK201_TX_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 64) // 8251 is set to /64 on the clock input
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vt240_state, write_keyboard_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, vt240_state, write_keyboard_clock))
 
-	MCFG_RS232_PORT_ADD("host", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", scn2681_device, ip5_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("duart", scn2681_device, ip0_w))
+	MCFG_DEVICE_ADD("host", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip5_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("duart", scn2681_device, ip0_w))
 
-	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", scn2681_device, ip1_w))
+	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip1_w))
 
 	MCFG_X2212_ADD("x2212")
 MACHINE_CONFIG_END
@@ -717,16 +717,16 @@ MACHINE_CONFIG_START(vt240_state::mc7105)
 
 	MCFG_DEVICE_REMOVE("lk201")
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
+	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
 
 	MCFG_DEVICE_MODIFY("i8251")
 	MCFG_I8251_TXD_HANDLER(NOOP)
-	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("ms7004", ms7004_device, rx_w))
+	//MCFG_I8251_TXD_HANDLER(WRITELINE("ms7004", ms7004_device, rx_w))
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_REMOVE("keyboard_clock")
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vt240_state, write_keyboard_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, vt240_state, write_keyboard_clock))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -784,8 +784,8 @@ ROM_START( vt240 )
 	ROM_LOAD( "x2212", 0x000, 0x100, CRC(31c90c64) SHA1(21a0f1d4eec1ced04b85923151783bf23d18bfbd) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt240,  0,      0,       vt240,    vt240, vt240_state,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1983, vt241,  0,      0,       vt220,     vt220, vt240_state,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                          FULLNAME  FLAGS */
+COMP( 1983, vt240,  0,      0,      vt240,   vt240, vt240_state, empty_init, "Digital Equipment Corporation", "VT240",  MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1983, vt241,  0,      0,      vt220,   vt220, vt240_state, empty_init, "Digital Equipment Corporation", "VT241",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
-COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, vt240_state,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, mc7105, 0,      0,      mc7105,  vt240, vt240_state, empty_init, "Elektronika",                   "MC7105", MACHINE_IMPERFECT_GRAPHICS )

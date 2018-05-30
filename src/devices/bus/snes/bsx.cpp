@@ -234,9 +234,10 @@ void sns_rom_bsx_device::bsx_base::write(uint32_t offset, uint8_t data)
 }
 
 
-static SLOT_INTERFACE_START(bsx_cart)
-	SLOT_INTERFACE_INTERNAL("bsmempak",  SNS_BSMEMPAK)
-SLOT_INTERFACE_END
+static void bsx_cart(device_slot_interface &device)
+{
+	device.option_add_internal("bsmempak",  SNS_BSMEMPAK);
+}
 
 
 //-------------------------------------------------

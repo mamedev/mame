@@ -113,7 +113,7 @@ public:
 	DECLARE_WRITE32_MEMBER(aa310_psy_wram_w);
 	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
-	DECLARE_DRIVER_INIT(aa310);
+	void init_aa310();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
@@ -168,7 +168,7 @@ WRITE32_MEMBER(aa310_state::aa310_psy_wram_w)
 }
 
 
-DRIVER_INIT_MEMBER(aa310_state, aa310)
+void aa310_state::init_aa310()
 {
 	uint32_t ram_size = m_ram->size();
 
@@ -378,10 +378,11 @@ FLOPPY_FORMATS_MEMBER( aa310_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( aa310_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void aa310_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
 {
@@ -401,13 +402,13 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
 
 MACHINE_CONFIG_START(aa310_state::aa310)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(24'000'000) / 3)        /* ARM2 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(aa310_mem)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(24'000'000) / 3)        /* ARM2 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(aa310_mem)
 	MCFG_ARM_COPRO(VL86C020)
 
 	MCFG_DEVICE_ADD("kart", AAKART, 8000000/256)
-	MCFG_AAKART_OUT_TX_CB(WRITELINE(archimedes_state, a310_kart_tx_w))
-	MCFG_AAKART_OUT_RX_CB(WRITELINE(archimedes_state, a310_kart_rx_w))
+	MCFG_AAKART_OUT_TX_CB(WRITELINE(*this, archimedes_state, a310_kart_tx_w))
+	MCFG_AAKART_OUT_RX_CB(WRITELINE(*this, archimedes_state, a310_kart_rx_w))
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(0x100)
@@ -424,8 +425,8 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 
 	MCFG_WD1772_ADD("fdc", 8000000 / 1) // TODO: frequency
 	MCFG_WD_FDC_DISABLE_MOTOR_CONTROL
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(aa310_state, aa310_wd177x_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(aa310_state, aa310_wd177x_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats) // rarely had 2nd FDD installed, space was used for HDD
@@ -433,24 +434,24 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "archimedes")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Expansion slots - 2-card backplane */
 MACHINE_CONFIG_END
@@ -512,8 +513,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aa310_state::aa540)
 	aa310(config);
-	MCFG_CPU_MODIFY("maincpu") // ARM3
-	MCFG_CPU_CLOCK(XTAL(52'000'000) / 2)
+	MCFG_DEVICE_MODIFY("maincpu") // ARM3
+	MCFG_DEVICE_CLOCK(XTAL(52'000'000) / 2)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -526,8 +527,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aa310_state::aa5000)
 	aa310(config);
-	MCFG_CPU_MODIFY("maincpu") // ARM3
-	MCFG_CPU_CLOCK(XTAL(50'000'000) / 2)
+	MCFG_DEVICE_MODIFY("maincpu") // ARM3
+	MCFG_DEVICE_CLOCK(XTAL(50'000'000) / 2)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -540,8 +541,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aa310_state::aa4)
 	aa5000(config);
-	MCFG_CPU_MODIFY("maincpu") // ARM3
-	MCFG_CPU_CLOCK(XTAL(24'000'000))
+	MCFG_DEVICE_MODIFY("maincpu") // ARM3
+	MCFG_DEVICE_CLOCK(XTAL(24'000'000))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -554,14 +555,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aa310_state::aa5000a)
 	aa5000(config);
-	MCFG_CPU_MODIFY("maincpu") // ARM3
-	MCFG_CPU_CLOCK(33000000)
+	MCFG_DEVICE_MODIFY("maincpu") // ARM3
+	MCFG_DEVICE_CLOCK(33000000)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aa310_state::aa3010)
 	aa310(config);
-	MCFG_CPU_MODIFY("maincpu") // ARM250
-	MCFG_CPU_CLOCK(XTAL(72'000'000) / 6)
+	MCFG_DEVICE_MODIFY("maincpu") // ARM250
+	MCFG_DEVICE_CLOCK(XTAL(72'000'000) / 6)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
@@ -741,18 +742,18 @@ ROM_END
 #define rom_aa3020 rom_aa3010
 #define rom_aa4000 rom_aa3010
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT    COMPANY  FULLNAME             FLAGS */
-COMP( 1987, aa305,   aa310,  0,      aa305,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 305",    MACHINE_NOT_WORKING)
-COMP( 1987, aa310,   0,      0,      aa310,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 310",    MACHINE_NOT_WORKING)
-COMP( 1987, aa440,   aa310,  0,      aa440,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 440",    MACHINE_NOT_WORKING)
-COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310,  aa310_state, aa310,  "Acorn", "BBC A3000",         MACHINE_NOT_WORKING)
-COMP( 1989, aa4101,  aa310,  0,      aa4101,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 410/1",  MACHINE_NOT_WORKING)
-COMP( 1989, aa4201,  aa310,  0,      aa4201,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 420/1",  MACHINE_NOT_WORKING)
-COMP( 1989, aa4401,  aa310,  0,      aa4401,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 440/1",  MACHINE_NOT_WORKING)
-COMP( 1990, aa540,   aa310,  0,      aa540,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 540",    MACHINE_NOT_WORKING)
-COMP( 1991, aa5000,  0,      0,      aa5000,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A5000",       MACHINE_NOT_WORKING)
-COMP( 1992, aa4,     aa5000, 0,      aa4,     aa310,  aa310_state, aa310,  "Acorn", "Acorn A4",          MACHINE_NOT_WORKING)
-COMP( 1992, aa3010,  aa4000, 0,      aa3010,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A3010",       MACHINE_NOT_WORKING)
-COMP( 1992, aa3020,  aa4000, 0,      aa3020,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A3020",       MACHINE_NOT_WORKING)
-COMP( 1992, aa4000,  0,      0,      aa4000,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A4000",       MACHINE_NOT_WORKING)
-COMP( 1993, aa5000a, aa5000, 0,      aa5000a, aa310,  aa310_state, aa310,  "Acorn", "Acorn A5000 Alpha", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME             FLAGS */
+COMP( 1987, aa305,   aa310,  0,      aa305,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 305",    MACHINE_NOT_WORKING)
+COMP( 1987, aa310,   0,      0,      aa310,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 310",    MACHINE_NOT_WORKING)
+COMP( 1987, aa440,   aa310,  0,      aa440,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 440",    MACHINE_NOT_WORKING)
+COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310, aa310_state, init_aa310, "Acorn", "BBC A3000",         MACHINE_NOT_WORKING)
+COMP( 1989, aa4101,  aa310,  0,      aa4101,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 410/1",  MACHINE_NOT_WORKING)
+COMP( 1989, aa4201,  aa310,  0,      aa4201,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 420/1",  MACHINE_NOT_WORKING)
+COMP( 1989, aa4401,  aa310,  0,      aa4401,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 440/1",  MACHINE_NOT_WORKING)
+COMP( 1990, aa540,   aa310,  0,      aa540,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 540",    MACHINE_NOT_WORKING)
+COMP( 1991, aa5000,  0,      0,      aa5000,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A5000",       MACHINE_NOT_WORKING)
+COMP( 1992, aa4,     aa5000, 0,      aa4,     aa310, aa310_state, init_aa310, "Acorn", "Acorn A4",          MACHINE_NOT_WORKING)
+COMP( 1992, aa3010,  aa4000, 0,      aa3010,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A3010",       MACHINE_NOT_WORKING)
+COMP( 1992, aa3020,  aa4000, 0,      aa3020,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A3020",       MACHINE_NOT_WORKING)
+COMP( 1992, aa4000,  0,      0,      aa4000,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A4000",       MACHINE_NOT_WORKING)
+COMP( 1993, aa5000a, aa5000, 0,      aa5000a, aa310, aa310_state, init_aa310, "Acorn", "Acorn A5000 Alpha", MACHINE_NOT_WORKING)

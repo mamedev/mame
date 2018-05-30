@@ -42,7 +42,7 @@ WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		logerror("DMD3: Reset\n");
 	}
 	m_ctrl = data;
@@ -133,8 +133,8 @@ void decodmd_type3_device::decodmd3_map(address_map &map)
 
 MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(decodmd3_map)
+	MCFG_DEVICE_ADD("dmdcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(decodmd3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

@@ -81,7 +81,7 @@ WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
 WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
@@ -817,7 +817,7 @@ static const gfx_layout layout16x16x6 =
 	16*16*6
 };
 
-static GFXDECODE_START( fantland )
+static GFXDECODE_START( gfx_fantland )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16x6, 0, 4 ) // [0] Sprites
 GFXDECODE_END
 
@@ -840,7 +840,7 @@ MACHINE_RESET_MEMBER(fantland_state,fantland)
 WRITE_LINE_MEMBER(fantland_state::fantland_irq)
 {
 	if (state && BIT(m_nmi_enable, 3))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
@@ -851,13 +851,13 @@ INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 MACHINE_CONFIG_START(fantland_state::fantland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)        // ?
-	MCFG_CPU_PROGRAM_MAP(fantland_map)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(fantland_map)
 
-	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
-	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
-	MCFG_CPU_IO_MAP(fantland_sound_iomap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fantland_state, fantland_sound_irq,  8000)
+	MCFG_DEVICE_ADD("audiocpu", I8088, 8000000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(fantland_sound_map)
+	MCFG_DEVICE_IO_MAP(fantland_sound_iomap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fantland_state, fantland_sound_irq,  8000)
 	// NMI when soundlatch is written
 
 	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
@@ -873,24 +873,24 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -902,12 +902,12 @@ WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 MACHINE_CONFIG_START(fantland_state::galaxygn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 8000000)        // ?
-	MCFG_CPU_PROGRAM_MAP(galaxygn_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(galaxygn_map)
 
-	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
-	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
-	MCFG_CPU_IO_MAP(galaxygn_sound_iomap)
+	MCFG_DEVICE_ADD("audiocpu", I8088, 8000000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(fantland_sound_map)
+	MCFG_DEVICE_IO_MAP(galaxygn_sound_iomap)
 	// IRQ by YM2151, NMI when soundlatch is written
 
 	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
@@ -921,19 +921,19 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(fantland_state, galaxygn_sound_irq))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, fantland_state, galaxygn_sound_irq))
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -984,11 +984,11 @@ MACHINE_RESET_MEMBER(fantland_state,borntofi)
 MACHINE_CONFIG_START(fantland_state::borntofi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
-	MCFG_CPU_PROGRAM_MAP(borntofi_map)
+	MCFG_DEVICE_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	MCFG_DEVICE_PROGRAM_MAP(borntofi_map)
 
-	MCFG_CPU_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
-	MCFG_CPU_PROGRAM_MAP(borntofi_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	MCFG_DEVICE_PROGRAM_MAP(borntofi_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fantland_state,borntofi)
 	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,borntofi)
@@ -1001,35 +1001,35 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("msm3", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_2))   /* IRQ handler */
+	MCFG_DEVICE_ADD("msm3", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_2))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("msm4", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_3))   /* IRQ handler */
+	MCFG_DEVICE_ADD("msm4", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_3))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1038,11 +1038,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fantland_state::wheelrun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V20, XTAL(18'000'000)/2)      // D701080C-8 (V20)
-	MCFG_CPU_PROGRAM_MAP(wheelrun_map)
+	MCFG_DEVICE_ADD("maincpu", V20, XTAL(18'000'000)/2)      // D701080C-8 (V20)
+	MCFG_DEVICE_PROGRAM_MAP(wheelrun_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/2)     // Z8400BB1 (Z80B)
-	MCFG_CPU_PROGRAM_MAP(wheelrun_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'000'000)/2)     // Z8400BB1 (Z80B)
+	MCFG_DEVICE_PROGRAM_MAP(wheelrun_sound_map)
 	// IRQ by YM3526, NMI when soundlatch is written
 
 	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
@@ -1056,18 +1056,18 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(14'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(14'000'000)/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1425,8 +1425,8 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, 0, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, 0, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, empty_init, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

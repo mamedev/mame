@@ -70,8 +70,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	DECLARE_DRIVER_INIT(pal);
-	DECLARE_DRIVER_INIT(ntsc);
+	void init_pal();
+	void init_ntsc();
 	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
 
 	// memory
@@ -153,7 +153,7 @@ public:
 //  DECLARE_WRITE_LINE_MEMBER( wd2797_index_callback);
 
 	//required_device<ram_device> m_ramdisk;
-	DECLARE_DRIVER_INIT(brno);
+	void init_brno();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( brno );
 //  DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
 

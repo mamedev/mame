@@ -289,7 +289,7 @@ static const gfx_layout tile_layout =
 	2*8*8
 };
 
-static GFXDECODE_START( tceptor )
+static GFXDECODE_START( gfx_tceptor )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,     0,  256 )
 
 	/* decode in video_start */
@@ -325,21 +325,21 @@ void tceptor_state::machine_reset()
 MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(m6809_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(m6809_map)
 
-	MCFG_CPU_ADD("audiocpu", M65C02, XTAL(49'152'000)/24)
-	MCFG_CPU_PROGRAM_MAP(m6502_a_map)
+	MCFG_DEVICE_ADD("audiocpu", M65C02, XTAL(49'152'000)/24)
+	MCFG_DEVICE_PROGRAM_MAP(m6502_a_map)
 
-	MCFG_CPU_ADD("audio2", M65C02, XTAL(49'152'000)/24)
-	MCFG_CPU_PROGRAM_MAP(m6502_b_map)
+	MCFG_DEVICE_ADD("audio2", M65C02, XTAL(49'152'000)/24)
+	MCFG_DEVICE_PROGRAM_MAP(m6502_b_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(49'152'000)/4)
-	MCFG_CPU_PROGRAM_MAP(m68k_map)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(m68k_map)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_ADC0808_IN3_CB(IOPORT("STICKY"))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tceptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tceptor)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INDIRECT_ENTRIES(1024)
 	MCFG_PALETTE_INIT_OWNER(tceptor_state, tceptor)
@@ -366,25 +366,26 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
 	MCFG_SCREEN_UPDATE_DRIVER(tceptor_state, screen_update_tceptor)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tceptor_state, screen_vblank_tceptor))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tceptor_state, screen_vblank_tceptor))
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.4) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.4) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -502,6 +503,6 @@ ROM_START( tceptor2 )
 ROM_END
 
 
-//   ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      MONITOR   COMPANY   FULLNAME                 FLAGS )
-GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor",        0)
-GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "3-D Thunder Ceptor II", 0, layout_tceptor2)
+//     YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        MONITOR  COMPANY  FULLNAME                 FLAGS )
+GAME(  1986, tceptor,  0,       tceptor, tceptor,  tceptor_state, empty_init, ROT0,    "Namco", "Thunder Ceptor",        0)
+GAMEL( 1986, tceptor2, tceptor, tceptor, tceptor2, tceptor_state, empty_init, ROT0,    "Namco", "3-D Thunder Ceptor II", 0, layout_tceptor2)

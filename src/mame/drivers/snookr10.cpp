@@ -698,13 +698,13 @@ WRITE8_MEMBER(snookr10_state::output_port_0_w)
 	m_bit4 = m_outporth & 1;
 	m_bit5 = (m_outporth >> 1) & 1;
 
-	output().set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
-	output().set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
-	output().set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
-	output().set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
-	output().set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
-	output().set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
-	output().set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
+	m_lamp[0] = m_bit5;   /* Lamp 0 - START  */
+	m_lamp[1] = m_bit2;   /* Lamp 1 - CANCEL */
+	m_lamp[2] = m_bit0;   /* Lamp 2 - STOP1  */
+	m_lamp[3] = m_bit1;   /* Lamp 3 - STOP2  */
+	m_lamp[4] = m_bit0;   /* Lamp 4 - STOP3  */
+	m_lamp[5] = m_bit3;   /* Lamp 5 - STOP4  */
+	m_lamp[6] = m_bit4;   /* Lamp 6 - STOP5  */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Coin in */
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Key in */
@@ -739,13 +739,13 @@ WRITE8_MEMBER(snookr10_state::output_port_1_w)
 	m_bit4 = data & 1;
 	m_bit5 = (data >> 1) & 1;
 
-	output().set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
-	output().set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
-	output().set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
-	output().set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
-	output().set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
-	output().set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
-	output().set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
+	m_lamp[0] = m_bit5;   /* Lamp 0 - START  */
+	m_lamp[1] = m_bit2;   /* Lamp 1 - CANCEL */
+	m_lamp[2] = m_bit0;   /* Lamp 2 - STOP1  */
+	m_lamp[3] = m_bit1;   /* Lamp 3 - STOP2  */
+	m_lamp[4] = m_bit0;   /* Lamp 4 - STOP3  */
+	m_lamp[5] = m_bit3;   /* Lamp 5 - STOP4  */
+	m_lamp[6] = m_bit4;   /* Lamp 6 - STOP5  */
 }
 
 
@@ -1031,7 +1031,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( snookr10 )
+static GFXDECODE_START( gfx_snookr10 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -1043,8 +1043,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(snookr10_state::snookr10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
-	MCFG_CPU_PROGRAM_MAP(snookr10_map)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
+	MCFG_DEVICE_PROGRAM_MAP(snookr10_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1059,13 +1059,13 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snookr10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_snookr10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, snookr10)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
 MACHINE_CONFIG_END
@@ -1074,7 +1074,7 @@ MACHINE_CONFIG_START(snookr10_state::apple10)
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1087,8 +1087,8 @@ MACHINE_CONFIG_START(snookr10_state::tenballs)
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tenballs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tenballs_map)
 
 MACHINE_CONFIG_END
 
@@ -1096,8 +1096,8 @@ MACHINE_CONFIG_START(snookr10_state::crystalc)
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crystalc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crystalc_map)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, crystalc)
@@ -1226,9 +1226,9 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT */
-GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
-GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
-GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
-GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
-GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT */
+GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, empty_init, ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
+GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, empty_init, ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
+GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, empty_init, ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
+GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
+GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )

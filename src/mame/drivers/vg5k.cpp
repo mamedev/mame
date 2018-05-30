@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
-	DECLARE_DRIVER_INIT(vg5k);
+	void init_vg5k();
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
@@ -336,20 +336,20 @@ static const gfx_layout vg5k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vg5k )
+static GFXDECODE_START( gfx_vg5k )
 	GFXDECODE_ENTRY( "ef9345", 0x2000, vg5k_charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(vg5k_state,vg5k)
+void vg5k_state::init_vg5k()
 {
 	uint8_t *FNT = memregion("ef9345")->base();
-	uint16_t a,b,c,d,dest=0x2000;
+	uint16_t dest = 0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
-	for (a = 0; a < 8192; a+=4096)
-		for (b = 0; b < 2048; b+=64)
-			for (c = 0; c < 4; c++)
-				for (d = 0; d < 64; d+=4)
+	for (uint16_t a = 0; a < 8192; a+=4096)
+		for (uint16_t b = 0; b < 2048; b+=64)
+			for (uint16_t c = 0; c < 4; c++)
+				for (uint16_t d = 0; d < 64; d+=4)
 					FNT[dest++]=FNT[a|b|c|d];
 
 
@@ -366,9 +366,9 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 MACHINE_CONFIG_START(vg5k_state::vg5k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(vg5k_mem)
-	MCFG_CPU_IO_MAP(vg5k_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vg5k_mem)
+	MCFG_DEVICE_IO_MAP(vg5k_io)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vg5k_scanline", vg5k_state, vg5k_scanline, "screen", 0, 10)
 
@@ -385,18 +385,17 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vg5k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vg5k)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cassette */
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(0, "speaker", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vg5k_cassette_formats)
@@ -428,5 +427,5 @@ ROM_START( vg5k )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY     FULLNAME   FLAGS
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  vg5k_state,  vg5k, "Philips",  "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME   FLAGS
+COMP( 1984, vg5k, 0,      0,      vg5k,    vg5k,  vg5k_state, init_vg5k, "Philips", "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

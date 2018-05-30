@@ -700,10 +700,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 {
 	COMBINE_DATA(&m_leds[0]);
 
-	output().set_led_value(0, data & 0x8000);
-	output().set_led_value(1, data & 0x4000);
-	output().set_led_value(2, data & 0x1000);    // square button
-	output().set_led_value(3, data & 0x0800);    // round  button
+	m_led[0] = BIT(data, 15);
+	m_led[1] = BIT(data, 14);
+	m_led[2] = BIT(data, 12);    // square button
+	m_led[3] = BIT(data, 11);    // round  button
 //  machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);   // coin lockouts?
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
 
@@ -711,10 +711,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 //  machine().bookkeeping().coin_counter_w(1, data & 0x0020);
 	machine().bookkeeping().coin_counter_w(0, data & 0x0010);
 
-	output().set_led_value(5, data & 0x0008);
-	output().set_led_value(6, data & 0x0004);
-	output().set_led_value(7, data & 0x0002);
-	output().set_led_value(8, data & 0x0001);
+	m_led[5] = BIT(data, 3);
+	m_led[6] = BIT(data, 2);
+	m_led[7] = BIT(data, 1);
+	m_led[8] = BIT(data, 0);
 
 	show_leds();
 }
@@ -907,17 +907,17 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 
-		output().set_led_value(0, data & 0x0010);
-		output().set_led_value(1, data & 0x0020);
-		output().set_led_value(2, data & 0x0040);
-		output().set_led_value(3, data & 0x0080);
+		m_led[0] = BIT(data, 4);
+		m_led[1] = BIT(data, 5);
+		m_led[2] = BIT(data, 6);
+		m_led[3] = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(4, data & 0x0100);
-		output().set_led_value(5, data & 0x0200);
-		output().set_led_value(6, data & 0x0400);    // not tested in service mode
-		output().set_led_value(7, data & 0x0800);    // not tested in service mode
+		m_led[4] = BIT(data, 8);
+		m_led[5] = BIT(data, 9);
+		m_led[6] = BIT(data, 10);    // not tested in service mode
+		m_led[7] = BIT(data, 11);    // not tested in service mode
 
 		m_oki[0]->set_rom_bank((data & 0x8000) >> 15);
 	}
@@ -1133,14 +1133,14 @@ WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0,    data & 0x0001); // suru
-		output().set_led_value(1,    data & 0x0002); // shinai
-		output().set_led_value(2,    data & 0x0004); // payout
-		output().set_led_value(3,    data & 0x0008); // go
-		output().set_led_value(4,    data & 0x0010); // 1 bet
-		output().set_led_value(5,    data & 0x0020); // medal
-		m_hopper    =                   data & 0x0040;  // hopper
-		output().set_led_value(6,    data & 0x0080); // 3 bet
+		m_led[0] = BIT(data, 0); // suru
+		m_led[1] = BIT(data, 1); // shinai
+		m_led[2] = BIT(data, 2); // payout
+		m_led[3] = BIT(data, 3); // go
+		m_led[4] = BIT(data, 4); // 1 bet
+		m_led[5] = BIT(data, 5); // medal
+		m_hopper = BIT(data, 6);  // hopper
+		m_led[6] = BIT(data, 7); // 3 bet
 	}
 
 //  popmessage("led %04X", data);
@@ -1179,13 +1179,13 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_led_value(0,    data & 0x0001); // pac-man
-		output().set_led_value(1,    data & 0x0002); // ms. pac-man
-		output().set_led_value(2,    data & 0x0004); // payout
-		output().set_led_value(3,    data & 0x0008); // start
-		output().set_led_value(4,    data & 0x0010); // bet
-		output().set_led_value(5,    data & 0x0020); // medal
-		m_hopper    =                   data & 0x0040;  // hopper
+		m_led[0] = data & 0x0001; // pac-man
+		m_led[1] = data & 0x0002; // ms. pac-man
+		m_led[2] = data & 0x0004; // payout
+		m_led[3] = data & 0x0008; // start
+		m_led[4] = data & 0x0010; // bet
+		m_led[5] = data & 0x0020; // medal
+		m_hopper = data & 0x0040;  // hopper
 	}
 
 //  popmessage("led %04X", data);
@@ -1910,7 +1910,7 @@ static const gfx_layout layout_sprites =
                                 Dangun Feveron
 ***************************************************************************/
 
-static GFXDECODE_START( dfeveron )
+static GFXDECODE_START( gfx_dfeveron )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1925,7 +1925,7 @@ GFXDECODE_END
                                 Dodonpachi
 ***************************************************************************/
 
-static GFXDECODE_START( ddonpach )
+static GFXDECODE_START( gfx_ddonpach )
 	/* Layers 01 are 4 bit deep and use the first 16 of every 256
 	   colors for any given color code (a palette_init function
 	   is provided for these layers, filling the 8000-83ff entries
@@ -1942,7 +1942,7 @@ GFXDECODE_END
                                 Donpachi
 ***************************************************************************/
 
-static GFXDECODE_START( donpachi )
+static GFXDECODE_START( gfx_donpachi )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1958,7 +1958,7 @@ GFXDECODE_END
                                 Esprade
 ***************************************************************************/
 
-static GFXDECODE_START( esprade )
+static GFXDECODE_START( gfx_esprade )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x8, 0x4000, 0x40 ) // [1] Layer 1
@@ -1969,7 +1969,7 @@ GFXDECODE_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static GFXDECODE_START( hotdogst )
+static GFXDECODE_START( gfx_hotdogst )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1985,7 +1985,7 @@ GFXDECODE_END
                                 Koro Koro Quest
 ***************************************************************************/
 
-static GFXDECODE_START( korokoro )
+static GFXDECODE_START( gfx_korokoro )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4400, 0x40 ) // [0] Layer 0
 GFXDECODE_END
@@ -1994,7 +1994,7 @@ GFXDECODE_END
                                 Mazinger Z
 ***************************************************************************/
 
-static GFXDECODE_START( mazinger )
+static GFXDECODE_START( gfx_mazinger )
 	/*  Sprites are 4 bit deep.
 	    Layer 0 is 4 bit deep.
 	    Layer 1 uses 64 color palettes, but the game only fills the
@@ -2012,7 +2012,7 @@ GFXDECODE_END
                                Poka Poka Satan
 ***************************************************************************/
 
-static GFXDECODE_START( ppsatan )
+static GFXDECODE_START( gfx_ppsatan )
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x4000, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x4000, 0x40 ) // [2] Layer 2
@@ -2022,7 +2022,7 @@ GFXDECODE_END
                                 Power Instinct 2
 ***************************************************************************/
 
-static GFXDECODE_START( pwrinst2 )
+static GFXDECODE_START( gfx_pwrinst2 )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0800+0x8000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x1000+0x8000, 0x40 ) // [1] Layer 1
@@ -2035,7 +2035,7 @@ GFXDECODE_END
                                 Sailor Moon
 ***************************************************************************/
 
-static GFXDECODE_START( sailormn )
+static GFXDECODE_START( gfx_sailormn )
 	/* 4 bit sprites ? */
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4,   0x4400, 0x40 ) // [0] Layer 0
@@ -2048,7 +2048,7 @@ GFXDECODE_END
                                 Uo Poko
 ***************************************************************************/
 
-static GFXDECODE_START( uopoko )
+static GFXDECODE_START( gfx_uopoko )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 GFXDECODE_END
@@ -2062,8 +2062,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(cave_state,cave)
+void cave_state::machine_start()
 {
+	m_led.resolve();
 	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::cave_vblank_end), this));
 
 	save_item(NAME(m_soundbuf_wptr));
@@ -2097,11 +2098,10 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 MACHINE_CONFIG_START(cave_state::dfeveron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(dfeveron_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(dfeveron_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2115,17 +2115,17 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfeveron)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfeveron)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2138,11 +2138,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::ddonpach)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(ddonpach_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(ddonpach_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2156,17 +2155,17 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddonpach)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddonpach)
 	MCFG_PALETTE_ADD("palette", 0x8000 + 0x40*16)   // $400 extra entries for layers 1&2
 	MCFG_PALETTE_INIT_OWNER(cave_state,ddonpach)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2178,11 +2177,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::donpachi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(donpachi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(donpachi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2196,19 +2194,19 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", donpachi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 4.224_MHz_XTAL/4, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4.224_MHz_XTAL/4, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.60)
 
-	MCFG_OKIM6295_ADD("oki2", 4.224_MHz_XTAL/2, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -2225,11 +2223,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::esprade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(esprade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(esprade_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2243,17 +2240,17 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2265,11 +2262,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::gaia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(gaia_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(gaia_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2284,17 +2280,17 @@ MACHINE_CONFIG_START(cave_state::gaia)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2306,11 +2302,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::guwange)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(guwange_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(guwange_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2324,17 +2319,17 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2345,15 +2340,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::hotdogst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(hotdogst_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(hotdogst_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32_MHz_XTAL/8)
-	MCFG_CPU_PROGRAM_MAP(hotdogst_sound_map)
-	MCFG_CPU_IO_MAP(hotdogst_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL/8)
+	MCFG_DEVICE_PROGRAM_MAP(hotdogst_sound_map)
+	MCFG_DEVICE_IO_MAP(hotdogst_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2367,26 +2361,26 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotdogst)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotdogst)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 32_MHz_XTAL/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 32_MHz_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL/16, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -2399,11 +2393,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::korokoro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(korokoro_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(korokoro_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -2417,24 +2410,24 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", korokoro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korokoro)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,korokoro)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::crusherm)
 	korokoro(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crusherm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
 
 
@@ -2445,18 +2438,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::mazinger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mazinger_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mazinger_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4_MHz_XTAL) // Bidirectional communication
-	MCFG_CPU_PROGRAM_MAP(mazinger_sound_map)
-	MCFG_CPU_IO_MAP(mazinger_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4_MHz_XTAL) // Bidirectional communication
+	MCFG_DEVICE_PROGRAM_MAP(mazinger_sound_map)
+	MCFG_DEVICE_IO_MAP(mazinger_sound_portmap)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2470,26 +2462,26 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mazinger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mazinger)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,mazinger)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4_MHz_XTAL)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4_MHz_XTAL)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki1", 1.056_MHz_XTAL, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -2502,18 +2494,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::metmqstr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(metmqstr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(metmqstr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(metmqstr_sound_map)
-	MCFG_CPU_IO_MAP(metmqstr_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(metmqstr_sound_map)
+	MCFG_DEVICE_IO_MAP(metmqstr_sound_portmap)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)    /* start with the watchdog armed */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2527,27 +2518,27 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", donpachi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL / 16 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_OKIM6295_ADD("oki2", 32_MHz_XTAL / 16 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
@@ -2562,14 +2553,13 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(pacslot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pacslot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2585,29 +2575,30 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 chip is present but its rom socket is unpopulated
-	MCFG_OKIM6295_ADD("oki2", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::paceight)
 	pacslot(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(paceight_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(paceight_map)
 MACHINE_CONFIG_END
 /***************************************************************************
                                Poka Poka Satan
@@ -2621,14 +2612,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 MACHINE_CONFIG_START(cave_state::ppsatan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(ppsatan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(ppsatan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2659,7 +2649,7 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_right)
 	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, cave_vblank_start_right)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppsatan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppsatan)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,ppsatan)
 	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
@@ -2667,9 +2657,10 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 1.056_MHz_XTAL, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
 MACHINE_CONFIG_END
@@ -2684,15 +2675,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::pwrinst2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(pwrinst2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)    /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(pwrinst2_sound_map)
-	MCFG_CPU_IO_MAP(pwrinst2_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)    /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_sound_map)
+	MCFG_DEVICE_IO_MAP(pwrinst2_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2706,29 +2696,29 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pwrinst2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pwrinst2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0x2800)
 	MCFG_PALETTE_INIT_OWNER(cave_state,pwrinst2)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_4_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 3_MHz_XTAL, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki2", 3_MHz_XTAL, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -2743,7 +2733,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(cave_state,sailormn)
@@ -2756,20 +2746,19 @@ MACHINE_RESET_MEMBER(cave_state,sailormn)
 MACHINE_CONFIG_START(cave_state::sailormn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(sailormn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(sailormn_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
 	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
-	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
-	MCFG_CPU_IO_MAP(sailormn_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
+	MCFG_DEVICE_PROGRAM_MAP(sailormn_sound_map)
+	MCFG_DEVICE_IO_MAP(sailormn_sound_portmap)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2783,27 +2772,27 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sailormn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sailormn)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,sailormn) // 4 bit sprites, 6 bit tiles
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,sailormn_3_layers) /* Layer 2 has 1 banked ROM */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 
@@ -2820,14 +2809,13 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(tekkencw_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tekkencw_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2843,16 +2831,17 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -2861,8 +2850,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::tekkenbs)
 	tekkencw(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END
 
 
@@ -2875,14 +2864,13 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(tjumpman_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tjumpman_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2898,16 +2886,17 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -2922,11 +2911,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::uopoko)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(uopoko_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(uopoko_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2939,17 +2927,17 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -5170,7 +5158,7 @@ void cave_state::init_oki_bank(int chip)
 }
 
 
-DRIVER_INIT_MEMBER(cave_state,agallet)
+void cave_state::init_agallet()
 {
 	init_cave();
 
@@ -5183,7 +5171,7 @@ DRIVER_INIT_MEMBER(cave_state,agallet)
 	unpack_sprites(0);
 }
 
-DRIVER_INIT_MEMBER(cave_state,dfeveron)
+void cave_state::init_dfeveron()
 {
 	init_cave();
 
@@ -5191,7 +5179,7 @@ DRIVER_INIT_MEMBER(cave_state,dfeveron)
 	m_kludge = 2;
 }
 
-DRIVER_INIT_MEMBER(cave_state,feversos)
+void cave_state::init_feversos()
 {
 	init_cave();
 
@@ -5199,7 +5187,7 @@ DRIVER_INIT_MEMBER(cave_state,feversos)
 	m_kludge = 2;
 }
 
-DRIVER_INIT_MEMBER(cave_state,ddonpach)
+void cave_state::init_ddonpach()
 {
 	init_cave();
 
@@ -5208,7 +5196,7 @@ DRIVER_INIT_MEMBER(cave_state,ddonpach)
 	m_time_vblank_irq = 90;
 }
 
-DRIVER_INIT_MEMBER(cave_state,donpachi)
+void cave_state::init_donpachi()
 {
 	init_cave();
 
@@ -5218,7 +5206,7 @@ DRIVER_INIT_MEMBER(cave_state,donpachi)
 }
 
 
-DRIVER_INIT_MEMBER(cave_state,esprade)
+void cave_state::init_esprade()
 {
 	init_cave();
 
@@ -5233,7 +5221,7 @@ DRIVER_INIT_MEMBER(cave_state,esprade)
 #endif
 }
 
-DRIVER_INIT_MEMBER(cave_state,gaia)
+void cave_state::init_gaia()
 {
 	init_cave();
 
@@ -5244,7 +5232,7 @@ DRIVER_INIT_MEMBER(cave_state,gaia)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,guwange)
+void cave_state::init_guwange()
 {
 	init_cave();
 
@@ -5252,7 +5240,7 @@ DRIVER_INIT_MEMBER(cave_state,guwange)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,hotdogst)
+void cave_state::init_hotdogst()
 {
 	init_cave();
 
@@ -5264,7 +5252,7 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,mazinger)
+void cave_state::init_mazinger()
 {
 	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
@@ -5277,8 +5265,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	/* decrypt sprites */
 	std::vector<uint8_t> buffer(len);
 	{
-		int i;
-		for (i = 0; i < len; i++)
+		for (int i = 0; i < len; i++)
 			buffer[i ^ 0xdf88] = src[bitswap<24>(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
@@ -5289,7 +5276,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	m_time_vblank_irq = 2100;
 }
 
-DRIVER_INIT_MEMBER(cave_state,metmqstr)
+void cave_state::init_metmqstr()
 {
 	init_cave();
 
@@ -5303,7 +5290,7 @@ DRIVER_INIT_MEMBER(cave_state,metmqstr)
 	m_time_vblank_irq = 17376;
 }
 
-DRIVER_INIT_MEMBER(cave_state,ppsatan)
+void cave_state::init_ppsatan()
 {
 	init_cave();
 
@@ -5318,11 +5305,10 @@ DRIVER_INIT_MEMBER(cave_state,ppsatan)
 	save_item(NAME(m_ppsatan_io_mux));
 }
 
-DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
+void cave_state::init_pwrinst2j()
 {
 	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
-	int i, j;
 
 	init_cave();
 
@@ -5330,9 +5316,9 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	std::vector<uint8_t> buffer(len);
 	{
-		for(i = 0; i < len/2; i++)
+		for(int i = 0; i < len/2; i++)
 		{
-			j = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
+			int j = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
 			if(((j & 6) == 0) || ((j & 6) == 6))
 				j ^= 6;
 			buffer[j ^ 7] = (src[i] >> 4) | (src[i] << 4);
@@ -5347,11 +5333,11 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,pwrinst2)
+void cave_state::init_pwrinst2()
 {
 	/* this patch fixes on of the moves, why is it needed? is the rom bad or is there another
 	   problem? does the Japan set need it or not? */
-	DRIVER_INIT_CALL(pwrinst2j);
+	init_pwrinst2j();
 
 #if 1       //ROM PATCH
 	{
@@ -5362,7 +5348,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 }
 
-DRIVER_INIT_MEMBER(cave_state,sailormn)
+void cave_state::init_sailormn()
 {
 	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
@@ -5376,8 +5362,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	/* decrypt sprites */
 	std::vector<uint8_t> buffer(len);
 	{
-		int i;
-		for (i = 0; i < len; i++)
+		for (int i = 0; i < len; i++)
 			buffer[i ^ 0x950c4] = src[bitswap<24>(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
@@ -5393,7 +5378,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	save_item(NAME(m_sailormn_tilebank));
 }
 
-DRIVER_INIT_MEMBER(cave_state,tjumpman)
+void cave_state::init_tjumpman()
 {
 	init_cave();
 
@@ -5406,7 +5391,7 @@ DRIVER_INIT_MEMBER(cave_state,tjumpman)
 	save_item(NAME(m_hopper));
 }
 
-DRIVER_INIT_MEMBER(cave_state,uopoko)
+void cave_state::init_uopoko()
 {
 	init_cave();
 
@@ -5415,7 +5400,7 @@ DRIVER_INIT_MEMBER(cave_state,uopoko)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,korokoro)
+void cave_state::init_korokoro()
 {
 	init_cave();
 
@@ -5439,94 +5424,94 @@ DRIVER_INIT_MEMBER(cave_state,korokoro)
 
 ***************************************************************************/
 
-GAME( 1994, pwrinst2,    0,        pwrinst2, metmqstr, cave_state, pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pwrinst2j,   pwrinst2, pwrinst2, metmqstr, cave_state, pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)", MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1994, mazinger,    0,        mazinger, cave,     cave_state, mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mazingerj,   mazinger, mazinger, cave,     cave_state, mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mazinger,   0,        mazinger, cave,     cave_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mazingerj,  mazinger, mazinger, cave,     cave_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, donpachi,    0,        donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachij,   donpachi, donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachikr,  donpachi, donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachihk,  donpachi, donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachi,   0,        donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachij,  donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachikr, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachihk, donpachi, donpachi, cave,     cave_state, init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, metmqstr,    0,        metmqstr, metmqstr, cave_state, metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, nmaster,     metmqstr, metmqstr, metmqstr, cave_state, metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, cave_state, init_metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, cave_state, init_metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, plegends,    0,        pwrinst2, metmqstr, cave_state, pwrinst2j, ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, plegendsj,   plegends, pwrinst2, metmqstr, cave_state, pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95/06/20)", MACHINE_SUPPORTS_SAVE )
-
-// The EEPROM determines the region, program roms are the same between sets
-GAME( 1995, sailormn,    0,        sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnu,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnj,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnk,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnt,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnh,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnn,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnu,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnj,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnk,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnt,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnnh,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormno,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Europe)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnou,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, USA)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoj,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnok,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Korea)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnot,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Taiwan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoh,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95/06/20)", MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1996, agallet,     0,        sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletu,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (USA)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletj,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (Japan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletk,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agallett,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Taiwan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalleth,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormn,   0,        sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnu,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnj,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnk,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnt,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnh,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnn,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnu, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnj, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnk, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnt, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnnh, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormno,  sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Europe)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnou, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, USA)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoj, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnok, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnot, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Taiwan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoh, sailormn, sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/21, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+
+// The EEPROM determines the region, program roms are the same between sets
+GAME( 1996, agallet,    0,        sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletu,   agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (USA)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletj,   agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletk,   agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agallett,   agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalleth,   agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Hong Kong)", MACHINE_SUPPORTS_SAVE )
 // this set appears to be older, there is some kind of reset circuit / watchdog circuit check on startup, the same check exists in the above set but the code skips over it so presumably it was removed
 // to avoid boards simply hanging on a black screen if the circuit didn't fire.
-GAME( 1996, agalleta,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletau,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, USA)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletaj,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (older, Japan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletak,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletat,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Taiwan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletah,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalleta,   agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletau,  agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, USA)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletaj,  agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (older, Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletak,  agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletat,  agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletah,  agallet,  sailormn, cave,     cave_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, hotdogst,    0,        hotdogst, cave,     cave_state, hotdogst,  ROT90,  "Marble (Ace International license)",     "Hotdog Storm (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, hotdogst,   0,        hotdogst, cave,     cave_state, init_hotdogst,  ROT90,  "Marble (Ace International license)",     "Hotdog Storm (Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paceight,    0,        paceight, paceight, cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Eight", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pacslot,    0,        pacslot,  pacslot,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paceight,   0,        paceight, paceight, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Eight", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, ppsatan,     0,        ppsatan,  ppsatan,  cave_state, ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan,  cave_state, init_ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, tekkencw,    0,        tekkencw, tekkencw, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Card World",     MACHINE_SUPPORTS_SAVE )
-GAME( 1998, tekkenbs,    0,        tekkenbs, tekkenbs, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Battle Scratch", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tekkencw,   0,        tekkencw, tekkencw, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Tekken Card World",     MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tekkenbs,   0,        tekkenbs, tekkenbs, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Tekken Battle Scratch", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, ddonpach,    0,        ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, ddonpachj,   ddonpach, ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ddonpach,   0,        ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )
 // NOT an official CAVE release, but several PCBs have been converted to it and used on location.
-GAME( 2012, ddonpacha,   ddonpach, ddonpach, cave,     cave_state, ddonpach,  ROT270, "hack (trap15)",                          "DoDonPachi (2012/02/12 Arrange Ver. 1.1) (hack)",  MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ddonpacha,  ddonpach, ddonpach, cave,     cave_state, init_ddonpach,  ROT270, "hack (trap15)",                          "DoDonPachi (2012/02/12 Arrange Ver. 1.1) (hack)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, dfeveron,    feversos, dfeveron, cave,     cave_state, dfeveron,  ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1998, feversos,    0,        dfeveron, cave,     cave_state, feversos,  ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, dfeveron,   feversos, dfeveron, cave,     cave_state, init_dfeveron,  ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1998, feversos,   0,        dfeveron, cave,     cave_state, init_feversos,  ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, esprade,     0,        esprade,  cave,     cave_state, esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, espradej,    esprade,  esprade,  cave,     cave_state, esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1998, espradejo,   esprade,  esprade,  cave,     cave_state, esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998, esprade,    0,        esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, espradej,   esprade,  esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998, espradejo,  esprade,  esprade,  cave,     cave_state, init_esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, uopoko,      0,        uopoko,   cave,     cave_state, uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, uopokoj,     uopoko,   uopoko,   cave,     cave_state, uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998, uopoko,     0,        uopoko,   cave,     cave_state, init_uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     cave_state, init_uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, guwange,     0,        guwange,  guwange,  cave_state, guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1999, guwanges,    guwange,  guwange,  guwange,  cave_state, guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Special Ver. 00/07/07)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, guwange,    0,        guwange,  guwange,  cave_state, init_guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1999, guwanges,   guwange,  guwange,  guwange,  cave_state, init_guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Special Ver. 00/07/07)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, gaia,        0,        gaia,     gaia,     cave_state, gaia,      ROT0,   "Noise Factory",                          "Gaia Crusaders", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 1999, gaia,       0,        gaia,     gaia,     cave_state, init_gaia,      ROT0,   "Noise Factory",                          "Gaia Crusaders", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 1999, korokoro,    0,        korokoro, korokoro, cave_state, korokoro,  ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, korokoro,   0,        korokoro, korokoro, cave_state, init_korokoro,  ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, crusherm,    0,        crusherm, korokoro, cave_state, korokoro,  ROT0,   "Takumi",                                 "Crusher Makochan (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, crusherm,   0,        crusherm, korokoro, cave_state, init_korokoro,  ROT0,   "Takumi",                                 "Crusher Makochan (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, tjumpman,    0,        tjumpman, tjumpman, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, theroes,     0,        gaia,     theroes,  cave_state, gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 2001, theroes,    0,        gaia,     theroes,  cave_state, init_gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally

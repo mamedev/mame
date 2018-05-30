@@ -23,23 +23,6 @@ class segas32_state : public device_t
 public:
 	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_shared_ptr<uint8_t> m_z80_shared_ram;
-	optional_shared_ptr<uint16_t> m_system32_workram;
-	required_shared_ptr<uint16_t> m_system32_videoram;
-	required_shared_ptr<uint16_t> m_system32_spriteram;
-	optional_shared_ptr_array<uint16_t, 2> m_system32_paletteram;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	optional_device<multipcm_device> m_multipcm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	required_device<timer_device> m_irq_timer_0;
-	required_device<timer_device> m_irq_timer_1;
-	optional_device<s32comm_device> m_s32comm;
-
 	typedef void (segas32_state::*sys32_output_callback)(int which, uint16_t data);
 
 	struct layer_info
@@ -63,34 +46,6 @@ public:
 		uint8_t                   bank;
 	};
 
-	uint8_t m_v60_irq_control[0x10];
-	timer_device *m_v60_irq_timer[2];
-	uint8_t m_sound_irq_control[4];
-	uint8_t m_sound_irq_input;
-	uint8_t m_sound_dummy_value;
-	uint16_t m_sound_bank;
-	sys32_output_callback m_sw1_output;
-	sys32_output_callback m_sw2_output;
-	sys32_output_callback m_sw3_output;
-	std::unique_ptr<uint16_t[]> m_system32_protram;
-	uint16_t m_system32_displayenable[2];
-	uint16_t m_system32_tilebank_external;
-	uint16_t m_arescue_dsp_io[6];
-	uint8_t m_is_multi32;
-	struct cache_entry *m_cache_head;
-	struct layer_info m_layer_data[11];
-	uint16_t m_mixer_control[2][0x40];
-	std::unique_ptr<uint16_t[]> m_solid_0000;
-	std::unique_ptr<uint16_t[]> m_solid_ffff;
-	uint8_t m_sprite_render_count;
-	uint8_t m_sprite_control_latched[8];
-	uint8_t m_sprite_control[8];
-	std::unique_ptr<uint32_t[]> m_spriteram_32bit;
-	typedef void (segas32_state::*prot_vblank_func)();
-	prot_vblank_func m_system32_prot_vblank;
-	int m_print_count;
-	emu_timer *m_vblank_end_int_timer;
-	emu_timer *m_update_sprites_timer;
 	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
 	DECLARE_READ16_MEMBER(brival_protection_r);
 	DECLARE_WRITE16_MEMBER(brival_protection_w);
@@ -174,7 +129,6 @@ public:
 	void signal_v60_irq(int which);
 	void update_sound_irq_state();
 	void segas32_common_init();
-	void multi32_common_init();
 	void radm_sw1_output( int which, uint16_t data );
 	void radm_sw2_output( int which, uint16_t data );
 	void radr_sw2_output( int which, uint16_t data );
@@ -203,6 +157,7 @@ public:
 	void clear_sound_irq(int which);
 	void darkedge_fd1149_vblank();
 	void f1lap_fd1149_vblank();
+	cpu_device* maincpu() { return m_maincpu; }
 
 	void init_alien3(void);
 	void init_arescue(int m_hasdsp);
@@ -234,6 +189,7 @@ public:
 	void multi32_sound_map(address_map &map);
 	void multi32_sound_portmap(address_map &map);
 	void multipcm_map(address_map &map);
+	void rf5c68_map(address_map &map);
 	void system32_4player_map(address_map &map);
 	void system32_analog_map(address_map &map);
 	void system32_cd_map(address_map &map);
@@ -249,6 +205,58 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	required_shared_ptr<uint8_t> m_z80_shared_ram;
+	optional_shared_ptr<uint16_t> m_system32_workram;
+	required_shared_ptr<uint16_t> m_system32_videoram;
+	required_shared_ptr<uint16_t> m_system32_spriteram;
+	optional_shared_ptr_array<uint16_t, 2> m_system32_paletteram;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	optional_device<multipcm_device> m_multipcm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_device<timer_device> m_irq_timer_0;
+	required_device<timer_device> m_irq_timer_1;
+	optional_device<s32comm_device> m_s32comm;
+
+	required_region_ptr<uint32_t> m_sprite_region;
+	required_memory_region m_maincpu_region;
+	required_memory_bank m_soundrom_bank;
+	optional_memory_bank m_multipcm_bank_hi;
+	optional_memory_bank m_multipcm_bank_lo;
+
+	uint8_t m_v60_irq_control[0x10];
+	timer_device *m_v60_irq_timer[2];
+	uint8_t m_sound_irq_control[4];
+	uint8_t m_sound_irq_input;
+	uint8_t m_sound_dummy_value;
+	uint16_t m_sound_bank;
+	sys32_output_callback m_sw1_output;
+	sys32_output_callback m_sw2_output;
+	sys32_output_callback m_sw3_output;
+	std::unique_ptr<uint16_t[]> m_system32_protram;
+	uint16_t m_system32_displayenable[2];
+	uint16_t m_system32_tilebank_external;
+	uint16_t m_arescue_dsp_io[6];
+	uint8_t m_is_multi32;
+	struct cache_entry *m_cache_head;
+	struct layer_info m_layer_data[11];
+	uint16_t m_mixer_control[2][0x40];
+	std::unique_ptr<uint16_t[]> m_solid_0000;
+	std::unique_ptr<uint16_t[]> m_solid_ffff;
+	uint8_t m_sprite_render_count;
+	uint8_t m_sprite_control_latched[8];
+	uint8_t m_sprite_control[8];
+	std::unique_ptr<uint32_t[]> m_spriteram_32bit;
+	typedef void (segas32_state::*prot_vblank_func)();
+	prot_vblank_func m_system32_prot_vblank;
+	int m_print_count;
+	emu_timer *m_vblank_end_int_timer;
+	emu_timer *m_update_sprites_timer;
 };
 
 class segas32_regular_state : public segas32_state
@@ -341,6 +349,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset() override;
+
+private:
+	output_finder<16> m_lamp;
 };
 
 class sega_multi32_state : public segas32_state

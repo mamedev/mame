@@ -143,8 +143,8 @@ void gamecube_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START(gamecube_state::gc)
-	MCFG_CPU_ADD("maincpu", PPC603, 485000000 / 100) // 485 MHz IBM "Gekko" (750CXe/750FX based)
-	MCFG_CPU_PROGRAM_MAP(ppc_mem)
+	MCFG_DEVICE_ADD("maincpu", PPC603, 485000000 / 100) // 485 MHz IBM "Gekko" (750CXe/750FX based)
+	MCFG_DEVICE_PROGRAM_MAP(ppc_mem)
 MACHINE_CONFIG_END
 
 
@@ -241,8 +241,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS           INIT  COMPANY    FULLNAME  FLAGS
-CONS( 2001, gcjp,  0,      0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (Japan)",  MACHINE_IS_SKELETON )
-CONS( 2001, gcus,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (USA)",    MACHINE_IS_SKELETON )
-CONS( 2002, gceu,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (EUR)",    MACHINE_IS_SKELETON )
-CONS( 2002, gcbr,  gcjp,   0,       gc,      gc,    gamecube_state, 0,    "Nintendo", "GameCube (Brazil)", MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY     FULLNAME             FLAGS
+CONS( 2001, gcjp,  0,      0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Japan)",  MACHINE_IS_SKELETON )
+CONS( 2001, gcus,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (USA)",    MACHINE_IS_SKELETON )
+CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (EUR)",    MACHINE_IS_SKELETON )
+CONS( 2002, gcbr,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Brazil)", MACHINE_IS_SKELETON )

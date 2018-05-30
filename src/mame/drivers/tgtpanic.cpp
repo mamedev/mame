@@ -154,10 +154,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tgtpanic_state::tgtpanic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tgtpanic_state, irq0_line_hold,  20) /* Unverified */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tgtpanic_state, irq0_line_hold,  20) /* Unverified */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -187,4 +187,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, tgtpanic_state, 0, ROT0, "Konami", "Target Panic", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, tgtpanic_state, empty_init, ROT0, "Konami", "Target Panic", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

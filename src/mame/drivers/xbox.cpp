@@ -158,20 +158,22 @@ void xbox_state::machine_reset()
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
 
-SLOT_INTERFACE_START(usb_xbox)
-	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
-SLOT_INTERFACE_END
+void usb_xbox(device_slot_interface &device)
+{
+	device.option_add("xbox_controller", OHCI_GAME_CONTROLLER);
+}
 
-SLOT_INTERFACE_START(xbox_ata_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
-SLOT_INTERFACE_END
+void xbox_ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
 
 MACHINE_CONFIG_START(xbox_state::xbox)
 	xbox_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xbox_map)
-	MCFG_CPU_IO_MAP(xbox_map_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xbox_map)
+	MCFG_DEVICE_IO_MAP(xbox_map_io)
 
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
@@ -184,8 +186,8 @@ MACHINE_CONFIG_START(xbox_state::xbox)
 	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
 
 /* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
@@ -239,4 +241,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

@@ -317,7 +317,7 @@ static const gfx_layout spritelayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( mario )
+static GFXDECODE_START( gfx_mario )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
@@ -338,34 +338,34 @@ WRITE_LINE_MEMBER(mario_state::vblank_irq)
 MACHINE_CONFIG_START(mario_state::mario_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mario_map)
-	MCFG_CPU_IO_MAP(mario_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mario_map)
+	MCFG_DEVICE_IO_MAP(mario_io_map)
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80dma", Z80DMA, Z80_CLOCK)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(mario_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(mario_state, memory_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, mario_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, mario_state, memory_write_byte))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2L (7E80H)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mario_state, gfx_bank_w)) // ~T ROM
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mario_state, gfx_bank_w)) // ~T ROM
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // 2 PSL
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mario_state, flip_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mario_state, palette_bank_w)) // CREF 0
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mario_state, nmi_mask_w)) // NMI EI
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("z80dma", z80dma_device, rdy_w)) // DMA SET
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mario_state, coin_counter_1_w)) // COUNTER 2 (misnumbered on schematic)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mario_state, coin_counter_2_w)) // COUNTER 1 (misnumbered on schematic)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mario_state, flip_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, mario_state, palette_bank_w)) // CREF 0
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, mario_state, nmi_mask_w)) // NMI EI
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("z80dma", z80dma_device, rdy_w)) // DMA SET
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mario_state, coin_counter_1_w)) // COUNTER 2 (misnumbered on schematic)
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mario_state, coin_counter_2_w)) // COUNTER 1 (misnumbered on schematic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mario_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mario_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mario)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mario)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
 
@@ -378,9 +378,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mario_state::masao)
 	mario_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(masao_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(4000000)        /* 4.000 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(masao_map)
 
 	/* sound hardware */
 	masao_audio(config);
@@ -562,8 +562,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   mario,  mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariof,   mario,   mario,   mariof, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioe,   mario,   mario,   marioe, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioj,   mario,   mario,   marioj, mario_state, 0, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   mario,  mario_state, 0, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioe, mario, mario, marioe, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,  mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )

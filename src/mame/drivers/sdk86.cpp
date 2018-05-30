@@ -146,32 +146,32 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sdk86_state::sdk86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
-	MCFG_CPU_PROGRAM_MAP(sdk86_mem)
-	MCFG_CPU_IO_MAP(sdk86_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600)/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
+	MCFG_DEVICE_PROGRAM_MAP(sdk86_mem)
+	MCFG_DEVICE_IO_MAP(sdk86_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sdk86)
 
 	/* Devices */
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_cts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_cts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(14'745'600)/3/16)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_TAG, i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(sdk86_state, scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk86_state, digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(sdk86_state, kbd_r))                  // kbd RL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk86_state, scanlines_w))          // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk86_state, digit_w))            // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, sdk86_state, kbd_r))                  // kbd RL lines
 	MCFG_I8279_IN_SHIFT_CB(GND)                                     // Shift key
 	MCFG_I8279_IN_CTRL_CB(GND)
 
@@ -219,5 +219,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS */
-COMP( 1979, sdk86,  0,      0,      sdk86,   sdk86, sdk86_state, 0,    "Intel",  "MCS-86 System Design Kit", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME  FLAGS */
+COMP( 1979, sdk86, 0,      0,      sdk86,   sdk86, sdk86_state, empty_init, "Intel",  "MCS-86 System Design Kit", MACHINE_NO_SOUND_HW)

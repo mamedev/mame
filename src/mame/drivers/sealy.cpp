@@ -92,7 +92,7 @@ static const gfx_layout gfxlayout_8x8x16 =
 };
 
 
-static GFXDECODE_START( sealy )
+static GFXDECODE_START( gfx_sealy )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x16, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_8x8x16, 0, 1 )
 GFXDECODE_END
@@ -101,8 +101,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sealy_state::sealy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
-	MCFG_CPU_PROGRAM_MAP(sealy_map)
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	MCFG_DEVICE_PROGRAM_MAP(sealy_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -112,13 +112,13 @@ MACHINE_CONFIG_START(sealy_state::sealy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sealy_state, screen_update_sealy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sealy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sealy)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(sealy_state, sealy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/13, PIN7_HIGH)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/13, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -139,4 +139,4 @@ ROM_START( crzyddz )
 ROM_END
 
 
-GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )

@@ -152,7 +152,8 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 ********************/
 READ8_MEMBER(kchamp_state::sound_reset_r)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	if (!machine().side_effects_disabled())
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 
@@ -346,7 +347,7 @@ static const gfx_layout spritelayout =
 	16*8    /* ofset to next tile */
 };
 
-static GFXDECODE_START( kchamp )
+static GFXDECODE_START( gfx_kchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   32*4, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, spritelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, spritelayout, 0, 16 )
@@ -406,20 +407,20 @@ void kchamp_state::machine_reset()
 MACHINE_CONFIG_START(kchamp_state::kchampvs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
-	MCFG_CPU_IO_MAP(kchampvs_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(kchampvs_map)
+	MCFG_DEVICE_IO_MAP(kchampvs_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(kchampvs_sound_map)
-	MCFG_CPU_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(kchampvs_sound_map)
+	MCFG_DEVICE_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 8C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kchamp_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kchamp_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(kchamp_state, sound_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kchamp_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, kchamp_state, sound_reset_w))
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
@@ -431,30 +432,30 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // at 4C
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(kchamp_state, msmint))         /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, kchamp_state, msmint))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -466,20 +467,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kchamp_state::kchamp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 12MHz / 4 = 3.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kchamp_map)
-	MCFG_CPU_IO_MAP(kchamp_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 12MHz / 4 = 3.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kchamp_map)
+	MCFG_DEVICE_IO_MAP(kchamp_io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 12MHz / 4 = 3.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kchamp_sound_map)
-	MCFG_CPU_IO_MAP(kchamp_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125) /* Hz */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 12MHz / 4 = 3.0 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kchamp_sound_map)
+	MCFG_DEVICE_IO_MAP(kchamp_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125) /* Hz */
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC71
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kchamp_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kchamp_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kchamp_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
@@ -491,28 +492,28 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // IC11
+	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // IC11
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -738,12 +739,11 @@ void kchamp_state::decrypt_code()
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::init_kchampvs()
 {
 	decrypt_code();
 
 	uint8_t *rom = memregion("maincpu")->base();
-	int A;
 
 	/*
 	    Note that the first 4 opcodes that the program
@@ -755,7 +755,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 	    encrypted address for the jump.
 	 */
 	m_decrypted_opcodes[0] = rom[0];  /* this is a jump */
-	A = rom[1] + 256 * rom[2];
+	int A = rom[1] + 256 * rom[2];
 	m_decrypted_opcodes[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
 	rom[A+1] ^= 0xee;       /* fix address of the second jump */
 	A = rom[A+1] + 256 * rom[A+2];
@@ -768,7 +768,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
+void kchamp_state::init_kchampvs2()
 {
 	decrypt_code();
 	m_msm_play_lo_nibble = true;
@@ -776,8 +776,8 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )

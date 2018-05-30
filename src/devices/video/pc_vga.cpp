@@ -184,6 +184,7 @@ ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag,
 
 ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_vga(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -413,14 +414,6 @@ void ibm8514a_device::device_start()
 	memset(&ibm8514, 0, sizeof(ibm8514));
 	ibm8514.read_mask = 0x00000000;
 	ibm8514.write_mask = 0xffffffff;
-}
-
-void ibm8514a_device::device_config_complete()
-{
-	if(m_vga_tag.length() != 0)
-	{
-		m_vga = machine().device<svga_device>(m_vga_tag.c_str());
-	}
 }
 
 void mach8_device::device_start()
@@ -3311,7 +3304,7 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 
 void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
 	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
 	uint8_t src = 0;
@@ -3400,7 +3393,7 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 
 void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
 	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
 	uint8_t src = 0;
@@ -3530,8 +3523,7 @@ void ibm8514a_device::ibm8514_write(uint32_t offset, uint32_t src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
-		address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-		if(m_vga->mem_linear_r(space,src,0xff) != 0x00)
+		if (m_vga->mem_linear_r(machine().dummy_space(), src, 0xff) != 0x00)
 			ibm8514_write_fg(offset);
 		else
 			ibm8514_write_bg(offset);

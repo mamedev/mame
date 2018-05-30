@@ -273,7 +273,7 @@
 // other standard palettes
 #define MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS(_tag, _region, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
-	downcast<palette_device &>(*device).set_prom_region("^" _region); \
+	downcast<palette_device &>(*device).set_prom_region(_region); \
 	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 
 // not implemented yet

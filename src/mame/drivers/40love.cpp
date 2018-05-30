@@ -306,7 +306,7 @@ READ8_MEMBER(fortyl_state::pix2_r)
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(fortyl_state,undoukai)
+void fortyl_state::init_undoukai()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
@@ -317,7 +317,7 @@ DRIVER_INIT_MEMBER(fortyl_state,undoukai)
 	m_pix_color[3] = 0x1ec;
 }
 
-DRIVER_INIT_MEMBER(fortyl_state,40love)
+void fortyl_state::init_40love()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
@@ -657,7 +657,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( 40love )
+static GFXDECODE_START( gfx_40love )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0, 64 )
 GFXDECODE_END
@@ -705,16 +705,16 @@ MACHINE_RESET_MEMBER(fortyl_state,40love)
 MACHINE_CONFIG_START(fortyl_state::_40love)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000/2) /* OK */
-	MCFG_CPU_PROGRAM_MAP(_40love_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80,8000000/2) /* OK */
+	MCFG_DEVICE_PROGRAM_MAP(_40love_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* OK */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
+	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* OK */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
@@ -736,20 +736,20 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 40love)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_40love)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortyl_state, sound_control_3_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -763,24 +763,24 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fortyl_state::undoukai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(undoukai_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(undoukai_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
+	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
@@ -802,20 +802,20 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 40love)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_40love)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortyl_state, sound_control_3_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
@@ -829,9 +829,9 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*******************************************************************************/
@@ -986,7 +986,7 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
-GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 40love,   0,        _40love,  40love,   fortyl_state, init_40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   _40love,  40love,   fortyl_state, init_40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
+GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, init_undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, init_undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

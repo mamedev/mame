@@ -105,8 +105,8 @@ WRITE8_MEMBER(portrait_state::ctrl_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	/* the 2 lamps near the camera */
-	output().set_led_value(0, data & 0x08);
-	output().set_led_value(1, data & 0x40);
+	m_lamp[0] = BIT(data, 3);
+	m_lamp[1] = BIT(data, 6);
 
 	/* shows the black and white photo from the camera */
 	output().set_value("photo", (data >> 7) & 1);
@@ -244,18 +244,18 @@ static const gfx_layout tile_layout =
 	8*16 /* character offset */
 };
 
-static GFXDECODE_START( portrait )
+static GFXDECODE_START( gfx_portrait )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout, 0, 0x800/8 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(portrait_state::portrait)
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(portrait_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(portrait_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I8039, 3120000)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(portrait_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", I8039, 3120000)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(portrait_sound_map)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -268,17 +268,17 @@ MACHINE_CONFIG_START(portrait_state::portrait)
 	MCFG_SCREEN_UPDATE_DRIVER(portrait_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portrait)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portrait)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x40)
 	MCFG_PALETTE_INIT_OWNER(portrait_state, portrait)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("tms", TMS5200, 640000)
+	MCFG_DEVICE_ADD("tms", TMS5200, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -392,5 +392,5 @@ ROM_END
 
 
 
-GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, 0, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, 0, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

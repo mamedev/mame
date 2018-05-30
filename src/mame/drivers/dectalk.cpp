@@ -436,9 +436,9 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 {
 	m_hack_self_test_is_second_read = false; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	machine().device<x2212_device>("x2212")->recall(0);
-	machine().device<x2212_device>("x2212")->recall(1);
-	machine().device<x2212_device>("x2212")->recall(0); // nvram recall
+	m_nvram->recall(0);
+	m_nvram->recall(1);
+	m_nvram->recall(0); // nvram recall
 	m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	m_duart->reset(); // reset the DUART
@@ -868,28 +868,27 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	m_dac->write(data >> 4);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
-	/*device_t *duart = machine().device("duart");
-	if (machine.input().code_pressed(KEYCODE_F1))
-	    duart_rx_break(duart, 1, 1);
+	/*if (machine.input().code_pressed(KEYCODE_F1))
+	    m_duart->duart_rx_break(1, 1);
 	else
-	    duart_rx_break(duart, 1, 0);*/
+	    m_duart->duart_rx_break(1, 0);*/
 }
 
 MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
-	MCFG_CPU_PROGRAM_MAP(m68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
+	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(dectalk_state, duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, duart_input))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
-	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
-	MCFG_CPU_IO_MAP(tms32010_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
+	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
+	MCFG_DEVICE_PROGRAM_MAP(tms32010_mem)
+	MCFG_DEVICE_IO_MAP(tms32010_io)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
 #ifdef USE_LOOSE_TIMING
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else
@@ -901,15 +900,15 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* video hardware */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 MACHINE_CONFIG_END
 
 
@@ -1011,5 +1010,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS */
+COMP( 1984, dectalk, 0,      0,      dectalk, dectalk, dectalk_state, empty_init, "Digital Equipment Corporation", "DECtalk DTC-01", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

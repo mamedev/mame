@@ -1850,7 +1850,7 @@ static const gfx_layout supracan_gfx1bpp_alt =
 };
 
 
-static GFXDECODE_START( supracan )
+static GFXDECODE_START( gfx_supracan )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx8bpp,   0, 1 )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx4bpp,   0, 0x10 )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx2bpp,   0, 0x40 )
@@ -1885,13 +1885,13 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 
 MACHINE_CONFIG_START(supracan_state::supracan)
 
-	MCFG_CPU_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
-	MCFG_CPU_PROGRAM_MAP( supracan_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
+	MCFG_DEVICE_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
+	MCFG_DEVICE_PROGRAM_MAP( supracan_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
 
-	MCFG_CPU_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
-	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
+	MCFG_DEVICE_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
+	MCFG_DEVICE_PROGRAM_MAP( supracan_sound_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1907,7 +1907,7 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supracan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supracan)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "supracan_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
@@ -1922,5 +1922,5 @@ ROM_START( supracan )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT    COMPANY                  FULLNAME        FLAGS */
-CONS( 1995, supracan,   0,      0,      supracan,   supracan, supracan_state, 0,      "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY                  FULLNAME        FLAGS */
+CONS( 1995, supracan, 0,      0,      supracan, supracan, supracan_state, empty_init, "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

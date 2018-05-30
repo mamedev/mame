@@ -670,7 +670,7 @@ static const gfx_layout avigo_6_by_8 =
 	16*16                   /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( avigo )
+static GFXDECODE_START( gfx_avigo )
 	GFXDECODE_ENTRY( "flash0", 0x08992, avigo_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "flash0", 0x0c020, avigo_8_by_14, 0, 1 )
 	GFXDECODE_ENTRY( "flash0", 0x0c020, avigo_16_by_15, 0, 1 )
@@ -751,23 +751,23 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 
 MACHINE_CONFIG_START(avigo_state::avigo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(avigo_mem)
-	MCFG_CPU_IO_MAP(avigo_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(avigo_mem)
+	MCFG_DEVICE_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(avigo_state, com_interrupt))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, avigo_state, com_interrupt))
 
-	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -780,18 +780,18 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 
 	MCFG_DEFAULT_LAYOUT(layout_avigo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", avigo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_avigo)
 	MCFG_PALETTE_ADD("palette", AVIGO_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(avigo_state, avigo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
 	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(avigo_state, tc8521_alarm_int))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */
 	MCFG_AMD_29F080_ADD("flash0")
@@ -907,9 +907,9 @@ ROM_START(avigo_it)
 	ROMX_LOAD("italian_100.rom",  0x000000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(3))
 ROM_END
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE  INPUT  STATE        INIT    COMPANY              FULLNAME                       FLAGS
-COMP(1997,  avigo,     0,       0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA",             MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_de,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (German)",    MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_fr,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (French)",    MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_es,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (Spanish)",   MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_it,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (Italian)",   MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME                     FLAGS
+COMP( 1997, avigo,    0,      0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA",           MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_de, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (German)",  MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_fr, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (French)",  MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_es, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (Spanish)", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_it, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (Italian)", MACHINE_SUPPORTS_SAVE)

@@ -7,9 +7,6 @@
 
 #include "lpc.h"
 
-#define MCFG_LPC_PIT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, LPC_PIT, 0)
-
 class lpc_pit_device : public lpc_device {
 public:
 	lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

@@ -353,7 +353,7 @@ static const gfx_layout sorcerer_charlayout =
 };
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
-static GFXDECODE_START( sorcerer )
+static GFXDECODE_START( gfx_sorcerer )
 	GFXDECODE_ENTRY( "maincpu", 0xf800, sorcerer_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -418,9 +418,9 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
-	MCFG_CPU_IO_MAP(sorcerer_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, ES_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sorcerer_mem)
+	MCFG_DEVICE_IO_MAP(sorcerer_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -431,30 +431,28 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SCREEN_UPDATE_DRIVER(sorcerer_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sorcerer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sorcerer)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
-	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass2 speaker
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
 	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
 	MCFG_AY31015_AUTO_RDAV(true)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")
 
 	/* The use of the parallel port as a general purpose port is not emulated.
 	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -488,8 +486,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	sorcerer(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sorcererd_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
@@ -501,7 +499,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(sorcerer_state, sorcerer)
+void sorcerer_state::init_sorcerer()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
@@ -541,7 +539,7 @@ ROM_START(sorcerer2)
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(2) )
 ROM_END
 
-/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     STATE           INIT      COMPANY      FULLNAME */
-COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer",                     0 )
-COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2",                   0 )
-COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */
+COMP( 1979, sorcerer,  0,        0,      sorcerer,  sorcerer, sorcerer_state, init_sorcerer, "Exidy Inc", "Sorcerer",                     0 )
+COMP( 1979, sorcerer2, sorcerer, 0,      sorcerer,  sorcerer, sorcerer_state, init_sorcerer, "Exidy Inc", "Sorcerer 2",                   0 )
+COMP( 1979, sorcererd, sorcerer, 0,      sorcererd, sorcerer, sorcerer_state, init_sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )

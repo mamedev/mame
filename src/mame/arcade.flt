@@ -333,6 +333,7 @@ drw80pkr.cpp
 dunhuang.cpp
 dwarfd.cpp
 dynadice.cpp
+dynamoah.cpp
 dynax.cpp
 dynduke.cpp
 ecoinf1.cpp
@@ -428,6 +429,7 @@ galpanic.cpp
 galspnbl.cpp
 gambl186.cpp
 gamecstl.cpp
+gamemasters.cpp
 gameplan.cpp
 gammagic.cpp
 gamtor.cpp
@@ -1040,6 +1042,7 @@ segas18.cpp
 segas24.cpp
 segas32.cpp
 segasp.cpp
+segattl.cpp
 segaufo.cpp
 segaxbd.cpp
 segaybd.cpp
@@ -1153,7 +1156,6 @@ stellafr.cpp
 stfight.cpp
 stlforce.cpp
 strkzn.cpp
-strnskil.cpp
 stuntair.cpp
 stv.cpp
 su2000.cpp
@@ -1363,6 +1365,7 @@ xtom3d.cpp
 xxmissio.cpp
 xybots.cpp
 xyonix.cpp
+y2.cpp
 yiear.cpp
 yunsun16.cpp
 yunsung8.cpp

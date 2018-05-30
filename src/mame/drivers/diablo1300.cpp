@@ -177,9 +177,9 @@ void diablo1300_state::machine_reset()
 
 MACHINE_CONFIG_START( diablo1300_state::diablo1300 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DIABLO1300, XTAL(1'689'600))
-	MCFG_CPU_PROGRAM_MAP(diablo1300_map)
-	MCFG_CPU_DATA_MAP(diablo1300_data_map)
+	MCFG_DEVICE_ADD("maincpu", DIABLO1300, XTAL(1'689'600))
+	MCFG_DEVICE_PROGRAM_MAP(diablo1300_map)
+	MCFG_DEVICE_DATA_MAP(diablo1300_data_map)
 MACHINE_CONFIG_END
 
 ROM_START( diablo )
@@ -191,5 +191,5 @@ ROM_START( diablo )
 	ROMX_LOAD ("diablo1300.even", 0x0000, 0x200, CRC (85562eb1) SHA1 (9335eeeabdd37255d6ffee153a027944a4519126), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-//   YEAR  NAME     PARENT    COMPAT   MACHINE      INPUT   STATE              INIT  COMPANY               FULLNAME
-COMP(1976, diablo,  0,        0,       diablo1300,  diablo1300, diablo1300_state,  0,    "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_IS_SKELETON)
+//   YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY               FULLNAME
+COMP(1976, diablo, 0,      0,      diablo1300, diablo1300, diablo1300_state, empty_init, "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_IS_SKELETON)

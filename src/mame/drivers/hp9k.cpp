@@ -144,7 +144,7 @@ public:
 	uint8_t m_videoram[0x4000];
 	uint8_t m_screenram[0x800];
 
-	DECLARE_DRIVER_INIT(hp9k);
+	void init_hp9k();
 
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_WRITE16_MEMBER(buserror_w);
@@ -331,7 +331,7 @@ static INPUT_PORTS_START( hp9k )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(hp9k_state,hp9k)
+void hp9k_state::init_hp9k()
 {
 }
 
@@ -348,7 +348,7 @@ static const gfx_layout hp9k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( hp9k )
+static GFXDECODE_START( gfx_hp9k )
 	GFXDECODE_ENTRY( "bootrom", 0x2000, hp9k_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -397,8 +397,8 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 
 MACHINE_CONFIG_START(hp9k_state::hp9k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hp9k_mem)
 
 	/* video hardware */
 
@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9k_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hp9k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 16)
@@ -432,5 +432,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY            FULLNAME     FLAGS */
-COMP( 1982, hp9816, 0,      0,      hp9k,    hp9k,  hp9k_state, hp9k,  "Hewlett Packard",  "HP 9816" ,  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY            FULLNAME   FLAGS */
+COMP( 1982, hp9816, 0,      0,      hp9k,    hp9k,  hp9k_state, init_hp9k, "Hewlett Packard", "HP 9816", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

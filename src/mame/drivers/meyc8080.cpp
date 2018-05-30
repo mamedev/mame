@@ -78,11 +78,8 @@ public:
 		, m_videoram_2(*this, "vram2")
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
+		, m_lamp(*this, "lamp%u", 0U)
 	{ }
-
-	required_shared_ptr<uint8_t> m_videoram_0;
-	required_shared_ptr<uint8_t> m_videoram_1;
-	required_shared_ptr<uint8_t> m_videoram_2;
 
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
@@ -92,10 +89,18 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_byte_interface> m_dac;
 	void meyc8080(machine_config &config);
 	void meyc8080_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+
+	required_shared_ptr<uint8_t> m_videoram_0;
+	required_shared_ptr<uint8_t> m_videoram_1;
+	required_shared_ptr<uint8_t> m_videoram_2;
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_byte_interface> m_dac;
+	output_finder<11> m_lamp;
 };
 
 
@@ -185,11 +190,11 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
   xxxx ----   Seems unused...
 
 */
-	output().set_lamp_value(0, (data) & 1);       /* Lamp 0 */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
+	m_lamp[0] = BIT(data, 0);  /* Lamp 0 */
+	m_lamp[1] = BIT(data, 1);  /* Lamp 1 */
+	m_lamp[2] = BIT(data, 2);  /* Lamp 2 */
+	m_lamp[3] = BIT(data, 3);  /* Lamp 3 */
+	m_lamp[4] = BIT(data, 4);  /* Lamp 4 */
 
 	logerror("lights 1: %02x\n", data);
 }
@@ -232,13 +237,13 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
   xxx- ----   Unknown.
 
 */
-	output().set_lamp_value(5, (data) & 1);       /* Lamp 5 */
-	output().set_lamp_value(6, (data >> 1) & 1);  /* Lamp 6 */
-	output().set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 */
-	output().set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 */
-	output().set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 */
+	m_lamp[5] = BIT(data, 0);  /* Lamp 5 */
+	m_lamp[6] = BIT(data, 1);  /* Lamp 6 */
+	m_lamp[7] = BIT(data, 2);  /* Lamp 7 */
+	m_lamp[8] = BIT(data, 3);  /* Lamp 8 */
+	m_lamp[9] = BIT(data, 4);  /* Lamp 9 */
 
-	output().set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 (Game-Over) */
+	m_lamp[10] = BIT(data, 5); /* Lamp 10 (Game-Over) */
 
 	logerror("lights 2: %02x\n", data);
 }
@@ -585,8 +590,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(meyc8080_state::meyc8080)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(meyc8080_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(meyc8080_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -599,10 +604,10 @@ MACHINE_CONFIG_START(meyc8080_state::meyc8080)
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8080_state, screen_update_meyc8080)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.66) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.66) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 
@@ -735,8 +740,8 @@ ROM_END
  *
  *************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT  ROT   COMPANY              FULLNAME                                     FLAGS                                            LAYOUT
-GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wldarrow ) // B&W version not dumped yet
-GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr ) // year not shown, but it is in mdrawpkra
-GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr )
-GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_meybjack ) // B&W version not dumped yet
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY              FULLNAME                                     FLAGS                                            LAYOUT
+GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wldarrow ) // B&W version not dumped yet
+GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr ) // year not shown, but it is in mdrawpkra
+GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr )
+GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_meybjack ) // B&W version not dumped yet

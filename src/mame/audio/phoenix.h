@@ -12,7 +12,7 @@
 class phoenix_sound_device : public device_t, public device_sound_interface
 {
 public:
-	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE8_MEMBER( control_a_w );
 	DECLARE_WRITE8_MEMBER( control_b_w );
@@ -55,8 +55,8 @@ private:
 	int noise(int samplerate);
 };
 
-DECLARE_DEVICE_TYPE(PHOENIX, phoenix_sound_device)
+DECLARE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device)
 
-DISCRETE_SOUND_EXTERN(phoenix);
+DISCRETE_SOUND_EXTERN(phoenix_discrete);
 
 #endif // MAME_AUDIO_PHOENIX_H

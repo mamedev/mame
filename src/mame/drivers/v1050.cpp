@@ -929,10 +929,11 @@ void v1050_state::update_fdc()
 
 // disk format: 80 tracks, 1 head, 10 sectors, 512 bytes sector length, first sector id 1
 
-static SLOT_INTERFACE_START( v1050_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD ) // Teac FD 55E-02-U
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Teac FD 55-FV-35-U
-SLOT_INTERFACE_END
+static void v1050_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD); // Teac FD 55E-02-U
+	device.option_add("525qd", FLOPPY_525_QD); // Teac FD 55-FV-35-U
+}
 
 WRITE_LINE_MEMBER( v1050_state::fdc_intrq_w )
 {
@@ -1025,15 +1026,15 @@ void v1050_state::machine_reset()
 
 MACHINE_CONFIG_START(v1050_state::v1050)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, 16_MHz_XTAL/4)
-	MCFG_CPU_PROGRAM_MAP(v1050_mem)
-	MCFG_CPU_IO_MAP(v1050_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(v1050_state,v1050_int_ack)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL/4)
+	MCFG_DEVICE_PROGRAM_MAP(v1050_mem)
+	MCFG_DEVICE_IO_MAP(v1050_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v1050_state,v1050_int_ack)
 
 	MCFG_QUANTUM_PERFECT_CPU(Z80_TAG)
 
-	MCFG_CPU_ADD(M6502_TAG, M6502, 15.36_MHz_XTAL/16)
-	MCFG_CPU_PROGRAM_MAP(v1050_crt_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 15.36_MHz_XTAL/16)
+	MCFG_DEVICE_PROGRAM_MAP(v1050_crt_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	// keyboard HACK
@@ -1044,64 +1045,64 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 
 	// devices
 	MCFG_DEVICE_ADD(UPB8214_TAG, I8214, 16_MHz_XTAL/4)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(v1050_state, pic_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, v1050_state, pic_int_w))
 
 	MCFG_DEVICE_ADD(MSM58321RS_TAG, MSM58321, 32.768_kHz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(v1050_state, rtc_ppi_pc_3_w))
+	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_0_w))
+	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_1_w))
+	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_2_w))
+	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_3_w))
+	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pc_3_w))
 
 	MCFG_DEVICE_ADD(I8255A_DISP_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8(I8255A_M6502_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state, disp_ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_M6502_TAG, i8255_device, pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, disp_ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8255A_MISC_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(v1050_state, misc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTC_CB(READ8(v1050_state,misc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state,misc_ppi_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, misc_ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state,misc_ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state,misc_ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8255A_RTC_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(v1050_state, rtc_ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(v1050_state, rtc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(v1050_state, rtc_ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(v1050_state, rtc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state, rtc_ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, v1050_state, rtc_ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, rtc_ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, v1050_state, rtc_ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state, rtc_ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, rtc_ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8255A_M6502_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8(I8255A_DISP_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(v1050_state, m6502_ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_DISP_TAG, i8255_device, pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, m6502_ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0/*16_MHz_XTAL/8,*/)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(V1050_KEYBOARD_TAG, v1050_keyboard_device, si_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(v1050_state, kb_rxrdy_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(V1050_KEYBOARD_TAG, v1050_keyboard_device, si_w))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v1050_state, kb_rxrdy_w))
 
 	MCFG_DEVICE_ADD(CLOCK_KB_TAG, CLOCK, 16_MHz_XTAL/4/13/8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v1050_state, write_keyboard_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_keyboard_clock))
 
 	// keyboard
 	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
-	MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_KB_TAG, i8251_device, write_rxd))
+	MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_KB_TAG, i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD(I8251A_SIO_TAG, I8251, 0/*16_MHz_XTAL/8,*/)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(v1050_state, sio_rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(v1050_state, sio_txrdy_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v1050_state, sio_rxrdy_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, v1050_state, sio_txrdy_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v1050_state, write_sio_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))
 
 	MCFG_MB8877_ADD(MB8877_TAG, 16_MHz_XTAL/16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(v1050_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(v1050_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
@@ -1110,11 +1111,11 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	// SASI bus
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
-	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
-	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(v1050_state, write_sasi_io)) MCFG_DEVCB_XOR(1) // bit4
+	MCFG_SCSI_REQ_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_BSY_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
+	MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
+	MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, v1050_state, write_sasi_io)) MCFG_DEVCB_XOR(1) // bit4
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
 
 	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SASIBUS_TAG)
@@ -1130,8 +1131,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 
 	// printer
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(v1050_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(v1050_state, write_centronics_perror))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, v1050_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, v1050_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -1152,5 +1153,5 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE         INIT    COMPANY                  FULLNAME       FLAGS
-COMP( 1983, v1050,  0,      0,      v1050,  v1050, v1050_state,  0,      "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                  FULLNAME       FLAGS
+COMP( 1983, v1050, 0,      0,      v1050,   v1050, v1050_state, empty_init, "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

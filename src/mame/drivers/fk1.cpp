@@ -412,10 +412,10 @@ uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 MACHINE_CONFIG_START(fk1_state::fk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fk1_mem)
-	MCFG_CPU_IO_MAP(fk1_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fk1_mem)
+	MCFG_DEVICE_IO_MAP(fk1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -430,33 +430,33 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(fk1_state, fk1_pit_out0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out0))
 	MCFG_PIT8253_CLK1(1000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(fk1_state, fk1_pit_out1))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out1))
 	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(fk1_state, fk1_pit_out2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out2))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(fk1_state, fk1_ppi_1_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_1_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_1_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(fk1_state, fk1_ppi_1_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_1_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_1_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_1_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_1_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_1_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_1_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_1_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_1_c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_2_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_2_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_2_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_2_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_2_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_2_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_2_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_2_c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(fk1_state, fk1_ppi_3_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fk1_state, fk1_ppi_3_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(fk1_state, fk1_ppi_3_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(fk1_state, fk1_ppi_3_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(fk1_state, fk1_ppi_3_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fk1_state, fk1_ppi_3_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_3_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_3_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_3_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_3_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_3_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_3_c_w))
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -480,5 +480,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE      INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1989, fk1,    0,      0,       fk1,       fk1,   fk1_state, 0,    "Statni statek Klicany", "FK-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                  FULLNAME  FLAGS
+COMP( 1989, fk1,  0,      0,      fk1,     fk1,   fk1_state, empty_init, "Statni statek Klicany", "FK-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

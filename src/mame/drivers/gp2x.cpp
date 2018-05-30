@@ -360,8 +360,8 @@ static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gp2x_state::gp2x)
-	MCFG_CPU_ADD("maincpu", ARM9, 80000000)
-	MCFG_CPU_PROGRAM_MAP(gp2x_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 80000000)
+	MCFG_DEVICE_PROGRAM_MAP(gp2x_map)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
@@ -372,7 +372,8 @@ MACHINE_CONFIG_START(gp2x_state::gp2x)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gp2x_state, screen_update_gp2x)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 ROM_START(gp2x)
@@ -395,4 +396,4 @@ ROM_START(gp2x)
 	ROMX_LOAD( "gp2xyaffs.v4",   0x300000, 0x2dfed0, CRC(e77efc53) SHA1(21477ff77aacb84005bc465a03066d71031a6098), ROM_BIOS(3))
 ROM_END
 
-CONS(2005, gp2x, 0, 0, gp2x, gp2x, gp2x_state, 0, "Game Park Holdings", "GP2X", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2005, gp2x, 0, 0, gp2x, gp2x, gp2x_state, empty_init, "Game Park Holdings", "GP2X", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

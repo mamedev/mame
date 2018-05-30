@@ -361,6 +361,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
 			m_adc8(*this, "adc8"),
+			m_lamps(*this, "lamp%u", 1U),
 			m_hd34010_host_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
@@ -1455,9 +1456,9 @@ WRITE_LINE_MEMBER(harddriv_state::video_int_write_line)
 MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
+	MCFG_DEVICE_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(driver_68k_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 117)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
@@ -1474,13 +1475,13 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_ADC0808_IN6_CB(IOPORT("8BADC.6"))
 	MCFG_ADC0808_IN7_CB(IOPORT("8BADC.7"))
 
-	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
+	MCFG_DEVICE_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(driver_gsp_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_driver) /* scanline callback (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdgsp_irq_gen))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdgsp_irq_gen))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(harddriv_state, hdgsp_write_to_shiftreg)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(harddriv_state, hdgsp_read_from_shiftreg)
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -1491,11 +1492,11 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
 
 	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(harddriv_state, harddriv_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, harddriv_state, harddriv_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE ("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE ("duartn68681", mc68681_device, rx_a_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE ("duartn68681", mc68681_device, rx_a_w))
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -1505,7 +1506,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_SCREEN_UPDATE_DEVICE("gsp", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(harddriv_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, harddriv_state, video_int_write_line))
 MACHINE_CONFIG_END
 
 
@@ -1515,12 +1516,12 @@ MACHINE_CONFIG_START(harddriv_state::driver_msp)
 	driver_nomsp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("msp", TMS34010, XTAL(50'000'000))
-	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
+	MCFG_DEVICE_ADD("msp", TMS34010, XTAL(50'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(driver_msp_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_REMOVE("slapstic")
@@ -1533,11 +1534,11 @@ MACHINE_CONFIG_START(harddriv_state::multisync_nomsp)
 	driver_nomsp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(multisync_68k_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(multisync_68k_map)
 
-	MCFG_CPU_MODIFY("gsp")
-	MCFG_CPU_PROGRAM_MAP(multisync_gsp_map)
+	MCFG_DEVICE_MODIFY("gsp")
+	MCFG_DEVICE_PROGRAM_MAP(multisync_gsp_map)
 	MCFG_TMS340X0_PIXEL_CLOCK(6000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_multisync) /* scanline callback (indexed16) */
@@ -1554,12 +1555,12 @@ MACHINE_CONFIG_START(harddriv_state::multisync_msp)
 	multisync_nomsp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("msp", TMS34010, XTAL(50'000'000))
-	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
+	MCFG_DEVICE_ADD("msp", TMS34010, XTAL(50'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(driver_msp_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_REMOVE("slapstic")
@@ -1572,11 +1573,11 @@ MACHINE_CONFIG_START(harddriv_state::multisync2)
 	multisync_nomsp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(multisync2_68k_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(multisync2_68k_map)
 
-	MCFG_CPU_MODIFY("gsp")
-	MCFG_CPU_PROGRAM_MAP(multisync2_gsp_map)
+	MCFG_DEVICE_MODIFY("gsp")
+	MCFG_DEVICE_PROGRAM_MAP(multisync2_gsp_map)
 
 	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
@@ -1593,9 +1594,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::adsp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2100, XTAL(32'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2100, XTAL(32'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 MACHINE_CONFIG_END
 
 
@@ -1603,34 +1604,35 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::ds3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2101, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
-	MCFG_CPU_DATA_MAP(ds3_data_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2101, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ds3_program_map)
+	MCFG_DEVICE_DATA_MAP(ds3_data_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_CPU_ADD("ds3sdsp", ADSP2105, XTAL(10'000'000))
-	MCFG_ADSP21XX_SPORT_RX_CB(READ32(harddriv_state, hdds3sdsp_serial_rx_callback))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(harddriv_state, hdds3sdsp_serial_tx_callback))
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(harddriv_state, hdds3sdsp_timer_enable_callback))
-	MCFG_CPU_PROGRAM_MAP(ds3sdsp_program_map)
-	MCFG_CPU_DATA_MAP(ds3sdsp_data_map)
+	MCFG_DEVICE_ADD("ds3sdsp", ADSP2105, XTAL(10'000'000))
+	MCFG_ADSP21XX_SPORT_RX_CB(READ32(*this, harddriv_state, hdds3sdsp_serial_rx_callback))
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, harddriv_state, hdds3sdsp_serial_tx_callback))
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(*this, harddriv_state, hdds3sdsp_timer_enable_callback))
+	MCFG_DEVICE_PROGRAM_MAP(ds3sdsp_program_map)
+	MCFG_DEVICE_DATA_MAP(ds3sdsp_data_map)
 	MCFG_TIMER_DRIVER_ADD("ds3sdsp_timer", harddriv_state, ds3sdsp_internal_timer_callback)
 
-	MCFG_CPU_ADD("ds3xdsp", ADSP2105, XTAL(10'000'000))
-	MCFG_ADSP21XX_SPORT_RX_CB(READ32(harddriv_state, hdds3xdsp_serial_rx_callback))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(harddriv_state, hdds3xdsp_serial_tx_callback))
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(harddriv_state, hdds3xdsp_timer_enable_callback))
-	MCFG_CPU_PROGRAM_MAP(ds3xdsp_program_map)
-	MCFG_CPU_DATA_MAP(ds3xdsp_data_map)
+	MCFG_DEVICE_ADD("ds3xdsp", ADSP2105, XTAL(10'000'000))
+	MCFG_ADSP21XX_SPORT_RX_CB(READ32(*this, harddriv_state, hdds3xdsp_serial_rx_callback))
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, harddriv_state, hdds3xdsp_serial_tx_callback))
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(*this, harddriv_state, hdds3xdsp_timer_enable_callback))
+	MCFG_DEVICE_PROGRAM_MAP(ds3xdsp_program_map)
+	MCFG_DEVICE_DATA_MAP(ds3xdsp_data_map)
 	MCFG_TIMER_DRIVER_ADD("ds3xdsp_timer", harddriv_state, ds3xdsp_internal_timer_callback)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1645,9 +1647,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::dsk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dsp32", DSP32C, XTAL(40'000'000))
-	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(harddriv_state,hddsk_update_pif))
-	MCFG_CPU_PROGRAM_MAP(dsk_dsp32_map)
+	MCFG_DEVICE_ADD("dsp32", DSP32C, XTAL(40'000'000))
+	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(*this, harddriv_state,hddsk_update_pif))
+	MCFG_DEVICE_PROGRAM_MAP(dsk_dsp32_map)
 
 	MCFG_EEPROM_2816_ADD("dsk_10c") // MK48Z02
 	MCFG_EEPROM_2816_ADD("dsk_30c") // MK48Z02
@@ -1661,9 +1663,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::dsk2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dsp32", DSP32C, XTAL(40'000'000))
-	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(harddriv_state,hddsk_update_pif))
-	MCFG_CPU_PROGRAM_MAP(dsk2_dsp32_map)
+	MCFG_DEVICE_ADD("dsp32", DSP32C, XTAL(40'000'000))
+	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(*this, harddriv_state,hddsk_update_pif))
+	MCFG_DEVICE_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
@@ -1858,7 +1860,7 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	multisync_nomsp(config);
 
 	/* basic machine hardware */        /* multisync board without MSP */
-	MCFG_CPU_MODIFY("gsp")
+	MCFG_DEVICE_MODIFY("gsp")
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
 	adsp(config);                       /* ADSP board */
 	MCFG_DEVICE_REMOVE("slapstic")
@@ -1868,9 +1870,9 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
 
 	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(harddriv_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1935,9 +1937,9 @@ MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(harddriv_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1963,7 +1965,7 @@ MACHINE_CONFIG_START(strtdriv_board_device_state::device_add_mconfig)
 
 	/* basic machine hardware */        /* multisync board */
 	ds3(config);                        /* DS III board */
-	MCFG_CPU_MODIFY("ds3xdsp")          /* DS III auxiliary sound DSP has no code */
+	MCFG_DEVICE_MODIFY("ds3xdsp")          /* DS III auxiliary sound DSP has no code */
 	MCFG_DEVICE_DISABLE()
 
 	dsk(config);                        /* DSK board */
@@ -2077,7 +2079,7 @@ MACHINE_CONFIG_START(harddriv_new_state::racedriv_panorama_machine)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, harddriv_new_state,tx_a))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, harddriv_new_state, tx_a))
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	MCFG_DEVICE_MODIFY("mainpcb:slapstic")
@@ -5083,7 +5085,7 @@ void harddriv_state::init_racedrivb1(void)
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x002000, 0x5fffff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x640000, 0xfff7ff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
 
-	DRIVER_INIT_CALL(racedriv);
+	init_racedriv();
 }
 
 READ32_MEMBER(harddriv_state::rddsp_unmap_r)
@@ -5244,64 +5246,64 @@ void harddriv_state::init_hdrivairp(void)
  *
  *************************************/
 
-GAME( 1988, harddriv,     0,        harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
-GAME( 1988, harddrivb,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
-GAME( 1988, harddrivg,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
-GAME( 1988, harddrivj,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )
-GAME( 1988, harddrivb6,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 6)", 0 )
-GAME( 1988, harddrivj6,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 6)", 0 )
-GAME( 1988, harddrivb5,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 5)", 0 )
-GAME( 1988, harddrivg4,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 4)", 0 )
-GAME( 1988, harddriv3,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 3)", 0 )
-GAME( 1988, harddriv2,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 2)", 0 )
-GAME( 1988, harddriv1,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", 0 )
+GAME(  1988, harddriv,    0,        harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
+GAME(  1988, harddrivb,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
+GAME(  1988, harddrivg,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
+GAME(  1988, harddrivj,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )
+GAME(  1988, harddrivb6,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 6)", 0 )
+GAME(  1988, harddrivj6,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 6)", 0 )
+GAME(  1988, harddrivb5,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 5)", 0 )
+GAME(  1988, harddrivg4,  harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 4)", 0 )
+GAME(  1988, harddriv3,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 3)", 0 )
+GAME(  1988, harddriv2,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 2)", 0 )
+GAME(  1988, harddriv1,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", 0 )
 
-GAME( 1990, harddrivc,    harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 2)", 0 )
-GAME( 1990, harddrivcg,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
-GAME( 1990, harddrivcb,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, British, rev 2)", 0 )
-GAME( 1990, harddrivc1,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 1)", 0 )
+GAME(  1990, harddrivc,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, rev 2)", 0 )
+GAME(  1990, harddrivcg,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
+GAME(  1990, harddrivcb,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, British, rev 2)", 0 )
+GAME(  1990, harddrivc1,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, rev 1)", 0 )
 
-GAME( 1989, stunrun,      0,        stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 6)", 0 )
-GAME( 1989, stunrunj,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 7, Japan)", 0 )
-GAME( 1989, stunrun5,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5)", 0 )
-GAME( 1989, stunrune,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5, Europe)", 0 )
-GAME( 1989, stunrun4,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 4)", 0 )
-GAME( 1989, stunrun3,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3)", 0 )
-GAME( 1989, stunrun3e,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3, Europe)", 0 )
-GAME( 1989, stunrun2,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2)", 0 )
-GAME( 1989, stunrun2e,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2, Europe)", 0 )
-GAME( 1989, stunrun0,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 0)", 0 )
-GAME( 1989, stunrunp,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (upright prototype)", 0 )
+GAME(  1989, stunrun,     0,        stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 6)", 0 )
+GAME(  1989, stunrunj,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 7, Japan)", 0 )
+GAME(  1989, stunrun5,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5)", 0 )
+GAME(  1989, stunrune,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5, Europe)", 0 )
+GAME(  1989, stunrun4,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 4)", 0 )
+GAME(  1989, stunrun3,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3)", 0 )
+GAME(  1989, stunrun3e,   stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3, Europe)", 0 )
+GAME(  1989, stunrun2,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2)", 0 )
+GAME(  1989, stunrun2e,   stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2, Europe)", 0 )
+GAME(  1989, stunrun0,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 0)", 0 )
+GAME(  1989, stunrunp,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (upright prototype)", 0 )
 
-GAME( 1990, racedriv,     0,        racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
-GAME( 1990, racedrivb,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
-GAME( 1990, racedrivg,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
-GAME( 1990, racedriv4,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
-GAME( 1990, racedrivb4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
-GAME( 1990, racedrivg4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
-GAME( 1990, racedriv3,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
-GAME( 1990, racedriv2,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
-GAME( 1990, racedriv1,    racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
-GAME( 1990, racedrivb1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
-GAME( 1990, racedrivg1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
+GAME(  1990, racedriv,    0,        racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
+GAME(  1990, racedrivb,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
+GAME(  1990, racedrivg,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
+GAME(  1990, racedriv4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
+GAME(  1990, racedrivb4,  racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
+GAME(  1990, racedrivg4,  racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
+GAME(  1990, racedriv3,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
+GAME(  1990, racedriv2,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
+GAME(  1990, racedriv1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
+GAME(  1990, racedrivb1,  racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
+GAME(  1990, racedrivg1,  racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
 
-GAME( 1990, racedrivc,    racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 5)", 0 )
-GAME( 1990, racedrivcb,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 5)", 0 )
-GAME( 1990, racedrivcg,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 5)", 0 )
-GAME( 1990, racedrivc4,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 4)", 0 )
-GAME( 1990, racedrivcb4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 4)", 0 )
-GAME( 1990, racedrivcg4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
-GAME( 1990, racedrivc2,   racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
-GAME( 1990, racedrivc1,   racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
+GAME(  1990, racedrivc,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 5)", 0 )
+GAME(  1990, racedrivcb,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 5)", 0 )
+GAME(  1990, racedrivcg,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 5)", 0 )
+GAME(  1990, racedrivc4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 4)", 0 )
+GAME(  1990, racedrivcb4, racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 4)", 0 )
+GAME(  1990, racedrivcg4, racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
+GAME(  1990, racedrivc2,  racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
+GAME(  1990, racedrivc1,  racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
 
-GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
+GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
 
-GAME( 1991, steeltal,     0,        steeltal_machine,  steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
-GAME( 1991, steeltalg,    steeltal, steeltal_machine,  steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
-GAME( 1991, steeltal1,    steeltal, steeltal1_machine, steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
-GAME( 1991, steeltalp,    steeltal, steeltalp_machine, steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
+GAME(  1991, steeltal,    0,        steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
+GAME(  1991, steeltalg,   steeltal, steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
+GAME(  1991, steeltal1,   steeltal, steeltal1_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
+GAME(  1991, steeltalp,   steeltal, steeltalp_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
 
-GAME( 1993, strtdriv,     0,        strtdriv_machine,  strtdriv,   harddriv_new_state, 0, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
+GAME(  1993, strtdriv,    0,        strtdriv_machine,   strtdriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
 
-GAME( 1993, hdrivair,     0,        hdrivair_machine,  hdrivair,   harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, hdrivairp,    hdrivair, hdrivairp_machine, hdrivair,   harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME(  1993, hdrivair,    0,        hdrivair_machine,   hdrivair,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME(  1993, hdrivairp,   hdrivair, hdrivairp_machine,  hdrivair,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

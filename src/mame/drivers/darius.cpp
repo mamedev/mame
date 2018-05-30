@@ -450,7 +450,7 @@ void darius_state::darius_sound2_map(address_map &map)
 WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 {
 	if (m_nmi_enable)
-		m_adpcm->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_adpcm->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(darius_state::adpcm_command_read)
@@ -648,7 +648,7 @@ static const gfx_layout char2layout =
 	16*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( darius )
+static GFXDECODE_START( gfx_darius )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 128 )  /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )  /* scr tiles */
 	GFXDECODE_ENTRY( "gfx3", 0, char2layout,  0, 128 )  /* top layer scr tiles */
@@ -707,27 +707,27 @@ void darius_state::machine_reset()
 MACHINE_CONFIG_START(darius_state::darius)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)  /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(darius_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)  /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(darius_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(darius_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(darius_sound_map)
 
-	MCFG_CPU_ADD("cpub", M68000, XTAL(16'000'000)/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(darius_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpub", M68000, XTAL(16'000'000)/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(darius_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("adpcm", Z80, XTAL(8'000'000)/2) /* 4 MHz */  /* ADPCM player using MSM5205 */
-	MCFG_CPU_PROGRAM_MAP(darius_sound2_map)
-	MCFG_CPU_IO_MAP(darius_sound2_io_map)
+	MCFG_DEVICE_ADD("adpcm", Z80, XTAL(8'000'000)/2) /* 4 MHz */  /* ADPCM player using MSM5205 */
+	MCFG_DEVICE_PROGRAM_MAP(darius_sound2_map)
+	MCFG_DEVICE_IO_MAP(darius_sound2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame ? */
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darius)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darius)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
@@ -764,12 +764,13 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA0))  /* portA write */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB0))  /* portB write */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, darius_state, darius_write_portA0))  /* portA write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, darius_state, darius_write_portB0))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)
 	MCFG_SOUND_ROUTE(0, "filter0.0r", 0.08)
 	MCFG_SOUND_ROUTE(1, "filter0.1l", 0.08)
@@ -779,9 +780,9 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SOUND_ROUTE(3, "filter0.3l", 0.60)
 	MCFG_SOUND_ROUTE(3, "filter0.3r", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA1))  /* portA write */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB1))  /* portB write */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, darius_state, darius_write_portA1))  /* portA write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, darius_state, darius_write_portB1))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter1.0l", 0.08)
 	MCFG_SOUND_ROUTE(0, "filter1.0r", 0.08)
 	MCFG_SOUND_ROUTE(1, "filter1.1l", 0.08)
@@ -791,50 +792,32 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SOUND_ROUTE(3, "filter1.3l", 0.60)
 	MCFG_SOUND_ROUTE(3, "filter1.3r", 0.60)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(darius_state, darius_adpcm_int))   /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, darius_state, darius_adpcm_int))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz   */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("filter0.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.3l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.3r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "filter0.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_FILTER_VOLUME_ADD("filter1.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.3l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.3r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "filter1.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_FILTER_VOLUME_ADD("msm5205.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("msm5205.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "msm5205.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "msm5205.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -1130,8 +1113,8 @@ ROM_START( dariuse )
 ROM_END
 
 
-GAME( 1986, darius,   0,        darius,   darius,  darius_state, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusu,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusj,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuso,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuse,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darius,  0,       darius,  darius,  darius_state, empty_init, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusu, darius,  darius,  dariusu, darius_state, empty_init, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusj, darius,  darius,  dariusj, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuso, darius,  darius,  dariusj, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuse, darius,  darius,  dariusu, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )

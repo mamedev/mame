@@ -406,7 +406,7 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( supercrd )  /* Adressing the first half of the palette */
+static GFXDECODE_START( gfx_supercrd )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -417,8 +417,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(supercrd_state::supercrd)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
-	MCFG_CPU_PROGRAM_MAP(supercrd_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
+	MCFG_DEVICE_PROGRAM_MAP(supercrd_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supercrd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supercrd)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(supercrd_state, supercrd)
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 //  MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -513,6 +513,6 @@ ROM_START( fruitstr )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY      FULLNAME                  FLAGS
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )

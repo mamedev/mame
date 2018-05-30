@@ -551,7 +551,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( joystand )
+static GFXDECODE_START( gfx_joystand )
 	GFXDECODE_ENTRY( "tiles",    0, layout_8x8x4,   0, 0x100 )
 	GFXDECODE_ENTRY( "cart.u5",  0, layout_16x16x8, 0,  0x10 )
 	GFXDECODE_ENTRY( "cart.u6",  0, layout_16x16x8, 0,  0x10 )
@@ -585,15 +585,15 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // !! TMP68301 !!
-	MCFG_CPU_PROGRAM_MAP(joystand_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // !! TMP68301 !!
+	MCFG_DEVICE_PROGRAM_MAP(joystand_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(joystand_state, eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(joystand_state, eeprom_w))
+	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, joystand_state, eeprom_r))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, joystand_state, eeprom_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -604,17 +604,17 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", joystand)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_joystand)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("bg15_palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// cart
@@ -690,4 +690,4 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1997, joystand, 0, joystand, joystand, joystand_state, 0, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

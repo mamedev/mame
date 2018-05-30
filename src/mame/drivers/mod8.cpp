@@ -147,10 +147,10 @@ void mod8_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(mod8_state::mod8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(mod8_mem)
-	MCFG_CPU_IO_MAP(mod8_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(mod8_mem)
+	MCFG_DEVICE_IO_MAP(mod8_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)
@@ -172,5 +172,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY                           FULLNAME  FLAGS
-COMP( 1974, mod8,   0,       0,      mod8,      mod8,   mod8_state,   0,    "Microsystems International Ltd", "MOD-8",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                           FULLNAME  FLAGS
+COMP( 1974, mod8, 0,      0,      mod8,    mod8,  mod8_state, empty_init, "Microsystems International Ltd", "MOD-8",  MACHINE_NO_SOUND_HW )

@@ -20,10 +20,10 @@
 #define S3C2440_TAG "s3c2440"
 
 #define MCFG_S3C2440_PALETTE(_palette_tag) \
-	downcast<s3c2440_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<s3c2440_device &>(*device).set_palette_tag(_palette_tag);
 
 #define MCFG_S3C2440_SCREEN(screen_tag) \
-	downcast<s3c2440_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<s3c2440_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_S3C2440_CORE_PIN_R_CB(_devcb) \
 	devcb = &downcast<s3c2440_device &>(*device).set_core_pin_r_callback(DEVCB_##_devcb);

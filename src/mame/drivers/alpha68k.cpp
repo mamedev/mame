@@ -283,43 +283,17 @@ READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(alpha68k_state::kyros_sound_w)
-{
-	if(ACCESSING_BITS_8_15)
-		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
-}
-
-WRITE16_MEMBER(alpha68k_state::alpha68k_II_sound_w)
-{
-	if(ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
-}
-
-WRITE16_MEMBER(alpha68k_state::alpha68k_V_sound_w)
-{
-	/* Sound & fix bank select are in the same word */
-	if(ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
-	if(ACCESSING_BITS_8_15)
-		alpha68k_V_video_bank_w((data >> 8) & 0xff);
-}
 //AT
-WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)
+WRITE8_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE16_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
+WRITE8_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 //ZT
 /******************************************************************************/
@@ -652,7 +626,8 @@ void alpha68k_state::kyros_map(address_map &map)
 	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
 	map(0x080000, 0x0801ff).rw(this, FUNC(alpha68k_state::kyros_alpha_trigger_r), FUNC(alpha68k_state::alpha_microcontroller_w));
 	map(0x0c0000, 0x0c0001).portr("IN0");
-	map(0x0e0000, 0x0e0001).rw(this, FUNC(alpha68k_state::kyros_dip_r), FUNC(alpha68k_state::kyros_sound_w));
+	map(0x0e0000, 0x0e0001).r(this, FUNC(alpha68k_state::kyros_dip_r));
+	map(0x0e0000, 0x0e0000).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
 void alpha68k_state::alpha68k_I_map(address_map &map)
@@ -664,7 +639,8 @@ void alpha68k_state::alpha68k_I_map(address_map &map)
 	map(0x180008, 0x180009).portr("IN4");            // LSB: DSW1
 	map(0x300000, 0x300001).portr("IN0");            // joy1, joy2
 	map(0x340000, 0x340001).portr("IN1");            // coin, start, service
-	map(0x380000, 0x380001).portr("IN2").w(this, FUNC(alpha68k_state::paddlema_soundlatch_w)); // LSB: sound latch write and RST38 trigger, joy3, joy4
+	map(0x380000, 0x380001).portr("IN2");
+	map(0x380001, 0x380001).w(this, FUNC(alpha68k_state::paddlema_soundlatch_w)); // LSB: sound latch write and RST38 trigger, joy3, joy4
 }
 
 void alpha68k_state::alpha68k_II_map(address_map &map)
@@ -672,7 +648,7 @@ void alpha68k_state::alpha68k_II_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x040fff).ram().share("shared_ram");
 	map(0x080000, 0x080001).r(this, FUNC(alpha68k_state::control_1_r)); /* Joysticks */
-	map(0x080000, 0x080001).w(this, FUNC(alpha68k_state::alpha68k_II_sound_w));
+	map(0x080001, 0x080001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0000, 0x0c0001).r(this, FUNC(alpha68k_state::control_2_r)); /* CN1 & Dip 1 */
 	map(0x0c0000, 0x0c00ff).w(this, FUNC(alpha68k_state::alpha68k_II_video_bank_w));
 	map(0x0c8000, 0x0c8001).r(this, FUNC(alpha68k_state::control_3_r)); /* Bottom of CN2 */
@@ -691,7 +667,9 @@ void alpha68k_state::alpha68k_V_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram().share("shared_ram");
-	map(0x080000, 0x080001).rw(this, FUNC(alpha68k_state::control_1_r), FUNC(alpha68k_state::alpha68k_V_sound_w)); /* Joysticks */
+	map(0x080000, 0x080001).r(this, FUNC(alpha68k_state::control_1_r)); /* Joysticks */
+	map(0x080000, 0x080000).w(this, FUNC(alpha68k_state::alpha68k_V_video_bank_w));
+	map(0x080001, 0x080001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0000, 0x0c0001).r(this, FUNC(alpha68k_state::control_2_V_r)); /* Dip 2 */
 	map(0x0c0000, 0x0c00ff).w(this, FUNC(alpha68k_state::alpha68k_V_video_control_w));
 	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
@@ -724,14 +702,14 @@ void alpha68k_state::tnextspc_map(address_map &map)
 	map(0x0e0018, 0x0e0019).r(this, FUNC(alpha68k_state::sound_cpu_r));
 	map(0x0f0000, 0x0f0001).w(this, FUNC(alpha68k_state::tnextspc_unknown_w));
 	map(0x0f0002, 0x0f0005).w(this, FUNC(alpha68k_state::tnextspc_coin_counters_w));
-	map(0x0f0008, 0x0f0009).w(this, FUNC(alpha68k_state::tnextspc_soundlatch_w));
+	map(0x0f0009, 0x0f0009).w(this, FUNC(alpha68k_state::tnextspc_soundlatch_w));
 }
 
 /******************************************************************************/
 
 WRITE8_MEMBER(alpha68k_state::sound_bank_w)
 {
-	membank("bank7")->set_entry(data);
+	membank("bank7")->set_entry(data & 0x1f);
 }
 
 void alpha68k_state::sound_map(address_map &map)
@@ -794,12 +772,13 @@ void alpha68k_state::tnextspc_sound_map(address_map &map)
 
 void alpha68k_state::sound_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
-	map(0x08, 0x08).w("dac", FUNC(dac_byte_interface::write));
+	map.global_mask(0x0f);
+	map(0x00, 0x00).mirror(0x0f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x00, 0x00).mirror(0x01).w(m_soundlatch, FUNC(generic_latch_8_device::clear_w));
+	map(0x08, 0x08).mirror(0x01).w("dac", FUNC(dac_byte_interface::write));
 	map(0x0a, 0x0b).w("ym2", FUNC(ym2413_device::write));
 	map(0x0c, 0x0d).w("ym1", FUNC(ym2203_device::write));
-	map(0x0e, 0x0e).w(this, FUNC(alpha68k_state::sound_bank_w));
+	map(0x0e, 0x0e).mirror(0x01).w(this, FUNC(alpha68k_state::sound_bank_w));
 }
 
 void alpha68k_state::kyros_sound_portmap(address_map &map)
@@ -1781,28 +1760,28 @@ static const gfx_layout jongbou_layout5 =
 
 /******************************************************************************/
 
-static GFXDECODE_START( alpha68k_I )
+static GFXDECODE_START( gfx_alpha68k_I )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( alpha68k_II )
+static GFXDECODE_START( gfx_alpha68k_II )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,  16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( alpha68k_V )
+static GFXDECODE_START( gfx_alpha68k_V )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_V,  0,  16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 256 )
 GFXDECODE_END
 
-static GFXDECODE_START( sstingry )
+static GFXDECODE_START( gfx_sstingry )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sting_layout1,  0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sting_layout2,  0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, sting_layout1,  0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, sting_layout3,  0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( kyros )
+static GFXDECODE_START( gfx_kyros )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, kyros_char_layout1,  0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, kyros_char_layout2,  0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x18000, kyros_char_layout1,  0, 32 )
@@ -1813,7 +1792,7 @@ static GFXDECODE_START( kyros )
 	GFXDECODE_ENTRY( "gfx1", 0x48000, kyros_char_layout2,  0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( jongbou )
+static GFXDECODE_START( gfx_jongbou )
 	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout1,  0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout2,  0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout3,  0, 32 )
@@ -1918,7 +1897,7 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 
 
 // Pixel clock, assuming that it can't be 4 MHz because 4 MHz / 15,20 KHz = 263 HTOTAL (VERY unlikely).
-#define ALPHA68K_PIXEL_CLOCK XTAL(24'000'000)/4
+#define ALPHA68K_PIXEL_CLOCK (24_MHz_XTAL / 4)
 #define ALPHA68K_HTOTAL 394
 #define ALPHA68K_HBEND 0
 #define ALPHA68K_HBSTART 256
@@ -1929,24 +1908,24 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 MACHINE_CONFIG_START(alpha68k_state::sstingry)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
-	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
+	MCFG_DEVICE_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
+	MCFG_DEVICE_PROGRAM_MAP(kyros_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(sstingry_sound_map)
-	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(sstingry_sound_map)
+	MCFG_DEVICE_IO_MAP(kyros_sound_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
-	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
-//  MCFG_CPU_PROGRAM_MAP(i8748_map)
-//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(alpha68k_state, saiyugoub1_mcu_command_r))
+	MCFG_DEVICE_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
+//  MCFG_DEVICE_PROGRAM_MAP(i8748_map)
+//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, alpha68k_state, saiyugoub1_mcu_command_r))
 //  MCFG_MCS48_PORT_T0_CLK_CUSTOM(alpha68k_state, saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
-//  MCFG_MCS48_PORT_T1_IN_CB(READLINE(alpha68k_state, saiyugoub1_m5205_irq_r))
-//  MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alpha68k_state, saiyugoub1_adpcm_rom_addr_w))
-//  MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alpha68k_state, saiyugoub1_adpcm_control_w))
+//  MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, alpha68k_state, saiyugoub1_m5205_irq_r))
+//  MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alpha68k_state, saiyugoub1_adpcm_rom_addr_w))
+//  MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alpha68k_state, saiyugoub1_adpcm_control_w))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
@@ -1962,44 +1941,44 @@ MACHINE_CONFIG_START(alpha68k_state::sstingry)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_sstingry)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sstingry)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sstingry)
 
 	MCFG_PALETTE_ADD("palette", 256 + 1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("ym3", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym3", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::kyros)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* Verified on bootleg PCB */
-	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
+	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 4)   /* Verified on bootleg PCB */
+	MCFG_DEVICE_PROGRAM_MAP(kyros_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6) /* Verified on bootleg PCB */
-	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
-	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 6) /* Verified on bootleg PCB */
+	MCFG_DEVICE_PROGRAM_MAP(kyros_sound_map)
+	MCFG_DEVICE_IO_MAP(kyros_sound_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -2014,43 +1993,43 @@ MACHINE_CONFIG_START(alpha68k_state::kyros)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kyros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyros)
 
 	MCFG_PALETTE_ADD("palette", 256 + 1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(24'000'000)/12)    /* Verified on bootleg PCB */
+	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL / 12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(24'000'000)/12)    /* Verified on bootleg PCB */
+	MCFG_DEVICE_ADD("ym2", YM2203, 24_MHz_XTAL / 12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("ym3", YM2203, XTAL(24'000'000)/12)    /* Verified on bootleg PCB */
+	MCFG_DEVICE_ADD("ym3", YM2203, 24_MHz_XTAL / 12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::jongbou)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*16) // MCU irq
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(kyros_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*16) // MCU irq
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(jongbou_sound_map)
-	MCFG_CPU_IO_MAP(jongbou_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  160*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(jongbou_sound_map)
+	MCFG_DEVICE_IO_MAP(jongbou_sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  160*60)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -2065,31 +2044,31 @@ MACHINE_CONFIG_START(alpha68k_state::jongbou)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jongbou)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jongbou)
 
 	MCFG_PALETTE_ADD("palette", 256 + 1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
-	MCFG_CPU_PROGRAM_MAP(alpha68k_I_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq1_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
+	MCFG_DEVICE_PROGRAM_MAP(alpha68k_I_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq1_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // 4Mhz seems to yield the correct tone
-	MCFG_CPU_PROGRAM_MAP(alpha68k_I_s_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // 4Mhz seems to yield the correct tone
+	MCFG_DEVICE_PROGRAM_MAP(alpha68k_I_s_map)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -2104,18 +2083,18 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_I)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_I)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -2123,20 +2102,20 @@ MACHINE_CONFIG_END
 INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* Correct */
-	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) /* Correct */
+	MCFG_DEVICE_PROGRAM_MAP(alpha68k_II_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545*2) /* Unlikely but needed to stop nested NMI's */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  7500)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, 7614)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
@@ -2151,98 +2130,54 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_II)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
+	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 
-	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ym2", YM2413, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::btlfieldb)
 	alpha68k_II(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*4) // MCU irq
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*4) // MCU irq
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_II_gm)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*3) // MCU irq
-
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000*2) // TODO: fix this
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  7500)
-
-	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
-	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_II)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
-
-	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
-
-	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	alpha68k_II(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*3) // MCU irq
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(alpha68k_V_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(alpha68k_V_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  8500)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
@@ -2257,89 +2192,47 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_V)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
+	MCFG_DEVICE_ADD("ym1", YM2203, ALPHA68K_PIXEL_CLOCK / 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 
-	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ym2", YM2413, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // ALPHA-VOICE88 custom DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_V_sb)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(alpha68k_V_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
-
-	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  8500)
-
-	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
-	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
+	alpha68k_V(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V_sb)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_V)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
-
-	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
-
-	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::tnextspc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */
-	MCFG_CPU_PROGRAM_MAP(tnextspc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq1_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */
+	MCFG_DEVICE_PROGRAM_MAP(tnextspc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq1_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(tnextspc_sound_map)
-	MCFG_CPU_IO_MAP(tnextspc_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(tnextspc_sound_map)
+	MCFG_DEVICE_IO_MAP(tnextspc_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -2354,18 +2247,18 @@ MACHINE_CONFIG_START(alpha68k_state::tnextspc)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_I)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_I)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -3340,7 +3233,7 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(alpha68k_state,sstingry)
+void alpha68k_state::init_sstingry()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x00ff;
@@ -3348,7 +3241,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,sstingry)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,kyros)
+void alpha68k_state::init_kyros()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x0012;
@@ -3356,7 +3249,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,kyros)
 	m_game_id = ALPHA68K_KYROS;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,jongbou)
+void alpha68k_state::init_jongbou()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c0000, 0x0c0001, read16_delegate(FUNC(alpha68k_state::jongbou_inputs_r),this));
 	m_invert_controls = 0;
@@ -3365,14 +3258,14 @@ DRIVER_INIT_MEMBER(alpha68k_state,jongbou)
 	m_game_id = ALPHA68K_JONGBOU;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,paddlema)
+void alpha68k_state::init_paddlema()
 {
 	m_microcontroller_id = 0;
 	m_coin_id = 0;              // Not needed !
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,timesold)
+void alpha68k_state::init_timesold()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0;
@@ -3380,7 +3273,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,timesold)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,timesold1)
+void alpha68k_state::init_timesold1()
 {
 	m_invert_controls = 1;
 	m_microcontroller_id = 0;
@@ -3388,7 +3281,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,timesold1)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,btlfield)
+void alpha68k_state::init_btlfield()
 {
 	m_invert_controls = 1;
 	m_microcontroller_id = 0;
@@ -3396,7 +3289,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,btlfield)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,btlfieldb)
+void alpha68k_state::init_btlfieldb()
 {
 	m_invert_controls = 1;
 	m_microcontroller_id = 0;
@@ -3404,7 +3297,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,btlfieldb)
 	m_game_id = ALPHA68K_BTLFIELDB;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,skysoldr)
+void alpha68k_state::init_skysoldr()
 {
 	membank("bank8")->set_base((memregion("maincpu")->base()) + 0x40000);
 	m_invert_controls = 0;
@@ -3413,7 +3306,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,skysoldr)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,goldmedl)
+void alpha68k_state::init_goldmedl()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8803; //AT
@@ -3421,7 +3314,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,goldmedl)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,goldmedla)
+void alpha68k_state::init_goldmedla()
 {
 	membank("bank8")->set_base(memregion("data_bank")->base());
 	m_invert_controls = 0;
@@ -3430,7 +3323,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,goldmedla)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,skyadvnt)
+void alpha68k_state::init_skyadvnt()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8814;
@@ -3438,7 +3331,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,skyadvnt)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,skyadvntu)
+void alpha68k_state::init_skyadvntu()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8814;
@@ -3446,7 +3339,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,skyadvntu)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,gangwarsu)
+void alpha68k_state::init_gangwarsu()
 {
 	membank("bank8")->set_base(memregion("user1")->base());
 	m_invert_controls = 0;
@@ -3455,7 +3348,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,gangwarsu)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,gangwars)
+void alpha68k_state::init_gangwars()
 {
 	membank("bank8")->set_base(memregion("user1")->base());
 	m_invert_controls = 0;
@@ -3464,7 +3357,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,gangwars)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,sbasebal)
+void alpha68k_state::init_sbasebal()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -3488,7 +3381,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,sbasebal)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,sbasebalj)
+void alpha68k_state::init_sbasebalj()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8512;  // Same as 'gangwars' ?
@@ -3496,7 +3389,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,sbasebalj)
 	m_game_id = 0;
 }
 
-DRIVER_INIT_MEMBER(alpha68k_state,tnextspc)
+void alpha68k_state::init_tnextspc()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x890a;
@@ -3506,41 +3399,41 @@ DRIVER_INIT_MEMBER(alpha68k_state,tnextspc)
 
 /******************************************************************************/
 
-GAME( 1986, sstingry,  0,        sstingry,       sstingry, alpha68k_state, sstingry, ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, sstingry,  0,        sstingry,       sstingry,  alpha68k_state, init_sstingry,  ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1987, kyros,     0,        kyros,          kyros,    alpha68k_state, kyros,    ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kyrosj,    kyros,    kyros,          kyros,    alpha68k_state, kyros,    ROT90, "Alpha Denshi Co.",                                  "Kyros No Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, kyros,     0,        kyros,          kyros,     alpha68k_state, init_kyros,     ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kyrosj,    kyros,    kyros,          kyros,     alpha68k_state, init_kyros,     ROT90, "Alpha Denshi Co.",                                  "Kyros No Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, jongbou,   0,        jongbou,        jongbou,  alpha68k_state, jongbou,  ROT90, "SNK",                                               "Mahjong Block Jongbou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, jongbou,   0,        jongbou,        jongbou,   alpha68k_state, init_jongbou,   ROT90, "SNK",                                               "Mahjong Block Jongbou (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, paddlema,  0,        alpha68k_I,     paddlema, alpha68k_state, paddlema, ROT90, "SNK",                                               "Paddle Mania", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, paddlema,  0,        alpha68k_I,     paddlema,  alpha68k_state, init_paddlema,  ROT90, "SNK",                                               "Paddle Mania", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, timesold,  0,        alpha68k_II,    timesold, alpha68k_state, timesold, ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, timesold1, timesold, alpha68k_II,    timesold, alpha68k_state, timesold1,ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, timesold,  0,        alpha68k_II,    timesold,  alpha68k_state, init_timesold,  ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, timesold1, timesold, alpha68k_II,    timesold,  alpha68k_state, init_timesold1, ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield, alpha68k_state, btlfield, ROT90, "Alpha Denshi Co. (SNK license)",                    "Battle Field (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb,alpha68k_state, btlfieldb,ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield,  alpha68k_state, init_btlfield,  ROT90, "Alpha Denshi Co. (SNK license)",                    "Battle Field (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb, alpha68k_state, init_btlfieldb, ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr, alpha68k_state, skysoldr, ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr, alpha68k_state, skysoldr, ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_state, init_skysoldr,  ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, alpha68k_state, goldmedl, ROT0,  "SNK",                                               "Gold Medalist (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (set 2)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // current handling never really accesses video banking other than boot time.
-GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // same as above
+GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // current handling never really accesses video banking other than boot time.
+GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // same as above
 
-GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt, alpha68k_state, skyadvnt, ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu,alpha68k_state, skyadvntu,ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skyadvntj, skyadvnt, alpha68k_V,     skyadvnt, alpha68k_state, skyadvnt, ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt,  alpha68k_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu, alpha68k_state, init_skyadvntu, ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyadvntj, skyadvnt, alpha68k_V,     skyadvnt,  alpha68k_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, gangwars,  0,        alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gangwarsj, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu,alpha68k_state, gangwarsu,ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
+GAME( 1989, gangwars,  0,        alpha68k_V,     gangwars,  alpha68k_state, init_gangwars,  ROT0,  "Alpha Denshi Co.",                                  "Gang Wars", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gangwarsj, gangwars, alpha68k_V,     gangwars,  alpha68k_state, init_gangwars,  ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu, alpha68k_state, init_gangwarsu, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwars,  alpha68k_state, init_gangwars,  ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
 
-GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, alpha68k_state, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
-GAME( 1989, sbasebalj, sbasebal, alpha68k_V_sb,  sbasebalj,alpha68k_state, sbasebalj,ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
+GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal,  alpha68k_state, init_sbasebal,  ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
+GAME( 1989, sbasebalj, sbasebal, alpha68k_V_sb,  sbasebalj, alpha68k_state, init_sbasebalj, ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
 
-GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, tnextspcj, tnextspc, tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK (Pasadena International Corp. license)",        "The Next Space (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc,  alpha68k_state, init_tnextspc,  ROT90, "SNK",                                               "The Next Space (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc,  alpha68k_state, init_tnextspc,  ROT90, "SNK",                                               "The Next Space (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, tnextspcj, tnextspc, tnextspc,       tnextspc,  alpha68k_state, init_tnextspc,  ROT90, "SNK (Pasadena International Corp. license)",        "The Next Space (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

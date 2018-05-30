@@ -150,11 +150,11 @@ static const gfx_layout kaypro484_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( kayproii )
+static GFXDECODE_START( gfx_kayproii )
 	GFXDECODE_ENTRY( "chargen", 0x0000, kayproii_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( kaypro484 )
+static GFXDECODE_START( gfx_kaypro484 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, kaypro484_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -187,18 +187,19 @@ static const z80_daisy_config kaypro484_daisy_chain[] =
 ************************************************************/
 
 
-static SLOT_INTERFACE_START( kaypro_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void kaypro_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(kaypro_state::kayproii)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20_MHz_XTAL / 8)
-	MCFG_CPU_PROGRAM_MAP(kaypro_map)
-	MCFG_CPU_IO_MAP(kayproii_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20_MHz_XTAL / 8)
+	MCFG_DEVICE_PROGRAM_MAP(kaypro_map)
+	MCFG_DEVICE_IO_MAP(kayproii_io)
 	MCFG_Z80_DAISY_CHAIN(kayproii_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
@@ -214,56 +215,56 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kayproii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kayproii)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
 	MCFG_DEVICE_ADD("kbd", KAYPRO_10_KEYBOARD, 0)
-	MCFG_KAYPRO10KBD_RXD_CB(DEVWRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, syncb_w))
+	MCFG_KAYPRO10KBD_RXD_CB(WRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, syncb_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kaypro_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, synca_w)) // TODO: confirm this is connected
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
+	MCFG_DEVICE_ADD("serial", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, synca_w)) // TODO: confirm this is connected
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcda_w))
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // WD1943, SMC8116
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("sio", z80sio_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD("z80pio_g", Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
 
 	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(kaypro_state, pio_system_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kaypro_state, kayproii_pio_system_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, kaypro_state, pio_system_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kaypro_state, kayproii_pio_system_w))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, 20_MHz_XTAL / 8)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("serial", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("serial", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("serial", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("serial", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("serial", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("serial", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
 
 	MCFG_FD1793_ADD("fdc", 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -277,8 +278,8 @@ MACHINE_CONFIG_START(kaypro_state::kayproiv)
 	MCFG_DEVICE_REMOVE("z80pio_s")
 	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 2500000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(kaypro_state, pio_system_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kaypro_state, kayproiv_pio_system_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, kaypro_state, pio_system_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kaypro_state, kayproiv_pio_system_w))
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -288,9 +289,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(kaypro_map)
-	MCFG_CPU_IO_MAP(kaypro484_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(kaypro_map)
+	MCFG_DEVICE_IO_MAP(kaypro484_io)
 	MCFG_Z80_DAISY_CHAIN(kaypro484_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
@@ -304,13 +305,13 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro484)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kaypro484)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kaypro484)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(kaypro_state, kaypro)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
@@ -322,48 +323,48 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
 	MCFG_DEVICE_ADD("kbd", KAYPRO_10_KEYBOARD, 0)
-	MCFG_KAYPRO10KBD_RXD_CB(DEVWRITELINE("sio_1", z80sio_device, rxb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_1", z80sio_device, syncb_w))
+	MCFG_KAYPRO10KBD_RXD_CB(WRITELINE("sio_1", z80sio_device, rxb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_1", z80sio_device, syncb_w))
 
 	MCFG_CLOCK_ADD("kbdtxrxc", 4800)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio_1", z80sio_device, rxtxcb_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio_1", z80sio_device, rxtxcb_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kaypro_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_RS232_PORT_ADD("modem", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio_1", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_1", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio_1", z80sio_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio_1", z80sio_device, dcda_w))
+	MCFG_DEVICE_ADD("modem", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio_1", z80sio_device, rxa_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_1", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio_1", z80sio_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio_1", z80sio_device, dcda_w))
 
-	MCFG_RS232_PORT_ADD("serprn", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio_2", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_2", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio_2", z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD("serprn", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio_2", z80sio_device, rxa_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_2", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio_2", z80sio_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("sio_1", Z80SIO, 16_MHz_XTAL / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // FIXME: use a combiner
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("modem", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("modem", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("modem", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("modem", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("modem", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("modem", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("kbd", kaypro_10_keyboard_device, txd_w))
 
 	MCFG_DEVICE_ADD("sio_2", Z80SIO, 16_MHz_XTAL / 4)   /* extra sio for modem and printer */
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // FIXME: use a combiner
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("serprn", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("serprn", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // WD1943, SMC8116
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio_1", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_1", z80sio_device, txca_w))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("sio_2", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio_2", z80sio_device, txca_w))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("sio_1", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_1", z80sio_device, txca_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("sio_2", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_2", z80sio_device, txca_w))
 
 	MCFG_FD1793_ADD("fdc", 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -398,7 +399,7 @@ MACHINE_CONFIG_START(kaypro_state::omni2)
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( kaypro_state, kaypro )
+void kaypro_state::init_kaypro()
 {
 	uint8_t *main = memregion("roms")->base();
 	uint8_t *ram = memregion("rambank")->base();
@@ -676,19 +677,19 @@ ROM_START(omni4)
 ROM_END
 
 
-/*    YEAR  NAME         PARENT     COMPAT  MACHINE    INPUT   CLASS         INIT    COMPANY                FULLNAME */
-COMP( 1982, kayproii,    0,         0,      kayproii,  kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 1983, kayproiv,    kayproii,  0,      kayproiv,  kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro IV - 4/83" , 0 ) // model 81-004
-COMP( 1983, kaypro10,    0,         0,      kaypro10,  kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10 - 1983", 0 )
-COMP( 1983, kayproiip88, kayproii,  0,      kayproii,  kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 1984, kaypro484,   0,         0,      kaypro484, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4/84" , MACHINE_NOT_WORKING ) // model 81-015
-COMP( 1984, kaypro284,   kaypro484, 0,      kaypro284, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2/84" , MACHINE_NOT_WORKING ) // model 81-015
-COMP( 1984, kaypro484p88,kaypro484, 0,      kaypro484, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4/84 plus88", MACHINE_NOT_WORKING ) // model 81-015 with an added 8088 daughterboard and rom
-COMP( 1984, kaypro1084,  kaypro10,  0,      kaypro10,  kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
-COMP( 1984, robie,       0,         0,      kaypro484, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , MACHINE_NOT_WORKING )
-COMP( 1985, kaypro2x,    kaypro484, 0,      kaypro484, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
-COMP( 1985, kaypronew2,  0,         0,      kaypronew2,kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro New 2", MACHINE_NOT_WORKING )
-COMP( 1985, kaypro4x,    robie,     0,      kaypro484, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4x" , MACHINE_NOT_WORKING )
-COMP( 1986, kaypro1,     kaypro484, 0,      kaypro484, kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 1", MACHINE_NOT_WORKING )
-COMP( 198?, omni2,       kayproii,  0,      omni2,     kaypro, kaypro_state, kaypro, "Non Linear Systems",  "Omni II Logic Analyzer" , 0 )
-COMP( 198?, omni4,       kaypro484, 0,      kaypro484, kaypro, kaypro_state, kaypro, "Omni Logic Inc.",     "Omni 4 Logic Analyzer" , MACHINE_NOT_WORKING )
+/*    YEAR  NAME          PARENT     COMPAT  MACHINE     INPUT   CLASS         INIT         COMPANY               FULLNAME */
+COMP( 1982, kayproii,     0,         0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro II - 2/83" , 0 )
+COMP( 1983, kayproiv,     kayproii,  0,      kayproiv,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro IV - 4/83" , 0 ) // model 81-004
+COMP( 1983, kaypro10,     0,         0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10 - 1983", 0 )
+COMP( 1983, kayproiip88,  kayproii,  0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
+COMP( 1984, kaypro484,    0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84" , MACHINE_NOT_WORKING ) // model 81-015
+COMP( 1984, kaypro284,    kaypro484, 0,      kaypro284,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2/84" , MACHINE_NOT_WORKING ) // model 81-015
+COMP( 1984, kaypro484p88, kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84 plus88", MACHINE_NOT_WORKING ) // model 81-015 with an added 8088 daughterboard and rom
+COMP( 1984, kaypro1084,   kaypro10,  0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
+COMP( 1984, robie,        0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro Robie" , MACHINE_NOT_WORKING )
+COMP( 1985, kaypro2x,     kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
+COMP( 1985, kaypronew2,   0,         0,      kaypronew2, kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro New 2", MACHINE_NOT_WORKING )
+COMP( 1985, kaypro4x,     robie,     0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4x" , MACHINE_NOT_WORKING )
+COMP( 1986, kaypro1,      kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 1", MACHINE_NOT_WORKING )
+COMP( 198?, omni2,        kayproii,  0,      omni2,      kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Omni II Logic Analyzer" , 0 )
+COMP( 198?, omni4,        kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Omni Logic Inc.",    "Omni 4 Logic Analyzer" , MACHINE_NOT_WORKING )

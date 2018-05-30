@@ -80,10 +80,10 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(cit220_state::cit220p)
-	MCFG_CPU_ADD("maincpu", I8085A, 6000000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_I8085A_SOD(WRITELINE(cit220_state, sod_w))
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_I8085A_SOD(WRITELINE(*this, cit220_state, sod_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(24553200, 1580, 0, 1320, 259, 0, 240) // dot clock guessed
@@ -118,4 +118,4 @@ ROM_START( cit220p )
 	ROM_LOAD( "v00_kbd.bin",   0x0000, 0x1000, CRC(f9d24190) SHA1(c4e9ef8188afb18de373f2a537ca9b7a315bfb76) )
 ROM_END
 
-COMP( 1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, 0, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_IS_SKELETON )
+COMP( 1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_IS_SKELETON )

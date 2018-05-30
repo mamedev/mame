@@ -141,7 +141,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( rcorsair )
+static GFXDECODE_START( gfx_rcorsair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -159,13 +159,13 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */
 
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(rcorsair_main_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(rcorsair_main_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", I8035, 8000000)
-	MCFG_CPU_PROGRAM_MAP(rcorsair_sub_map)
-	MCFG_CPU_IO_MAP(rcorsair_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", I8035, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(rcorsair_sub_map)
+	MCFG_DEVICE_IO_MAP(rcorsair_sub_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -175,7 +175,7 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rcorsair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rcorsair)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
@@ -199,4 +199,4 @@ ROM_START( rcorsair )
 ROM_END
 
 
-GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, 0, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )
+GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, empty_init, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )

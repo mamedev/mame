@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -598,7 +598,7 @@ WRITE_LINE_MEMBER( nano_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -636,12 +636,12 @@ void osc1000b_state::machine_reset()
 
 void tmc2000_state::machine_start()
 {
-	uint16_t addr;
+	m_led.resolve();
 
 	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
 
 	// randomize color RAM contents
-	for (addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
+	for (uint16_t addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
 		m_colorram[addr] = machine().rand() & 0xff;
 	}
@@ -677,6 +677,8 @@ void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 void nano_state::machine_start()
 {
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -714,23 +716,23 @@ QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 
 MACHINE_CONFIG_START(tmc1800_state::tmc1800)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(tmc1800_map)
-	MCFG_CPU_IO_MAP(tmc1800_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(tmc1800_map)
+	MCFG_DEVICE_IO_MAP(tmc1800_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc1800_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc1800_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc1800_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc1800_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, tmc1800_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc1800_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc1800_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc1800_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1861_TAG, cdp1861_device, dma_w))
 
 	// video hardware
 	tmc1800_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_DEVICE_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -746,22 +748,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(osc1000b_state::osc1000b)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(osc1000b_map)
-	MCFG_CPU_IO_MAP(osc1000b_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(osc1000b_map)
+	MCFG_DEVICE_IO_MAP(osc1000b_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(osc1000b_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(osc1000b_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(osc1000b_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(osc1000b_state, q_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, osc1000b_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, osc1000b_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, osc1000b_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, osc1000b_state, q_w))
 
 	// video hardware
 	osc1000b_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_DEVICE_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -777,15 +779,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tmc2000_state::tmc2000)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(tmc2000_map)
-	MCFG_CPU_IO_MAP(tmc2000_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(tmc2000_map)
+	MCFG_DEVICE_IO_MAP(tmc2000_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc2000_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc2000_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc2000_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc2000_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(tmc2000_state, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, tmc2000_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc2000_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc2000_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc2000_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, tmc2000_state, dma_w))
 
 	// video hardware
 	tmc2000_video(config);
@@ -803,15 +805,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nano_state::nano)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_CPU_PROGRAM_MAP(nano_map)
-	MCFG_CPU_IO_MAP(nano_io_map)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(nano_map)
+	MCFG_DEVICE_IO_MAP(nano_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(nano_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(nano_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(nano_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(nano_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1864_TAG, cdp1864_device, dma_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, nano_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, nano_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, nano_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, nano_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1864_TAG, cdp1864_device, dma_w))
 
 	// video hardware
 	nano_video(config);
@@ -872,15 +874,15 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
+void tmc1800_state::init_tmc1800()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT     COMPANY        FULLNAME       FLAGS
-COMP( 1977, tmc1800,    0,       0,      tmc1800,    tmc1800, tmc1800_state,  tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800, 0,      osc1000b,   tmc1800, osc1000b_state, 0,       "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
-COMP( 1980, tmc2000,    0,       0,      tmc2000,    tmc2000, tmc2000_state,  0,       "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, nano,       tmc2000, 0,      nano,       nano,    nano_state,     0,       "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT          COMPANY        FULLNAME       FLAGS
+COMP( 1977, tmc1800,  0,       0,      tmc1800,  tmc1800, tmc1800_state,  init_tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
+COMP( 1977, osc1000b, tmc1800, 0,      osc1000b, tmc1800, osc1000b_state, empty_init,   "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
+COMP( 1980, tmc2000,  0,       0,      tmc2000,  tmc2000, tmc2000_state,  empty_init,   "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, nano,     tmc2000, 0,      nano,     nano,    nano_state,     empty_init,   "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

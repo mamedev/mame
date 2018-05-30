@@ -18,7 +18,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "machine/watchdog.h"
 #include "video/resnet.h"
@@ -53,9 +52,6 @@ public:
 	DECLARE_READ8_MEMBER(lastsurv_port_r);
 	DECLARE_WRITE8_MEMBER(lastsurv_muxer_w);
 
-	// sound Z80 CPU read/write handlers
-	DECLARE_READ8_MEMBER(sound_data_r);
-
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -85,8 +81,7 @@ protected:
 	enum
 	{
 		TID_SCANLINE,
-		TID_IRQ2_GEN,
-		TID_SOUND_WRITE
+		TID_IRQ2_GEN
 	};
 
 	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -101,9 +96,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 	void generic_iochip0_lamps_w(uint8_t data);
 
-		// compare/timer chip callbacks
-	void timer_ack_callback();
-	DECLARE_WRITE8_MEMBER(sound_data_w);
+	// compare/timer chip callbacks
+	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 
 	DECLARE_WRITE8_MEMBER(pc_0_w);
 	DECLARE_WRITE8_MEMBER(pd_0_w);
@@ -121,7 +115,6 @@ protected:
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
-	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint16_t> m_subram0;
 
 	// configuration
@@ -153,6 +146,7 @@ protected:
 	required_ioport m_io0_porta;
 	optional_ioport_array<8> m_adc_ports;
 	optional_ioport_array<4> m_mux_ports;
+	output_finder<4> m_lamp;
 
 protected:
 	virtual void device_start() override;

@@ -72,7 +72,18 @@ static const char DEVICE_SELF_OWNER[] = "^";
 
 namespace emu { namespace detail {
 
-class device_type_impl;
+class device_type_impl_base;
+
+
+template <typename T> struct is_device_implementation
+{
+	static constexpr bool value = std::is_base_of<device_t, T>::value;
+};
+
+template <typename T> struct is_device_interface
+{
+	static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value;
+};
 
 
 struct device_feature
@@ -112,9 +123,9 @@ public:
 	{
 	public:
 		typedef std::ptrdiff_t difference_type;
-		typedef device_type_impl value_type;
-		typedef device_type_impl *pointer;
-		typedef device_type_impl &reference;
+		typedef device_type_impl_base value_type;
+		typedef device_type_impl_base *pointer;
+		typedef device_type_impl_base &reference;
 		typedef std::forward_iterator_tag iterator_category;
 
 		const_iterator() = default;
@@ -143,15 +154,15 @@ public:
 	const_iterator cend() const;
 
 private:
-	friend class device_type_impl;
+	friend class device_type_impl_base;
 
 	class const_iterator_helper : public const_iterator
 	{
 	public:
-		const_iterator_helper(device_type_impl *type) { m_type = type; }
+		const_iterator_helper(device_type_impl_base *type) { m_type = type; }
 	};
 
-	static device_type_impl *register_device(device_type_impl &type);
+	static device_type_impl_base *register_device(device_type_impl_base &type);
 };
 
 
@@ -165,26 +176,26 @@ auto device_tag_func() { return device_tag_struct<DeviceClass, ShortName, FullNa
 template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
 auto driver_tag_func() { return driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>{ }; };
 
-class device_type_impl
+class device_type_impl_base
 {
 private:
 	friend class device_registrar;
 
-	typedef std::unique_ptr<device_t> (*create_func)(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	typedef std::unique_ptr<device_t> (*create_func)(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	device_type_impl(device_type_impl const &) = delete;
-	device_type_impl(device_type_impl &&) = delete;
-	device_type_impl &operator=(device_type_impl const &) = delete;
-	device_type_impl &operator=(device_type_impl &&) = delete;
+	device_type_impl_base(device_type_impl_base const &) = delete;
+	device_type_impl_base(device_type_impl_base &&) = delete;
+	device_type_impl_base &operator=(device_type_impl_base const &) = delete;
+	device_type_impl_base &operator=(device_type_impl_base &&) = delete;
 
 	template <typename DeviceClass>
-	static std::unique_ptr<device_t> create_device(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	static std::unique_ptr<device_t> create_device(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	{
 		return make_unique_clear<DeviceClass>(mconfig, tag, owner, clock);
 	}
 
 	template <typename DriverClass>
-	static std::unique_ptr<device_t> create_driver(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	static std::unique_ptr<device_t> create_driver(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	{
 		assert(!owner);
 		assert(!clock);
@@ -200,10 +211,12 @@ private:
 	device_feature::type const m_unemulated_features;
 	device_feature::type const m_imperfect_features;
 
-	device_type_impl *m_next;
+	device_type_impl_base *m_next;
 
 public:
-	device_type_impl(std::nullptr_t)
+	using exposed_type = device_t;
+
+	device_type_impl_base(std::nullptr_t)
 		: m_creator(nullptr)
 		, m_type(typeid(std::nullptr_t))
 		, m_shortname(nullptr)
@@ -216,7 +229,7 @@ public:
 	}
 
 	template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
-	device_type_impl(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
+	device_type_impl_base(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
 		, m_shortname(ShortName)
@@ -229,7 +242,7 @@ public:
 	}
 
 	template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
-	device_type_impl(driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect> (*)())
+	device_type_impl_base(driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect> (*)())
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
 		, m_shortname(ShortName)
@@ -248,14 +261,36 @@ public:
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
 
-	std::unique_ptr<device_t> operator()(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
+	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
 		return m_creator(*this, mconfig, tag, owner, clock);
 	}
 
 	explicit operator bool() const { return bool(m_creator); }
-	bool operator==(device_type_impl const &that) const { return &that == this; }
-	bool operator!=(device_type_impl const &that) const { return &that != this; }
+	bool operator==(device_type_impl_base const &that) const { return &that == this; }
+	bool operator!=(device_type_impl_base const &that) const { return &that != this; }
+};
+
+
+template <class DeviceClass>
+class device_type_impl : public device_type_impl_base
+{
+public:
+	using exposed_type = DeviceClass;
+
+	using device_type_impl_base::device_type_impl_base;
+	using device_type_impl_base::create;
+
+	template <typename... Params>
+	std::unique_ptr<DeviceClass> create(machine_config &mconfig, char const *tag, device_t *owner, Params &&... args) const
+	{
+		return make_unique_clear<DeviceClass>(mconfig, tag, owner, std::forward<Params>(args)...);
+	}
+
+	template <typename... Params> DeviceClass &operator()(machine_config &mconfig, char const *tag, Params &&... args) const;
+	template <typename Exposed, bool Required, typename... Params> DeviceClass &operator()(machine_config &mconfig, device_finder<Exposed, Required> &finder, Params &&... args) const;
+	template <typename... Params> DeviceClass &operator()(machine_config_replace replace, char const *tag, Params &&... args) const;
+	template <typename Exposed, bool Required, typename... Params> DeviceClass &operator()(machine_config_replace replace, device_finder<Exposed, Required> &finder, Params &&... args) const;
 };
 
 
@@ -265,7 +300,7 @@ inline device_registrar::const_iterator &device_registrar::const_iterator::opera
 
 
 // device types
-typedef emu::detail::device_type_impl const &device_type;
+typedef emu::detail::device_type_impl_base const &device_type;
 typedef std::add_pointer_t<device_type> device_type_ptr;
 extern emu::detail::device_registrar const registered_device_types;
 
@@ -286,13 +321,13 @@ template <
 constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>;
 
 #define DECLARE_DEVICE_TYPE(Type, Class) \
-		extern device_type const Type; \
 		class Class; \
+		extern emu::detail::device_type_impl<Class> const &Type; \
 		extern template class device_finder<Class, false>; \
 		extern template class device_finder<Class, true>;
 
 #define DECLARE_DEVICE_TYPE_NS(Type, Namespace, Class) \
-		extern device_type const Type; \
+		extern emu::detail::device_type_impl<Namespace::Class> const &Type; \
 		extern template class device_finder<Namespace::Class, false>; \
 		extern template class device_finder<Namespace::Class, true>;
 
@@ -301,16 +336,23 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
 		} \
-		device_type const Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		emu::detail::device_type_impl<Class> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
 		template class device_finder<Class, false>; \
 		template class device_finder<Class, true>;
+
+#define DEFINE_DEVICE_TYPE_PRIVATE(Type, Base, Class, ShortName, FullName) \
+		namespace { \
+			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+		} \
+		emu::detail::device_type_impl<Base> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>;
 
 #define DEFINE_DEVICE_TYPE_NS(Type, Namespace, Class, ShortName, FullName) \
 		namespace { \
 			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
 		} \
-		device_type const Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		emu::detail::device_type_impl<Namespace::Class> const &Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
 		template class device_finder<Namespace::Class, false>; \
 		template class device_finder<Namespace::Class, true>;
 
@@ -498,7 +540,7 @@ public:
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
-	void add_machine_configuration(machine_config &config) { device_add_mconfig(config); }
+	void add_machine_configuration(machine_config &config);
 	void set_clock(u32 clock);
 	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
 	void set_input_default(const input_device_default *config) { m_input_defaults = config; }

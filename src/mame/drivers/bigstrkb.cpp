@@ -191,7 +191,7 @@ static const gfx_layout bigstrkb_char16layout =
 
 
 
-static GFXDECODE_START( bigstrkb )
+static GFXDECODE_START( gfx_bigstrkb )
 	GFXDECODE_ENTRY( "gfx1", 0, bigstrkb_charlayout,   0x200, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bigstrkb_char16layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, bigstrkb_char16layout,   0x300, 16 )
@@ -202,11 +202,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigstrkb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigstrkb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigstrkb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -220,14 +220,15 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_YM2151_ADD("ymsnd", ym2151_config)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, ym2151_config)
 
-	MCFG_OKIM6295_ADD("oki1", 4000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki2", 4000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -298,5 +299,5 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrkba,bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrkb,  bigstrik, bigstrkb, bigstrkb, bigstrkb_state, empty_init, ROT0, "bootleg", "Big Striker (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrkba, bigstrik, bigstrkb, bigstrkb, bigstrkb_state, empty_init, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

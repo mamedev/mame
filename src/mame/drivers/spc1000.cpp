@@ -458,41 +458,41 @@ WRITE_LINE_MEMBER( spc1000_state::irq_w )
 //  address maps
 //-------------------------------------------------
 
-extern SLOT_INTERFACE_START(spc1000_exp)
-	SLOT_INTERFACE("fdd", SPC1000_FDD_EXP)
-	SLOT_INTERFACE("vdp", SPC1000_VDP_EXP)
-SLOT_INTERFACE_END
+void spc1000_exp(device_slot_interface &device)
+{
+	device.option_add("fdd", SPC1000_FDD_EXP);
+	device.option_add("vdp", SPC1000_VDP_EXP);
+}
 
 MACHINE_CONFIG_START(spc1000_state::spc1000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
-	MCFG_CPU_IO_MAP(spc1000_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spc1000_mem)
+	MCFG_DEVICE_IO_MAP(spc1000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
 	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(spc1000_state, irq_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(spc1000_state, mc6847_videoram_r))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, spc1000_state, irq_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, spc1000_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
 	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2)
 	// other lines not connected
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(4'000'000) / 1)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1000_state, porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 1)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1000_state, porta_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(spc1000_state, centronics_busy_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1000_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -525,5 +525,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY    FULLNAME    FLAGS
-COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, spc1000_state,  0,    "Samsung", "SPC-1000", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
+COMP( 1982, spc1000, 0,      0,      spc1000, spc1000, spc1000_state, empty_init, "Samsung", "SPC-1000", 0 )

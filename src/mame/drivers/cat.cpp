@@ -290,7 +290,7 @@ public:
 	DECLARE_MACHINE_START(cat);
 	DECLARE_MACHINE_RESET(cat);
 	DECLARE_VIDEO_START(cat);
-	DECLARE_DRIVER_INIT(cat);
+	void init_cat();
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -365,16 +365,15 @@ protected:
 
 // TODO: this init doesn't actually work yet! please fix me!
 /*
-DRIVER_INIT_MEMBER( cat_state,cat )
+void cat_state::init_cat()
 {
     uint8_t *svrom = memregion("svrom")->base();
-    int i;
     // fill svrom with the correct 2e80 pattern except where svrom1 sits
     // first half
-    for (i = 0; i < 0x20000; i+=2)
+    for (int i = 0; i < 0x20000; i+=2)
         svrom[i] = 0x2E;
     // second half
-    for (i = 0x20000; i < 0x40000; i+=2)
+    for (int i = 0x20000; i < 0x40000; i+=2)
     {
         svrom[i] = 0x2E;
         svrom[i+1] = 0x80;
@@ -1058,9 +1057,9 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 MACHINE_CONFIG_START(cat_state::cat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(19'968'000)/4)
-	MCFG_CPU_PROGRAM_MAP(cat_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(19'968'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(cat_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)
@@ -1079,18 +1078,18 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
 	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL(19'968'000)*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, cat_state, cat_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txb))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, cat_state, cat_duart_output))
 
 	MCFG_CENTRONICS_ADD("ctx", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(cat_state, prn_ack_ff))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, cat_state, prn_ack_ff))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1178,5 +1177,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1987, cat,  0,      0,       cat,       cat,     cat_state,     0,       "Canon",  "Cat",         MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1987, cat,  0,      0,      cat,     cat,   cat_state, empty_init, "Canon", "Cat",    MACHINE_NOT_WORKING)

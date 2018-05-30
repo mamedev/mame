@@ -338,7 +338,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( chaknpop )
+static GFXDECODE_START( gfx_chaknpop )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   32, 8 )
 GFXDECODE_END
@@ -365,9 +365,9 @@ void chaknpop_state::machine_reset()
 MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000) / 6)    // Verified on PCB
-	MCFG_CPU_PROGRAM_MAP(chaknpop_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000) / 6)    // Verified on PCB
+	MCFG_DEVICE_PROGRAM_MAP(chaknpop_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(18'000'000) / 6)    // Verified on PCB
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
@@ -381,21 +381,21 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chaknpop)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chaknpop)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(chaknpop_state, chaknpop)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'000'000) / 12)  // Verified on PCB
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000) / 12)  // Verified on PCB
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'000'000) / 12)  /* Verified on PCB */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chaknpop_state, unknown_port_1_w))   // ??
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chaknpop_state, unknown_port_2_w))    // ??
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'000'000) / 12)  /* Verified on PCB */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, chaknpop_state, unknown_port_1_w))   // ??
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, chaknpop_state, unknown_port_2_w))    // ??
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -431,5 +431,5 @@ ROM_START( chaknpop )
 ROM_END
 
 
-//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  COMPANY              FULLNAME       FLAGS )
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY              FULLNAME       FLAGS )
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, empty_init, ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
