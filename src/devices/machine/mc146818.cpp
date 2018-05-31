@@ -490,18 +490,17 @@ int mc146818_device::get_timer_bypass()
 
 void mc146818_device::update_irq()
 {
-	// IRQ line is active low
 	if (((m_data[REG_C] & REG_C_UF) && (m_data[REG_B] & REG_B_UIE)) ||
 		((m_data[REG_C] & REG_C_AF) && (m_data[REG_B] & REG_B_AIE)) ||
 		((m_data[REG_C] & REG_C_PF) && (m_data[REG_B] & REG_B_PIE)))
 	{
 		m_data[REG_C] |= REG_C_IRQF;
-		m_write_irq(CLEAR_LINE);
+		m_write_irq(ASSERT_LINE);
 	}
 	else
 	{
 		m_data[REG_C] &= ~REG_C_IRQF;
-		m_write_irq(ASSERT_LINE);
+		m_write_irq(CLEAR_LINE);
 	}
 }
 

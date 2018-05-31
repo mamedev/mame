@@ -692,17 +692,9 @@ READ8_MEMBER(apollo_state::apollo_rtc_r)
 	return data;
 }
 
-// TODO: this is covering for missing mc146818 functionality
-TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
+WRITE_LINE_MEMBER(apollo_state::apollo_rtc_irq_function)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	// FIXME: reading register 0x0c will clear all interrupt flags
-	if ((apollo_rtc_r(space, 0x0c) & 0x80))
-	{
-		//SLOG2(("apollo_rtc_timer - set_irq_line %d", APOLLO_IRQ_RTC));
-		apollo_pic_set_irq_line(APOLLO_IRQ_RTC, 1);
-	}
+	apollo_pic_set_irq_line(APOLLO_IRQ_RTC, state);
 }
 
 //##########################################################################
@@ -1108,6 +1100,8 @@ MACHINE_CONFIG_START(apollo_state::common)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
 
 	MCFG_DEVICE_ADD(APOLLO_RTC_TAG, MC146818, 32.768_kHz_XTAL)
+	// FIXME: is this interrupt really only connected on DN3000?
+	//MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
 	MCFG_MC146818_UTC(true)
 	MCFG_MC146818_BINARY(false)
 	MCFG_MC146818_24_12(false)
@@ -1195,13 +1189,6 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 {
 	MLOG1(("machine_start_apollo"));
 
-	if (apollo_is_dn3000())
-	{
-		//MLOG1(("faking mc146818 interrupts (DN3000 only)"));
-		// fake mc146818 interrupts (DN3000 only)
-		m_dn3000_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_state::apollo_rtc_timer),this));
-	}
-
 	m_dma_channel = -1;
 	m_cur_eop = false;
 }
@@ -1236,11 +1223,6 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 
 	ptm_counter = 0;
 	sio_output_data = 0xff;
-
-	if (apollo_is_dn3000())
-	{
-		m_dn3000_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
-	}
 }
 
 #ifdef APOLLO_XXL

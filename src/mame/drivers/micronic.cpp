@@ -346,7 +346,7 @@ void micronic_state::machine_reset()
 
 WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 {
-	m_maincpu->set_input_line(0, !state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
