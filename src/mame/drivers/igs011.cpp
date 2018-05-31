@@ -260,7 +260,6 @@ private:
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
 	void wlcc_decrypt();
 	void lhb_decrypt();
-	void drgnwrld_type4_decrypt();
 	void drgnwrld_type3_decrypt();
 	void drgnwrld_type2_decrypt();
 	void drgnwrld_type1_decrypt();
@@ -747,32 +746,6 @@ void igs011_state::lhb_decrypt()
 	}
 }
 
-void igs011_state::drgnwrld_type4_decrypt()
-{
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-
-	int rom_size = 0x80000;
-
-	for (int i = 0; i <rom_size / 2; i++)
-	{
-		uint16_t x = src[i];
-
-		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
-		{	logerror("x:%04x, 04", x); x ^= 0x0004; }
-
-		if ((i & 0x0100) == 0x0100 || (i & 0x0040) == 0x0040 || (i & 0x0012) == 0x0012)
-		{	logerror("x:%04x, 20", x); x ^= 0x0020; }
-
-		if ( (i & 0x2400) == 0x0000)
-		{	logerror("x:%04x, 200", x); x ^= 0x0200; }
-
-		if ((x & 0x0024) == 0x0004 || (x & 0x0024) == 0x0020)
-		{ logerror("x:%04x, 24", x); 	x ^= 0x0024; } 
-
-		src[i] = x;
-		logerror("i: %08x x: %04x\n", i, x);
-	}
-}
 
 void igs011_state::drgnwrld_type3_decrypt()
 {
@@ -2333,7 +2306,7 @@ void igs011_state::init_drgnwrldv20j()
 
 void igs011_state::init_drgnwrldv40k()
 {
-	drgnwrld_type4_decrypt(); // wrong
+	//drgnwrld_type3_decrypt(); // wrong
 	drgnwrld_gfx_decrypt();
 
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
