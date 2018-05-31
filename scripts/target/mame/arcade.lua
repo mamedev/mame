@@ -3282,6 +3282,7 @@ files {
 	MAME_DIR .. "src/mame/machine/segag80.cpp",
 	MAME_DIR .. "src/mame/machine/segag80.h",
 	MAME_DIR .. "src/mame/audio/segag80r.cpp",
+	MAME_DIR .. "src/mame/audio/segag80r.h",
 	MAME_DIR .. "src/mame/video/segag80r.cpp",
 	MAME_DIR .. "src/mame/drivers/segag80v.cpp",
 	MAME_DIR .. "src/mame/includes/segag80v.h",
