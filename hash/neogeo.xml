@@ -1180,7 +1180,46 @@
 		</part>
 	</software>
 
-
+	<software name="gpilotsp" cloneof="gpilots">
+		<!-- prototype - different revisions of the 68k and z80 programs, gfx + samples different ROM arrangement but same data, rest identical-->
+		<description>Ghost Pilots (prototype)</description>
+		<year>1991</year>
+		<publisher>SNK</publisher>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="p1" offset="0x000001" size="0x080000" crc="c42125b4" sha1="b5879d06152bba0c0211c44fff4837b54405e7ee" />
+				<rom loadflag="load16_byte" name="p2" offset="0x000000" size="0x080000" crc="5a4db1f3" sha1="535b6abd266bba174d20bfff17b2668c6a36d1e6" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="s1" crc="a6d83d53" sha1="9a8c092f89521cc0b27a385aa72e29cbaca926c5" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="m1" crc="32a108cf" sha1="4d38a283376725e1c1aca0d5aeedd4862146ba1f" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x180000">
+				<rom name="v11" offset="0x000000" size="0x080000" crc="8cc44140" sha1="0a88d8962e057bf0cabd4819d4ba67e093c49b82" />
+				<rom name="v12" offset="0x080000" size="0x080000" crc="415c61cd" sha1="638e5fd9b02b4553df42f00188a7ac52a5a7bf84" />
+				<rom name="v13" offset="0x100000" size="0x080000" crc="4a9e6f03" sha1="d3ac11f333b03d8a318921bdaefb14598e289a14" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="0x80000">
+				<rom name="v21" offset="0x000000" size="0x080000" crc="7abf113d" sha1="5b2a0e70f2eaf4638b44702dacd4cb17838fb1d5" />
+			</dataarea>			
+			<dataarea name="sprites" size="0x400000">
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="c11" offset="0x000000" size="0x080000" crc="7a5158b3" sha1="01dd241534c16e81ce1113a53495606d8f907e1e" />
+				<rom loadflag="load32_byte" name="c12" offset="0x000002" size="0x080000" crc="41e67a5a" sha1="21df717cea93c0c4c5773e98ffefcdc2a06b83c4" />
+				<rom loadflag="load32_byte" name="c13" offset="0x000001" size="0x080000" crc="5f80c0d0" sha1="48a5c081de88811b170da794634f1a82e42bd472" />
+				<rom loadflag="load32_byte" name="c14" offset="0x000003" size="0x080000" crc="61227b93" sha1="563283401cf648edd7cc881969a1107d78f31b75" />
+				<rom loadflag="load32_byte" name="c15" offset="0x200000" size="0x080000" crc="96de9bb5" sha1="c3d42b1dd27cc153310a6fc14a02380b6b673574" />
+				<rom loadflag="load32_byte" name="c16" offset="0x200002" size="0x080000" crc="2b904c85" sha1="9e162449af1f37cc22900df09e37226e74d62d35" />
+				<rom loadflag="load32_byte" name="c17" offset="0x200001" size="0x080000" crc="c0d7517d" sha1="db60e23d1b3323ad757c1fda009f2c08abd5630b" />
+				<rom loadflag="load32_byte" name="c18" offset="0x200003" size="0x080000" crc="75569e35" sha1="fac74ec97c6612bffdfd1239c115d6247eb7fabc" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!--
 	ID-0021
 	. NGM-021

@@ -3760,6 +3760,34 @@ ROM_START( gpilotsh ) /* AES VERSION (US) */
 	ROM_LOAD16_BYTE( "020-c4.c4", 0x200001, 0x100000, CRC(edde439b) SHA1(79be7b10ecdab54c2f77062b8f5fda0e299fa982) ) /* Plane 2,3 */ /* TC538200 */
 ROM_END
 
+ROM_START( gpilotsp ) /* prototype - different revisions of the 68k and z80 programs, gfx + samples different ROM arrangement but same data, rest identical */
+	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_BYTE( "p1", 0x000001, 0x080000, CRC(c42125b4) SHA1(b5879d06152bba0c0211c44fff4837b54405e7ee) )
+	ROM_LOAD16_BYTE( "p2", 0x000000, 0x080000, CRC(5a4db1f3) SHA1(535b6abd266bba174d20bfff17b2668c6a36d1e6) )
+
+	NEO_SFIX_128K( "s1", CRC(a6d83d53) SHA1(9a8c092f89521cc0b27a385aa72e29cbaca926c5) )
+
+	NEO_BIOS_AUDIO_128K( "m1", CRC(32a108cf) SHA1(4d38a283376725e1c1aca0d5aeedd4862146ba1f) )
+
+	ROM_REGION( 0x180000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "v11", 0x000000, 0x080000, CRC(8cc44140) SHA1(0a88d8962e057bf0cabd4819d4ba67e093c49b82) )
+	ROM_LOAD( "v12", 0x080000, 0x080000, CRC(415c61cd) SHA1(638e5fd9b02b4553df42f00188a7ac52a5a7bf84) )
+	ROM_LOAD( "v13", 0x100000, 0x080000, CRC(4a9e6f03) SHA1(d3ac11f333b03d8a318921bdaefb14598e289a14) )
+
+	ROM_REGION( 0x080000, "cslot1:ymsnd.deltat", 0 )
+	ROM_LOAD( "v21", 0x000000, 0x080000, CRC(7abf113d) SHA1(5b2a0e70f2eaf4638b44702dacd4cb17838fb1d5) )
+
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 )
+	ROM_LOAD32_BYTE( "c11", 0x000000, 0x80000, CRC(7a5158b3) SHA1(01dd241534c16e81ce1113a53495606d8f907e1e) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "c12", 0x000002, 0x80000, CRC(41e67a5a) SHA1(21df717cea93c0c4c5773e98ffefcdc2a06b83c4) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "c13", 0x000001, 0x80000, CRC(5f80c0d0) SHA1(48a5c081de88811b170da794634f1a82e42bd472) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "c14", 0x000003, 0x80000, CRC(61227b93) SHA1(563283401cf648edd7cc881969a1107d78f31b75) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "c15", 0x200000, 0x80000, CRC(96de9bb5) SHA1(c3d42b1dd27cc153310a6fc14a02380b6b673574) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "c16", 0x200002, 0x80000, CRC(2b904c85) SHA1(9e162449af1f37cc22900df09e37226e74d62d35) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "c17", 0x200001, 0x80000, CRC(c0d7517d) SHA1(db60e23d1b3323ad757c1fda009f2c08abd5630b) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "c18", 0x200003, 0x80000, CRC(75569e35) SHA1(fac74ec97c6612bffdfd1239c115d6247eb7fabc) ) /* Plane 3 */
+ROM_END
+
 /****************************************
  ID-0021
  . NGM-021
@@ -11525,6 +11553,7 @@ GAME( 1991, burningfp,  burningf, neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1990, lbowling,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "League Bowling (NGM-019 ~ NGH-019)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gpilots,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Ghost Pilots (NGM-020 ~ NGH-020)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gpilotsh,   gpilots,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Ghost Pilots (NGH-020, US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gpilotsp,   gpilots,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Ghost Pilots (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, joyjoy,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Puzzled / Joy Joy Kid (NGM-021 ~ NGH-021)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, quizdais,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down (NGM-023 ~ NGH-023)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, quizdaisk,  quizdais, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down (Korean release)", MACHINE_SUPPORTS_SAVE )
