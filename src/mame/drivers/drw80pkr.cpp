@@ -56,7 +56,6 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_t0;
 	uint8_t m_t1;
-	uint8_t m_p0;
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_prog;
