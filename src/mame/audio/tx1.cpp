@@ -89,6 +89,11 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 {
 }
 
+tx1j_sound_device::tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tx1_sound_device(mconfig, TX1J_SOUND, tag, owner, clock)
+{
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

@@ -119,9 +119,7 @@ protected:
 class tx1j_sound_device : public tx1_sound_device
 {
 public:
-	tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		tx1_sound_device(mconfig, tag, owner, clock)
-	{ }
+	tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 
