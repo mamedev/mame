@@ -59,7 +59,6 @@ public:
 		m_track_x(*this, "TRACK%u_X", 1U),
 		m_track_y(*this, "TRACK%u_Y", 1U),
 		m_sharedram(*this,"sharedram"),
-		m_vregs(*this,"vregs"),
 		m_vram(*this,"vram_%u", 0U),
 		m_vctrl(*this,"vctrl_%u", 0U),
 		m_paletteram(*this,"paletteram%u", 1U),
@@ -90,7 +89,6 @@ public:
 	optional_ioport_array<2> m_track_y;
 
 	optional_shared_ptr<uint8_t> m_sharedram;
-	optional_shared_ptr<uint16_t> m_vregs;
 	optional_shared_ptr_array<uint16_t, 2> m_vram;
 	optional_shared_ptr_array<uint16_t, 2> m_vctrl;
 	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
@@ -103,6 +101,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	uint8_t m_vregs;
+
 	int m_tiles_offset;
 	tilemap_t *m_tilemap[2]; // Max 2 Layers
 	int m_rambank[2]; // 2 Tilemap banks for each layers
@@ -113,9 +113,6 @@ public:
 
 	uPD71054_state m_uPD71054;
 	const game_offset *m_global_offsets;
-
-	bool m_coin_lockout_initialized;
-	int m_coin_lockout;
 
 	int m_sub_ctrl_data;
 
@@ -135,7 +132,9 @@ public:
 	uint16_t m_kiwame_row_select;
 
 	DECLARE_READ16_MEMBER(metafox_protection_r);
-	DECLARE_WRITE16_MEMBER(seta_vregs_w);
+	DECLARE_WRITE8_MEMBER(seta_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(seta_coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(seta_vregs_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE16_MEMBER(twineagl_tilebank_w);
 	DECLARE_WRITE16_MEMBER(timer_regs_w);
@@ -155,7 +154,6 @@ public:
 	DECLARE_READ16_MEMBER(keroppi_protection_init_r);
 	DECLARE_READ16_MEMBER(keroppi_coin_r);
 	DECLARE_WRITE16_MEMBER(keroppi_prize_w);
-	DECLARE_WRITE16_MEMBER(msgundam_vregs_w);
 	DECLARE_WRITE16_MEMBER(kiwame_row_select_w);
 	DECLARE_READ16_MEMBER(kiwame_input_r);
 	DECLARE_READ16_MEMBER(thunderl_protection_r);
@@ -232,7 +230,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
-	void seta_coin_lockout_w(int data);
 	void set_pens();
 	void usclssic_set_pens();
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);
