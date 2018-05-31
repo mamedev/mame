@@ -52,6 +52,8 @@ public:
 		, m_mainsndbank(*this, "mainsndbank")
 		, m_dspsndbank(*this, "dspsndbank")
 		, m_config_io(*this, "CONFIG")
+		, m_joy(*this, "JOY%u", 0U)
+		, m_buttons(*this, "BUTTONS%u", 0U)
 		, m_is_r3000(false)
 		, m_is_cojag(false)
 		, m_hacks_enabled(false)
@@ -101,6 +103,8 @@ public:
 	optional_memory_bank m_mainsndbank;
 	optional_memory_bank m_dspsndbank;
 	optional_ioport m_config_io;
+	optional_ioport_array<8> m_joy;
+	optional_ioport_array<8> m_buttons;
 
 	// configuration
 	bool m_is_r3000;
