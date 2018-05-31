@@ -285,6 +285,7 @@ public:
 	///   valid until resolution time.
 	void set_tag(device_t &base, char const *tag)
 	{
+		assert(!m_resolved);
 		m_base = base;
 		m_tag = tag;
 	}
@@ -308,6 +309,7 @@ public:
 	///   from.
 	void set_tag(finder_base const &finder)
 	{
+		assert(!m_resolved);
 		std::tie(m_base, m_tag) = finder.finder_target();
 	}
 
@@ -424,6 +426,9 @@ protected:
 
 	/// \brief Object tag to search for
 	char const *m_tag;
+
+	/// \brief Set when object resolution completes
+	bool m_resolved;
 };
 
 
@@ -445,7 +450,7 @@ public:
 	/// target during configuration.  This needs to be cleared to ensure
 	/// the correct target is found if a device further up the hierarchy
 	/// subsequently removes or replaces devices.
-	virtual void end_configuration() override { m_target = nullptr; }
+	virtual void end_configuration() override { assert(!m_resolved); m_target = nullptr; }
 
 	/// \brief Get pointer to target object
 	/// \return Pointer to target object if found, or nullptr otherwise.
@@ -483,7 +488,7 @@ protected:
 	/// \param [in] tag Object tag to search for.  This is not copied,
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
-	object_finder_base(device_t &base, const char *tag) : finder_base(base, tag), m_target(nullptr) { }
+	object_finder_base(device_t &base, const char *tag) : finder_base(base, tag) { }
 
 	/// \brief Log if object was not found
 	///
@@ -500,7 +505,7 @@ protected:
 	/// Pointer to target object, or nullptr if resolution has not been
 	/// attempted or the search failed.  Concrete derived classes must
 	/// set this in their implementation of the findit member function.
-	ObjectClass *m_target;
+	ObjectClass *m_target = nullptr;
 };
 
 
@@ -545,6 +550,7 @@ public:
 	template <typename T>
 	std::enable_if_t<std::is_convertible<T *, DeviceClass *>::value, T &> operator=(T &device)
 	{
+		assert(!this->m_resolved);
 		assert(is_expected_tag(device));
 		this->m_target = &device;
 		return device;
@@ -583,6 +589,9 @@ private:
 	///   is found, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
+		if (!isvalidation)
+			this->m_resolved = true;
+
 		device_t *const device = this->m_base.get().subdevice(this->m_tag);
 		this->m_target = dynamic_cast<DeviceClass *>(device);
 		if (device && !this->m_target)
@@ -648,7 +657,10 @@ private:
 	///   memory region is found, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return this->validate_memregion(0, Required);
+		if (isvalidation)
+			return this->validate_memregion(0, Required);
+
+		this->m_resolved = true;
 		this->m_target = this->m_base.get().memregion(this->m_tag);
 		return this->report_missing("memory region");
 	}
@@ -708,7 +720,10 @@ public:
 	///   bank is found or this is a dry run, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return true;
+		if (isvalidation)
+			return true;
+
+		this->m_resolved = true;
 		this->m_target = this->m_base.get().membank(this->m_tag);
 		return this->report_missing("memory bank");
 	}
@@ -779,7 +794,10 @@ private:
 	///   is found or this is a dry run, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return true;
+		if (isvalidation)
+			return true;
+
+		this->m_resolved = true;
 		this->m_target = this->m_base.get().ioport(this->m_tag);
 		return this->report_missing("I/O port");
 	}
@@ -877,7 +895,10 @@ private:
 	///   memory region is found, or false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return this->validate_memregion(sizeof(PointerType) * m_desired_length, Required);
+		if (isvalidation)
+			return this->validate_memregion(sizeof(PointerType) * m_desired_length, Required);
+
+		this->m_resolved = true;
 		m_length = m_desired_length;
 		this->m_target = reinterpret_cast<PointerType *>(this->find_memregion(sizeof(PointerType), m_length, Required));
 		return this->report_missing("memory region");
@@ -959,7 +980,10 @@ private:
 	// finder
 	virtual bool findit(bool isvalidation) override
 	{
-		if (isvalidation) return true;
+		if (isvalidation)
+			return true;
+
+		this->m_resolved = true;
 		this->m_target = reinterpret_cast<PointerType *>(this->find_memshare(m_width, m_bytes, Required));
 		return this->report_missing("shared pointer");
 	}
