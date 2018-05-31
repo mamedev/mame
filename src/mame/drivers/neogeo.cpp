@@ -2229,7 +2229,7 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 3, "us-e", "US MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-e.sp1",          0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* 5 Yellow - US, 6 Slot (V5?) */ \
 	ROM_SYSTEM_BIOS( 4, "us-v2", "US MVS (4 slot, Ver 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "v2.bin",            0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* 3 Cyan - US, 4 slot */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "sp1-u2",            0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* 3 Cyan - US, 4 slot - also seen with "v2" label*/ \
 	ROM_SYSTEM_BIOS( 5, "us-u3", "US MVS (U3)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "sp1-u3.bin",        0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 Green - 6 Slot */ \
 	\
