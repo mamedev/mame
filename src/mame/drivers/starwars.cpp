@@ -34,8 +34,6 @@
 #include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
-#include "sound/tms5220.h"
-#include "machine/x2212.h"
 #include "screen.h"
 #include "speaker.h"
 
