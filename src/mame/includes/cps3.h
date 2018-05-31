@@ -145,7 +145,7 @@ public:
 	void init_crypt(uint32_t key1, uint32_t key2, int altEncryption);
 	void cps3_set_mame_colours(int colournum, uint16_t data, uint32_t fadeval);
 	void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	uint32_t cps3_flashmain_r(address_space &space, int which, uint32_t offset, uint32_t mem_mask);
+	uint32_t cps3_flashmain_r(int which, uint32_t offset, uint32_t mem_mask);
 	void cps3_flashmain_w(int which, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t process_byte( uint8_t real_byte, uint32_t destination, int max_length );
 	void cps3_do_char_dma( uint32_t real_source, uint32_t real_destination, uint32_t real_length );
