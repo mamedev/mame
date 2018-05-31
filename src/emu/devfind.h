@@ -590,7 +590,10 @@ private:
 	virtual bool findit(bool isvalidation) override
 	{
 		if (!isvalidation)
+		{
+			assert(!this->m_resolved);
 			this->m_resolved = true;
+		}
 
 		device_t *const device = this->m_base.get().subdevice(this->m_tag);
 		this->m_target = dynamic_cast<DeviceClass *>(device);
@@ -660,6 +663,7 @@ private:
 		if (isvalidation)
 			return this->validate_memregion(0, Required);
 
+		assert(!this->m_resolved);
 		this->m_resolved = true;
 		this->m_target = this->m_base.get().memregion(this->m_tag);
 		return this->report_missing("memory region");
@@ -723,6 +727,7 @@ public:
 		if (isvalidation)
 			return true;
 
+		assert(!this->m_resolved);
 		this->m_resolved = true;
 		this->m_target = this->m_base.get().membank(this->m_tag);
 		return this->report_missing("memory bank");
@@ -797,6 +802,7 @@ private:
 		if (isvalidation)
 			return true;
 
+		assert(!this->m_resolved);
 		this->m_resolved = true;
 		this->m_target = this->m_base.get().ioport(this->m_tag);
 		return this->report_missing("I/O port");
@@ -898,6 +904,7 @@ private:
 		if (isvalidation)
 			return this->validate_memregion(sizeof(PointerType) * m_desired_length, Required);
 
+		assert(!this->m_resolved);
 		this->m_resolved = true;
 		m_length = m_desired_length;
 		this->m_target = reinterpret_cast<PointerType *>(this->find_memregion(sizeof(PointerType), m_length, Required));
@@ -983,6 +990,7 @@ private:
 		if (isvalidation)
 			return true;
 
+		assert(!this->m_resolved);
 		this->m_resolved = true;
 		this->m_target = reinterpret_cast<PointerType *>(this->find_memshare(m_width, m_bytes, Required));
 		return this->report_missing("shared pointer");
