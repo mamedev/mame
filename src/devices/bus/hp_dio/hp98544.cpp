@@ -85,9 +85,7 @@ void dio16_98544_device::map(address_map& map)
 
 device_memory_interface::space_config_vector dio16_98544_device::memory_space_config() const
 {
-        return space_config_vector {
-                std::make_pair(0, &m_space_config)
-        };
+	return space_config_vector{ std::make_pair(0, &m_space_config) };
 }
 
 //-------------------------------------------------
@@ -96,18 +94,15 @@ device_memory_interface::space_config_vector dio16_98544_device::memory_space_co
 
 void dio16_98544_device::device_start()
 {
-	// set_nubus_device makes m_slot valid
-	set_dio_device();
-
-	m_dio->install_memory(
+	dio().install_memory(
 			0x200000, 0x2fffff,
 			read16_delegate(FUNC(topcat_device::vram_r), static_cast<topcat_device*>(m_topcat)),
 			write16_delegate(FUNC(topcat_device::vram_w), static_cast<topcat_device*>(m_topcat)));
-	m_dio->install_memory(
+	dio().install_memory(
 			0x560000, 0x563fff,
 			read16_delegate(FUNC(dio16_98544_device::rom_r), this),
 			write16_delegate(FUNC(dio16_98544_device::rom_w), this));
-	m_dio->install_memory(
+	dio().install_memory(
 			0x564000, 0x567fff,
 			read16_delegate(FUNC(topcat_device::ctrl_r), static_cast<topcat_device*>(m_topcat)),
 			write16_delegate(FUNC(topcat_device::ctrl_w), static_cast<topcat_device*>(m_topcat)));

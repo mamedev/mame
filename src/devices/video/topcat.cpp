@@ -104,8 +104,8 @@ void topcat_device::update_cursor(int x, int y, uint8_t ctrl, uint8_t width)
 		modify_vram(m_cursor_x_pos+i, m_cursor_y_pos-1, false);
 		modify_vram(m_cursor_x_pos+i, m_cursor_y_pos-2, false);
 	}
-	m_cursor_x_pos = std::min(x, m_fb_width - m_cursor_width);
-	m_cursor_y_pos = std::max(std::min(y, m_fb_height), 2);
+	m_cursor_x_pos = (std::min)(x, m_fb_width - m_cursor_width);
+	m_cursor_y_pos = (std::max)((std::min)(y, m_fb_height), 2);
 	m_cursor_ctrl = ctrl;
 	m_cursor_width = width;
 }
