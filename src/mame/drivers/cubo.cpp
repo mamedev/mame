@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_END
 
 
 
-#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
+#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CD32_BIOS \
 	ROM_REGION32_BE(0x100000, "kickstart", 0 ) \

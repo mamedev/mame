@@ -1703,13 +1703,13 @@ void ms32_state::machine_reset()
 MACHINE_CONFIG_START(ms32_state::ms32)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // 20MHz
+	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // D70632GD-20 20MHz
 	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
 	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))

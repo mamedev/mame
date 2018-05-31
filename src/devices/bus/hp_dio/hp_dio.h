@@ -23,16 +23,8 @@
 
 #define MCFG_DIO16_CPU(_cputag) \
 	downcast<dio16_device &>(*device).set_cputag(_cputag);
-#define MCFG_DIO16_SLOT_ADD(_diotag, _tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, DIO16_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<dio16_slot_device &>(*device).set_dio16_slot(this, _diotag);
 #define MCFG_DIO32_CPU(_cputag) \
 	downcast<dio32_device &>(*device).set_cputag(_cputag);
-#define MCFG_DIO32_SLOT_ADD(_diotag, _tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, DIO32_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<dio32_slot_device &>(*device).set_dio32_slot(this, _diotag);
 
 #define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
 	devcb = &downcast<dio16_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
@@ -52,25 +44,35 @@
 
 class dio16_device;
 
-class dio16_slot_device : public device_t,
-							public device_slot_interface
+class dio16_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio16_slot_device(mconfig, tag, owner, clock)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
 	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// inline configuration
-	void set_dio16_slot(device_t *owner, const char *dio_tag) { m_owner = owner; m_dio_tag = dio_tag; }
+	template <typename T> void set_dio(T &&dio_tag) { m_dio.set_tag(std::forward<T>(dio_tag)); }
 
 protected:
 	dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+
 	// configuration
-	device_t *m_owner;
-	const char *m_dio_tag;
+	required_device<dio16_device> m_dio;
 };
 
 // device type definition
@@ -84,7 +86,7 @@ public:
 	// construction/destruction
 	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
-	void set_cputag(const char *tag) { m_cputag = tag; }
+	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 	template <class Object> devcb_base &set_out_irq3_callback(Object &&cb) { return m_out_irq3_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_irq4_callback(Object &&cb) { return m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_irq5_callback(Object &&cb) { return m_out_irq5_cb.set_callback(std::forward<Object>(cb)); }
@@ -103,10 +105,10 @@ public:
 	void unmap_rom(offs_t start, offs_t end);
 
 	// IRQs 1, 2, and 7 are reserved for non-bus usage.
-	DECLARE_WRITE_LINE_MEMBER( irq3_w );
-	DECLARE_WRITE_LINE_MEMBER( irq4_w );
-	DECLARE_WRITE_LINE_MEMBER( irq5_w );
-	DECLARE_WRITE_LINE_MEMBER( irq6_w );
+	DECLARE_WRITE_LINE_MEMBER( irq3_w ) { m_out_irq3_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( irq4_w ) { m_out_irq4_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( irq5_w ) { m_out_irq5_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( irq6_w ) { m_out_irq6_cb(state); }
 
 	int m_prgwidth;
 
@@ -120,7 +122,7 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	// address spaces
 	address_space *m_prgspace;
@@ -129,10 +131,6 @@ protected:
 	devcb_write_line    m_out_irq4_cb;
 	devcb_write_line    m_out_irq5_cb;
 	devcb_write_line    m_out_irq6_cb;
-
-	const char                 *m_cputag;
-
-private:
 };
 
 
@@ -152,16 +150,16 @@ public:
 
 	device_dio16_card_interface *next() const { return m_next; }
 
-	void set_dio_device();
-
 	// inline configuration
-	void set_diobus(device_t *dio_device) { m_dio_dev = dio_device; }
+	void set_diobus(dio16_device &dio_device) { m_dio_dev = &dio_device; }
 
-public:
+protected:
 	device_dio16_card_interface(const machine_config &mconfig, device_t &device);
+	dio16_device &dio() { assert(m_dio_dev); return *m_dio_dev; }
 
-	dio16_device  *m_dio;
-	device_t     *m_dio_dev;
+	virtual void interface_pre_start() override;
+
+	dio16_device *m_dio_dev;
 
 private:
 	device_dio16_card_interface *m_next;
@@ -173,12 +171,21 @@ class dio32_slot_device : public dio16_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio32_slot_device(mconfig, tag, owner, clock)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
 	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-		// device-level overrides
-	virtual void device_start() override;
 
-	// inline configuration
-	void set_dio32_slot(device_t *owner, const char *dio_tag) { m_owner = owner; m_dio_tag = dio_tag; }
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -194,12 +201,9 @@ public:
 
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-private:
 };
 
 
@@ -216,12 +220,12 @@ public:
 	// construction/destruction
 	virtual ~device_dio32_card_interface();
 
-	void set_dio_device();
-
 protected:
 	device_dio32_card_interface(const machine_config &mconfig, device_t &device);
 
-	dio32_device  *m_dio;
+	virtual void interface_pre_start() override;
+
+	dio32_device &dio() { assert(m_dio_dev); return downcast<dio32_device &>(*m_dio_dev); }
 };
 
 #endif // MAME_BUS_HPDIO_HPDIO_H

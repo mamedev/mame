@@ -318,7 +318,7 @@ void segasp_state::init_segasp()
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 #define SEGASP_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \

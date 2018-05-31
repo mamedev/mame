@@ -195,13 +195,13 @@ void esd16_state::jumppop_map(address_map &map)
 	map(0x120000, 0x123fff).ram();
 	map(0x1a0000, 0x1a7fff).ram();
 
-	map(0x180008, 0x180009).w(this, FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
-
 	esd16_palette_area(map, 0x140000);
 	esd16_sprite_area(map, 0x160000);
 	esd16_io_area_dsw(map, 0x180000);
 	esd16_vram_area(map, 0x300000);
 	esd16_vid_attr_area(map, 0x380000);
+
+	map(0x180008, 0x180009).w(this, FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
 }
 
 void esd16_state::hedpanic_map(address_map &map)

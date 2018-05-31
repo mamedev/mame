@@ -302,10 +302,10 @@ MACHINE_CONFIG_END
 ROM_START( cp1 )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "b", "b" )
-	ROMX_LOAD( "cp1-kosmos-b.rom", 0x0000, 0x0800, CRC(fea8a2b2) SHA1(c987b79a7b90fcbd58b66a69e95913f2655a1f0d), ROM_BIOS(1))
+	ROMX_LOAD( "cp1-kosmos-b.rom", 0x0000, 0x0800, CRC(fea8a2b2) SHA1(c987b79a7b90fcbd58b66a69e95913f2655a1f0d), ROM_BIOS(0))
 	// This is from 2716 eprom that was on board with I8039 instead of I8049
 	ROM_SYSTEM_BIOS( 1, "2716", "2716" )
-	ROMX_LOAD( "cp1-2716.bin",     0x0000, 0x0800, CRC(3a2caf0e) SHA1(ff4befcf82a664950186d3af1843fdef70d2209f), ROM_BIOS(2))
+	ROMX_LOAD( "cp1-2716.bin",     0x0000, 0x0800, CRC(3a2caf0e) SHA1(ff4befcf82a664950186d3af1843fdef70d2209f), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

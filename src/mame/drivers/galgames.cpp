@@ -1081,7 +1081,7 @@ Copyright notice in rom states: Creative Electronics & Software Written by Keith
 ***************************************************************************/
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
 
 #define GALGAMES_BIOS_ROMS \
 	ROM_SYSTEM_BIOS( 0, "1.90",   "v1.90 12/01/98" ) \

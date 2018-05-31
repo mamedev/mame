@@ -135,6 +135,7 @@ private:
 	struct{
 		uint8_t shift;
 		uint16_t mask;
+		uint16_t cmd;
 		uint16_t vstart;
 		uint8_t addr;
 		uint8_t reg[8];
@@ -178,15 +179,25 @@ uint32_t pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &b
 		{
 			for(xi=0;xi<16;xi++)
 			{
-				for(pen_i=0;pen_i<4;pen_i++)
-					pen[pen_i] = (m_vram[count+pen_i*0x10000] >> xi) & 1;
+				if(m_crtc.cmd != 0xffff)
+				{
+					for(pen_i=0;pen_i<4;pen_i++)
+						pen[pen_i] = (m_vram[count+pen_i*0x10000] >> xi) & 1;
 
-				dot = 0;
-				for(pen_i=0;pen_i<4;pen_i++)
-					dot |= pen[pen_i]<<pen_i;
+					dot = 0;
+					for(pen_i=0;pen_i<4;pen_i++)
+						dot |= pen[pen_i]<<pen_i;
 
-				if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-					bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
+					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
+						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
+				}
+				else
+				{
+					dot = (m_vram[count] >> xi) & 1;
+
+					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
+						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot ? 15 : 0);
+				}
 			}
 
 			count++;
@@ -276,13 +287,13 @@ WRITE8_MEMBER( pc100_state::pc100_output_w )
 	{
 		m_timer_mode = (data & 0x18) >> 3;
 		m_beeper->set_state(((data & 0x40) >> 6) ^ 1);
-		printf("%02x\n",data & 0xc0);
+		//printf("%02x\n",data & 0xc0);
 	}
 }
 
 WRITE8_MEMBER( pc100_state::pc100_tc_w )
 {
-	machine().device<upd765a_device>("upd765")->tc_w(data & 0x40);
+	m_fdc->tc_w(data & 0x40);
 }
 
 READ8_MEMBER( pc100_state::pc100_shift_r )
@@ -319,7 +330,7 @@ WRITE8_MEMBER( pc100_state::pc100_crtc_addr_w )
 WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
 {
 	m_crtc.reg[m_crtc.addr] = data;
-	printf("%02x %02x\n",m_crtc.addr,data);
+	//printf("%02x %02x\n",m_crtc.addr,data);
 }
 
 
@@ -342,7 +353,8 @@ void pc100_state::pc100_io(address_map &map)
 	map(0x3a, 0x3a).w(this, FUNC(pc100_state::pc100_crtc_data_w)); //crtc data reg
 	map(0x3c, 0x3f).rw(this, FUNC(pc100_state::pc100_vs_vreg_r), FUNC(pc100_state::pc100_vs_vreg_w)).umask16(0x00ff); //crtc vertical start position
 	map(0x40, 0x5f).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-//  AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
+	map(0x60, 0x61).r(read16_delegate([this](address_space &s, offs_t o, u8 mm) { return m_crtc.cmd; }, "pc100_crtc_cmd_r")).
+					w(write16_delegate([this](address_space &s, offs_t o, u16 d, u8 mm) { m_crtc.cmd = d; }, "pc100_crtc_cmd_w"));
 	map(0x80, 0x81).rw(this, FUNC(pc100_state::pc100_kanji_r), FUNC(pc100_state::pc100_kanji_w));
 	map(0x82, 0x83).nopw(); //kanji-related?
 	map(0x84, 0x87).nopw(); //kanji "strobe" signal 0/1
@@ -514,7 +526,8 @@ WRITE8_MEMBER( pc100_state::rtc_porta_w )
     ---- ---x write
 */
 
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 0x20));
+	if(data != 0) // work around 8255 behavior that resets the whole chip on mode write
+		m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 0x20));
 	m_rtc->write_w((data >> 0) & 1);
 	m_rtc->read_w((data >> 1) & 1);
 	m_rtc->cs1_w((data >> 2) & 1);

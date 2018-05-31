@@ -367,7 +367,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios+1))
+#define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
 
 #define ARCADIA_BIOS \
 	ROM_REGION16_BE(0x80000, "kickstart", 0 ) \

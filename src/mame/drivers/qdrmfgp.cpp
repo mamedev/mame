@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
@@ -598,7 +598,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp2_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)

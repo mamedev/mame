@@ -55,15 +55,15 @@ ROM_START( pc9801_26 )
 	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
 	// PC9801_26k is a minor change that applies to 286+ CPUs
 	ROM_SYSTEM_BIOS( 0,  "26k",     "nec26k" )
-	ROMX_LOAD( "26k_wyka01_00.bin", 0x0000, 0x2000, CRC(f071bf69) SHA1(f3cdef94e9fee116cf4a9b54881e77c6cd903815), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "26k_wyka02_00.bin", 0x0001, 0x2000, CRC(eaa01052) SHA1(5d47edae49aad591f139d5599fe04b61aefd5ecd), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "26k_wyka01_00.bin", 0x0000, 0x2000, CRC(f071bf69) SHA1(f3cdef94e9fee116cf4a9b54881e77c6cd903815), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "26k_wyka02_00.bin", 0x0001, 0x2000, CRC(eaa01052) SHA1(5d47edae49aad591f139d5599fe04b61aefd5ecd), ROM_SKIP(1) | ROM_BIOS(0) )
 	// regular BIOS, for V30 and downward CPUs
 	ROM_SYSTEM_BIOS( 1,  "26",      "nec26" )
-	ROMX_LOAD( "sound.rom",       0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23), ROM_BIOS(2) )
+	ROMX_LOAD( "sound.rom",       0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23), ROM_BIOS(1) )
 	// following rom is unchecked and of dubious quality
 	// we also currently mark it based off where they originally belonged to, lacking a better info
 	ROM_SYSTEM_BIOS( 2,  "26_9821", "nec26_9821" )
-	ROMX_LOAD( "sound_9821.rom",  0x0000, 0x4000, BAD_DUMP CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60), ROM_BIOS(3) )
+	ROMX_LOAD( "sound_9821.rom",  0x0000, 0x4000, BAD_DUMP CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *pc9801_26_device::device_rom_region() const

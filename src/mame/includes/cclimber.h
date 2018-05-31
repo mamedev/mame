@@ -3,6 +3,7 @@
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/segacrpt_device.h"
 
 class cclimber_state : public driver_device
 {
@@ -24,7 +25,8 @@ public:
 		m_swimmer_background_color(*this, "bgcolor"),
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
 		m_toprollr_bg_coloram(*this, "bg_coloram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;

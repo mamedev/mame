@@ -601,14 +601,14 @@ ROM_START( sbrain )
 
 	ROM_REGION( 0x10000, "subcpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "4_003", "4.003" )
-	ROMX_LOAD( "4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(1) )
+	ROMX_LOAD("4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "3_1", "3.1" )
-	ROMX_LOAD( "3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(2) )
+	ROMX_LOAD("3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "3_05", "3.05" )
-	ROMX_LOAD( "qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(3) )
+	ROMX_LOAD("qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(2))
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, init_sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )

@@ -369,10 +369,10 @@ MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD32_WORD_BIOS(bios, name, offset, length, hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(bios))
 
 #define ROM_LOAD64_WORD_BIOS(bios, name, offset, length, hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6) | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6) | ROM_BIOS(bios))
 
 /*
 BIOS/set chips are known to be in 3 locations depending on the PCB used:

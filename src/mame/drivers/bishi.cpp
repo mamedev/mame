@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(bishi_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(bishi_state::dobouchn)
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
 //  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
 MACHINE_CONFIG_END
 
 // ROM definitions

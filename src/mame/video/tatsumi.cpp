@@ -51,11 +51,7 @@ WRITE8_MEMBER(roundup5_state::gfxdata_w)
 {
 	if((m_control_word & 0x200) == 0x200)
 	{	
-		offset += (m_control_word & 0x6000) << 2;
-		//m_gfxdecode->gfx(2)->mark_dirty(offset/8);
-		// TODO: temp, until we get the actual decoding
-		m_gfxdecode->gfx(2)->mark_all_dirty();
-		
+		offset += (m_control_word & 0x6000) << 2;		
 		m_bg_gfxram[offset] = data;
 		return;
 	}
@@ -88,7 +84,7 @@ WRITE8_MEMBER(tatsumi_state::hd6445_crt_w)
 	{
 		m_hd6445_reg[m_hd6445_address] = data;
 		
-		static const char *regnames[40] =
+		static char const *const regnames[40] =
 		{ 
 			"Horizontal Total Characters", "Horizontal Displayed Characters", "Horizontal Sync Position",   "Sync Width",
 			"Vertical Total Rows",         "Vertical Total Adjust",           "Vertical Displayed Rows",    "Vertical Sync Position",
@@ -131,11 +127,11 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
-{	
+{
 	int tile=m_cyclwarr_videoram[Bank][(tile_index+0x400)&0x7fff];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)|(bank<<10),((tile>>12)&0xf) | m_cyclwarr_color_bank,0);
-	// TODO: enables transparent pen on sideways	
+	// TODO: enables transparent pen on sideways
 	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
 }
 
@@ -171,8 +167,8 @@ void cyclwarr_state::tile_expand()
 				uint8_t pix = (*c0++ & 7);
 				uint8_t respix = m_cyclwarr_tileclut[(c << 3)|pix];
 				*dest++ = respix;
-				// Transparent pixels are set by both the tile pixel data==0 AND colour palette==0
-				m_mask[(c << 3) | (y & 7)] |= ((pix != 0) && (respix != 0)) ? (0x80 >> (x & 7)) : 0;
+				// Transparent pixels are set by both the tile pixel data==0 AND colour palette & 7 == 0
+				m_mask[(c << 3) | (y & 7)] |= ((pix&0x7)!=0 || ((pix&0x7)==0 && (respix&0x7)!=0)) ? (0x80 >> (x & 7)) : 0;
 			}
 			c0base += gx0->rowbytes();
 		}
@@ -204,7 +200,6 @@ VIDEO_START_MEMBER(roundup5_state,roundup5)
 	m_tx_layer->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
-	m_gfxdecode->gfx(2)->set_source(m_bg_gfxram.get());
 	
 	save_pointer(NAME(m_tx_gfxram.get()),0x20000);
 	save_pointer(NAME(m_bg_gfxram.get()),0x20000);
@@ -706,7 +701,7 @@ start_offset-=48;
 	}
 }
 
-void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 /*
 0xf980 0x0008 0x8c80 0x4a00 - road right to below, width unknown (32 pixels guess)
@@ -765,32 +760,33 @@ pos is 11.5 fixed point
 */
 	int y,x;
 	int visible_line=0;
-	const uint16_t *data = m_roundup_r_ram;
-
+	const uint16_t *data = m_road_ctrl_ram;
+	
 	// Road layer enable (?)
-	if ((m_roundup5_unknown0[0x1]&0x1)==0)
+	if ((m_vregs[0x1]&0x1)==0)
 		return;
 
 	// Road data bank select (double buffered)
-	if (m_roundup5_e0000_ram[0]&0x10)
+	if (m_road_vregs[0]&0x10)
 		data+=0x400;
-
-	// ??  Todo: This is wrong - don't know how to clip the road properly
-	y=256 - (m_roundup5_unknown0[0xb/2] >> 8);
+	
+	// Apply clipping: global screen + local road y offsets
+	y = 256 - ((m_vregs[0xa/2] >> 8) + m_road_yclip[0]);
 	data+=y*4;
 
 	visible_line=0;
-
-	for (/*y=0*/; y<256; y++) {
+	
+	for (/*y=0*/; y<cliprect.max_y+1; y++) 
+	{
 		int shift=data[0];
 		int shift2=data[2];
-		int pal=4; //(data[3]>>8)&0xf;
+		int pal = 4; //(data[3]>>8)&0xf;
 		int step=((data[1]&0xff)<<8)|((data[1]&0xff00)>>8);
 		int samplePos=0;
-		const uint16_t* linedata=m_roundup_p_ram;// + (0x100 * pal);
+		const uint16_t* linedata=m_road_pixel_ram;// + (0x100 * pal);
 		int startPos=0, endPos=0;
 
-		int palette_byte;//=m_roundup_l_ram[visible_line/8];
+		int palette_byte;//=m_road_color_ram[visible_line/8];
 
 		/*
 		    Each road line consists of up to two sets of 128 pixel data that can be positioned
@@ -815,8 +811,8 @@ offset is from last pixel of first road segment?
 
 		*/
 
-		palette_byte=m_roundup_l_ram[visible_line/8];
-		pal=4 + ((palette_byte>>(visible_line%8))&1);
+		palette_byte=m_road_color_ram[visible_line/8];
+		pal = 4 + ((palette_byte>>(visible_line%8))&1);
 
 		visible_line++;
 
@@ -828,37 +824,34 @@ offset is from last pixel of first road segment?
 			startPos=((shift<<8) + 0x80 )/ step;
 
 		/* Fill in left of road segment */
-		for (x=0; x<startPos && x<320; x++) {
+		for (x=0; (x < startPos) && (x < cliprect.max_x+1); x++) 
+		{
 			int col = linedata[0]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
 		}
 
 		/* If startpos is negative, clip it and adjust the sampling position accordingly */
-		if (startPos<0) {
+		if (startPos<0) 
+		{
 			samplePos=step*(0-startPos);
 			startPos=0;
-		} else {
+		} 
+		else 
+		{
 			samplePos=0;
 		}
 
 		/* Fill in main part of road, then right-hand side edge */
-		for (x=startPos; x<320 && (samplePos>>11)<0x80; x++) {
+		for (x=startPos; x < (cliprect.max_x + 1) && ((samplePos>>11)<0x80); x++) 
+		{
 			// look up colour
 			int col = linedata[(samplePos>>11)&0x7f]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
 			//  col=linedata[0x7f]&0xf;
 
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col);
 
 			samplePos+=step;
 		}
@@ -878,42 +871,43 @@ offset is from last pixel of first road segment?
 		endPos=startPos+endPos;
 
 		/* Fill pixels */
-		for (x=startPos; x<320 && x<endPos; x++) {
+		for (x=startPos; x < (cliprect.max_x+1) && (x < endPos); x++) 
+		{
 			int col = linedata[0x80]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
 			//  col=linedata[0x7f]&0xf;
 
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col + 32);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
 		}
 
-		if (endPos<0) {
+		if (endPos<0) 
+		{
+			// end of left intersection (taking right turn)
 			samplePos=step*(0-startPos);
 		}
-		else if (endPos<x) {
+		else if (endPos<x) 
+		{
+			// start of right intersection
 			samplePos=step*(x-endPos);
-		} else {
+		} 
+		else 
+		{
+			// end of right intersection (taking right turn)
 			samplePos=0; // todo
 		}
 
-		for (/*x=endPos*/; x<320; x++) {
+		for (/*x=endPos*/; x < cliprect.max_x+1; x++) 
+		{
 			// look up colour
 			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;
-			uint8_t shadow=shadow_bitmap.pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			if ((samplePos>>11) > 0x7f)
 				col=linedata[0x7f + 0x200]&0xf;
 
-			if (shadow)
-				bitmap.pix32(y, x) = m_palette->pen(768 + pal*16 + col + 32);
-			else
-				bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
+			bitmap.pix32(y, x) = m_palette->pen(256 + pal*16 + col + 32);
 
 			samplePos+=step;
 		}
@@ -957,29 +951,37 @@ void tatsumi_state::update_cluts(int fake_palette_offset, int object_base, int l
 
 /**********************************************************************/
 
-// TODO: rowscroll_enable might be selectable somehow
-void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool rowscroll_enable, bool is_road)
+void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool is_road, bool is_opaque)
 {
 	rectangle clip;
 	clip.min_x = cliprect.min_x;
 	clip.max_x = cliprect.max_x;
+	// TODO: both enabled when this occurs
+	bool rowscroll_enable = (scrollx[0] & 0x1000) == 0;
+	bool colscroll_enable = (scrollx[0] & 0x2000) == 0;
+
 	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
 	{
 		clip.min_y = clip.max_y = y;
 		int y_base = rowscroll_enable ? y : 0;
-		int src_x = scrollx[y_base] + xscroll_offset;
-		int src_y = scrolly[y_base] + yscroll_offset;
-		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an 
+		int x_base = colscroll_enable ? y : 0;
+		int src_y = (scrolly[y_base] & 0xfff) + yscroll_offset;
+		int src_x = (scrollx[x_base] & 0xfff) + xscroll_offset;
+
+		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
 		// additional tile color bank and per scanline.
 		if(is_road == true && scrolly[y_base] & 0x8000)
 		{
 			m_cyclwarr_color_bank = (scrolly[y_base] >> 13) & 3;
 			src->mark_all_dirty();
+			// TODO: road sidelines attempt, still not right (cuts off cyan color at intro and farmost road lines)
+			//if(m_cyclwarr_color_bank)
+			//	is_opaque = true;
 		}
-		
+
 		src->set_scrollx(0,src_x);
 		src->set_scrolly(0,src_y);
-		src->draw(screen, bitmap, clip, 0, 0);
+		src->draw(screen, bitmap, clip, is_opaque ? TILEMAP_DRAW_OPAQUE : 0, 0);
 	}
 }
 
@@ -1047,6 +1049,46 @@ if (0) {
 }
 }
 
+// background layer landscape for Round Up 5
+// two bitmap layers, back layer is 512 x 128, the other one is 512 x 64
+// it's safe to assume that three monitor version will have a different arrangement here ...
+void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type)
+{
+	// TODO: guess, assume back layer having less scroll increment than front for parallax scrolling.
+	// also notice that m_vregs[8/2] >> 8 is identical to [0x0c/2], always?
+	uint16_t x_base = type ? m_bg_scrollx[0] : m_vregs[0xc/2];
+	// TODO: maybe [0xa/2] applies here as well?
+	uint16_t y_base = m_bg_scrolly[0] & 0x1ff;
+	uint16_t y_scroll = 0x180 - y_base;
+	uint32_t base_offset;
+	uint16_t color_base = type ? 0x100 : 0x110;
+	int ysize = type ? 64 : 128;
+	
+	base_offset = 0x10000 + type * 0x8000;
+	if(type)
+		y_scroll += 64;
+	
+	//popmessage("%04x %04x %04x",m_vregs[8/2],m_vregs[0xc/2],m_bg_scrollx[0]);
+	
+	for(int y = 0; y < ysize; y++)
+	{
+		for(int x = 0; x < 512; x++)
+		{
+			int res_x = (x_base + x) & 0x1ff;
+			uint32_t color = m_bg_gfxram[(res_x >> 1)+y*256+base_offset];
+
+			if(res_x & 1)
+				color >>= 4;
+			
+			color &= 0xf;
+		
+			if(cliprect.contains(x, y+y_scroll) && color)
+				bitmap.pix32(y+y_scroll, x) = m_palette->pen(color+color_base);
+		}
+	}
+
+}
+
 /**********************************************************************/
 
 uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1056,7 +1098,10 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
 	m_tx_layer->set_scrollx(0,24);
 
 	bitmap.fill(m_palette->pen(0), cliprect);
+	screen.priority().fill(0, cliprect);
+	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
 //  draw_ground(bitmap, cliprect);
 	draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1065,8 +1110,6 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
 
 uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-//  uint16_t bg_x_scroll=m_roundup5_unknown1[0];
-//  uint16_t bg_y_scroll=m_roundup5_unknown2[0];
 	int tx_start_addr;
 	
 	tx_start_addr = (m_hd6445_reg[0xc] << 8) | (m_hd6445_reg[0xd]);
@@ -1079,9 +1122,11 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 
 	bitmap.fill(m_palette->pen(384), cliprect); // todo
 	screen.priority().fill(0, cliprect);
-
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_road(bitmap,cliprect,screen.priority());
+	draw_landscape(bitmap,cliprect,0);
+	draw_landscape(bitmap,cliprect,1);
+	draw_road(bitmap,cliprect);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1095,6 +1140,22 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	return 0;
 }
 
+void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+{
+	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	{
+		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		{
+			uint8_t shadow = shadow_bitmap.pix8(y, x);
+			if(shadow)
+			{
+				rgb_t shadow_pen = bitmap.pix32(y, x);
+				bitmap.pix32(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
+			}
+		}
+	}	
+}
+
 uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bigfight_bank=m_bigfight_a40000[0];
@@ -1106,16 +1167,26 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 		}
 		m_bigfight_last_bank=m_bigfight_bank;
 	}
-
-	bitmap.fill(m_palette->pen(0), cliprect);
-	
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80,false, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80,false, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40,true, true);
 	update_cluts(8192, 4096, 8192);
-	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80,false, false);
 	
+	bitmap.fill(m_palette->pen(0), cliprect);
+
+	#ifdef UNUSED_FUNCTION
+	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
+													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
+														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
+														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
+	#endif													
+	
+	screen.priority().fill(0, cliprect);
+	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x80, false, true);
+	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x80, false, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, true, false);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x80, false, false);
+
 	return 0;
 }
 
@@ -1130,14 +1201,25 @@ uint32_t cyclwarr_state::screen_update_bigfight(screen_device &screen, bitmap_rg
 		}
 		m_bigfight_last_bank=m_bigfight_bank;
 	}
-
-	bitmap.fill(m_palette->pen(0), cliprect);
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x40,true, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x40,true, false);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40,true, false);
 	update_cluts(8192, 4096, 8192);
+
+	#ifdef UNUSED_FUNCTION
+	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
+													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
+														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
+														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
+	#endif
+	
+	bitmap.fill(m_palette->pen(0), cliprect);
+	
+	screen.priority().fill(0, cliprect);
+	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], 8, -0x40, false, true);
+	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], 8, -0x40, false, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], 8, -0x40, false, false);
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x40,true, false);
+	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], 0x10, -0x40, false, false);
 
 	return 0;
 }

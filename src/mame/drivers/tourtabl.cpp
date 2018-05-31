@@ -174,7 +174,7 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tourtabl_state, tourtabl_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tourtabl_state, tourtabl_get_databus_contents))
 

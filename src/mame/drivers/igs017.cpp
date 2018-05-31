@@ -4718,8 +4718,8 @@ ROM_START( spkrform )
 ROM_END
 
 
-GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M, Gambling)",              0 )
-GAME( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS",                      "IQ Block (V113FR, Gambling)",                 0 )
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M, gambling)",              0 )
+GAME( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS",                      "IQ Block (V113FR, gambling)",                 0 )
 GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, init_mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V125T1)",    MACHINE_IMPERFECT_COLORS ) // wrong colors in betting screen
 GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, init_mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
 GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )

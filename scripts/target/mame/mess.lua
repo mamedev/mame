@@ -346,6 +346,7 @@ VIDEOS["TMS3556"] = true
 VIDEOS["TMS9927"] = true
 VIDEOS["TMS9928A"] = true
 VIDEOS["TOPCAT"] = true
+VIDEOS["NEREID"] = true
 VIDEOS["UPD3301"] = true
 VIDEOS["UPD7220"] = true
 VIDEOS["UPD7227"] = true

@@ -482,7 +482,7 @@
 #define DMA_INT_PEND    (0x00000001)    // interrupt pending, set when TC=1
 #define DMA_READ_ONLY   (DMA_TC | DMA_BYTE_ADDR | DMA_REQ_PEND | DMA_PACK_CNT | DMA_ERR_PEND | DMA_INT_PEND)
 #define DMA_WRITE_ONLY  (DMA_FLUSH)
-#define DMA_READ_WRITE  (DMA_EN_CNT | DMA_EN_DMA | DMA_WRITE | DMA_RESET | DMA_INT_EN)
+#define DMA_READ_WRITE  (DMA_EN_CNT | DMA_EN_DMA | DMA_WRITE | DMA_RESET | DMA_DRAIN | DMA_INT_EN)
 #define DMA_CTRL        (0)
 #define DMA_ADDR        (1)
 #define DMA_BYTE_COUNT  (2)
@@ -1808,29 +1808,22 @@ WRITE32_MEMBER( sun4_state::dma_w )
 		{
 			// clear write-only bits
 			logerror("dma_w: ctrl: %08x\n", data);
-			uint32_t old_ctrl = m_dma[DMA_CTRL];
 
-			m_dma[DMA_CTRL] &= (DMA_WRITE_ONLY | DMA_READ_WRITE);
-			m_dma[DMA_CTRL] |= (data & (DMA_WRITE_ONLY | DMA_READ_WRITE));
+			mem_mask &= (DMA_READ_WRITE);
+			COMBINE_DATA(&m_dma[DMA_CTRL]);
 
-			uint32_t diff = old_ctrl ^ m_dma[DMA_CTRL];
-
-			if (diff & DMA_FLUSH)
+			if (data & DMA_RESET)
+				m_dma[DMA_CTRL] &= ~(DMA_ERR_PEND | DMA_PACK_CNT | DMA_INT_EN | DMA_FLUSH | DMA_DRAIN | DMA_WRITE | DMA_EN_DMA | DMA_REQ_PEND | DMA_EN_CNT | DMA_TC);
+			else if (data & DMA_FLUSH)
 			{
-				m_dma[DMA_CTRL] &= ~DMA_PACK_CNT;
-				m_dma[DMA_CTRL] &= ~DMA_ERR_PEND;
-				m_dma[DMA_CTRL] &= ~DMA_TC;
+				m_dma[DMA_CTRL] &= ~(DMA_PACK_CNT | DMA_ERR_PEND | DMA_TC);
 
 				dma_check_interrupts();
 			}
+			// TODO: DMA_DRAIN
 
-			if (diff & DMA_EN_DMA)
-			{
-				if ((data & DMA_EN_DMA) != 0 && (m_dma[DMA_CTRL] & DMA_REQ_PEND) != 0)
-				{
-					dma_transfer();
-				}
-			}
+			if (data & DMA_EN_DMA && (m_dma[DMA_CTRL] & DMA_REQ_PEND))
+				dma_transfer();
 			break;
 		}
 
@@ -2184,11 +2177,11 @@ ROM_END
 ROM_START( sun4_50 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
-	ROMX_LOAD( "ipx-29.h1.u0501", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8), ROM_BIOS(1)) // 525-1177-06(?) Boot (Version 2.9 version 20, supposedly?)
+	ROMX_LOAD( "ipx-29.h1.u0501", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8), ROM_BIOS(0)) // 525-1177-06(?) Boot (Version 2.9 version 20, supposedly?)
 	ROM_SYSTEM_BIOS( 1, "v26", "V2.6" )
-	ROMX_LOAD( "525-1177-05__=c=_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
+	ROMX_LOAD( "525-1177-05__=c=_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(1)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
 	ROM_SYSTEM_BIOS( 2, "v23", "V2.3" )
-	ROMX_LOAD( "525-1177-03.h1.u0501", 0x0000, 0x40000, CRC(dcc1e66c) SHA1(a4dc3d8631aaa8416e22de273707c4ed7a2fe561), ROM_BIOS(3)) // 525-1177-03 Boot (Version 2.3)
+	ROMX_LOAD( "525-1177-03.h1.u0501", 0x0000, 0x40000, CRC(dcc1e66c) SHA1(a4dc3d8631aaa8416e22de273707c4ed7a2fe561), ROM_BIOS(2)) // 525-1177-03 Boot (Version 2.3)
 ROM_END
 
 // SPARCstation SLC (Sun 4/20)
@@ -2268,29 +2261,29 @@ ROM_END
 ROM_START( sun4_75 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
-	ROMX_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1), ROM_BIOS(1) )
+	ROMX_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v22", "V2.2" )
-	ROMX_LOAD( "525-1107-06.rom", 0x0000, 0x40000, CRC(7f5b58b4) SHA1(10a3eb3ddee667e7cf3c04aef6f6549e1b7f8311), ROM_BIOS(2) )
+	ROMX_LOAD( "525-1107-06.rom", 0x0000, 0x40000, CRC(7f5b58b4) SHA1(10a3eb3ddee667e7cf3c04aef6f6549e1b7f8311), ROM_BIOS(1) )
 ROM_END
 
 // SPARCstation 10 (Sun S10)
 ROM_START( sun_s10 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "r225", "Rev 2.2.5")
-	ROMX_LOAD( "ss10_v2.25.rom", 0x0000, 0x80000, CRC(c7a48fd3) SHA1(db13d85b02f181eb7fce4c38b11996ff64116619), ROM_BIOS(1))
+	ROMX_LOAD( "ss10_v2.25.rom", 0x0000, 0x80000, CRC(c7a48fd3) SHA1(db13d85b02f181eb7fce4c38b11996ff64116619), ROM_BIOS(0))
 	// SPARCstation 10 and 20
 	ROM_SYSTEM_BIOS(1, "r225r", "Rev 2.2.5r")
-	ROMX_LOAD( "ss10-20_v2.25r.rom", 0x0000, 0x80000, CRC(105ba132) SHA1(58530e88369d1d26ab11475c7884205f2299d255), ROM_BIOS(2))
+	ROMX_LOAD( "ss10-20_v2.25r.rom", 0x0000, 0x80000, CRC(105ba132) SHA1(58530e88369d1d26ab11475c7884205f2299d255), ROM_BIOS(1))
 ROM_END
 
 // SPARCstation 20
 ROM_START( sun_s20 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "r225", "Rev 2.2.5")
-	ROMX_LOAD( "ss20_v2.25.rom", 0x0000, 0x80000, CRC(b4f5c547) SHA1(ee78312069522094950884d5bcb21f691eb6f31e), ROM_BIOS(1))
+	ROMX_LOAD( "ss20_v2.25.rom", 0x0000, 0x80000, CRC(b4f5c547) SHA1(ee78312069522094950884d5bcb21f691eb6f31e), ROM_BIOS(0))
 	// SPARCstation 10 and 20
 	ROM_SYSTEM_BIOS(1, "r225r", "Rev 2.2.5r")
-	ROMX_LOAD( "ss10-20_v2.25r.rom", 0x0000, 0x80000, CRC(105ba132) SHA1(58530e88369d1d26ab11475c7884205f2299d255), ROM_BIOS(2))
+	ROMX_LOAD( "ss10-20_v2.25r.rom", 0x0000, 0x80000, CRC(105ba132) SHA1(58530e88369d1d26ab11475c7884205f2299d255), ROM_BIOS(1))
 ROM_END
 
 void sun4_state::init_sun4()

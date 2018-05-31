@@ -477,9 +477,9 @@ ROM_START( asma2k )
 	    which is integrated onto one plcc44 chip called a zpsd211r.
 	*/
 	ROM_SYSTEM_BIOS( 0, "v314", "v3.14" )
-	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(1) )
+	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
-	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(2) )
+	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
 
 	ROM_REGION( 0x8000, "spellcheck", 0 )
 	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )

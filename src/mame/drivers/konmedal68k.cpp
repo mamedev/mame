@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(konmedal68k_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")

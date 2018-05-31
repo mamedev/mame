@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 
 // Analog Devices AD1848, main codec in Windows Sound System adapters
+// TODO: Emulate pin-compatible Crystal Semiconductor CS4231 and its extra Mode 2 features
 
 #include "emu.h"
 #include "sound/ad1848.h"
@@ -100,6 +101,7 @@ WRITE8_MEMBER(ad1848_device::write)
 				case 9:
 				{
 					m_play = (data & 1) ? true : false;
+					// FIXME: provide external configuration for XTAL1 (24.576 MHz) and XTAL2 (16.9344 MHz) inputs
 					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
 							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
 					m_timer->adjust(rate, 0 , rate);

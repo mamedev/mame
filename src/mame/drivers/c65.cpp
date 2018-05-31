@@ -39,19 +39,19 @@ class c65_state : public driver_device
 {
 public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cia0(*this, "cia_0"),
-			m_cia1(*this, "cia_1"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_workram(*this, "wram"),
-			m_palred(*this, "redpal"),
-			m_palgreen(*this, "greenpal"),
-			m_palblue(*this, "bluepal"),
-			m_dmalist(*this, "dmalist"),
-			m_cram(*this, "cram"),
-			m_gfxdecode(*this, "gfxdecode")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cia0(*this, "cia_0")
+		, m_cia1(*this, "cia_1")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_workram(*this, "wram")
+		, m_palred(*this, "redpal")
+		, m_palgreen(*this, "greenpal")
+		, m_palblue(*this, "bluepal")
+		, m_dmalist(*this, "dmalist")
+		, m_cram(*this, "cram")
+		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// devices
@@ -739,15 +739,15 @@ MACHINE_CONFIG_END
 ROM_START( c65 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "910111", "V0.9.910111" ) // sum16 CAFF, this shows up on the picture from a spare, unused rom on the 20171102 c64dx auction as "390488-02 CAFF" with the 02 scratched off on the chip and 03 written in pen, unclear what the "correct" label is.
-	ROMX_LOAD( "910111.bin", 0x0000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206), ROM_BIOS(1) )
+	ROMX_LOAD( "910111.bin", 0x0000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "910523", "V0.9.910523" ) // sum16 B96B
-	ROMX_LOAD( "910523.bin", 0x0000, 0x20000, CRC(e8235dd4) SHA1(e453a8e7e5b95de65a70952e9d48012191e1b3e7), ROM_BIOS(2) )
+	ROMX_LOAD( "910523.bin", 0x0000, 0x20000, CRC(e8235dd4) SHA1(e453a8e7e5b95de65a70952e9d48012191e1b3e7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "910626", "V0.9.910626" ) // sum16 888C
-	ROMX_LOAD( "910626.bin", 0x0000, 0x20000, CRC(12527742) SHA1(07c185b3bc58410183422f7ac13a37ddd330881b), ROM_BIOS(3) )
+	ROMX_LOAD( "910626.bin", 0x0000, 0x20000, CRC(12527742) SHA1(07c185b3bc58410183422f7ac13a37ddd330881b), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "910828", "V0.9.910828" ) // sum16 C9CD
-	ROMX_LOAD( "910828.bin", 0x0000, 0x20000, CRC(3ee40b06) SHA1(b63d970727a2b8da72a0a8e234f3c30a20cbcb26), ROM_BIOS(4) )
+	ROMX_LOAD( "910828.bin", 0x0000, 0x20000, CRC(3ee40b06) SHA1(b63d970727a2b8da72a0a8e234f3c30a20cbcb26), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "911001", "V0.9.911001" ) // sum16 4BCF
-	ROMX_LOAD( "911001.bin", 0x0000, 0x20000, CRC(0888b50f) SHA1(129b9a2611edaebaa028ac3e3f444927c8b1fc5d), ROM_BIOS(5) )
+	ROMX_LOAD( "911001.bin", 0x0000, 0x20000, CRC(0888b50f) SHA1(129b9a2611edaebaa028ac3e3f444927c8b1fc5d), ROM_BIOS(4) )
 ROM_END
 
 ROM_START( c64dx )
