@@ -316,10 +316,19 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 	return r;
 }
 
-READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
+READ8_MEMBER(cyclwarr_state::oki_status_xor_r)
 {
-	int r=m_oki->read(space,0);
+	int r = m_oki->read(space,0);
 
+	// Cycle Warriors and Big Fight access this with reversed activeness.
+	// this is particularly noticeable with the "We got em" sample played in CW at stage clear:
+    // gets cut too early with the old hack below.
+	// fwiw returning normal oki status doesn't work at all, both games don't make any sound.
+	// TODO: verify with HW
+	return (r ^ 0xff);
+	#ifdef UNUSED_FUNCTION
+	// old hack left for reference
+	
 	if (m_audiocpu->pc()==0x2b70 || m_audiocpu->pc()==0x2bb5
 		|| m_audiocpu->pc()==0x2acc
 		|| m_audiocpu->pc()==0x1c79 // BigFight
@@ -330,4 +339,5 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
 		|| m_audiocpu->pc()==0x1cac) // BigFight
 		return 0;
 	return r;
+	#endif
 }

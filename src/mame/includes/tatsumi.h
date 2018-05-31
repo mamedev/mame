@@ -57,7 +57,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	INTERRUPT_GEN_MEMBER(v30_interrupt);
 	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
-	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
 	DECLARE_WRITE8_MEMBER(hd6445_crt_w);
 
 	void tatsumi_reset();
@@ -202,6 +201,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
 	DECLARE_WRITE16_MEMBER(output_w);
+	DECLARE_READ8_MEMBER(oki_status_xor_r);
+
 	template<int Bank> DECLARE_READ16_MEMBER(cyclwarr_videoram_r);
 	template<int Bank> DECLARE_WRITE16_MEMBER(cyclwarr_videoram_w);
 
