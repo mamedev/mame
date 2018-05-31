@@ -74,6 +74,7 @@ private:
 
 	required_device<timer_device> m_dma_timer;
 	required_device_array<timer_device, 2> m_timer;
+	optional_device_array<dmadac_sound_device, 4> m_dmadac;
 
 	required_memory_bank m_bootbank;
 	required_memory_bank m_mainbank;
@@ -95,7 +96,6 @@ private:
 	uint16_t m_control;
 
 	uint32_t *m_speedup_ram;
-	dmadac_sound_device *m_dmadac[4];
 
 	offs_t m_speedup;
 };

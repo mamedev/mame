@@ -127,6 +127,7 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type 
 	m_soundlatch(*this, "soundlatch%u", 1U),
 	m_dma_timer(*this, "cage_dma_timer"),
 	m_timer(*this, "cage_timer%u", 0U),
+	m_dmadac(*this, "dac%u", 1U),
 	m_bootbank(*this, "bootbank"),
 	m_mainbank(*this, "mainbank"),
 	m_bootrom(*this, "boot"),
@@ -155,13 +156,6 @@ void atari_cage_device::device_start()
 	if (m_speedup) {
 		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(FUNC(atari_cage_device::speedup_w),this));
 		m_speedup_ram = m_cageram + m_speedup;
-	}
-
-	for (int chan = 0; chan < DAC_BUFFER_CHANNELS; chan++)
-	{
-		char buffer[10];
-		sprintf(buffer, "dac%d", chan + 1);
-		m_dmadac[chan] = subdevice<dmadac_sound_device>(buffer);
 	}
 
 	save_item(NAME(m_serial_period_per_word));
@@ -240,10 +234,14 @@ void atari_cage_device::update_dma_state(address_space &space)
 			sound_data[i % STACK_SOUND_BUFSIZE] = space.read_dword(addr);
 			addr += inc;
 			if (i % STACK_SOUND_BUFSIZE == STACK_SOUND_BUFSIZE - 1)
-				dmadac_transfer(&m_dmadac[0], DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
+				for (int j = 0; j < DAC_BUFFER_CHANNELS; j++)
+					m_dmadac[j]->transfer(j, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
 		}
 		if (tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE != 0)
-			dmadac_transfer(&m_dmadac[0], DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, (tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE) / DAC_BUFFER_CHANNELS, sound_data);
+		{
+			for (int j = 0; j < DAC_BUFFER_CHANNELS; j++)
+				m_dmadac[j]->transfer(j, 1, DAC_BUFFER_CHANNELS, (tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE) / DAC_BUFFER_CHANNELS, sound_data);
+		}
 
 		/* compute the time of the interrupt and set the timer */
 		if (!m_dma_timer_enabled)
@@ -344,8 +342,11 @@ void atari_cage_device::update_serial()
 	freq = ATTOSECONDS_TO_HZ(m_serial_period_per_word.attoseconds()) / DAC_BUFFER_CHANNELS;
 	if (freq > 0 && freq < 100000)
 	{
-		dmadac_set_frequency(&m_dmadac[0], DAC_BUFFER_CHANNELS, freq);
-		dmadac_enable(&m_dmadac[0], DAC_BUFFER_CHANNELS, 1);
+		for (int i = 0; i < DAC_BUFFER_CHANNELS; i++)
+		{
+			m_dmadac[i]->set_frequency(freq);
+			m_dmadac[i]->enable(1);
+		}
 	}
 }
 
