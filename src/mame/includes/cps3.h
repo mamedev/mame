@@ -20,6 +20,13 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_cps3sound(*this, "cps3sound")
+		, m_simm{{*this, "simm1.%u", 0U},
+		         {*this, "simm2.%u", 0U},
+		         {*this, "simm3.%u", 0U},
+		         {*this, "simm4.%u", 0U},
+		         {*this, "simm5.%u", 0U},
+		         {*this, "simm6.%u", 0U},
+		         {*this, "simm7.%u", 0U}}
 		, m_mainram(*this, "mainram")
 		, m_spriteram(*this, "spriteram")
 		, m_colourram(*this, "colourram")
@@ -40,6 +47,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cps3_sound_device> m_cps3sound;
+	optional_device_array<fujitsu_29f016a_device, 8> m_simm[7];
 
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_spriteram;
@@ -56,7 +64,6 @@ public:
 	optional_memory_region      m_user4_region;
 	optional_memory_region      m_user5_region;
 
-	fujitsu_29f016a_device *m_simm[7][8];
 	uint32_t m_cram_gfxflash_bank;
 	std::unique_ptr<uint32_t[]> m_char_ram;
 	std::unique_ptr<uint32_t[]> m_eeprom;
