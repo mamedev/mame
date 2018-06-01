@@ -871,22 +871,22 @@ MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 
 	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 	MCFG_DEVICE_ADD(":pci:00.0", NV2A_HOST, 0, m_maincpu)
-	MCFG_DEVICE_ADD(":pci:00.3", NV2A_RAM, 0) downcast<pci_device &>(*device).set_ids(0x10de02a6, 0, 0, 0);
-	MCFG_DEVICE_ADD(":pci:01.0", MCPX_LPC, 0) downcast<pci_device &>(*device).set_ids(0x10de01b2, 0xb4, 0, 0); // revision id must be at least 0xb4, otherwise usb will require a hub
-	MCFG_DEVICE_ADD(":pci:01.1", MCPX_SMBUS, 0) downcast<pci_device &>(*device).set_ids(0x10de01b4, 0, 0, 0);
+	MCFG_DEVICE_ADD(":pci:00.3", NV2A_RAM, 0)
+	MCFG_DEVICE_ADD(":pci:01.0", MCPX_LPC, 0)
+	MCFG_DEVICE_ADD(":pci:01.1", MCPX_SMBUS, 0)
 	MCFG_MCPX_SMBUS_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_smbus_interrupt_changed))
-	MCFG_DEVICE_ADD(":pci:02.0", MCPX_OHCI, 0) downcast<pci_device &>(*device).set_ids(0x10de01c2, 0, 0, 0);
+	MCFG_DEVICE_ADD(":pci:02.0", MCPX_OHCI, 0)
 	MCFG_MCPX_OHCI_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_ohci_usb_interrupt_changed))
-	MCFG_DEVICE_ADD(":pci:03.0", MCPX_OHCI, 0) downcast<pci_device &>(*device).set_ids(0x10de01c2, 0, 0, 0);
-	MCFG_DEVICE_ADD(":pci:04.0", MCPX_ETH, 0) downcast<pci_device &>(*device).set_ids(0x10de01c3, 0, 0, 0);
+	MCFG_DEVICE_ADD(":pci:03.0", MCPX_OHCI, 0)
+	MCFG_DEVICE_ADD(":pci:04.0", MCPX_ETH, 0)
 	MCFG_DEVICE_ADD(":pci:05.0", MCPX_APU, 0, m_maincpu)
-	MCFG_DEVICE_ADD(":pci:06.0", MCPX_AC97_AUDIO, 0) downcast<pci_device &>(*device).set_ids(0x10de01b1, 0, 0, 0);
-	MCFG_DEVICE_ADD(":pci:06.1", MCPX_AC97_MODEM, 0) downcast<pci_device &>(*device).set_ids(0x10de01c1, 0, 0, 0);
+	MCFG_DEVICE_ADD(":pci:06.0", MCPX_AC97_AUDIO, 0)
+	MCFG_DEVICE_ADD(":pci:06.1", MCPX_AC97_MODEM, 0)
 	MCFG_DEVICE_ADD(":pci:08.0", PCI_BRIDGE, 0, 0x10de01b8, 0)
-	MCFG_DEVICE_ADD(":pci:09.0", MCPX_IDE, 0) downcast<pci_device &>(*device).set_ids(0x10de01bc, 0, 0, 0);
+	MCFG_DEVICE_ADD(":pci:09.0", MCPX_IDE, 0)
 	MCFG_MCPX_IDE_INTERRUPT_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 	MCFG_DEVICE_ADD(":pci:1e.0", NV2A_AGP, 0, 0x10de01b7, 0)
-	MCFG_DEVICE_ADD(":pci:1e.0:00.0", NV2A_GPU, 0) downcast<pci_device &>(*device).set_ids(0x10de02a0, 0, 0, 0);
+	MCFG_DEVICE_ADD(":pci:1e.0:00.0", NV2A_GPU, 0)
 	MCFG_MCPX_NV2A_GPU_CPU(m_maincpu)
 	MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_nv2a_interrupt_changed))
 
