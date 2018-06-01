@@ -1159,6 +1159,8 @@ VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)
 	
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 
+	// set up scroll bases
+	// TODO: more HW configs
 	m_layer[3]->set_scrolldx(-8,-8);
 	m_layer[2]->set_scrolldx(-8,-8);
 	m_layer[1]->set_scrolldx(-8,-8);	
@@ -1176,6 +1178,8 @@ VIDEO_START_MEMBER(cyclwarr_state,bigfight)
 
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 
+	// set up scroll bases
+	// TODO: more HW configs
 	m_layer[3]->set_scrolldx(-8,-8);
 	m_layer[2]->set_scrolldx(-8,-8);
 	m_layer[1]->set_scrolldx(-8,-8);
