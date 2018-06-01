@@ -1058,20 +1058,27 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
  *
  *********************************/
 
-// TODO: color offset is a mystery, it's certainly not masked with 0xf
-// cfr. Big Fight fade in/out effects or CRT test
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 {
-	int tile = m_cyclwarr_videoram[Bank][tile_index&0x7fff];
+	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index&0x7fff];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	uint16_t tileno = (tile&0x3ff)|(bank<<10);
+	// color is bits 12-13
+	uint8_t color = (tile >> 12) & 0x3;
+
+	// all layers but 0 wants this palette bank (fade in/out effects)
+	// a similar result is obtainable with priority bit, but then it's wrong for 
+	// Big Fight CRT test (dark red background) and character name bio in attract mode (reference shows it doesn't fade in like rest of text)
+	// TODO: likely an HW config sets this up
+	if(Bank != 0)
+		color |= 4;
 	// bit 14: ignore transparency on this tile
 	int opaque = ((tile >> 14) & 1) == 1;
 
 	SET_TILE_INFO_MEMBER(1,
 						 tileno,
-						 (tile >> 12) & 0xf,
+						 color,
 						opaque ? TILE_FORCE_LAYER0 : 0);
 
 	// bit 15: tile appears in front of sprites
@@ -1084,14 +1091,17 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
 {
-	int tile = m_cyclwarr_videoram[Bank][tile_index&0x7fff];
+	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index&0x7fff];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	uint16_t tileno = (tile&0x3ff)|(bank<<10);
+	uint8_t color = (tile >> 12) & 0x3;
+//	if(Bank != 0)
+	color |= 4;
 	int opaque = ((tile >> 14) & 1) == 1;
 	
 	SET_TILE_INFO_MEMBER(1,
 	                     tileno,
-						 ((tile>>12) & 0xf) | m_road_color_bank,
+						 color | m_road_color_bank,
 						 opaque ? TILE_FORCE_LAYER0 : 0);
 
 	tileinfo.category = (tile >> 15) & 1;
@@ -1143,9 +1153,9 @@ VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)
 {
 	tile_expand();
 	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_cyclwarr_road<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
-	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_cyclwarr_road<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<2>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
+	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<3>),this),TILEMAP_SCAN_ROWS,8,8,64,512);
 	
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 
@@ -1160,9 +1170,9 @@ VIDEO_START_MEMBER(cyclwarr_state,bigfight)
 {
 	tile_expand();
 	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<0>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
-	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<1>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<2>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
+	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cyclwarr_state::get_tile_info_bigfight<3>),this),TILEMAP_SCAN_ROWS,8,8,128,256);
 
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 
