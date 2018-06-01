@@ -212,7 +212,6 @@ public:
 	DECLARE_VIDEO_START(cyclwarr);
 	DECLARE_VIDEO_START(bigfight);
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
@@ -240,8 +239,11 @@ private:
 	uint16_t m_bigfight_a40000[2];
 	uint16_t m_bigfight_bank;
 	uint16_t m_bigfight_last_bank;
-	uint16_t m_cyclwarr_color_bank;
-
+	uint16_t m_road_color_bank, m_prev_road_bank;
+	bool m_layer1_can_be_road;
+	
 	void tile_expand();
-	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool is_road, bool is_opaque);
+	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, bool is_opaque, int hi_priority);
+	void draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority);
 };
+

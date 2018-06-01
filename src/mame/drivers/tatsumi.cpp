@@ -215,11 +215,8 @@ template<int Bank>
 WRITE16_MEMBER(cyclwarr_state::cyclwarr_videoram_w)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram[Bank][offset]);
-	if (offset>=0x400)
-	{
-		m_layer[(Bank<<1)|0]->mark_tile_dirty(offset-0x400);
-		m_layer[(Bank<<1)|1]->mark_tile_dirty(offset-0x400);
-	}
+	m_layer[(Bank<<1)|0]->mark_tile_dirty(offset);
+	m_layer[(Bank<<1)|1]->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(cyclwarr_state::output_w)
@@ -1012,6 +1009,8 @@ void cyclwarr_state::machine_reset()
 	
 	m_last_control = 0;
 	m_control_word = 0;
+	
+	m_road_color_bank = m_prev_road_bank = 0;
 }
 
 MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
@@ -1076,8 +1075,8 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	cyclwarr(config);
 
 	// TODO: it's same video HW, we don't know how/where video registers are mapped
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
+//	MCFG_SCREEN_MODIFY("screen")
+//	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
