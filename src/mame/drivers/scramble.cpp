@@ -76,7 +76,7 @@ void scramble_state::scramble_sound_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x8000, 0x8fff).rw(this, FUNC(scramble_state::scramble_soundram_r), FUNC(scramble_state::scramble_soundram_w)).share("soundram");
-	map(0x9000, 0x9fff).w(this, FUNC(scramble_state::scramble_filter_w));
+	map(0x9000, 0x9fff).nopw(); // w(this, FUNC(scramble_state::scramble_filter_w)); - scramble doesn't instantiate any RC filters. This is dead code!
 }
 
 void scramble_state::scramble_sound_io_map(address_map &map)
@@ -400,7 +400,7 @@ void scramble_state::harem_sound_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x6000, 0x6000).r(this, FUNC(scramble_state::harem_digitalker_intr_r));
 	map(0x8000, 0x83ff).ram();
-	map(0xa000, 0xafff).w(this, FUNC(scramble_state::scramble_filter_w));
+	map(0xa000, 0xafff).nopw(); // w(this, FUNC(scramble_state::scramble_filter_w)); - scramble/harem don't instantiate any RC filters. This is dead code!
 }
 
 void scramble_state::harem_sound_io_map(address_map &map)
