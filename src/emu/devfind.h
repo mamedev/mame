@@ -38,20 +38,15 @@ template <typename T, unsigned Count>
 class object_array_finder
 {
 private:
-	template <unsigned... V> struct indices { };
-	template <unsigned C, unsigned... V> struct range : public range<C - 1, C - 1, V...> { };
-	template <unsigned... V> struct range<0U, V...> { typedef indices<V...> type; };
-	template <unsigned C> using index_range = typename range<C>::type;
-
 	template <typename F, typename... Param, unsigned... V>
-	object_array_finder(device_t &base, F const &fmt, unsigned start, indices<V...>, Param const &... arg)
+	object_array_finder(device_t &base, F const &fmt, unsigned start, std::integer_sequence<unsigned, V...>, Param const &... arg)
 		: m_tag{ util::string_format(fmt, start + V)... }
 		, m_array{ { base, m_tag[V].c_str(), arg... }... }
 	{
 	}
 
 	template <typename... Param, unsigned... V>
-	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, indices<V...>, Param const &... arg)
+	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, std::integer_sequence<unsigned, V...>, Param const &... arg)
 		: m_array{ { base, tags[V], arg... }... }
 	{
 	}
@@ -110,7 +105,7 @@ public:
 	/// \sa util::string_format
 	template <typename F, typename... Param>
 	object_array_finder(device_t &base, F const &fmt, unsigned start, Param const &... arg)
-		: object_array_finder(base, fmt, start, index_range<Count>(), arg...)
+		: object_array_finder(base, fmt, start, std::make_integer_sequence<unsigned, Count>(), arg...)
 	{
 	}
 
@@ -126,7 +121,7 @@ public:
 	///   all elements.
 	template <typename... Param>
 	object_array_finder(device_t &base, std::array<char const *, Count> const &tags, Param const &... arg)
-		: object_array_finder(base, tags, index_range<Count>(), arg...)
+		: object_array_finder(base, tags, std::make_integer_sequence<unsigned, Count>(), arg...)
 	{
 	}
 
