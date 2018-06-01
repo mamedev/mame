@@ -73,7 +73,7 @@ ToDo:
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x0000, 0x3fff).bankr(m_read_bank).bankw("bankw0");
 	map(0x4000, 0xffff).ram();
 }
 
@@ -273,8 +273,8 @@ void zorba_state::machine_start()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
-	membank("bankr0")->configure_entry(0, &main[0x0000]);
-	membank("bankr0")->configure_entry(1, &main[0x10000]);
+	m_read_bank->configure_entry(0, &main[0x0000]);
+	m_read_bank->configure_entry(1, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 
 	save_item(NAME(m_intmask));
@@ -304,7 +304,7 @@ void zorba_state::machine_reset()
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
 	m_read_bank->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	membank("bankw0")->set_entry(0); // always write to RAM
 
 	m_maincpu->reset();
 }
