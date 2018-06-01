@@ -1066,11 +1066,13 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 	int tile = m_cyclwarr_videoram[Bank][tile_index&0x7fff];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	uint16_t tileno = (tile&0x3ff)|(bank<<10);
-	
+	// bit 14: ignore transparency on this tile
+	int opaque = ((tile >> 14) & 1) == 1;
+
 	SET_TILE_INFO_MEMBER(1,
 						 tileno,
 						 (tile >> 12) & 0xf,
-						 0);
+						opaque ? TILE_FORCE_LAYER0 : 0);
 
 	// bit 15: tile appears in front of sprites
 	tileinfo.category = (tile >> 15) & 1;
@@ -1085,14 +1087,14 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
 	int tile = m_cyclwarr_videoram[Bank][tile_index&0x7fff];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	uint16_t tileno = (tile&0x3ff)|(bank<<10);
-
+	int opaque = ((tile >> 14) & 1) == 1;
+	
 	SET_TILE_INFO_MEMBER(1,
 	                     tileno,
 						 ((tile>>12) & 0xf) | m_road_color_bank,
-						 0);
+						 opaque ? TILE_FORCE_LAYER0 : 0);
 
 	tileinfo.category = (tile >> 15) & 1;
-	// TODO: enables transparent pen on sideways
 	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
 }
 
@@ -1172,7 +1174,7 @@ VIDEO_START_MEMBER(cyclwarr_state,bigfight)
 }
 
 
-void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, bool is_opaque, int hi_priority)
+void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, int hi_priority)
 {
 	rectangle clip;
 	clip.min_x = cliprect.min_x;
@@ -1188,7 +1190,7 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		int x_base = colscroll_enable ? y : 0;
 		int src_y = (scrolly[y_base] & 0xfff);
 		int src_x = (scrollx[x_base] & 0x7ff);
-		
+
 		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
 		// additional tile color bank and per scanline.
 		if(is_road == true)
@@ -1203,23 +1205,20 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 				m_prev_road_bank = m_road_color_bank;
 				src->mark_all_dirty();
 			}
-			// TODO: road sidelines attempt, still not right (cuts off cyan color at intro and farmost road lines)
-			//if(m_road_color_bank)
-			//	is_opaque = true;
 		}
 
 		src->set_scrollx(0,src_x);
 		src->set_scrolly(0,src_y);
-		src->draw(screen, bitmap, clip, (is_opaque ? TILEMAP_DRAW_OPAQUE : 0) | TILEMAP_DRAW_CATEGORY(hi_priority), 0);
+		src->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(hi_priority), 0);
 	}
 }
 
 void cyclwarr_state::draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority)
 {
-	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], false, hi_priority == 0, hi_priority);
-	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], false, false, hi_priority);
-	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], m_layer1_can_be_road, false, hi_priority);
-	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], false, false,hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[3], &m_cyclwarr_videoram[1][0x000], &m_cyclwarr_videoram[1][0x100], false, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[2], &m_cyclwarr_videoram[1][0x200], &m_cyclwarr_videoram[1][0x300], false, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[1], &m_cyclwarr_videoram[0][0x000], &m_cyclwarr_videoram[0][0x100], m_layer1_can_be_road, hi_priority);
+	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], false, hi_priority);
 }
 
 uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

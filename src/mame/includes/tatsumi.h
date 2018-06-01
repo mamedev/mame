@@ -243,7 +243,7 @@ private:
 	bool m_layer1_can_be_road;
 	
 	void tile_expand();
-	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, bool is_opaque, int hi_priority);
+	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, int hi_priority);
 	void draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority);
 };
 
