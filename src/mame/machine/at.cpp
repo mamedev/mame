@@ -14,7 +14,6 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "machine/input_merger.h"
 
 #define LOG_PORT80  0
 
@@ -62,12 +61,9 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, at_mb_device, pit8254_out2_changed))
 
-	MCFG_INPUT_MERGER_ANY_LOW("eop")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, at_mb_device, dma8237_out_eop))
-
 	MCFG_DEVICE_ADD("dma8237_1", AM9517A, 14.318181_MHz_XTAL / 3)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_2", am9517a_device, dreq0_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE("eop", input_merger_device, in_w<0>))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, at_mb_device, dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, at_mb_device, dma_read_byte))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, at_mb_device, dma_write_byte))
 	MCFG_I8237_IN_IOR_0_CB(READ8(*this, at_mb_device, dma8237_0_dack_r))
@@ -85,7 +81,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, 14.318181_MHz_XTAL / 3)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, at_mb_device, dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE("eop", input_merger_device, in_w<1>))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, at_mb_device, dma8237_2_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, at_mb_device, dma_read_word))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, at_mb_device, dma_write_word))
 	MCFG_I8237_IN_IOR_1_CB(READ8(*this, at_mb_device, dma8237_5_dack_r))
@@ -340,6 +336,13 @@ WRITE_LINE_MEMBER( at_mb_device::dma8237_out_eop )
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
 		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
+}
+
+WRITE_LINE_MEMBER( at_mb_device::dma8237_2_out_eop )
+{
+	m_cur_eop2 = state == ASSERT_LINE;
+	if(m_dma_channel != -1)
+		m_isabus->eop_w(m_dma_channel, m_cur_eop2 ? ASSERT_LINE : CLEAR_LINE );
 }
 
 void at_mb_device::set_dma_channel(int channel, int state)
