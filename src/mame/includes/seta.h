@@ -167,6 +167,7 @@ public:
 	DECLARE_READ8_MEMBER(downtown_ip_r);
 	DECLARE_WRITE8_MEMBER(calibr50_sub_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(calibr50_soundlatch2_w);
+	DECLARE_WRITE8_MEMBER(twineagl_ctrl_w);
 	DECLARE_READ16_MEMBER(twineagl_debug_r);
 	DECLARE_READ16_MEMBER(twineagl_200100_r);
 	DECLARE_WRITE16_MEMBER(twineagl_200100_w);
