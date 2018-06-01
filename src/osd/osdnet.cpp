@@ -47,7 +47,7 @@ osd_netdev::~osd_netdev()
 {
 }
 
-void osd_netdev::close()
+void osd_netdev::stop()
 {
 	m_stop = true;
 	m_timer->reset();
