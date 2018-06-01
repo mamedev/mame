@@ -33074,6 +33074,7 @@ rz1                             // 1986 Casio
 @source:rzone.cpp
 rzbatfor                        //
 rzindy500                       //
+rztoshden                       //
 
 @source:s11.cpp
 gmine_l2                        //
