@@ -630,12 +630,13 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid (zero) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
-	if (m_palette != nullptr)
+	if (m_palette.finder_tag() != finder_base::DUMMY_TAG)
 	{
+		if (!m_palette)
+			osd_printf_error("Screen references non-existent palette tag %s\n", m_palette.finder_tag());
+
 		if (texformat == TEXFORMAT_RGB32)
-		{
 			osd_printf_warning("Screen does not need palette defined\n");
-		}
 	}
 	else if (texformat == TEXFORMAT_PALETTE16)
 	{
@@ -659,9 +660,7 @@ void screen_device::device_resolve_objects()
 
 	// assign our format to the palette before it starts
 	if (m_palette)
-	{
 		m_palette->m_format = format();
-	}
 }
 
 
@@ -689,7 +688,7 @@ void screen_device::device_start()
 	}
 
 	// if we have a palette and it's not started, wait for it
-	if (m_palette != nullptr && !m_palette->device().started())
+	if (m_palette && !m_palette->device().started())
 		throw device_missing_dependencies();
 
 	// configure bitmap formats and allocate screen bitmaps
@@ -962,7 +961,7 @@ void screen_device::realloc_screen_bitmaps()
 		item->m_bitmap.resize(effwidth, effheight);
 
 	// re-set up textures
-	if (m_palette != nullptr)
+	if (m_palette)
 	{
 		m_bitmap[0].set_palette(m_palette->palette());
 		m_bitmap[1].set_palette(m_palette->palette());
@@ -1334,7 +1333,7 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 	// if allocating now, just do it
 	bitmap.allocate(width(), height());
-	if (m_palette != nullptr)
+	if (m_palette)
 		bitmap.set_palette(m_palette->palette());
 }
 
