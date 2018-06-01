@@ -83,9 +83,9 @@
 void leland_state::master_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x9fff).bankr("masterbank_0");
-	map(0xa000, 0xdfff).bankr("masterbank_1").w(this, FUNC(leland_state::leland_battery_ram_w)).share("battery");
-	map(0xe000, 0xefff).ram().share("mainram");
+	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
+	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(this, FUNC(leland_state::leland_battery_ram_w)).share("battery");
+	map(0xe000, 0xefff).ram().share(m_mainram);
 	map(0xf000, 0xf3ff).rw(this, FUNC(leland_state::leland_gated_paletteram_r), FUNC(leland_state::leland_gated_paletteram_w)).share("palette");
 	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_master_video_addr_w));
 }
@@ -110,9 +110,9 @@ void leland_state::master_redline_map_io(address_map &map)
 void ataxx_state::master_map_program_2(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x9fff).bankr("masterbank_0");
-	map(0xa000, 0xdfff).bankr("masterbank_1").w(this, FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
-	map(0xe000, 0xf7ff).ram().share("mainram");
+	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
+	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(this, FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
+	map(0xe000, 0xf7ff).ram().share(m_mainram);
 	map(0xf800, 0xffff).rw(this, FUNC(ataxx_state::ataxx_paletteram_and_misc_r), FUNC(ataxx_state::ataxx_paletteram_and_misc_w)).share("palette");
 }
 
@@ -140,7 +140,7 @@ void ataxx_state::master_map_io_2(address_map &map)
 void leland_state::slave_small_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0xdfff).bankr("slavebank");
+	map(0x2000, 0xdfff).bankr(m_slave_bankslot);
 	map(0xe000, 0xefff).ram();
 	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
 	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
@@ -151,7 +151,7 @@ void leland_state::slave_small_map_program(address_map &map)
 void leland_state::slave_large_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0xbfff).bankr("slavebank");
+	map(0x4000, 0xbfff).bankr(m_slave_bankslot);
 	map(0xc000, 0xc000).w(this, FUNC(leland_state::leland_slave_large_banksw_w));
 	map(0xe000, 0xefff).ram();
 	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
@@ -170,7 +170,7 @@ void leland_state::slave_map_io(address_map &map)
 void leland_state::slave_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x9fff).bankr("slavebank");
+	map(0x2000, 0x9fff).bankr(m_slave_bankslot);
 	map(0xa000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
 	map(0xfffc, 0xfffd).w(this, FUNC(leland_state::leland_slave_video_addr_w));
