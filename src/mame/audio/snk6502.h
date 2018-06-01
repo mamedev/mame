@@ -12,7 +12,7 @@
 
 #include "sound/discrete.h"
 #include "sound/samples.h"
-
+#include "sound/sn76477.h"
 
 class snk6502_sound_device : public device_t, public device_sound_interface
 {
@@ -38,9 +38,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	static constexpr unsigned CHANNELS = 3;
+	static constexpr unsigned NUM_CHANNELS = 3;
 
-	struct TONE
+	struct tone_t
 	{
 		int mute;
 		int offset;
@@ -53,15 +53,17 @@ private:
 	};
 
 	// internal state
-	TONE m_tone_channels[CHANNELS];
+	tone_t m_tone_channels[NUM_CHANNELS];
 	int32_t m_tone_clock_expire;
 	int32_t m_tone_clock;
 	sound_stream * m_tone_stream;
 
+	optional_device<sn76477_device> m_sn76477_2;
+	optional_device<discrete_device> m_discrete;
 	optional_device<samples_device> m_samples;
-	uint8_t *m_ROM;
-	int m_Sound0StopOnRollover;
-	uint8_t m_LastPort1;
+	required_memory_region m_rom;
+	int m_sound0_stop_on_rollover;
+	uint8_t m_last_port1;
 
 	int m_hd38880_cmd;
 	uint32_t m_hd38880_addr;

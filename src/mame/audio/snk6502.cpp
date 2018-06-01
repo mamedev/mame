@@ -15,9 +15,6 @@
 #include "emu.h"
 #include "audio/snk6502.h"
 
-#include "sound/sn76477.h"
-
-
 #ifndef M_LN2
 #define M_LN2       0.69314718055994530942
 #endif
@@ -133,14 +130,15 @@ DEFINE_DEVICE_TYPE(SNK6502, snk6502_sound_device, "snk6502_sound", "SNK6502 Cust
 snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SNK6502, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		//m_tone_channels[CHANNELS],
 		m_tone_clock_expire(0),
 		m_tone_clock(0),
 		m_tone_stream(nullptr),
+		m_sn76477_2(*this, ":sn76477.2"),
+		m_discrete(*this, ":discrete"),
 		m_samples(*this, ":samples"),
-		m_ROM(nullptr),
-		m_Sound0StopOnRollover(0),
-		m_LastPort1(0),
+		m_rom(*this, ":snk6502"),
+		m_sound0_stop_on_rollover(0),
+		m_last_port1(0),
 		m_hd38880_cmd(0),
 		m_hd38880_addr(0),
 		m_hd38880_data_bytes(0),
@@ -155,8 +153,6 @@ snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const 
 
 void snk6502_sound_device::device_start()
 {
-	m_ROM = machine().root_device().memregion("snk6502")->base();
-
 	// adjusted
 	set_music_freq(43000);
 
@@ -165,7 +161,7 @@ void snk6502_sound_device::device_start()
 
 	m_tone_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
 
-	for (int i = 0; i < CHANNELS; i++)
+	for (int i = 0; i < NUM_CHANNELS; i++)
 	{
 		save_item(NAME(m_tone_channels[i].mute), i);
 		save_item(NAME(m_tone_channels[i].offset), i);
@@ -177,8 +173,8 @@ void snk6502_sound_device::device_start()
 	}
 
 	save_item(NAME(m_tone_clock));
-	save_item(NAME(m_Sound0StopOnRollover));
-	save_item(NAME(m_LastPort1));
+	save_item(NAME(m_sound0_stop_on_rollover));
+	save_item(NAME(m_last_port1));
 	save_item(NAME(m_hd38880_cmd));
 	save_item(NAME(m_hd38880_addr));
 	save_item(NAME(m_hd38880_data_bytes));
@@ -189,7 +185,7 @@ inline void snk6502_sound_device::validate_tone_channel(int channel)
 {
 	if (!m_tone_channels[channel].mute)
 	{
-		uint8_t romdata = m_ROM[m_tone_channels[channel].base + m_tone_channels[channel].offset];
+		uint8_t romdata = m_rom->base()[m_tone_channels[channel].base + m_tone_channels[channel].offset];
 
 		if (romdata != 0xff)
 			m_tone_channels[channel].sample_step = m_tone_channels[channel].sample_rate / (256 - romdata);
@@ -200,164 +196,105 @@ inline void snk6502_sound_device::validate_tone_channel(int channel)
 
 void snk6502_sound_device::sasuke_build_waveform(int mask)
 {
-	int bit0, bit1, bit2, bit3;
-	int base;
-	int i;
+	const int bit0 = BIT(mask, 0);
+	const int bit1 = BIT(mask, 1);
+	const int bit2 = 1;
+	const int bit3 = BIT(mask, 2);
+	const int base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
 
-	mask &= 7;
-
-	//logerror("0: wave form = %d\n", mask);
-	bit0 = bit1 = bit3 = 0;
-	bit2 = 1;
-
-	if (mask & 1)
-		bit0 = 1;
-	if (mask & 2)
-		bit1 = 1;
-	if (mask & 4)
-		bit3 = 1;
-
-	base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		int data = 0;
-
-		if (i & 1)
-			data += bit0;
-		if (i & 2)
-			data += bit1;
-		if (i & 4)
-			data += bit2;
-		if (i & 8)
-			data += bit3;
-
-		//logerror(" %3d\n", data);
+		const int data = (bit0 & BIT(i, 0)) + (bit1 & BIT(i, 1)) + (bit2 & BIT(i, 2)) + (bit3 & BIT(i, 3));
 		m_tone_channels[0].form[i] = data - base;
 	}
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_tone_channels[0].form[i] *= 65535 / 16;
 }
 
 void snk6502_sound_device::satansat_build_waveform(int mask)
 {
-	int bit0, bit1, bit2, bit3;
-	int base;
-	int i;
-
-	mask &= 7;
-
 	//logerror("1: wave form = %d\n", mask);
-	bit0 = bit1 = bit2 = 1;
-	bit3 = 0;
+	const int bit0 = 1;
+	const int bit1 = 1;
+	const int bit2 = 1;
+	const int bit3 = BIT(mask, 0);
+	const int base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
 
-	if (mask & 1)
-		bit3 = 1;
-
-	base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		int data = 0;
-
-		if (i & 1)
-			data += bit0;
-		if (i & 2)
-			data += bit1;
-		if (i & 4)
-			data += bit2;
-		if (i & 8)
-			data += bit3;
-
-		//logerror(" %3d\n", data);
+		const int data = (bit0 & BIT(i, 0)) + (bit1 & BIT(i, 1)) + (bit2 & BIT(i, 2)) + (bit3 & BIT(i, 3));
 		m_tone_channels[1].form[i] = data - base;
 	}
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_tone_channels[1].form[i] *= 65535 / 16;
 }
 
 void snk6502_sound_device::build_waveform(int channel, int mask)
 {
-	int bit0, bit1, bit2, bit3;
-	int base;
-	int i;
-
-	mask &= 15;
-
 	//logerror("%d: wave form = %d\n", channel, mask);
-	bit0 = bit1 = bit2 = bit3 = 0;
+	int bit0 = 0;
+	int bit1 = 0;
+	int bit2 = 0;
+	int bit3 = 0;
 
 	// bit 3
-	if (mask & (1 | 2))
+	if (BIT(mask, 0) || BIT(mask, 1))
 		bit3 = 8;
-	else if (mask & 4)
+	else if (BIT(mask, 2))
 		bit3 = 4;
-	else if (mask & 8)
+	else if (BIT(mask, 8))
 		bit3 = 2;
 
 	// bit 2
-	if (mask & 4)
+	if (BIT(mask, 2))
 		bit2 = 8;
-	else if (mask & (2 | 8))
+	else if (BIT(mask, 1) || BIT(mask, 3))
 		bit2 = 4;
 
 	// bit 1
-	if (mask & 8)
+	if (BIT(mask, 3))
 		bit1 = 8;
-	else if (mask & 4)
+	else if (BIT(mask, 2))
 		bit1 = 4;
-	else if (mask & 2)
+	else if (BIT(mask, 1))
 		bit1 = 2;
 
 	// bit 0
-	bit0 = bit1 / 2;
+	bit0 = bit1 >> 1;
 
 	if (bit0 + bit1 + bit2 + bit3 < 16)
 	{
-		bit0 *= 2;
-		bit1 *= 2;
-		bit2 *= 2;
-		bit3 *= 2;
+		bit0 <<= 1;
+		bit1 <<= 1;
+		bit2 <<= 1;
+		bit3 <<= 1;
 	}
 
-	base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
+	const int base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		/* special channel for fantasy */
 		if (channel == 2)
 		{
-			m_tone_channels[channel].form[i] = (i & 8) ? 7 : -8;
+			m_tone_channels[channel].form[i] = BIT(i, 3) ? 7 : -8;
 		}
 		else
 		{
-			int data = 0;
-
-			if (i & 1)
-				data += bit0;
-			if (i & 2)
-				data += bit1;
-			if (i & 4)
-				data += bit2;
-			if (i & 8)
-				data += bit3;
-
-			//logerror(" %3d\n", data);
+			const int data = (bit0 & BIT(i, 0)) + (bit1 & BIT(i, 1)) + (bit2 & BIT(i, 2)) + (bit3 & BIT(i, 3));
 			m_tone_channels[channel].form[i] = data - base;
 		}
 	}
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_tone_channels[channel].form[i] *= 65535 / 160;
 }
 
 void snk6502_sound_device::set_music_freq(int freq)
 {
-	int i;
-
-	for (i = 0; i < CHANNELS; i++)
+	for (int i = 0; i < NUM_CHANNELS; i++)
 	{
 		m_tone_channels[i].mute = 1;
 		m_tone_channels[i].offset = 0;
@@ -401,25 +338,25 @@ WRITE8_MEMBER( snk6502_sound_device::sasuke_sound_w )
 		    7   reset counter
 		*/
 
-		if ((~data & 0x01) && (m_LastPort1 & 0x01))
+		if ((~data & 0x01) && (m_last_port1 & 0x01))
 			m_samples->start(0, 0);
-		if ((~data & 0x02) && (m_LastPort1 & 0x02))
+		if ((~data & 0x02) && (m_last_port1 & 0x02))
 			m_samples->start(1, 1);
-		if ((~data & 0x04) && (m_LastPort1 & 0x04))
+		if ((~data & 0x04) && (m_last_port1 & 0x04))
 			m_samples->start(2, 2);
-		if ((~data & 0x08) && (m_LastPort1 & 0x08))
+		if ((~data & 0x08) && (m_last_port1 & 0x08))
 			m_samples->start(3, 3);
 
-		if ((data & 0x80) && (~m_LastPort1 & 0x80))
+		if ((data & 0x80) && (~m_last_port1 & 0x80))
 		{
 			m_tone_channels[0].offset = 0;
 			m_tone_channels[0].mute = 0;
 		}
 
-		if ((~data & 0x80) && (m_LastPort1 & 0x80))
+		if ((~data & 0x80) && (m_last_port1 & 0x80))
 			m_tone_channels[0].mute = 1;
 
-		m_LastPort1 = data;
+		m_last_port1 = data;
 		break;
 
 	case 1:
@@ -440,7 +377,7 @@ WRITE8_MEMBER( snk6502_sound_device::sasuke_sound_w )
 		m_tone_channels[0].base = 0x0000 + ((data & 0x70) << 4);
 		m_tone_channels[0].mask = 0xff;
 
-		m_Sound0StopOnRollover = 1;
+		m_sound0_stop_on_rollover = 1;
 
 		/* bit 1-3 sound0 waveform control */
 		sasuke_build_waveform((data & 0x0e) >> 1);
@@ -463,7 +400,7 @@ WRITE8_MEMBER( snk6502_sound_device::satansat_sound_w )
 		/* bit 1 = to 76477 */
 
 		/* bit 2 = analog sound trigger */
-		if (data & 0x04 && !(m_LastPort1 & 0x04))
+		if (data & 0x04 && !(m_last_port1 & 0x04))
 			m_samples->start(0, 1);
 
 		if (data & 0x08)
@@ -478,7 +415,7 @@ WRITE8_MEMBER( snk6502_sound_device::satansat_sound_w )
 		/* bit 7 sound1 waveform control */
 		satansat_build_waveform((data & 0x80) >> 7);
 
-		m_LastPort1 = data;
+		m_last_port1 = data;
 		break;
 	case 1:
 		/*
@@ -492,7 +429,7 @@ WRITE8_MEMBER( snk6502_sound_device::satansat_sound_w )
 		m_tone_channels[1].base = 0x0800 + ((data & 0x60) << 4);
 		m_tone_channels[1].mask = 0x1ff;
 
-		m_Sound0StopOnRollover = 1;
+		m_sound0_stop_on_rollover = 1;
 
 		if (data & 0x01)
 			m_tone_channels[0].mute = 0;
@@ -532,17 +469,17 @@ WRITE8_MEMBER( snk6502_sound_device::vanguard_sound_w )
 		m_tone_channels[0].base = ((data & 0x07) << 8);
 		m_tone_channels[0].mask = 0xff;
 
-		m_Sound0StopOnRollover = 1;
+		m_sound0_stop_on_rollover = 1;
 
 		/* play noise samples requested by sound command byte */
 		/* SHOT A */
-		if (data & 0x20 && !(m_LastPort1 & 0x20))
+		if (data & 0x20 && !(m_last_port1 & 0x20))
 			m_samples->start(1, 0);
-		else if (!(data & 0x20) && m_LastPort1 & 0x20)
+		else if (!(data & 0x20) && m_last_port1 & 0x20)
 			m_samples->stop(1);
 
 		/* BOMB */
-		if (data & 0x80 && !(m_LastPort1 & 0x80))
+		if (data & 0x80 && !(m_last_port1 & 0x80))
 			m_samples->start(2, 1);
 
 		if (data & 0x08)
@@ -557,9 +494,9 @@ WRITE8_MEMBER( snk6502_sound_device::vanguard_sound_w )
 		}
 
 		/* SHOT B */
-		machine().device<sn76477_device>("sn76477.2")->enable_w((data & 0x40) ? 0 : 1);
+		m_sn76477_2->enable_w((data & 0x40) ? 0 : 1);
 
-		m_LastPort1 = data;
+		m_last_port1 = data;
 		break;
 	case 1:
 		/*
@@ -628,7 +565,7 @@ WRITE8_MEMBER( snk6502_sound_device::fantasy_sound_w )
 		m_tone_channels[0].base = 0x0000 + ((data & 0x07) << 8);
 		m_tone_channels[0].mask = 0xff;
 
-		m_Sound0StopOnRollover = 0;
+		m_sound0_stop_on_rollover = 0;
 
 		if (data & 0x08)
 			m_tone_channels[0].mute = 0;
@@ -647,9 +584,9 @@ WRITE8_MEMBER( snk6502_sound_device::fantasy_sound_w )
 		}
 
 		/* BOMB */
-		machine().device<discrete_device>("discrete")->write(space, FANTASY_BOMB_EN, data & 0x80);
+		m_discrete->write(space, FANTASY_BOMB_EN, data & 0x80);
 
-		m_LastPort1 = data;
+		m_last_port1 = data;
 		break;
 	case 1:
 		/*
@@ -769,9 +706,7 @@ void snk6502_sound_device::speech_w(uint8_t data, const uint16_t *table, int sta
 
 				if (m_hd38880_data_bytes == 5 && !m_samples->playing(0))
 				{
-					int i;
-
-					for (i = 0; i < 16; i++)
+					for (int i = 0; i < 16; i++)
 					{
 						if (table[i] && table[i] == m_hd38880_addr)
 						{
@@ -940,31 +875,29 @@ void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 {
 	stream_sample_t *buffer = outputs[0];
 
-	int i;
-
-	for (i = 0; i < CHANNELS; i++)
+	for (int i = 0; i < NUM_CHANNELS; i++)
 		validate_tone_channel(i);
 
 	while (samples-- > 0)
 	{
 		int32_t data = 0;
 
-		for (i = 0; i < CHANNELS; i++)
+		for (int i = 0; i < NUM_CHANNELS; i++)
 		{
-			TONE *voice = &m_tone_channels[i];
-			int16_t *form = voice->form;
+			tone_t &voice = m_tone_channels[i];
+			int16_t *form = voice.form;
 
-			if (!voice->mute && voice->sample_step)
+			if (!voice.mute && voice.sample_step)
 			{
-				int cur_pos = voice->sample_cur + voice->sample_step;
-				int prev = form[(voice->sample_cur >> FRAC_BITS) & 15];
+				int cur_pos = voice.sample_cur + voice.sample_step;
+				int prev = form[(voice.sample_cur >> FRAC_BITS) & 15];
 				int cur = form[(cur_pos >> FRAC_BITS) & 15];
 
 				/* interpolate */
 				data += ((int32_t)prev * (FRAC_ONE - (cur_pos & FRAC_MASK))
 						+ (int32_t)cur * (cur_pos & FRAC_MASK)) >> FRAC_BITS;
 
-				voice->sample_cur = cur_pos;
+				voice.sample_cur = cur_pos;
 			}
 		}
 
@@ -973,7 +906,7 @@ void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		m_tone_clock += FRAC_ONE;
 		if (m_tone_clock >= m_tone_clock_expire)
 		{
-			for (i = 0; i < CHANNELS; i++)
+			for (int i = 0; i < NUM_CHANNELS; i++)
 			{
 				m_tone_channels[i].offset++;
 				m_tone_channels[i].offset &= m_tone_channels[i].mask;
@@ -981,7 +914,7 @@ void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				validate_tone_channel(i);
 			}
 
-			if (m_tone_channels[0].offset == 0 && m_Sound0StopOnRollover)
+			if (m_tone_channels[0].offset == 0 && m_sound0_stop_on_rollover)
 				m_tone_channels[0].mute = 1;
 
 			m_tone_clock -= m_tone_clock_expire;
