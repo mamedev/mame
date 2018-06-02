@@ -669,7 +669,7 @@ ROM_START( sf )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -739,7 +739,7 @@ ROM_START( sfua )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -809,7 +809,7 @@ ROM_START( sfj )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -876,7 +876,7 @@ ROM_START( sfan )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -944,7 +944,7 @@ ROM_START( sfjan )
 	ROM_LOAD( "sf_27.4d.27256", 0x000000, 0x004000, CRC(59416e03) SHA1(028e74e0b23c5063883d19f94da35719be4feada) ) //  First half FF, second half matches known
 	ROM_CONTINUE( 0, 0x004000 )
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) ) // sf_37.4h.27c512
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) ) // sf_36.3h.27c512
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) ) // sf_32.3g.27c512
@@ -1013,7 +1013,7 @@ ROM_START( sfw )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -1077,7 +1077,7 @@ ROM_START( sfp )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "vram.4d", 0x000000, 0x004000, CRC(bfadfb32) SHA1(8443ad9f02da5fb032017fc0c657b1bdc15e4f27) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "bks1j10.5h", 0x000000, 0x010000, CRC(4934aacd) SHA1(15274ae8b26799e15c7a66ff89ffd386de1659d3) )
 	ROM_LOAD( "bks1j18.3h", 0x010000, 0x010000, CRC(551ffc88) SHA1(4f9213f4e80033f910dd8aae44b2c6d9ba760d61) )
 	ROM_LOAD( "ms1j10.3g",  0x020000, 0x010000, CRC(f92958b8) SHA1(da8fa64ea9ad27c737225681c49f7c57cc7afeed) )

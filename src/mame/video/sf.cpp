@@ -9,11 +9,8 @@
 
 ***************************************************************************/
 
-// logical tilemap width is 32768(2048 * 16) but we load only 1024 pixel each
-// for reduce RAM usage.
 TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 {
-	tile_index = ((m_bgscroll & 0xff00) + tile_index) & 0x7fff;
 	uint8_t *base = &m_tilerom[2 * tile_index];
 	int attr = base[0x10000];
 	int color = base[0];
@@ -26,7 +23,6 @@ TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 {
-	tile_index = ((m_fgscroll & 0xff00) + tile_index) & 0x7fff;
 	uint8_t *base = &m_tilerom[0x20000 + 2 * tile_index];
 	int attr = base[0x10000];
 	int color = base[0];
@@ -56,10 +52,8 @@ TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
 
 void sf_state::video_start()
 {
-//	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 1024/16, 16);
-//	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 1024/16, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
@@ -82,24 +76,14 @@ WRITE16_MEMBER(sf_state::videoram_w)
 
 WRITE16_MEMBER(sf_state::bg_scroll_w)
 {
-	int old = m_bgscroll & 0xff00;
 	COMBINE_DATA(&m_bgscroll);
-	if (ACCESSING_BITS_0_7)
-		m_bg_tilemap->set_scrollx(0, m_bgscroll & 0xff);
-	if (ACCESSING_BITS_8_15)
-		if ((old ^ (m_bgscroll & 0xff00)) != 0) // high bit of scroll - instead load new chunk of tilemap
-			m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->set_scrollx(0, m_bgscroll);
 }
 
 WRITE16_MEMBER(sf_state::fg_scroll_w)
 {
-	int old = m_fgscroll & 0xff00;
 	COMBINE_DATA(&m_fgscroll);
-	if (ACCESSING_BITS_0_7)
-		m_fg_tilemap->set_scrollx(0, m_fgscroll & 0xff);
-	if (ACCESSING_BITS_8_15)
-		if ((old ^ (m_fgscroll & 0xff00)) != 0) // high bit of scroll - instead load new chunk of tilemap
-			m_fg_tilemap->mark_all_dirty();
+	m_fg_tilemap->set_scrollx(0, m_fgscroll);
 }
 
 WRITE16_MEMBER(sf_state::gfxctrl_w)
