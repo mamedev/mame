@@ -54,7 +54,7 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
-	required_device<timer_device> m_scan_timer;
+	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
