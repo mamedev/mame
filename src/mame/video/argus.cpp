@@ -123,7 +123,8 @@ BG0 palette intensity ( $C47F, $C4FF )
   Callbacks for the tilemap code
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
+template<int Gfx>
+TILE_GET_INFO_MEMBER(argus_state::get_tx_tile_info)
 {
 	uint8_t hi, lo;
 
@@ -132,7 +133,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
 	lo = m_txram[tile_index];
 	hi = m_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(3,
+	SET_TILE_INFO_MEMBER(Gfx,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -172,21 +173,6 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg1_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::valtric_get_tx_tile_info)
-{
-	uint8_t hi, lo;
-
-	tile_index <<= 1;
-
-	lo = m_txram[tile_index];
-	hi = m_txram[tile_index + 1];
-
-	SET_TILE_INFO_MEMBER(2,
-			((hi & 0xc0) << 2) | lo,
-			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4));
-}
-
 TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
 {
 	uint8_t hi, lo;
@@ -202,33 +188,14 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
-{
-	uint8_t hi, lo;
-
-	tile_index ^= 0x3e0;
-	tile_index <<= 1;
-
-	lo = m_butasan_txram[tile_index];
-	hi = m_butasan_txram[tile_index + 1];
-
-	SET_TILE_INFO_MEMBER(3,
-			((hi & 0xc0) << 2) | lo,
-			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4));
-}
-
 TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
 {
 	uint8_t hi, lo;
-	int attrib;
 
-	attrib = (tile_index & 0x00f) | ((tile_index & 0x3e0) >> 1) | ((tile_index & 0x010) << 5);
-	attrib ^= 0x0f0;
-	attrib <<= 1;
+	tile_index <<= 1;
 
-	lo = m_butasan_bg0ram[attrib];
-	hi = m_butasan_bg0ram[attrib + 1];
+	lo = m_butasan_bg0ram[tile_index];
+	hi = m_butasan_bg0ram[tile_index + 1];
 
 	SET_TILE_INFO_MEMBER(1,
 			((hi & 0xc0) << 2) | lo,
@@ -238,12 +205,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
 
 TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg1_tile_info)
 {
-	int attrib, tile;
-
-	attrib = (tile_index & 0x00f) | ((tile_index & 0x3e0) >> 1) | ((tile_index & 0x010) << 5);
-	attrib ^= 0x0f0;
-
-	tile = m_butasan_bg1ram[attrib] | ((m_butasan_bg1_status & 2) << 7);
+	int const tile = m_butasan_bg1ram[tile_index] | ((m_butasan_bg1_status & 2) << 7);
 
 	SET_TILE_INFO_MEMBER(2,
 			tile,
@@ -251,6 +213,17 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg1_tile_info)
 			0);
 }
 
+TILEMAP_MAPPER_MEMBER(argus_state::butasan_bg_scan)
+{
+	/* logical (col,row) -> memory offset */
+	return (col & 0x0f) | ((row ^ 0x0f) << 4) | ((col & 0x10) << 5);
+}
+
+TILEMAP_MAPPER_MEMBER(argus_state::butasan_tx_scan)
+{
+	/* logical (col,row) -> memory offset */
+	return (col & 0x1f) | ((row ^ 0x1f) << 5);
+}
 
 /***************************************************************************
   Initialize and destroy video hardware emulation
@@ -266,10 +239,10 @@ void argus_state::reset_common()
 VIDEO_START_MEMBER(argus_state,argus)
 {
 	/*                           info                     offset             w   h  col  row */
-//	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096, 32);
+//	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096,    32);
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 1024/16, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_tx_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_tx_tile_info),this),  TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32,      32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_tx_tile_info<3>),this),     TILEMAP_SCAN_COLS,  8,  8, 32,      32);
 
 	m_bg_tilemap[1]->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
@@ -290,7 +263,7 @@ VIDEO_START_MEMBER(argus_state,valtric)
 {
 	/*                           info                      offset             w   h  col  row */
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::valtric_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_tx_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::valtric_get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_tx_tile_info<2>),this),      TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 
@@ -313,9 +286,9 @@ VIDEO_RESET_MEMBER(argus_state,valtric)
 VIDEO_START_MEMBER(argus_state,butasan)
 {
 	/*                           info                       offset             w   h  col  row */
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tx_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_tx_tile_info),this),  TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(argus_state::butasan_bg_scan),this), 16, 16, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(argus_state::butasan_bg_scan),this), 16, 16, 32, 32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_tx_tile_info<3>),this),       tilemap_mapper_delegate(FUNC(argus_state::butasan_tx_scan),this),  8,  8, 32, 32);
 
 	m_bg_tilemap[1]->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
@@ -587,14 +560,8 @@ WRITE8_MEMBER(argus_state::butasan_paletteram_w)
 
 WRITE8_MEMBER(argus_state::butasan_bg1ram_w)
 {
-	int idx;
-
 	m_butasan_bg1ram[offset] = data;
-
-	idx = (offset & 0x00f) | ((offset & 0x200) >> 5) | ((offset & 0x1f0) << 1);
-	idx ^= 0x0f0;
-
-	m_bg_tilemap[1]->mark_tile_dirty(idx);
+	m_bg_tilemap[1]->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(argus_state::butasan_pageselect_w)
@@ -617,17 +584,12 @@ WRITE8_MEMBER(argus_state::butasan_pagedram_w)
 	if (!m_butasan_page_latch)
 	{
 		if (offset <= 0x07ff)
-		{
-			int idx;
-			idx = ((offset & 0x01e) >> 1) | ((offset & 0x400) >> 6) | (offset & 0x3e0);
-			idx ^= 0x1e0;
-			m_bg_tilemap[0]->mark_tile_dirty(idx);
-		}
+			m_bg_tilemap[0]->mark_tile_dirty(offset >> 1);
 	}
 	else
 	{
 		if (offset <= 0x07ff)
-			m_tx_tilemap->mark_tile_dirty((offset ^ 0x7c0) >> 1);
+			m_tx_tilemap->mark_tile_dirty(offset >> 1);
 	}
 }
 
