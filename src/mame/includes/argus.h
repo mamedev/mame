@@ -47,6 +47,9 @@ public:
 	uint8_t m_flipscreen;
 	uint16_t m_palette_intensity;
 
+	// argus specific
+	uint8_t m_vrom_offset;
+
 	// butasan specific
 	uint8_t *m_butasan_txram;
 	uint8_t *m_butasan_bg0ram;

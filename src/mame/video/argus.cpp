@@ -142,7 +142,9 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
 {
 	uint8_t hi, lo;
 
-	tile_index <<= 1;
+	// logical width is 65536(4096*16) but we load only 1024 pixel each
+	// for reduce RAM usage
+	tile_index = (((m_vrom_offset << 9) + tile_index) & 0x1ffff) <<= 1;
 	int vrom_offset = (tile_index >> 3);
 	tile_index = (m_vrom[0][vrom_offset & ~1] << 4) | ((m_vrom[0][vrom_offset | 1] & 0x7) << 12) | (tile_index & 0xf);
 
@@ -264,7 +266,8 @@ void argus_state::reset_common()
 VIDEO_START_MEMBER(argus_state,argus)
 {
 	/*                           info                     offset             w   h  col  row */
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096, 32);
+//	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 1024/16, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_tx_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_tx_tile_info),this),  TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
@@ -654,8 +657,21 @@ void argus_state::bg_setting()
 	{
 		if (m_bg_tilemap[0] != nullptr)
 		{
-			m_bg_tilemap[0]->set_scrollx(0, bg_scrollx(0));
-			m_bg_tilemap[0]->set_scrolly(0, bg_scrolly(0));
+			if (m_vrom[0] != nullptr) && (m_vrom[1] != nullptr)
+			{
+				if (m_vrom_offset != m_bg_scrollx[0][1])
+				{
+					m_vrom_offset = m_bg_scrollx[0][1];
+					m_bg_tilemap[0]->mark_all_dirty();
+				}
+				m_bg_tilemap[0]->set_scrollx(0, m_bg_scrollx[0][0]);
+				m_bg_tilemap[0]->set_scrolly(0, bg_scrolly(0));
+			}
+			else
+			{
+				m_bg_tilemap[0]->set_scrollx(0, bg_scrollx(0));
+				m_bg_tilemap[0]->set_scrolly(0, bg_scrolly(0));
+			}
 		}
 		m_bg_tilemap[1]->set_scrollx(0, bg_scrollx(1) & 0x1ff);
 		m_bg_tilemap[1]->set_scrolly(0, bg_scrolly(1) & 0x1ff);
@@ -664,8 +680,21 @@ void argus_state::bg_setting()
 	{
 		if (m_bg_tilemap[0] != nullptr)
 		{
-			m_bg_tilemap[0]->set_scrollx(0, (bg_scrollx(0) + 256));
-			m_bg_tilemap[0]->set_scrolly(0, (bg_scrolly(0) + 256));
+			if (m_vrom[0] != nullptr) && (m_vrom[1] != nullptr)
+			{
+				if (m_vrom_offset != ((m_bg_scrollx[0][1] + 1) & 0xff))
+				{
+					m_vrom_offset = ((m_bg_scrollx[0][1] + 1) & 0xff);
+					m_bg_tilemap[0]->mark_all_dirty();
+				}
+				m_bg_tilemap[0]->set_scrollx(0, m_bg_scrollx[0][0]);
+				m_bg_tilemap[0]->set_scrolly(0, (bg_scrolly(0) + 256));
+			}
+			else
+			{
+				m_bg_tilemap[0]->set_scrollx(0, (bg_scrollx(0) + 256));
+				m_bg_tilemap[0]->set_scrolly(0, (bg_scrolly(0) + 256));
+			}
 		}
 		m_bg_tilemap[1]->set_scrollx(0, (bg_scrollx(1) + 256) & 0x1ff);
 		m_bg_tilemap[1]->set_scrolly(0, (bg_scrolly(1) + 256) & 0x1ff);
