@@ -99,6 +99,7 @@ public:
 	TILE_GET_INFO_MEMBER(argus_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(argus_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(valtric_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(butasan_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
 	TILEMAP_MAPPER_MEMBER(butasan_bg_scan);

@@ -188,6 +188,21 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
 			0);
 }
 
+TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
+{
+	uint8_t hi, lo;
+
+	tile_index <<= 1;
+
+	lo = m_butasan_txram[tile_index];
+	hi = m_butasan_txram[tile_index + 1];
+
+	SET_TILE_INFO_MEMBER(3,
+			((hi & 0xc0) << 2) | lo,
+			hi & 0x0f,
+			TILE_FLIPYX((hi & 0x30) >> 4));
+}
+
 TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
 {
 	uint8_t hi, lo;
@@ -239,7 +254,7 @@ void argus_state::reset_common()
 VIDEO_START_MEMBER(argus_state,argus)
 {
 	/*                           info                     offset             w   h  col  row */
-//	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096,    32);
+//	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096,    32); // full 65536 width tilemap
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 1024/16, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32,      32);
 	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_tx_tile_info<3>),this),     TILEMAP_SCAN_COLS,  8,  8, 32,      32);
@@ -288,7 +303,7 @@ VIDEO_START_MEMBER(argus_state,butasan)
 	/*                           info                       offset             w   h  col  row */
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(argus_state::butasan_bg_scan),this), 16, 16, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(argus_state::butasan_bg_scan),this), 16, 16, 32, 32);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_tx_tile_info<3>),this),       tilemap_mapper_delegate(FUNC(argus_state::butasan_tx_scan),this),  8,  8, 32, 32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_tx_tile_info),this),  tilemap_mapper_delegate(FUNC(argus_state::butasan_tx_scan),this),  8,  8, 32, 32);
 
 	m_bg_tilemap[1]->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
