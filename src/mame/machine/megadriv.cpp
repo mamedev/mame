@@ -808,7 +808,7 @@ MACHINE_RESET_MEMBER(md_base_state,megadriv)
 
 	if (!m_vdp->m_use_alt_timing)
 	{
-		m_vdp->m_megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
+		m_vdp->m_megadriv_scanline_timer = m_scan_timer;
 		m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 	}
 
@@ -878,7 +878,7 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 }
 
 MACHINE_CONFIG_START(md_base_state::megadriv_timers)
-	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
+	MCFG_TIMER_DEVICE_ADD(m_scan_timer, "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
 
 
@@ -998,7 +998,6 @@ void md_base_state::megadriv_init_common()
 	/* Look to see if this system has the standard Sound Z80 */
 	if (m_z80snd)
 	{
-		//printf("GENESIS Sound Z80 cpu found '%s'\n", machine().device("genesis_snd_z80")->tag());
 		m_genz80.z80_prgram = std::make_unique<uint8_t[]>(0x2000);
 		membank("bank1")->set_base(m_genz80.z80_prgram.get());
 		save_item(NAME(m_genz80.z80_is_reset));

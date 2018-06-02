@@ -609,7 +609,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
 	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
 	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
 	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
