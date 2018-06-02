@@ -260,7 +260,7 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 	{
 		m_ics->reset();
 		m_soundcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_soundcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	else
 	{
@@ -283,7 +283,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
 		m_soundlatch->write(space, 0, data);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -563,7 +563,7 @@ MACHINE_CONFIG_END
 /* take note of "sprmask" needed for expanding the Sprite Colour Data */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define PGM_68K_BIOS \
 	ROM_SYSTEM_BIOS( 0, "v2",     "PGM Bios V2" ) \
@@ -4960,6 +4960,6 @@ GAME( 2008, kovshxas,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_ty
 //乱世拳皇/Luànshì quánhuáng
 GAME( 200?, kovlsqh,      kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Quanhuang (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Quanhuang 2 (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-//乱世街霸/Luànshì jiē b�
+//乱世街霸/Luànshì jiē bà
 GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */

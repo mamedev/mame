@@ -599,7 +599,7 @@ WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 
 	m_m5205_part ^= 1;
 	if(!m_m5205_part)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

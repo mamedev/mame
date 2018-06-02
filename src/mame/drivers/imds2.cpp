@@ -525,7 +525,7 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 	if (lten) {
 		pixels = ~0;
 	} else if (vsp != 0 || (linecount & 8) != 0) {
-		pixels = 0;
+		pixels = 0; // VSP is gated with LC3
 	} else {
 		// See [2], pg 58 for the very peculiar way of generating character images
 		// Here each half-pixel is translated into a full pixel
@@ -892,15 +892,15 @@ ROM_START(imds2)
 		ROM_DEFAULT_BIOS("mon13")
 		// 1x2732 Copyright 1979
 		ROM_SYSTEM_BIOS(0, "mon13", "Series II Monitor v1.3")
-		ROMX_LOAD("ipc13_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2), ROM_BIOS(1))
+		ROMX_LOAD("ipc13_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2), ROM_BIOS(0))
 		// 2x2716 Copyright 1978
 		ROM_SYSTEM_BIOS(1, "mon12", "Series II Monitor v1.2")
-		ROMX_LOAD("ipc12_a57.bin" , 0x0000 , 0x0800 , CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(2))
-		ROMX_LOAD("ipc12_a48.bin" , 0x0800 , 0x0800 , CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(2))
+		ROMX_LOAD("ipc12_a57.bin" , 0x0000 , 0x0800 , CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(1))
+		ROMX_LOAD("ipc12_a48.bin" , 0x0800 , 0x0800 , CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(1))
 		// 2x2716 Copyright 1977
 		ROM_SYSTEM_BIOS(2, "mon11", "Series II Monitor v1.1")
-		ROMX_LOAD("ipc11_a57.bin" , 0x0000 , 0x0800 , CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(3))
-		ROMX_LOAD("ipc11_a48.bin" , 0x0800 , 0x0800 , CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(3))
+		ROMX_LOAD("ipc11_a57.bin" , 0x0000 , 0x0800 , CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(2))
+		ROMX_LOAD("ipc11_a48.bin" , 0x0800 , 0x0800 , CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(2))
 
 		// ROM definition of IOC cpu (8080A)
 		ROM_REGION(0x2000 , "ioccpu" , 0)

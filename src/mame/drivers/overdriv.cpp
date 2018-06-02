@@ -108,7 +108,7 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		output().set_led_value(0, data & 0x08);
+		m_led = BIT(data, 3);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
@@ -300,6 +300,7 @@ INPUT_PORTS_END
 
 void overdriv_state::machine_start()
 {
+	m_led.resolve();
 	m_objdma_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
 
 	save_item(NAME(m_cpuB_ctrl));

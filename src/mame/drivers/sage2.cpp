@@ -306,7 +306,7 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	m_pic->ir7_w(BIT(data, 2));
 
 	// processor LED
-	output().set_led_value(0, BIT(data, 3));
+	m_led = BIT(data, 3);
 
 	// centronics
 	m_centronics->write_strobe(BIT(data, 4));
@@ -379,6 +379,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sage2_state::machine_start()
 {
+	m_led.resolve();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base()); // Avoid the 68000 reading from lalaland in its reset handler
 }

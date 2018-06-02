@@ -71,7 +71,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
 	}
 	else if ((scanline % 32) == 0)
 	{
-		if (m_intenable & 0x08) m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_intenable & 0x08) m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -85,7 +85,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
 	}
 	else if (scanline == 0)
 	{
-		if (m_intenable & 0x08) m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_intenable & 0x08) m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

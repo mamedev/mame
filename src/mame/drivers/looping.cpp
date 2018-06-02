@@ -113,6 +113,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_aysnd(*this, "aysnd"),
+		m_tms(*this, "tms"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -171,8 +173,10 @@ private:
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ay8910_device> m_aysnd;
+	required_device<tms5220_device> m_tms;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -360,9 +364,8 @@ void looping_state::machine_start()
 void looping_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 /*************************************
@@ -450,22 +453,14 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 
 WRITE_LINE_MEMBER(looping_state::ay_enable_w)
 {
-	device_t *device = machine().device("aysnd");
-	int output;
-
-	device_sound_interface *sound;
-	device->interface(sound);
-	for (output = 0; output < 3; output++)
-		sound->set_output_gain(output, state ? 1.0 : 0.0);
+	for (int output = 0; output < 3; output++)
+		m_aysnd->set_output_gain(output, state ? 1.0 : 0.0);
 }
 
 
 WRITE_LINE_MEMBER(looping_state::speech_enable_w)
 {
-	device_t *device = machine().device("tms");
-	device_sound_interface *sound;
-	device->interface(sound);
-	sound->set_output_gain(0, state ? 1.0 : 0.0);
+	m_tms->set_output_gain(0, state ? 1.0 : 0.0);
 }
 
 

@@ -38,7 +38,7 @@
 #include "formats/mz_cas.h"
 
 
-#define MASTER_CLOCK XTAL(17'734'470)/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
+#define MASTER_CLOCK 17.73447_MHz_XTAL  / 5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 
 #define UTF8_POUND "\xc2\xa3"
 #define UTF8_YEN "\xc2\xa5"
@@ -822,7 +822,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	{
 		m_ipl_enable = 0;
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	m_beeper->set_state(data & 0x04);
@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_MB8877_ADD("mb8877a", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)

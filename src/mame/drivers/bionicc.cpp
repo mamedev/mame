@@ -71,6 +71,10 @@
         This is probably done to be pedantic about coin insertions (might be protection
         related). In fact, currently coin insertions are not consistently recognized.
 
+        We have the schematics for this board and the protection circuit, there
+        are a number of incorrect assumptions in the code which need fixing, especially
+        regarding the two MCU interrupt hookups.
+
 
 ******************************************************************************************/
 

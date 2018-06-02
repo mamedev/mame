@@ -35,8 +35,7 @@ enum line_state
 {
 	CLEAR_LINE = 0,             // clear (a fired or held) line
 	ASSERT_LINE,                // assert an interrupt immediately
-	HOLD_LINE,                  // hold interrupt line until acknowledged
-	PULSE_LINE                  // pulse interrupt line instantaneously (only for NMI, RESET)
+	HOLD_LINE                   // hold interrupt line until acknowledged
 };
 
 
@@ -87,7 +86,7 @@ enum
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
 	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(), nullptr);
+	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(), finder_base::DUMMY_TAG);
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
 	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
@@ -136,14 +135,15 @@ public:
 	attotime cycles_to_attotime(u64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
 	u64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 	u32 input_lines() const { return execute_input_lines(); }
-	u32 default_irq_vector() const { return execute_default_irq_vector(); }
+	u32 default_irq_vector(int linenum) const { return execute_default_irq_vector(linenum); }
+	bool input_edge_triggered(int linenum) const { return execute_input_edge_triggered(linenum); }
 
 	// inline configuration helpers
 	void set_disable() { m_disabled = true; }
-	template <typename Object> void set_vblank_int(Object &&cb, const char *tag, int rate = 0)
+	template <typename Object, typename T> void set_vblank_int(Object &&cb, T &&tag, int rate = 0)
 	{
 		m_vblank_interrupt = std::forward<Object>(cb);
-		m_vblank_interrupt_screen = tag;
+		m_vblank_interrupt_screen.set_tag(std::forward<T>(tag));
 	}
 	template <typename Object> void set_periodic_int(Object &&cb, const attotime &rate)
 	{
@@ -203,7 +203,8 @@ protected:
 
 	// input line information getters
 	virtual u32 execute_input_lines() const;
-	virtual u32 execute_default_irq_vector() const;
+	virtual u32 execute_default_irq_vector(int linenum) const;
+	virtual bool execute_input_edge_triggered(int linenum) const;
 
 	// optional operation overrides
 	virtual void execute_run() = 0;
@@ -289,7 +290,7 @@ private:
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
-	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
+	optional_device<screen_device> m_vblank_interrupt_screen; // the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
 

@@ -264,7 +264,7 @@ READ8_MEMBER(airbustr_state::devram_r)
 
 WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 {
-	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(airbustr_state::master_bankswitch_w)

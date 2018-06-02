@@ -1472,11 +1472,13 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 240
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1571,7 +1573,7 @@ MACHINE_CONFIG_START(williams_state::williams_muxed)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(williams_state::spdball)
+MACHINE_CONFIG_START(spdball_state::spdball)
 	williams(config);
 
 	/* basic machine hardware */
@@ -1649,7 +1651,6 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 	MCFG_DEVICE_PROGRAM_MAP(blaster_map)
 
 	MCFG_MACHINE_START_OVERRIDE(blaster_state,blaster)
-	MCFG_MACHINE_RESET_OVERRIDE(blaster_state,blaster)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(blaster_state,blaster)
@@ -1737,8 +1738,11 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 254
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3214,14 +3218,12 @@ void blaster_state::init_blaster()
 }
 
 
-void williams_state::init_spdball()
+void spdball_state::driver_init()
 {
-	pia6821_device *pia_3 = machine().device<pia6821_device>("pia_3");
-
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 
 	/* add a third PIA */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), pia_3), write8_delegate(FUNC(pia6821_device::write), pia_3));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), (pia6821_device*)m_pia_3), write8_delegate(FUNC(pia6821_device::write), (pia6821_device*)m_pia_3));
 
 	/* install extra input handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xc800, 0xc800, "AN0");
@@ -3351,7 +3353,7 @@ GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,  init
 GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,  init_blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,  init_blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // mono sound
 
-GAME( 1985, spdball,    0,        spdball,        spdball,  williams_state, init_spdball,  ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,  driver_init,   ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, alienar,    0,        williams_muxed, alienar,  williams_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, alienaru,   alienar,  williams_muxed, alienar,  williams_state, init_alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )

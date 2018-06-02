@@ -95,7 +95,7 @@ void s11c_bg_device::device_reset()
 	m_cpubank->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 	m_cpubank->set_entry(0);
 	// reset the CPU again, so that the CPU are starting with the right vectors (otherwise sound may die on reset)
-	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 WRITE_LINE_MEMBER( s11c_bg_device::ym2151_irq_w)

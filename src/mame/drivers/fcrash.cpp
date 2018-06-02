@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER(cps_state::m5205_int1)
 	m_sample_buffer1 >>= 4;
 	m_sample_select1 ^= 1;
 	if (m_sample_select1 == 0)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(cps_state::m5205_int2)
@@ -1642,8 +1642,6 @@ MACHINE_CONFIG_START(cps_state::fcrash)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -1707,8 +1705,6 @@ MACHINE_CONFIG_START(cps_state::kodb)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -1749,8 +1745,6 @@ MACHINE_CONFIG_START(cps_state::sf2mdt)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 4096)
-
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1804,8 +1798,6 @@ MACHINE_CONFIG_START(cps_state::knightsb)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2190,8 +2182,6 @@ MACHINE_CONFIG_START(cps_state::dinopic)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -2346,7 +2336,6 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -2474,8 +2463,6 @@ MACHINE_CONFIG_START(cps_state::punipic)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2665,7 +2652,6 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3048,8 +3034,6 @@ MACHINE_CONFIG_START(cps_state::slampic)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -3148,8 +3132,6 @@ MACHINE_CONFIG_START(cps_state::varthb)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

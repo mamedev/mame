@@ -24,6 +24,7 @@
 
 void fastfred_state::machine_start()
 {
+	galaxold_state::machine_start();
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_colorbank));
 	save_item(NAME(m_nmi_mask));
@@ -629,7 +630,7 @@ WRITE_LINE_MEMBER(fastfred_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(fastfred_state::fastfred)

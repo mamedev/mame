@@ -325,7 +325,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 	if (m_toggle)
 	{
 		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -338,7 +338,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 	if (m_toggle_cpu1)
 	{
 		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);  // cpu1
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // cpu1
 	}
 }
 
@@ -886,7 +886,7 @@ READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
 WRITE8_MEMBER(dynax_state::jantouki_rombank_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);
-	output().set_led_value(0, data & 0x10);  // maybe
+	m_led = BIT(data, 4);  // maybe
 }
 
 void dynax_state::jantouki_io_map(address_map &map)
@@ -4123,6 +4123,8 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(dynax_state,dynax)
 {
+	m_led.resolve();
+
 	m_blitter_irq_mask = 1;
 	m_blitter2_irq_mask = 1;
 

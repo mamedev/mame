@@ -773,13 +773,8 @@ void cps3_state::cps3_decrypt_bios()
 
 void cps3_state::init_common(void)
 {
-	// flash roms
-	for (int simmnum = 0; simmnum < 7; simmnum++)
-		for (int chipnum = 0; chipnum < 8; chipnum++)
-			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(string_format("simm%d.%d", simmnum + 1, chipnum).c_str());
-
 	m_eeprom = std::make_unique<uint32_t[]>(0x400/4);
-	machine().device<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
+	subdevice<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
 }
 
 
@@ -1410,8 +1405,8 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 	uint32_t result = 0;
 	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
 
-	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
-	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
+	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1].target();
+	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1].target();
 	if (chip0 == nullptr || chip1 == nullptr)
 		return 0xffffffff;
 
@@ -1501,7 +1496,7 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 
 
-uint32_t cps3_state::cps3_flashmain_r(address_space &space, int which, uint32_t offset, uint32_t mem_mask)
+uint32_t cps3_state::cps3_flashmain_r(int which, uint32_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -1538,7 +1533,7 @@ uint32_t cps3_state::cps3_flashmain_r(address_space &space, int which, uint32_t 
 
 READ32_MEMBER(cps3_state::cps3_flash1_r)
 {
-	uint32_t retvalue = cps3_flashmain_r(space, 0, offset,mem_mask);
+	uint32_t retvalue = cps3_flashmain_r(0, offset, mem_mask);
 
 	if (m_altEncryption) return retvalue;
 
@@ -1548,7 +1543,7 @@ READ32_MEMBER(cps3_state::cps3_flash1_r)
 
 READ32_MEMBER(cps3_state::cps3_flash2_r)
 {
-	uint32_t retvalue = cps3_flashmain_r(space, 1, offset,mem_mask);
+	uint32_t retvalue = cps3_flashmain_r(1, offset, mem_mask);
 
 	if (m_altEncryption) return retvalue;
 

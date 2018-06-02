@@ -57,7 +57,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return -1; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

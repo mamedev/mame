@@ -78,9 +78,7 @@ private:
 	uint8_t m_channel_check;
 	uint8_t m_nmi_enabled;
 
-	const char *cpu_tag;
 	int ram_size;
-	cpu_device *cpu;
 	std::vector<uint32_t> ram;
 	uint32_t m_mailbox;
 	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
@@ -148,6 +146,9 @@ private:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc_dma_read_word);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
+	DECLARE_WRITE_LINE_MEMBER(cpu_int_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu_a20_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu_reset_w);
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496, sis85c496_host_device)

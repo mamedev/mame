@@ -185,7 +185,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
-			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			if (isHectorHR()) /* aviable for HR and up */
 			{
 				m_hector_flag_hr=1;
@@ -771,14 +771,14 @@ void hec2hrp_state::hector_reset(int hr, int with_D2 )
 	m_hector_flag_hr = hr;
 	m_flag_clk = 0;
 	m_write_cassette = 0;
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// Initialization Disc II
 	if (with_D2==1)
 
 	{
 		upd765a_device *fdc = machine().device<upd765a_device>("upd765");
-		m_disc2cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_disc2cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		fdc->reset();
 	}
 }
@@ -874,7 +874,7 @@ WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_dma_irq )
 void hec2hrp_state::hector_disc2_reset()
 {
 	// Initialization Disc2 unit
-	m_disc2cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_disc2cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	machine().device<upd765a_device>("upd765")->reset();
 	// Select ROM memory to cold restart
 	membank("bank3")->set_entry(DISCII_BANK_ROM);

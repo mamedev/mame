@@ -278,6 +278,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
+		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
 		m_io_analog(*this, "AN%u", 0),
@@ -289,6 +290,7 @@ public:
 	required_device<mips3_device> m_maincpu;
 	optional_device<atari_cage_seattle_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;
+	required_device<screen_device> m_screen;
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
@@ -451,12 +453,12 @@ void seattle_state::machine_reset()
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs") != nullptr)
+	if (m_dcs != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-	else if (machine().device("cage") != nullptr)
+	else if (m_cage != nullptr)
 	{
 		m_cage->control_w(0);
 		m_cage->control_w(3);
@@ -1871,13 +1873,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(seattle_state::seattle_common)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_ADD(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 
 	// PCI Bus Devices
-	MCFG_PCI_ROOT_ADD(":pci")
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 
 	MCFG_GT64010_ADD(PCI_ID_GALILEO, ":maincpu", SYSTEM_CLOCK, GALILEO_IRQ_NUM)
 	MCFG_GT64XXX_SET_CS(0, seattle_state::seattle_cs0_map)
@@ -1886,11 +1888,11 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x100b0002, 0x01, 0x0)
-	MCFG_IDE_PCI_IRQ_ADD(":maincpu", IDE_IRQ_NUM)
+	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x100b0002, 0x01, 0x0)
+	MCFG_IDE_PCI_IRQ_HANDLER(INPUTLINE(m_maincpu, IDE_IRQ_NUM))
 	MCFG_IDE_PCI_SET_LEGACY_TOP(0x0a0)
 
-	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
+	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, m_screen)
 	MCFG_VOODOO_PCI_FBMEM(2)
 	MCFG_VOODOO_PCI_TMUMEM(4, 0)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
@@ -1901,7 +1903,7 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
@@ -1912,7 +1914,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::phoenixsa)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
+	MCFG_DEVICE_REPLACE(m_maincpu, R4700LE, SYSTEM_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1925,7 +1927,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::seattle150)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1941,7 +1943,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::seattle200)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1956,7 +1958,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::flagstaff)
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -2310,11 +2312,11 @@ ROM_START( calspeeda )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 
 	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.0x to 2.1a (1.25) Step 1 of 3" )
-	ROMX_LOAD("eprom @1 2.1a 90a7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
+	ROMX_LOAD("eprom @1 2.1a 90a7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.0x to 2.1a (1.25) Step 2 of 3" )
-	ROMX_LOAD("eprom @2 2.1a 9f84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
+	ROMX_LOAD("eprom @2 2.1a 9f84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.0x to 2.1a (1.25) Step 3 of 3" )
-	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
+	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(3))
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */
@@ -2430,7 +2432,7 @@ ROM_START( blitz99a )
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF ) // to use this rom run with -bios up130 and go into TEST mode to update.
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 	ROM_SYSTEM_BIOS( 1, "up130",       "Update to 1.30" )
-	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(2) )
+	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(1) )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Hard Drive Version 1.30 */
 	DISK_IMAGE( "blitz99a", 0, SHA1(43f834727ce01d7a63b482fc28cbf292477fc6f2) )
@@ -2486,7 +2488,7 @@ ROM_START( hyprdriv )
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 	ROM_SYSTEM_BIOS( 1, "update",       "Unknown Update" )
-	ROMX_LOAD( "hyperdrive1.2.u33", 0x000000, 0x100000, CRC(fcc922fb) SHA1(7bfa4f0614f561ba77ad2dc7d776af2c3e84b7e7), ROM_BIOS(2) )
+	ROMX_LOAD( "hyperdrive1.2.u33", 0x000000, 0x100000, CRC(fcc922fb) SHA1(7bfa4f0614f561ba77ad2dc7d776af2c3e84b7e7), ROM_BIOS(1) )
 	/*  it's either an update to 1.40, or an older version, either way we can't use it with the drive we have, it reports the following
 
 	    'Valid Update Rom Detected'

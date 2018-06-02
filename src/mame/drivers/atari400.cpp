@@ -2421,11 +2421,11 @@ ROM_START(a400)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
 	ROM_SYSTEM_BIOS(0, "default", "OS Rev. B")
-	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(1) )    // CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(0) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(0) )    // CRC and label waiting for confirmation
 	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
-	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )    // CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(1) )    // CRC and label waiting for confirmation
 ROM_END
 
 ROM_START(a400pal)
@@ -2439,11 +2439,11 @@ ROM_START(a800)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
 	ROM_SYSTEM_BIOS(0, "default", "OS Rev. B")
-	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(1) )    // CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(0) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(0) )    // CRC and label waiting for confirmation
 	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
-	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )    // CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(1) )    // CRC and label waiting for confirmation
 ROM_END
 
 ROM_START(a800pal)
@@ -2456,11 +2456,11 @@ ROM_END
 ROM_START(a1200xl)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "default", "OS Rev. 11")
-	ROMX_LOAD( "co60616b.rom", 0xc000, 0x2000, BAD_DUMP CRC(6e29ec8d) SHA1(3f9c06d6b4d261f3d5bf4354e3cff0c17b9347b9), ROM_BIOS(1) )    // CRC and label waiting for confirmation
-	ROMX_LOAD( "co60617b.rom", 0xe000, 0x2000, BAD_DUMP CRC(d73ce29a) SHA1(64790242d902643fe0c40dd842749f1fe461831b), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co60616b.rom", 0xc000, 0x2000, BAD_DUMP CRC(6e29ec8d) SHA1(3f9c06d6b4d261f3d5bf4354e3cff0c17b9347b9), ROM_BIOS(0) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co60617b.rom", 0xe000, 0x2000, BAD_DUMP CRC(d73ce29a) SHA1(64790242d902643fe0c40dd842749f1fe461831b), ROM_BIOS(0) )    // CRC and label waiting for confirmation
 	ROM_SYSTEM_BIOS(1, "rev10", "OS Rev. 10")
-	ROMX_LOAD( "co60616a.rom", 0xc000, 0x2000, BAD_DUMP CRC(0391386b) SHA1(7c176657c88b89b8a69bf021fa8e0939efc0dff2), ROM_BIOS(2) )    // CRC and label waiting for confirmation
-	ROMX_LOAD( "co60617a.rom", 0xe000, 0x2000, BAD_DUMP CRC(b502f1e7) SHA1(6688db57d97fa570aef5c15cef3e5fb2688879c2), ROM_BIOS(2) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co60616a.rom", 0xc000, 0x2000, BAD_DUMP CRC(0391386b) SHA1(7c176657c88b89b8a69bf021fa8e0939efc0dff2), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co60617a.rom", 0xe000, 0x2000, BAD_DUMP CRC(b502f1e7) SHA1(6688db57d97fa570aef5c15cef3e5fb2688879c2), ROM_BIOS(1) )    // CRC and label waiting for confirmation
 ROM_END
 
 ROM_START(a600xl)
@@ -2511,9 +2511,9 @@ ROM_END
 ROM_START(a5200)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "default", "a5200")
-	ROMX_LOAD( "5200.rom",  0xf800, 0x0800, CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530), ROM_BIOS(1) )
+	ROMX_LOAD( "5200.rom",  0xf800, 0x0800, CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "alt", "a5200 (alt)")
-	ROMX_LOAD( "5200a.rom", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5), ROM_BIOS(2) )
+	ROMX_LOAD( "5200a.rom", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5), ROM_BIOS(1) )
 ROM_END
 
 

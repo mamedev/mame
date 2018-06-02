@@ -7,9 +7,6 @@
 #pragma once
 
 
-#define NEC_INPUT_LINE_INTP0 10
-#define NEC_INPUT_LINE_INTP1 11
-#define NEC_INPUT_LINE_INTP2 12
 #define NEC_INPUT_LINE_POLL 20
 
 enum
@@ -35,7 +32,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 80; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

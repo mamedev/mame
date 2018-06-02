@@ -228,7 +228,7 @@ WRITE_LINE_MEMBER( monty_state::halt_changed )
 WRITE_LINE_MEMBER( monty_state::key_pressed )
 {
 	if (!state && m_halt)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 

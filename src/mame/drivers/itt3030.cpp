@@ -696,7 +696,7 @@ void itt3030_state::machine_reset()
 MACHINE_CONFIG_START(itt3030_state::itt3030)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(itt3030_map)
 	MCFG_DEVICE_IO_MAP(itt3030_io)
 
@@ -705,7 +705,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 	// T0 is the key matrix return
 	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-	MCFG_DEVICE_ADD("kbdmcu", I8741, XTAL(6'000'000))
+	MCFG_DEVICE_ADD("kbdmcu", I8741, 6_MHz_XTAL)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, itt3030_state, kbd_matrix_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, itt3030_state, kbd_matrix_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, itt3030_state, kbd_port2_r))
@@ -728,10 +728,10 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0xc000)
 
-	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL(6'000'000) / 8)
+	MCFG_DEVICE_ADD("crt5027", CRT5027, 6_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_FD1791_ADD("fdc", XTAL(20'000'000) / 20)
+	MCFG_DEVICE_ADD("fdc", FD1791, 20_MHz_XTAL / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcirq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcdrq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, itt3030_state, fdchld_w))

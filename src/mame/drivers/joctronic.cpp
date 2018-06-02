@@ -226,7 +226,7 @@ WRITE8_MEMBER(joctronic_state::soundlatch_nmi_w)
 
 WRITE8_MEMBER(joctronic_state::soundlatch_nmi_pulse_w)
 {
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_soundlatch = data;
 }
 

@@ -102,7 +102,7 @@ WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 
 WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(dbz_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)

@@ -662,7 +662,6 @@ TODO:
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/discrete.h"
 #include "sound/sn76496.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
@@ -696,7 +695,7 @@ INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
 		m_tenspot_current_game++;
 		m_tenspot_current_game%=10;
 		tenspot_set_game_bank(m_tenspot_current_game, 1);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }
 
@@ -720,7 +719,7 @@ WRITE8_MEMBER(galaxian_state::start_lamp_w)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
-	output().set_led_value(offset, data & 1);
+	m_lamps[offset] = BIT(data, 0);
 }
 
 
@@ -828,23 +827,23 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 
 WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 {
-	discrete_device *discrete = machine().device<discrete_device>("konami");
-	static const char *const ayname[2] = { "8910.0", "8910.1" };
-	int which, chan;
-
 	/* the offset is used as data, 6 channels * 2 bits each */
 	/* AV0 .. AV5 ==> AY8910 #2 */
 	/* AV6 .. AV11 ==> AY8910 #1 */
-	for (which = 0; which < 2; which++)
-		if (machine().device(ayname[which]) != nullptr)
-			for (chan = 0; chan < 3; chan++)
+	for (int which = 0; which < 2; which++)
+	{
+		if (m_ay8910[which] != nullptr)
+		{
+			for (int chan = 0; chan < 3; chan++)
 			{
 				uint8_t bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
 
 				/* low bit goes to 0.22uF capacitor = 220000pF  */
 				/* high bit goes to 0.047uF capacitor = 47000pF */
-				discrete->write(space, NODE(3 * which + chan + 11), bits);
+				m_discrete->write(space, NODE(3 * which + chan + 11), bits);
 			}
+		}
+	}
 }
 
 
@@ -1242,7 +1241,7 @@ INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 	galaxian_stars_enable_w(space, 0, 0);
 
 	/* reset the CPU */
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -1422,7 +1421,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -6082,7 +6081,7 @@ MACHINE_CONFIG_START(galaxian_state::mshuttle)
 	MCFG_DEVICE_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
-	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
+	MCFG_DEVICE_ADD("cclimber_audio", CCLIMBER_AUDIO, 0)
 MACHINE_CONFIG_END
 
 

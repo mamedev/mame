@@ -72,9 +72,9 @@ WRITE8_MEMBER(tunhunt_state::control_w)
 	*/
 
 	m_control = data;
-	machine().bookkeeping().coin_counter_w(0,data&0x01 );
-	machine().bookkeeping().coin_counter_w(1,data&0x02 );
-	output().set_led_value(0, data&0x40 ); /* start */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	m_led = BIT(data , 6); /* start */
 }
 
 

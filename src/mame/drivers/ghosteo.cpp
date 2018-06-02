@@ -269,7 +269,6 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	#endif
@@ -294,7 +293,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	#endif
@@ -329,7 +327,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	uint8_t data = 0;
 	switch (nand.mode)
 	{
@@ -375,7 +372,6 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
 {
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 	#endif

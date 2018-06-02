@@ -69,14 +69,17 @@ class rbmk_state : public driver_device
 {
 public:
 	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_vidram2(*this, "vidram2"),
-		m_vidram(*this, "vidram"),
-		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
-		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_vidram2(*this, "vidram2")
+		, m_vidram(*this, "vidram")
+		, m_maincpu(*this, "maincpu")
+		, m_mcu(*this, "mcu")
+		, m_eeprom(*this, "eeprom")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_ymsnd(*this, "ymsnd")
+	{
+	}
 
 	void rbmk(machine_config &config);
 	void rbspm(machine_config &config);
@@ -93,6 +96,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ym2151_device> m_ymsnd;
 
 	uint16_t m_tilebank;
 	uint8_t m_mux_data;
@@ -114,7 +118,6 @@ private:
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mcu_irq);
 };
 
 
@@ -210,7 +213,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 {
 	if(m_mux_data & 8)
 	{
-		return machine().device<ym2151_device>("ymsnd")->read(space, offset & 1);
+		return m_ymsnd->read(space, offset & 1);
 	}
 	else if(m_mux_data & 4)
 	{
@@ -226,7 +229,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 
 WRITE8_MEMBER(rbmk_state::mcu_io_w)
 {
-	if(m_mux_data & 8) { machine().device<ym2151_device>("ymsnd")->write(space, offset & 1, data); }
+	if(m_mux_data & 8) { m_ymsnd->write(space, offset & 1, data); }
 	else if(m_mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);
@@ -561,11 +564,6 @@ uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
-{
-	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_DEVICE_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_DEVICE_PROGRAM_MAP(rbmk_mem)
@@ -575,7 +573,6 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_mem)
 	MCFG_DEVICE_IO_MAP(mcu_io)
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, rbmk_state, mcu_io_mux_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbmk)
 

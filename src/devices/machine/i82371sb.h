@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 // Intel i82371sb southbridge (PIIX3)
-
 #ifndef MAME_MACHINE_I82371SB_H
 #define MAME_MACHINE_I82371SB_H
 
@@ -23,9 +22,6 @@
 
 #include "machine/am9517a.h"
 
-
-#define MCFG_I82371SB_ISA_ADD(_tag) \
-	MCFG_PCI_DEVICE_ADD(_tag, I82371SB_ISA, 0x80867000, 0x03, 0x060100, 0x00000000)
 
 #define MCFG_I82371SB_SMI_CB(_devcb) \
 	devcb = &downcast<i82371sb_isa_device &>(*device).set_smi_callback(DEVCB_##_devcb);

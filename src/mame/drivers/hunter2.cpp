@@ -348,7 +348,7 @@ PALETTE_INIT_MEMBER(hunter2_state, hunter2)
 WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 {
 	if(state == ASSERT_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(hunter2_state::timer1_out)

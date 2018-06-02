@@ -1267,7 +1267,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 {
 	if(m_video.nmi_mask == 0 && m_video.sub_halt == 0)
-		m_sub->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_sub->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
@@ -2068,18 +2068,18 @@ MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 MACHINE_CONFIG_START(fm7_state::fm7)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(16'128'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 16.128_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(fm7_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("sub", MC6809, XTAL(16'128'000) / 2)
+	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("psg", AY8910, XTAL(4'915'200) / 4)
+	MCFG_DEVICE_ADD("psg", AY8910, 4.9152_MHz_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2088,7 +2088,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
+	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2100,7 +2100,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
@@ -2121,12 +2121,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm8)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'915'200))  // 1.2MHz 68A09
+	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL)  // 1.2MHz 68A09
 	MCFG_DEVICE_PROGRAM_MAP(fm8_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("sub", MC6809, XTAL(16'128'000) / 2)
+	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
@@ -2139,7 +2139,7 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200)
+	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2149,7 +2149,7 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
@@ -2167,18 +2167,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm77av)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(16'128'000) / 8)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16.128_MHz_XTAL / 8)
 	MCFG_DEVICE_PROGRAM_MAP(fm77av_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("sub", MC6809E, XTAL(16'128'000) / 8)
+	MCFG_DEVICE_ADD("sub", MC6809E, 16.128_MHz_XTAL / 8)
 	MCFG_DEVICE_PROGRAM_MAP(fm77av_sub_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ym", YM2203, XTAL(4'915'200) / 4)
+	MCFG_DEVICE_ADD("ym", YM2203, 4.9152_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, fm7_state, fm77av_fmirq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, fm7_state, fm77av_joy_1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, fm7_state, fm77av_joy_2_r))
@@ -2207,7 +2207,7 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200)
+	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
@@ -2220,7 +2220,7 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
@@ -2290,7 +2290,7 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 
@@ -2336,7 +2336,7 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
 

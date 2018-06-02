@@ -82,6 +82,7 @@ private:
 	required_device<floppy_image_device> m_floppy;
 	required_device<plus4_expansion_slot_device> m_exp;
 	required_ioport m_jp1;
+	output_finder<2> m_leds;
 
 	// TCBM bus
 	uint8_t m_tcbm_data;                      // data

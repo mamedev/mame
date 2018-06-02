@@ -526,7 +526,7 @@ WRITE8_MEMBER( epson_lx810l_device::cr_stepper )
 
 WRITE_LINE_MEMBER( epson_lx810l_device::e05a30_ready )
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -61,7 +61,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, at_mb_device, pit8254_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
+	MCFG_DEVICE_ADD("dma8237_1", AM9517A, 14.318181_MHz_XTAL / 3)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, at_mb_device, dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, at_mb_device, dma_read_byte))
@@ -78,8 +78,10 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, at_mb_device, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, at_mb_device, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, at_mb_device, dack3_w))
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
+
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, 14.318181_MHz_XTAL / 3)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, at_mb_device, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, at_mb_device, dma8237_2_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, at_mb_device, dma_read_word))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, at_mb_device, dma_write_word))
 	MCFG_I8237_IN_IOR_1_CB(READ8(*this, at_mb_device, dma8237_5_dack_r))
@@ -123,7 +125,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("dma8237_2", am9517a_device, dreq2_w))
 	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("dma8237_2", am9517a_device, dreq3_w))
 
-	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir0_w)) MCFG_DEVCB_INVERT
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
@@ -132,7 +134,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, 12_MHz_XTAL)
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("pic8259_master", pic8259_device, ir1_w))
@@ -334,6 +336,13 @@ WRITE_LINE_MEMBER( at_mb_device::dma8237_out_eop )
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
 		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
+}
+
+WRITE_LINE_MEMBER( at_mb_device::dma8237_2_out_eop )
+{
+	m_cur_eop2 = state == ASSERT_LINE;
+	if(m_dma_channel != -1)
+		m_isabus->eop_w(m_dma_channel, m_cur_eop2 ? ASSERT_LINE : CLEAR_LINE );
 }
 
 void at_mb_device::set_dma_channel(int channel, int state)

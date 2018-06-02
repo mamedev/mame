@@ -1542,7 +1542,7 @@ WRITE8_MEMBER(rainbow_state::ext_ram_w)
 #ifndef OLD_RAM_BOARD_PRESENT
 	if(m_diagnostic & 0x08)
 		if( (offset + 0x10000) >= (MOTHERBOARD_RAM + 1))
-			m_i8088->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_i8088->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 #endif
 }
 
@@ -3214,24 +3214,24 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'073'400) / 5) // approximately 4.815 MHz
+	MCFG_DEVICE_ADD("maincpu", I8088, 24.0734_MHz_XTAL / 5) // approximately 4.815 MHz
 	MCFG_DEVICE_PROGRAM_MAP(rainbow8088_map)
 	MCFG_DEVICE_IO_MAP(rainbow8088_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
+	MCFG_DEVICE_ADD("subcpu", Z80, 24.0734_MHz_XTAL / 6)
 	MCFG_DEVICE_PROGRAM_MAP(rainbowz80_mem)
 	MCFG_DEVICE_IO_MAP(rainbowz80_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400) / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
+	MCFG_SCREEN_RAW_PARAMS(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
 
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_rainbow)
 
-	MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL(24'073'400))
+	MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, 24.0734_MHz_XTAL)
 
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
@@ -3260,7 +3260,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
-	MCFG_FD1793_ADD(FD1793_TAG, XTAL(24'073'400) / 24) // no separate 1 Mhz quartz
+	MCFG_DEVICE_ADD(FD1793_TAG, FD1793, 24.0734_MHz_XTAL / 24) // no separate 1 Mhz quartz
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
@@ -3305,11 +3305,11 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-	MCFG_DEVICE_ADD("dbrg", COM8116_003, XTAL(24'073'400) / 4) // 6.01835 MHz (nominally 6 MHz)
+	MCFG_DEVICE_ADD("dbrg", COM8116_003, 24.0734_MHz_XTAL / 4) // 6.01835 MHz (nominally 6 MHz)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, rainbow_state, dbrg_fr_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, rainbow_state, dbrg_ft_w))
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(24'073'400) / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
+	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 24.0734_MHz_XTAL / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))
 	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("comm", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("printer", rs232_port_device, write_txd))
@@ -3332,7 +3332,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_DEVICE_MODIFY("printer")
 	MCFG_SLOT_DEFAULT_OPTION("printer")
 
-	MCFG_DEVICE_ADD("kbdser", I8251, XTAL(24'073'400) / 5 / 2)
+	MCFG_DEVICE_ADD("kbdser", I8251, 24.0734_MHz_XTAL / 5 / 2)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, rainbow_state, kbd_tx))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, rainbow_state, irq_hi_w))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_rxready_w))
@@ -3341,7 +3341,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("prtbrg", RIPPLE_COUNTER, XTAL(24'073'400) / 6 / 13) // 74LS393 at E17 (both halves)
+	MCFG_DEVICE_ADD("prtbrg", RIPPLE_COUNTER, 24.0734_MHz_XTAL / 6 / 13) // 74LS393 at E17 (both halves)
 	// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
 	MCFG_RIPPLE_COUNTER_STAGES(8)
 	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, rainbow_state, bitrate_counter_w))

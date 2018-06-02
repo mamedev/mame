@@ -45,12 +45,8 @@ void i82875p_host_device::config_map(address_map &map)
 
 i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, I82875P_HOST, tag, owner, clock)
+	, cpu(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void i82875p_host_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
 }
 
 void i82875p_host_device::set_ram_size(int _ram_size)
@@ -66,7 +62,6 @@ READ8_MEMBER(i82875p_host_device::capptr_r)
 void i82875p_host_device::device_start()
 {
 	pci_host_device::device_start();
-	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
 
@@ -431,6 +426,7 @@ void i82875p_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: agp_bridge_device(mconfig, I82875P_AGP, tag, owner, clock)
 {
+	set_ids_bridge(0x80862579, 0x02);
 }
 
 void i82875p_agp_device::device_start()

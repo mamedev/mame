@@ -1079,3 +1079,14 @@ if (VIDEOS["TOPCAT"]~=null) then
 		MAME_DIR .. "src/devices/video/topcat.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/nereid.h,VIDEOS["NEREID"] = true
+--------------------------------------------------
+if (VIDEOS["NEREID"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/nereid.cpp",
+		MAME_DIR .. "src/devices/video/nereid.h",
+	}
+end

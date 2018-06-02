@@ -166,7 +166,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL(10'000'000)
+#define MASTER_CLOCK        (10_MHz_XTAL)
 
 
 
@@ -203,7 +203,7 @@ void kangaroo_state::machine_reset()
 	/* the copy protection. */
 	/* Anyway, what I do here is just immediately generate the NMI, so the game */
 	/* properly starts. */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_mcu_clock = 0;
 }
@@ -273,17 +273,6 @@ void kangaroo_state::main_map(address_map &map)
  *************************************/
 
 void kangaroo_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x0fff).rom();
-	map(0x4000, 0x43ff).mirror(0x0c00).ram();
-	map(0x6000, 0x6000).mirror(0x0fff).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x7000, 0x7000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x8000, 0x8000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::address_w));
-}
-
-
-/* yes, this is identical */
-void kangaroo_state::sound_portmap(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x43ff).mirror(0x0c00).ram();
@@ -438,7 +427,7 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/8)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_IO_MAP(sound_map) // yes, this is identical
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
 
 

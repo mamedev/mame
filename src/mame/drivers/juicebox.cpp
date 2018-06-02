@@ -36,10 +36,10 @@ class juicebox_state : public driver_device
 {
 public:
 	juicebox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_s3c44b0(*this, "s3c44b0"),
-			m_smartmedia(*this, "smartmedia")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_s3c44b0(*this, "s3c44b0")
+		, m_smartmedia(*this, "smartmedia")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -58,10 +58,10 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	void smc_reset( );
-	void smc_init( );
-	uint8_t smc_read( );
-	void smc_write( uint8_t data);
+	void smc_reset();
+	void smc_init();
+	uint8_t smc_read();
+	void smc_write(uint8_t data);
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
@@ -351,11 +351,11 @@ INPUT_PORTS_END
 ROM_START( juicebox )
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "juicebox", "Juice Box v.28 08242004" )
-	ROMX_LOAD( "juicebox.rom", 0, 0x800000, CRC(ac731197) SHA1(8278891c3531b3b6b5fec2a97a3ef6f0de1ac81d), ROM_BIOS(1) )
+	ROMX_LOAD( "juicebox.rom", 0, 0x800000, CRC(ac731197) SHA1(8278891c3531b3b6b5fec2a97a3ef6f0de1ac81d), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "uclinuxp", "uClinux 2.4.24-uc0 (patched)" )
-	ROMX_LOAD( "newboot.rom", 0, 0x1A0800, CRC(443f48b7) SHA1(38f0dc07b5cf02b972a851aa9e87f5d93d03f629), ROM_BIOS(2) )
+	ROMX_LOAD( "newboot.rom", 0, 0x1A0800, CRC(443f48b7) SHA1(38f0dc07b5cf02b972a851aa9e87f5d93d03f629), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "uclinux", "uClinux 2.4.24-uc0" )
-	ROMX_LOAD( "image.rom", 0, 0x19E400, CRC(6c0308bf) SHA1(5fe21a38a4cd0d86bb60920eb100138b0e924d90), ROM_BIOS(3) )
+	ROMX_LOAD( "image.rom", 0, 0x19E400, CRC(6c0308bf) SHA1(5fe21a38a4cd0d86bb60920eb100138b0e924d90), ROM_BIOS(2) )
 ROM_END
 
 COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox_state, init_juicebox, "Mattel", "Juice Box", 0)

@@ -53,24 +53,13 @@ public:
 		m_digits(*this, { "sc_thousand", "sc_hundred", "sc_half", "sc_unity", "tm_half", "tm_unity" }),
 		m_s2636(*this, "s2636"),
 		m_7segs(*this, "digit%u", 0U),
+		m_lamp(*this, "lamp0"),
 		m_waveenable(false),
 		m_collision(0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-	{
-	}
-
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_objram;
-	required_device_array<dm9368_device, 6> m_digits;
-	required_device<s2636_device> m_s2636;
-	output_finder<6> m_7segs;
-
-	tilemap_t *m_bg_tilemap;
-	bitmap_ind16 m_collision_bg;
+	{ }
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
@@ -88,19 +77,35 @@ public:
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
+	DECLARE_PALETTE_INIT(seabattl);
+	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void seabattl(machine_config &config);
+	void seabattl_data_map(address_map &map);
+	void seabattl_map(address_map &map);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(seabattl);
-	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_objram;
+	required_device_array<dm9368_device, 6> m_digits;
+	required_device<s2636_device> m_s2636;
+	output_finder<6> m_7segs;
+	output_finder<> m_lamp;
+
+	tilemap_t *m_bg_tilemap;
+	bitmap_ind16 m_collision_bg;
+
 	bool m_waveenable;
 	uint8_t m_collision;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void seabattl(machine_config &config);
-	void seabattl_data_map(address_map &map);
-	void seabattl_map(address_map &map);
 };
 
 
@@ -286,7 +291,7 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	// bit 4: lamp
 	// bit 5: enable wave
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
-	output().set_lamp_value(0, BIT(data,4));
+	m_lamp = BIT(data,4);
 	m_waveenable = BIT(data, 5);
 }
 
@@ -432,6 +437,7 @@ INPUT_PORTS_END
 
 void seabattl_state::machine_start()
 {
+	m_lamp.resolve();
 }
 
 void seabattl_state::machine_reset()

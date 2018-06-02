@@ -2565,11 +2565,11 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("P1 Left Control") PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT)   PORT_NAME("P1 Left Shift") PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT)     PORT_NAME("P1 Left Alt") PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LWIN)     PORT_NAME("P1 S1") PORT_PLAYER(1) 
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LWIN)     PORT_NAME("P1 S1") PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("P1 Right Control") PORT_PLAYER(1)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RSHIFT)   PORT_NAME("P1 Right Shift") PORT_PLAYER(1)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT)     PORT_NAME("P1 Right Alt") PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RWIN)     PORT_NAME("P1 S2") PORT_PLAYER(1) 
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RWIN)     PORT_NAME("P1 S2") PORT_PLAYER(1)
 
 	PORT_START("P1.LD")
 	// TODO: LED information
@@ -2580,13 +2580,13 @@ static INPUT_PORTS_START( naomi_kb )
 	// ---- -x-- scroll lock
 	// ---- --x- caps lock
 	// ---- ---x num lock
-	
+
 	PORT_START("P1.KC1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state, naomi_kb_r, 0)
 
 	PORT_START("P1.KC2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("P1.KC3")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -2631,14 +2631,14 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_Y) PORT_NAME("P1 y / Y")
 	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_Z) PORT_NAME("P1 z / Z")
 	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_1) PORT_NAME("P1 1 / !")
-	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_2) PORT_NAME("P1 2 / “")
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_2) PORT_NAME("P1 2 / \"")
 
 	PORT_START("P1.ROW1")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_3) PORT_NAME("P1 3 / #")
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_4) PORT_NAME("P1 4 / $")
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_5) PORT_NAME("P1 5 / %")
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_6) PORT_NAME("P1 6 / &")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_7) PORT_NAME("P1 7 / ‘")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_7) PORT_NAME("P1 7 / '")
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_8) PORT_NAME("P1 8 / (")
 	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_9) PORT_NAME("P1 9 / )")
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_0) PORT_NAME("P1 0 / ~")
@@ -2687,7 +2687,7 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LEFT) PORT_NAME("P1 Left")
 	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_DOWN) PORT_NAME("P1 Down")
 	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) PORT_CODE(KEYCODE_UP) PORT_NAME("P1 Up")
-	PORT_BIT(0xfff80000, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT(0xfff80000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1.ROW3")
 	PORT_BIT(0x0000001f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2702,7 +2702,7 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P1 Kanji Henkan")
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_PLAYER(1) /*PORT_CODE(KEYCODE_?)*/ PORT_NAME("P1 Kanji Muhenkan")
 	PORT_BIT(0xfffff000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	// TODO: keyboard for player 2
 	PORT_START("P2.M")
 	PORT_DIPNAME( 0x01, 0x00, "P2.ROW0" )
@@ -2732,7 +2732,7 @@ static INPUT_PORTS_START( naomi_kb )
 
 	PORT_START("P2.LD")
 	// TODO: same as above
-	
+
 	PORT_START("P2.KC1")
 	PORT_DIPNAME( 0x01, 0x00, "P2.ROW2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -3022,7 +3022,7 @@ MACHINE_CONFIG_START(naomi_state::naomigd_kb)
 	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
 	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
 MACHINE_CONFIG_END
- 
+
 /*
  * Naomi 2
  */
@@ -3107,7 +3107,7 @@ MACHINE_CONFIG_START(atomiswave_state::aw2c)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 /* BIOS info:
 
@@ -10704,18 +10704,18 @@ ROM_END
 /* 0014A */ GAME( 2002, chocomk,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_FLAGS )
 // 0015
 // 0016  Yonin Uchi Mahjong MJ (GDL-0016)
-/* 0017  */ GAME( 2002, quizqgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270,"Amedio (Taito license)","Quiz Keitai Q mode (GDL-0017)", GAME_FLAGS )
-/* 0018  */ GAME( 2002, azumanga,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"MOSS (Taito license)","Azumanga Daioh Puzzle Bobble (GDL-0018)", GAME_FLAGS )
-/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,"Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
-/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,"Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
+/* 0017  */ GAME( 2002, quizqgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Amedio (Taito license)","Quiz Keitai Q mode (GDL-0017)", GAME_FLAGS )
+/* 0018  */ GAME( 2002, azumanga,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "MOSS (Taito license)","Azumanga Daioh Puzzle Bobble (GDL-0018)", GAME_FLAGS )
+/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
+/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
 /* 0020  */ GAME( 2004, tetkiwam,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Success",      "Tetris Kiwamemichi (Japan) (GDL-0020)", GAME_FLAGS )
 /* 0021  */ GAME( 2003, shikgam2,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Alfa System",  "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_FLAGS )
-/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,"Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND  )
+/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND  )
 // 0023  Border Down (GDL-0023)
 /* 0023A */ GAME( 2003, bdrdown,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Border Down (Rev A) (GDL-0023A)", GAME_FLAGS )
 /* 0024  */ GAME( 2003, psyvar2,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Success",      "Psyvariar 2 - The Will To Fabricate (Japan) (GDL-0024)", GAME_FLAGS )
 /* 0025  */ GAME( 2004, cfield,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Able",         "Chaos Field (Japan) (GDL-0025)", GAME_FLAGS )
-/* 0026  */ GAME( 2004, trizeal,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Taito",        "Trizeal (Japan) (GDL-0026)", GAME_FLAGS )
+/* 0026  */ GAME( 2004, trizeal,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Triangle Service",  "Trizeal (Japan) (GDL-0026)", GAME_FLAGS )
 // 0027
 /* 0028  */ GAME( 2005, meltyblo,  meltybld,naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza (Japan) (GDL-0028)", GAME_FLAGS )
 // 0028A Melty Blood Act Cadenza (Rev A) (GDL-0028A)

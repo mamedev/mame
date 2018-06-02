@@ -45,15 +45,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void rowamet(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(mute_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void rowamet(machine_config &config);
 	void rowamet_map(address_map &map);
 	void rowamet_sub_io(address_map &map);
 	void rowamet_sub_map(address_map &map);
+
 private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
@@ -196,7 +199,7 @@ WRITE8_MEMBER( rowamet_state::io_w )
 		if (cmd != m_sndcmd)
 		{
 			m_sndcmd = cmd;
-			m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }

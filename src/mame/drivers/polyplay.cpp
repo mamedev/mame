@@ -155,7 +155,7 @@ static const z80_daisy_config daisy_chain_zrepp[] =
 
 INTERRUPT_GEN_MEMBER(polyplay_state::nmi_handler)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* I/O Port handling */
@@ -183,47 +183,12 @@ READ8_MEMBER(polyplay_state::pio_portb_r)
 
 WRITE8_MEMBER(polyplay_state::pio_portb_w)
 {
-	uint8_t lightState = data & 0x07;
+	uint8_t const lightState = data & 0x07;
 	//uint8_t soundState = data & 0xe0;
 
 	// there is a DS8205D attached to bit 0 and 1
-	switch (lightState)
-	{
-		case 0:
-			output().set_lamp_value(1, 1);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
-			break;
-
-		case 1:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 1);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
-			break;
-
-		case 2:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 1);
-			output().set_lamp_value(4, 0);
-			break;
-
-		case 3:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 1);
-			break;
-
-		default:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
-			break;
-	}
+	for (unsigned i = 0; 4 > i; ++i)
+		m_lamps[i] = (lightState == i) ? 1 : 0;
 }
 
 INPUT_CHANGED_MEMBER(polyplay_state::input_changed)

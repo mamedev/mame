@@ -170,7 +170,7 @@ void lisa_state::set_parity_error_pending(int value)
 	if ((! m_parity_error_pending) && value)
 	{
 		m_parity_error_pending = 1;
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->pulse_input_line_and_vector(M68K_IRQ_7, attotime::zero, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else if (m_parity_error_pending && (! value))
 	{
@@ -292,7 +292,7 @@ void lisa_state::scan_keyboard()
 #if 0
 						if (keycode == m_NMIcode)
 						{   /* generate NMI interrupt */
-							m_maincpu->set_input_line(M68K_IRQ_7, PULSE_LINE);
+							pulse_input_line(M68K_IRQ_7, attotime::zero);
 							m_maincpu->set_input_line_vector(M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif

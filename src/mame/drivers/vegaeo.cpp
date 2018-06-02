@@ -175,7 +175,7 @@ MACHINE_CONFIG_START(vegaeo_state::vega)
 	MCFG_DEVICE_PROGRAM_MAP(vega_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)
 
-	MCFG_AT28C16_ADD("at28c16", nullptr)
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

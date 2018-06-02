@@ -132,6 +132,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_gcr_rom;
+	output_finder<2> m_leds;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
 	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da);

@@ -252,7 +252,7 @@ void redbaron_state::machine_start()
 INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
 {
 	if (ioport("IN0")->read() & 0x10)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -465,7 +465,7 @@
 #include "swhr2u.lh"          // 5      1, 2, 3, 4, 5   25
 #include "wnpost.lh"          // 5      1, 2, 3, 5, 10  50
 
-#define MASTER_CLOCK        XTAL(72'000'000)      /* confirmed */
+#define MASTER_CLOCK        72_MHz_XTAL      /* confirmed */
 
 class aristmk5_state : public archimedes_state
 {
@@ -2086,7 +2086,7 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 	MCFG_INPUT_MERGER_ANY_HIGH("uart_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, aristmk5_state, uart_irq_callback))
 
-	MCFG_DS1302_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", DS1302, 32.768_kHz_XTAL)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 

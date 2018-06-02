@@ -40,7 +40,7 @@ WRITE16_MEMBER(fromanc2_state::sndcmd_w)
 	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
 	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
 
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_sndcpu_nmi_flag = 0;
 }
 
@@ -103,7 +103,7 @@ WRITE16_MEMBER(fromanc2_state::subcpu_w)
 
 READ16_MEMBER(fromanc2_state::subcpu_r)
 {
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_subcpu_nmi_flag = 0;
 
 	return (m_datalatch_2h << 8) | m_datalatch_2l;

@@ -3282,6 +3282,7 @@ files {
 	MAME_DIR .. "src/mame/machine/segag80.cpp",
 	MAME_DIR .. "src/mame/machine/segag80.h",
 	MAME_DIR .. "src/mame/audio/segag80r.cpp",
+	MAME_DIR .. "src/mame/audio/segag80r.h",
 	MAME_DIR .. "src/mame/video/segag80r.cpp",
 	MAME_DIR .. "src/mame/drivers/segag80v.cpp",
 	MAME_DIR .. "src/mame/includes/segag80v.h",
@@ -3312,6 +3313,7 @@ files {
 	MAME_DIR .. "src/mame/includes/segas32.h",
 	MAME_DIR .. "src/mame/machine/segas32.cpp",
 	MAME_DIR .. "src/mame/video/segas32.cpp",
+	MAME_DIR .. "src/mame/drivers/segattl.cpp",
 	MAME_DIR .. "src/mame/drivers/segaufo.cpp",
 	MAME_DIR .. "src/mame/drivers/segaxbd.cpp",
 	MAME_DIR .. "src/mame/includes/segaxbd.h",
@@ -3659,9 +3661,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/shangha3.cpp",
 	MAME_DIR .. "src/mame/includes/shangha3.h",
 	MAME_DIR .. "src/mame/video/shangha3.cpp",
-	MAME_DIR .. "src/mame/drivers/strnskil.cpp",
-	MAME_DIR .. "src/mame/includes/strnskil.h",
-	MAME_DIR .. "src/mame/video/strnskil.cpp",
 	MAME_DIR .. "src/mame/drivers/tonton.cpp",
 }
 
@@ -4585,6 +4584,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/galaxi.cpp",
 	MAME_DIR .. "src/mame/drivers/galgame.cpp",
 	MAME_DIR .. "src/mame/drivers/gamecstl.cpp",
+	MAME_DIR .. "src/mame/drivers/gamemasters.cpp",
 	MAME_DIR .. "src/mame/drivers/gammagic.cpp",
 	MAME_DIR .. "src/mame/drivers/gamtor.cpp",
 	MAME_DIR .. "src/mame/drivers/gei.cpp",

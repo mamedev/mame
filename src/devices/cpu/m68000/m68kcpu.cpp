@@ -1300,7 +1300,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 			u16 result = m_space->read_byte(address0) << 8;
 			return result | m_space->read_byte(address1);
 		}
-		
+
 		if (WORD_ALIGNED(address))
 			return m_space->read_word(address);
 		u16 result = m_space->read_byte(address) << 8;

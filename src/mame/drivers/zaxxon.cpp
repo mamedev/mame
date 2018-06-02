@@ -299,7 +299,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -1020,7 +1020,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_SEGAUSBROM_ADD("usbsnd")
+	MCFG_SEGAUSBROM_ADD("usbsnd", "maincpu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::ixion)

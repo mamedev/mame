@@ -2957,9 +2957,9 @@ ROM Definitions
 #define CPZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "j", "japan" ) \
-	ROMX_LOAD( "m534002c-13.ic353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a), ROM_BIOS(1) ) /* japanese */ \
+	ROMX_LOAD( "m534002c-13.ic353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a), ROM_BIOS(0) ) /* japanese */ \
 	ROM_SYSTEM_BIOS( 1, "e", "english (debug)" ) \
-	ROMX_LOAD( "msm27c402zb.ic353", 0x000000, 0x080000, CRC(f20f7fe5) SHA1(9aac7d3b3d0cc0bbbe4056164b73078dce41d91c), ROM_BIOS(2) ) /* english (debug) */ \
+	ROMX_LOAD( "msm27c402zb.ic353", 0x000000, 0x080000, CRC(f20f7fe5) SHA1(9aac7d3b3d0cc0bbbe4056164b73078dce41d91c), ROM_BIOS(1) ) /* english (debug) */ \
 	ROM_REGION( 0x8, "cat702_1", 0 ) \
 	ROM_LOAD( "cp01.ic652", 0x000000, 0x000008, CRC(bb7ba033) SHA1(966f3aee5d00e1312c455f855915d621e6cb0672) ) \
 	ROM_REGION( 0x2000, "upd78081", 0 ) \

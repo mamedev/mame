@@ -280,6 +280,11 @@ READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 	return ioport("IN0")->read() | inp1 | inp2 << 4;
 }
 
+WRITE8_MEMBER(alpha68k_state::outlatch_w)
+{
+	m_outlatch->write_bit((offset >> 2) & 7, BIT(offset, 5));
+}
+
 
 /******************************************************************************/
 
@@ -293,7 +298,7 @@ WRITE8_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 WRITE8_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 //ZT
 /******************************************************************************/
@@ -646,11 +651,12 @@ void alpha68k_state::alpha68k_I_map(address_map &map)
 void alpha68k_state::alpha68k_II_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
+	map(0x008ffe, 0x008fff).nopw();
 	map(0x040000, 0x040fff).ram().share("shared_ram");
 	map(0x080000, 0x080001).r(this, FUNC(alpha68k_state::control_1_r)); /* Joysticks */
 	map(0x080001, 0x080001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0000, 0x0c0001).r(this, FUNC(alpha68k_state::control_2_r)); /* CN1 & Dip 1 */
-	map(0x0c0000, 0x0c00ff).w(this, FUNC(alpha68k_state::alpha68k_II_video_bank_w));
+	map(0x0c0001, 0x0c0001).select(0x78).w(this, FUNC(alpha68k_state::outlatch_w));
 	map(0x0c8000, 0x0c8001).r(this, FUNC(alpha68k_state::control_3_r)); /* Bottom of CN2 */
 	map(0x0d0000, 0x0d0001).r(this, FUNC(alpha68k_state::control_4_r)); /* Top of CN1 & CN2 */
 	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
@@ -668,10 +674,10 @@ void alpha68k_state::alpha68k_V_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram().share("shared_ram");
 	map(0x080000, 0x080001).r(this, FUNC(alpha68k_state::control_1_r)); /* Joysticks */
-	map(0x080000, 0x080000).w(this, FUNC(alpha68k_state::alpha68k_V_video_bank_w));
+	map(0x080000, 0x080000).w(this, FUNC(alpha68k_state::video_bank_w));
 	map(0x080001, 0x080001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0000, 0x0c0001).r(this, FUNC(alpha68k_state::control_2_V_r)); /* Dip 2 */
-	map(0x0c0000, 0x0c00ff).w(this, FUNC(alpha68k_state::alpha68k_V_video_control_w));
+	map(0x0c0001, 0x0c0001).select(0x78).w(this, FUNC(alpha68k_state::outlatch_w));
 	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
 	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
 	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
@@ -1843,6 +1849,7 @@ MACHINE_RESET_MEMBER(alpha68k_state,common)
 	m_microcontroller_data = 0;
 	m_latch = 0;
 	m_flipscreen = 0;
+	m_last_bank = 0;
 }
 
 MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
@@ -1864,18 +1871,11 @@ MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_bank_base = 0;
-	m_last_bank = 0;
 }
 
 MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-
-	m_bank_base = 0;
-	m_last_bank = 0;
-	m_buffer_28 = 0;
-	m_buffer_60 = 0;
-	m_buffer_68 = 0;
 }
 
 MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
@@ -1888,9 +1888,6 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_last_bank));
-	save_item(NAME(m_buffer_28));
-	save_item(NAME(m_buffer_60));
-	save_item(NAME(m_buffer_68));
 	save_item(NAME(m_sound_nmi_mask));
 	save_item(NAME(m_sound_pa_latch));
 }
@@ -2102,7 +2099,7 @@ MACHINE_CONFIG_END
 INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
@@ -2116,6 +2113,11 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, 7614)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 14A
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, alpha68k_state, video_control2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, alpha68k_state, video_control3_w))
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, alpha68k_state, video_bank_w)) MCFG_DEVCB_MASK(0x70) MCFG_DEVCB_RSHIFT(-4)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
@@ -2178,6 +2180,10 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 13C
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, alpha68k_state, video_control2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, alpha68k_state, video_control3_w))
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)

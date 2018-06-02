@@ -42,7 +42,7 @@ public:
 		m_samples(*this, "oki"),
 		m_alligator(*this, "alligator%u", 0U),
 		m_digit(*this, "digit%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
@@ -72,7 +72,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
 	void program_map(address_map &map);
 
@@ -85,7 +85,7 @@ private:
 	required_memory_region m_samples;
 	output_finder<5> m_alligator;
 	output_finder<8> m_digit;
-	output_finder<32> m_lamp;
+	output_finder<32> m_lamps;
 
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -185,7 +185,7 @@ void wackygtr_state::machine_start()
 {
 	m_alligator.resolve();
 	m_digit.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_adpcm_sel));
 	save_item(NAME(m_adpcm_pos));
@@ -211,7 +211,7 @@ void wackygtr_state::set_digits(int p, uint8_t value)
 void wackygtr_state::set_lamps(int p, uint8_t value)
 {
 	for (int i=0; i<8; i++)
-		m_lamp[p + i] = BIT(value, i);
+		m_lamps[p + i] = BIT(value, i);
 }
 
 static INPUT_PORTS_START( wackygtr )

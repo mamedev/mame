@@ -285,7 +285,7 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 	else
 	{
 		m_msm->data_w(m_adpcm_byte & 0xf);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	m_msm5205_vclk_toggle ^= 1;

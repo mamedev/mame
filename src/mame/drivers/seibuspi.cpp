@@ -1863,19 +1863,22 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, XTAL(50'000'000)/2) // AMD or Intel 386DX, 25MHz
+	MCFG_DEVICE_ADD("maincpu", I386, 50_MHz_XTAL / 2) // AMD or Intel 386DX, 25MHz
 	MCFG_DEVICE_PROGRAM_MAP(spi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/4) // Z84C0008PEC, 7.159MHz
+	MCFG_DEVICE_ADD("audiocpu", Z80, 28.636363_MHz_XTAL / 4) // Z84C0008PEC, 7.159MHz
 	MCFG_DEVICE_PROGRAM_MAP(spi_soundmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
-	MCFG_DS2404_ADD("ds2404", 1995, 1, 1)
+	MCFG_DEVICE_ADD("ds2404", DS2404, 32.768_kHz_XTAL)
+	MCFG_DS2404_REF_YEAR(1995)
+	MCFG_DS2404_REF_MONTH(1)
+	MCFG_DS2404_REF_DAY(1)
 
 	MCFG_INTEL_E28F008SA_ADD("soundflash1") // Sharp LH28F008 on newer mainboard revision
 	MCFG_INTEL_E28F008SA_ADD("soundflash2") // "
@@ -1902,7 +1905,7 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymf", YMF271, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymf", YMF271, 16.9344_MHz_XTAL)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
 	MCFG_DEVICE_ADDRESS_MAP(0, spi_ymf271_map)
 
@@ -1958,7 +1961,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2e)
 	MCFG_DEVICE_REMOVE("rspeaker")
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_REPLACE("ymf", YMF271, XTAL(16'934'400))
+	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.9344_MHz_XTAL)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1984,13 +1987,13 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2g) // clocks differ, but otherwise same
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
-	MCFG_DEVICE_CLOCK(XTAL(28'636'363))
+	MCFG_DEVICE_CLOCK(28.636363_MHz_XTAL)
 
 	MCFG_DEVICE_MODIFY("audiocpu") // Z84C0004PCS, 4.9152MHz
-	MCFG_DEVICE_CLOCK(XTAL(4'915'200))
+	MCFG_DEVICE_CLOCK(4.9512_MHz_XTAL)
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ymf", YMF271, XTAL(16'384'000)) // 16.384MHz(!)
+	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.384_MHz_XTAL) // 16.384MHz(!)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2002,7 +2005,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seibuspi_state::sys386i)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, XTAL(40'000'000)) // AMD 386DX, 40MHz
+	MCFG_DEVICE_ADD("maincpu", I386, 40_MHz_XTAL) // AMD 386DX, 40MHz
 	MCFG_DEVICE_PROGRAM_MAP(sys386i_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
@@ -2027,10 +2030,10 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'636'363)/20, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(28'636'363)/20, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2382,6 +2385,37 @@ ROM_START( batlball )
 	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("fb_7.216",      0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
+ROM_END
+
+ROM_START( batlballo ) // Board has a low serial number 000014 and PCB date is 95.10.02
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("seibu_1a.211", 0x100000, 0x40000, CRC(90340e8c) SHA1(303d3c5ffc1a64e1e4aa614105119d9d7768f516) )
+	ROM_LOAD32_BYTE("seibu_2a.212", 0x100001, 0x40000, CRC(db655d3e) SHA1(bfd873e0d0daf3759778c76fe72fcf96e84250a4) )
+	ROM_LOAD32_BYTE("seibu_3a.210", 0x100002, 0x40000, CRC(659a54a2) SHA1(a6c024e42b104a6198829f0f75baaa294fe9de6c) )
+	ROM_LOAD32_BYTE("seibu_4a.029", 0x100003, 0x40000, CRC(51183421) SHA1(d97da1693e429cb7a061f08274070eb3e6966ec0) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_WORD("seibu_6.413", 0x000000, 0x20000, CRC(338556f9) SHA1(dfab6e1562dd9c373aa094a3791ecd4cd3c9b6f5) )
+	ROM_LOAD24_BYTE("seibu_5.48",  0x000002, 0x10000, CRC(6ccfb72e) SHA1(825b917ecd8495de23d55d2d2902d9d7c54ce4ed) )
+
+	ROM_REGION( 0x300000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
+	ROM_LOAD24_BYTE("fb_bg-1p.410", 0x000002, 0x100000, CRC(b46e774e) SHA1(00b6c1d0b0ea37f4354acab543b270c0bf45896d) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("fb_obj-1.322", 0x000000, 0x400000, CRC(29f86f68) SHA1(1afe809ce00a25f8b27543e4188edc3e3e604951) )
+	ROM_LOAD("fb_obj-2.324", 0x400000, 0x400000, CRC(c9e3130b) SHA1(12b5d5363142e8efb3b7fc44289c0afffa5011c6) )
+	ROM_LOAD("fb_obj-3.323", 0x800000, 0x400000, CRC(f6c3bc49) SHA1(d0eb9c6aa3954d94e3a442a48e0fe6cc279f5513) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
+	ROM_CONTINUE(                    0x400000, 0x080000 )
+	ROM_LOAD32_BYTE("seibu_7.216",   0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
@@ -2739,6 +2773,38 @@ ROM_START( viprp1h )
 	ROM_LOAD("flash0_blank_region90.u1053", 0x000000, 0x100000, CRC(8da617a2) SHA1(29c6ee05ed1c9a428a89d625b72692296c38424b) )
 ROM_END
 
+ROM_START( viprp1t )
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("viper_prg0_010995.u0211", 0x000000, 0x80000, CRC(f998dcf7) SHA1(c2dc876e4dc51062caf3d0df7c3c9cc9a5201760) ) /* same code as viprp1s and viprp1h, different region byte value */
+	ROM_LOAD32_BYTE("viper_prg1_010995.u0212", 0x000001, 0x80000, CRC(9d4d3486) SHA1(ded6fa32b973046e50c40c40c446590b5f6d0b76) )
+	ROM_LOAD32_BYTE("viper_prg2_010995.u0210", 0x000002, 0x80000, CRC(d7ea460b) SHA1(aed10adacd073f7d2b35f12ba4b7876e5c99d142) )
+	ROM_LOAD32_BYTE("viper_prg3_010995.u029",  0x000003, 0x80000, CRC(ca6df094) SHA1(921eec141ce2d449047172fa9cdf39d459b5cc7b) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_WORD("viper_fix_010995.u0413", 0x000000, 0x20000, CRC(5ece677c) SHA1(b782cf3296f866f79fafa69ff719211c9d4026df) )
+	ROM_LOAD24_BYTE("viper_fixp_010995.u048", 0x000002, 0x10000, CRC(44844ef8) SHA1(bcbe24d2ffb64f9165ba4ab7de27f44b99b5ff5a) )
+
+	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("v_bg-11.415",  0x000000, 0x200000, CRC(6fc96736) SHA1(12df47d8af2c1febc1bce5bcf3218766447885bd) )
+	ROM_LOAD24_BYTE("v_bg-12.415",  0x000002, 0x100000, CRC(d3c7281c) SHA1(340bca1f31486609b3c34dd7830362a216ff648e) )
+	ROM_LOAD24_WORD("v_bg-21.410",  0x300000, 0x100000, CRC(d65b4318) SHA1(6522970d95ffa7fa2f32e0b5b4f0eb69e0286b36) )
+	ROM_LOAD24_BYTE("v_bg-22.416",  0x300002, 0x080000, CRC(24a0a23a) SHA1(0b0330717620e3f3274a25845d9edaf8023b9db2) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("v_obj-1.322",  0x000000, 0x400000, CRC(3be5b631) SHA1(fd1064428d28ca166a9267b968c0ba846cfed656) )
+	ROM_LOAD("v_obj-2.324",  0x400000, 0x400000, CRC(924153b4) SHA1(db5dadcfb4cd5e6efe9d995085936ce4f4eb4254) )
+	ROM_LOAD("v_obj-3.323",  0x800000, 0x400000, CRC(e9fb9062) SHA1(18e97b4c5cced2b529e6e72d8041c6f78fcec76e) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
+	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
+ROM_END
+
 ROM_START( viprp1hk )
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
 	ROM_LOAD32_BYTE("seibu_1", 0x000000, 0x80000, CRC(283ba7b7) SHA1(28122e04b72f1163c69f3f845f6a493fdb6ed652) ) /* Old Version, "=HONG KONG=" seems part of title */
@@ -2899,6 +2965,38 @@ ROM_START( rdftu )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
+ROM_END
+
+ROM_START( rdftua ) // This set uses SXX2C ROM SUB4 cart. Identical with rdftadi / rdftam / rdftjb sets except prog rom 1
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("seibu_1.211",    0x000000, 0x80000, CRC(ddbadc30) SHA1(d419847db8b7f4ca6f161bfa309314eafeea8b40) )
+	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
+	ROM_LOAD24_BYTE("seibu_7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+
+	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("gun_dogs_bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("gun_dogs_bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("gun_dogs_bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("gun_dogs_bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
+
+	ROM_REGION( 0xc00000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("gun_dogs_obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("gun_dogs_obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("gun_dogs_obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_WORD("raiden-f_pcm2.u0217", 0x000000, 0x100000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
+	ROM_CONTINUE(                          0x400000, 0x100000 )
+	/* SOUND1 socket is unpopulated */
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
@@ -3999,9 +4097,10 @@ ROM_END
 /*****************************************************************************/
 
 /* SPI */
-GAME( 1995, senkyu,     0,        spi,     spi_3button, seibuspi_state, init_senkyu,   ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, senkyua,    senkyu,   spi,     spi_3button, seibuspi_state, init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlball,   senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, senkyu,     0,        spi,     spi_3button, seibuspi_state, init_senkyu,   ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, senkyua,    senkyu,   spi,     spi_3button, seibuspi_state, init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlball,   senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlballo,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, batlballu,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Fabtek license)",        "Battle Balls (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, batlballa,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, batlballe,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
@@ -4013,6 +4112,7 @@ GAME( 1995, viprp1ua,   viprp1,   spi,     spi_3button, seibuspi_state, init_vip
 GAME( 1995, viprp1j,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, viprp1s,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Switzerland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // counterintuitively this seems to be the oldest set of the game despite playing with the 'new version' rules, it has various typos not present in other sets eg. 'UPDATEING'
 GAME( 1995, viprp1h,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Holland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // Code is the same as the above Switzerland set, just different region byte
+GAME( 1995, viprp1t,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu (Tuning license)",        "Viper Phase 1 (New Version, Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // ^^
 
 GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu (Tuning license)",        "Viper Phase 1 (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
@@ -4021,10 +4121,11 @@ GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, init_vip
 GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, init_ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftja,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftjb,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftja,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earliest)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftjb,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftua,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftam,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftadi,    rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftau,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Australia)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

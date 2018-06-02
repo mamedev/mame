@@ -2798,9 +2798,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_DEVICE_ADD("cdda",CDDA)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND,0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "lspeaker", 0.50).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(307200)
@@ -2825,7 +2823,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
-	MCFG_MB8877_ADD("fdc",XTAL(8'000'000)/4)  // clock unknown
+	MCFG_DEVICE_ADD("fdc", MB8877, 8'000'000 / 4)  // clock unknown
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)

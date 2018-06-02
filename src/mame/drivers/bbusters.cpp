@@ -258,7 +258,7 @@ WRITE16_MEMBER(bbusters_state::sound_cpu_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data&0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

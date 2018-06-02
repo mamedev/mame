@@ -361,6 +361,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
 			m_adc8(*this, "adc8"),
+			m_lamps(*this, "lamp%u", 1U),
 			m_hd34010_host_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
@@ -1487,7 +1488,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
-	MCFG_M48T02_ADD("200e") // MK48T02
+	MCFG_DEVICE_ADD("200e", M48T02, 0)
 	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
 
 	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL(3'686'400))

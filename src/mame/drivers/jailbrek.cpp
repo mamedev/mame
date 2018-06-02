@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(jailbrek_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

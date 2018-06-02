@@ -300,7 +300,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // seen metro_rxd_r
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // seen metro_rxd_r
 		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}

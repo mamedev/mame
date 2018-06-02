@@ -127,7 +127,7 @@ static void coco_fdc_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(coco_fdc_device_base::device_add_mconfig)
-	MCFG_WD1773_ADD(WD_TAG, XTAL(8'000'000))
+	MCFG_DEVICE_ADD(WD_TAG, WD1773, 8_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, coco_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, coco_fdc_device_base, fdc_drq_w))
 
@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(coco_fdc_device_base::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL(32'768))
+	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, 32.768_kHz_XTAL)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
 MACHINE_CONFIG_END
 

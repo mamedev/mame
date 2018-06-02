@@ -83,7 +83,6 @@
 #include "includes/mz700.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74145.h"
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 
@@ -99,7 +98,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_cursor_callback)
 {
-	m_cursor_timer ^= 1;
+	m_cursor_bit ^= 1;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_other_callback)

@@ -524,7 +524,7 @@ AY-3-8910 'preliminary' datasheet (which actually describes the AY-3-8914) from 
   http://spatula-city.org/~im14u2c/intv/gi_micro_programmable_tv_games/page_7_103.png
   http://spatula-city.org/~im14u2c/intv/gi_micro_programmable_tv_games/page_7_104.png
   http://spatula-city.org/~im14u2c/intv/gi_micro_programmable_tv_games/page_7_105.png
-AY-3-8910/8912 Feb 1979 manual: http://dev-docs.atariforge.org/files/GI_AY-3-8910_Feb-1979.pdf
+AY-3-8910/8912 Feb 1979 manual: https://web.archive.org/web/20140217224114/http://dev-docs.atariforge.org/files/GI_AY-3-8910_Feb-1979.pdf
 AY-3-8910/8912/8913 post-1983 manual: http://map.grauw.nl/resources/sound/generalinstrument_ay-3-8910.pdf or http://www.ym2149.com/ay8910.pdf
 AY-8930 datasheet: http://www.ym2149.com/ay8930.pdf
 YM2149 datasheet: http://www.ym2149.com/ym2149.pdf

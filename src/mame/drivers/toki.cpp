@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 
 	m_toggle ^= 1;
 	if (m_toggle)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)

@@ -76,15 +76,6 @@ Notes:
 #include "speaker.h"
 
 
-struct blitter_t
-{
-	uint16_t  x, y, w, h,
-			gfx_lo, gfx_hi,
-			depth,
-			pen,
-			flags;
-};
-
 class igs011_state : public driver_device
 {
 public:
@@ -94,6 +85,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_ics(*this, "ics")
 		, m_priority_ram(*this, "priority_ram")
 		, m_vbowl_trackball(*this, "vbowl_trackball")
 		, m_generic_paletteram_16(*this, "paletteram")
@@ -102,11 +94,50 @@ public:
 	{
 	}
 
+	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
+
+	void init_lhbv33c();
+	void init_drgnwrldv21j();
+	void init_wlcc();
+	void init_nkishusp();
+	void init_drgnwrldv21();
+	void init_dbc();
+	void init_lhb();
+	void init_drgnwrld();
+	void init_drgnwrldv30();
+	void init_drgnwrldv11h();
+	void init_lhb2();
+	void init_xymg();
+	void init_drgnwrldv10c();
+	void init_drgnwrldv20j();
+	void init_drgnwrldv40k();
+	void init_vbowl();
+	void init_vbowlj();
+	void init_vbowlhk();
+	void init_ryukobou();
+
+	void igs011_base(machine_config &config);
+	void drgnwrld(machine_config &config);
+	void nkishusp(machine_config &config);
+	void wlcc(machine_config &config);
+	void vbowl(machine_config &config);
+	void vbowlhk(machine_config &config);
+	void xymg(machine_config &config);
+	void lhb2(machine_config &config);
+	void lhb(machine_config &config);
+	void drgnwrld_igs012(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<ics2115_device> m_ics;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_priority_ram;
@@ -132,6 +163,16 @@ public:
 	uint8_t m_igs012_prot_mode;
 	uint16_t m_igs003_reg[2];
 	uint16_t m_lhb_irq_enable;
+
+	struct blitter_t
+	{
+		uint16_t  x, y, w, h,
+			gfx_lo, gfx_hi,
+			depth,
+			pen,
+			flags;
+	};
+
 	blitter_t m_blitter;
 
 	uint16_t m_igs003_prot_hold;
@@ -206,35 +247,14 @@ public:
 	DECLARE_WRITE16_MEMBER(vbowl_link_2_w);
 	DECLARE_WRITE16_MEMBER(vbowl_link_3_w);
 	uint16_t igs_dips_r(int NUM);
-	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
 	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
 	DECLARE_READ16_MEMBER(ics2115_word_r);
 	DECLARE_WRITE16_MEMBER(ics2115_word_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	void init_lhbv33c();
-	void init_drgnwrldv21j();
-	void init_wlcc();
-	void init_nkishusp();
-	void init_drgnwrldv21();
-	void init_dbc();
-	void init_lhb();
-	void init_drgnwrld();
-	void init_drgnwrldv30();
-	void init_drgnwrldv11h();
-	void init_lhb2();
-	void init_xymg();
-	void init_drgnwrldv10c();
-	void init_drgnwrldv20j();
-	void init_drgnwrldv40k();
-	void init_vbowl();
-	void init_vbowlj();
-	void init_vbowlhk();
-	void init_ryukobou();
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+
 	uint32_t screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_vbowl);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
@@ -253,16 +273,7 @@ public:
 	void vbowl_gfx_decrypt();
 	void drgnwrld_gfx_decrypt();
 	void prot_mem_range_set();
-	void igs011_base(machine_config &config);
-	void drgnwrld(machine_config &config);
-	void nkishusp(machine_config &config);
-	void wlcc(machine_config &config);
-	void vbowl(machine_config &config);
-	void vbowlhk(machine_config &config);
-	void xymg(machine_config &config);
-	void lhb2(machine_config &config);
-	void lhb(machine_config &config);
-	void drgnwrld_igs012(machine_config &config);
+
 	void drgnwrld(address_map &map);
 	void drgnwrld_igs012(address_map &map);
 	void lhb(address_map &map);
@@ -2856,27 +2867,25 @@ void igs011_state::nkishusp(address_map &map)
  */
 READ16_MEMBER(igs011_state::ics2115_word_r)
 {
-	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
-		case 0: return ics2115->read(space, (offs_t)0);
-		case 1: return ics2115->read(space, (offs_t)1);
-		case 2: return (ics2115->read(space, (offs_t)3) << 8) | ics2115->read(space, (offs_t)2);
+		case 0: return m_ics->read(space, (offs_t)0);
+		case 1: return m_ics->read(space, (offs_t)1);
+		case 2: return (m_ics->read(space, (offs_t)3) << 8) | m_ics->read(space, (offs_t)2);
 	}
 	return 0xff;
 }
 
 WRITE16_MEMBER(igs011_state::ics2115_word_w)
 {
-	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
 		case 1:
-			if (ACCESSING_BITS_0_7)     ics2115->write(space, 1,data);
+			if (ACCESSING_BITS_0_7)     m_ics->write(space, 1,data);
 			break;
 		case 2:
-			if (ACCESSING_BITS_0_7)     ics2115->write(space, 2,data);
-			if (ACCESSING_BITS_8_15)    ics2115->write(space, 3,data>>8);
+			if (ACCESSING_BITS_0_7)     m_ics->write(space, 2,data);
+			if (ACCESSING_BITS_8_15)    m_ics->write(space, 3,data>>8);
 			break;
 	}
 }

@@ -135,7 +135,7 @@ void mgolf_state::update_plunger(  )
 			m_time_released = machine().time();
 
 			if (!m_mask)
-				m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 		else
 			m_time_pushed = machine().time();

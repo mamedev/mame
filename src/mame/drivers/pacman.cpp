@@ -429,7 +429,7 @@ INTERRUPT_GEN_MEMBER(pacman_state::periodic_irq)
 WRITE_LINE_MEMBER(pacman_state::vblank_nmi)
 {
 	if (state && m_irq_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(pacman_state::irq_mask_w)

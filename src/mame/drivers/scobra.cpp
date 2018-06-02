@@ -338,7 +338,7 @@ void scobra_state::scobra_sound_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x8000, 0x8fff).rw(this, FUNC(scobra_state::scobra_soundram_r), FUNC(scobra_state::scobra_soundram_w)).share("soundram");
-	map(0x9000, 0x9fff).w(this, FUNC(scobra_state::scramble_filter_w));
+	map(0x9000, 0x9fff).nopw(); // w(this, FUNC(scobra_state::scramble_filter_w)); - scobra doesn't instantiate any RC filters. This is dead code!
 }
 
 
@@ -355,7 +355,7 @@ void scobra_state::hustler_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x6000, 0x6fff).w(this, FUNC(scobra_state::frogger_filter_w));
+	map(0x6000, 0x6fff).nopw(); // w(this, FUNC(scobra_state::frogger_filter_w)); - hustler doesn't instantiate any RC filters. This is dead code!
 }
 
 void scobra_state::hustler_sound_io_map(address_map &map)
@@ -369,7 +369,7 @@ void scobra_state::hustler_sound_io_map(address_map &map)
 void scobra_state::hustlerb_sound_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x6000, 0x6fff).w(this, FUNC(scobra_state::frogger_filter_w));
+	map(0x6000, 0x6fff).nopw(); // w(this, FUNC(scobra_state::frogger_filter_w)); - hustlerb doesn't instantiate any RC filters. This is dead code!
 	map(0x8000, 0x8fff).ram().r(this, FUNC(scobra_state::scobra_soundram_r)).share("soundram");  /* only here to initialize pointer */
 }
 

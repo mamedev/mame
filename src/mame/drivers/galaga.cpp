@@ -762,8 +762,8 @@ CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)p
 
 WRITE8_MEMBER(galaga_state::out_0)
 {
-	output().set_led_value(1,data & 1);
-	output().set_led_value(0,data & 2);
+	m_leds[1] = BIT(data, 0);
+	m_leds[0] = BIT(data, 1);
 	machine().bookkeeping().coin_counter_w(1,~data & 4);
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
@@ -810,8 +810,9 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-MACHINE_START_MEMBER(galaga_state,galaga)
+void galaga_state::machine_start()
 {
+	m_leds.resolve();
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
 	save_item(NAME(m_main_irq_mask));
@@ -819,15 +820,20 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 	save_item(NAME(m_sub2_nmi_mask));
 }
 
-MACHINE_RESET_MEMBER(galaga_state,galaga)
+void galaga_state::machine_reset()
 {
 	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
-MACHINE_RESET_MEMBER(xevious_state,battles)
+void battles_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(galaga);
-	battles_customio_init();
+	galaga_state::machine_reset();
+
+	m_customio_command = 0;
+	m_customio_prev_command = 0;
+	m_customio_command_count = 0;
+	m_customio_data = 0;
+	m_sound_played = 0;
 }
 
 
@@ -926,14 +932,14 @@ void galaga_state::galaga_mem4(address_map &map)
 	map(0x1000, 0x107f).ram();
 }
 
-void xevious_state::battles_mem4(address_map &map)
+void battles_state::battles_mem4(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x4000, 0x4003).r(this, FUNC(xevious_state::battles_input_port_r));
-	map(0x4001, 0x4001).w(this, FUNC(xevious_state::battles_CPU4_coin_w));
-	map(0x5000, 0x5000).w(this, FUNC(xevious_state::battles_noise_sound_w));
-	map(0x6000, 0x6000).rw(this, FUNC(xevious_state::battles_customio3_r), FUNC(xevious_state::battles_customio3_w));
-	map(0x7000, 0x7000).rw(this, FUNC(xevious_state::battles_customio_data3_r), FUNC(xevious_state::battles_customio_data3_w));
+	map(0x4000, 0x4003).r(this, FUNC(battles_state::input_port_r));
+	map(0x4001, 0x4001).w(this, FUNC(battles_state::cpu4_coin_w));
+	map(0x5000, 0x5000).w(this, FUNC(battles_state::noise_sound_w));
+	map(0x6000, 0x6000).rw(this, FUNC(battles_state::customio3_r), FUNC(battles_state::customio3_w));
+	map(0x7000, 0x7000).rw(this, FUNC(battles_state::customio_data3_r), FUNC(battles_state::customio_data3_w));
 	map(0x8000, 0x80ff).ram();
 }
 
@@ -1631,8 +1637,6 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(bosco_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(bosco_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1706,8 +1710,6 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1812,8 +1814,6 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1840,11 +1840,10 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xevious_state::battles)
+MACHINE_CONFIG_START(battles_state::battles)
 	xevious(config);
 
 	/* basic machine hardware */
-
 	MCFG_DEVICE_REMOVE("50xx")
 	MCFG_DEVICE_REMOVE("54xx")
 	MCFG_DEVICE_REMOVE("06xx")
@@ -1860,11 +1859,9 @@ MACHINE_CONFIG_START(xevious_state::battles)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, vblank_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, xevious_state, battles_interrupt_4))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, battles_state, interrupt_4))
 
-	MCFG_TIMER_DRIVER_ADD("battles_nmi", xevious_state, battles_nmi_generate)
-
-	MCFG_MACHINE_RESET_OVERRIDE(xevious_state,battles)
+	MCFG_TIMER_DRIVER_ADD("nmi", battles_state, nmi_generate)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("discrete")
@@ -1929,8 +1926,6 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MCFG_MACHINE_START_OVERRIDE(galaga_state,galaga)
-	MCFG_MACHINE_RESET_OVERRIDE(galaga_state,galaga)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -3458,11 +3453,11 @@ void xevious_state::init_xevios()
 }
 
 
-void xevious_state::init_battles()
+void battles_state::driver_init()
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(FUNC(xevious_state::battles_customio_data0_r),this), write8_delegate(FUNC(xevious_state::battles_customio_data0_w),this) );
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(FUNC(xevious_state::battles_customio0_r),this), write8_delegate(FUNC(xevious_state::battles_customio0_w),this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(FUNC(battles_state::customio_data0_r),this), write8_delegate(FUNC(battles_state::customio_data0_w),this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(FUNC(battles_state::customio0_r),this), write8_delegate(FUNC(battles_state::customio0_w),this) );
 
 	init_xevious();
 }
@@ -3503,7 +3498,7 @@ GAME( 1984, gatsbee,   galaga,  gatsbee, gatsbee,  galaga_state,  init_galaga,  
 GAME( 1981, nebulbee,  galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Nebulous Bee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1982, xevios,    xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Xevios", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, battles,   xevious, battles, xevious,  xevious_state, init_battles, ROT90,  "bootleg", "Battles (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, battles,   xevious, battles, xevious,  battles_state, driver_init,  ROT90,  "bootleg", "Battles (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, battles2,  xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Battles (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, dzigzag,   digdug,  dzigzag, digdug,   digdug_state,  empty_init,   ROT90,  "bootleg", "Zig Zag (Dig Dug hardware)", MACHINE_SUPPORTS_SAVE )

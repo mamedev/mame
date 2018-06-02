@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_C352_ADD("c352", 48384000/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, 48384000/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.

@@ -97,7 +97,7 @@ INPUT_CHANGED_MEMBER( redclash_state::left_coin_inserted )
 INPUT_CHANGED_MEMBER( redclash_state::right_coin_inserted )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 static INPUT_PORTS_START( redclash )

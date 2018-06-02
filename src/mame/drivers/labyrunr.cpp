@@ -30,7 +30,7 @@ WRITE_LINE_MEMBER(labyrunr_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 {
 	if (m_k007121->ctrlram_r(7) & 0x01)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

@@ -1736,13 +1736,13 @@ MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
 
-	MCFG_AT28C16_ADD("at28c16", nullptr)
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", 25401600, 288)
+	MCFG_DEVICE_ADD("c352", C352, 25401600, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.

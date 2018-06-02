@@ -647,14 +647,14 @@ WRITE8_MEMBER(norautp_state::mainlamps_w)
     -x-- ----  * HOLD 5 lamp.
     x--- ----  * CANCEL lamp.
 */
-	output().set_lamp_value(0, (data >> 0) & 1);  /* CHANGE CARD lamp */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* SAVE / HALF GAMBLE lamp */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* HOLD 1 lamp */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* HOLD 2 lamp */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* HOLD 3 lamp */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* HOLD 4 lamp */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* HOLD 5 lamp */
-	output().set_lamp_value(7, (data >> 7) & 1);  /* CANCEL lamp */
+	m_lamps[0] = BIT(data, 0);  /* CHANGE CARD lamp */
+	m_lamps[1] = BIT(data, 1);  /* SAVE / HALF GAMBLE lamp */
+	m_lamps[2] = BIT(data, 2);  /* HOLD 1 lamp */
+	m_lamps[3] = BIT(data, 3);  /* HOLD 2 lamp */
+	m_lamps[4] = BIT(data, 4);  /* HOLD 3 lamp */
+	m_lamps[5] = BIT(data, 5);  /* HOLD 4 lamp */
+	m_lamps[6] = BIT(data, 6);  /* HOLD 5 lamp */
+	m_lamps[7] = BIT(data, 7);  /* CANCEL lamp */
 
 //  popmessage("lamps: %02x", data);
 }
@@ -672,8 +672,8 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
   xxxx ----  * Discrete Sound Lines.
 */
 
-	output().set_lamp_value(8, (data >> 0) & 1);  /* DEAL / DRAW lamp */
-	output().set_lamp_value(9, (data >> 1) & 1);  /* BET / COLLECT lamp */
+	m_lamps[8] = BIT(data, 0);  /* DEAL / DRAW lamp */
+	m_lamps[9] = BIT(data, 1);  /* BET / COLLECT lamp */
 
 	/* the 4 MSB are for discrete sound */
 	m_discrete->write(space, NORAUTP_SND_EN, (data >> 7) & 0x01);
@@ -697,8 +697,8 @@ WRITE8_MEMBER(norautp_state::counterlamps_w)
     -x-- ----  + Coin counter related.
     x--- ----  + DEFLECT (always activated).
 */
-	output().set_lamp_value(10, (data >> 0) & 1); /* HI lamp */
-	output().set_lamp_value(11, (data >> 1) & 1); /* LO lamp */
+	m_lamps[10] = BIT(data, 0); /* HI lamp */
+	m_lamps[11] = BIT(data, 1); /* LO lamp */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin1/3 counter */
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Coin2 counter */
@@ -755,8 +755,8 @@ WRITE8_MEMBER(norautp_state::vram_data_w)
 	m_np_vram[m_np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
-//  i8255a_pc7_w(machine().device("ppi8255_2"), 0);
-//  i8255a_pc7_w(machine().device("ppi8255_2"), 1);
+//  m_ppi8255_2->set_pc_bit(7, 0);
+//  m_ppi8255_2->set_pc_bit(7, 1);
 
 }
 

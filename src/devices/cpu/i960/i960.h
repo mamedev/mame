@@ -90,7 +90,6 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
 	virtual uint32_t execute_max_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
 	virtual uint32_t execute_input_lines() const override { return 4; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xffffffff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

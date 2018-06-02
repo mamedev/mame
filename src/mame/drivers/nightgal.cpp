@@ -410,7 +410,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
 
 WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	// doesn't seem to be any way around this blatant hack
 	m_audiocpu->reset();

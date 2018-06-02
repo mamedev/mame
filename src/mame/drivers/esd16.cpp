@@ -195,13 +195,13 @@ void esd16_state::jumppop_map(address_map &map)
 	map(0x120000, 0x123fff).ram();
 	map(0x1a0000, 0x1a7fff).ram();
 
-	map(0x180008, 0x180009).w(this, FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
-
 	esd16_palette_area(map, 0x140000);
 	esd16_sprite_area(map, 0x160000);
 	esd16_io_area_dsw(map, 0x180000);
 	esd16_vram_area(map, 0x300000);
 	esd16_vid_attr_area(map, 0x380000);
+
+	map(0x180008, 0x180009).w(this, FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
 }
 
 void esd16_state::hedpanic_map(address_map &map)
@@ -962,7 +962,7 @@ ROM_START( mchampdx )
 	ROM_LOAD16_BYTE( "rom.fu34", 0x000001, 0x200000, CRC(2895cf09) SHA1(88756fcd589af1986c3881d4080f086afc11b498) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "ver0106_esd4.su10", 0x00000, 0x40000, CRC(ac8ae009) SHA1(2c1c30cc4b3e34a5f14d7dfb6f6e18ff21f526f5) )
+	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(646b2f53) SHA1(f6673f68084b63a69c612a03c58f57435d5a9496) )

@@ -52,13 +52,12 @@ dio16_98603b_device::dio16_98603b_device(const machine_config &mconfig, device_t
 
 void dio16_98603b_device::device_start()
 {
-	set_dio_device();
 }
 
 void dio16_98603b_device::device_reset()
 {
 		m_rom = device().machine().root_device().memregion(this->subtag(HP98603B_ROM_REGION).c_str())->base();
-		m_dio->install_memory(0x100000, 0x1fffff, read16_delegate(FUNC(dio16_98603b_device::rom_r), this),
+		dio().install_memory(0x100000, 0x1fffff, read16_delegate(FUNC(dio16_98603b_device::rom_r), this),
 					  write16_delegate(FUNC(dio16_98603b_device::rom_w), this));
 }
 

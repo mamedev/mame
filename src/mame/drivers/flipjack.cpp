@@ -301,7 +301,7 @@ WRITE8_MEMBER(flipjack_state::flipjack_portc_w)
 INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 {
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

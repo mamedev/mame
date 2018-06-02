@@ -199,6 +199,8 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_start();
 
+	m_leds.resolve();
+
 	save_item(NAME(m_interrupt_enable));
 	save_item(NAME(m_p2portwr_state));
 	save_item(NAME(m_p2portrd_state));
@@ -333,8 +335,8 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 {
-	output().set_led_value(0, data & 0x04);
-	output().set_led_value(1, data & 0x08);
+	m_leds[0] = BIT(data, 2);
+	m_leds[1] = BIT(data, 3);
 	if (m_tms5220.found())
 	{
 		data = 12 | ((data >> 5) & 1);
@@ -645,7 +647,7 @@ WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 
 	/* a large number of signals are reset when this happens */
 	m_soundcomm->reset();
-	machine().device("ymsnd")->reset();
+	m_ym2151->reset();
 	if (m_tms5220.found())
 	{
 		m_tms5220->reset(); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.

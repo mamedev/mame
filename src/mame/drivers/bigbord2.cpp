@@ -544,7 +544,7 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 /* Machine Drivers */
 
-#define MAIN_CLOCK XTAL(8'000'000) / 2
+#define MAIN_CLOCK 8_MHz_XTAL / 2
 
 MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	/* basic machine hardware */
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -587,14 +587,14 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bigbord2_state, ctc_z1_w))  // to SIO Ch A
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc2", z80ctc_device, trg3))
 
-	MCFG_MB8877_ADD("fdc", XTAL(16'000'000) / 8) // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
+	MCFG_DEVICE_ADD("fdc", MB8877, 16_MHz_XTAL / 8) // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
 	//MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", ??)) // info missing from schematic
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(16'000'000) / 8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 16_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)

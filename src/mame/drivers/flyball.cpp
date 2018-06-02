@@ -44,7 +44,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
-		m_playfield_ram(*this, "playfield_ram")
+		m_playfield_ram(*this, "playfield_ram"),
+		m_lamp(*this, "lamp0")
 	{ }
 
 	void flyball(machine_config &config);
@@ -88,6 +89,8 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
+
+	output_finder<> m_lamp;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
@@ -288,7 +291,7 @@ WRITE8_MEMBER(flyball_state::misc_w)
 
 WRITE_LINE_MEMBER(flyball_state::lamp_w)
 {
-	output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -431,6 +434,7 @@ void flyball_state::machine_start()
 		m_pot_assert_timer[i] = timer_alloc(TIMER_POT_ASSERT);
 	m_pot_clear_timer = timer_alloc(TIMER_POT_CLEAR);
 	m_quarter_timer = timer_alloc(TIMER_QUARTER);
+	m_lamp.resolve();
 
 	save_item(NAME(m_pitcher_vert));
 	save_item(NAME(m_pitcher_horz));

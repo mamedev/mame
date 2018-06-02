@@ -97,7 +97,7 @@ WRITE8_MEMBER(seicross_state::portB_w)
 	if (((m_portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 

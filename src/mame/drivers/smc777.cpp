@@ -33,7 +33,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL(4'028'000)
+#define MASTER_CLOCK 4.028_MHz_XTAL
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
 #define mc6845_h_display        (m_crtc_vreg[1])
@@ -1048,7 +1048,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// floppy controller
-	MCFG_MB8876_ADD("fdc", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("fdc", MB8876, 1_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_drq_w))
 
@@ -1076,9 +1076,9 @@ ROM_START( smc777 )
 	/* shadow ROM */
 	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "1st", "1st rev.")
-	ROMX_LOAD( "smcrom.dat", 0x0000, 0x4000, CRC(b2520d31) SHA1(3c24b742c38bbaac85c0409652ba36e20f4687a1), ROM_BIOS(1))
+	ROMX_LOAD( "smcrom.dat", 0x0000, 0x4000, CRC(b2520d31) SHA1(3c24b742c38bbaac85c0409652ba36e20f4687a1), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
-	ROMX_LOAD( "smcrom.v2",  0x0000, 0x4000, CRC(c1494b8f) SHA1(a7396f5c292f11639ffbf0b909e8473c5aa63518), ROM_BIOS(2))
+	ROMX_LOAD( "smcrom.v2",  0x0000, 0x4000, CRC(c1494b8f) SHA1(a7396f5c292f11639ffbf0b909e8473c5aa63518), ROM_BIOS(1))
 
 	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i80xx", 0x000, 0x800, NO_DUMP ) // keyboard mcu, needs decapping

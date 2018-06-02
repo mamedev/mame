@@ -57,16 +57,21 @@ http://www.zzzaccaria.com/manuals/GalaxiaSchematics.zip
 The manual for Astro Wars can also be found at:
 http://www.opdenkelder.com/Astrowars_manual.zip
 
-HW has many similarities with quasar.c / cvs.c / zac2650.c
+HW has many similarities with quasar.cpp / cvs.cpp / zac2650.cpp
+real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
 ---
 
 TODO:
-- speed is wrong for all games. needs investigation, interrupt related?
-  real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
-- correct color/star generation using info from Galaxia technical manual and schematics
+- go through everything in the schematics for astrowar / galaxia
+- video rewrite to:
+   * support RAW_PARAMS, blanking is much like how laserbat hardware does it
+   and is needed to correct the speed in all machines
+   * improve bullets
+   * provide correct color/star generation, using info from Galaxia technical
+   manual and schematics
+   * provide accurate sprite/bg sync in astrowar
+- what is the PROM for? schematics are too burnt to tell anything
 - add sound board emulation
-- improve bullets
-- accurate sprite/bg sync in astrowar
 
 */
 
@@ -112,13 +117,17 @@ WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
 
 WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
 {
-	// d0/d1: maybe coincounter
+	// d0: triggers on every new credit
+	// d1: coin counter? if you put a coin in slot A, galaxia constantly
+	// strobes sets and clears the bit. if you put a coin in slot B
+	// however, the bit is set and cleared only once.
+	// d5: set as soon as the game completes selftest
 	// other bits: unknown
 }
 
 WRITE8_MEMBER(galaxia_state::galaxia_dataport_w)
 {
-	// cvs-style video fx? or lamps?
+	// seems to be related to sound board comms
 }
 
 READ8_MEMBER(galaxia_state::galaxia_collision_r)
@@ -304,7 +313,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(60) // wrong
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)

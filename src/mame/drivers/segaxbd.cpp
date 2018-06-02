@@ -39,7 +39,7 @@ Royal Ascot        (C) Sega 1991    dumped, but very likely incomplete
 Super Monaco GP    (C) Sega 1989
 Thunder Blade      (C) Sega 1987
 
-* denotes not dumped. There are also several revisions of the above games not dumper either.
+* denotes not dumped. There are also several revisions of the above games not dumped either.
 
 Main Board
 ----------
@@ -283,34 +283,34 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 }
 
 segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_soundcpu2(*this, "soundcpu2"),
-		m_mcu(*this, "mcu"),
-		m_watchdog(*this, "watchdog"),
-		m_cmptimer_1(*this, "cmptimer_main"),
-		m_sprites(*this, "sprites"),
-		m_segaic16vid(*this, "segaic16vid"),
-		m_segaic16road(*this, "segaic16road"),
-		m_soundlatch(*this, "soundlatch"),
-		m_subram0(*this, "subram0"),
-		m_road_priority(1),
-		m_scanline_timer(nullptr),
-		m_timer_irq_state(0),
-		m_vblank_irq_state(0),
-		m_pc_0(0),
-		m_loffire_sync(nullptr),
-		m_lastsurv_mux(0),
-		m_paletteram(*this, "paletteram"),
-		m_gprider_hack(false),
-		m_palette_entries(0),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_io0_porta(*this, "IO0PORTA"),
-		m_adc_ports(*this, "ADC%u", 0),
-		m_mux_ports(*this, "MUX%u", 0)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_maincpu(*this, "maincpu")
+	, m_subcpu(*this, "subcpu")
+	, m_soundcpu(*this, "soundcpu")
+	, m_soundcpu2(*this, "soundcpu2")
+	, m_mcu(*this, "mcu")
+	, m_watchdog(*this, "watchdog")
+	, m_cmptimer_1(*this, "cmptimer_main")
+	, m_sprites(*this, "sprites")
+	, m_segaic16vid(*this, "segaic16vid")
+	, m_segaic16road(*this, "segaic16road")
+	, m_subram0(*this, "subram0")
+	, m_road_priority(1)
+	, m_scanline_timer(nullptr)
+	, m_timer_irq_state(0)
+	, m_vblank_irq_state(0)
+	, m_pc_0(0)
+	, m_loffire_sync(nullptr)
+	, m_lastsurv_mux(0)
+	, m_paletteram(*this, "paletteram")
+	, m_gprider_hack(false)
+	, m_palette_entries(0)
+	, m_screen(*this, "screen")
+	, m_palette(*this, "palette")
+	, m_io0_porta(*this, "IO0PORTA")
+	, m_adc_ports(*this, "ADC%u", 0)
+	, m_mux_ports(*this, "MUX%u", 0)
+	, m_lamps(*this, "lamp%u", 0U)
 {
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 	palette_init();
@@ -322,6 +322,7 @@ void segaxbd_state::device_start()
 	if(!m_segaic16road->started())
 		throw device_missing_dependencies();
 
+	m_lamps.resolve();
 	// point globals to allocated memory regions
 	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
@@ -346,7 +347,7 @@ void segaxbd_state::device_reset()
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaxbd_state::m68k_reset_callback),this));
 
 	// start timers to track interrupts
-	m_scanline_timer->adjust(m_screen->time_until_pos(1), 1);
+	m_scanline_timer->adjust(m_screen->time_until_pos(0), 0);
 }
 
 
@@ -450,25 +451,15 @@ const auto SOUND_CLOCK = XTAL(16'000'000);
 //**************************************************************************
 
 //-------------------------------------------------
-//  timer_ack_callback - acknowledge a timer chip
-//  interrupt signal
+//  timer_irq_w - handle the interrupt signal from
+//  the timer chip
 //-------------------------------------------------
 
-void segaxbd_state::timer_ack_callback()
+WRITE_LINE_MEMBER(segaxbd_state::timer_irq_w)
 {
-	// clear the timer IRQ
-	m_timer_irq_state = 0;
+	// set/clear the timer IRQ
+	m_timer_irq_state = (state == ASSERT_LINE);
 	update_main_irqs();
-}
-
-
-//-------------------------------------------------
-//  sound_data_w - write data to the sound CPU
-//-------------------------------------------------
-
-WRITE8_MEMBER(segaxbd_state::sound_data_w)
-{
-	synchronize(TID_SOUND_WRITE, data);
 }
 
 
@@ -630,22 +621,6 @@ WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
 
 
 //**************************************************************************
-//  SOUND Z80 CPU READ/WRITE CALLBACKS
-//**************************************************************************
-
-//-------------------------------------------------
-//  sound_data_r - read latched sound data
-//-------------------------------------------------
-
-READ8_MEMBER( segaxbd_state::sound_data_r )
-{
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
-
-
-//**************************************************************************
 //  DRIVER OVERRIDES
 //**************************************************************************
 
@@ -657,48 +632,30 @@ void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch (id)
 	{
-		case TID_SOUND_WRITE:
-			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
-			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
-			// if an extra sound board is attached, do an nmi there as well
-			if (m_soundcpu2 != nullptr)
-				m_soundcpu2->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			break;
-
 		case TID_SCANLINE:
 		{
 			int scanline = param;
-			int next_scanline = (scanline + 2) % 262;
-			bool update = false;
+			int next_scanline = (scanline + 1) % 262;
 
-			// clock the timer and set the IRQ if something happened
-			if ((scanline % 2) != 0 && m_cmptimer_1->clock())
-				m_timer_irq_state = 1, update = true;
+			// clock the timer with V0
+			m_cmptimer_1->exck_w(scanline % 2);
 
 			// set VBLANK on scanline 223
 			if (scanline == 223)
 			{
 				m_vblank_irq_state = 1;
-				update = true;
 				m_subcpu->set_input_line(4, ASSERT_LINE);
-				next_scanline = scanline + 1;
+				update_main_irqs();
 			}
 
 			// clear VBLANK on scanline 224
 			else if (scanline == 224)
 			{
 				m_vblank_irq_state = 0;
-				update = true;
 				m_subcpu->set_input_line(4, CLEAR_LINE);
-				next_scanline = scanline + 1;
+				update_main_irqs();
 			}
 
-			// update IRQs on the main CPU
-			if (update)
-				update_main_irqs();
-
-			// come back in 2 scanlines
 			m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 			break;
 		}
@@ -733,10 +690,10 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 	// d6: danger lamp
 	// in clone aburner, lamps work only in testmode?
 
-	machine().output().set_lamp_value(0, (data >> 5) & 0x01);
-	machine().output().set_lamp_value(1, (data >> 6) & 0x01);
-	machine().output().set_lamp_value(2, (data >> 1) & 0x01);
-	machine().output().set_lamp_value(3, (data >> 2) & 0x01);
+	m_lamps[0] = BIT(data, 5);
+	m_lamps[1] = BIT(data, 6);
+	m_lamps[2] = BIT(data, 1);
+	m_lamps[3] = BIT(data, 2);
 }
 
 
@@ -866,7 +823,7 @@ void segaxbd_state::update_main_irqs()
 
 WRITE_LINE_MEMBER(segaxbd_state::m68k_reset_callback)
 {
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
@@ -1033,7 +990,7 @@ void segaxbd_state::sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segaxbd_state::sound_data_r));
+	map(0x40, 0x40).mirror(0x3f).r("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::zread));
 }
 
 
@@ -1057,7 +1014,7 @@ void segaxbd_state::smgp_sound2_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segaxbd_state::sound_data_r));
+	map(0x40, 0x40).mirror(0x3f).r("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::zread));
 }
 
 
@@ -1726,8 +1683,8 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
-	MCFG_SEGA_315_5250_TIMER_ACK(segaxbd_state, timer_ack_callback)
-	MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(WRITE8(*this, segaxbd_state, sound_data_w))
+	MCFG_SEGA_315_5250_68KINT_CALLBACK(WRITELINE(*this, segaxbd_state, timer_irq_w))
+	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 
@@ -1762,8 +1719,6 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -1943,6 +1898,10 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
+	MCFG_DEVICE_MODIFY("cmptimer_main")
+	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("soundcpu2", INPUT_LINE_NMI))
+
 	MCFG_DEVICE_MODIFY("iochip_0")
 	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))
 	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
@@ -1984,6 +1943,10 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_DEVICE_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
 	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
+
+	MCFG_DEVICE_MODIFY("cmptimer_main")
+	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("soundcpu2", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_MODIFY("iochip_0")
 	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))

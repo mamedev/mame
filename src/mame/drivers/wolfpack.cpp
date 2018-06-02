@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {
 	int scanline = param;
 
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	scanline += 64;
 
@@ -43,6 +43,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 
 void wolfpack_state::machine_start()
 {
+	m_led.resolve();
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 }
 
@@ -117,7 +118,7 @@ WRITE8_MEMBER(wolfpack_state::attract_w)
 
 WRITE8_MEMBER(wolfpack_state::credit_w)
 {
-	output().set_led_value(0, !(data & 1));
+	m_led = BIT(~data, 0);
 }
 
 

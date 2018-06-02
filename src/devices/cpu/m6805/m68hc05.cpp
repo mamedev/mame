@@ -618,7 +618,7 @@ void m68hc05_device::burn_cycles(unsigned count)
 	{
 		LOGCOP("PCOP reset\n");
 		m_copcr |= 0x10;
-		set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	m_pcop_cnt = (m_pcop_cnt + count) & ((u32(1) << 21) - 1);
 
@@ -626,7 +626,7 @@ void m68hc05_device::burn_cycles(unsigned count)
 	m_ncop_cnt += count;
 	if ((u32(1) << 17) <= m_ncop_cnt)
 	{
-		set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		LOGCOP("NCOP reset\n");
 	}
 	m_ncop_cnt &= (u32(1) << 17) - 1;

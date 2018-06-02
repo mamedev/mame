@@ -35,23 +35,17 @@ class cabaret_state : public driver_device
 {
 public:
 	cabaret_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram"),
-		m_bg_scroll(*this, "bg_scroll"),
-		m_bg_tile_ram(*this, "bg_tile_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_fg_tile_ram(*this, "fg_tile_ram")
+		, m_fg_color_ram(*this, "fg_color_ram")
+		, m_bg_scroll(*this, "bg_scroll")
+		, m_bg_tile_ram(*this, "bg_tile_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_led(*this, "led6")
+	{ }
 
-	required_shared_ptr<uint8_t> m_fg_tile_ram;
-	required_shared_ptr<uint8_t> m_fg_color_ram;
-	required_shared_ptr<uint8_t> m_bg_scroll;
-	required_shared_ptr<uint8_t> m_bg_tile_ram;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int m_nmi_enable;
-	uint8_t m_out[3];
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
@@ -63,16 +57,29 @@ public:
 	void init_cabaret();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cabaret_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void cabaret(machine_config &config);
 	void cabaret_map(address_map &map);
 	void cabaret_portmap(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_bg_tile_ram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	int m_nmi_enable;
+	uint8_t m_out[3];
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<> m_led;
 };
 
 
@@ -167,7 +174,7 @@ WRITE8_MEMBER(cabaret_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	output().set_led_value(6,        data & 0x40);   // led for coin m_out / hopper active
+	m_led = BIT(data, 6);   // led for coin m_out / hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
@@ -353,8 +360,8 @@ void cabaret_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 {
-		if (m_nmi_enable & 0x80)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable & 0x80)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(cabaret_state::cabaret)

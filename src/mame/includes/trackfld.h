@@ -6,8 +6,12 @@
 
 ***************************************************************************/
 
+#include "audio/trackfld.h"
+#include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
+
+#include "screen.h"
 
 class trackfld_state : public driver_device
 {
@@ -21,8 +25,12 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundbrd(*this, "trackfld_audio"),
 		m_sn(*this, "snsnd"),
 		m_vlm(*this, "vlm"),
+		m_dac(*this, "dac"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -72,8 +80,12 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<trackfld_audio_device> m_soundbrd;
 	optional_device<sn76496_device> m_sn;
 	optional_device<vlm5030_device> m_vlm;
+	required_device<dac_8bit_r2r_device> m_dac;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

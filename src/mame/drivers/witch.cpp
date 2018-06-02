@@ -217,7 +217,7 @@ Interesting memory locations
 TODO :
     - Figure out the ports for the "PayOut" stuff (a006/a00c?);
     - Hook up the OKI M5202;
-	- lagging sprites on witch (especially noticeable when game scrolls up/down)
+    - lagging sprites on witch (especially noticeable when game scrolls up/down)
 */
 
 #include "emu.h"
@@ -461,7 +461,7 @@ WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 		m_bg_bank = new_bg_bank;
 		m_gfx1_tilemap->mark_all_dirty();
 	}
-//	m_mainbank->set_entry((data >> 6) & 3);
+//  m_mainbank->set_entry((data >> 6) & 3);
 }
 
 WRITE8_MEMBER(witch_state::write_a006)
@@ -849,8 +849,8 @@ static INPUT_PORTS_START( keirinou )
 	PORT_DIPSETTING(    0x05, "90%" )
 	PORT_DIPSETTING(    0x04, "95%" )
 	PORT_DIPSETTING(    0x03, "100%" )
-//	PORT_DIPSETTING(    0x01, "80%" )
-//	PORT_DIPSETTING(    0x00, "90%" )
+//  PORT_DIPSETTING(    0x01, "80%" )
+//  PORT_DIPSETTING(    0x00, "90%" )
 	PORT_DIPNAME( 0x08, 0x08, "Double-Up Rate" )
 	PORT_DIPSETTING(    0x08, "90%" )
 	PORT_DIPSETTING(    0x00, "100%" )
@@ -1026,7 +1026,7 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	MCFG_PALETTE_ADD("palette", 0x200+0x80)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
 
-//	MCFG_PALETTE_FORMAT(IIBBGGRR)
+//  MCFG_PALETTE_FORMAT(IIBBGGRR)
 
 	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
@@ -1137,20 +1137,20 @@ ROM_END
 
 ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
+	ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
 
 	ROM_REGION( 0x10000, "sub", ROMREGION_ERASE00 )
-    ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
+	ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
 
 	// rearranged so that it fits available gfx decode
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "a6.a6",        0x0000, 0x4000, CRC(6d59a5e4) SHA1(4580756ee7db4a088ad02cd56f78fd55fef6ec0a) )
 	ROM_CONTINUE(             0x8000, 0x4000 )
-    ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
+	ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
 	ROM_CONTINUE(             0xc000, 0x4000 )
 
 	ROM_REGION( 0x10000, "gfx2", ROMREGION_ERASE00 )
-    ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
+	ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
 	ROM_CONTINUE(             0x8000, 0x04000 )
 	ROM_CONTINUE(             0x4000, 0x04000 )
 	ROM_CONTINUE(             0xc000, 0x04000 )

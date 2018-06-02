@@ -408,9 +408,9 @@ ROM_START( aquarius )
 	/* basic rom */
 	ROM_DEFAULT_BIOS("rev2")
 	ROM_SYSTEM_BIOS(0, "rev1", "Revision 1")
-	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev2", "Revision 2")
-	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(2))
+	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(1))
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)

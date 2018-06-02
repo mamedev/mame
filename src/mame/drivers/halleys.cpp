@@ -1538,7 +1538,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 56*3:
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
@@ -1564,7 +1564,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
 			break;
 
 		case 56*3:
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 		case 56*2:
@@ -1601,7 +1601,7 @@ WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 	m_io_ram[0x8a] = data;
 	m_soundlatch->write(space,offset,data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

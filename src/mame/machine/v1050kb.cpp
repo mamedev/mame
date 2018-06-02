@@ -290,6 +290,7 @@ v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, cons
 	m_discrete(*this, DISCRETE_TAG),
 	m_y(*this, "Y%u", 0),
 	m_out_tx_handler(*this),
+	m_led(*this, "led0"),
 	m_keylatch(0)
 {
 }
@@ -301,6 +302,7 @@ v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, cons
 
 void v1050_keyboard_device::device_start()
 {
+	m_led.resolve();
 	// state saving
 	save_item(NAME(m_keylatch));
 }
@@ -376,7 +378,7 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 	*/
 
 	// led output
-	machine().output().set_led_value(0, BIT(data, 5));
+	m_led = BIT(data, 5);
 
 	// speaker output
 	m_discrete->write(space, NODE_01, BIT(data, 6));

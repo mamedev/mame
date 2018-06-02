@@ -75,6 +75,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void midearth(machine_config &config);
+	void atari_s1(machine_config &config);
+	void atarians(machine_config &config);
+protected:
 	DECLARE_READ8_MEMBER(m1080_r);
 	DECLARE_WRITE8_MEMBER(m1080_w);
 	DECLARE_READ8_MEMBER(m1084_r);
@@ -90,9 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(midearth_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	void midearth(machine_config &config);
-	void atari_s1(machine_config &config);
-	void atarians(machine_config &config);
 	void atari_s1_map(address_map &map);
 	void atarians_map(address_map &map);
 	void midearth_map(address_map &map);
@@ -380,7 +381,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	m_bit6++;
 	if (m_t_c > 0x40)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_t_c++;
 

@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(kongambl_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	SPEAKER(config, "lspeaker").front_left();

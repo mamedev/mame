@@ -118,7 +118,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /****************************************************************************/

@@ -511,9 +511,9 @@ ROM_END
 ROM_START( cgenienz )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "old", "Old ROM")
-	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1))
+	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "new", "New ROM")
-	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2))
+	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(1))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))

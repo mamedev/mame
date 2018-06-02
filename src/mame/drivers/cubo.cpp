@@ -409,7 +409,7 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 1 = Power Led on Amiga */
-	output().set_led_value(0, (data & 2) ? 0 : 1);
+	m_power_led = BIT(~data, 1);
 
 	handle_joystick_cia(data, m_cia_0->read(space, 2));
 }
@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_END
 
 
 
-#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
+#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CD32_BIOS \
 	ROM_REGION32_BE(0x100000, "kickstart", 0 ) \

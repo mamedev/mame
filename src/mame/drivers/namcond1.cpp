@@ -361,9 +361,8 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
-	MCFG_YGV608_ADD("ygv608")
-	MCFG_YGV608_PALETTE("palette")
+	MCFG_DEVICE_ADD("ygv608", YGV608, 0)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
 	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -384,15 +383,13 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", XTAL(49'152'000)/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, XTAL(49'152'000)/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_AT28C16_ADD( "at28c16", nullptr )
-
-
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcond1_state::abcheck)

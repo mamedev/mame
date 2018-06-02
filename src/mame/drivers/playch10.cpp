@@ -638,9 +638,9 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 	{
 		/* LS161A, Sheet 1 - bottom left of Z80 */
 		if (!m_pc10_dog_di && !m_pc10_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		else if (m_pc10_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -716,7 +716,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define BIOS_CPU                                            \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \

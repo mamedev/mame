@@ -461,7 +461,7 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	if(m_toggle)
 	{
 		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
-		if(m_msm_nmi_mask) { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+		if(m_msm_nmi_mask) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	}
 	else
 	{

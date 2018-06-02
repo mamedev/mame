@@ -152,7 +152,8 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 ********************/
 READ8_MEMBER(kchamp_state::sound_reset_r)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	if (!machine().side_effects_disabled())
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 

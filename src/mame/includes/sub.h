@@ -56,14 +56,14 @@ public:
 	void subm_map(address_map &map);
 	void subm_sound_io(address_map &map);
 	void subm_sound_map(address_map &map);
-	
+
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	
+
 private:
 	tilemap_t *m_tilemap;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -75,7 +75,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_scrolly;
-	
+
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

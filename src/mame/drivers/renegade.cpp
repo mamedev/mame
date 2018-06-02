@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	{
 		m_msm->reset_w(1);
 		m_adpcm_playing = false;
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	else
 	{
@@ -221,7 +221,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 	int scanline = param;
 
 	if (scanline == 112) // ???
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else if(scanline == 240)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }

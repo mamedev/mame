@@ -303,7 +303,7 @@ WRITE8_MEMBER(deco_ld_state::nmimask_w)
 
 INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
-	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmimask) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

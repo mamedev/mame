@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -598,7 +598,7 @@ WRITE_LINE_MEMBER( nano_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	output().set_led_value(1, state);
+	m_led = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -636,12 +636,12 @@ void osc1000b_state::machine_reset()
 
 void tmc2000_state::machine_start()
 {
-	uint16_t addr;
+	m_led.resolve();
 
 	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
 
 	// randomize color RAM contents
-	for (addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
+	for (uint16_t addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
 		m_colorram[addr] = machine().rand() & 0xff;
 	}
@@ -677,6 +677,8 @@ void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 void nano_state::machine_start()
 {
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -845,11 +847,11 @@ ROM_END
 ROM_START( tmc2000 )
 	ROM_REGION( 0x800, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "prom200", "PROM N:o 200" )
-	ROMX_LOAD( "200.m5",    0x000, 0x200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(1) ) // typed in from the manual
+	ROMX_LOAD( "200.m5",    0x000, 0x200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(0) ) // typed in from the manual
 	ROM_SYSTEM_BIOS( 1, "prom202", "PROM N:o 202" )
-	ROMX_LOAD( "202.m5",    0x000, 0x200, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "202.m5",    0x000, 0x200, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "tool2000", "TOOL-2000" )
-	ROMX_LOAD( "tool2000",  0x000, 0x800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "tool2000",  0x000, 0x800, NO_DUMP, ROM_BIOS(2) )
 ROM_END
 
 ROM_START( nano )

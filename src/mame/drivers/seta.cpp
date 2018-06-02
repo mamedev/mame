@@ -1569,7 +1569,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				if ( !(m_sub_ctrl_data & 1) && (data & 1) )
-					m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+					m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				m_sub_ctrl_data = data;
 			}
 			break;
@@ -1635,7 +1635,8 @@ template<int Layer>
 WRITE16_MEMBER(seta_state::vram_w)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
-	m_tilemap[Layer][(offset >> 12) & 1]->mark_tile_dirty(offset & 0x7ff);
+	if (m_rambank[Layer] == ((offset >> 12) & 1))
+		m_tilemap[Layer]->mark_tile_dirty(offset & 0x7ff);
 }
 
 
@@ -1723,14 +1724,23 @@ void seta_state::tndrcade_map(address_map &map)
         (with slight variations, and Meta Fox protection hooked in)
 ***************************************************************************/
 
+WRITE8_MEMBER(seta_state::twineagl_ctrl_w)
+{
+	if ((data & 0x30) == 0)
+	{
+		m_maincpu->set_input_line(1, CLEAR_LINE);
+		m_maincpu->set_input_line(3, CLEAR_LINE);
+	}
+}
+
 void seta_state::downtown_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();                             // ROM
 	map(0x100000, 0x103fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0x200000, 0x200001).noprw();                             // watchdog? (twineagl)
-	map(0x300000, 0x300001).nopw();                        // IRQ enable/acknowledge?
+	map(0x300000, 0x300001).w(this, FUNC(seta_state::ipl1_ack_w));
 	map(0x400000, 0x400007).w(this, FUNC(seta_state::twineagl_tilebank_w));      // special tile banking to animate water in twineagl
-	map(0x500000, 0x500001).nopw();                        // ?
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::twineagl_ctrl_w));
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0x800000, 0x800005).writeonly().share("vctrl_0");// VRAM Ctrl
@@ -1821,7 +1831,7 @@ WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 		machine().tilemap().mark_all_dirty();
 	m_tiles_offset = tiles_offset;
 
-	seta_coin_lockout_w(data);
+	seta_coin_lockout_w(space, 0, data);
 }
 
 
@@ -1886,7 +1896,9 @@ void seta_state::blandia_map(address_map &map)
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // (gundhara) Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
@@ -1922,7 +1934,9 @@ void seta_state::blandiap_map(address_map &map)
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs"); // (gundhara) Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
@@ -1973,8 +1987,8 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 
 	/* Gun Recoils */
 	/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
-	output().set_value("Player1_Gun_Recoil", BIT(data, 4));
-	output().set_value("Player2_Gun_Recoil", BIT(data, 3));
+	m_gun_recoil[0] = BIT(data, 4);
+	m_gun_recoil[1] = BIT(data, 3);
 }
 
 READ16_MEMBER(seta_state::extra_r)
@@ -1992,7 +2006,9 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // (gundhara) Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
 	map(0x500006, 0x500007).r(this, FUNC(seta_state::extra_r));                   // Buttons 4,5,6 (Daioh only)
 
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
@@ -2042,8 +2058,9 @@ void seta_state::zingzipbl_map(address_map &map)
 //  AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
 	map(0x400002, 0x400003).r(this, FUNC(seta_state::zingzipbl_unknown_r));       // P2
 //  AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // (gundhara) Coin Lockout + Video Registers
-
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
 	//AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)              // DSW
 	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
@@ -2080,8 +2097,9 @@ void seta_state::jjsquawb_map(address_map &map)
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // (gundhara) Coin Lockout + Video Registers
-
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x70b3ff).ram();                             // RZ: (rezon,jjsquawk)
 	map(0x70b400, 0x70bfff).ram().share("paletteram1");  // Palette
@@ -2233,7 +2251,7 @@ void seta_state::blockcar_map(address_map &map)
 	map(0x100000, 0x100001).nopw();                        // ? 1 (start of interrupts, main loop: watchdog?)
 	map(0x200000, 0x200001).nopw();                        // ? 0/1 (IRQ acknowledge?)
 	map(0x300000, 0x300003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0x400000, 0x400001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Sound Enable (bit 4?)
+	map(0x400001, 0x400001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout + Sound Enable (bit 4?)
 	map(0x500000, 0x500001).portr("P1");                 // P1
 	map(0x500002, 0x500003).portr("P2");                 // P2
 	map(0x500004, 0x500005).portr("COINS");              // Coins
@@ -2254,7 +2272,7 @@ void seta_state::blockcarb_map(address_map &map)
 	map(0x100000, 0x100001).nopw();                        // ? 1 (start of interrupts, main loop: watchdog?)
 	map(0x200000, 0x200001).nopw();                        // ? 0/1 (IRQ acknowledge?)
 	map(0x300000, 0x300003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0x400000, 0x400001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Sound Enable (bit 4?)
+	map(0x400001, 0x400001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout + Sound Enable (bit 4?)
 	map(0x500000, 0x500001).portr("P1");                 // P1
 	map(0x500002, 0x500003).portr("P2");                 // P2
 	map(0x500004, 0x500005).portr("COINS");              // Coins
@@ -2279,7 +2297,9 @@ void seta_state::daioh_map(address_map &map)
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
 	map(0x500006, 0x500007).portr("EXTRA");              // Buttons 4,5,6
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));   // DSW
 	map(0x700000, 0x7003ff).ram();
@@ -2314,7 +2334,9 @@ void seta_state::daiohp_map(address_map &map)
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
 	map(0x500006, 0x500007).portr("EXTRA");              // Buttons 4,5,6
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));   // DSW
 	map(0x700000, 0x7003ff).ram();
@@ -2351,7 +2373,8 @@ void seta_state::drgnunit_map(address_map &map)
 	map(0x100000, 0x103fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0x200000, 0x200001).nopw();                        // Watchdog
 	map(0x300000, 0x300001).nopw();                        // ? IRQ Ack
-	map(0x500000, 0x500001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0x800000, 0x800005).ram().share("vctrl_0");     // VRAM Ctrl
@@ -2370,6 +2393,11 @@ void seta_state::drgnunit_map(address_map &map)
 /***************************************************************************
                                 The Roulette
 ***************************************************************************/
+
+MACHINE_START_MEMBER(setaroul_state, setaroul)
+{
+	m_leds.resolve();
+}
 
 // Coin drop
 MACHINE_RESET_MEMBER(setaroul_state, setaroul)
@@ -2489,8 +2517,8 @@ WRITE8_MEMBER(setaroul_state::led_w)
 {
 	m_led = data;
 
-	output().set_led_value(0,   data  & 0x01);  // pay out        (hop.c in input test, touch '1')
-	output().set_led_value(1,   data  & 0x02);  // call attendant (cal.o in input test, touch '9')
+	m_leds[0] = BIT(data, 0);  // pay out        (hop.c in input test, touch '1')
+	m_leds[1] = BIT(data, 1);  // call attendant (cal.o in input test, touch '9')
 	//
 	//                          data  & 0x10    // hopper divider (divider in input test, touch '10')
 	//                          data  & 0x80    // video enable?
@@ -2555,7 +2583,8 @@ void seta_state::extdwnhl_map(address_map &map)
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 	map(0x400008, 0x40000b).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x40000c, 0x40000d).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));    // Watchdog (extdwnhl (R) & sokonuke (W) MUST RETURN $FFFF)
-	map(0x500000, 0x500003).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x500004, 0x500007).noprw();                             // IRQ Ack  (extdwnhl (R) & sokonuke (W))
 	map(0x600400, 0x600fff).ram().share("paletteram1");  // Palette
 	map(0x601000, 0x610bff).ram();                             //
@@ -2587,7 +2616,8 @@ void seta_state::kamenrid_map(address_map &map)
 	map(0x500004, 0x500007).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x500008, 0x500009).portr("COINS");              // Coins
 	map(0x50000c, 0x50000d).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));    // xx Watchdog? (sokonuke)
-	map(0x600000, 0x600005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // ? Coin Lockout + Video Registers
+	map(0x600001, 0x600001).w(this, FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
+	map(0x600003, 0x600003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x600004, 0x600005).w(this, FUNC(seta_state::ipl1_ack_w));
 	map(0x600006, 0x600007).w(this, FUNC(seta_state::ipl2_ack_w));
 	map(0x700000, 0x7003ff).ram();                             // Palette RAM (tested)
@@ -2618,7 +2648,8 @@ void seta_state::madshark_map(address_map &map)
 	map(0x500004, 0x500005).portr("COINS");              // Coins
 	map(0x500008, 0x50000b).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x50000c, 0x50000d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x600000, 0x600005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // ? Coin Lockout + Video Registers
+	map(0x600001, 0x600001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x600003, 0x600003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x600004, 0x600005).w(this, FUNC(seta_state::ipl1_ack_w));
 	map(0x600006, 0x600007).w(this, FUNC(seta_state::ipl2_ack_w));
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
@@ -2641,7 +2672,7 @@ WRITE16_MEMBER(seta_state::magspeed_lights_w)
 	COMBINE_DATA( &m_magspeed_lights[offset] );
 
 	for (int i = 0; i < 16; i++)
-		output().set_led_value(offset * 16 + i, BIT(m_magspeed_lights[offset], i));
+		m_leds[offset * 16 + i] = BIT(m_magspeed_lights[offset], i);
 
 //  popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
 }
@@ -2650,13 +2681,15 @@ WRITE16_MEMBER(seta_state::magspeed_lights_w)
 void seta_state::magspeed_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                             // ROM
+	map(0x1f8000, 0x1f8fff).noprw();                           // NVRAM?
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0x500000, 0x500001).portr("P1");                 // P1
 	map(0x500002, 0x500003).portr("P2");                 // P2
 	map(0x500004, 0x500005).portr("COINS");              // Coins
 	map(0x500008, 0x50000b).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x50000c, 0x50000d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x500010, 0x500015).ram().w(this, FUNC(seta_state::msgundam_vregs_w)).share("vregs");   // ? Coin Lockout + Video Registers
+	map(0x500011, 0x500011).w(this, FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
+	map(0x500015, 0x500015).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x500018, 0x500019).w(this, FUNC(seta_state::ipl1_ack_w));               // lev 2 irq ack?
 	map(0x50001c, 0x50001d).w(this, FUNC(seta_state::ipl2_ack_w));               // lev 4 irq ack?
 	map(0x600000, 0x600005).w(this, FUNC(seta_state::magspeed_lights_w));        // Lights
@@ -2712,17 +2745,6 @@ void seta_state::krzybowl_map(address_map &map)
                             Mobile Suit Gundam
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::msgundam_vregs_w)
-{
-	// swap $500002 with $500004
-	switch( offset )
-	{
-		case 1: offset = 2; break;
-		case 2: offset = 1; break;
-	}
-	seta_vregs_w(space,offset,data,mem_mask);
-}
-
 /* Mirror RAM is necessary or startup, to clear Work RAM after the test */
 
 void seta_state::msgundam_map(address_map &map)
@@ -2735,7 +2757,9 @@ void seta_state::msgundam_map(address_map &map)
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 	map(0x400000, 0x400001).w(this, FUNC(seta_state::ipl1_ack_w));               // Lev 2 IRQ Ack
 	map(0x400004, 0x400005).w(this, FUNC(seta_state::ipl2_ack_w));               // Lev 4 IRQ Ack
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::msgundam_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500002, 0x500003).nopw();                                               // ?
+	map(0x500005, 0x500005).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
 	map(0x800000, 0x8005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -2766,7 +2790,9 @@ void seta_state::oisipuzl_map(address_map &map)
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 	map(0x400000, 0x400001).nopw();                        // ? IRQ Ack
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();                        // ? IRQ Ack
 	map(0x700000, 0x703fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0x800000, 0x803fff).ram().w(this, FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
 	map(0x880000, 0x883fff).ram().w(this, FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
@@ -2796,8 +2822,11 @@ void seta_state::triplfun_map(address_map &map)
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 	map(0x400000, 0x400001).nopw();                        // ? IRQ Ack
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();                        // ? IRQ Ack
 	map(0x500007, 0x500007).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // tfun sound
+	map(0x700000, 0x703fff).noprw();
 	map(0x800000, 0x803fff).ram().w(this, FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
 	map(0x880000, 0x883fff).ram().w(this, FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
 	map(0x900000, 0x900005).ram().share("vctrl_0");     // VRAM 0&1 Ctrl
@@ -2882,7 +2911,7 @@ void seta_state::thunderl_map(address_map &map)
 	map(0x200000, 0x200001).rw(this, FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x300000, 0x300001).nopw();                        // ?
 	map(0x400000, 0x40ffff).w(this, FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
-	map(0x500000, 0x500001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
@@ -2907,7 +2936,7 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0x200000, 0x200001).rw(this, FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x300000, 0x300001).nopw();                        // ?
 //  map(0x400000, 0x40ffff).w(this, FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
-	map(0x500000, 0x500001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
@@ -2936,7 +2965,7 @@ void seta_state::wiggie_map(address_map &map)
 	map(0x200000, 0x200001).rw(this, FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x300000, 0x300001).nopw();                        // ?
 	map(0x400000, 0x40ffff).w(this, FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
-	map(0x500000, 0x500001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
@@ -2977,7 +3006,7 @@ void seta_state::umanclub_map(address_map &map)
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 	map(0x400000, 0x400001).nopw();                        // ? (end of lev 2)
 	map(0x400004, 0x400005).nopw();                        // ? (end of lev 2)
-	map(0x500000, 0x500001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
@@ -3006,7 +3035,8 @@ void seta_state::utoukond_map(address_map &map)
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
-	map(0x500000, 0x500005).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // ? Coin Lockout + Video Registers
+	map(0x500001, 0x500001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x500003, 0x500003).w(this, FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x600000, 0x600003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
 	map(0x800000, 0x803fff).ram().w(this, FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
@@ -3047,7 +3077,7 @@ void seta_state::pairlove_map(address_map &map)
 	map(0x100000, 0x100001).nopw();                        // ? 1 (start of interrupts, main loop: watchdog?)
 	map(0x200000, 0x200001).nopw();                        // ? 0/1 (IRQ acknowledge?)
 	map(0x300000, 0x300003).r(this, FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0x400000, 0x400001).ram().w(this, FUNC(seta_state::seta_vregs_w)).share("vregs");   // Coin Lockout + Sound Enable (bit 4?)
+	map(0x400001, 0x400001).w(this, FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout + Sound Enable (bit 4?)
 	map(0x500000, 0x500001).portr("P1");                 // P1
 	map(0x500002, 0x500003).portr("P2");                 // P2
 	map(0x500004, 0x500005).portr("COINS");              // Coins
@@ -3148,9 +3178,9 @@ WRITE16_MEMBER(jockeyc_state::jockeyc_mux_w)
 	// 0x0002 hopper 2 motor / switch hopper output to p1 (single hopper mode)
 	// 0x0001 hopper 1 motor
 
-	output().set_value("cancel1", (data & 0x8000) ? 1 : 0);
-	output().set_value("payout2", (data & 0x4000) ? 1 : 0);
-	output().set_value("payout1", (data & 0x2000) ? 1 : 0);
+	m_out_cancel[0] = BIT(data, 15);
+	m_out_payout[1] = BIT(data, 14);
+	m_out_payout[0] = BIT(data, 13);
 
 	update_hoppers();
 	show_outputs();
@@ -3177,9 +3207,9 @@ WRITE16_MEMBER(jockeyc_state::jockeyc_out_w)
 	// 0x0002
 	// 0x0001
 
-	output().set_value("start2",  (data & 0x8000) ? 1 : 0);
-	output().set_value("start1",  (data & 0x4000) ? 1 : 0);
-	output().set_value("cancel2", (data & 0x0020) ? 1 : 0);
+	m_out_start[1] = BIT(data, 15);
+	m_out_start[0] = BIT(data, 14);
+	m_out_cancel[1] = BIT(data, 5);
 
 	machine().bookkeeping().coin_counter_w(6, data  & 0x2000); // coin 2/4
 	machine().bookkeeping().coin_counter_w(5, data  & 0x1000); // p1 hopper coin out
@@ -3298,8 +3328,8 @@ WRITE16_MEMBER(jockeyc_state::inttoote_mux_w)
 	// 0x1000 lamp (help button)
 	// 0x0800 lamp (start button)
 
-	output().set_value("help",  (data & 0x1000) ? 1 : 0);
-	output().set_value("start", (data & 0x0800) ? 1 : 0);
+	m_out_help = BIT(data, 12);
+	m_out_itstart = BIT(data, 11);
 
 	update_hoppers();
 	show_outputs();
@@ -3381,8 +3411,8 @@ WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
 {
-	sub_bankswitch_w(space,offset,data);
-	seta_coin_lockout_w(data);
+	m_subbank->set_entry(data >> 4);
+	seta_coin_lockout_w(space, 0, data);
 }
 
 
@@ -7790,7 +7820,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
 	int scanline = param;
 
 	if(scanline == 240)
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if(scanline == 112)
 		m_subcpu->set_input_line(0, HOLD_LINE);
@@ -7806,7 +7836,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 	int scanline = param;
 
 	if(scanline == 240)
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if((scanline % 16) == 0)
 		m_subcpu->set_input_line(0, HOLD_LINE);
@@ -7872,7 +7902,7 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq3_line_assert)
 
 	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(twineagl_sub_map)
@@ -7918,7 +7948,7 @@ MACHINE_CONFIG_START(seta_state::downtown)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("m_scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_assert)
 
 	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(downtown_sub_map)
@@ -8110,7 +8140,7 @@ MACHINE_CONFIG_START(seta_state::metafox)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq3_line_assert)
 
 	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(metafox_sub_map)
@@ -8520,6 +8550,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
+	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8717,12 +8748,16 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
+MACHINE_START_MEMBER(seta_state,zombraid){ m_gun_recoil.resolve(); }
+
 MACHINE_CONFIG_START(seta_state::zombraid)
 	gundhara(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zombraid_map)
+
+	MCFG_MACHINE_START_OVERRIDE(seta_state, zombraid)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -9034,6 +9069,8 @@ MACHINE_CONFIG_END
                                 Magical Speed
 ***************************************************************************/
 
+MACHINE_START_MEMBER(seta_state,magspeed){ m_leds.resolve(); }
+
 /*  magspeed: lev 2 by vblank, lev 4 by timer */
 MACHINE_CONFIG_START(seta_state::magspeed)
 
@@ -9043,6 +9080,8 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
@@ -9754,6 +9793,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
+MACHINE_START_MEMBER(jockeyc_state, jockeyc)
+{
+	m_out_cancel.resolve();
+	m_out_payout.resolve();
+	m_out_start.resolve();
+}
+
+
 MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	/* basic machine hardware */
@@ -9769,6 +9816,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
+	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
@@ -9808,12 +9856,19 @@ MACHINE_CONFIG_END
                              International Toote
 ***************************************************************************/
 
+MACHINE_START_MEMBER(jockeyc_state, inttoote)
+{
+	m_out_help.resolve();
+	m_out_itstart.resolve();
+}
+
 MACHINE_CONFIG_START(jockeyc_state::inttoote)
 	jockeyc(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
 	MCFG_DEVICE_PROGRAM_MAP(inttoote_map)
 
+	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, inttoote)
 	// I/O board (not hooked up yet)
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
@@ -11995,7 +12050,6 @@ void seta_state::init_crazyfgt()
 	RAM[0x1078/2] = 0x4e71;
 
 	// fixed priorities?
-	m_vregs.allocate(3);
 
 	init_blandia();
 }

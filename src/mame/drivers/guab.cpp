@@ -542,7 +542,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
 
 	// floppy
-	MCFG_WD1773_ADD("fdc", 8000000)
+	MCFG_DEVICE_ADD("fdc", WD1773, 8000000)
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", 6))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
