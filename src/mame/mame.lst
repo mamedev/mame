@@ -12231,6 +12231,9 @@ ec_unk5__b                      //
 ec_unk5__c                      //
 ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 
+@source:efdt.cpp
+efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
+
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
 

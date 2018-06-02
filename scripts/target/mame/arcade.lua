@@ -4554,6 +4554,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/ecoinf1.cpp",
 	MAME_DIR .. "src/mame/drivers/ecoinf2.cpp",
 	MAME_DIR .. "src/mame/drivers/ecoinf3.cpp",
+	MAME_DIR .. "src/mame/includes/efdt.h",
+	MAME_DIR .. "src/mame/drivers/efdt.cpp",
 	MAME_DIR .. "src/mame/drivers/electra.cpp",
 	MAME_DIR .. "src/mame/drivers/epos.cpp",
 	MAME_DIR .. "src/mame/includes/epos.h",
