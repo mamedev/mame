@@ -619,7 +619,7 @@ void argus_state::bg_setting()
 	{
 		if (m_bg_tilemap[0] != nullptr)
 		{
-			if (m_vrom[0] != nullptr) && (m_vrom[1] != nullptr)
+			if ((m_vrom[0] != nullptr) && (m_vrom[1] != nullptr))
 			{
 				if (m_vrom_offset != m_bg_scrollx[0][1])
 				{
@@ -642,7 +642,7 @@ void argus_state::bg_setting()
 	{
 		if (m_bg_tilemap[0] != nullptr)
 		{
-			if (m_vrom[0] != nullptr) && (m_vrom[1] != nullptr)
+			if ((m_vrom[0] != nullptr) && (m_vrom[1] != nullptr))
 			{
 				if (m_vrom_offset != ((m_bg_scrollx[0][1] + 1) & 0xff))
 				{
