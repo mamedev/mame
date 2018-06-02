@@ -140,25 +140,17 @@ WRITE8_MEMBER(sf_state::soundcmd_w)
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
-	membank("bank1")->set_entry(data);
+	m_audiobank->set_entry(data);
 }
 
-WRITE8_MEMBER(sf_state::msm1_5205_w)
+template<int Chip>
+WRITE8_MEMBER(sf_state::msm_w)
 {
-	m_msm1->reset_w(BIT(data, 7));
+	m_msm[Chip]->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->data_w(data);
-	m_msm1->vclk_w(1);
-	m_msm1->vclk_w(0);
-}
-
-WRITE8_MEMBER(sf_state::msm2_5205_w)
-{
-	m_msm2->reset_w(BIT(data, 7));
-	/* ?? bit 6?? */
-	m_msm2->data_w(data);
-	m_msm2->vclk_w(1);
-	m_msm2->vclk_w(0);
+	m_msm[Chip]->data_w(data);
+	m_msm[Chip]->vclk_w(1);
+	m_msm[Chip]->vclk_w(0);
 }
 
 void sf_state::sfan_map(address_map &map)
@@ -245,15 +237,15 @@ void sf_state::sound_map(address_map &map)
 void sf_state::sound2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr("audiobank");
 	map(0x0000, 0xffff).nopw(); /* avoid cluttering up error.log */
 }
 
 void sf_state::sound2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sf_state::msm1_5205_w));
-	map(0x01, 0x01).w(this, FUNC(sf_state::msm2_5205_w));
+	map(0x00, 0x00).w(this, FUNC(sf_state::msm_w<0>));
+	map(0x01, 0x01).w(this, FUNC(sf_state::msm_w<1>));
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x02).w(this, FUNC(sf_state::sound2_bank_w));
 }
@@ -497,8 +489,8 @@ static const gfx_layout char_layout =
 	RGN_FRAC(1,1),
 	2,
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(4*2*2,1) },
 	16*8
 };
 
@@ -508,10 +500,8 @@ static const gfx_layout sprite_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2) },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-			16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+8+0, 16*16+8+1, 16*16+8+2, 16*16+8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*16,1), STEP4(4*2*2*16+4,1) },
+	{ STEP16(4*2*2,1) },
 	64*8
 };
 
@@ -530,7 +520,7 @@ void sf_state::machine_start()
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_fgscroll));
 
-	membank("bank1")->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
+	m_audiobank->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
 }
 
 void sf_state::machine_reset()
