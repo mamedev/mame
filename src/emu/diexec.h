@@ -86,7 +86,7 @@ enum
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
 	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(), finder_base::DUMMY_TAG);
+	dynamic_cast<device_execute_interface &>(*device).set_vblank_int(device_interrupt_delegate(), nullptr);
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
 	dynamic_cast<device_execute_interface &>(*device).set_periodic_int(device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
@@ -140,10 +140,10 @@ public:
 
 	// inline configuration helpers
 	void set_disable() { m_disabled = true; }
-	template <typename Object, typename T> void set_vblank_int(Object &&cb, T &&tag, int rate = 0)
+    template <typename Object> void set_vblank_int(Object &&cb, const char *tag, int rate = 0)
 	{
 		m_vblank_interrupt = std::forward<Object>(cb);
-		m_vblank_interrupt_screen.set_tag(std::forward<T>(tag));
+        m_vblank_interrupt_screen = tag;
 	}
 	template <typename Object> void set_periodic_int(Object &&cb, const attotime &rate)
 	{
@@ -290,7 +290,7 @@ private:
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
-	optional_device<screen_device> m_vblank_interrupt_screen; // the screen that causes the VBLANK interrupt
+    const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
 
