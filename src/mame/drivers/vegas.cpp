@@ -355,6 +355,7 @@ public:
 	uint8_t m_sio_reset_ctrl;
 	uint8_t m_sio_irq_enable;
 	uint8_t m_sio_irq_state;
+	uint8_t m_duart_irq_state;
 	uint8_t m_sio_led_state;
 	uint8_t m_pending_analog_read;
 	uint8_t m_cmos_unlocked;
@@ -464,6 +465,7 @@ void vegas_state::machine_start()
 	save_item(NAME(m_sio_reset_ctrl));
 	save_item(NAME(m_sio_irq_enable));
 	save_item(NAME(m_sio_irq_state));
+	save_item(NAME(m_duart_irq_state));
 	save_item(NAME(m_sio_led_state));
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_cmos_unlocked));
@@ -500,6 +502,7 @@ void vegas_state::machine_reset()
 	memset(m_cpuio_data, 0, ARRAY_LENGTH(m_cpuio_data));
 	// Clear SIO registers
 	reset_sio();
+	m_duart_irq_state = 0;
 	m_i40_data = 0;
 	m_keypad_select = 0;
 	m_gear = 1;
@@ -604,7 +607,8 @@ std::string vegas_state::sioIRQString(uint8_t data)
 
 void vegas_state::update_sio_irqs()
 {
-	if (m_sio_irq_state & m_sio_irq_enable) {
+	// Duart shares IRQ with SIO
+	if ((m_sio_irq_state & m_sio_irq_enable) || m_duart_irq_state) {
 		m_nile->pci_intr_c(ASSERT_LINE);
 	}
 	else {
@@ -619,10 +623,11 @@ void vegas_state::update_sio_irqs()
 
 WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
 {
-	if (state)
-		m_nile->pci_intr_c(ASSERT_LINE);
-	else
-		m_nile->pci_intr_c(CLEAR_LINE);
+	// Duart shares IRQ with SIO
+	if (state ^ m_duart_irq_state) {
+		m_duart_irq_state = state;
+		update_sio_irqs();
+	}
 }
 
 WRITE_LINE_MEMBER(vegas_state::vblank_assert)
@@ -1822,13 +1827,13 @@ MACHINE_CONFIG_START(vegas_state::denver)
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD(m_uart1, NS16550, vegas_state::SYSTEM_CLOCK / 12)
+	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys01", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys01", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys01", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vegas_state, duart_irq_cb))
 
-	MCFG_DEVICE_ADD(m_uart2, NS16550, vegas_state::SYSTEM_CLOCK / 12)
+	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys02", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys02", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys02", rs232_port_device, write_rts))
@@ -1969,7 +1974,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
@@ -1984,7 +1989,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049se)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
@@ -1999,7 +2004,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049te)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 

@@ -846,7 +846,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_dcs, DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD(m_dcs, DCS2_AUDIO_DENVER_2CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0xe33)
 
@@ -863,13 +863,13 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	}
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(24'000'000))
+	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("com1", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("com1", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("com1", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, atlantis_state, duart_irq_callback))
 
-	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(24'000'000))
+	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("com2", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("com2", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("com2", rs232_port_device, write_rts))

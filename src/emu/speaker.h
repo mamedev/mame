@@ -45,6 +45,9 @@ public:
 	speaker_device &front_center() { set_position(0.0, 0.0, 1.0); return *this; }
 	speaker_device &front_left() { set_position(-0.2, 0.0, 1.0); return *this; }
 	speaker_device &front_right() { set_position(0.2, 0.0, 1.0); return *this; }
+	speaker_device &rear_left() { set_position(-0.2, 0.0, -0.5); return *this; }
+	speaker_device &rear_right() { set_position(0.2, 0.0, -0.5); return *this; }
+	speaker_device &subwoofer() { set_position(0.0, 0.0, 0.0); return *this; }
 
 	// internally for use by the sound system
 	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);

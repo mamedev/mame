@@ -382,20 +382,40 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device)
 
-// dcs2_audio_denver_device
-
+// dcs2_audio_denver_device types
 class dcs2_audio_denver_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+};
 
+class dcs2_audio_denver_5ch_device : public dcs2_audio_denver_device
+{
+public:
+	// construction/destruction
+	dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class dcs2_audio_denver_2ch_device : public dcs2_audio_denver_device
+{
+public:
+	// construction/destruction
+	dcs2_audio_denver_2ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER, dcs2_audio_denver_device)
+DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device)
+
+DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_2CH, dcs2_audio_denver_2ch_device)
 
 #endif // MAME_AUDIO_DCS_H
