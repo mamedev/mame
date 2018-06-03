@@ -1299,6 +1299,7 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 
 void lynx_state::lynx_draw_line()
 {
+	const pen_t *pen = m_palette->pens();
 	int x, y;
 	uint16_t j; // clipping needed!
 	uint8_t byte;
@@ -1317,8 +1318,8 @@ void lynx_state::lynx_draw_line()
 		for (x = 160 - 2; x >= 0; j++, x -= 2)
 		{
 			byte = lynx_read_ram(j);
-			line[x + 1] = m_palette->pen((byte >> 4) & 0x0f);
-			line[x + 0] = m_palette->pen((byte >> 0) & 0x0f);
+			line[x + 1] = pen[(byte >> 4) & 0x0f];
+			line[x + 0] = pen[(byte >> 0) & 0x0f];
 		}
 	}
 	else
@@ -1327,8 +1328,8 @@ void lynx_state::lynx_draw_line()
 		for (x = 0; x < 160; j++, x += 2)
 		{
 			byte = lynx_read_ram(j);
-			line[x + 0] = m_palette->pen((byte >> 4) & 0x0f);
-			line[x + 1] = m_palette->pen((byte >> 0) & 0x0f);
+			line[x + 0] = pen[(byte >> 4) & 0x0f];
+			line[x + 1] = pen[(byte >> 0) & 0x0f];
 		}
 	}
 }
