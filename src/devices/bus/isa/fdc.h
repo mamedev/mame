@@ -88,13 +88,13 @@ class isa8_ec1841_0003_device : public isa8_fdc_device {
 public:
 	isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( aux_irq_w );
-
 protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	required_device<bus_mouse_device> bus_mouse;
+	DECLARE_WRITE_LINE_MEMBER( aux_irq_w );
+
+	required_device<bus_mouse_device> m_bus_mouse;
 };
 
 // device type definition

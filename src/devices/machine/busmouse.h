@@ -34,13 +34,6 @@ public:
 
 	template <class Object> static devcb_base &set_extint_wr_callback(device_t &device, Object &&cb) { return downcast<bus_mouse_device &>(device).m_write_extint.set_callback(std::forward<Object>(cb)); }
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_READ8_MEMBER(ppi_a_r);
-	DECLARE_READ8_MEMBER(ppi_c_r);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
-
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_x_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y_changed);
 
@@ -52,6 +45,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+
+	DECLARE_READ8_MEMBER(ppi_a_r);
+	DECLARE_READ8_MEMBER(ppi_c_r);
+	DECLARE_WRITE8_MEMBER(ppi_c_w);
 
 private:
 	emu_timer *m_irq_timer;

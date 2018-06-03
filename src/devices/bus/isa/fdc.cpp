@@ -142,14 +142,14 @@ MACHINE_CONFIG_END
 
 isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: isa8_fdc_device(mconfig, ISA8_EC1841_0003, tag, owner, clock)
-	, bus_mouse(*this, "bus_mouse")
+	, m_bus_mouse(*this, "bus_mouse")
 {
 }
 
 void isa8_ec1841_0003_device::device_start()
 {
 	isa8_fdc_device::device_start();
-	m_isa->install_device(0x023c, 0x023f, *bus_mouse, &bus_mouse_device::map);
+	m_isa->install_device(0x023c, 0x023f, *m_bus_mouse, &bus_mouse_device::map);
 }
 
 WRITE_LINE_MEMBER( isa8_ec1841_0003_device::aux_irq_w )
