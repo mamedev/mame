@@ -458,7 +458,7 @@ const tiny_rom_entry *pc_kbd_keytronic_pc3270_device::device_rom_region() const
 
 WRITE_LINE_MEMBER( pc_kbd_keytronic_pc3270_device::clock_write )
 {
-	m_cpu->set_input_line(MCS51_INT0_LINE, state );
+	m_cpu->set_input_line(MCS51_INT0_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -619,10 +619,7 @@ READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
 {
 	uint8_t data = m_p3;
 
-	data &= ~0x14;
-
-	/* -INT0 signal */
-	data |= (clock_signal() ? 0x04 : 0x00);
+	data &= ~0x10;
 
 	/* T0 signal */
 	data |= (data_signal() ? 0x00 : 0x10);
