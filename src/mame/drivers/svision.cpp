@@ -422,13 +422,10 @@ uint32_t svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE_LINE_MEMBER(svision_state::frame_int_w)
+INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 {
-	if (!state)
-		return;
-
 	if (BIT(m_reg[BANK], 0))
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_sound->sound_decrement();
 }
@@ -522,6 +519,7 @@ MACHINE_CONFIG_START(svision_state::svision)
 
 	MCFG_DEVICE_ADD(m_maincpu, M65C02, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(svision_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER(m_screen, svision_state,  svision_frame_int)
 
 	MCFG_SCREEN_ADD(m_screen, LCD)
 	MCFG_SCREEN_REFRESH_RATE(61)
@@ -529,7 +527,6 @@ MACHINE_CONFIG_START(svision_state::svision)
 	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
 	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
 	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, svision_state, frame_int_w))
 
 	MCFG_PALETTE_ADD(m_palette, ARRAY_LENGTH(svision_palette) * 3)
 	MCFG_PALETTE_INIT_OWNER(svision_state, svision )
