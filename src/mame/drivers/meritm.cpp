@@ -1075,7 +1075,7 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
 MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 {
 	m_ram = std::make_unique<uint8_t[]>( 0x8000 );
-	machine().device<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
+	subdevice<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
 	memset(m_ram.get(), 0x00, 0x8000);
 	m_bank1->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);
 	m_bank2->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);

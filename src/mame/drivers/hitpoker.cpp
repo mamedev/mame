@@ -496,7 +496,7 @@ void hitpoker_state::init_hitpoker()
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	// init nvram
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));
 
 	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;

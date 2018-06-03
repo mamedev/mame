@@ -425,7 +425,7 @@ ROM_END
 void pcat_nit_state::init_pcat_nit()
 {
 	m_banked_nvram = std::make_unique<uint8_t[]>(0x2000);
-	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
 }
 
 GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

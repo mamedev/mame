@@ -53,7 +53,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
-	isa8_aga_device *m_aga;
 
 	DECLARE_WRITE8_MEMBER( europc_pio_w );
 	DECLARE_READ8_MEMBER( europc_pio_r );
@@ -385,9 +384,7 @@ void europc_pc_state::init_europc()
 	m_rtc_timer->adjust(attotime::zero, 0, attotime(1,0));
 	//  europc_rtc_set_time();
 
-	machine().device<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
-	m_aga = machine().device<isa8_aga_device>("aga:aga");
-
+	subdevice<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
 }
 
 WRITE8_MEMBER( europc_pc_state::europc_pio_w )

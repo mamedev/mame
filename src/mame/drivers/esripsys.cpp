@@ -628,7 +628,7 @@ void esripsys_state::init_esripsys()
 	m_fdt_b = std::make_unique<uint8_t[]>(FDT_RAM_SIZE);
 	m_cmos_ram = std::make_unique<uint8_t[]>(CMOS_RAM_SIZE);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
+	subdevice<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);

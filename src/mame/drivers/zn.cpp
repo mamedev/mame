@@ -1183,7 +1183,7 @@ void zn_state::coh1000tb_map(address_map &map)
 void zn_state::init_coh1000tb()
 {
 	m_fx1b_fram = std::make_unique<uint8_t[]>(0x200);
-	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
+	subdevice<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
 
 	save_pointer(NAME(m_fx1b_fram.get()), 0x200);
 }
@@ -2147,7 +2147,7 @@ void zn_state::nbajamex_bank_map(address_map &map)
 void zn_state::init_nbajamex()
 {
 	m_nbajamex_sram = std::make_unique<uint8_t[]>(0x8000);
-	machine().device<nvram_device>("71256")->set_base(m_nbajamex_sram.get(), 0x8000);
+	subdevice<nvram_device>("71256")->set_base(m_nbajamex_sram.get(), 0x8000);
 
 	save_pointer(NAME(m_nbajamex_sram.get()), 0x8000);
 

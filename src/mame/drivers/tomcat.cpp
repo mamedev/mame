@@ -300,7 +300,7 @@ void tomcat_state::machine_start()
 	((uint16_t*)m_shared_ram)[0x0002] = 0xf600;
 	((uint16_t*)m_shared_ram)[0x0003] = 0x0000;
 
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, 0x800);
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, 0x800);
 
 	save_item(NAME(m_nvram));
 	save_item(NAME(m_dsp_BIO));

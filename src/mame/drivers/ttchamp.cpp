@@ -157,7 +157,7 @@ void ttchamp_state::machine_start()
 	m_picmodex = picmode::IDLE;
 
 	m_bakram = std::make_unique<uint8_t[]>(0x100);
-	machine().device<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
+	subdevice<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
 
 	save_item(NAME(m_paloff));
 	save_item(NAME(m_port10));

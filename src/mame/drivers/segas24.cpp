@@ -1184,7 +1184,7 @@ void segas24_state::decrypted_opcodes_map(address_map &map)
 void segas24_state::machine_start()
 {
 	if (track_size)
-		machine().device<nvram_device>("floppy_nvram")->set_base(memregion("floppy")->base(), 2*track_size);
+		subdevice<nvram_device>("floppy_nvram")->set_base(memregion("floppy")->base(), 2*track_size);
 
 	if (m_romboard != nullptr)
 	{

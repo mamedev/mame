@@ -372,7 +372,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		//  printf("blah %02x\n", byteValue);
 			if (byteValue == 0x00)
 			{
-				machine().device("ymsnd")->reset();
+				m_ym->reset();
 				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			else m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -847,7 +847,7 @@ void ngcd_state::machine_start()
 	// initialize the memcard data structure
 	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
 	m_meminternal_data = make_unique_clear<uint8_t[]>(0x2000);
-	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
+	subdevice<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
 	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
 	m_tempcdc->reset_cd();

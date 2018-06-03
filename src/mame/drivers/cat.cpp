@@ -931,7 +931,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	m_video_enable = 1;
 	m_video_invert = 0;
 	m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS);
-	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
+	subdevice<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
 MACHINE_RESET_MEMBER(cat_state,cat)

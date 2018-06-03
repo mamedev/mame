@@ -368,7 +368,7 @@ void upscope_state::init_upscope()
 	m_denise_id = DENISE;
 
 	// allocate nvram
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
 

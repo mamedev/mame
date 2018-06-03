@@ -417,7 +417,7 @@ void s7_state::machine_start()
 	m_digits.resolve();
 	m_memprotect = 0;
 	save_item(NAME(m_nvram));
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
 MACHINE_RESET_MEMBER( s7_state, s7 )
