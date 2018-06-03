@@ -56,17 +56,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_fdc(*this, "upd765"),
+		m_floppy(*this, "upd765:%u", 0U),
 		m_ram(*this, RAM_TAG),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
-	uint8_t m_rom_page;
-	uint32_t m_vdisk_addr;
-	uint8_t m_key_code;
-	uint8_t m_keyboard_clk;
-	uint8_t m_video_mode;
-	uint8_t m_tick50_mark;
-	uint8_t m_floppy_ctrl;
+	void pyl601(machine_config &config);
+	void pyl601a(machine_config &config);
+	void init_pyl601();
+
+private:
 	DECLARE_READ8_MEMBER(rom_page_r);
 	DECLARE_WRITE8_MEMBER(rom_page_w);
 	DECLARE_WRITE8_MEMBER(vdisk_page_w);
@@ -86,19 +85,27 @@ public:
 	MC6845_UPDATE_ROW(pyl601_update_row);
 	MC6845_UPDATE_ROW(pyl601a_update_row);
 	uint8_t selectedline(uint16_t data);
-	required_device<speaker_sound_device> m_speaker;
-	required_device<upd765a_device> m_fdc;
-	required_device<ram_device> m_ram;
-	void init_pyl601();
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void pyl601_mem(address_map &map);
+
+	uint8_t m_rom_page;
+	uint32_t m_vdisk_addr;
+	uint8_t m_key_code;
+	uint8_t m_keyboard_clk;
+	uint8_t m_video_mode;
+	uint8_t m_tick50_mark;
+	uint8_t m_floppy_ctrl;
+
+	required_device<speaker_sound_device> m_speaker;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void pyl601(machine_config &config);
-	void pyl601a(machine_config &config);
-	void pyl601_mem(address_map &map);
 };
 
 
@@ -240,7 +247,7 @@ WRITE8_MEMBER(pyl601_state::floppy_w)
 		//reset
 		m_fdc->reset();
 
-	floppy_image_device *floppy = machine().device<floppy_connector>(BIT(data,2) ? "upd765:1" : "upd765:0")->get_device();
+	floppy_image_device *floppy = m_floppy[BIT(data, 2)]->get_device();
 	if(floppy)
 		floppy->mon_w(!BIT(data, 3));
 
