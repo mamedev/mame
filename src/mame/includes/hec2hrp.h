@@ -113,15 +113,15 @@ public:
 	uint8_t m_hector_disc2_data_w_ready;
 	uint8_t m_hector_disc2_data_read;
 	uint8_t m_hector_disc2_data_write;
-	uint8_t m_hector_disc2_RNMI;
+	uint8_t m_hector_disc2_rnmi;
 	uint8_t m_state3000;
 	uint8_t m_write_cassette;
-	emu_timer *m_Cassette_timer;
-	uint8_t m_CK_signal ;
+	emu_timer *m_cassette_timer;
+	uint8_t m_ck_signal;
 	uint8_t m_flag_clk;
-	double m_Pin_Value[29][2];
-	int m_AU[17];
-	int m_ValMixer;
+	double m_pin_value[29][2];
+	int m_au[17];
+	int m_val_mixer;
 	int m_oldstate3000;
 	int m_oldstate1000;
 	uint8_t m_pot0;
@@ -134,10 +134,10 @@ public:
 	uint8_t m_hector_port_cmd;
 	uint8_t m_cassette_bit;
 	uint8_t m_cassette_bit_mem;
-	uint8_t m_Data_K7;
+	uint8_t m_data_k7;
 	int m_counter_write;
-	int m_IRQ_current_state;
-	int m_NMI_current_state;
+	int m_irq_current_state;
+	int m_nmi_current_state;
 	int m_hector_cmd[10];
 	int m_hector_nb_cde;
 	int m_hector_flag_result;
@@ -167,22 +167,22 @@ public:
 	DECLARE_MACHINE_START(hec2mdhrx);
 	DECLARE_MACHINE_RESET(hec2mdhrx);
 	uint32_t screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(Callback_CK);
+	TIMER_CALLBACK_MEMBER(cassette_clock);
 
 	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_dma_irq );
-	int isHectorWithDisc2();
-	int isHectorWithMiniDisc();
-	int isHectorHR();
-	int isHectoreXtend();
-	void Mise_A_Jour_Etat(int Adresse, int Value );
-	void Init_Value_SN76477_Hector();
-	void Update_Sound(address_space &space, uint8_t data);
-	void hector_reset(int hr, int with_D2 );
+	int has_disc2();
+	int has_minidisc();
+	int is_hr();
+	int is_extended();
+	void update_state(int Adresse, int Value );
+	void init_sn76477();
+	void update_sound(address_space &space, uint8_t data);
+	void hector_reset(int hr, int with_d2);
 	void hector_init();
-	void Init_Hector_Palette();
-	void hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram) ;
-	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram) ;
+	void init_palette();
+	void hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
+	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	/*----------- defined in machine/hecdisk2.c -----------*/
 
 	// disc2 handling

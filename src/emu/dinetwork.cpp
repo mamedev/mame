@@ -40,6 +40,8 @@ void device_network_interface::set_mac(const char *mac)
 
 void device_network_interface::set_interface(int id)
 {
+	if(m_dev)
+		m_dev->stop();
 	m_dev.reset(open_netdev(id, this, (int)(m_bandwidth*1000000/8.0f/1500)));
 	if(!m_dev) {
 		device().logerror("Network interface %d not found\n", id);

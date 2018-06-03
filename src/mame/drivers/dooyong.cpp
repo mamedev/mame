@@ -777,7 +777,7 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc007).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc008, 0xc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc010, 0xc010).portr("SYSTEM");
@@ -797,7 +797,7 @@ void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 void dooyong_z80_ym2203_state::pollux_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
 	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
@@ -816,7 +816,7 @@ void dooyong_z80_ym2203_state::pollux_map(address_map &map)
 void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
 	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
@@ -836,7 +836,7 @@ void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 void dooyong_z80_state::bluehawk_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc000).portr("DSWA");
 	map(0xc000, 0xc000).w(this, FUNC(dooyong_z80_state::flip_screen_w));
 	map(0xc001, 0xc001).portr("DSWB");
@@ -857,7 +857,7 @@ void dooyong_z80_state::bluehawk_map(address_map &map)
 void dooyong_z80_state::flytiger_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram().share("spriteram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("P1");
@@ -877,7 +877,7 @@ void dooyong_z80_state::flytiger_map(address_map &map)
 void dooyong_z80_state::primella_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram(); /* what is this? looks like a palette? scratchpad RAM maybe? */
 	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
@@ -1487,7 +1487,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1495,7 +1495,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_lastday)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
@@ -1540,7 +1540,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1548,7 +1548,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_gulfstrm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
@@ -1578,7 +1578,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1586,7 +1586,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_pollux)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
@@ -1616,7 +1616,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1624,7 +1624,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_bluehawk)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bluehawk)
@@ -1656,7 +1656,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1664,7 +1664,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_flytiger)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flytiger)
@@ -1742,7 +1742,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1750,7 +1750,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rshark_state, screen_update_rshark)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
@@ -1794,7 +1794,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1802,7 +1802,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(popbingo_state, screen_update_popbingo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)

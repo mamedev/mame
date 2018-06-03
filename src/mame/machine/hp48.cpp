@@ -115,9 +115,6 @@ void hp48_state::rs232_start_recv_byte(uint8_t data)
 /* end of send event */
 TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_sent_cb)
 {
-	//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
-	//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
-
 	LOG_SERIAL(("%f hp48_state::rs232_byte_sent_cb: end of send, data=%02x\n", machine().time().as_double(), param));
 
 	m_io[0x12] &= ~3; /* clear byte sending and buffer full */
@@ -127,10 +124,6 @@ TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_sent_cb)
 	{
 		pulse_irq(SATURN_IRQ_LINE);
 	}
-
-	/* protocol action */
-	//if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
-	//else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
 }
 
 /* CPU initiates a send event */
@@ -445,17 +438,8 @@ READ8_MEMBER(hp48_state::io_r)
 	/* serial */
 	case 0x15:
 	{
-		/* second nibble of received data */
-
-		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
-		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
-
 		m_io[0x11] &= ~1;  /* clear byte received */
 		data = m_io[offset];
-
-		/* protocol action */
-		//if ( xmodem && xmodem->exists() ) xmodem_byte_transmitted( &xmodem->device() );
-		//else if ( kermit && kermit->exists() ) kermit_byte_transmitted( &kermit->device() );
 		break;
 	}
 

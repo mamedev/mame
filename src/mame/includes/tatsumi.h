@@ -57,7 +57,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	INTERRUPT_GEN_MEMBER(v30_interrupt);
 	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
-	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
 	DECLARE_WRITE8_MEMBER(hd6445_crt_w);
 
 	void tatsumi_reset();
@@ -69,6 +68,7 @@ public:
 	
 protected:
 	uint8_t m_hd6445_reg[64];
+	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
 private:
 	uint8_t m_hd6445_address;
 };
@@ -164,7 +164,7 @@ protected:
 //	virtual void machine_reset() override;
 
 private:
-	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
+	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
 	
 	required_shared_ptr<uint16_t> m_vregs;
@@ -201,6 +201,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
 	DECLARE_WRITE16_MEMBER(output_w);
+	DECLARE_READ8_MEMBER(oki_status_xor_r);
+
 	template<int Bank> DECLARE_READ16_MEMBER(cyclwarr_videoram_r);
 	template<int Bank> DECLARE_WRITE16_MEMBER(cyclwarr_videoram_w);
 
@@ -210,7 +212,6 @@ public:
 	DECLARE_VIDEO_START(cyclwarr);
 	DECLARE_VIDEO_START(bigfight);
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
@@ -238,8 +239,11 @@ private:
 	uint16_t m_bigfight_a40000[2];
 	uint16_t m_bigfight_bank;
 	uint16_t m_bigfight_last_bank;
-	uint16_t m_cyclwarr_color_bank;
-
+	uint16_t m_road_color_bank, m_prev_road_bank;
+	bool m_layer1_can_be_road;
+	
 	void tile_expand();
-	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, int xscroll_offset, int yscroll_offset, bool rowscroll_enable, bool is_road);
+	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, int hi_priority);
+	void draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority);
 };
+

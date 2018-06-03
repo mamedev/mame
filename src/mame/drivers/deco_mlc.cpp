@@ -87,13 +87,12 @@
         - DE156 clock: 7.000MHz (42MHz / 6, QFP100, clock measured on pin 90)
 
         Stadium Hero contains a '146' protection chip on the ROM/CPU pcb, but
-        it is barely used by the game (only checked at startup).  See decoprot.c
+        it is barely used by the game (only checked at startup). See deco146.cpp.
 
     Driver TODO:
         stadhr96 - protection? issues (or 156 co-processor? or timing?)
         avengrgs - doesn't generate enough line interrupts?
         ddream95 seems to have a dual screen mode(??)
-        hoops** - crash entering test mode (regression from 0.113 era?)
         skullfng - slowdowns not verified from real PCB, Random hangs sometimes
 
     Graphic TODO:
@@ -503,25 +502,23 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
+void deco_mlc_state::machine_reset()
 {
 	m_vbl_i = 0xffffffff;
-	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
 MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
+	MCFG_DEVICE_ADD(m_maincpu, SH2, 42000000/2) /* 21 MHz clock confirmed on real board */
 	MCFG_DEVICE_PROGRAM_MAP(avengrgs_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
+	MCFG_EEPROM_SERIAL_93C46_ADD(m_eeprom) /* Actually 93c45 */
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD(m_raster_irq_timer, deco_mlc_state, interrupt_gen)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
@@ -529,18 +526,16 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deco_mlc)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_deco_mlc)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
-
-	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_DEVICE_ADD(m_ymz, YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -548,16 +543,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(deco_mlc_state::mlc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
+	MCFG_DEVICE_ADD(m_maincpu, ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
 	MCFG_DEVICE_PROGRAM_MAP(decomlc_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
+	MCFG_EEPROM_SERIAL_93C46_ADD(m_eeprom) /* Actually 93c45 */
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD(m_raster_irq_timer, deco_mlc_state, interrupt_gen)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
@@ -565,21 +559,19 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deco_mlc)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_deco_mlc)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
 
-	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
-
-	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_ADD(m_deco146)
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_DEVICE_ADD(m_ymz, YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

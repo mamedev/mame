@@ -702,12 +702,6 @@ READ32_MEMBER(jaguar_state::joystick_r)
 {
 	uint16_t joystick_result = 0xfffe;
 	uint16_t joybuts_result = 0xffef;
-	int i;
-	static const char *const keynames[2][8] =
-	{
-		{ "JOY0", "JOY1", "JOY2", "JOY3", "JOY4", "JOY5", "JOY6", "JOY7" },
-		{ "BUTTONS0", "BUTTONS1", "BUTTONS2", "BUTTONS3", "BUTTONS4", "BUTTONS5", "BUTTONS6", "BUTTONS7" }
-	};
 
 	/*
 	 *   16        12        8         4         0
@@ -723,12 +717,12 @@ READ32_MEMBER(jaguar_state::joystick_r)
 	 *   to the buttons.
 	 */
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if ((m_joystick_data & (0x10000 << i)) == 0)
 		{
-			joystick_result &= ioport(keynames[0][i])->read();
-			joybuts_result &= ioport(keynames[1][i])->read();
+			joystick_result &= m_joy[i]->read();
+			joybuts_result &= m_buttons[i]->read();
 		}
 	}
 

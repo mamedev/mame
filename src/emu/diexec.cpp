@@ -46,7 +46,7 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	: device_interface(device, "execute")
 	, m_scheduler(nullptr)
 	, m_disabled(false)
-	, m_vblank_interrupt_screen(nullptr)
+	, m_vblank_interrupt_screen(*this, finder_base::DUMMY_TAG)
 	, m_timed_interrupt_period(attotime::zero)
 	, m_nextexec(nullptr)
 	, m_timedint_timer(nullptr)
@@ -345,13 +345,12 @@ void device_execute_interface::execute_set_input(int linenum, int state)
 void device_execute_interface::interface_validity_check(validity_checker &valid) const
 {
 	// validate the interrupts
-	if (!m_vblank_interrupt.isnull())
+	if (!m_vblank_interrupt_screen)
 	{
-		screen_device_iterator iter(device().mconfig().root_device());
-		if (iter.first() == nullptr)
-			osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
-		else if (m_vblank_interrupt_screen != nullptr && device().siblingdevice(m_vblank_interrupt_screen) == nullptr)
-			osd_printf_error("VBLANK interrupt references a non-existant screen tag '%s'\n", m_vblank_interrupt_screen);
+		if (m_vblank_interrupt_screen.finder_tag() != finder_base::DUMMY_TAG)
+			osd_printf_error("VBLANK interrupt references non-existent screen tag %s\n", m_vblank_interrupt_screen.finder_tag());
+		else if (!m_vblank_interrupt.isnull())
+			osd_printf_error("VBLANK interrupt specified, but no screen configured\n");
 	}
 
 	if (!m_timed_interrupt.isnull() && m_timed_interrupt_period == attotime::zero)
@@ -443,14 +442,8 @@ void device_execute_interface::interface_post_reset()
 		elem.reset();
 
 	// reconfingure VBLANK interrupts
-	if (m_vblank_interrupt_screen != nullptr)
-	{
-		// get the screen that will trigger the VBLANK
-		screen_device *screen = device().siblingdevice<screen_device>(m_vblank_interrupt_screen);
-
-		assert(screen != nullptr);
-		screen->register_vblank_callback(vblank_state_delegate(&device_execute_interface::on_vblank, this));
-	}
+	if (m_vblank_interrupt_screen)
+		m_vblank_interrupt_screen->register_vblank_callback(vblank_state_delegate(&device_execute_interface::on_vblank, this));
 
 	// reconfigure periodic interrupts
 	if (m_timed_interrupt_period != attotime::zero)

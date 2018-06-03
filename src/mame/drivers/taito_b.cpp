@@ -198,115 +198,6 @@ WRITE8_MEMBER(taitob_state::bankswitch_w)
 	membank("bank1")->set_entry(data & 3);
 }
 
-void taitob_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case RSAGA2_INTERRUPT2:
-		m_maincpu->set_input_line(2, HOLD_LINE);
-		break;
-	case CRIMEC_INTERRUPT3:
-		m_maincpu->set_input_line(3, HOLD_LINE);
-		break;
-	case HITICE_INTERRUPT6:
-		m_maincpu->set_input_line(6, HOLD_LINE);
-		break;
-	case RAMBO3_INTERRUPT1:
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		break;
-	case PBOBBLE_INTERRUPT5:
-		m_maincpu->set_input_line(5, HOLD_LINE);
-		break;
-	case VIOFIGHT_INTERRUPT1:
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		break;
-	case MASTERW_INTERRUPT4:
-		m_maincpu->set_input_line(4, HOLD_LINE);
-		break;
-	case SILENTD_INTERRUPT4:
-		m_maincpu->set_input_line(4, HOLD_LINE);
-		break;
-	case SELFEENA_INTERRUPT4:
-		m_maincpu->set_input_line(4, HOLD_LINE);
-		break;
-	case SBM_INTERRUPT5:
-		m_maincpu->set_input_line(5, HOLD_LINE);
-		break;
-	case REALPUNC_INTERRUPT3:
-		m_maincpu->set_input_line(3, HOLD_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in taitob_state::device_timer");
-	}
-}
-
-
-INTERRUPT_GEN_MEMBER(taitob_state::rastansaga2_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), RSAGA2_INTERRUPT2);
-	device.execute().set_input_line(4, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::crimec_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), CRIMEC_INTERRUPT3);
-	device.execute().set_input_line(5, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::hitice_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), HITICE_INTERRUPT6);
-	device.execute().set_input_line(4, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::rambo3_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), RAMBO3_INTERRUPT1);
-	device.execute().set_input_line(6, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::pbobble_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), PBOBBLE_INTERRUPT5);
-	device.execute().set_input_line(3, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::viofight_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), VIOFIGHT_INTERRUPT1);
-	device.execute().set_input_line(4, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::masterw_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), MASTERW_INTERRUPT4);
-	device.execute().set_input_line(5, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::silentd_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), SILENTD_INTERRUPT4);
-	device.execute().set_input_line(6, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::selfeena_interrupt)
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), SELFEENA_INTERRUPT4);
-	device.execute().set_input_line(6, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::sbm_interrupt)//5
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), SBM_INTERRUPT5);
-	device.execute().set_input_line(4, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(taitob_state::realpunc_interrupt)//2
-{
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), REALPUNC_INTERRUPT3);
-	device.execute().set_input_line(2, HOLD_LINE);
-}
-
 
 
 READ16_MEMBER(taitob_state::tracky1_hi_r)
@@ -1947,7 +1838,6 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(rastsag2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1983,6 +1873,8 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2004,7 +1896,6 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(masterw_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  masterw_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)  /* 6 MHz Z80B */
 	MCFG_DEVICE_PROGRAM_MAP(masterw_sound_map)
@@ -2040,6 +1931,8 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2082,7 +1975,6 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(rastsag2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2118,6 +2010,8 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2139,7 +2033,6 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(crimec_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  crimec_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2175,6 +2068,8 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2197,7 +2092,6 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(hitice_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  hitice_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)  /* 6 MHz Z80B */
 	MCFG_DEVICE_PROGRAM_MAP(viofight_sound_map)
@@ -2234,6 +2128,8 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2260,7 +2156,6 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(rambo3_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  rambo3_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2296,6 +2191,8 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2318,7 +2215,6 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12MHz verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(rambo3_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  rambo3_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4) /* 4MHz verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2354,6 +2250,8 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2375,7 +2273,6 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(pbobble_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  pbobble_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2417,6 +2314,8 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2438,7 +2337,6 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(spacedx_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  pbobble_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2480,6 +2378,8 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2501,7 +2401,6 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(spacedxo_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2537,6 +2436,8 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2558,7 +2459,6 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz according to the readme*/
 	MCFG_DEVICE_PROGRAM_MAP(qzshowby_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  pbobble_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2600,6 +2500,8 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2621,7 +2523,6 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(viofight_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  viofight_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)  /* 6 MHz verified */
 	MCFG_DEVICE_PROGRAM_MAP(viofight_sound_map)
@@ -2657,6 +2558,8 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2683,7 +2586,6 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(silentd_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  silentd_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2719,6 +2621,8 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2740,7 +2644,6 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(selfeena_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2776,6 +2679,8 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2806,7 +2711,6 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(selfeena_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2842,6 +2746,8 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2870,7 +2776,6 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sbm_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  sbm_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2906,6 +2811,8 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2926,7 +2833,6 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(realpunc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitob_state,  realpunc_interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -2964,6 +2870,8 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
+	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

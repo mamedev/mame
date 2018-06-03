@@ -34,8 +34,6 @@
 #include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
-#include "sound/tms5220.h"
-#include "machine/x2212.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -517,7 +515,7 @@ ROM_START( esb )
 	ROM_CONTINUE(              0x10000, 0x2000 )
 	/* $8000 - $9fff : slapstic page */
 	ROM_LOAD( "136031-102.1jk",0xa000, 0x2000, CRC(62ce5c12) SHA1(976256acf4499dc396542a117910009a8808f448) )
-	ROM_CONTINUE(              0xc000, 0x2000 )
+	ROM_CONTINUE(              0x1c000, 0x2000 )
 	ROM_LOAD( "136031-203.1kl",0xc000, 0x2000, CRC(27b0889b) SHA1(a13074e83f0f57d65096d7f49ae78f33ab00c479) )
 	ROM_CONTINUE(              0x1e000, 0x2000 )
 	ROM_LOAD( "136031-104.1m", 0xe000, 0x2000, CRC(fd5c725e) SHA1(541cfd004b1736b6cec13836dfa813f00eedeed0) )

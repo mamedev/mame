@@ -12231,6 +12231,9 @@ ec_unk5__b                      //
 ec_unk5__c                      //
 ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 
+@source:efdt.cpp
+efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
+
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
 
@@ -29709,6 +29712,7 @@ goalx3                          // 0209 (c) 1995 Visco
 gowcaizr                        // 0094 (c) 1995 Technos
 gpilots                         // 0020 (c) 1991 SNK
 gpilotsh                        // 0020 (c) 1991 SNK
+gpilotsp                        // prototype
 gururin                         // 0067 (c) 1994 Face
 ironclad                        // 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (protoype)
 ironclado                       // 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (protoype, older)
@@ -33074,6 +33078,7 @@ rz1                             // 1986 Casio
 @source:rzone.cpp
 rzbatfor                        //
 rzindy500                       //
+rztoshden                       //
 
 @source:s11.cpp
 gmine_l2                        //

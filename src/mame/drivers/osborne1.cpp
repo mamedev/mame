@@ -102,11 +102,11 @@ static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;
 
 void osborne1_state::osborne1_mem(address_map &map)
 {
-	map(0x0000, 0x0FFF).bankr("bank_0xxx").w(this, FUNC(osborne1_state::bank_0xxx_w));
-	map(0x1000, 0x1FFF).bankr("bank_1xxx").w(this, FUNC(osborne1_state::bank_1xxx_w));
+	map(0x0000, 0x0FFF).bankr(m_bank_0xxx).w(this, FUNC(osborne1_state::bank_0xxx_w));
+	map(0x1000, 0x1FFF).bankr(m_bank_1xxx).w(this, FUNC(osborne1_state::bank_1xxx_w));
 	map(0x2000, 0x3FFF).rw(this, FUNC(osborne1_state::bank_2xxx_3xxx_r), FUNC(osborne1_state::bank_2xxx_3xxx_w));
 	map(0x4000, 0xEFFF).ram();
-	map(0xF000, 0xFFFF).bankr("bank_fxxx").w(this, FUNC(osborne1_state::videoram_w));
+	map(0xF000, 0xFFFF).bankr(m_bank_fxxx).w(this, FUNC(osborne1_state::videoram_w));
 }
 
 

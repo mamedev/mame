@@ -215,11 +215,8 @@ template<int Bank>
 WRITE16_MEMBER(cyclwarr_state::cyclwarr_videoram_w)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram[Bank][offset]);
-	if (offset>=0x400)
-	{
-		m_layer[(Bank<<1)|0]->mark_tile_dirty(offset-0x400);
-		m_layer[(Bank<<1)|1]->mark_tile_dirty(offset-0x400);
-	}
+	m_layer[(Bank<<1)|0]->mark_tile_dirty(offset);
+	m_layer[(Bank<<1)|1]->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(cyclwarr_state::output_w)
@@ -286,7 +283,7 @@ void apache3_state::apache3_v20_map(address_map &map)
 	map(0x04000, 0x04003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x06000, 0x06001).portr("IN0"); // esw
 	map(0x08000, 0x08001).r(this, FUNC(apache3_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
-	map(0x0a000, 0x0a000).r(this, FUNC(apache3_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0x0a000, 0x0a000).r(m_oki, FUNC(okim6295_device::read)).w(m_oki, FUNC(okim6295_device::write));
 	map(0x0e000, 0x0e007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0xf0000, 0xfffff).rom().region("sound_rom", 0);
 }
@@ -334,7 +331,7 @@ void roundup5_state::roundup5_z80_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffef).ram();
 	map(0xfff0, 0xfff1).r(this, FUNC(roundup5_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
-	map(0xfff4, 0xfff4).r(this, FUNC(roundup5_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0xfff4, 0xfff4).r(m_oki, FUNC(okim6295_device::read)).w(m_oki, FUNC(okim6295_device::write));
 	map(0xfff8, 0xfffb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfffc, 0xfffc).portr("STICKX");
 }
@@ -393,7 +390,7 @@ void cyclwarr_state::sound_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffef).ram();
 	map(0xfff0, 0xfff1).r(this, FUNC(cyclwarr_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
-	map(0xfff4, 0xfff4).r(this, FUNC(cyclwarr_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0xfff4, 0xfff4).r(this, FUNC(cyclwarr_state::oki_status_xor_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0xfffc, 0xfffc).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xfffe, 0xfffe).nopw();
 }
@@ -1012,6 +1009,8 @@ void cyclwarr_state::machine_reset()
 	
 	m_last_control = 0;
 	m_control_word = 0;
+	
+	m_road_color_bank = m_prev_road_bank = 0;
 }
 
 MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
@@ -1076,8 +1075,8 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	cyclwarr(config);
 
 	// TODO: it's same video HW, we don't know how/where video registers are mapped
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
+//	MCFG_SCREEN_MODIFY("screen")
+//	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 

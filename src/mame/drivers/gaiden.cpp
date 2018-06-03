@@ -123,8 +123,9 @@ MG-Y.VO
 Notes:
     68k clock:      9.216 MHz (18.432 / 2)
     Z80 clock:      4.000 MHz
-    YM2203 clock:       4.000 MHz
+    YM2203 clock:   4.000 MHz
     MSM6295 clock:  1.000 MHz (samplerate 7575Hz, i.e. / 132)
+    8049 clock:     4.000 MHz (separate XTAL)
 
     IOP8 manufactured by Ricoh. Full part number: RICOH EPLIOP8BP (PAL or PIC?)
 
@@ -135,6 +136,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
@@ -822,12 +824,18 @@ MACHINE_CONFIG_START(gaiden_state::wildfang)
 	shadoww(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wildfang_map)
+
+	MCFG_DEVICE_ADD("mcu", I8049, 4_MHz_XTAL)
+	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::raiga)
 	shadoww(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(raiga_map)
+
+	MCFG_DEVICE_ADD("mcu", I8049, 4_MHz_XTAL)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
@@ -1337,8 +1345,8 @@ ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Tecmo Knight
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
 	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
@@ -1368,8 +1376,8 @@ ROM_START( wildfangs ) /* Wild Fang - No title change option */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
 	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
@@ -1399,8 +1407,8 @@ ROM_START( tknight ) /* Tecmo Knight - No title change option */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
 	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) ) /* 8x8 tiles */
@@ -1427,8 +1435,8 @@ ROM_START( stratof )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "b-7a.5",           0x00000, 0x10000, CRC(6d2e4bf1) SHA1(edcf96bbcc109da71e3adbb37d119254d3873b29) )
@@ -1455,8 +1463,8 @@ ROM_START( raiga )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "b-7a.5",           0x00000, 0x10000, CRC(6d2e4bf1) SHA1(edcf96bbcc109da71e3adbb37d119254d3873b29) )

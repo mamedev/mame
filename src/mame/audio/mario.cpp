@@ -8,7 +8,9 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+#if !OLD_SOUND
 #include "audio/nl_mario.h"
+#endif
 
 /****************************************************************
  *
@@ -40,10 +42,7 @@
 #define I8035_P2_W_AH(M,B,D) I8035_P2_W(M,ACTIVEHIGH_PORT_BIT(I8035_P2_R(M),B,(D)))
 
 
-#if !OLD_SOUND
-
-
-#else
+#if OLD_SOUND
 /****************************************************************
  *
  * Discrete Sound defines
@@ -596,7 +595,7 @@ WRITE8_MEMBER(mario_state::mario_sh3_w)
 			break;
 		case 7: /* skid */
 #if OLD_SOUND
-			machine().device<discrete_device>("discrete")->write(space, DS_SOUND7_INP, data & 1);
+			m_discrete->write(space, DS_SOUND7_INP, data & 1);
 #else
 			m_audio_snd7->write((data & 1) ^ 1);
 #endif
@@ -661,7 +660,7 @@ MACHINE_CONFIG_START(mario_state::mario_audio)
 
 #if OLD_SOUND
 	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(mario)
+	MCFG_DISCRETE_INTF(mario_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 #else
 	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)

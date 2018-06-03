@@ -1020,7 +1020,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_SEGAUSBROM_ADD("usbsnd")
+	MCFG_SEGAUSBROM_ADD("usbsnd", "maincpu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::ixion)

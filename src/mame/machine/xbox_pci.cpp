@@ -64,6 +64,7 @@ void nv2a_ram_device::config_map(address_map &map)
 nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, NV2A_RAM, tag, owner, clock)
 {
+	set_ids(0x10de02a6, 0, 0, 0);
 }
 
 READ32_MEMBER(nv2a_ram_device::config_register_r)
@@ -89,6 +90,7 @@ void mcpx_lpc_device::lpc_io(address_map &map)
 mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_LPC, tag, owner, clock)
 {
+	set_ids(0x10de01b2, 0xb4, 0, 0); // revision id must be at least 0xb4, otherwise usb will require a hub
 }
 
 void mcpx_lpc_device::device_start()
@@ -137,6 +139,7 @@ mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *
 	: pci_device(mconfig, MCPX_SMBUS, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
+	set_ids(0x10de01b4, 0, 0, 0);
 }
 
 void mcpx_smbus_device::device_start()
@@ -232,6 +235,7 @@ mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *ta
 	timer(nullptr),
 	connecteds_count(0)
 {
+	set_ids(0x10de01c2, 0, 0, 0);
 }
 
 void mcpx_ohci_device::plug_usb_device(int port, ohci_function *function)
@@ -331,6 +335,7 @@ void mcpx_eth_device::eth_io(address_map &map)
 mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_ETH, tag, owner, clock)
 {
+	set_ids(0x10de01c3, 0, 0, 0);
 }
 
 void mcpx_eth_device::device_start()
@@ -576,6 +581,7 @@ void mcpx_ac97_audio_device::ac97_io1(address_map &map)
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_AUDIO, tag, owner, clock)
 {
+	set_ids(0x10de01b1, 0, 0, 0);
 }
 
 void mcpx_ac97_audio_device::device_start()
@@ -669,6 +675,7 @@ DEFINE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device, "mcpx_ac97_modem", "
 mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_MODEM, tag, owner, clock)
 {
+	set_ids(0x10de01c1, 0, 0, 0);
 }
 
 /*
@@ -686,6 +693,7 @@ mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag,
 	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
+	set_ids(0x10de01bc, 0, 0, 0);
 }
 
 void mcpx_ide_device::device_start()
@@ -756,6 +764,7 @@ nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag,
 	m_interrupt_handler(*this),
 	m_program(nullptr)
 {
+	set_ids(0x10de02a0, 0, 0, 0);
 }
 
 void nv2a_gpu_device::device_start()
