@@ -44,12 +44,15 @@ public:
 	dms86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_sio(*this, "sio%u", 1U)
+		, m_ctc(*this, "ctc")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	DECLARE_WRITE8_MEMBER(m1_ack_w);
 
-	DECLARE_READ16_MEMBER( port9a_r );
-	DECLARE_READ16_MEMBER( port9c_r );
+	DECLARE_READ16_MEMBER(port9a_r);
+	DECLARE_READ16_MEMBER(port9c_r);
 	void kbd_put(u8 data);
 
 	void dms86(machine_config &config);
@@ -59,6 +62,8 @@ private:
 	u8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_device_array<z80sio_device, 2> m_sio;
+	required_device<z80ctc_device> m_ctc;
 };
 
 
@@ -68,12 +73,20 @@ WRITE_LINE_MEMBER(dms86_state::nmi_w)
 }
 
 
-READ16_MEMBER( dms86_state::port9a_r )
+WRITE8_MEMBER(dms86_state::m1_ack_w)
+{
+	m_sio[0]->z80daisy_decode(data);
+	m_sio[1]->z80daisy_decode(data);
+	m_ctc->z80daisy_decode(data);
+}
+
+
+READ16_MEMBER(dms86_state::port9a_r)
 {
 	return m_term_data ? 0x40 : 0;
 }
 
-READ16_MEMBER( dms86_state::port9c_r )
+READ16_MEMBER(dms86_state::port9c_r)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -86,6 +99,7 @@ void dms86_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x1ffff).ram();
 	map(0xfe000, 0xfffff).rom().region("roms", 0);
+	map(0xfed03, 0xfed03).w(this, FUNC(dms86_state::m1_ack_w));
 }
 
 void dms86_state::io_map(address_map &map)
