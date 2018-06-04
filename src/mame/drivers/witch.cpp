@@ -515,11 +515,16 @@ READ8_MEMBER(witch_state::prot_read_700x)
 
 WRITE8_MEMBER(witch_state::xscroll_w)
 {
-	m_scrollx=data;
+	m_scrollx = data;
+	// need to mark tiles dirty here, as the tilemap writes are affected by scrollx, see FIX_OFFSET macro.
+	// without it keirin ou can seldomly draw garbage after a big/small bonus game
+	// TODO: rewrite tilemap code so that it doesn't need FIX_OFFSET at all!
+	m_gfx1_tilemap->mark_all_dirty();
 }
+
 WRITE8_MEMBER(witch_state::yscroll_w)
 {
-	m_scrolly=data;
+	m_scrolly = data;
 }
 
 WRITE8_MEMBER(keirinou_state::palette_w)
