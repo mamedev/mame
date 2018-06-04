@@ -349,9 +349,9 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 	{
 		screen_device_iterator iter(device().mconfig().root_device());
 		if (iter.first() == nullptr)
-		osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
+			osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
 		else if (m_vblank_interrupt_screen != nullptr && device().siblingdevice(m_vblank_interrupt_screen) == nullptr)
-		osd_printf_error("VBLANK interrupt references a non-existant screen tag '%s'\n", m_vblank_interrupt_screen);
+			osd_printf_error("VBLANK interrupt references a non-existant screen tag '%s'\n", m_vblank_interrupt_screen);
 	}
 
 	if (!m_timed_interrupt.isnull() && m_timed_interrupt_period == attotime::zero)
