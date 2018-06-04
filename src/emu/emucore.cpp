@@ -12,8 +12,9 @@
 #include "emucore.h"
 #include "osdcore.h"
 
-emu_fatalerror::emu_fatalerror(const char *format, ...)
-: code(0)
+const char *const endianness_names[2] = { "little", "big" };
+
+emu_fatalerror::emu_fatalerror(const char *format, ...) : code(0)
 {
 	if (format == nullptr)
 	{
@@ -29,8 +30,7 @@ emu_fatalerror::emu_fatalerror(const char *format, ...)
 	osd_break_into_debugger(text);
 }
 
-emu_fatalerror::emu_fatalerror(const char *format, va_list ap)
-: code(0)
+emu_fatalerror::emu_fatalerror(const char *format, va_list ap) : code(0)
 {
 	if (format == nullptr)
 	{
@@ -43,8 +43,7 @@ emu_fatalerror::emu_fatalerror(const char *format, va_list ap)
 	osd_break_into_debugger(text);
 }
 
-emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...)
-: code(_exitcode)
+emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...) : code(_exitcode)
 {
 	if (format == nullptr)
 	{
@@ -59,8 +58,7 @@ emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...)
 	}
 }
 
-emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, va_list ap)
-: code(_exitcode)
+emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, va_list ap) : code(_exitcode)
 {
 	if (format == nullptr)
 	{

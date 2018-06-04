@@ -90,11 +90,11 @@ public:
 	DECLARE_WRITE8_MEMBER(robokid_bg1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(robokid_bg2_ctrl_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_sprite_overdraw_w);
-	DECLARE_DRIVER_INIT(mnight);
-	DECLARE_DRIVER_INIT(ninjakd2);
-	DECLARE_DRIVER_INIT(bootleg);
-	DECLARE_DRIVER_INIT(robokid);
-	DECLARE_DRIVER_INIT(robokidj);
+	void init_mnight();
+	void init_ninjakd2();
+	void init_bootleg();
+	void init_robokid();
+	void init_robokidj();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjakd2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(mnight_get_bg_tile_info);
@@ -116,7 +116,6 @@ public:
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_ninjakd2);
-	INTERRUPT_GEN_MEMBER(ninjakd2_interrupt);
 	void robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const uint8_t* const videoram);
 	void bg_ctrl(int offset, int data, tilemap_t* tilemap);
 	void draw_sprites( bitmap_ind16 &bitmap);

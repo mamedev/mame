@@ -560,7 +560,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( fresh )
+static GFXDECODE_START( gfx_fresh )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
@@ -596,8 +596,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 MACHINE_CONFIG_START(fresh_state::fresh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
-	MCFG_CPU_PROGRAM_MAP(fresh_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
+	MCFG_DEVICE_PROGRAM_MAP(fresh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fresh_state, fake_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -612,12 +612,12 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fresh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fresh)
 
 	/* sound hw? */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -638,4 +638,4 @@ ROM_END
 
 
 // title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28'
-GAME( 1996, fresh, 0, fresh, fresh, fresh_state, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING )
+GAME( 1996, fresh, 0, fresh, fresh, fresh_state, empty_init, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING )

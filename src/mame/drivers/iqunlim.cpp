@@ -87,8 +87,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(iqunlim_state::iqunlim)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // DragonBall EZ (MC68EZ328) (68k core) (is the xtal correct? this was from the other hardware)
-	MCFG_CPU_PROGRAM_MAP(iqunlim_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // DragonBall EZ (MC68EZ328) (68k core) (is the xtal correct? this was from the other hardware)
+	MCFG_DEVICE_PROGRAM_MAP(iqunlim_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -104,4 +104,4 @@ ROM_START( iqunlim )
 	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) )
 ROM_END
 
-COMP( 19??, iqunlim,    0,      0,      iqunlim,     iqunlim, iqunlim_state, 0,    "Video Technology", "VTech IQ Unlimited (Germany)",              MACHINE_IS_SKELETON)
+COMP( 19??, iqunlim, 0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "Video Technology", "VTech IQ Unlimited (Germany)", MACHINE_IS_SKELETON)

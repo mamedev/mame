@@ -563,7 +563,7 @@ static const gfx_layout tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static GFXDECODE_START( sidearms )
+static GFXDECODE_START( gfx_sidearms )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   768, 64 ) /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 32 ) /* colors   0-511 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 ) /* colors 512-767 */
@@ -592,7 +592,7 @@ static const gfx_layout turtship_tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static GFXDECODE_START( turtship )
+static GFXDECODE_START( gfx_turtship )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          768, 64 )  /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, turtship_tilelayout,   0, 32 )  /* colors   0-511 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        512, 16 )  /* colors 512-767 */
@@ -602,17 +602,17 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sidearms_state::sidearms)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(sidearms_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(sidearms_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -620,27 +620,27 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidearms)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidearms)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -651,45 +651,45 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sidearms_state::turtship)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(turtship_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(turtship_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -699,21 +699,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sidearms_state::whizz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(whizz_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(whizz_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(whizz_sound_map)
-	MCFG_CPU_IO_MAP(whizz_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(whizz_sound_map)
+	MCFG_DEVICE_IO_MAP(whizz_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -721,20 +721,20 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -1219,41 +1219,41 @@ ROM_START( whizz )  /* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Ser
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sidearms_state,sidearms)
+void sidearms_state::init_sidearms()
 {
 	m_gameid = 0;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,turtship)
+void sidearms_state::init_turtship()
 {
 	m_gameid = 1;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,dyger)
+void sidearms_state::init_dyger()
 {
 	m_gameid = 2;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,whizz)
+void sidearms_state::init_whizz()
 {
 	m_gameid = 3;
 }
 
 // date string is at 0xaa2 in 'rom 03' it does not appear to be displayed
 
-GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, turtship, 0,        turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipj,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipk,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipko,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                         "Turtle Ship (Korea, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipkn, turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                       "Turtle Ship (Korea, 88/9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtship,   0,        turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipj,  turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipk,  turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipko, turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                         "Turtle Ship (Korea, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipkn, turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                       "Turtle Ship (Korea, 88/9)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dyger,    0,        turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dygera,   dyger,    turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyger,      0,        turtship, dyger,    sidearms_state, init_dyger,    ROT270, "Philko", "Dyger (Korea set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dygera,     dyger,    turtship, dyger,    sidearms_state, init_dyger,    ROT270, "Philko", "Dyger (Korea set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, twinfalc, 0,        whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, whizz,    twinfalc, whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko",                             "Whizz", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twinfalc,   0,        whizz,    whizz,    sidearms_state, init_whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, whizz,      twinfalc, whizz,    whizz,    sidearms_state, init_whizz,    ROT0,   "Philko",                             "Whizz", MACHINE_SUPPORTS_SAVE )

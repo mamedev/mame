@@ -53,9 +53,9 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(a2bus_applicard_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -144,7 +144,7 @@ uint8_t a2bus_applicard_device::read_c0nx(uint8_t offset)
 			fatalerror("Applicard: Z80 IRQ not supported yet\n");
 
 		case 7: // NMI on Z80 (direct)
-			m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 	}

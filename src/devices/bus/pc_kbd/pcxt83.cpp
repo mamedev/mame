@@ -73,13 +73,13 @@ const tiny_rom_entry *ibm_pc_xt_83_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(ibm_pc_xt_83_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20.7)))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ibm_pc_xt_83_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ibm_pc_xt_83_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ibm_pc_xt_83_keyboard_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ibm_pc_xt_83_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(ibm_pc_xt_83_keyboard_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ibm_pc_xt_83_keyboard_device, t1_r))
+	MCFG_DEVICE_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20.7)))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ibm_pc_xt_83_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, ibm_pc_xt_83_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ibm_pc_xt_83_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ibm_pc_xt_83_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, ibm_pc_xt_83_keyboard_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ibm_pc_xt_83_keyboard_device, t1_r))
 MACHINE_CONFIG_END
 
 
@@ -205,7 +205,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // 76 "Clear"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) // 76 "Clear"
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 INPUT_PORTS_END
 

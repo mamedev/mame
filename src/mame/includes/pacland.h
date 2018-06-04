@@ -17,7 +17,9 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_leds(*this, "led%u", 0U)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd63701_cpu_device> m_mcu;
@@ -29,6 +31,8 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_spriteram;
+
+	output_finder<2> m_leds;
 
 	uint8_t m_palette_bank;
 	const uint8_t *m_color_prom;
@@ -63,8 +67,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pacland);
 
-	INTERRUPT_GEN_MEMBER(main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void switch_palette();

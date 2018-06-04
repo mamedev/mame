@@ -9,8 +9,8 @@
 
 #define MCFG_DOOYONG_ROM_TILEMAP_ADD(tag, gfx, num, rom, offset) \
 		MCFG_DEVICE_ADD(tag, DOOYONG_ROM_TILEMAP, 0) \
-		downcast<dooyong_rom_tilemap_device &>(*device).set_gfxdecode_tag("^" gfx); \
-		downcast<dooyong_rom_tilemap_device &>(*device).set_tilerom_tag("^" rom); \
+		downcast<dooyong_rom_tilemap_device &>(*device).set_gfxdecode_tag(gfx); \
+		downcast<dooyong_rom_tilemap_device &>(*device).set_tilerom_tag(rom); \
 		downcast<dooyong_rom_tilemap_device &>(*device).set_gfxnum((num)); \
 		downcast<dooyong_rom_tilemap_device &>(*device).set_tilerom_offset((offset));
 #define MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(pen) \
@@ -20,17 +20,17 @@
 
 #define MCFG_RSHARK_ROM_TILEMAP_ADD(tag, gfx, num, rom, offset, rom2, offset2) \
 		MCFG_DEVICE_ADD(tag, RSHARK_ROM_TILEMAP, 0) \
-		downcast<rshark_rom_tilemap_device &>(*device).set_gfxdecode_tag("^" gfx); \
-		downcast<rshark_rom_tilemap_device &>(*device).set_tilerom_tag("^" rom); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_gfxdecode_tag(gfx); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_tilerom_tag(rom); \
 		downcast<rshark_rom_tilemap_device &>(*device).set_gfxnum((num)); \
 		downcast<rshark_rom_tilemap_device &>(*device).set_tilerom_offset((offset)); \
 		downcast<rshark_rom_tilemap_device &>(*device).set_primella_code_bits(13); \
-		downcast<rshark_rom_tilemap_device &>(*device).set_colorrom_tag("^" rom2); \
+		downcast<rshark_rom_tilemap_device &>(*device).set_colorrom_tag(rom2); \
 		downcast<rshark_rom_tilemap_device &>(*device).set_colorrom_offset((offset2));
 
 #define MCFG_DOOYONG_RAM_TILEMAP_ADD(tag, gfx, num) \
 		MCFG_DEVICE_ADD(tag, DOOYONG_RAM_TILEMAP, 0) \
-		downcast<dooyong_ram_tilemap_device &>(*device).set_gfxdecode_tag("^" gfx); \
+		downcast<dooyong_ram_tilemap_device &>(*device).set_gfxdecode_tag(gfx); \
 		downcast<dooyong_ram_tilemap_device &>(*device).set_gfxnum((num));
 
 

@@ -322,8 +322,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 	m_mb->m_pit8253->write_gate2(BIT(data, 0));
 	m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
 	m_port_b_data = data;
-// device_t *cvsd = machine().device("cvsd");
-//  hc55516_digit_w(cvsd, data);
+//  m_cvsd->digit_w(data);
 }
 
 /*Floppy Disk Controller 765 device*/
@@ -486,21 +485,22 @@ void pcxt_state::machine_reset()
 	m_lastvalue = -1;
 }
 
-static SLOT_INTERFACE_START( filetto_isa8_cards )
-	SLOT_INTERFACE_INTERNAL("filetto",  ISA8_CGA_FILETTO)
-	SLOT_INTERFACE_INTERNAL("tetriskr", ISA8_CGA_TETRISKR)
-SLOT_INTERFACE_END
+static void filetto_isa8_cards(device_slot_interface &device)
+{
+	device.option_add_internal("filetto",  ISA8_CGA_FILETTO);
+	device.option_add_internal("tetriskr", ISA8_CGA_TETRISKR);
+}
 
 
 MACHINE_CONFIG_START(pcxt_state::filetto)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(filetto_map)
-	MCFG_CPU_IO_MAP(filetto_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_PROGRAM_MAP(filetto_map)
+	MCFG_DEVICE_IO_MAP(filetto_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", filetto_isa8_cards, "filetto", true)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "filetto", true) // FIXME: determine ISA bus clock
 
-	MCFG_SOUND_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
+	MCFG_DEVICE_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.60)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -514,13 +514,13 @@ MACHINE_CONFIG_START(pcxt_state::filetto)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcxt_state::tetriskr)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(tetriskr_map)
-	MCFG_CPU_IO_MAP(tetriskr_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_PROGRAM_MAP(tetriskr_map)
+	MCFG_DEVICE_IO_MAP(tetriskr_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", filetto_isa8_cards, "tetriskr", true)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "tetriskr", true) // FIXME: determine ISA bus clock
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
@@ -552,5 +552,5 @@ ROM_START( tetriskr )
 	ROM_LOAD( "b-10.u10", 0x0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
 ROM_END
 
-GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state,  0,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )
-GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state,  0,  ROT0,  "bootleg",    "Tetris (Korean bootleg of Mirrorsoft PC-XT Tetris)", MACHINE_IMPERFECT_SOUND )
+GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state, empty_init, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state, empty_init, ROT0,  "bootleg",    "Tetris (Korean bootleg of Mirrorsoft PC-XT Tetris)", MACHINE_IMPERFECT_SOUND )

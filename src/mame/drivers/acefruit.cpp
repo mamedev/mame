@@ -43,7 +43,7 @@ public:
 		m_refresh_timer(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT(sidewndr);
+	void init_sidewndr();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
@@ -382,14 +382,14 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel/Clear" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )              /* "Token in" - also "Refill" when "Refill" mode ON */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x01)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x01)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")   // 3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Hold/Nudge 1" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME( "Accountancy System" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )              /* "50P in" */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x02)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x02)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN4")   // 4
@@ -496,7 +496,7 @@ static INPUT_PORTS_START( starspnr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect/Cancel" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x08) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x08) /* to be confirmed */
 
 	PORT_START("IN2")   // 2
 	/* tested at 0xe83c */
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xef82 after IN5 bit 1 and after IN1 bit 3 - after coins are tested - table at 0xefa8 (3 bytes) */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN3 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x02) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x02) /* to be confirmed */
 	/* tested at 0x1b0f */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -515,7 +515,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xe8ea and 0xecbe */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN2 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x01) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x01) /* to be confirmed */
 	/* tested at 0x0178 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -526,7 +526,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xed86 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x04) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x04) /* to be confirmed */
 
 	PORT_START("IN5")   // 5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME( "Hold 3" )
@@ -535,7 +535,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xec6f */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN6 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x01) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x01) /* to be confirmed */
 	/* tested at 0xe312 and 0xe377 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -544,7 +544,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xee42, 0xee5e and 0xeff5 before IN1 bit 0 - invalid code after 0xf000 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x02) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x02) /* to be confirmed */
 	/* tested at 0xe8dd and 0xec1c */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -556,7 +556,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xedcb */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN6 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x04) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x04) /* to be confirmed */
 	/* tested at 0xec2a */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -620,7 +620,7 @@ static const gfx_layout spritelayout =
 	32*32 /* every sprite takes 128 bytes */
 };
 
-static GFXDECODE_START( acefruit )
+static GFXDECODE_START( gfx_acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
@@ -628,14 +628,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(acefruit_state::acefruit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(acefruit_map)
-	MCFG_CPU_IO_MAP(acefruit_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(acefruit_map)
+	MCFG_DEVICE_IO_MAP(acefruit_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acefruit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acefruit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -655,11 +655,11 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(acefruit_state,sidewndr)
+void acefruit_state::init_sidewndr()
 {
-	uint8_t *ROM = memregion( "maincpu" )->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */
-	ROM[ 0 ] = 0xf3;
+	ROM[0] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */
 }
 
@@ -793,8 +793,8 @@ ROM_START( acefruit  )
 ROM_END
 
 
-GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, acefruit_state, sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAMEL( 1981?, spellbnd, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAME ( 1982?, starspnr, 0,        acefruit, starspnr, acefruit_state, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
+GAMEL( 1981?, sidewndr, 0, acefruit, sidewndr, acefruit_state, init_sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAMEL( 1981?, spellbnd, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAME(  1982?, starspnr, 0, acefruit, starspnr, acefruit_state, empty_init,    ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  1982?, acefruit, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
 // not dumped: Magnum?

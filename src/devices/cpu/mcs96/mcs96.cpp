@@ -15,7 +15,7 @@
 mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_LITTLE, data_width, 16),
-	program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
+	program(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
 	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
 {
 }
@@ -23,8 +23,15 @@ mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, cons
 void mcs96_device::device_start()
 {
 	program = &space(AS_PROGRAM);
-	direct = program->direct<0>();
-	m_icountptr = &icount;
+	if(program->data_width() == 8) {
+		auto cache = program->cache<0, 0, ENDIANNESS_LITTLE>();
+		m_pr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	} else {
+		auto cache = program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_pr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	}
+
+	set_icountptr(icount);
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();

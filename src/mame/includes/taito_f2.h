@@ -15,6 +15,7 @@
 #include "video/tc0280grd.h"
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
+#include "machine/timer.h"
 
 
 class taitof2_state : public driver_device
@@ -41,6 +42,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_cchip(*this, "cchip"),
+			m_cchip_irq_clear(*this, "cchip_irq_clear"),
 			m_oki(*this, "oki"),
 			m_tc0100scn(*this, "tc0100scn"),
 			m_tc0100scn_1(*this, "tc0100scn_1"),
@@ -108,6 +110,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<taito_cchip_device> m_cchip;
+	optional_device<timer_device> m_cchip_irq_clear;
 	optional_device<okim6295_device> m_oki;
 	optional_device<tc0100scn_device> m_tc0100scn;
 	optional_device<tc0100scn_device> m_tc0100scn_1;
@@ -137,10 +140,10 @@ public:
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
-	DECLARE_DRIVER_INIT(driveout);
-	DECLARE_DRIVER_INIT(cameltry);
-	DECLARE_DRIVER_INIT(mjnquest);
-	DECLARE_DRIVER_INIT(finalb);
+	void init_driveout();
+	void init_cameltry();
+	void init_mjnquest();
+	void init_finalb();
 	DECLARE_MACHINE_START(f2);
 	DECLARE_VIDEO_START(taitof2_default);
 	DECLARE_MACHINE_START(common);
@@ -181,6 +184,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_full_buffer_delayed);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_qzchikyu);
 	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
+	INTERRUPT_GEN_MEMBER(megab_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 	void reset_driveout_sound_region();
 	void taitof2_core_vh_start (int sprite_type, int hide, int flip_hide );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer );

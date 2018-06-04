@@ -90,7 +90,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
 	DECLARE_READ8_MEMBER(apple3_c0xx_r);
 	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
-	DECLARE_DRIVER_INIT(apple3);
+	void init_apple3();
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);
 	uint32_t screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

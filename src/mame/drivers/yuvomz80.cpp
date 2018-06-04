@@ -96,35 +96,36 @@ static INPUT_PORTS_START( goldhexa )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(yuvomz80_state::goldhexa)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(audio_mem_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(audio_mem_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
 
 	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
 	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
 	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
 	MCFG_DEVICE_ADD("ppi3", I8255A, 0)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(yuvomz80_state::hexapres)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000))
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(audio_mem_map)
-	MCFG_CPU_IO_MAP(hexapres_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(audio_mem_map)
+	MCFG_DEVICE_IO_MAP(hexapres_audio_io_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000) // type guessed
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000) // type guessed
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -158,5 +159,5 @@ ROM_START( hexapres )
 	ROM_LOAD( "ghp_voib.bin",  0x00000, 0x80000, CRC(8be745fe) SHA1(840bbb212c8c519f2e4633f8db731fcf3f55635a) )
 ROM_END
 
-GAME( 200?, goldhexa, 0, goldhexa, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hexapres, 0, hexapres, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, goldhexa, 0, goldhexa, goldhexa, yuvomz80_state, empty_init, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hexapres, 0, hexapres, goldhexa, yuvomz80_state, empty_init, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )

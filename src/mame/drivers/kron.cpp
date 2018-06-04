@@ -298,9 +298,9 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
  */
 MACHINE_CONFIG_START(kron180_state::kron180)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", Z180, XTAL(12'288'000))
-	MCFG_CPU_PROGRAM_MAP (kron180_mem)
-	MCFG_CPU_IO_MAP(kron180_iomap)
+	MCFG_DEVICE_ADD ("maincpu", Z180, XTAL(12'288'000))
+	MCFG_DEVICE_PROGRAM_MAP (kron180_mem)
+	MCFG_DEVICE_IO_MAP(kron180_iomap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(kron180_state::kron180)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard TODO: fix it, doesn't work yet */
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(kron180_state, keyb_interrupt))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, kron180_state, keyb_interrupt))
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -327,5 +327,5 @@ ROM_START (kron180)
 ROM_END
 
 /* Driver */
-//     YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS         INIT  COMPANY        FULLNAME      FLAGS
-COMP ( 1995, kron180,      0,      0,       kron180,        kron180, kron180_state, 0,    "Kron Ltd",    "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME      FLAGS
+COMP ( 1995, kron180, 0,      0,      kron180, kron180, kron180_state, empty_init, "Kron Ltd", "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

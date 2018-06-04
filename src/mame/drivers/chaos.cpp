@@ -150,10 +150,10 @@ void chaos_state::machine_reset()
 
 MACHINE_CONFIG_START(chaos_state::chaos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DATA_MAP(data_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_DATA_MAP(data_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -171,5 +171,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY          FULLNAME   FLAGS
-COMP( 1983, chaos,  0,      0,      chaos,   chaos, chaos_state, 0,    "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME   FLAGS
+COMP( 1983, chaos, 0,      0,      chaos,   chaos, chaos_state, empty_init, "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )

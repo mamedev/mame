@@ -324,7 +324,7 @@ protected:
 	uint8_t            m_external_host_access;
 	uint8_t            m_executing;
 	address_space *m_program;
-	direct_read_data<3> *m_direct;
+	memory_access_cache<1, 3, ENDIANNESS_LITTLE> *m_cache;
 	uint32_t  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
 	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;

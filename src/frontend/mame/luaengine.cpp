@@ -799,7 +799,11 @@ void lua_engine::initialize()
 	emu["wait"] = lua_CFunction([](lua_State *L) {
 			lua_engine *engine = mame_machine_manager::instance()->lua();
 			luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
+			int ret = lua_pushthread(L);
+			if(ret == 1)
+				return luaL_error(L, "cannot wait from outside coroutine");
+			int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
 			return lua_yield(L, 0);
 		});
 	emu["lang_translate"] = &lang_translate;
@@ -1231,16 +1235,13 @@ void lua_engine::initialize()
 			"visible_cpu", sol::property([](debugger_manager &debug) { debug.cpu().get_visible_cpu(); },
 				[](debugger_manager &debug, device_t &dev) { debug.cpu().set_visible_cpu(&dev); }),
 			"execution_state", sol::property([](debugger_manager &debug) {
-					int execstate = debug.cpu().execution_state();
-					if(execstate == 0)
-						return "stop";
-					return "run";
+					return debug.cpu().is_stopped() ? "stop" : "run";
 				},
 				[](debugger_manager &debug, const std::string &state) {
-					int execstate = 1;
 					if(state == "stop")
-						execstate = 0;
-					debug.cpu().set_execution_state(execstate);
+						debug.cpu().set_execution_stopped();
+					else
+						debug.cpu().set_execution_running();
 				}));
 
 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
@@ -1440,8 +1441,9 @@ void lua_engine::initialize()
 			"write_direct_u32", &addr_space::direct_mem_write<uint32_t>,
 			"write_direct_i64", &addr_space::direct_mem_write<int64_t>,
 			"write_direct_u64", &addr_space::direct_mem_write<uint64_t>,
-			"name", sol::property(&addr_space::name),
+			"name", sol::property([](addr_space &sp) { return sp.space.name(); }),
 			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
+			"index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }),
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();
@@ -2024,13 +2026,16 @@ void lua_engine::close()
 
 void lua_engine::resume(void *ptr, int nparam)
 {
-	lua_State *L = static_cast<lua_State *>(ptr);
+	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
+	lua_State *L = lua_tothread(m_lua_state, -1);
+	lua_pop(m_lua_state, 1);
 	int stat = lua_resume(L, nullptr, 0);
 	if((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
 
 void lua_engine::run(sol::load_result res)

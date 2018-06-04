@@ -77,7 +77,7 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 void f8_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_iospace = &space(AS_IO);
 
 	save_item(NAME(m_debug_pc));
@@ -170,7 +170,7 @@ void f8_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_debug_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void f8_cpu_device::device_reset()
@@ -315,7 +315,7 @@ void f8_cpu_device::ROMC_00(int insttim)
 	 * of PC0.
 	 */
 
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim; /* ROMC00 is usually short, not short+long, but DS is long */
 }
@@ -328,7 +328,7 @@ void f8_cpu_device::ROMC_01()
 	 * location addressed by PC0; then all devices add the 8-bit value
 	 * on the data bus as signed binary number to PC0.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_pc0 += (s8)m_dbus;
 	m_icount -= cL;
 }
@@ -352,7 +352,7 @@ void f8_cpu_device::ROMC_03(int insttim)
 	 * Similiar to 0x00, except that it is used for immediate operands
 	 * fetches (using PC0) instead of instruction fetches.
 	 */
-	m_dbus = m_io = m_direct->read_byte(m_pc0);
+	m_dbus = m_io = m_cache->read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim;
 }
@@ -446,7 +446,7 @@ void f8_cpu_device::ROMC_0C()
 	 * by PC0 into the data bus; then all devices move the value that
 	 * has just been placed on the data bus into the low order byte of PC0.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_pc0 = (m_pc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -469,7 +469,7 @@ void f8_cpu_device::ROMC_0E()
 	 * The value on the data bus is then moved to the low order byte
 	 * of DC0 by all devices.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -507,7 +507,7 @@ void f8_cpu_device::ROMC_11()
 	 * data bus. All devices must then move the contents of the
 	 * data bus to the upper byte of DC0.
 	 */
-	m_dbus = m_direct->read_byte(m_pc0);
+	m_dbus = m_cache->read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0x00ff) | (m_dbus << 8);
 	m_icount -= cL;
 }
@@ -1655,7 +1655,7 @@ void f8_cpu_device::execute_run()
 		u8 op = m_dbus;
 
 		m_debug_pc = (m_pc0 - 1) & 0xffff;
-		debugger_instruction_hook(this, m_debug_pc);
+		debugger_instruction_hook(m_debug_pc);
 
 		switch( op )
 		{

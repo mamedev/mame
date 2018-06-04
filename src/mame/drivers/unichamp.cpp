@@ -64,7 +64,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 
 	uint8_t m_ram[256];
-	DECLARE_DRIVER_INIT(unichamp);
+	void init_unichamp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(unichamp);
@@ -155,7 +155,7 @@ READ8_MEMBER(unichamp_state::bext_r)
 }
 
 
-DRIVER_INIT_MEMBER(unichamp_state,unichamp)
+void unichamp_state::init_unichamp()
 {
 }
 
@@ -238,14 +238,14 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
-	//MCFG_CPU_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
+	//MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
 	//But since it is only running 7752/29868 th's of the time...
 	//TODO find a more accurate method? (the emulation will me the same though)
-	MCFG_CPU_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
+	MCFG_DEVICE_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
 
-	MCFG_CPU_PROGRAM_MAP(unichamp_mem)
+	MCFG_DEVICE_PROGRAM_MAP(unichamp_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_CP1610_BEXT_CALLBACK(READ8(unichamp_state, bext_r))
+	MCFG_CP1610_BEXT_CALLBACK(READ8(*this, unichamp_state, bext_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -264,8 +264,8 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 	MCFG_PALETTE_INIT_OWNER(unichamp_state, unichamp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(unichamp_state, unichamp_gicram_r) )
+	SPEAKER(config, "mono").front_center();
+	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(*this, unichamp_state, unichamp_gicram_r) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* cartridge */
@@ -289,4 +289,4 @@ ROM_START(unichamp)
 ROM_END
 
 
-CONS( 1977, unichamp, 0,  0, unichamp, unichamp,  unichamp_state,   unichamp,  "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )
+CONS( 1977, unichamp, 0, 0, unichamp, unichamp, unichamp_state, init_unichamp, "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )

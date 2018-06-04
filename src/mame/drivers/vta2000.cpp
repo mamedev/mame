@@ -148,7 +148,7 @@ static const gfx_layout vta2000_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vta2000 )
+static GFXDECODE_START( gfx_vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -161,9 +161,9 @@ PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 
 MACHINE_CONFIG_START(vta2000_state::vta2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -176,7 +176,7 @@ MACHINE_CONFIG_START(vta2000_state::vta2000)
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vta2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vta2000)
 MACHINE_CONFIG_END
 
 
@@ -193,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME    FLAGS */
-COMP( 19??, vta2000,  0,      0,       vta2000,   vta2000, vta2000_state, 0,    "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS */
+COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(I8156, i8156_device, "i8156", "Intel 8156 RAM, I/O & Timer")
 
 #define LOG_PORT (1U << 0)
 #define LOG_TIMER (1U << 1)
-#define VERBOSE (LOG_PORT | LOG_TIMER)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 enum
@@ -110,9 +110,10 @@ enum
 //**************************************************************************
 
 // default address map
-ADDRESS_MAP_START(i8155_device::i8155)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void i8155_device::i8155(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 
 

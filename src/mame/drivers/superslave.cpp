@@ -24,7 +24,7 @@ Oxx,yy          = Out port
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/am9519.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
@@ -381,9 +381,9 @@ void superslave_state::machine_reset()
 
 MACHINE_CONFIG_START(superslave_state::superslave)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(superslave_mem)
-	MCFG_CPU_IO_MAP(superslave_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(superslave_mem)
+	MCFG_DEVICE_IO_MAP(superslave_io)
 	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
 
 	// devices
@@ -394,51 +394,51 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(Z80DART_0_TAG, Z80DART, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, ctsa_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, ctsb_w))
 
 	MCFG_DEVICE_ADD(Z80DART_1_TAG, Z80DART, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_C_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_D_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232_D_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, ctsb_w))
 
 	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, rxca_w))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, rxtxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, rxtxcb_w))
+	MCFG_COM8116_FR_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_0_TAG, z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, rxca_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxtxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, rxtxcb_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -467,5 +467,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY                         FULLNAME        FLAGS
-COMP( 1983, superslv, 0,      0,      superslave, superslave, superslave_state, 0,    "Advanced Digital Corporation", "Super Slave",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME        FLAGS
+COMP( 1983, superslv, 0,      0,      superslave, superslave, superslave_state, empty_init, "Advanced Digital Corporation", "Super Slave",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -13,7 +13,7 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/k7659kb.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
@@ -30,6 +30,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
 		, m_p_chargen(*this, "chargen")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
@@ -43,8 +44,8 @@ public:
 	DECLARE_READ8_MEMBER(llc2_port1_b_r);
 	DECLARE_READ8_MEMBER(llc2_port2_a_r);
 	DECLARE_WRITE8_MEMBER(llc2_port1_b_w);
-	DECLARE_DRIVER_INIT(llc2);
-	DECLARE_DRIVER_INIT(llc1);
+	void init_llc2();
+	void init_llc1();
 	DECLARE_MACHINE_START(llc1);
 	DECLARE_MACHINE_RESET(llc1);
 	DECLARE_MACHINE_RESET(llc2);
@@ -68,6 +69,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 	required_region_ptr<u8> m_p_chargen;
+	output_finder<8> m_digits;
 };
 
 #endif // MAME_INCLUDES_LLC_H

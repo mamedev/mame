@@ -163,6 +163,7 @@
 
 static const int clock_divisors[3] = {1, DIV_64, DIV_15};
 
+constexpr unsigned pokey_device::FREQ_17_EXACT;
 
 
 
@@ -289,16 +290,11 @@ void pokey_device::device_start()
 		save_item(NAME(m_channel[i].m_AUDC), i);
 	}
 
-	save_item(NAME(m_divisor));
 	save_item(NAME(m_clock_cnt));
 	save_item(NAME(m_p4));
 	save_item(NAME(m_p5));
 	save_item(NAME(m_p9));
 	save_item(NAME(m_p17));
-	save_item(NAME(m_pot_counter));
-	save_item(NAME(m_kbd_cnt));
-	save_item(NAME(m_kbd_latch));
-	save_item(NAME(m_kbd_state));
 
 	save_item(NAME(m_POTx));
 	save_item(NAME(m_AUDCTL));
@@ -310,6 +306,11 @@ void pokey_device::device_start()
 	save_item(NAME(m_IRQEN));
 	save_item(NAME(m_SKSTAT));
 	save_item(NAME(m_SKCTL));
+
+	save_item(NAME(m_pot_counter));
+	save_item(NAME(m_kbd_cnt));
+	save_item(NAME(m_kbd_latch));
+	save_item(NAME(m_kbd_state));
 
 	// State support
 
@@ -332,8 +333,7 @@ void pokey_device::device_start()
 	state_add(SKCTL_C, "SKCTL", m_SKCTL);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
-
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -1271,7 +1271,6 @@ pokey_device::pokey_channel::pokey_channel()
 		m_borrow_cnt(0),
 		m_counter(0),
 		m_output(0),
-		m_filter_sample(0),
-		m_div2(0)
+		m_filter_sample(0)
 {
 }

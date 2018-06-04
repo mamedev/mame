@@ -175,18 +175,6 @@ WRITE8_MEMBER(liberatr_state::output_latch_w)
 }
 
 
-WRITE_LINE_MEMBER(liberatr_state::start_led_1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-
-WRITE_LINE_MEMBER(liberatr_state::start_led_2_w)
-{
-	output().set_led_value(1, !state);
-}
-
-
 WRITE_LINE_MEMBER(liberatr_state::coin_counter_left_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -435,21 +423,21 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(liberatr_state::liberatr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
-	MCFG_CPU_PROGRAM_MAP(liberatr_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
+	MCFG_DEVICE_PROGRAM_MAP(liberatr_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
 	MCFG_DEVICE_ADD("earom", ER2055, 0)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(liberatr_state, start_led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(liberatr_state, start_led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LED1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LED2
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // TBSWP
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // SPARE
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(liberatr_state, trackball_reset_w)) // CTRLD
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(liberatr_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(liberatr_state, coin_counter_left_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(liberatr_state, planet_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, liberatr_state, trackball_reset_w)) // CTRLD
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, liberatr_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, liberatr_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, liberatr_state, planet_select_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -462,14 +450,14 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 	MCFG_SCREEN_VISIBLE_AREA(8, 247, 13, 244)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -480,8 +468,8 @@ MACHINE_CONFIG_START(liberatr_state::liberat2)
 	liberatr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(liberat2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(liberat2_map)
 MACHINE_CONFIG_END
 
 
@@ -560,5 +548,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, liberatr, 0,        liberatr, liberatr, liberatr_state, 0, ROT0, "Atari", "Liberator (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, liberatr2,liberatr, liberat2, liberatr, liberatr_state, 0, ROT0, "Atari", "Liberator (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatr, 0,        liberatr, liberatr, liberatr_state, empty_init, ROT0, "Atari", "Liberator (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatr2,liberatr, liberat2, liberatr, liberatr_state, empty_init, ROT0, "Atari", "Liberator (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -64,7 +64,7 @@ enum
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(I8255, i8255_device, "i8255", "Intel 8255 PPI")
-const device_type I8255A = I8255;
+decltype(I8255) I8255A = I8255;
 
 
 //**************************************************************************
@@ -431,6 +431,13 @@ uint8_t i8255_device::read_pc()
 			data |= m_ibf[PORT_A] ? 0x20 : 0x00;
 			data |= m_inte[PORT_A] ? 0x10 : 0x00;
 			mask |= 0xc0;
+		}
+
+		if (port_c_upper_mode() == MODE_OUTPUT)
+		{
+			// read data from output latch
+			data |= m_output[PORT_C] & mask;
+			mask = 0;
 		}
 		break;
 

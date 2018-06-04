@@ -29,7 +29,7 @@ TO DO:
 TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_pending_nmi = 1;
 }
@@ -50,7 +50,7 @@ WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_pending_nmi = 0;
 	}
 }
@@ -399,7 +399,7 @@ static const gfx_layout tile_layout =
 	32*8
 };
 
-static GFXDECODE_START( msisaac )
+static GFXDECODE_START( gfx_msisaac )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 64 )
@@ -449,17 +449,17 @@ void msisaac_state::machine_reset()
 MACHINE_CONFIG_START(msisaac_state::msisaac)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(msisaac_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(msisaac_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(msisaac_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(msisaac_sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
 
 #ifdef USE_MCU
-	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MCFG_DEVICE_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 #endif
 
@@ -473,26 +473,26 @@ MACHINE_CONFIG_START(msisaac_state::msisaac)
 	MCFG_SCREEN_UPDATE_DRIVER(msisaac_state, screen_update_msisaac)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msisaac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msisaac)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
 	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -544,4 +544,4 @@ ROM_START( msisaac )
 ROM_END
 
 
-GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

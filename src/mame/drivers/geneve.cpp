@@ -271,7 +271,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_ready );
 	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
 
-	DECLARE_DRIVER_INIT(geneve);
+	void init_geneve();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -655,7 +655,7 @@ WRITE_LINE_MEMBER( geneve_state::dbin_line )
 	m_mapper->dbin_in(state);
 }
 
-DRIVER_INIT_MEMBER(geneve_state,geneve)
+void geneve_state::init_geneve()
 {
 }
 
@@ -697,32 +697,32 @@ MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
-	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(geneve_state, external_operation) )
-	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(geneve_state, clock_out) )
-	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(geneve_state, dbin_line) )
+	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, geneve_state, external_operation) )
+	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, geneve_state, clock_out) )
+	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(*this, geneve_state, dbin_line) )
 
 	// Video hardware
 	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(geneve_state, set_tms9901_INT2_from_v9938))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, geneve_state, set_tms9901_INT2_from_v9938))
 	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
 
 	// Main board components
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(geneve_state, read_by_9901) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( geneve_state, peripheral_bus_reset) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( geneve_state, VDP_reset) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( geneve_state, joystick_select) )
-	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_lsb) )  // new for PFM
-	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_output_enable) )  // new for PFM
-	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GENEVE_KEYBOARD_TAG, bus::ti99::internal::geneve_keyboard_device, reset_line) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( geneve_state, extbus_wait_states) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( geneve_state, video_wait_states) )
-	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( geneve_state, tms9901_interrupt) )
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, geneve_state, read_by_9901) )
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, geneve_state, peripheral_bus_reset) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, geneve_state, VDP_reset) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, geneve_state, joystick_select) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_lsb) )  // new for PFM
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_output_enable) )  // new for PFM
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( GENEVE_KEYBOARD_TAG, bus::ti99::internal::geneve_keyboard_device, reset_line) )
+	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, geneve_state, extbus_wait_states) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, geneve_state, video_wait_states) )
+	MCFG_TMS9901_P13_HANDLER( WRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, geneve_state, tms9901_interrupt) )
 
 	// Mapper
 	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENEVE_MAPPER, 0)
-	MCFG_GENEVE_READY_HANDLER( WRITELINE(geneve_state, mapper_ready) )
+	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
 
 	// Clock
 	MCFG_DEVICE_ADD(GENEVE_CLOCK_TAG, MM58274C, 0)
@@ -731,19 +731,19 @@ MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 
 	// Peripheral expansion box (Geneve composition)
 	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(geneve_state, inta) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(geneve_state, intb) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
+	SPEAKER(config, "sound_out").front_center();
+	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
+	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
 
 	// User interface devices
 	MCFG_DEVICE_ADD( GENEVE_KEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
-	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(geneve_state, keyboard_interrupt) )
+	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(*this, geneve_state, keyboard_interrupt) )
 	MCFG_GENEVE_JOYPORT_ADD( TI_JOYPORT_TAG )
 	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
 
@@ -775,5 +775,5 @@ ROM_START(geneve)
 	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   STATE         INIT    COMPANY  FULLNAME       FLAGS
-COMP( 1987, geneve, 0,      0,      geneve_60hz, geneve, geneve_state, geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT         COMPANY  FULLNAME       FLAGS
+COMP( 1987, geneve, 0,      0,      geneve_60hz, geneve, geneve_state, init_geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)

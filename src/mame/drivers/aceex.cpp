@@ -84,8 +84,8 @@ void aceex2814_state::machine_reset()
 MACHINE_CONFIG_START(aceex2814_state::aceex2814)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, Y2_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(aceex2814_map)
+	MCFG_DEVICE_ADD("maincpu", I80C31, Y2_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(aceex2814_map)
 MACHINE_CONFIG_END
 
 ROM_START( aceex2814 )
@@ -93,5 +93,5 @@ ROM_START( aceex2814 )
 	ROM_LOAD( "dm2814u16-194.bin", 0x00000, 0x10000, CRC(36dc423d) SHA1(0f350b7c533eb5270a72587ab3e050e5fe453006) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY              FULLNAME      FLAGS
-COMP( 1995, aceex2814,  0,          0,      aceex2814,  aceex2814, aceex2814_state, 0,          "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY              FULLNAME      FLAGS
+COMP( 1995, aceex2814, 0,      0,      aceex2814, aceex2814, aceex2814_state, empty_init, "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )

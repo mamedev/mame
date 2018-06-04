@@ -221,10 +221,11 @@ void msm58321_device::device_start()
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	m_clock_timer->adjust(clocks_to_attotime(32768), 0, clocks_to_attotime(32768));
 
+	// busy signal active period is approximately 427 µs
 	m_busy_timer = timer_alloc(TIMER_BUSY);
-	m_busy_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
+	m_busy_timer->adjust(clocks_to_attotime(32768 - 14), 0, clocks_to_attotime(32768));
 
 	// state saving
 	save_item(NAME(m_cs2));
@@ -259,12 +260,17 @@ void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	case TIMER_CLOCK:
 		if (!m_stop)
 			advance_seconds();
+		if (!m_busy)
+		{
+			m_busy = 1;
+			m_busy_handler(m_busy);
+		}
 		break;
 
 	case TIMER_BUSY:
 		if (!m_cs1 || !m_cs2 || !m_write || m_address != REGISTER_RESET)
 		{
-			m_busy = !m_busy;
+			m_busy = 0;
 			m_busy_handler(m_busy);
 		}
 		break;

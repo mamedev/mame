@@ -129,7 +129,7 @@ void bw12_state::ls259_w(int address, int data)
 		break;
 
 	case 4: /* CAP LOCK */
-		output().set_led_value(0, data);
+		m_led = data ? 1 : 0;
 		break;
 
 	case 5: /* MOTOR 0 */
@@ -479,6 +479,8 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 void bw12_state::machine_start()
 {
+	m_led.resolve();
+
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());
@@ -508,17 +510,19 @@ void bw12_state::machine_reset()
 	}
 }
 
-static SLOT_INTERFACE_START( bw12_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void bw12_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_SSDD);
+}
 
 FLOPPY_FORMATS_MEMBER( bw12_state::bw12_floppy_formats )
 	FLOPPY_BW12_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( bw14_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void bw14_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( bw12_state::bw14_floppy_formats )
 	FLOPPY_BW12_FORMAT
@@ -539,7 +543,7 @@ static const gfx_layout bw12_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( bw12 )
+static GFXDECODE_START( gfx_bw12 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bw12_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -547,9 +551,9 @@ GFXDECODE_END
 /* Machine Driver */
 MACHINE_CONFIG_START(bw12_state::common)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(bw12_mem)
-	MCFG_CPU_IO_MAP(bw12_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(bw12_mem)
+	MCFG_DEVICE_IO_MAP(bw12_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
@@ -559,7 +563,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bw12)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bw12)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(16'000'000)/8)
@@ -568,39 +572,39 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // ls273.ic5 + mc1408.ic4
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // ls273.ic5 + mc1408.ic4
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
 
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(bw12_state, pia_pa_r))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(bw12_state, pia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, bw12_state, pia_pa_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, bw12_state, pia_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(1'843'200))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(bw12_state, pit_out0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, bw12_state, pit_out0_w))
 	MCFG_PIT8253_CLK1(XTAL(1'843'200))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(XTAL(1'843'200))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(bw12_state, pit_out2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw12_state, pit_out2_w))
 
 	MCFG_DEVICE_ADD(AY3600PRO002_TAG, AY3600, 0)
 	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
@@ -612,26 +616,26 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(bw12_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(bw12_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(bw12_state, ay3600_data_ready_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, bw12_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, bw12_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, bw12_state, ay3600_data_ready_w))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(PIA6821_TAG, pia6821_device, ca1_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bw12_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(bw12_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(bw12_state, write_centronics_perror))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, ca1_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw12_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, bw12_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, bw12_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
@@ -678,6 +682,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984, bw12,   0,      0,      bw12,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 12",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 14",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME       FLAGS */
+COMP( 1984, bw12, 0,      0,      bw12,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 12", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14, bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 14", MACHINE_SUPPORTS_SAVE )

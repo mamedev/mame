@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_online_callback(_Object object) { return m_online_cb.set_callback(object); }
+	template <class Object> devcb_base &set_online_callback(Object &&cb) { return m_online_cb.set_callback(std::forward<Object>(cb)); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

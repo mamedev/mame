@@ -193,6 +193,7 @@ Board contains only 29 ROMs and not much else.
 #include "audio/taito_en.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "machine/taitoio.h"
 #include "machine/watchdog.h"
@@ -200,23 +201,6 @@ Board contains only 29 ROMs and not much else.
 #include "screen.h"
 
 #include "cbombers.lh"
-
-
-/***********************************************************
-                INTERRUPTS
-***********************************************************/
-
-void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_INTERRUPT5:
-		m_maincpu->set_input_line(5, HOLD_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in undrfire_state::device_timer");
-	}
-}
 
 
 /**********************************************************
@@ -257,36 +241,6 @@ WRITE16_MEMBER(undrfire_state::shared_ram_w)
 			m_shared_ram[offset/2]=(m_shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
 	}
 }
-
-
-
-/* Some unknown hardware byte mapped at $600002-5 */
-
-READ32_MEMBER(undrfire_state::unknown_hardware_r)
-{
-	switch (offset) /* four single bytes are read in sequence at $156e */
-	{
-		case 0x00:  /* $600002-3 */
-		{
-			return 0xffff;  // no idea what they should be
-		}
-
-		case 0x01:  /* $600004-5 */
-		{
-			return 0xffff0000;  // no idea what they should be
-		}
-	}
-
-	return 0x0;
-}
-
-
-WRITE32_MEMBER(undrfire_state::unknown_int_req_w)
-{
-	/* 10000 cycle delay is arbitrary */
-	timer_set(m_maincpu->cycles_to_attotime(10000), TIMER_INTERRUPT5);
-}
-
 
 READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 {
@@ -380,20 +334,6 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ32_MEMBER(undrfire_state::cbombers_adc_r)
-{
-	return (ioport("STEER")->read() << 24);
-}
-
-WRITE8_MEMBER(undrfire_state::cbombers_adc_w)
-{
-	/* One interrupt per input port (4 per frame, though only 2 used).
-	    1000 cycle delay is arbitrary */
-	/* TODO: hook it up to offset 0 only otherwise cbomber proto keeps sending irqs.
-	         Could or could not be right. */
-	if(offset == 0)
-		timer_set(m_maincpu->cycles_to_attotime(1000), TIMER_INTERRUPT5);
-}
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -408,7 +348,7 @@ void undrfire_state::undrfire_map(address_map &map)
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
 	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::motor_control_w));      /* gun vibration */
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x600000, 0x600007).rw(this, FUNC(undrfire_state::unknown_hardware_r), FUNC(undrfire_state::unknown_int_req_w));    /* int request for unknown hardware */
+	map(0x600000, 0x600007).noprw(); // space for ADC0809, not fitted on pcb
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
@@ -428,7 +368,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x300000, 0x303fff).ram().share("spriteram");
 	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::cbombers_cpua_ctrl_w));
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x600000, 0x600007).r(this, FUNC(undrfire_state::cbombers_adc_r)).w(this, FUNC(undrfire_state::cbombers_adc_w));
+	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
@@ -602,13 +542,13 @@ static const gfx_layout scclayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( undrfire )
+static GFXDECODE_START( gfx_undrfire )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
 GFXDECODE_END
 
-static GFXDECODE_START( cbombers )
+static GFXDECODE_START( gfx_cbombers )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0x1000, 512 )
 	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
@@ -627,9 +567,9 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 MACHINE_CONFIG_START(undrfire_state::undrfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
-	MCFG_CPU_PROGRAM_MAP(undrfire_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
+	MCFG_DEVICE_PROGRAM_MAP(undrfire_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -637,12 +577,12 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(undrfire_state, coin_word_w))
+	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(*this, undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, undrfire_state, coin_word_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */
@@ -654,7 +594,7 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_undrfire)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", undrfire)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_undrfire)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -680,28 +620,32 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
-	MCFG_CPU_PROGRAM_MAP(cbombers_cpua_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
+	MCFG_DEVICE_PROGRAM_MAP(cbombers_cpua_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(cbombers_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cbombers_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))
+	MCFG_ADC0808_IN0_CB(IOPORT("STEER"))
+
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(undrfire_state, coin_word_w))
+	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(*this, undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, undrfire_state, coin_word_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */
@@ -713,7 +657,7 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_cbombers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbombers)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbombers)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -1066,25 +1010,21 @@ ROM_START( cbombersp )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(undrfire_state,undrfire)
+void undrfire_state::init_undrfire()
 {
-	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx3")->base();
-	int size=memregion("gfx3")->bytes();
-	int data;
+	int size = memregion("gfx3")->bytes();
 
 	/* make SCC tile GFX format suitable for gfxdecode */
-	offset = size/2;
-	for (i = size/2+size/4; i<size; i++)
+	uint32_t offset = size / 2;
+	for (uint32_t i = size / 2 + size / 4; i < size; i++)
 	{
-		int d1,d2,d3,d4;
-
 		/* Expand 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data>>0) & 3;
-		d2 = (data>>2) & 3;
-		d3 = (data>>4) & 3;
-		d4 = (data>>6) & 3;
+		int data = gfx[i];
+		int d1 = (data>>0) & 3;
+		int d2 = (data>>2) & 3;
+		int d3 = (data>>4) & 3;
+		int d4 = (data>>6) & 3;
 
 		gfx[offset] = (d1<<2) | (d2<<6);
 		offset++;
@@ -1095,40 +1035,35 @@ DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 }
 
 
-DRIVER_INIT_MEMBER(undrfire_state,cbombers)
+void undrfire_state::init_cbombers()
 {
-	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx3")->base();
-	int size=memregion("gfx3")->bytes();
-	int data;
-
+	int size = memregion("gfx3")->bytes();
 
 	/* make SCC tile GFX format suitable for gfxdecode */
-	offset = size/2;
-	for (i = size/2+size/4; i<size; i++)
+	uint32_t offset = size/2;
+	for (uint32_t i = size/2+size/4; i<size; i++)
 	{
-		int d1,d2,d3,d4;
-
 		/* Expand 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data>>0) & 3;
-		d2 = (data>>2) & 3;
-		d3 = (data>>4) & 3;
-		d4 = (data>>6) & 3;
+		int data = gfx[i];
+		int d1 = (data >> 0) & 3;
+		int d2 = (data >> 2) & 3;
+		int d3 = (data >> 4) & 3;
+		int d4 = (data >> 6) & 3;
 
-		gfx[offset] = (d1<<2) | (d2<<6);
+		gfx[offset] = (d1 << 2) | (d2 << 6);
 		offset++;
 
-		gfx[offset] = (d3<<2) | (d4<<6);
+		gfx[offset] = (d3 << 2) | (d4 << 6);
 		offset++;
 	}
 }
 
 
 
-GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
-GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
-GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, init_undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
+GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, init_undrfire, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
+GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, init_undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, init_cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, init_cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, init_cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )

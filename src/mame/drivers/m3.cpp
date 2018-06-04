@@ -103,7 +103,7 @@ static const gfx_layout charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( f4disp )
+static GFXDECODE_START( gfx_f4disp )
 	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -113,9 +113,9 @@ void m3_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(m3_state::m3)
-	MCFG_CPU_ADD("maincpu", Z80, 2'000'000) // no idea of clock.
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000) // no idea of clock.
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(m3_state::m3)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f4disp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f4disp)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -146,4 +146,4 @@ ROM_START( m3 )
 	ROM_LOAD( "keyboard_prom,032.bin",     0x0000, 0x0800, CRC(21548355) SHA1(ee4ce4af9c78474263dd58e0f19e79e5b00926fa) )
 ROM_END
 
-COMP( 19??, m3, 0, 0, m3, m3, m3_state, 0, "LSI", "M3", MACHINE_IS_SKELETON )
+COMP( 19??, m3, 0, 0, m3, m3, m3_state, empty_init, "LSI", "M3", MACHINE_IS_SKELETON )

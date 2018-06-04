@@ -414,7 +414,7 @@ static const gfx_layout spritelayout =
 	16*2*8
 };
 
-static GFXDECODE_START( popper )
+static GFXDECODE_START( gfx_popper )
 	GFXDECODE_ENTRY("tiles",   0, layer0_charlayout, 0, 32)
 	GFXDECODE_ENTRY("tiles",   0, layer1_charlayout, 0, 16)
 	GFXDECODE_ENTRY("sprites", 0, spritelayout,      0, 16)
@@ -534,11 +534,11 @@ void popper_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START(popper_state::popper)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -548,18 +548,18 @@ MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popper)
 
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
 
 	// audio hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -594,5 +594,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, popper_state, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY  FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )

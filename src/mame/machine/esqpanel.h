@@ -8,6 +8,8 @@
 #include "machine/esqvfd.h"
 #include "machine/esqlcd.h"
 
+#include "diserial.h"
+
 #include <vector>
 
 //**************************************************************************

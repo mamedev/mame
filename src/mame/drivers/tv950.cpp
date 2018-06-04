@@ -272,8 +272,8 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 
 MACHINE_CONFIG_START(tv950_state::tv950)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/14)
-	MCFG_CPU_PROGRAM_MAP(tv950_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/14)
+	MCFG_DEVICE_PROGRAM_MAP(tv950_mem)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )   // not real values
@@ -285,17 +285,17 @@ MACHINE_CONFIG_START(tv950_state::tv950)
 	MCFG_MC6845_CHAR_WIDTH(14)
 	MCFG_MC6845_UPDATE_ROW_CB(tv950_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(tv950_state, crtc_update_addr)
-	MCFG_MC6845_OUT_HSYNC_CB(DEVWRITELINE(VIA_TAG, via6522_device, write_pb6))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tv950_state, crtc_vs_w))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(VIA_TAG, via6522_device, write_pb6))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tv950_state, crtc_vs_w))
 	MCFG_VIDEO_SET_SCREEN(nullptr)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, MASTER_CLOCK/14)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(tv950_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(tv950_state, via_b_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8(tv950_state, via_b_r))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(tv950_state, via_crtc_reset_w))
-	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(tv950_state, via_blink_rate_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, tv950_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, tv950_state, via_b_w))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, tv950_state, via_b_r))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, tv950_state, via_crtc_reset_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, tv950_state, via_blink_rate_w))
 
 	MCFG_DEVICE_ADD(ACIA1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
@@ -332,5 +332,5 @@ ROM_START( tv950 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "Model 950 Video Display Terminal",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME                            FLAGS
+COMP( 1981, tv950, 0,      0,      tv950,   tv950, tv950_state, empty_init, "TeleVideo", "Model 950 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

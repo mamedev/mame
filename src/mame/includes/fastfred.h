@@ -61,20 +61,20 @@ public:
 	DECLARE_WRITE8_MEMBER(imago_fg_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(imago_charbank_w);
 
-	DECLARE_DRIVER_INIT(fastfred);
-	DECLARE_DRIVER_INIT(flyboy);
-	DECLARE_DRIVER_INIT(flyboyb);
-	DECLARE_DRIVER_INIT(imago);
-	DECLARE_DRIVER_INIT(boggy84);
-	DECLARE_DRIVER_INIT(jumpcoas);
-	DECLARE_DRIVER_INIT(boggy84b);
+	void init_fastfred();
+	void init_flyboy();
+	void init_flyboyb();
+	void init_imago();
+	void init_boggy84();
+	void init_jumpcoas();
+	void init_boggy84b();
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_web);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	virtual void machine_start() override;

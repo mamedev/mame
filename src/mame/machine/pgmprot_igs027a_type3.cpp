@@ -195,12 +195,12 @@ MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3 )
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(svg_68k_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
-	MCFG_CPU_PROGRAM_MAP(_55857G_arm7_map)
+	MCFG_DEVICE_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
+	MCFG_DEVICE_PROGRAM_MAP(_55857G_arm7_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
 MACHINE_CONFIG_END
@@ -510,7 +510,7 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xE59F; base += 2;
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
+void pgm_arm_type3_state::init_theglad()
 {
 	svg_basic_init();
 	pgm_theglad_decrypt(machine());
@@ -579,9 +579,9 @@ void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base
 	}
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state, theglada)
+void pgm_arm_type3_state::init_theglada()
 {
-	DRIVER_INIT_CALL(theglad);
+	init_theglad();
 
 	pgm_patch_external_arm_rom_jumptable_theglada(0x82078);
 
@@ -594,7 +594,7 @@ INPUT_PORTS_START( theglad )
 	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	//PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) ) // it doesn't appear that carts of the Japanese version were released, the PCB has an extra sample ROM used in Japanese mode for the music
+	//PORT_CONFSETTING(      0x0002, "Japan (Alta/AMI license)" ) // it doesn't appear that carts of the Japanese version were released, the PCB has an extra sample ROM used in Japanese mode for the music
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
@@ -609,7 +609,7 @@ INPUT_PORTS_START( svg )
 	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
+	PORT_CONFSETTING(      0x0002, "Japan (AMI license)" )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
@@ -624,6 +624,21 @@ INPUT_PORTS_START( svgtw )
 	PORT_CONFNAME( 0x00ff, 0x0001, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, "Japan (AMI license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
+INPUT_PORTS_END
+
+INPUT_PORTS_START( svgpcb )
+	PORT_INCLUDE ( pgm )
+
+	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
@@ -632,7 +647,7 @@ INPUT_PORTS_START( svgtw )
 	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
+void pgm_arm_type3_state::init_svg()
 {
 	svg_basic_init();
 	pgm_svg_decrypt(machine());
@@ -644,7 +659,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
+void pgm_arm_type3_state::init_svgpcb()
 {
 	svg_basic_init();
 	pgm_svgpcb_decrypt(machine());
@@ -664,7 +679,7 @@ READ32_MEMBER(pgm_arm_type3_state::killbldp_speedup_r )
 	return m_arm_ram2[0x00c/4];
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
+void pgm_arm_type3_state::init_killbldp()
 {
 	svg_basic_init();
 	pgm_killbldp_decrypt(machine());
@@ -704,7 +719,7 @@ READ16_MEMBER(pgm_arm_type3_state::dmnfrnt_main_speedup_r )
 	return data;
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
+void pgm_arm_type3_state::init_dmnfrnt()
 {
 	svg_basic_init();
 	pgm_dfront_decrypt(machine());
@@ -782,11 +797,9 @@ INPUT_PORTS_START( happy6 )
 	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
+void pgm_arm_type3_state::init_happy6()
 {
-	uint8_t *src;
-
-	src = (uint8_t *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
+	uint8_t *src = (uint8_t *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 

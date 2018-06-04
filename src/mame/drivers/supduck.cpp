@@ -420,7 +420,7 @@ static const gfx_layout tile_layout =
 
 
 
-static GFXDECODE_START( supduck )
+static GFXDECODE_START( gfx_supduck )
 	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  16 )    /* colors   0-  63 */
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  16 )    /* colors 256- 319 */
@@ -443,12 +443,12 @@ void supduck_state::machine_reset()
 MACHINE_CONFIG_START(supduck_state::supduck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* Verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supduck_state,  irq2_line_hold) // 2 & 4?
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000)) /* Verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supduck_state,  irq2_line_hold) // 2 & 4?
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/4) /* 2MHz - verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/4) /* 2MHz - verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -458,11 +458,11 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supduck)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
@@ -470,11 +470,11 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
@@ -524,4 +524,4 @@ ROM_START( supduck )
 	ROM_LOAD( "1.su13",   0x00000, 0x80000, CRC(7fb1ed42) SHA1(77ec86a6454398e329066aa060e9b6a39085ce71) ) // banked sample data
 ROM_END
 
-GAME( 1992, supduck, 0, supduck, supduck, supduck_state, 0, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, supduck, 0, supduck, supduck, supduck_state, empty_init, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )

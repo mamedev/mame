@@ -179,7 +179,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( yard )
+static GFXDECODE_START( gfx_yard )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     512, 32 )
 GFXDECODE_END
@@ -195,12 +195,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(m58_state::yard)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
-	MCFG_CPU_PROGRAM_MAP(yard_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(yard_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yard)
 	MCFG_PALETTE_ADD("palette", 256+256+256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+256+16)
 	MCFG_PALETTE_INIT_OWNER(m58_state, m58)
@@ -427,10 +427,10 @@ ROM_START( 10yard85 )
 ROM_END
 
 
-/*    YEAR  NAME       PARENT    MACHINE  INPUT     STATE      INIT  MONITOR  COMPANY  FULLNAME, FLAGS */
-GAME( 1983, 10yard,    0,        yard,    yard,     m58_state, 0,    ROT0,    "Irem",  "10-Yard Fight (World, set 1)", MACHINE_SUPPORTS_SAVE ) // no copyright
-GAME( 1983, 10yardj,   10yard,   yard,    yard,     m58_state, 0,    ROT0,    "Irem",  "10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vs10yard,  10yard,   yard,    vs10yard, m58_state, 0,    ROT0,    "Irem",  "Vs 10-Yard Fight (World, 11/05/84)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vs10yardj, 10yard,   yard,    vs10yarj, m58_state, 0,    ROT0,    "Irem",  "Vs 10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vs10yardu, 10yard,   yard,    vs10yard, m58_state, 0,    ROT0,    "Irem (Taito license)", "Vs 10-Yard Fight (US, Taito license)", MACHINE_SUPPORTS_SAVE ) // had '85 stickers, but doesn't have '85 on the title screen like the set below
-GAME( 1985, 10yard85,  10yard,   yard,    yard,     m58_state, 0,    ROT0,    "Irem (Taito license)", "10-Yard Fight '85 (US, Taito license)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    MACHINE  INPUT     STATE      INIT        MONITOR  COMPANY  FULLNAME, FLAGS */
+GAME( 1983, 10yard,    0,        yard,    yard,     m58_state, empty_init, ROT0,    "Irem",  "10-Yard Fight (World, set 1)", MACHINE_SUPPORTS_SAVE ) // no copyright
+GAME( 1983, 10yardj,   10yard,   yard,    yard,     m58_state, empty_init, ROT0,    "Irem",  "10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vs10yard,  10yard,   yard,    vs10yard, m58_state, empty_init, ROT0,    "Irem",  "Vs 10-Yard Fight (World, 11/05/84)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vs10yardj, 10yard,   yard,    vs10yarj, m58_state, empty_init, ROT0,    "Irem",  "Vs 10-Yard Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vs10yardu, 10yard,   yard,    vs10yard, m58_state, empty_init, ROT0,    "Irem (Taito license)", "Vs 10-Yard Fight (US, Taito license)", MACHINE_SUPPORTS_SAVE ) // had '85 stickers, but doesn't have '85 on the title screen like the set below
+GAME( 1985, 10yard85,  10yard,   yard,    yard,     m58_state, empty_init, ROT0,    "Irem (Taito license)", "10-Yard Fight '85 (US, Taito license)", MACHINE_SUPPORTS_SAVE )

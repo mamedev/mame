@@ -32,8 +32,10 @@ static const floppy_interface bml3_mp1805_floppy_interface =
 
 WRITE_LINE_MEMBER( bml3bus_mp1805_device::bml3_mc6843_intrq_w )
 {
-	if (state) {
-		m_bml3bus->set_nmi_line(PULSE_LINE);
+	if (state)
+	{
+		m_bml3bus->set_nmi_line(ASSERT_LINE);
+		m_bml3bus->set_nmi_line(CLEAR_LINE);
 	}
 }
 
@@ -56,7 +58,7 @@ ROM_END
 
 MACHINE_CONFIG_START(bml3bus_mp1805_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
-	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(bml3bus_mp1805_device, bml3_mc6843_intrq_w))
+	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(*this, bml3bus_mp1805_device, bml3_mc6843_intrq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
 MACHINE_CONFIG_END
 

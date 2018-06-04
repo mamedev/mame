@@ -371,7 +371,7 @@ static void kick_sn74s516(running_machine &machine, uint16_t *data, const int in
 	}
 
 	math.dbgaddr = math.promaddr;
-	math.dbgpc = machine.device("math_cpu")->safe_pcbase();
+	math.dbgpc = state->m_mathcpu->pcbase();
 }
 
 

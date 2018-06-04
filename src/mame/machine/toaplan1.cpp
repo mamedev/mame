@@ -12,10 +12,10 @@
 #include "includes/toaplan1.h"
 
 
-INTERRUPT_GEN_MEMBER(toaplan1_state::toaplan1_interrupt)
+void toaplan1_state::toaplan1_interrupt()
 {
 	if (m_intenable)
-		device.execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)
@@ -172,8 +172,8 @@ void toaplan1_state::toaplan1_reset_sound()
 	/* Reset the secondary CPU and sound chip */
 	/* rallybik, truxton, hellfire, demonwld write to a port to cause a reset */
 	/* zerowing, fireshrk, outzone, vimana use a RESET instruction instead */
-	machine().device("ymsnd")->reset();
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_ymsnd->reset();
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound_w)

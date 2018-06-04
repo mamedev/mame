@@ -741,37 +741,37 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(clcd_state::clcd)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
-	MCFG_CPU_PROGRAM_MAP(clcd_mem)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(clcd_mem)
 
 	MCFG_DEVICE_ADD("via0", VIA6522, 2000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via0_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(clcd_state, via0_cb1_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(clcd_state, write_irq_via0))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, clcd_state, via0_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, clcd_state, via0_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, clcd_state, via0_cb1_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, clcd_state, write_irq_via0))
 
 	MCFG_DEVICE_ADD("via1", VIA6522, 2000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via1_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via1_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(clcd_state, write_irq_via1))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, clcd_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, clcd_state, via1_pb_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, clcd_state, write_irq_via1))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 2000000)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(clcd_state, write_irq_acia))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, clcd_state, write_irq_acia))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("via1", via6522_device, write_pb4))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, nullptr)
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
@@ -798,11 +798,11 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
-	MCFG_MSM58321_D0_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa0))
-	MCFG_MSM58321_D1_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa1))
-	MCFG_MSM58321_D2_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa2))
-	MCFG_MSM58321_D3_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa3))
-	MCFG_MSM58321_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa7))
+	MCFG_MSM58321_D0_HANDLER(WRITELINE("via1", via6522_device, write_pa0))
+	MCFG_MSM58321_D1_HANDLER(WRITELINE("via1", via6522_device, write_pa1))
+	MCFG_MSM58321_D2_HANDLER(WRITELINE("via1", via6522_device, write_pa2))
+	MCFG_MSM58321_D3_HANDLER(WRITELINE("via1", via6522_device, write_pa3))
+	MCFG_MSM58321_BUSY_HANDLER(WRITELINE("via1", via6522_device, write_pa7))
 	MCFG_MSM58321_YEAR0(1984)
 	MCFG_MSM58321_DEFAULT_24H(true)
 
@@ -819,8 +819,8 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_RAM_ADD("ram")
@@ -845,5 +845,5 @@ ROM_START( clcd )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                        FULLNAME           FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd,  clcd_state,  0,     "Commodore Business Machines", "LCD (Prototype)", 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                        FULLNAME           FLAGS */
+COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (Prototype)", 0 )

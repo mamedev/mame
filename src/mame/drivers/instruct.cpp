@@ -63,6 +63,7 @@ public:
 		, m_p_smiram(*this, "smiram")
 		, m_p_extram(*this, "extram")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(port_r);
@@ -83,6 +84,7 @@ public:
 	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;
 	uint8_t m_digit;
 	bool m_valid_digit;
@@ -93,6 +95,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_smiram;
 	required_shared_ptr<uint8_t> m_p_extram;
 	required_device<cassette_image_device> m_cass;
+	output_finder<129> m_digits;
 };
 
 // flag led
@@ -127,7 +130,7 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 WRITE8_MEMBER( instruct_state::portf9_w )
 {
 	if (m_valid_digit)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 	m_valid_digit = false;
 }
 
@@ -417,13 +420,13 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 
 MACHINE_CONFIG_START(instruct_state::instruct)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(3'579'545) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DATA_MAP(data_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
-	MCFG_S2650_SENSE_INPUT(READLINE(instruct_state, sense_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(instruct_state, flag_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(3'579'545) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_DATA_MAP(data_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, instruct_state, sense_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, instruct_state, flag_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
@@ -433,9 +436,8 @@ MACHINE_CONFIG_START(instruct_state::instruct)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -450,5 +452,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY      FULLNAME                   FLAGS
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME                   FLAGS
+COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", 0 )

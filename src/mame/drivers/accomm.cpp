@@ -713,7 +713,7 @@ static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Keypad =")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
 
 	PORT_START("LINE1.9")
@@ -832,9 +832,9 @@ static INPUT_PORTS_START( accomm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(accomm_state::accomm)
-	MCFG_CPU_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
+	MCFG_DEVICE_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 50.08 )
@@ -857,43 +857,43 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 300)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* rtc pcf8573 */
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", G65816_LINE_IRQ))
 
-	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("serial", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(16'000'000) / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(accomm_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, accomm_state, write_acia_clock))
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, data_w))
 	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", G65816_LINE_NMI))
 	MCFG_ECONET_ADD()
-	MCFG_ECONET_CLK_CALLBACK(WRITELINE(accomm_state, econet_clk_w))
-	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
+	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, accomm_state, econet_clk_w))
+	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
@@ -901,12 +901,12 @@ ROM_START(accomm)
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("100")
 	ROM_SYSTEM_BIOS(0, "100", "1.00 13/Nov/86") /* Version 1.00 13/Nov/86 (C)1986 */
-	ROMX_LOAD( "romv100-3.rom", 0x000000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-2.rom", 0x010000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9), ROM_BIOS(1) )
+	ROMX_LOAD( "romv100-3.rom", 0x000000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a), ROM_BIOS(0) )
+	ROMX_LOAD( "romv100-2.rom", 0x010000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419), ROM_BIOS(0) )
+	ROMX_LOAD( "romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab), ROM_BIOS(0) )
+	ROMX_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9), ROM_BIOS(0) )
 	/* Version 1.70 04/Jun/87 (C)1987 */
 	/* Versone 3.00 13/gen/88 (C)1988 */
 ROM_END
 
-COMP( 1986,  accomm,  0, 0, accomm,  accomm, accomm_state,  0,  "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )
+COMP( 1986, accomm, 0, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )

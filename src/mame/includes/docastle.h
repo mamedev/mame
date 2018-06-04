@@ -77,6 +77,8 @@ public:
 	void video_start_common( uint32_t tile_transmask );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(docastle_tint);
+	DECLARE_WRITE_LINE_MEMBER(stx_on_w);
+	DECLARE_WRITE_LINE_MEMBER(stx_off_w);
 	DECLARE_WRITE_LINE_MEMBER(idsoccer_adpcm_int);
 	void dorunrun(machine_config &config);
 	void idsoccer(machine_config &config);

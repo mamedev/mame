@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irqmask_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sounden_w);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void alinvade(machine_config &config);
@@ -62,7 +62,7 @@ static const discrete_dac_r1_ladder alinvade_music_dac =
 
 #define ALINVADE_MUSIC_CLK      (75000)
 
-DISCRETE_SOUND_START(alinvade)
+DISCRETE_SOUND_START(alinvade_discrete)
 	DISCRETE_INPUT_DATA (NODE_01)
 
 	DISCRETE_NOTE(NODE_20, 1, ALINVADE_MUSIC_CLK, NODE_01, 255, 5, DISC_CLK_IS_FREQ)
@@ -199,18 +199,17 @@ uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
+WRITE_LINE_MEMBER(alinvade_state::vblank_irq)
 {
-	if(m_irqmask & 1)
+	if (state && BIT(m_irqmask, 0))
 		m_maincpu->set_input_line(0,HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(alinvade_state::alinvade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(alinvade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", M6502,2000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alinvade_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -219,10 +218,11 @@ MACHINE_CONFIG_START(alinvade_state::alinvade)
 	MCFG_SCREEN_SIZE(128, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, alinvade_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DISCRETE_ADD("discrete", 0, alinvade)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, alinvade_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -244,4 +244,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAMEL( 198?, alinvade,  0,    alinvade, alinvade, alinvade_state,  0, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )
+GAMEL( 198?, alinvade, 0, alinvade, alinvade, alinvade_state, empty_init, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )

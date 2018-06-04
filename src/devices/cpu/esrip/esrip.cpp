@@ -193,7 +193,7 @@ void esrip_device::device_start()
 	m_ipt_ram.resize(IPT_RAM_SIZE/2);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-3>();
+	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
@@ -297,7 +297,7 @@ void esrip_device::device_start()
 	save_item(NAME(m_ipt_ram));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 }
 
@@ -1879,7 +1879,7 @@ void esrip_device::execute_run()
 		m_pl7 = m_l7;
 
 		/* Latch instruction */
-		inst = m_direct->read_qword(RIP_PC);
+		inst = m_cache->read_qword(RIP_PC);
 
 		in_h = inst >> 32;
 		in_l = inst & 0xffffffff;
@@ -1953,7 +1953,7 @@ void esrip_device::execute_run()
 			m_ipt_cnt = (m_ipt_cnt + 1) & 0x1fff;
 
 		if (calldebugger)
-			debugger_instruction_hook(this, RIP_PC);
+			debugger_instruction_hook(RIP_PC);
 
 		m_pc = next_pc;
 		m_rip_pc = (m_pc | ((m_status_out & 1) << 8));

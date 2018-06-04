@@ -16,13 +16,12 @@
 
 // Components
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/kc_keyb.h"
 #include "machine/rescap.h"
-#include "cpu/z80/z80daisy.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "screen.h"
@@ -67,6 +66,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_screen(*this, "screen")
+		, m_expansions(*this, {"m8", "mc", "exp"})
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -76,6 +76,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<screen_device> m_screen;
+	required_device_array<kcexp_slot_device, 3> m_expansions;
 
 	// defined in machine/kc.c
 	virtual void machine_start() override;
@@ -148,7 +149,6 @@ public:
 	int                 m_astb;
 	int                 m_cassette_in;
 
-	kcexp_slot_device * m_expansions[3];
 	DECLARE_PALETTE_INIT(kc85);
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);

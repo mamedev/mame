@@ -621,8 +621,8 @@ void hyperscan_state::machine_reset()
 
 MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
-	MCFG_CPU_PROGRAM_MAP(spg290_mem)
+	MCFG_DEVICE_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
+	MCFG_DEVICE_PROGRAM_MAP(spg290_mem)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","hyperscan")
 
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperscan_state, spg290_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperscan_state, spg290_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -649,5 +649,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      STATE            INIT  COMPANY   FULLNAME     FLAGS
-COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, 0,    "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
+COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

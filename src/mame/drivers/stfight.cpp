@@ -456,19 +456,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(stfight_state::stfight_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
-	MCFG_M68705_PORTB_R_CB(READ8(stfight_state, stfight_68705_port_b_r));
-	MCFG_M68705_PORTA_W_CB(WRITE8(stfight_state, stfight_68705_port_a_w));
-	MCFG_M68705_PORTB_W_CB(WRITE8(stfight_state, stfight_68705_port_b_w));
-	MCFG_M68705_PORTC_W_CB(WRITE8(stfight_state, stfight_68705_port_c_w));
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
+	MCFG_M68705_PORTB_R_CB(READ8(*this, stfight_state, stfight_68705_port_b_r));
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_a_w));
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_b_w));
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_c_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -476,33 +476,33 @@ MACHINE_CONFIG_START(stfight_state::stfight_base)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(stfight_state, stfight_adpcm_int)) // Interrupt function
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, stfight_state, stfight_adpcm_int)) // Interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // 8KHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(stfight_state::stfight)
 	stfight_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stfight_cpu1_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stfight_cpu1_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
 	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")
 MACHINE_CONFIG_END
@@ -510,9 +510,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(stfight_state::cshooter)
 	stfight_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cshooter_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
 
 	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
 MACHINE_CONFIG_END
@@ -1065,13 +1065,13 @@ ROM_END
 
 
 // Note: Marked MACHINE_IMPERFECT_SOUND due to YM2203 clock issue
-GAME( 1986, empcity,  0,       stfight,  stfight, stfight_state,  empcity,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityu, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
-GAME( 1986, empcityj, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityi, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfight,  empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfighta, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfightgb,empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcity,   0,       stfight,  stfight,  stfight_state, init_empcity,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityu,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
+GAME( 1986, empcityj,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityi,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfight,   empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfighta,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfightgb, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Cross Shooter uses the same base board, but different video board
-GAME( 1987, cshootert,airraid, cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshootert, airraid, cshooter, cshooter, stfight_state, init_cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

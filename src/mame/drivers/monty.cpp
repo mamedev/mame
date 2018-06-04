@@ -228,7 +228,7 @@ WRITE_LINE_MEMBER( monty_state::halt_changed )
 WRITE_LINE_MEMBER( monty_state::key_pressed )
 {
 	if (!state && m_halt)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -267,10 +267,10 @@ SED1520_UPDATE_CB(monty_state::screen_update)
 // TODO: Additional machine definition - Master Monty has a different memory layout
 MACHINE_CONFIG_START(monty_state::monty)
 	// Basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
-	MCFG_CPU_PROGRAM_MAP(monty_mem)
-	MCFG_CPU_IO_MAP(monty_io)
-	MCFG_Z80_SET_HALT_CALLBACK(WRITELINE(monty_state, halt_changed))
+	MCFG_DEVICE_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
+	MCFG_DEVICE_PROGRAM_MAP(monty_mem)
+	MCFG_DEVICE_IO_MAP(monty_io)
+	MCFG_Z80_SET_HALT_CALLBACK(WRITELINE(*this, monty_state, halt_changed))
 
 	// Video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -281,8 +281,8 @@ MACHINE_CONFIG_START(monty_state::monty)
 	MCFG_SCREEN_UPDATE_DRIVER(monty_state, lcd_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// LCD controller interfaces
@@ -291,8 +291,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(monty_state::mmonty)
 	monty(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mmonty_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mmonty_mem)
 MACHINE_CONFIG_END
 
 
@@ -313,6 +313,6 @@ ROM_END
 
 
 // Drivers
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY   FULLNAME                 FLAGS
-COMP( 1980, monty,   0,      0,       monty,     monty,  monty_state,  0,    "Ritam",  "Monty Plays Scrabble",  MACHINE_NOT_WORKING )
-COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  monty_state,  0,    "Ritam",  "Master Monty",          MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                FLAGS
+COMP( 1980, monty,  0,      0,      monty,   monty, monty_state, empty_init, "Ritam", "Monty Plays Scrabble", MACHINE_NOT_WORKING )
+COMP( 1982, mmonty, 0,      0,      mmonty,  monty, monty_state, empty_init, "Ritam", "Master Monty",         MACHINE_NOT_WORKING )

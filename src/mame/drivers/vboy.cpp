@@ -1344,17 +1344,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 #endif
 
 
-static SLOT_INTERFACE_START(vboy_cart)
-	SLOT_INTERFACE_INTERNAL("vb_rom",    VBOY_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
-SLOT_INTERFACE_END
+static void vboy_cart(device_slot_interface &device)
+{
+	device.option_add_internal("vb_rom",    VBOY_ROM_STD);
+	device.option_add_internal("vb_eeprom", VBOY_ROM_EEPROM);
+}
 
 MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", V810, XTAL(20'000'000) )
-	MCFG_CPU_PROGRAM_MAP(vboy_mem)
-	MCFG_CPU_IO_MAP(vboy_io)
+	MCFG_DEVICE_ADD( "maincpu", V810, XTAL(20'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(vboy_mem)
+	MCFG_DEVICE_IO_MAP(vboy_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
 	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_r", vboy_state, vboy_scanlineR, "3dright", 0, 1)
 
@@ -1388,8 +1389,9 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_VBOYSND_ADD("vbsnd")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("vbsnd", VBOYSND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1401,5 +1403,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY     FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0,       vboy,      vboy,  vboy_state, 0,    "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY     FULLNAME       FLAGS */
+CONS( 1995, vboy, 0,      0,      vboy,    vboy,  vboy_state, empty_init, "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

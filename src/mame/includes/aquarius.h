@@ -84,7 +84,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(scrambler_w);
 	DECLARE_READ8_MEMBER(cartridge_r);
-	DECLARE_DRIVER_INIT(aquarius);
+	void init_aquarius();
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(aquarius);

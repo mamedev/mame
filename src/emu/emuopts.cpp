@@ -383,14 +383,17 @@ namespace
 	std::vector<std::string> get_full_option_names(const device_image_interface &image)
 	{
 		std::vector<std::string> result;
+		bool same_name = image.instance_name() == image.brief_instance_name();
 
 		result.push_back(image.instance_name());
-		result.push_back(image.brief_instance_name());
+		if (!same_name)
+			result.push_back(image.brief_instance_name());
 
 		if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
 		{
 			result.push_back(image.instance_name() + "1");
-			result.push_back(image.brief_instance_name() + "1");
+			if (!same_name)
+				result.push_back(image.brief_instance_name() + "1");
 		}
 		return result;
 	}
@@ -747,9 +750,9 @@ void emu_options::reevaluate_default_card_software()
 			// retrieve info about the device instance
 			auto &slot_opt(slot_option(slot.slot_name()));
 
-			// device_slot_interface::get_default_card_software() is essentially a hook
-			// that lets devices provide a feedback loop to force a specified software
-			// list entry to be loaded
+			// device_slot_interface::get_default_card_software() allows a device that
+			// implements both device_slot_interface and device_image_interface to
+			// probe an image and specify the card device that should be loaded
 			//
 			// In the repeated cycle of adding slots and slot devices, this gives a chance
 			// for devices to "plug in" default software list items.  Of course, the fact
@@ -795,10 +798,10 @@ std::string emu_options::get_default_card_software(device_slot_interface &slot)
 			util::hash_collection hashes = image->calculate_hash_on_file(file);
 
 			return hashfile_extrainfo(
-				hash_path(),
-				image->device().mconfig().gamedrv(),
-				hashes,
-				extrainfo);
+					hash_path(),
+					image->device().mconfig().gamedrv(),
+					hashes,
+					extrainfo);
 		};
 	}
 

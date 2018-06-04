@@ -587,13 +587,13 @@ static const gfx_layout bg3232_charlayout =
 	32*32,
 };
 
-static GFXDECODE_START( kickgoal )
+static GFXDECODE_START( gfx_kickgoal )
 	GFXDECODE_ENTRY( "gfx1", 0, fg88_charlayout,    0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,  0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg3232_charlayout,  0x000, 0x40 )
 GFXDECODE_END
 
-static GFXDECODE_START( actionhw )
+static GFXDECODE_START( gfx_actionhw )
 	GFXDECODE_ENTRY( "gfx1", 0, fg88_alt_charlayout,    0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,      0x000, 0x40 )
 GFXDECODE_END
@@ -636,12 +636,12 @@ void kickgoal_state::oki_map(address_map &map)
 MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
 	MCFG_DEVICE_DISABLE()   /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
@@ -657,18 +657,18 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kickgoal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kickgoal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -676,11 +676,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
 	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
@@ -696,18 +696,18 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", actionhw)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actionhw)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -786,7 +786,7 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
+void kickgoal_state::init_kickgoal()
 {
 #if 0 /* we should find a real fix instead  */
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -797,7 +797,7 @@ DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 }
 
 
-GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, actionhw, 0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw,  0,        actionhw, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

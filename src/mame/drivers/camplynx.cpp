@@ -198,8 +198,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
 	DECLARE_MACHINE_RESET(lynx48k);
 	DECLARE_MACHINE_RESET(lynx128k);
-	DECLARE_DRIVER_INIT(lynx48k);
-	DECLARE_DRIVER_INIT(lynx128k);
+	void init_lynx48k();
+	void init_lynx128k();
 	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
@@ -245,7 +245,7 @@ d7 = read from bank 4 */
 
 	m_bankdata = data;
 	data ^= 0x31; // make all lines active high
-//printf("%s:%X\n", machine().describe_context(), data);
+//printf("%s:%X\n", machine().describe_context().c_str(), data);
 	// do writes
 	m_wbyte = (data & 0x0f) | ((m_port80 & 0x0c) << 3);
 	// do reads
@@ -371,7 +371,7 @@ d0 = read from bank 4 */
 	uint8_t rbyte = bitswap<8>(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
 	if (BIT(rbyte, 1))
 		rbyte &= 0x07; // remove 4 if 1 selected (AND gate in IC82)
-//printf("%s:%X:%X:%X\n", machine().describe_context(), data, rbyte, m_wbyte);
+//printf("%s:%X:%X:%X\n", machine().describe_context().c_str(), data, rbyte, m_wbyte);
 	switch (rbyte)
 	{
 		case 0x00:
@@ -838,24 +838,24 @@ FLOPPY_FORMATS_MEMBER( camplynx_state::camplynx_floppy_formats )
 	FLOPPY_CAMPLYNX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( camplynx_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void camplynx_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(camplynx_state::lynx_common)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.02)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.02);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(camplynx_state::lynx_disk)
-	MCFG_FD1793_ADD("fdc", 24_MHz_XTAL / 24)
+	MCFG_DEVICE_ADD("fdc", FD1793, 24_MHz_XTAL / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
@@ -865,9 +865,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(camplynx_state::lynx48k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
-	MCFG_CPU_PROGRAM_MAP(lynx48k_mem)
-	MCFG_CPU_IO_MAP(lynx48k_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
+	MCFG_DEVICE_PROGRAM_MAP(lynx48k_mem)
+	MCFG_DEVICE_IO_MAP(lynx48k_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
 
@@ -887,7 +887,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'000'000) / 8 )
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12_MHz_XTAL / 8 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
@@ -897,8 +897,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(camplynx_state::lynx96k)
 	lynx48k(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(lynx96k_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(lynx96k_io)
 
 	lynx_disk(config);
 
@@ -910,9 +910,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(camplynx_state::lynx128k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(lynx128k_mem)
-	MCFG_CPU_IO_MAP(lynx128k_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lynx128k_mem)
+	MCFG_DEVICE_IO_MAP(lynx128k_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx128k)
 
@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "128K")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(camplynx_state, lynx48k)
+void camplynx_state::init_lynx48k()
 {
 	m_is_128k = false;
 	m_p_ram = memregion("maincpu")->base();
@@ -959,7 +959,7 @@ DRIVER_INIT_MEMBER(camplynx_state, lynx48k)
 	membank("bankr8")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
 }
 
-DRIVER_INIT_MEMBER(camplynx_state, lynx128k)
+void camplynx_state::init_lynx128k()
 {
 	m_is_128k = true;
 	m_p_ram = memregion("maincpu")->base();
@@ -979,11 +979,11 @@ ROM_START( lynx48k )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("1")
 	ROM_SYSTEM_BIOS(0, "1", "Set1")
-	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(1) )
-	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(0) )
+	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "2", "Set2")
-	ROMX_LOAD( "lynx4811.rom", 0x0000, 0x2000, CRC(a933e577) SHA1(c7b30a28d99b38dbe63a1314c78e3e614287143b), ROM_BIOS(2) )
-	ROMX_LOAD( "lynx4812.rom", 0x2000, 0x2000, CRC(3d3fdd0e) SHA1(259d124f05367a96f891790f9418cc9c7798e2f8), ROM_BIOS(2) )
+	ROMX_LOAD( "lynx4811.rom", 0x0000, 0x2000, CRC(a933e577) SHA1(c7b30a28d99b38dbe63a1314c78e3e614287143b), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx4812.rom", 0x2000, 0x2000, CRC(3d3fdd0e) SHA1(259d124f05367a96f891790f9418cc9c7798e2f8), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( lynx96k )
@@ -992,11 +992,11 @@ ROM_START( lynx96k )
 	ROM_LOAD( "lynx9645.rom",  0x2000, 0x2000, CRC(f596b9a3) SHA1(3fca46bd68422d34c6cd801dd904507e52bd8846) )
 	ROM_DEFAULT_BIOS("orig")
 	ROM_SYSTEM_BIOS(0, "orig", "Original")
-	ROMX_LOAD( "lynx9644.rom", 0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx9644.rom", 0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "scorp", "Scorpion") /* Scorpion ROM v2.1 03/86 (Reading Lynx User Group) */
-	ROMX_LOAD( "skorprom.rom", 0x4000, 0x2000, CRC(698d3de9) SHA1(c707bdcecef79774c2a8a23d1f3e9ba382cb9304), ROM_BIOS(2) )
+	ROMX_LOAD( "skorprom.rom", 0x4000, 0x2000, CRC(698d3de9) SHA1(c707bdcecef79774c2a8a23d1f3e9ba382cb9304), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "danish", "Danish")
-	ROMX_LOAD( "danish96k3.rom", 0x4000, 0x2000, CRC(795c22ea) SHA1(0a57394cd986c5b338b38d514e894bace7f6e47b), ROM_BIOS(3) )
+	ROMX_LOAD( "danish96k3.rom", 0x4000, 0x2000, CRC(795c22ea) SHA1(0a57394cd986c5b338b38d514e894bace7f6e47b), ROM_BIOS(2) )
 	ROM_LOAD( "dosrom.rom",    0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
 
@@ -1010,7 +1010,7 @@ ROM_END
 
 
 /* Driver */
-/*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT    CLASS            INIT      COMPANY       FULLNAME     FLAGS */
-COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k",  0 )
-COMP( 1983, lynx96k,   lynx48k,   0,       lynx96k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",  0 )
-COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, camplynx_state,  lynx128k, "Camputers",  "Lynx 128k", 0 )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT           COMPANY      FULLNAME     FLAGS */
+COMP( 1983, lynx48k,  0,       0,      lynx48k,  lynx48k, camplynx_state, init_lynx48k,  "Camputers", "Lynx 48k",  0 )
+COMP( 1983, lynx96k,  lynx48k, 0,      lynx96k,  lynx48k, camplynx_state, init_lynx48k,  "Camputers", "Lynx 96k",  0 )
+COMP( 1983, lynx128k, lynx48k, 0,      lynx128k, lynx48k, camplynx_state, init_lynx128k, "Camputers", "Lynx 128k", 0 )

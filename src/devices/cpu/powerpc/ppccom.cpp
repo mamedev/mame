@@ -231,6 +231,10 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 		set_vtlb_fixed_entries(PPC603_FIXED_TLB_ENTRIES);
 }
 
+ppc_device::~ppc_device()
+{
+}
+
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 //  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
 //{
@@ -276,9 +280,10 @@ ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-ADDRESS_MAP_START(ppc4xx_device::internal_ppc4xx)
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
-ADDRESS_MAP_END
+void ppc4xx_device::internal_ppc4xx(address_map &map)
+{
+	map(0x40000000, 0x4000000f).rw(this, FUNC(ppc4xx_device::ppc4xx_spu_r), FUNC(ppc4xx_device::ppc4xx_spu_w));
+}
 
 ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor)
 	: ppc_device(mconfig, type, tag, owner, clock, 31, 32, flavor, cap, tb_divisor, address_map_constructor(FUNC(ppc4xx_device::internal_ppc4xx), this))
@@ -693,7 +698,6 @@ void ppc_device::device_start()
 	m_pit_reload = 0;
 	m_irqstate = 0;
 	memset(m_buffered_dma_rate, 0, sizeof(m_buffered_dma_rate));
-	m_codexor = 0;
 	m_system_clock = 0;
 	m_cpu_clock = 0;
 	m_tb_zero_cycles = 0;
@@ -710,15 +714,36 @@ void ppc_device::device_start()
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_cap & PPCCAP_4XX)
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		if(space_config()->m_endianness != ENDIANNESS_NATIVE)
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+				if(!(address & 4))
+					ptr++;
+				return ptr;
+			};
+		else
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+				if(address & 4)
+					ptr++;
+				return ptr;
+			};
+	}
 	m_system_clock = c_bus_frequency != 0 ? c_bus_frequency : clock();
 	m_dcr_read_func = read32_delegate();
 	m_dcr_write_func = write32_delegate();
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
-	m_codexor = 0;
-	if (!(m_cap & PPCCAP_4XX) && space_config()->m_endianness != ENDIANNESS_NATIVE)
-		m_codexor = 4;
 
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
@@ -814,7 +839,7 @@ void ppc_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_core->r[31]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow().formatstr("%1s");
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */

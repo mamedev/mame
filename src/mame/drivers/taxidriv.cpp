@@ -301,7 +301,7 @@ static const gfx_layout charlayout2 =
 };
 
 
-static GFXDECODE_START( taxidriv )
+static GFXDECODE_START( gfx_taxidriv )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 0, 1 )
@@ -337,48 +337,48 @@ PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
 MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,4000000)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
+	MCFG_DEVICE_ADD("sub", Z80,4000000)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(cpu3_map)
-	MCFG_CPU_IO_MAP(cpu3_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
+	MCFG_DEVICE_IO_MAP(cpu3_port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(taxidriv_state, p0a_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p0b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(taxidriv_state, p0c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p0c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, taxidriv_state, p0a_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p0b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, taxidriv_state, p0c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p0c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p1a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(taxidriv_state, p1b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(taxidriv_state, p1c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p1c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p1a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, taxidriv_state, p1b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, taxidriv_state, p1c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p1c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p2a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p2b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p2c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p2a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p2b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p2c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p3a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p3b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p3c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p3a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p3b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p3c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_4", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(taxidriv_state, p4a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(taxidriv_state, p4b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(taxidriv_state, p4c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p4a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p4b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p4c_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -389,20 +389,20 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taxidriv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taxidriv)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(taxidriv_state, taxidriv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(taxidriv_state, p8910_0a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taxidriv_state, p8910_0b_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, taxidriv_state, p8910_0a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taxidriv_state, p8910_0b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(taxidriv_state, p8910_1a_r))
+	MCFG_DEVICE_ADD("ay2", AY8910, 1250000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, taxidriv_state, p8910_1a_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -452,4 +452,4 @@ ROM_START( taxidriv )
 ROM_END
 
 
-GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, taxidriv_state, 0, ROT90, "Graphic Techno", "Taxi Driver", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, taxidriv_state, empty_init, ROT90, "Graphic Techno", "Taxi Driver", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

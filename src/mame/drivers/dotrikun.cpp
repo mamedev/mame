@@ -196,9 +196,9 @@ void dotrikun_state::machine_reset()
 MACHINE_CONFIG_START(dotrikun_state::dotrikun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dotrikun_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dotrikun_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scanline_on", dotrikun_state, scanline_on, "screen", 0, 1)
 	MCFG_TIMER_DRIVER_ADD("scanline_off", dotrikun_state, scanline_off)
 	MCFG_TIMER_DRIVER_ADD("interrupt", dotrikun_state, interrupt)
@@ -237,6 +237,6 @@ ROM_START( dotriman )
 ROM_END
 
 
-GAMEL(1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, 0, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
-GAMEL(1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, 0, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
-GAMEL(2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, 0, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL( 1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL( 1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL( 2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )

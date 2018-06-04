@@ -79,11 +79,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
-	DECLARE_DRIVER_INIT(devzone);
-	DECLARE_DRIVER_INIT(cosmicg);
-	DECLARE_DRIVER_INIT(nomnlnd);
-	DECLARE_DRIVER_INIT(cosmica);
-	DECLARE_DRIVER_INIT(panic);
+	void init_devzone();
+	void init_cosmicg();
+	void init_nomnlnd();
+	void init_cosmica();
+	void init_panic();
 	DECLARE_MACHINE_START(cosmic);
 	DECLARE_MACHINE_RESET(cosmic);
 	DECLARE_MACHINE_RESET(cosmicg);

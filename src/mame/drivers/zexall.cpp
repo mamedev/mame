@@ -159,8 +159,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(zexall_state::zexall)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -182,5 +182,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT   STATE         INIT    COMPANY                         FULLNAME                            FLAGS
-COMP( 2009, zexall,  0,      0,      zexall,   zexall, zexall_state, 0,      "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                         FULLNAME                            FLAGS
+COMP( 2009, zexall, 0,      0,      zexall,  zexall, zexall_state, empty_init, "Frank Cringle / Kevin Horton", "Zexall (FPGA Z80 test interface)", MACHINE_SUPPORTS_SAVE )

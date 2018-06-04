@@ -7,8 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "bus/ss50/mpc.h"
-#include "bus/ss50/interface.h"
+#include "mpc.h"
 
 #include "bus/rs232/rs232.h"
 #include "machine/6821pia.h"
@@ -103,24 +102,24 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(ss50_mpc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pia", PIA6821, 0) // actually MC6820
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITELINE("outgate", input_merger_device, in_w<0>)) MCFG_DEVCB_BIT(0)
-	MCFG_PIA_CB2_HANDLER(WRITELINE(ss50_mpc_device, reader_control_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITELINE("outgate", input_merger_device, in_w<0>)) MCFG_DEVCB_BIT(0)
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, ss50_mpc_device, reader_control_w))
 	MCFG_PIA_READPB_HANDLER(IOPORT("STOP")) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(ss50_mpc_device, count_r)) MCFG_DEVCB_BIT(7)
-	MCFG_PIA_WRITEPB_HANDLER(WRITELINE(ss50_mpc_device, count_select_w)) MCFG_DEVCB_BIT(2)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("counter", ripple_counter_device, reset_w)) MCFG_DEVCB_BIT(0)
-	//MCFG_PIA_IRQA_HANDLER(WRITELINE(ss50_mpc_device, pia_irq_w))
-	//MCFG_PIA_IRQB_HANDLER(WRITELINE(ss50_mpc_device, pia_irq_w))
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(*this, ss50_mpc_device, count_r)) MCFG_DEVCB_BIT(7)
+	MCFG_PIA_WRITEPB_HANDLER(WRITELINE(*this, ss50_mpc_device, count_select_w)) MCFG_DEVCB_BIT(2)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("counter", ripple_counter_device, reset_w)) MCFG_DEVCB_BIT(0)
+	//MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, ss50_mpc_device, pia_irq_w))
+	//MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, ss50_mpc_device, pia_irq_w))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ss50_mpc_device, serial_input_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, ss50_mpc_device, serial_input_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_INPUT_MERGER_ALL_HIGH("outgate")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("loopback")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("outgate", input_merger_device, in_w<1>))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("outgate", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("counter", RIPPLE_COUNTER, 0) // CD4024AE (IC3)
 	MCFG_RIPPLE_COUNTER_STAGES(7) // only Q5 (÷32) and Q4 (÷16) are actually used
@@ -191,4 +190,6 @@ WRITE_LINE_MEMBER(ss50_mpc_device::f300_w)
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(SS50_MPC, ss50_mpc_device, "ss50_mpc", "MP-C Serial Control Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(SS50_MPC, ss50_card_interface, ss50_mpc_device, "ss50_mpc", "MP-C Serial Control Interface")
+template class device_finder<ss50_card_interface, false>;
+template class device_finder<ss50_card_interface, true>;

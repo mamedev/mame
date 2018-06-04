@@ -86,8 +86,8 @@ void cuda_device::cuda_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(cuda_device::device_add_mconfig)
-	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL(32'768)*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
-	MCFG_CPU_PROGRAM_MAP(cuda_map)
+	MCFG_DEVICE_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL(32'768)*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	MCFG_DEVICE_PROGRAM_MAP(cuda_map)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *cuda_device::device_rom_region() const

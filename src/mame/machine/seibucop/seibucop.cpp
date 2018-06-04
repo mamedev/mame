@@ -36,6 +36,10 @@
     - (fixed) several if not all enemies definitely wants some sort of "axis aligned bounding box" in order to stop from going out of range
         (when i.e. first boss goes to bottom of the screen and become unreachable)
     - (btanb) Throw is made by quickly double jumping (!)
+    - (btanb) seldomly enemies thrown animates weirdly (bounces to the left when thrown to the right).
+      Culprit is with command 0x905 param +0x28, but it looks like this parameter is coming
+      from program ROM itself. Also a PCB recording video shows the same phenomenon, it's just sloppy
+      programming basically.
     Heated Barrel
     - (btanb) if player moves in diagonal a bogus projectile is fired.
     - gives random value to hi-score if you continue (only the first time, not a bug?);
@@ -45,8 +49,11 @@
     - (fixed) level 3+ boss movements looks wrong;
     - stage 3 "homing" missiles doesn't seem to like our 6200 hookup here, except it's NOT 6200!?
     - (fixed) barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
+    Godzilla
+    - few elements doesn't collide properly (i.e. Super X missiles, Tokyo's tower in stage 1),
+      Z axis check makes no sense whatsoever. Kludged to work in per-game driver_init.
     SD Gundam
-    - stage 3 mid-boss still has the sprite garbage bug;
+    - stage 3: mid-boss still has the sprite garbage bug;
     - stage 4: has sprite stuck on bottom-left of screen;
     Seibu Cup Soccer
     - Handles collision detection via the 130e/3bb0 macros
@@ -530,6 +537,10 @@ int raiden2cop_device::find_trigger_match(uint16_t triggerval, uint16_t mask)
 
 				if (triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900) /* collisions */
 					otherlog = 0;
+
+				// TODO: disable Z axis in driver code.
+				if (triggerval == 0xb000 || triggerval == 0xb800)
+					otherlog = 0;
 			}
 			else if (!strcmp(machine().system().name, "grainbow"))
 			{
@@ -844,7 +855,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 /* Number Conversion */
 void raiden2cop_device::bcd_update()
 {
-		//int digits = 1 << cop_itoa_mode*2;
+	//int digits = 1 << cop_itoa_mode*2;
 	uint32_t val = cop_itoa;
 
 	//if(digits > 9)

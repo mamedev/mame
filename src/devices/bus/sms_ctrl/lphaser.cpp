@@ -53,7 +53,7 @@ INPUT_CHANGED_MEMBER( sms_light_phaser_device::position_changed )
 static INPUT_PORTS_START( sms_light_phaser )
 	PORT_START("CTRL_PORT")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (trigger)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_r)
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LPHASER_X")
@@ -93,7 +93,7 @@ sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, 
 {
 	// Workaround for failed validation that occurs when running on a driver
 	// with Sega Scope emulation, which adds 2 screens (left/right lenses).
-	set_screen(":screen");
+	set_screen(*this, ":screen");
 }
 
 

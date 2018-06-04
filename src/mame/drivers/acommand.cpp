@@ -80,7 +80,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_bgtmap(*this, "bgtmap"),
-		m_txtmap(*this, "txtmap") { }
+		m_txtmap(*this, "txtmap"),
+		m_digits(*this, "digit%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	DECLARE_WRITE16_MEMBER(output_7seg0_w);
@@ -102,7 +104,7 @@ public:
 	void acommand(machine_config &config);
 	void acommand_map(address_map &map);
 protected:
-//  virtual void video_start() override;
+	virtual void machine_start() override;
 
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -113,6 +115,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<megasys1_tilemap_device> m_bgtmap;
 	required_device<megasys1_tilemap_device> m_txtmap;
+	output_finder<8> m_digits;
 
 	uint16_t m_7seg0;
 	uint16_t m_7seg1;
@@ -122,7 +125,10 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 };
 
-
+void acommand_state::machine_start()
+{
+	m_digits.resolve();
+}
 
 void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask)
 {
@@ -230,7 +236,7 @@ WRITE16_MEMBER(acommand_state::output_7seg0_w)
 
 	// nybble 0,1,2: left 7segs, nybble 3: right 7seg 1st digit
 	for (int i = 0; i < 4; i++)
-		output().set_digit_value(i, led_fill[m_7seg0 >> (i*4) & 0xf]);
+		m_digits[i] = led_fill[m_7seg0 >> (i*4) & 0xf];
 }
 
 WRITE16_MEMBER(acommand_state::output_7seg1_w)
@@ -239,7 +245,7 @@ WRITE16_MEMBER(acommand_state::output_7seg1_w)
 
 	// nybble 0,1: right 7seg 2nd,3rd digit
 	for (int i = 0; i < 2; i++)
-		output().set_digit_value(i+4, led_fill[m_7seg1 >> (i*4) & 0xf]);
+		m_digits[i+4] = led_fill[m_7seg1 >> (i*4) & 0xf];
 
 	// other: ?
 }
@@ -446,7 +452,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( acommand )
+static GFXDECODE_START( gfx_acommand )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x1800, 256 )
 GFXDECODE_END
 
@@ -464,8 +470,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)
 MACHINE_CONFIG_START(acommand_state::acommand)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,12000000)
-	MCFG_CPU_PROGRAM_MAP(acommand_map)
+	MCFG_DEVICE_ADD("maincpu",M68000,12000000)
+	MCFG_DEVICE_PROGRAM_MAP(acommand_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", acommand_state, acommand_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -477,7 +483,7 @@ MACHINE_CONFIG_START(acommand_state::acommand)
 	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acommand)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acommand)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -485,13 +491,14 @@ MACHINE_CONFIG_START(acommand_state::acommand)
 	MCFG_MEGASYS1_TILEMAP_ADD("txtmap", "palette", 0x2700)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -534,4 +541,4 @@ ROM_START( acommand )
 	ROM_LOAD( "jalmr17.bin",   0x080000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
 ROM_END
 
-GAMEL( 1994, acommand,  0,      acommand,  acommand, acommand_state,  0, ROT0, "Jaleco", "Alien Command" , MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_acommand )
+GAMEL( 1994, acommand, 0, acommand, acommand, acommand_state, empty_init, ROT0, "Jaleco", "Alien Command" , MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_acommand )

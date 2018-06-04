@@ -182,26 +182,26 @@ static const gfx_layout dai_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dai )
+static GFXDECODE_START( gfx_dai )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dai_charlayout, 0, 8 )
 GFXDECODE_END
 
 /* machine definition */
 MACHINE_CONFIG_START(dai_state::dai)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(dai_mem)
-	MCFG_CPU_IO_MAP(dai_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(dai_mem)
+	MCFG_DEVICE_IO_MAP(dai_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch0))
 	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch1))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch1))
 	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch2))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
@@ -214,19 +214,17 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dai)
 	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", DAI_SOUND, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	DAI_SOUND(config, "custom").add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -236,8 +234,8 @@ MACHINE_CONFIG_START(dai_state::dai)
 	/* tms5501 */
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)
 	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
-	MCFG_TMS5501_XI_CALLBACK(READ8(dai_state, dai_keyboard_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(dai_state, dai_keyboard_w))
+	MCFG_TMS5501_XI_CALLBACK(READ8(*this, dai_state, dai_keyboard_r))
+	MCFG_TMS5501_XO_CALLBACK(WRITE8(*this, dai_state, dai_keyboard_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -259,5 +257,5 @@ ROM_START(dai)
 	ROM_LOAD ("nch.bin", 0x0000, 0x1000, CRC(a9f5b30b) SHA1(24119b2984ab4e50dc0dabae1065ff6d6c1f237d))
 ROM_END
 
-/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT  STATE      INIT  COMPANY                            FULLNAME */
-COMP( 1978, dai, 0,      0,     dai,    dai,   dai_state, 0,    "Data Applications International", "DAI Personal Computer", 0)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                            FULLNAME */
+COMP( 1978, dai,  0,      0,      dai,     dai,   dai_state, empty_init, "Data Applications International", "DAI Personal Computer", 0)

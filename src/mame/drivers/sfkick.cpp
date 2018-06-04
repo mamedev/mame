@@ -189,7 +189,7 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	DECLARE_DRIVER_INIT(sfkick);
+	void init_sfkick();
 	void sfkick(machine_config &config);
 
 protected:
@@ -595,31 +595,31 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 
 MACHINE_CONFIG_START(sfkick_state::sfkick)
 
-	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(sfkick_map)
-	MCFG_CPU_IO_MAP(sfkick_io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(sfkick_map)
+	MCFG_DEVICE_IO_MAP(sfkick_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_CPU_ADD("soundcpu",Z80,MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(sfkick_sound_map)
-	MCFG_CPU_IO_MAP(sfkick_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu",Z80,MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(sfkick_sound_map)
+	MCFG_DEVICE_IO_MAP(sfkick_sound_io_map)
 
 	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(sfkick_state, ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(sfkick_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sfkick_state, ppi_port_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sfkick_state, ppi_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, sfkick_state, ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sfkick_state, ppi_port_c_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/6)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sfkick_state, irqhandler))
+	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/6)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, sfkick_state, irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -628,9 +628,9 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(sfkick_state,sfkick)
+void sfkick_state::init_sfkick()
 {
-	m_main_mem=std::make_unique<uint8_t[]>(0x4000);
+	m_main_mem = std::make_unique<uint8_t[]>(0x4000);
 }
 
 
@@ -705,6 +705,6 @@ ROM_START( spinkick )
 ROM_END
 
 
-GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung/HJ Corp", "Super Free Kick (set 1)", 0 )
-GAME( 198?, sfkicka,  sfkick, sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung", "Super Free Kick (set 2)", 0 )
-GAME( 1988, spinkick, sfkick, sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung/Seojin", "Hec's Spinkick", 0 )
+GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick_state, init_sfkick, ROT90, "Haesung/HJ Corp", "Super Free Kick (set 1)", 0 )
+GAME( 198?, sfkicka,  sfkick, sfkick, sfkick, sfkick_state, init_sfkick, ROT90, "Haesung", "Super Free Kick (set 2)", 0 )
+GAME( 1988, spinkick, sfkick, sfkick, sfkick, sfkick_state, init_sfkick, ROT90, "Haesung/Seojin", "Hec's Spinkick", 0 )

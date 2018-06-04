@@ -72,9 +72,9 @@ WRITE8_MEMBER(tunhunt_state::control_w)
 	*/
 
 	m_control = data;
-	machine().bookkeeping().coin_counter_w(0,data&0x01 );
-	machine().bookkeeping().coin_counter_w(1,data&0x02 );
-	output().set_led_value(0, data&0x40 ); /* start */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	m_led = BIT(data , 6); /* start */
 }
 
 
@@ -256,7 +256,7 @@ static const gfx_layout obj_layout =
 };
 
 
-static GFXDECODE_START( tunhunt )
+static GFXDECODE_START( gfx_tunhunt )
 	GFXDECODE_ENTRY( "gfx1", 0x000, alpha_layout, 0x10, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x200, obj_layout,   0x18, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x000, obj_layout,   0x18, 1 ) /* second bank, or second bitplane? */
@@ -272,9 +272,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12.096_MHz_XTAL/6)        /* ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL/6)        /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -285,27 +285,27 @@ MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tunhunt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tunhunt)
 	MCFG_PALETTE_ADD("palette", 0x1a)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(tunhunt_state, tunhunt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 12.096_MHz_XTAL/10)
+	MCFG_DEVICE_ADD("pokey1", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 12.096_MHz_XTAL/10)
+	MCFG_DEVICE_ADD("pokey2", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_POT0_R_CB(IOPORT("IN1"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("IN2"))
-	MCFG_POKEY_POT2_R_CB(READ8(tunhunt_state, dsw2_0r))
-	MCFG_POKEY_POT3_R_CB(READ8(tunhunt_state, dsw2_1r))
-	MCFG_POKEY_POT4_R_CB(READ8(tunhunt_state, dsw2_2r))
-	MCFG_POKEY_POT5_R_CB(READ8(tunhunt_state, dsw2_3r))
-	MCFG_POKEY_POT6_R_CB(READ8(tunhunt_state, dsw2_4r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, tunhunt_state, dsw2_0r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, tunhunt_state, dsw2_1r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, tunhunt_state, dsw2_2r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, tunhunt_state, dsw2_3r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, tunhunt_state, dsw2_4r))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -395,5 +395,5 @@ ROM_END
  *************************************/
 
 /*         rom       parent   machine    inp      state          init */
-GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
-GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, tunhunt_state, empty_init, ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, tunhunt_state, empty_init, ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )

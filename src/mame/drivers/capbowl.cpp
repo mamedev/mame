@@ -111,7 +111,7 @@
 INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
 {
 	if (ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);    /* trigger self test */
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);    /* trigger self test */
 }
 
 
@@ -319,15 +319,15 @@ void capbowl_state::machine_reset()
 MACHINE_CONFIG_START(capbowl_state::capbowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
-	MCFG_CPU_PROGRAM_MAP(capbowl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
+	MCFG_DEVICE_PROGRAM_MAP(capbowl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 //  MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
@@ -347,22 +347,22 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", M6809_FIRQ_LINE))      /* interrupt gen callback */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 2)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_A_READ_CB(DEVREADLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */
+	MCFG_AY8910_PORT_A_READ_CB(READLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */
 	MCFG_SOUND_ROUTE(0, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(3, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC0832, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC0832, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -371,8 +371,8 @@ MACHINE_CONFIG_START(capbowl_state::bowlrama)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bowlrama_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bowlrama_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -466,7 +466,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(capbowl_state,capbowl)
+void capbowl_state::init_capbowl()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -481,9 +481,9 @@ DRIVER_INIT_MEMBER(capbowl_state,capbowl)
  *
  *************************************/
 
-GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, 0,        ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, empty_init,   ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )

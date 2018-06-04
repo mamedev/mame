@@ -53,7 +53,7 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(ron);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(p1_mux_r);
@@ -143,6 +143,8 @@ uint32_t ron_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 WRITE8_MEMBER(ron_state::output_w)
 {
 	m_nmi_enable = (data & 0x10) == 0x10;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	if(data & 0xef)
 		printf("%02x\n",data);
@@ -395,7 +397,7 @@ static const gfx_layout charlayout_2bpp =
 	8*8
 };
 
-static GFXDECODE_START( ron )
+static GFXDECODE_START( gfx_ron )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,     0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_2bpp,     4, 1 )
 GFXDECODE_END
@@ -427,10 +429,10 @@ PALETTE_INIT_MEMBER(ron_state, ron)
 }
 
 
-INTERRUPT_GEN_MEMBER( ron_state::vblank_irq )
+WRITE_LINE_MEMBER(ron_state::vblank_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(ron_state::audio_cmd_r)
@@ -484,27 +486,27 @@ WRITE8_MEMBER(ron_state::ay_pa_w)
 MACHINE_CONFIG_START(ron_state::ron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ron_map)
-	MCFG_CPU_IO_MAP(ron_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ron_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ron_map)
+	MCFG_DEVICE_IO_MAP(ron_io)
 
-	MCFG_CPU_ADD("audiocpu", I8035, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ron_audio_map)
-	MCFG_CPU_IO_MAP(ron_audio_io)
+	MCFG_DEVICE_ADD("audiocpu", I8035, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ron_audio_map)
+	MCFG_DEVICE_IO_MAP(ron_audio_io)
 	MCFG_MCS48_PORT_T0_CLK_DEVICE("aysnd")
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(ron_state, audio_cmd_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ron_state, audio_p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ron_state, audio_p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ron_state, audio_T1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ron_state, audio_cmd_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ron_state, audio_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ron_state, audio_p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ron_state, audio_T1_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(ron_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 264, 0, 240)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ron_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ron)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ron)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	//MCFG_PALETTE_ADD("palette", 512)
@@ -512,10 +514,10 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_PALETTE_INIT_OWNER(ron_state, ron)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 0) // T0 CLK from I8035 (not verified)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, 0) // T0 CLK from I8035 (not verified)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ron_state, ay_pa_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ron_state, ay_pa_w))
 MACHINE_CONFIG_END
 
 
@@ -556,4 +558,4 @@ ROM_START( ron2 )
 	ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
 ROM_END
 
-GAME( 1981, ron2,  0,   ron,  ron, ron_state,  0,       ROT270, "Sanritsu",      "Ron II Mah-Jongg", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1981, ron2,  0,   ron,  ron, ron_state, empty_init, ROT270, "Sanritsu", "Ron II Mah-Jongg", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )

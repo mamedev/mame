@@ -455,7 +455,7 @@ static const gfx_layout tile2 =
 };
 
 
-static GFXDECODE_START( exprraid )
+static GFXDECODE_START( gfx_exprraid )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   128, 2 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,  64, 8 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile1,          0, 4 ) /* background tiles */
@@ -493,12 +493,12 @@ void exprraid_state::machine_reset()
 MACHINE_CONFIG_START(exprraid_state::exprraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO16, XTAL(12'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io_map)
+	MCFG_DEVICE_ADD("maincpu", DECO16, XTAL(12'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io_map)
 
-	MCFG_CPU_ADD("slave", MC6809, XTAL(12'000'000) / 2) // MC68B09P
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", MC6809, XTAL(12'000'000) / 2) // MC68B09P
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 	/* IRQs are caused by the YM3526 */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
@@ -513,28 +513,28 @@ MACHINE_CONFIG_START(exprraid_state::exprraid)
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exprraid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exprraid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("slave", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000) / 4)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(exprraid_state, irqhandler))
+	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(12'000'000) / 4)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, exprraid_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(exprraid_state::exprboot)
 	exprraid(config);
 
-	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 MACHINE_CONFIG_END
 
 
@@ -831,7 +831,7 @@ void exprraid_state::exprraid_gfx_expand()
 	}
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
+void exprraid_state::init_wexpressb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -848,28 +848,28 @@ DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,exprraid)
+void exprraid_state::init_exprraid()
 {
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb2)
+void exprraid_state::init_wexpressb2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb3)
+void exprraid_state::init_wexpressb3()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();
 }
 
 
-GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, exprraidu, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East USA",         "Express Raider (US, rev 5)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, exprraidi, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Express Raider (Italy)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpress,  exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb1,exprraid, exprraid, exprraid, exprraid_state, wexpressb, ROT0, "bootleg",               "Western Express (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, exprraid_state, wexpressb2,ROT0, "bootleg",               "Western Express (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb3,exprraid, exprboot, exprboot, exprraid_state, wexpressb3,ROT0, "bootleg",               "Western Express (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraid,   0,        exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraidu,  exprraid, exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East USA",         "Express Raider (US, rev 5)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraidi,  exprraid, exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East Corporation", "Express Raider (Italy)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpress,   exprraid, exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb1, exprraid, exprraid, exprraid, exprraid_state, init_wexpressb,  ROT0, "bootleg",               "Western Express (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb2, exprraid, exprboot, exprboot, exprraid_state, init_wexpressb2, ROT0, "bootleg",               "Western Express (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb3, exprraid, exprboot, exprboot, exprraid_state, init_wexpressb3, ROT0, "bootleg",               "Western Express (bootleg set 3)", MACHINE_SUPPORTS_SAVE )

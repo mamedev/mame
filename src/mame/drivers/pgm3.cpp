@@ -59,7 +59,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_DRIVER_INIT(kov3hd);
+	void init_kov3hd();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -103,8 +103,8 @@ void pgm3_state::machine_reset()
 MACHINE_CONFIG_START(pgm3_state::pgm3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 800000000) // wrong, see notes at top of driver
-	MCFG_CPU_PROGRAM_MAP(pgm3_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 800000000) // wrong, see notes at top of driver
+	MCFG_DEVICE_PROGRAM_MAP(pgm3_map)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -114,7 +114,7 @@ MACHINE_CONFIG_START(pgm3_state::pgm3)
 	MCFG_SCREEN_SIZE(1280, 720)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 720-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm3_state, screen_update_pgm3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm3_state, screen_vblank_pgm3))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm3_state, screen_vblank_pgm3))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
@@ -162,14 +162,14 @@ ROM_START( kov3hd101 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pgm3_state,kov3hd)
+void pgm3_state::init_kov3hd()
 {
 }
 
 
 // all dumped sets might be China region, unless region info comes from elsewhere
-GAME( 2011, kov3hd,     0,      pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (M-105CN 13-07-04 18:54:01)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd104,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V104)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd103,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V103)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd102,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V102)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd101,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V101)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd,     0,      pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (M-105CN 13-07-04 18:54:01)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd104,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V104)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd103,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V103)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd102,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V102)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd101,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V101)", MACHINE_IS_SKELETON )

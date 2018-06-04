@@ -11,13 +11,7 @@
 
 #include "emu.h"
 #include "includes/starwars.h"
-#include "machine/x2212.h"
 
-
-/* Control select values for ADC_R */
-#define kPitch      0
-#define kYaw        1
-#define kThrust     2
 
 /* Constants for matrix processor operations */
 #define NOP         0x00
@@ -50,14 +44,14 @@ TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
 
 WRITE8_MEMBER(starwars_state::starwars_nstore_w)
 {
-	machine().device<x2212_device>("x2212")->store(0);
-	machine().device<x2212_device>("x2212")->store(1);
-	machine().device<x2212_device>("x2212")->store(0);
+	m_novram->store(0);
+	m_novram->store(1);
+	m_novram->store(0);
 }
 
 WRITE_LINE_MEMBER(starwars_state::recall_w)
 {
-	machine().device<x2212_device>("x2212")->recall(!state);
+	m_novram->recall(!state);
 }
 
 /*************************************
@@ -76,21 +70,6 @@ WRITE_LINE_MEMBER(starwars_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(starwars_state::led1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(starwars_state::led2_w)
-{
-	output().set_led_value(1, !state);
-}
-
-WRITE_LINE_MEMBER(starwars_state::led3_w)
-{
-	output().set_led_value(2, !state);
-}
-
 
 
 /*************************************
@@ -103,35 +82,6 @@ CUSTOM_INPUT_MEMBER(starwars_state::matrix_flag_r)
 {
 	/* set the matrix processor flag */
 	return m_math_run ? 1 : 0;
-}
-
-
-
-/*************************************
- *
- *  ADC input and control
- *
- *************************************/
-
-READ8_MEMBER(starwars_state::starwars_adc_r)
-{
-	/* pitch */
-	if (m_control_num == kPitch)
-		return ioport("STICKY")->read();
-
-	/* yaw */
-	else if (m_control_num == kYaw)
-		return ioport("STICKX")->read();
-
-	/* default to unused thrust */
-	else
-		return 0;
-}
-
-
-WRITE8_MEMBER(starwars_state::starwars_adc_select_w)
-{
-	m_control_num = offset;
 }
 
 
@@ -199,8 +149,6 @@ void starwars_state::run_mproc()
 	int MA;
 	int IP15_8, IP7, IP6_0; /* Instruction PROM values */
 	int mptime;
-
-	logerror("Running Matrix Processor...\n");
 
 	mptime = 0;
 	m_math_run = 1;

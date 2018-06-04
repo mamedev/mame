@@ -676,14 +676,14 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( sslam )
+static GFXDECODE_START( gfx_sslam )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0x300, 16 ) /* spr */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout,     0, 16 ) /* bg */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0x100, 16 ) /* mid */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x200, 16 ) /* tx */
 GFXDECODE_END
 
-static GFXDECODE_START( powerbls )
+static GFXDECODE_START( gfx_powerbls )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0x100, 16 ) /* spr */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,       0, 16 ) /* bg */
 GFXDECODE_END
@@ -694,11 +694,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sslam_state::sslam)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(sslam_program_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sslam_program_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I8051, 12000000)
+	MCFG_DEVICE_ADD("audiocpu", I8051, 12000000)
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped - 2 boards were protected */
 
 	/* video hardware */
@@ -710,30 +710,30 @@ MACHINE_CONFIG_START(sslam_state::sslam)
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_sslam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sslam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sslam)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,sslam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sslam_state::powerbls)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(powerbls_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(powerbls_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I80C51, 12000000)      /* 83C751 */
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sslam_state, playmark_snd_control_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(sslam_state, playmark_snd_command_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(sslam_state, playmark_oki_w))
+	MCFG_DEVICE_ADD("audiocpu", I80C51, 12000000)      /* 83C751 */
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sslam_state, playmark_snd_control_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, sslam_state, playmark_snd_command_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, sslam_state, playmark_oki_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -744,18 +744,18 @@ MACHINE_CONFIG_START(sslam_state::powerbls)
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_powerbls)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbls)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbls)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,powerbls)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)   /* verified on original PCB */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)   /* verified on original PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -913,7 +913,7 @@ ROM_START( powerbals )
 	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
 ROM_END
 
-DRIVER_INIT_MEMBER(sslam_state,sslam)
+void sslam_state::init_sslam()
 {
 	m_track = 0;
 	m_melody = 0;
@@ -927,7 +927,7 @@ DRIVER_INIT_MEMBER(sslam_state,sslam)
 	m_music_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sslam_state::music_playback),this));
 }
 
-DRIVER_INIT_MEMBER(sslam_state,powerbls)
+void sslam_state::init_powerbls()
 {
 	save_item(NAME(m_oki_control));
 	save_item(NAME(m_oki_command));
@@ -935,7 +935,7 @@ DRIVER_INIT_MEMBER(sslam_state,powerbls)
 }
 
 
-GAME( 1993, sslam,    0,        sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 1)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sslama,   sslam,    sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 2)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sslamb,   sslam,    sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 3)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, powerbals,powerbal, powerbls, powerbls, sslam_state, powerbls, ROT0, "Playmark", "Power Balls (Super Slam conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslam,    0,        sslam,    sslam,    sslam_state, init_sslam,    ROT0, "Playmark", "Super Slam (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslama,   sslam,    sslam,    sslam,    sslam_state, init_sslam,    ROT0, "Playmark", "Super Slam (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslamb,   sslam,    sslam,    sslam,    sslam_state, init_sslam,    ROT0, "Playmark", "Super Slam (set 3)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, powerbals,powerbal, powerbls, powerbls, sslam_state, init_powerbls, ROT0, "Playmark", "Power Balls (Super Slam conversion)", MACHINE_SUPPORTS_SAVE )

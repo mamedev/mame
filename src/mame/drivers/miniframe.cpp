@@ -217,14 +217,15 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START( miniframe_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void miniframe_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(miniframe_state::miniframe)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(miniframe_mem)
+	MCFG_DEVICE_ADD("maincpu", M68010, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(miniframe_mem)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -240,19 +241,19 @@ MACHINE_CONFIG_START(miniframe_state::miniframe)
 
 	// floppy
 	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(miniframe_state, wd2797_intrq_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(miniframe_state, wd2797_drq_w))
+//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_intrq_w))
+//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// 8263s
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(76800)
 	MCFG_PIT8253_CLK1(76800)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
 	// chain clock 1 output into clock 2
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
 	// and ir4 on the PIC
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("pic8259", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("baudgen", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1228800)
@@ -281,5 +282,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, minifram,  0,      0,      miniframe,  miniframe, miniframe_state, 0,    "Convergent",  "Miniframe",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY       FULLNAME     FLAGS
+COMP( 1985, minifram, 0,      0,      miniframe, miniframe, miniframe_state, empty_init, "Convergent", "Miniframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -23,9 +23,10 @@ DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 
 
 // default address map
-ADDRESS_MAP_START(scn2674_device::scn2674_vram)
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void scn2674_device::scn2674_vram(address_map &map)
+{
+	map(0x0000, 0xffff).noprw();
+}
 
 scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scn2674_device(mconfig, SCN2672, tag, owner, clock)
@@ -978,7 +979,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			if (m_use_row_table)
 			{
 				if (m_double_ht_wd)
-					dw = m_dbl1;
+					dw = m_screen1_address >> 14;
 				if (!charrow)
 				{
 					uint16_t addr = m_screen2_address;

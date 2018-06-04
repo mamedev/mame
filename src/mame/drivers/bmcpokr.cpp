@@ -511,7 +511,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // SCORE
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // ACCOUNT         [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // KEY-OUT         [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // DOUBLE-UP
@@ -529,7 +529,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Left>2 (3rd)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
-//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
+//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A2              [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // C2              [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // S1              [START, ESC in service mode]
@@ -631,7 +631,7 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2          ) // NOTE
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  ) // KEY DOWN
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // PAY
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL        ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HOPPER
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM        ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HOPPER
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW       ) // ACCOUNT
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1       ) PORT_NAME("Reset") // RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // (unused)
@@ -781,7 +781,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( bmcpokr )
+static GFXDECODE_START( gfx_bmcpokr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -809,8 +809,8 @@ void bmcpokr_state::ramdac_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
-	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
+	MCFG_DEVICE_PROGRAM_MAP(bmcpokr_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bmcpokr_state, interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -824,27 +824,28 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmcpokr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmcpokr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(10), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)    // hopper stuck low if too slow
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(42'000'000) / 40, PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bmcpokr_state::mjmaglmp)
 	bmcpokr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjmaglmp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjmaglmp_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -959,5 +960,5 @@ ROM_START( mjmaglmp )
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
-GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, 0, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, 0, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )

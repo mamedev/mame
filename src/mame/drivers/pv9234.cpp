@@ -148,8 +148,8 @@ uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(pv9234_state::pv9234)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
-	MCFG_CPU_PROGRAM_MAP(pv9234_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
+	MCFG_DEVICE_PROGRAM_MAP(pv9234_map)
 
 
 	/* video hardware */
@@ -176,5 +176,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY               FULLNAME         FLAGS
-SYST( 1997, pv9234, 0,      0,      pv9234,  pv9234, pv9234_state, 0,    "Scientific Atlanta", "PowerVu D9234", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY               FULLNAME         FLAGS
+SYST( 1997, pv9234, 0,      0,      pv9234,  pv9234, pv9234_state, empty_init, "Scientific Atlanta", "PowerVu D9234", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

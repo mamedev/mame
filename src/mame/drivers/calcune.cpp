@@ -46,7 +46,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	DECLARE_DRIVER_INIT(calcune);
+	void init_calcune();
 
 	DECLARE_READ16_MEMBER(cal_700000_r);
 	DECLARE_WRITE16_MEMBER(cal_770000_w);
@@ -249,11 +249,11 @@ MACHINE_START_MEMBER(calcune_state,calcune)
 }
 
 MACHINE_CONFIG_START(calcune_state::calcune)
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MCFG_CPU_PROGRAM_MAP(calcune_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calcune_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)
 
-	MCFG_CPU_ADD("z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
+	MCFG_DEVICE_ADD("z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
 	MCFG_DEVICE_DISABLE() /* no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
 
 	MCFG_MACHINE_START_OVERRIDE(calcune_state,calcune)
@@ -268,9 +268,9 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv4irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0000);
 	MCFG_SEGA315_5313_PALETTE("palette")
@@ -278,9 +278,9 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_DEVICE_ADD("gen_vdp2", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
 //  are these not hooked up or should they OR with the other lines?
-//  MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_sndirqline_callback_genesis_z80));
-//  MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv6irqline_callback_genesis_68k));
-//  MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(calcune_state, vdp_lv4irqline_callback_genesis_68k));
+//  MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
+//  MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
+//  MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0c0);
 	MCFG_SEGA315_5313_PALETTE("palette")
@@ -293,19 +293,20 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* sound hardware - VDP */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(calcune_state,calcune)
+void calcune_state::init_calcune()
 {
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(false);
@@ -334,4 +335,4 @@ ROM_END
 
 
 
-GAME( 1996, calcune,  0,        calcune,   calcune,     calcune_state, calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )
+GAME( 1996, calcune, 0, calcune, calcune, calcune_state, init_calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )

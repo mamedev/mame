@@ -25,8 +25,8 @@ DEFINE_DEVICE_TYPE(ELECTRON_CLICK, electron_click_device, "electron_click", "Slo
 
 MACHINE_CONFIG_START(electron_click_device::device_add_mconfig)
 	/* rtc */
-	MCFG_MC146818_ADD("rtc", 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(electron_click_device, irq_w))
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, electron_click_device, irq_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -70,6 +70,7 @@ electron_click_device::electron_click_device(const machine_config &mconfig, cons
 
 void electron_click_device::device_start()
 {
+	save_item(NAME(m_page_register));
 }
 
 //-------------------------------------------------

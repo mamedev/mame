@@ -18,11 +18,12 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 	external_ready = false;
 }
 
-ADDRESS_MAP_START(i8271_device::map)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(sr_r, cmd_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(rr_r, param_w)
-	AM_RANGE(0x2, 0x2) AM_WRITE(reset_w)
-ADDRESS_MAP_END
+void i8271_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(this, FUNC(i8271_device::sr_r), FUNC(i8271_device::cmd_w));
+	map(0x1, 0x1).rw(this, FUNC(i8271_device::rr_r), FUNC(i8271_device::param_w));
+	map(0x2, 0x2).w(this, FUNC(i8271_device::reset_w));
+}
 
 void i8271_device::set_ready_line_connected(bool _ready)
 {

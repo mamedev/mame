@@ -178,16 +178,16 @@ WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	m_ticket->motor_w(BIT(data, 1));
-	output().set_lamp_value(0, BIT(data, 2));
+	m_lamps[0] = BIT(data, 2);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	output().set_lamp_value(0, BIT(data, 2));
-	output().set_lamp_value(1, BIT(data, 3));
-	output().set_lamp_value(2, BIT(data, 4));
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[2] = BIT(data, 4);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
@@ -195,9 +195,9 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	output().set_lamp_value(0, BIT(data, 2));
-	output().set_lamp_value(1, BIT(data, 4));
-	output().set_lamp_value(2, BIT(data, 5));
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 4);
+	m_lamps[2] = BIT(data, 5);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
 }
 
@@ -376,7 +376,7 @@ static INPUT_PORTS_START( ripribit )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -463,7 +463,7 @@ static INPUT_PORTS_START( cfarm )
 	PORT_DIPSETTING(      0x0000, "10" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0006, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -514,8 +514,8 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -633,8 +633,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(lethalj_state::gameroom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lethalj_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lethalj_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -651,15 +651,15 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_OKIM6295_ADD("oki3", SOUND_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki3", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -667,7 +667,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lethalj_state::lethalj)
 	gameroom(config);
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -1017,19 +1017,19 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(lethalj_state,ripribit)
+void lethalj_state::init_ripribit()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cfarm)
+void lethalj_state::init_cfarm()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cclownz)
+void lethalj_state::init_cclownz()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
 }
@@ -1042,15 +1042,15 @@ DRIVER_INIT_MEMBER(lethalj_state,cclownz)
  *
  *************************************/
 
-GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, 0,        ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
-GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, 0,        ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
-GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
-GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
-GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
-GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
-GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
-GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
-GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )
+GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, empty_init,    ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
+GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
+GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
+GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
+GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
+GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
+GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
+GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, init_cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
+GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, init_cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )

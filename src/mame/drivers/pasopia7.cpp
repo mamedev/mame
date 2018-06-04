@@ -83,8 +83,8 @@ public:
 	DECLARE_READ8_MEMBER(nmi_porta_r);
 	DECLARE_READ8_MEMBER(nmi_portb_r);
 	TIMER_CALLBACK_MEMBER(pio_timer);
-	DECLARE_DRIVER_INIT(p7_lcd);
-	DECLARE_DRIVER_INIT(p7_raster);
+	void init_p7_lcd();
+	void init_p7_raster();
 	DECLARE_VIDEO_START(pasopia7);
 	DECLARE_PALETTE_INIT(p7_lcd);
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -743,7 +743,7 @@ static const gfx_layout p7_chars_16x16 =
 	16*16
 };
 
-static GFXDECODE_START( pasopia7 )
+static GFXDECODE_START( gfx_pasopia7 )
 	GFXDECODE_ENTRY( "font",   0x00000, p7_chars_8x8,    0, 0x10 )
 	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
@@ -913,55 +913,56 @@ void pasopia7_state::fdc_irq(bool state)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static SLOT_INTERFACE_START( pasopia7_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pasopia7_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
-	MCFG_CPU_IO_MAP(pasopia7_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pasopia7_mem)
+	MCFG_DEVICE_IO_MAP(pasopia7_io)
 	MCFG_Z80_DAISY_CHAIN(p7_daisy)
 
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MCFG_DEVICE_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
+	MCFG_DEVICE_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia7_state, mux_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia7_state, keyb_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, pasopia7_state, mux_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pasopia7_state, keyb_r))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pasopia7_state, unk_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia7_state, screen_mode_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pasopia7_state, crtc_portb_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pasopia7_state, unk_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, screen_mode_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia7_state, crtc_portb_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia7_state, plane_reg_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pasopia7_state, video_attr_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pasopia7_state, video_misc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, plane_reg_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pasopia7_state, video_attr_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia7_state, video_misc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pasopia7_state, nmi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia7_state, nmi_mask_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pasopia7_state, nmi_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pasopia7_state, nmi_reg_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pasopia7_state, nmi_reg_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pasopia7_state, nmi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, nmi_mask_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia7_state, nmi_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pasopia7_state, nmi_reg_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia7_state, nmi_reg_w))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
@@ -980,7 +981,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_raster)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -1001,7 +1002,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -1057,14 +1058,14 @@ ROM_START( pasopia7lcd )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
+void pasopia7_state::init_p7_raster()
 {
 	m_screen_type = 1;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
-DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
+void pasopia7_state::init_p7_lcd()
 {
 	m_screen_type = 0;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
@@ -1074,5 +1075,5 @@ DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 
 /* Driver */
 
-COMP( 1983, pasopia7,    0,        0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
-COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pasopia7,    0,        0, p7_raster, pasopia7, pasopia7_state, init_p7_raster, "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
+COMP( 1983, pasopia7lcd, pasopia7, 0, p7_lcd,    pasopia7, pasopia7_state, init_p7_lcd,    "Toshiba", "Pasopia 7 (LCD)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

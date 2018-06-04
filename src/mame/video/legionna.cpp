@@ -60,7 +60,7 @@ WRITE16_MEMBER(legionna_state::tile_scroll_base_w)
 	if(offset == 7)
 		m_text_layer->set_scrolldy(0x1ef - data,0x1ef - data);
 
-	printf("%02x %04x\n",offset,data);
+	//printf("%02x %04x\n",offset,data);
 }
 
 WRITE16_MEMBER(legionna_state::heatbrl_setgfxbank)
@@ -425,7 +425,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			if(machine().input().code_pressed_once(KEYCODE_A))
 				pri_test++;
 
-			if(machine().input().code_pressed_once(KEYCODE_A))
+			if(machine().input().code_pressed_once(KEYCODE_S))
 				pri_test--;
 
 			pri_test&=3;

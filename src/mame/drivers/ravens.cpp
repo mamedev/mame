@@ -89,6 +89,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(port07_r);
@@ -111,9 +112,11 @@ public:
 private:
 	uint8_t m_term_char;
 	uint8_t m_term_data;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<generic_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cass;
+	output_finder<7> m_digits;
 };
 
 WRITE_LINE_MEMBER( ravens_state::cass_w )
@@ -128,7 +131,7 @@ READ_LINE_MEMBER( ravens_state::cass_r )
 
 WRITE8_MEMBER( ravens_state::display_w )
 {
-	output().set_digit_value(offset, data);
+	m_digits[offset] = data;
 }
 
 WRITE8_MEMBER( ravens_state::leds_w )
@@ -202,7 +205,7 @@ WRITE8_MEMBER( ravens_state::port1c_w )
 MACHINE_RESET_MEMBER( ravens_state, ravens2 )
 {
 	m_term_data = 0x80;
-	output().set_digit_value(6, 0);
+	m_digits[6] = 0;
 }
 
 
@@ -335,11 +338,11 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 
 MACHINE_CONFIG_START(ravens_state::ravens)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_CPU_PROGRAM_MAP(ravens_mem)
-	MCFG_CPU_IO_MAP(ravens_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
@@ -349,18 +352,17 @@ MACHINE_CONFIG_START(ravens_state::ravens)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ravens_state::ravens2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_CPU_PROGRAM_MAP(ravens_mem)
-	MCFG_CPU_IO_MAP(ravens2_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens2_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
@@ -373,18 +375,17 @@ MACHINE_CONFIG_START(ravens_state::ravens2)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ravens )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v1.0", "V1.0" )
-	ROMX_LOAD( "mon_v1.0.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8), ROM_BIOS(1))
+	ROMX_LOAD( "mon_v1.0.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v0.9", "V0.9" )
-	ROMX_LOAD( "mon_v0_9.bin", 0x0000, 0x07b5, CRC(2f9b9178) SHA1(ec2ebbc80ee9ff2502c1409ab4f99127032ed724), ROM_BIOS(2))
+	ROMX_LOAD( "mon_v0_9.bin", 0x0000, 0x07b5, CRC(2f9b9178) SHA1(ec2ebbc80ee9ff2502c1409ab4f99127032ed724), ROM_BIOS(1))
 ROM_END
 
 ROM_START( ravens2 )
@@ -394,6 +395,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS         INIT  COMPANY                            FULLNAME                               FLAGS */
-COMP( 1984, ravens,  0,       0,       ravens,  ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
-COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                            FULLNAME                               FLAGS */
+COMP( 1984, ravens,  0,      0,      ravens,  ravens, ravens_state, empty_init, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
+COMP( 1985, ravens2, ravens, 0,      ravens2, ravens, ravens_state, empty_init, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )

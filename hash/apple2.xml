@@ -1012,7 +1012,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="aztec (4am crack).dsk " size="143360" crc="f4c40d91" sha1="71d639bb9b55369abc2ef534bab6b74a731b7e65" offset="0x0000" />
+				<rom name="aztec (4am crack).dsk" size="143360" crc="f4c40d91" sha1="71d639bb9b55369abc2ef534bab6b74a731b7e65" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4612,7 +4612,7 @@
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.1 side d (1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
+				<rom name="where in time is carmen sandiego v1.1 side d (1989)(broderbund)(trex crack).dsk" size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4651,7 +4651,7 @@
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.0 (4am crack) side d.dsk " size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" offset="0x0000" />
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side d.dsk" size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

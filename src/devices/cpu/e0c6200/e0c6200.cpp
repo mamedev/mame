@@ -132,7 +132,7 @@ void e0c6200_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%4s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -210,7 +210,7 @@ void e0c6200_cpu_device::execute_run()
 		m_jpc = ((m_prev_op & 0xfe0) == 0xe40) ? m_npc : (m_prev_pc & 0x1f00);
 
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_op = m_program->read_word(m_pc) & 0xfff;
 		m_pc = (m_pc & 0x1000) | ((m_pc + 1) & 0x0fff);
 

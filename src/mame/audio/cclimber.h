@@ -14,19 +14,7 @@
 
 #include "sound/samples.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 DECLARE_DEVICE_TYPE(CCLIMBER_AUDIO, cclimber_audio_device)
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CCLIMBER_AUDIO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CCLIMBER_AUDIO, 0)
-
 
 // ======================> cclimber_audio_device
 

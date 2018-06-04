@@ -158,7 +158,6 @@ if (VIDEOS["EF9340_1"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/ef9340_1.cpp",
 		MAME_DIR .. "src/devices/video/ef9340_1.h",
-		MAME_DIR .. "src/devices/video/ef9341_chargen.h",
 	}
 end
 
@@ -505,6 +504,18 @@ if (VIDEOS["M50458"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/m50458.cpp",
 		MAME_DIR .. "src/devices/video/m50458.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/video/mb88303.h,VIDEOS["MB88303"] = true
+---------------------------------------------------
+
+if (VIDEOS["MB88303"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mb88303.cpp",
+		MAME_DIR .. "src/devices/video/mb88303.h",
 	}
 end
 
@@ -1043,5 +1054,39 @@ if (VIDEOS["DP8510"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/dp8510.cpp",
 		MAME_DIR .. "src/devices/video/dp8510.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/bt45x.h,VIDEOS["BT45X"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT45X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt45x.cpp",
+		MAME_DIR .. "src/devices/video/bt45x.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/topcat.h,VIDEOS["TOPCAT"] = true
+--------------------------------------------------
+if (VIDEOS["TOPCAT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/topcat.cpp",
+		MAME_DIR .. "src/devices/video/topcat.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/nereid.h,VIDEOS["NEREID"] = true
+--------------------------------------------------
+if (VIDEOS["NEREID"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/nereid.cpp",
+		MAME_DIR .. "src/devices/video/nereid.h",
 	}
 end

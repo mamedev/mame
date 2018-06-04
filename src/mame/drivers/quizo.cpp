@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 
-	DECLARE_DRIVER_INIT(quizo);
+	void init_quizo();
 	DECLARE_PALETTE_INIT(quizo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -217,11 +217,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(quizo_state::quizo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL1/2)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL1/2)
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_IO_MAP(portmap)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizo_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizo_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -236,8 +236,8 @@ MACHINE_CONFIG_START(quizo_state::quizo)
 	MCFG_PALETTE_INIT_OWNER(quizo_state, quizo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL2/16 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL2/16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -273,7 +273,7 @@ ROM_START( quizoa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(quizo_state,quizo)
+void quizo_state::init_quizo()
 {
 	m_videoram=std::make_unique<uint8_t[]>(0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
@@ -283,5 +283,5 @@ DRIVER_INIT_MEMBER(quizo_state,quizo)
 	save_item(NAME(m_port70));
 }
 
-GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state, init_quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state, init_quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", MACHINE_SUPPORTS_SAVE )

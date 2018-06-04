@@ -15,7 +15,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/z80sti.h"

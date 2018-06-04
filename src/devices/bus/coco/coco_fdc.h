@@ -22,8 +22,8 @@
 // ======================> coco_family_fdc_device_base
 
 class coco_family_fdc_device_base :
-	public device_t,
-	public device_cococart_interface
+		public device_t,
+		public device_cococart_interface
 {
 public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w) { m_intrq = state; update_lines(); }
@@ -61,11 +61,11 @@ private:
 };
 
 // device type definitions - CoCo FDC
-extern const device_type COCO_FDC;
-extern const device_type COCO_FDC_V11;
-extern const device_type COCO3_HDB1;
-extern const device_type COCO2_HDB1;
-extern const device_type CP450_FDC;
-extern const device_type CD6809_FDC;
+DECLARE_DEVICE_TYPE(COCO_FDC,       coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO_FDC_V11,   coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO3_HDB1,     coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO2_HDB1,     coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(CP450_FDC,      coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(CD6809_FDC,     coco_family_fdc_device_base)
 
 #endif // MAME_BUS_COCO_COCO_FDC_H

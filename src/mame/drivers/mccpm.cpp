@@ -80,24 +80,24 @@ void mccpm_state::machine_reset()
 
 MACHINE_CONFIG_START(mccpm_state::mccpm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mccpm_mem)
-	MCFG_CPU_IO_MAP(mccpm_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mccpm_mem)
+	MCFG_DEVICE_IO_MAP(mccpm_io)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
 MACHINE_CONFIG_END
@@ -106,14 +106,14 @@ MACHINE_CONFIG_END
 ROM_START( mccpm )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v36", "V3.6")
-	ROMX_LOAD( "mon36.j15",   0x0000, 0x1000, CRC(9c441537) SHA1(f95bad52d9392b8fc9d9b8779b7b861672a0022b), ROM_BIOS(1))
+	ROMX_LOAD("mon36.j15",   0x0000, 0x1000, CRC(9c441537) SHA1(f95bad52d9392b8fc9d9b8779b7b861672a0022b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v34", "V3.4")
-	ROMX_LOAD( "monhemc.bin", 0x0000, 0x1000, CRC(cae7b56e) SHA1(1f40be9491a595e6705099a452743cc0d49bfce8), ROM_BIOS(2))
+	ROMX_LOAD("monhemc.bin", 0x0000, 0x1000, CRC(cae7b56e) SHA1(1f40be9491a595e6705099a452743cc0d49bfce8), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v34a", "V3.4 (alt)")
-	ROMX_LOAD( "mc01mon.bin", 0x0000, 0x0d00, CRC(d1c89043) SHA1(f52a0ed3793dde0de74596be7339233b6a1770af), ROM_BIOS(3))
+	ROMX_LOAD("mc01mon.bin", 0x0000, 0x0d00, CRC(d1c89043) SHA1(f52a0ed3793dde0de74596be7339233b6a1770af), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1981, mccpm,  0,      0,       mccpm,     mccpm, mccpm_state, 0,    "GRAF Elektronik Systeme GmbH", "mc-CP/M-Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                         FULLNAME            FLAGS
+COMP( 1981, mccpm, 0,      0,      mccpm,   mccpm, mccpm_state, empty_init, "GRAF Elektronik Systeme GmbH", "mc-CP/M-Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

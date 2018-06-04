@@ -1,5 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_SATURN_H
+#define MAME_INCLUDES_SATURN_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
@@ -256,8 +260,8 @@ public:
 
 	void refresh_palette_data( void );
 	inline int stv_vdp2_window_process(int x,int y);
-	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
-	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
+	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
+	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
 	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t win_num);
 	int stv_vdp2_apply_window_on_layer(rectangle &cliprect);
 
@@ -282,8 +286,9 @@ public:
 	void stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap, bitmap_rgb32 &roz_bitmap, const rectangle &cliprect, int iRP, int planesizex, int planesizey, int planerenderedsizex, int planerenderedsizey);
-	bool stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter);
-	int get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable,uint8_t winarea);
+	inline bool stv_vdp2_roz_window(int x, int y);
+	inline bool stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter);
+	inline int get_roz_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable,uint8_t winarea);
 	void stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter );
 	uint8_t stv_vdp2_check_vram_cycle_pattern_registers( uint8_t access_command_pnmdr, uint8_t access_command_cpdr, uint8_t bitmap_enable );
 	uint8_t stv_vdp2_is_rotation_applied(void);
@@ -342,6 +347,7 @@ public:
 		uint8_t   linescroll_interval;
 		uint32_t  linescroll_table_address;
 		uint8_t   vertical_linescroll_enable;
+		uint8_t   vertical_cell_scroll_enable;
 		uint8_t   linezoom_enable;
 
 		uint8_t  plane_size;
@@ -448,4 +454,6 @@ public:
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_SATURN_H

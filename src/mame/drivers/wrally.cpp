@@ -260,16 +260,16 @@ static const gfx_layout wrally_tilelayout16 =
 	64*8
 };
 
-static GFXDECODE_START( wrally )
+static GFXDECODE_START( gfx_wrally )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, wrally_tilelayout16, 0, 64*8 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(wrally_state::wrally)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wrally_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wrally_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
@@ -283,24 +283,24 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wrally_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wrally_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wrally_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(wrally_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wrally_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wrally_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wrally_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, wrally_state, coin2_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                                                  /* Sound muting */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally_state, flipscreen_w))                 /* Flip screen */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wrally_state, flipscreen_w))                 /* Flip screen */
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)                                                  /* ??? */
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)                                                  /* ??? */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)                 /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)                 /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -431,7 +431,7 @@ ROM_START( wrallyat ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )

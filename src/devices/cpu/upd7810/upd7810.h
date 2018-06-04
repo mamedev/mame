@@ -220,6 +220,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 40; }
 	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return true; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -414,7 +415,7 @@ protected:
 	const struct opcode_s *m_op70;
 	const struct opcode_s *m_op74;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	int m_icount;
 
 	uint8_t RP(offs_t port);

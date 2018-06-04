@@ -64,6 +64,7 @@ const double XTAL::known_xtals[] = {
 		640'000, /* 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
 		960'000, /* 960_kHz_XTAL           Resonator - Xerox Notetaker Keyboard UART */
 	  1'000'000, /* 1_MHz_XTAL             Used to drive OKI M6295 chips */
+	  1'008'000, /* 1.008_MHz_XTAL         Acorn Microcomputer (System 1) */
 	  1'056'000, /* 1.056_MHz_XTAL         Resonator - OKI M6295 on Trio The Punch h/w */
 	  1'294'400, /* 1.2944_MHz_XTAL        BBN BitGraph PSG */
 	  1'689'600, /* 1.6896_MHz_XTAL        Diablo 1355WP Printer */
@@ -117,6 +118,7 @@ const double XTAL::known_xtals[] = {
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
 	  7'864'300, /* 7.8643_MHz_XTAL        Used on InterFlip games as video clock */
+	  7'987'000, /* 7.987_MHz_XTAL         PC9801-86 YM2608 clock */
 	  8'000'000, /* 8_MHz_XTAL             Extremely common, used on 100's of PCBs */
 	  8'200'000, /* 8.2_MHz_XTAL           Universal Mr. Do - Model 8021 PCB */
 	  8'388'000, /* 8.388_MHz_XTAL         Nintendo Game Boy Color */
@@ -182,7 +184,8 @@ const double XTAL::known_xtals[] = {
 	 14'192'640, /* 14.19264_MHz_XTAL      Central Data 2650 */
 	 14'218'000, /* 14.218_MHz_XTAL        Dragon */
 	 14'300'000, /* 14.3_MHz_XTAL          Agat-7 */
-	 14'314'000, /* 14.314_MHz_XTAL        Taito TTL Board             */
+	 14'314'000, /* 14.314_MHz_XTAL        Taito TTL Board  */
+	 14'318'000, /* 14.318_MHz_XTAL        Niemer - El Fin Del Tiempo */
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
@@ -196,6 +199,7 @@ const double XTAL::known_xtals[] = {
 	 15'400'000, /* 15.4_MHz_XTAL          DVK KSM */
 	 15'468'480, /* 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80 */
 	 15'582'000, /* 15.582_MHz_XTAL        Zentec Zephyr */
+	 15'700'000, /* 15.700_MHz_XTAL        Motogonki */
 	 15'897'600, /* 15.8976_MHz_XTAL       IAI Swyft */
 	 15'920'000, /* 15.92_MHz_XTAL         HP Integral PC */
 	 15'974'400, /* 15.9744_MHz_XTAL       Osborne 1 (9600 * 52 * 32) */
@@ -255,6 +259,7 @@ const double XTAL::known_xtals[] = {
 	 25'174'800, /* 25.1748_MHz_XTAL       Sega System 16A/16B (1600x NTSC line rate) */
 	 25'200'000, /* 25.2_MHz_XTAL          Tektronix 4404 video clock */
 	 25'398'360, /* 25.39836_MHz_XTAL      Tandberg TDV 2324 */
+	 25'400'000, /* 25.4_MHz_XTAL          PC9801-86 PCM base clock */
 	 25'447'000, /* 25.447_MHz_XTAL        Namco EVA3A (Funcube2) */
 	 25'590'906, /* 25.590906_MHz_XTAL     Atari Jaguar NTSC */
 	 25'593'900, /* 25.5939_MHz_XTAL       Atari Jaguar PAL */
@@ -299,6 +304,7 @@ const double XTAL::known_xtals[] = {
 	 33'868'800, /* 33.8688_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
 	 34'000'000, /* 34_MHz_XTAL            Gaelco PCBs */
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
+	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
 	 38'769'220, /* 38.76922_MHz_XTAL      Namco System 21 video board */
 	 39'321'600, /* 39.3216_MHz_XTAL       Sun 2/120 */
@@ -315,6 +321,7 @@ const double XTAL::known_xtals[] = {
 	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */
 	 45'619'200, /* 45.6192_MHz_XTAL       DEC VK100 */
 	 45'830'400, /* 45.8304_MHz_XTAL       Microterm 5510 */
+	 46'615'120, /* 46.61512_Mhz_XTAL      Soundblaster 16 PCM base clock */
 	 47'736'000, /* 47.736_MHz_XTAL        Visual 100 */
 	 48'000'000, /* 48_MHz_XTAL            Williams/Midway Y/Z-unit system / SSV board */
 	 48'384'000, /* 48.384_MHz_XTAL        Namco NB-1 */

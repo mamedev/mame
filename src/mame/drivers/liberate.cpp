@@ -655,14 +655,14 @@ static const gfx_layout pro_tiles =
 };
 
 
-static GFXDECODE_START( liberate )
+static GFXDECODE_START( gfx_liberate )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles1,      0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles2,      0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( prosport )
+static GFXDECODE_START( gfx_prosport )
 	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, charlayout,  0, 4 )
@@ -674,7 +674,7 @@ static GFXDECODE_START( prosport )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, pro_tiles,   0, 4 ) //backgrounds
 GFXDECODE_END
 
-static GFXDECODE_START( prosoccr )
+static GFXDECODE_START( gfx_prosoccr )
 	GFXDECODE_ENTRY( "fg_gfx", 0x00000, charlayout,        0, 4 )
 	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,           0, 4 )
 	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   8, 2 )
@@ -686,26 +686,30 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
+WRITE_LINE_MEMBER(liberate_state::deco16_interrupt)
 {
-	int p = ~ioport("IN3")->read();
-	if ((p & 0x43) && !m_latch)
+	if (state)
 	{
-		device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
-		m_latch = 1;
-	}
-	else
-	{
-		if (!(p & 0x43))
-			m_latch = 0;
+		int p = ~ioport("IN3")->read();
+		if ((p & 0x43) && !m_latch)
+		{
+			m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+			m_latch = 1;
+		}
+		else
+		{
+			if (!(p & 0x43))
+				m_latch = 0;
+		}
 	}
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
+WRITE_LINE_MEMBER(liberate_state::prosport_interrupt)
 {
 	/* ??? */
-	device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
@@ -740,14 +744,13 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 MACHINE_CONFIG_START(liberate_state::liberate_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(liberate_map)
-	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
+	MCFG_DEVICE_ADD("maincpu",DECO16, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(liberate_map)
+	MCFG_DEVICE_IO_MAP(deco16_io_map)
 
-	MCFG_CPU_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -762,38 +765,38 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", liberate)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_liberate)
 	MCFG_PALETTE_ADD("palette", 33)
 	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberate)
 	liberate_base(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberatb)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(liberatb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(liberatb_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::boomrang)
@@ -808,14 +811,14 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(10000000/8) //xtal is unknown?
-	MCFG_CPU_PROGRAM_MAP(prosoccr_map)
-	MCFG_CPU_IO_MAP(prosoccr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(10000000/8) //xtal is unknown?
+	MCFG_DEVICE_PROGRAM_MAP(prosoccr_map)
+	MCFG_DEVICE_IO_MAP(prosoccr_io_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
-	MCFG_CPU_PROGRAM_MAP(prosoccr_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
+	MCFG_DEVICE_PROGRAM_MAP(prosoccr_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -823,7 +826,7 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosoccr)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", prosoccr)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_prosoccr)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
@@ -831,14 +834,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(liberate_state::prosport)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(prosport_map)
-	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
+	MCFG_DEVICE_ADD("maincpu", DECO16, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(prosport_map)
+	MCFG_DEVICE_IO_MAP(deco16_io_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -853,22 +855,23 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prosport)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prosport)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1280,25 +1283,23 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(liberate_state,prosport)
+void liberate_state::init_prosport()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
-
 	/* Main cpu has the nibbles swapped */
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 		RAM[i] = ((RAM[i] & 0x0f) << 4) | ((RAM[i] & 0xf0) >> 4);
 
 }
 
-DRIVER_INIT_MEMBER(liberate_state,yellowcb)
+void liberate_state::init_yellowcb()
 {
-	DRIVER_INIT_CALL(prosport);
+	init_prosport();
 
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xa000, 0xa000, "IN0");
 }
 
-DRIVER_INIT_MEMBER(liberate_state,liberate)
+void liberate_state::init_liberate()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -1316,14 +1317,14 @@ DRIVER_INIT_MEMBER(liberate_state,liberate)
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Soccer", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, prosport,  0,        prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, prosporta, prosport, prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation (Digital Controls license)", "Pro Sports - Bowling, Tennis, and Golf (USA)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boomrang,  0,        boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boomranga, boomrang, boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kamikcab,  0,        boomrang,  kamikcab, liberate_state, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, yellowcbj, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, yellowcbb, kamikcab, boomrang,  yellowcb, liberate_state, yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, liberate,  0,        liberate,  liberate, liberate_state, liberate, ROT270, "Data East Corporation", "Liberation", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dualaslt,  liberate, liberate,  dualaslt, liberate_state, liberate, ROT270, "Data East USA",         "Dual Assault", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, liberateb, liberate, liberatb,  liberatb, liberate_state, prosport, ROT270, "bootleg",               "Liberation (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosoccr,  0,        prosoccr, prosoccr, liberate_state, init_prosport, ROT270, "Data East Corporation", "Pro Soccer", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosport,  0,        prosport, prosport, liberate_state, init_prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, prosporta, prosport, prosport, prosport, liberate_state, init_prosport, ROT270, "Data East Corporation (Digital Controls license)", "Pro Sports - Bowling, Tennis, and Golf (USA)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boomrang,  0,        boomrang, boomrang, liberate_state, init_prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boomranga, boomrang, boomrang, boomrang, liberate_state, init_prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kamikcab,  0,        boomrang, kamikcab, liberate_state, init_prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, yellowcbj, kamikcab, boomrang, yellowcb, liberate_state, init_yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, yellowcbb, kamikcab, boomrang, yellowcb, liberate_state, init_yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, liberate,  0,        liberate, liberate, liberate_state, init_liberate, ROT270, "Data East Corporation", "Liberation", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dualaslt,  liberate, liberate, dualaslt, liberate_state, init_liberate, ROT270, "Data East USA",         "Dual Assault", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, liberateb, liberate, liberatb, liberatb, liberate_state, init_prosport, ROT270, "bootleg",               "Liberation (bootleg)", MACHINE_SUPPORTS_SAVE )

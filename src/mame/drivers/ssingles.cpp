@@ -177,9 +177,9 @@ public:
 	DECLARE_READ8_MEMBER(atamanot_prot_r);
 	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
-	DECLARE_DRIVER_INIT(ssingles);
+	void init_ssingles();
 	virtual void video_start() override;
-	INTERRUPT_GEN_MEMBER(atamanot_irq);
+	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 	required_device<cpu_device> m_maincpu;
@@ -426,7 +426,7 @@ static INPUT_PORTS_START( ssingles )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //must be LOW
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ssingles_state,controls_r, nullptr)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ssingles_state,controls_r, nullptr)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -535,11 +535,11 @@ static const gfx_layout layout_8x16 =
 	8*8
 };
 
-static GFXDECODE_START( ssingles )
+static GFXDECODE_START( gfx_ssingles )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( atamanot )
+static GFXDECODE_START( gfx_atamanot )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8, 0, 8 )
 	GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
 	GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
@@ -548,10 +548,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(ssingles_state::ssingles)
 
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(ssingles_map)
-	MCFG_CPU_IO_MAP(ssingles_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssingles_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ssingles_map)
+	MCFG_DEVICE_IO_MAP(ssingles_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
@@ -559,35 +558,35 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 
 	MCFG_PALETTE_ADD("palette", 4) //guess
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssingles)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssingles)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, ssingles_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000) /* ? MHz */
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000) /* ? MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000) /* ? MHz */
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000) /* ? MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN_MEMBER(ssingles_state::atamanot_irq)
+WRITE_LINE_MEMBER(ssingles_state::atamanot_irq)
 {
 	// ...
 }
 
 MACHINE_CONFIG_START(ssingles_state::atamanot)
 	ssingles(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atamanot_map)
-	MCFG_CPU_IO_MAP(atamanot_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssingles_state,  atamanot_irq)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(atamanot_map)
+	MCFG_DEVICE_IO_MAP(atamanot_io_map)
 
 	MCFG_DEVICE_REMOVE("crtc")
 
@@ -595,8 +594,9 @@ MACHINE_CONFIG_START(ssingles_state::atamanot)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, atamanot_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, ssingles_state, atamanot_irq))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", atamanot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atamanot)
 MACHINE_CONFIG_END
 
 ROM_START( ssingles )
@@ -672,11 +672,11 @@ ROM_START( atamanot )
 	ROM_LOAD( "3.54",   0x00200, 0x0100, CRC(88acb21e) SHA1(18fe5280dad6687daf6bf42d37dde45157fab5e3) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ssingles_state,ssingles)
+void ssingles_state::init_ssingles()
 {
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_colorram));
 }
 
-GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki (Entertainment Enterprises, Ltd. license)", "Swinging Singles (US)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, init_ssingles, ROT90, "Yachiyo Denki (Entertainment Enterprises, Ltd. license)", "Swinging Singles (US)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, init_ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

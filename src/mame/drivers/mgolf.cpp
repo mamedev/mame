@@ -135,7 +135,7 @@ void mgolf_state::update_plunger(  )
 			m_time_released = machine().time();
 
 			if (!m_mask)
-				m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 		else
 			m_time_pushed = machine().time();
@@ -276,8 +276,8 @@ static INPUT_PORTS_START( mgolf )
 	PORT_DIPSETTING(    0xc0, "40" )
 
 	PORT_START("41")
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL A */
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL B */
+	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* DIAL A */
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* DIAL B */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
@@ -289,8 +289,8 @@ static INPUT_PORTS_START( mgolf )
 
 	PORT_START("61")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Course Select") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 1 */
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 2 */
+	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 1 */
+	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 2 */
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("DIAL")
@@ -343,7 +343,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( mgolf )
+static GFXDECODE_START( gfx_mgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 2 )
 GFXDECODE_END
@@ -371,8 +371,8 @@ void mgolf_state::machine_reset()
 MACHINE_CONFIG_START(mgolf_state::mgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* video hardware */
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(mgolf_state::mgolf)
 	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgolf)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(mgolf_state, mgolf)
 
@@ -415,4 +415,4 @@ ROM_START( mgolf )
 ROM_END
 
 
-GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, empty_init, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

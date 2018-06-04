@@ -357,7 +357,6 @@ enum : uint8_t
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-DEFINE_DEVICE_TYPE(Z80SCC,         z80scc_device,   "z80scc",         "Z80 SCC")
 DEFINE_DEVICE_TYPE(Z80SCC_CHANNEL, z80scc_channel,  "z80scc_channel", "Z80 SCC Channel")
 DEFINE_DEVICE_TYPE(SCC8030,        scc8030_device,  "scc8030",        "Zilog Z8030 SCC")
 DEFINE_DEVICE_TYPE(SCC80C30,       scc80c30_device, "scc80c30",       "Zilog Z80C30 SCC")
@@ -422,11 +421,6 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
-}
-
-z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, Z80SCC, tag, owner, clock, TYPE_Z80SCC)
-{
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -635,7 +629,7 @@ int z80scc_device::z80daisy_irq_ack()
 	if (ret == -1 && m_cputag != nullptr)
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
-		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
 		LOGINT(" - failed to find an interrupt to ack, returning default IRQ vector: %02x\n", ret );
 		logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
 	}

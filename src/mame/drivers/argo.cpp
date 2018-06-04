@@ -47,7 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(argo);
+	void init_argo();
 
 	void argo(machine_config &config);
 	void io_map(address_map &map);
@@ -283,7 +283,7 @@ void argo_state::machine_reset()
 	timer_set(attotime::from_usec(5), TIMER_BOOT);
 }
 
-DRIVER_INIT_MEMBER(argo_state,argo)
+void argo_state::init_argo()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
@@ -349,9 +349,9 @@ uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 MACHINE_CONFIG_START(argo_state::argo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3500000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -380,5 +380,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT  STATE        INIT    COMPANY        FULLNAME  FLAGS */
-COMP( 1986, argo,  0,      0,       argo,     argo,  argo_state,  argo,   "<unknown>",   "Argo",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY      FULLNAME  FLAGS */
+COMP( 1986, argo, 0,      0,      argo,    argo,  argo_state, init_argo, "<unknown>", "Argo",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

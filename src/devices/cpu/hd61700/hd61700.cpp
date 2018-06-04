@@ -200,7 +200,7 @@ void hd61700_cpu_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_flags).mask(0xff).formatstr("%8s").noshow();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -341,7 +341,7 @@ void hd61700_cpu_device::execute_run()
 	{
 		m_ppc = m_curpc;
 
-		debugger_instruction_hook(this, m_curpc);
+		debugger_instruction_hook(m_curpc);
 
 		// verify that CPU is not in sleep
 		if (m_state & CPU_SLP)

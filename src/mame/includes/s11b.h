@@ -15,9 +15,8 @@ class s11b_state : public s11a_state
 {
 public:
 	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: s11a_state(mconfig, type, tag),
-		m_bg_hc55516(*this, "hc55516_bg")
-
+		: s11a_state(mconfig, type, tag)
+		, m_bg_hc55516(*this, "hc55516_bg")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -29,8 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 
 	DECLARE_MACHINE_RESET(s11b);
-	DECLARE_DRIVER_INIT(s11b);
-	DECLARE_DRIVER_INIT(s11b_invert);
+	void init_s11b();
+	void init_s11b_invert();
 
 	void s11b(machine_config &config);
 	void s11b_audio_map(address_map &map);

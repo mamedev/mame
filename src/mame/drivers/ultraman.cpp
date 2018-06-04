@@ -175,13 +175,13 @@ void ultraman_state::machine_reset()
 MACHINE_CONFIG_START(ultraman_state::ultraman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)      /* 12 MHz? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ultraman_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,24000000/2)      /* 12 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ultraman_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)    /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,24000000/6)    /* 4 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -224,15 +224,16 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 	MCFG_K051316_CB(ultraman_state, zoom_callback_3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 24000000/6)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 24000000/6)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -277,4 +278,4 @@ ROM_START( ultraman )
 ROM_END
 
 
-GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, empty_init, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )

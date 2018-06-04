@@ -35,14 +35,38 @@ class cabaret_state : public driver_device
 {
 public:
 	cabaret_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram"),
-		m_bg_scroll(*this, "bg_scroll"),
-		m_bg_tile_ram(*this, "bg_tile_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_fg_tile_ram(*this, "fg_tile_ram")
+		, m_fg_color_ram(*this, "fg_color_ram")
+		, m_bg_scroll(*this, "bg_scroll")
+		, m_bg_tile_ram(*this, "bg_tile_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_led(*this, "led6")
+	{ }
+
+	DECLARE_WRITE8_MEMBER(bg_scroll_w);
+	DECLARE_WRITE8_MEMBER(bg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_color_w);
+	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
+	DECLARE_WRITE8_MEMBER(ppi2_b_w);
+	DECLARE_WRITE8_MEMBER(ppi2_c_w);
+	void show_out();
+	void init_cabaret();
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint32_t screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cabaret_interrupt);
+	void cabaret(machine_config &config);
+	void cabaret_map(address_map &map);
+	void cabaret_portmap(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
@@ -52,27 +76,10 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int m_nmi_enable;
 	uint8_t m_out[3];
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(ppi2_b_w);
-	DECLARE_WRITE8_MEMBER(ppi2_c_w);
-	void show_out();
-	DECLARE_DRIVER_INIT(cabaret);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cabaret_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void cabaret(machine_config &config);
-	void cabaret_map(address_map &map);
-	void cabaret_portmap(address_map &map);
+	output_finder<> m_led;
 };
 
 
@@ -167,7 +174,7 @@ WRITE8_MEMBER(cabaret_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	output().set_led_value(6,        data & 0x40);   // led for coin m_out / hopper active
+	m_led = BIT(data, 6);   // led for coin m_out / hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
@@ -334,7 +341,7 @@ static const gfx_layout layout_8x32x6i =
 	8*32*2
 };
 
-static GFXDECODE_START( cabaret )
+static GFXDECODE_START( gfx_cabaret )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6i, 0, 16 )
 GFXDECODE_END
@@ -353,16 +360,16 @@ void cabaret_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 {
-		if (m_nmi_enable & 0x80)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable & 0x80)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(cabaret_state::cabaret)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cabaret_map)
-	MCFG_CPU_IO_MAP(cabaret_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cabaret_map)
+	MCFG_DEVICE_IO_MAP(cabaret_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
 
 	MCFG_DEVICE_ADD("ppi1", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS2"))
@@ -371,11 +378,11 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 
 	MCFG_DEVICE_ADD("ppi2", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(cabaret_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(cabaret_state, ppi2_c_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cabaret_state, ppi2_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cabaret_state, ppi2_c_w))
 
 	MCFG_DEVICE_ADD("ppi3", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(cabaret_state, nmi_and_coins_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cabaret_state, nmi_and_coins_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0xf0))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
@@ -389,24 +396,23 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabaret)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabaret)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(cabaret_state,cabaret)
+void cabaret_state::init_cabaret()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
 
 	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
+	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x2206) == 0x2002) rom[i] ^= 0x01;
 	}
@@ -441,4 +447,4 @@ ROM_START( cabaret )
 	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )   /* background maps, read by the CPU */
 ROM_END
 
-GAME( 1992, cabaret,  0, cabaret,  cabaret, cabaret_state, cabaret,  ROT0, "AMT Co. Ltd.", "Cabaret", MACHINE_NOT_WORKING )
+GAME( 1992, cabaret, 0, cabaret, cabaret, cabaret_state, init_cabaret, ROT0, "AMT Co. Ltd.", "Cabaret", MACHINE_NOT_WORKING )

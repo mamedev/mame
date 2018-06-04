@@ -205,7 +205,7 @@ static const gfx_layout att4425_charlayout =
 	16*8
 };
 
-static GFXDECODE_START( att4425 )
+static GFXDECODE_START( gfx_att4425 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, att4425_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -240,9 +240,9 @@ static const z80_daisy_config att4425_daisy_chain[] =
 
 MACHINE_CONFIG_START(att4425_state::att4425)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(32'000'000)/8) // XXX
-	MCFG_CPU_PROGRAM_MAP(att4425_mem)
-	MCFG_CPU_IO_MAP(att4425_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(32'000'000)/8) // XXX
+	MCFG_DEVICE_PROGRAM_MAP(att4425_mem)
+	MCFG_DEVICE_IO_MAP(att4425_io)
 	MCFG_Z80_DAISY_CHAIN(att4425_daisy_chain)
 
 	/* video hardware */
@@ -253,52 +253,52 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_SIZE(720, 351)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 351-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", att4425)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_att4425)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	// ch.3 -- timer?
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(32'000'000)) // XXX
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 #ifdef notdef
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
 #endif
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, 4800) // XXX
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 
 	// host
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
 
 	// aux printer?
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, "printer")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, "printer")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxb_w))
 
 	// XXX
 	MCFG_DEVICE_ADD("line_clock", CLOCK, 9600*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(att4425_state, write_line_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_line_clock))
 
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	// XXX
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(att4425_state, write_keyboard_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_keyboard_clock))
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -320,5 +320,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1983, att4425,  0,      0,      att4425,   att4425, att4425_state, 0,    "AT&T", "AT&T Teletype 4425", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME              FLAGS
+COMP( 1983, att4425, 0,      0,      att4425, att4425, att4425_state, empty_init, "AT&T",  "AT&T Teletype 4425", MACHINE_IS_SKELETON )

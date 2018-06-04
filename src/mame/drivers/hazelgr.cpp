@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -72,19 +72,19 @@ static const z80_daisy_config daisy_chain[] =
 // All frequencies are guesswork, in an effort to get something to happen
 MACHINE_CONFIG_START(haze_state::haze)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,2000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,2000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 1'000'000)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc3", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc3", z80ctc_device, trg1))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc1", z80ctc_device, trg3))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg2))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg3))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc3", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc3", z80ctc_device, trg1))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, 1'000'000 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -114,4 +114,4 @@ ROM_START( hg_frd )
 ROM_END
 
 
-GAME( 198?,  hg_frd,  0,  haze,  haze, haze_state,  0,  ROT0,  "Hazel Grove",    "Fruit Deuce (Hazel Grove)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?, hg_frd, 0, haze, haze, haze_state, empty_init, ROT0, "Hazel Grove", "Fruit Deuce (Hazel Grove)", MACHINE_IS_SKELETON_MECHANICAL)

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Master Compact Disks -->
+<!-- Acorn BBC Master Compact Disks -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbcmc_flop" description="BBC Master Compact disks">
+<softwarelist name="bbcmc_flop" description="Acorn BBC Master Compact disks">
 
 	<software name="alps24">
 		<description>ALPS - Adventure Language Programming System</description>

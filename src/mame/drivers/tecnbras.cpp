@@ -114,9 +114,9 @@ void tecnbras_state::machine_reset()
 
 MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, 12_MHz_XTAL) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_ADD("maincpu", I80C31, 12_MHz_XTAL) // verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // buzzer ?
 
 /* TODO: Add an I2C RTC (Phillips PCF8583P)
@@ -143,5 +143,5 @@ ROM_START( tecnbras )
 	ROM_LOAD( "tecnbras.u2",  0x0000, 0x8000, CRC(1a1e18fc) SHA1(8907e72f0356a2e2e1097dabac6d6b0b3d717f85) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT  COMPANY     FULLNAME                            FLAGS
-COMP( 200?, tecnbras, 0,      0,      tecnbras, 0,     tecnbras_state, 0,    "Tecnbras", "Dot Matrix Display (70x7 pixels)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT        COMPANY     FULLNAME                            FLAGS
+COMP( 200?, tecnbras, 0,      0,      tecnbras, 0,     tecnbras_state, empty_init, "Tecnbras", "Dot Matrix Display (70x7 pixels)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

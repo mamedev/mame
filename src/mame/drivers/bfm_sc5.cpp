@@ -211,25 +211,25 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 }
 
 MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
-	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
-	MCFG_CPU_PROGRAM_MAP(sc5_map)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
+	MCFG_DEVICE_PROGRAM_MAP(sc5_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(bfm_sc5_state, bfm_sc5_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(bfm_sc5_state, bfm_sc5_duart_txa))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(bfm_sc5_state, bfm_sc5_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(bfm_sc5_state, bfm_sc5_duart_output_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_txa))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, bfm_sc5_state, bfm_sc5_duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, bfm_sc5_state, bfm_sc5_duart_output_w))
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc5)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -142,7 +142,7 @@ public:
 	DECLARE_READ8_MEMBER(ext_r);
 	DECLARE_READ8_MEMBER(dos_r);
 
-	DECLARE_DRIVER_INIT(atomeb);
+	void init_atomeb();
 
 	/* eprom state */
 	int m_eprom;

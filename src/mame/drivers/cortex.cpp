@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
 	DECLARE_READ8_MEMBER(pio_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
 	void cortex(machine_config &config);
 	void io_map(address_map &map);
@@ -170,7 +170,7 @@ void cortex_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER( cortex_state, init )
+void cortex_state::init_init()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -187,18 +187,18 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map)
 
 	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
-	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cortex_state, keyboard_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cortex_state, ebus_int_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cortex_state, ebus_to_en_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cortex_state, disk_size_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cortex_state, romsw_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state))
+	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cortex_state, basic_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cortex_state, keyboard_ack_w))
+	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cortex_state, ebus_int_ack_w))
+	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cortex_state, ebus_to_en_w))
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cortex_state, disk_size_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, cortex_state, romsw_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("beeper", beep_device, set_state))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "crtc", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INT_9995_INT1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(cortex_state, vdp_int_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, cortex_state, vdp_int_w))
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
@@ -210,8 +210,8 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	//MCFG_DEVICE_ADD("uart2", TMS9902, XTAL(12'000'000) / 4)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
@@ -219,15 +219,15 @@ MACHINE_CONFIG_END
 ROM_START( cortex )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "basic", "Cortex Bios")
-	ROMX_LOAD( "cortex.ic47", 0x10000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(1))
-	ROMX_LOAD( "cortex.ic46", 0x12000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(1))
-	ROMX_LOAD( "cortex.ic45", 0x14000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(1))
+	ROMX_LOAD( "cortex.ic47", 0x10000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(0))
+	ROMX_LOAD( "cortex.ic46", 0x12000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(0))
+	ROMX_LOAD( "cortex.ic45", 0x14000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "forth", "FIG-Forth")
-	ROMX_LOAD( "forth.ic47",  0x10000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(2))
-	ROMX_LOAD( "forth.ic46",  0x12000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(2))
+	ROMX_LOAD( "forth.ic47",  0x10000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(1))
+	ROMX_LOAD( "forth.ic46",  0x12000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1982, cortex, 0,      0,       cortex,    cortex, cortex_state, init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT       COMPANY                  FULLNAME  FLAGS
+COMP( 1982, cortex, 0,      0,      cortex,  cortex, cortex_state, init_init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )

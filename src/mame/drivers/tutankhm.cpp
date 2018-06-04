@@ -67,12 +67,15 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
+WRITE_LINE_MEMBER(tutankhm_state::vblank_irq)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
-	m_irq_toggle ^= 1;
-	if (m_irq_toggle && m_irq_enable)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state)
+	{
+		m_irq_toggle ^= 1;
+		if (m_irq_toggle && m_irq_enable)
+			m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 
@@ -208,7 +211,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(tutankhm_state,tutankhm)
+void tutankhm_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 
@@ -218,7 +221,7 @@ MACHINE_START_MEMBER(tutankhm_state,tutankhm)
 	save_item(NAME(m_flip_y));
 }
 
-MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
+void tutankhm_state::machine_reset()
 {
 	m_irq_toggle = 0;
 }
@@ -226,22 +229,18 @@ MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* 1.5 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tutankhm_state,  tutankhm_interrupt)
-
-	MCFG_MACHINE_START_OVERRIDE(tutankhm_state,tutankhm)
-	MCFG_MACHINE_RESET_OVERRIDE(tutankhm_state,tutankhm)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* 1.5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tutankhm_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tutankhm_state, irq_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // PAY OUT - not used
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tutankhm_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tutankhm_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tutankhm_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tutankhm_state, coin_counter_1_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // starfield?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(tutankhm_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tutankhm_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tutankhm_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tutankhm_state, flip_screen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -252,14 +251,14 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
 	MCFG_SCREEN_UPDATE_DRIVER(tutankhm_state, screen_update_tutankhm)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tutankhm_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
+	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
 MACHINE_CONFIG_END
 
 
@@ -337,5 +336,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, tutankhm_state, 0, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, tutankhm_state, 0, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, tutankhm_state, empty_init, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, tutankhm_state, empty_init, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)

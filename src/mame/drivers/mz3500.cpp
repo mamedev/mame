@@ -743,7 +743,7 @@ static const gfx_layout charlayout_8x16 =
 	8*16
 };
 
-static GFXDECODE_START( mz3500 )
+static GFXDECODE_START( gfx_mz3500 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_8x8,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0008, charlayout_8x8,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout_8x16,     0, 1 )
@@ -808,28 +808,29 @@ void mz3500_state::upd7220_2_map(address_map &map)
 	map(0x00000, 0x3ffff).ram(); // AM_SHARE("video_ram_2")
 }
 
-static SLOT_INTERFACE_START( mz3500_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void mz3500_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 /* TODO: clocks */
 MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master",Z80,MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(mz3500_master_map)
-	MCFG_CPU_IO_MAP(mz3500_master_io)
+	MCFG_DEVICE_ADD("master",Z80,MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(mz3500_master_map)
+	MCFG_DEVICE_IO_MAP(mz3500_master_io)
 
-	MCFG_CPU_ADD("slave",Z80,MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(mz3500_slave_map)
-	MCFG_CPU_IO_MAP(mz3500_slave_io)
+	MCFG_DEVICE_ADD("slave",Z80,MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(mz3500_slave_map)
+	MCFG_DEVICE_IO_MAP(mz3500_slave_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
 	MCFG_DEVICE_ADD("i8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz3500_state, mz3500_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz3500_state, mz3500_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz3500_state, mz3500_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz3500_state, mz3500_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz3500_state, mz3500_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz3500_state, mz3500_pc_w))
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))
@@ -841,7 +842,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
-	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
+	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
@@ -855,14 +856,14 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz3500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz3500)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
@@ -884,4 +885,4 @@ ROM_START( mz3500 )
 	ROM_LOAD( "mz-3500_cg-rom_2-b_m5l2764k.bin", 0x000000, 0x002000, CRC(29f2f80a) SHA1(64b307cd9de5a3327e3ec9f3d0d6b3485706f436) )
 ROM_END
 
-COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, mz3500_state,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )
+COMP( 198?, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_IS_SKELETON )

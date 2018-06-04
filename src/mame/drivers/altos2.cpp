@@ -16,7 +16,7 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/clock.h"
@@ -103,29 +103,29 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(altos2_state::altos2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 4915200) // ctc & dart connections are guesswork
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("dart1", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart1", z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart1", z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart2", z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80dart_device, txca_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart1", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart1", z80dart_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart1", z80dart_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("dart2", z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart2", z80dart_device, txca_w))
 
 	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(4'000'000))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL(4'000'000)) // channel B not used for communications
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("novram", x2210_device, store)) MCFG_DEVCB_INVERT // FIXME: no inverter should be needed
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("novram", x2210_device, store)) MCFG_DEVCB_INVERT // FIXME: no inverter should be needed
 
 	MCFG_DEVICE_ADD("novram", X2210, 0)
 
@@ -134,7 +134,7 @@ MACHINE_CONFIG_START(altos2_state::altos2)
 	MCFG_SCREEN_UPDATE_DRIVER(altos2_state, screen_update)
 
 	//MCFG_DEVICE_ADD("vpac", CRT9007, VPAC_CLOCK)
-	//MCFG_CRT9007_INT_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	//MCFG_CRT9007_INT_CALLBACK(WRITELINE("ctc", z80ctc_device, trg3))
 	//MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
@@ -147,4 +147,4 @@ ROM_START( altos2 )
 	ROM_LOAD( "us_v1.1_14410.u34", 0x0000, 0x2000, CRC(0ebb78bf) SHA1(96a1f7d34ff35037cbbc93049c0e2b9c9f11f1db) )
 ROM_END
 
-COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, 0, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )

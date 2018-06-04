@@ -137,6 +137,7 @@ public:
 		, m_cb2(*this, "bcd:cb2")
 		, m_digit(0.0)
 		, m_io_line(*this, "LINE%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 #if HTTPUI
 		, m_connection(NULL)
 		, m_web_line0(0)
@@ -180,6 +181,7 @@ private:
 
 	virtual void device_start() override;
 	required_ioport_array<5> m_io_line;
+	output_finder<4> m_digits;
 	uint16_t m_line[5];
 
 #if HTTPUI
@@ -212,6 +214,7 @@ NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit7_cb) { if (data != 0) m_digi
 
 void prodigy_state::device_start()
 {
+	m_digits.resolve();
 	memset(m_line, 0, sizeof(m_line));
 #if HTTPUI
 	m_server =  machine().manager().http();
@@ -554,22 +557,27 @@ void prodigy_state::update_bcd()
 		LOGBCD(" - segments: %02x -> ", m_digit);
 		m_segments = m_digit;
 		LOGBCD("%02x\n", m_segments);
-		if (m_digit_cache[digit_nbr] != m_segments)
+
+		if (digit_nbr < 4)
 		{
-			output().set_digit_value( digit_nbr, m_segments);
-			m_digit_cache[digit_nbr] = m_segments;
+			if (m_digit_cache[digit_nbr] != m_segments)
+			{
+				m_digits[digit_nbr] = m_segments;
+				m_digit_cache[digit_nbr] = m_segments;
 #if HTTPUI
-			update_web_bcd(digit_nbr, m_segments);
+				update_web_bcd(digit_nbr, m_segments);
 #endif
+			}
 		}
 	}
 }
 
-ADDRESS_MAP_START(prodigy_state::maincpu_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("via", via6522_device, read, write)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0x0000) AM_MIRROR(0x8000)
-ADDRESS_MAP_END
+void prodigy_state::maincpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x200f).rw("via", FUNC(via6522_device::read),FUNC(via6522_device::write));
+	map(0x6000, 0x7fff).rom().region("roms", 0).mirror(0x8000);
+}
 
 /*
  * The keypad was modelled after the physical appearance but altered after finding out how it was working so
@@ -633,20 +641,20 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(prodigy_state::prodigy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 	MCFG_DEFAULT_LAYOUT(layout_prodigy)
 
 	MCFG_DEVICE_ADD("io_74145", TTL74145, 0)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(2'000'000))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(prodigy_state, irq_handler));
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(prodigy_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(prodigy_state, via_pb_w))
-	MCFG_VIA6522_READPA_HANDLER(READ8(prodigy_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(prodigy_state, via_pb_r))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(prodigy_state, via_cb1_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(prodigy_state, via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, prodigy_state, irq_handler));
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, prodigy_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, prodigy_state, via_pb_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, prodigy_state, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, prodigy_state, via_pb_r))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, prodigy_state, via_cb1_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, prodigy_state, via_cb2_w))
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, XTAL(2'000'000) * 30)
 	MCFG_NETLIST_SETUP(prodigy)
@@ -709,5 +717,5 @@ ROM_START(prodigy)
 	ROM_LOAD("0x2000.bin",  0x0000, 0x02000, CRC(8d60345a) SHA1(fff18ff12e1b1be91f8eac1178605a682564eff2))
 ROM_END
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY,                FULLNAME,              FLAGS
-CONS( 1981, prodigy,    0,        0,      prodigy,   prodigy,   prodigy_state, 0,    "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY                 FULLNAME               FLAGS
+CONS( 1981, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )

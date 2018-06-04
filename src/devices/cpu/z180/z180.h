@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 enum
@@ -143,7 +143,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 16; }
 	virtual uint32_t execute_input_lines() const override { return 5; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_burn(int32_t cycles) override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -186,9 +187,9 @@ private:
 	uint8_t   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
 	uint8_t   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_oprogram;
-	direct_read_data<0> *m_odirect;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_ocache;
 	address_space *m_iospace;
 	uint8_t   m_rtemp;
 	uint32_t  m_ioltemp;

@@ -63,6 +63,7 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_keyboard(*this, "X%u", 0)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(pa_r);
@@ -75,9 +76,11 @@ public:
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia1;
 	required_ioport_array<4> m_keyboard;
 	required_device<cpu_device> m_maincpu;
+	output_finder<16> m_digits;
 };
 
 
@@ -164,7 +167,7 @@ WRITE8_MEMBER( datum_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3));
+		m_digits[m_keydata] = bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3);
 		m_keydata = 0;
 	}
 
@@ -181,17 +184,17 @@ WRITE8_MEMBER( datum_state::pb_w )
 
 MACHINE_CONFIG_START(datum_state::datum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
-	MCFG_CPU_PROGRAM_MAP(datum_mem)
+	MCFG_DEVICE_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(datum_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_datum)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0) // keyboard & display
-	MCFG_PIA_READPA_HANDLER(READ8(datum_state, pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(datum_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(datum_state, pb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, datum_state, pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, datum_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, datum_state, pb_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 
@@ -209,5 +212,5 @@ ROM_START( datum )
 	ROM_LOAD( "datum.bin", 0x0000, 0x0800, BAD_DUMP CRC(6fb11628) SHA1(8a77a846b62eee0d12848da76e16b4c66ef445d8) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS        INIT  COMPANY       FULLNAME   FLAGS
-COMP( 1982, datum,   0,      0,       datum,      datum,  datum_state, 0,    "Gammatron",  "Datum",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

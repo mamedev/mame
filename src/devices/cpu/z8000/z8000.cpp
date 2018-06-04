@@ -37,7 +37,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_BIG, iobits, 16, 0)
 	, m_mo_out(*this)
-	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
+	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_cache(nullptr), m_io(nullptr), m_icount(0)
 	, m_vector_mult(vecmult)
 {
 }
@@ -663,14 +663,14 @@ void z8001_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	init_tables();
 
 	register_debug_state();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_mo_out.resolve_safe();
 	m_mi = CLEAR_LINE;
 }
@@ -686,14 +686,14 @@ void z8002_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	init_tables();
 
 	register_debug_state();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_mo_out.resolve_safe();
 	m_mi = CLEAR_LINE;
 }
@@ -732,7 +732,7 @@ void z8002_device::execute_run()
 			Interrupt();
 
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if (m_irq_req & Z8000_HALT)
 		{

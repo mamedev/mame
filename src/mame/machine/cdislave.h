@@ -26,15 +26,8 @@ TODO:
 
 #pragma once
 
+#include "sound/dmadac.h"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDISLAVE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_CDISLAVE, 0)
-#define MCFG_CDISLAVE_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDISLAVE, 0)
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -59,13 +52,19 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override { }
-	virtual void device_clock_changed() override { }
+	virtual ioport_constructor device_input_ports() const override;
 
 	// internal callbacks
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
+
+	required_ioport m_mousex;
+	required_ioport m_mousey;
+	required_ioport m_mousebtn;
+
 	// internal state
 	class channel_state
 	{
@@ -107,6 +106,6 @@ private:
 
 
 // device type definition
-extern const device_type MACHINE_CDISLAVE;
+DECLARE_DEVICE_TYPE(CDI_SLAVE, cdislave_device)
 
-#endif // __CDISLAVE_H__
+#endif // MAME_MACHINE_CDISLAVE_H

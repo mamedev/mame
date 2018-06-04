@@ -120,8 +120,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(nemesis_interrupt);
-	INTERRUPT_GEN_MEMBER(blkpnthr_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(nemesis_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void create_palette_lookups();

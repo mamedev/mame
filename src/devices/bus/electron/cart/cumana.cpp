@@ -35,10 +35,11 @@ FLOPPY_FORMATS_MEMBER(electron_cumana_device::floppy_formats)
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(cumana_floppies)
-	SLOT_INTERFACE("35dd",  FLOPPY_35_DD)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void cumana_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd",  FLOPPY_35_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -46,14 +47,14 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(electron_cumana_device::device_add_mconfig)
 	/* fdc */
-	MCFG_FD1793_ADD("fdc", 16_MHz_XTAL / 16) // TODO: Not known whether DRQ and INTRQ are connected
+	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16) // TODO: Not known whether DRQ and INTRQ are connected
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", cumana_floppies, "525qd", electron_cumana_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", cumana_floppies, nullptr, electron_cumana_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* rtc */
-	MCFG_MC146818_ADD("rtc", 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 MACHINE_CONFIG_END
 
 //**************************************************************************

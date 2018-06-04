@@ -2016,9 +2016,9 @@ void z180_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_odirect = m_oprogram->direct<0>();
+	m_ocache = m_oprogram->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_iospace = &space(AS_IO);
 
 	/* set up the state table */
@@ -2162,7 +2162,7 @@ void z180_device::device_start()
 
 	save_item(NAME(m_mmu));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 /****************************************************************************
@@ -2420,7 +2420,7 @@ again:
 		if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(this, _PCD);
+			debugger_instruction_hook(_PCD);
 
 			/* FIXME z180_dma0 should be handled in handle_io_timers */
 			curcycles = z180_dma0(m_icount);
@@ -2437,7 +2437,7 @@ again:
 				m_after_EI = 0;
 
 				_PPC = _PCD;
-				debugger_instruction_hook(this, _PCD);
+				debugger_instruction_hook(_PCD);
 
 				if (!m_HALT)
 				{
@@ -2495,7 +2495,7 @@ again:
 			m_after_EI = 0;
 
 			_PPC = _PCD;
-			debugger_instruction_hook(this, _PCD);
+			debugger_instruction_hook(_PCD);
 
 			if (!m_HALT)
 			{

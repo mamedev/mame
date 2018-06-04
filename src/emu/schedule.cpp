@@ -481,9 +481,9 @@ void device_scheduler::timeslice()
 							exec->run();
 						else
 						{
-							debugger_start_cpu_hook(&exec->device(), target);
+							exec->debugger_start_cpu_hook(target);
 							exec->run();
-							debugger_stop_cpu_hook(&exec->device());
+							exec->debugger_stop_cpu_hook();
 						}
 
 						// adjust for any cycles we took back
@@ -762,7 +762,7 @@ void device_scheduler::rebuild_execute_list()
 		// if the configuration specifies a device to make perfect, pick that as the minimum
 		if (!machine().config().m_perfect_cpu_quantum.empty())
 		{
-			device_t *device = machine().device(machine().config().m_perfect_cpu_quantum.c_str());
+			device_t *device = machine().root_device().subdevice(machine().config().m_perfect_cpu_quantum.c_str());
 			if (device == nullptr)
 				fatalerror("Device '%s' specified for perfect interleave is not present!\n", machine().config().m_perfect_cpu_quantum.c_str());
 

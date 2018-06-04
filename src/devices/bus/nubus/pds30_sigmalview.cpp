@@ -67,10 +67,9 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0),
-	m_assembled_tag(util::string_format("%s:%s", tag, LVIEW_SCREEN_NAME))
+	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
 {
-	set_screen(m_assembled_tag.c_str());
+	set_screen(*this, LVIEW_SCREEN_NAME);
 }
 
 //-------------------------------------------------
@@ -163,7 +162,7 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 {
 	uint32_t rv = 0;
 
-//    printf("prot_r: @ %x, mask %08x [PC=%x  state %d]\n", offset, mem_mask, machine().device("maincpu")->safe_pc(), m_protstate);
+//    printf("%s prot_r: @ %x, mask %08x [state %d]\n", machine().describe_context().c_str(), offset, mem_mask, m_protstate);
 
 	if ((m_protstate == 1) || (m_protstate == 10) || (machine().device<cpu_device>("maincpu")->pc() == 0x5aac))
 	{

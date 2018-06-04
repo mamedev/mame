@@ -19,7 +19,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class tlc34076_device : public device_t
+class tlc34076_device : public device_t, public device_palette_interface
 {
 public:
 	enum tlc34076_bits
@@ -35,7 +35,6 @@ public:
 	void set_bits(tlc34076_bits bits) { m_dacbits = bits; }
 
 	// public interface
-	const rgb_t *get_pens();
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -44,15 +43,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 0x100; }
+
 private:
+	// internal helpers
+	void update_pen(uint8_t i);
+
 	// internal state
-	uint8_t m_local_paletteram[0x300];
+	std::unique_ptr<uint8_t[]> m_local_paletteram[3];
 	uint8_t m_regs[0x10];
 	uint8_t m_palettedata[3];
 	uint8_t m_writeindex;
 	uint8_t m_readindex;
 	uint8_t m_dacbits;
-	rgb_t m_pens[0x100];
 };
 
 

@@ -71,6 +71,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_ioport m_address;
 	floppy_image_device *m_floppy;
+	output_finder<4> m_leds;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

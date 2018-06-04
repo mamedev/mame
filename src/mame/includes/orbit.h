@@ -45,8 +45,6 @@ public:
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(heat_rst_led_w);
-	DECLARE_WRITE_LINE_MEMBER(hyper_led_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -86,6 +84,6 @@ private:
 };
 /*----------- defined in audio/orbit.c -----------*/
 
-DISCRETE_SOUND_EXTERN( orbit );
+DISCRETE_SOUND_EXTERN( orbit_discrete );
 
 #endif // MAME_INCLUDES_ORBIT_H

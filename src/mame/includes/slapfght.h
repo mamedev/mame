@@ -99,9 +99,9 @@ public:
 	virtual void machine_reset() override;
 
 	void init_banks();
-	DECLARE_DRIVER_INIT(getstarb1);
-	DECLARE_DRIVER_INIT(slapfigh);
-	DECLARE_DRIVER_INIT(getstarb2);
+	void init_getstarb1();
+	void init_slapfigh();
+	void init_getstarb2();
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
@@ -114,7 +114,7 @@ public:
 	uint32_t screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void tigerhb2(machine_config &config);
 	void tigerhb1(machine_config &config);

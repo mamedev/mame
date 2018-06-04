@@ -1,8 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 // thanks-to:Enrique Sanchez
+#ifndef MAME_INCLUDES_YIEAR
+#define MAME_INCLUDES_YIEAR
+
+#pragma once
+
+#include "audio/trackfld.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
+
+#include "screen.h"
 
 class yiear_state : public driver_device
 {
@@ -13,9 +21,11 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_audio(*this, "trackfld_audio"),
 		m_sn(*this, "snsnd"),
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
@@ -25,9 +35,11 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<trackfld_audio_device> m_audio;
 	required_device<sn76489a_device> m_sn;
 	required_device<vlm5030_device> m_vlm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	/* video-related */
@@ -49,10 +61,12 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(yiear);
 	uint32_t screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(yiear_vblank_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void yiear(machine_config &config);
 	void main_map(address_map &map);
 	void vlm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_YIEAR

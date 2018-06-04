@@ -306,7 +306,7 @@ void sfcbox_state::sfcbox_io(address_map &map)
 
 static INPUT_PORTS_START( snes )
 	PORT_START("RTC_R")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
 
 	PORT_START("RTC_W")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_clock_line)
@@ -457,26 +457,27 @@ void sfcbox_state::machine_reset()
 MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 
 	/* base snes hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_CPU_PROGRAM_MAP(snes_map)
+	MCFG_DEVICE_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(snes_map)
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_CPU_PROGRAM_MAP(spc_mem)
+	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
+	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* sfcbox hardware */
-	MCFG_CPU_ADD("bios", Z180, XTAL(12'000'000) / 2)  /* HD64180RF6X */
-	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
-	MCFG_CPU_IO_MAP(sfcbox_io)
+	MCFG_DEVICE_ADD("bios", Z180, XTAL(12'000'000) / 2)  /* HD64180RF6X */
+	MCFG_DEVICE_PROGRAM_MAP(sfcbox_map)
+	MCFG_DEVICE_IO_MAP(sfcbox_io)
 
 	MCFG_MB90082_ADD("mb90082",XTAL(12'000'000) / 2) /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
@@ -490,7 +491,7 @@ MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// SFCBOX
@@ -584,8 +585,8 @@ ROM_START( pss64 )
 ROM_END
 
 
-GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )

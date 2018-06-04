@@ -24,11 +24,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
-		m_discrete(*this, "discrete")
+		m_discrete(*this, "discrete"),
+		m_startled(*this, "startled")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	DECLARE_DRIVER_INIT(bradley);
+	void init_bradley();
 	void bzone(machine_config &config);
 
 protected:
@@ -47,6 +48,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	optional_device<discrete_device> m_discrete;
+	output_finder<> m_startled;
 
 	uint8_t m_analog_data;
 };

@@ -158,6 +158,6 @@ protected:
 DECLARE_DEVICE_TYPE(VIP_EXPANSION_SLOT, vip_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( vip_expansion_cards );
+void vip_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIP_EXP_H

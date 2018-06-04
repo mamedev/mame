@@ -56,12 +56,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_gfx_w);
 	DECLARE_WRITE8_MEMBER(sprite_ram_w);
 	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
-	DECLARE_DRIVER_INIT(25pacman);
-	DECLARE_DRIVER_INIT(20pacgal);
+	void init_25pacman();
+	void init_20pacgal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void get_pens(pen_t *pens);
 	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap);

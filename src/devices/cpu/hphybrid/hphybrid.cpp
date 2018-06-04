@@ -202,7 +202,7 @@ void hp_hybrid_cpu_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_reg_A));
@@ -223,7 +223,7 @@ void hp_hybrid_cpu_device::device_start()
 	save_item(NAME(m_reg_I));
 	save_item(NAME(m_forced_bsc_25));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_pa_changed_func.resolve_safe();
 }
@@ -241,7 +241,7 @@ void hp_hybrid_cpu_device::execute_run()
 		if (BIT(m_flags , HPHYBRID_DMAEN_BIT) && BIT(m_flags , HPHYBRID_DMAR_BIT)) {
 			handle_dma();
 		} else {
-			debugger_instruction_hook(this, m_genpc);
+			debugger_instruction_hook(m_genpc);
 
 			m_reg_I = execute_one(m_reg_I);
 
@@ -761,7 +761,7 @@ uint16_t hp_hybrid_cpu_device::RM(uint32_t addr)
 			return read_non_common_reg(addr_wo_bsc);
 		}
 	} else {
-		return m_direct->read_word(addr);
+		return m_cache->read_word(addr);
 	}
 }
 

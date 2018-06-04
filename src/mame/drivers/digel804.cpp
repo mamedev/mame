@@ -632,9 +632,9 @@ WRITE_LINE_MEMBER( ep804_state::ep804_acia_irq_w )
 
 MACHINE_CONFIG_START(digel804_state::digel804)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
-	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
-	MCFG_CPU_IO_MAP(z80_io_1_4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_4)
+	MCFG_DEVICE_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_ROC10937_ADD("vfd",0) // RIGHT_TO_LEFT
@@ -643,7 +643,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_DEFAULT_LAYOUT(layout_digel804)
 
 	MCFG_DEVICE_ADD("74c923", MM74C923, 0)
-	MCFG_MM74C922_DA_CALLBACK(WRITELINE(digel804_state, da_w))
+	MCFG_MM74C922_DA_CALLBACK(WRITELINE(*this, digel804_state, da_w))
 	MCFG_MM74C922_X1_CALLBACK(IOPORT("LINE0"))
 	MCFG_MM74C922_X2_CALLBACK(IOPORT("LINE1"))
 	MCFG_MM74C922_X3_CALLBACK(IOPORT("LINE2"))
@@ -652,25 +652,25 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL/2)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, digel804_state, acia_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", digel804_rs232_defaults)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", digel804_rs232_defaults)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", digel804_rs232_defaults)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", digel804_rs232_defaults)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,128K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -678,12 +678,12 @@ MACHINE_CONFIG_START(ep804_state::ep804)
 	digel804(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
-	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
-	MCFG_CPU_IO_MAP(z80_io_1_2)
+	MCFG_DEVICE_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_2)
+	MCFG_DEVICE_IO_MAP(z80_io_1_2)
 
 	MCFG_DEVICE_MODIFY("acia")
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(ep804_state, ep804_acia_irq_w))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, ep804_state, ep804_acia_irq_w))
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -752,15 +752,15 @@ ROM_START(ep804) // address mapper 804-1-2
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1
-	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.d41", 0x0000, 0x2000, CRC(2d4c334c) SHA1(1be70ed5f4f315a8d2e38a17327a049e00fa174e), ROM_BIOS(1))
-	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.d42", 0x2000, 0x2000, CRC(9c14906b) SHA1(41996039e604011c7c0f757397f82b6479ee3f62), ROM_BIOS(1))
+	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.d41", 0x0000, 0x2000, CRC(2d4c334c) SHA1(1be70ed5f4f315a8d2e38a17327a049e00fa174e), ROM_BIOS(0))
+	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.d42", 0x2000, 0x2000, CRC(9c14906b) SHA1(41996039e604011c7c0f757397f82b6479ee3f62), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "ep804_v1.4", "Wavetek/Digelec EP804 FWv1.4") // hardware 1.1
-	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.d41", 0x0000, 0x2000, CRC(fdc0d2e3) SHA1(da1bc1e8c4cb2a2d8cd2273f3e1a9f318ae8cb87), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x2000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x3000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(2)) // load this twice
+	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.d41", 0x0000, 0x2000, CRC(fdc0d2e3) SHA1(da1bc1e8c4cb2a2d8cd2273f3e1a9f318ae8cb87), ROM_BIOS(1))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x2000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(1))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x3000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(1)) // load this twice
 	ROM_SYSTEM_BIOS( 2, "ep804_v2.21", "Wavetek/Digelec EP804 FWv2.21") // hardware 1.5 NOTE: this may use the address mapper 804-1-3 which is not dumped!
-	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.d41", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(3))
-	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.d42", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(3))
+	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.d41", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(2))
+	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.d42", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(2))
 	ROM_REGION(0x20, "proms", 0)
 	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30dd4721) SHA1(e4b2f5756118be4c8ab56c708dc4f42469c7e51b)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
@@ -771,6 +771,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                 FULLNAME                        FLAGS
-COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, 0,    "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
-COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    0,    "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME                        FLAGS
+COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, empty_init, "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    empty_init, "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )

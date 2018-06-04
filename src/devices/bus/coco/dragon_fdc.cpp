@@ -68,7 +68,6 @@
 #include "emu.h"
 #include "dragon_fdc.h"
 
-#include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "machine/wd_fdc.h"
@@ -85,6 +84,10 @@
 #define LOG_FDC                 0
 #define WD2791_TAG              "wd2791"
 #define WD2797_TAG              "wd2797"
+
+
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 
 /***************************************************************************
@@ -140,39 +143,40 @@ namespace
     LOCAL VARIABLES
 ***************************************************************************/
 
-static SLOT_INTERFACE_START(dragon_fdc_device_base)
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void dragon_fdc_drives(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(dragon_fdc_device_base::device_add_mconfig)
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 4_MHz_XTAL / 4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_fdc_device_base, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_fdc_device_base, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(premier_fdc_device_base::device_add_mconfig)
-	MCFG_WD2791_ADD(WD2791_TAG, XTAL(2'000'000) / 2)
+	MCFG_DEVICE_ADD(WD2791_TAG, WD2791, 2_MHz_XTAL / 2)
 	MCFG_WD_FDC_FORCE_READY
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":0", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":1", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":1", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":2", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":3", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -399,7 +403,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(DRAGON_FDC, dragon_fdc_device, "dragon_fdc", "Dragon FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_FDC, device_cococart_interface, dragon_fdc_device, "dragon_fdc", "Dragon FDC")
 
 
 //**************************************************************************
@@ -431,7 +435,7 @@ namespace
 	};
 };
 
-DEFINE_DEVICE_TYPE(PREMIER_FDC, premier_fdc_device, "premier_fdc", "Premier FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(PREMIER_FDC, device_cococart_interface, premier_fdc_device, "premier_fdc", "Premier FDC")
 
 
 //**************************************************************************
@@ -463,4 +467,4 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(SDTANDY_FDC, sdtandy_fdc_device, "sdtandy_fdc", "SDTANDY FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(SDTANDY_FDC, device_cococart_interface, sdtandy_fdc_device, "sdtandy_fdc", "SDTANDY FDC")

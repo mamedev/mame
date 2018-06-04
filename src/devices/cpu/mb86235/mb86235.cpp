@@ -42,13 +42,15 @@
 DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "Fujitsu MB86235 \"TGPx4\"")
 
 
-ADDRESS_MAP_START(mb86235_device::internal_abus)
-	AM_RANGE(0x000000, 0x0003ff) AM_RAM
-ADDRESS_MAP_END
+void mb86235_device::internal_abus(address_map &map)
+{
+	map(0x000000, 0x0003ff).ram();
+}
 
-ADDRESS_MAP_START(mb86235_device::internal_bbus)
-	AM_RANGE(0x000000, 0x0003ff) AM_RAM
-ADDRESS_MAP_END
+void mb86235_device::internal_bbus(address_map &map)
+{
+	map(0x000000, 0x0003ff).ram();
+}
 
 
 
@@ -65,8 +67,8 @@ void mb86235_device::execute_run()
 
 		curpc = check_previous_op_stall() ? m_core->cur_fifo_state.pc : m_core->pc;
 
-		debugger_instruction_hook(this, curpc);
-		opcode = m_direct->read_qword(curpc);
+		debugger_instruction_hook(curpc);
+		opcode = m_pcache->read_qword(curpc);
 
 		m_core->ppc = curpc;
 
@@ -90,7 +92,7 @@ void mb86235_device::execute_run()
 void mb86235_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-3>();
+	m_pcache = m_program->cache<3, -3, ENDIANNESS_LITTLE>();
 	m_dataa = &space(AS_DATA);
 	m_datab = &space(AS_IO);
 
@@ -217,7 +219,7 @@ void mb86235_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_core->pc ).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 
 	m_core->fp0 = 0.0f;
 	save_pointer(NAME(m_core->pr), 24);
@@ -263,9 +265,16 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
 	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))
 	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(mb86235_device::internal_bbus), this))
+	, m_fifoin(*this, finder_base::DUMMY_TAG)
+	, m_fifoout0(*this, finder_base::DUMMY_TAG)
+	, m_fifoout1(*this, finder_base::DUMMY_TAG)
 	, m_cache(CACHE_SIZE + sizeof(mb86235_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
+{
+}
+
+mb86235_device::~mb86235_device()
 {
 }
 
@@ -291,56 +300,4 @@ void mb86235_device::state_string_export(const device_state_entry &entry, std::s
 std::unique_ptr<util::disasm_interface> mb86235_device::create_disassembler()
 {
 	return std::make_unique<mb86235_disassembler>();
-}
-
-
-void mb86235_device::fifoin_w(uint32_t data)
-{
-	if (m_core->fifoin.num >= FIFOIN_SIZE)
-	{
-		fatalerror("fifoin_w: pushing to full fifo");
-	}
-
-	//printf("FIFOIN push %08X\n", data);
-
-	m_core->fifoin.data[m_core->fifoin.wpos] = data;
-
-	m_core->fifoin.wpos++;
-	m_core->fifoin.wpos &= FIFOIN_SIZE-1;
-	m_core->fifoin.num++;
-}
-
-bool mb86235_device::is_fifoin_empty()
-{
-	return m_core->fifoin.num == 0;
-}
-
-bool mb86235_device::is_fifoin_full()
-{
-	return m_core->fifoin.num >= FIFOIN_SIZE;
-}
-
-uint32_t mb86235_device::fifoout0_r()
-{
-	if (m_core->fifoout0.num == 0)
-	{
-		fatalerror("fifoout0_r: reading from empty fifo");
-	}
-
-	uint32_t data = m_core->fifoout0.data[m_core->fifoout0.rpos];
-
-	m_core->fifoout0.rpos++;
-	m_core->fifoout0.rpos &= FIFOOUT0_SIZE - 1;
-	m_core->fifoout0.num--;
-	return data;
-}
-
-bool mb86235_device::is_fifoout0_full()
-{
-	return m_core->fifoout0.num >= FIFOOUT0_SIZE;
-}
-
-bool mb86235_device::is_fifoout0_empty()
-{
-	return m_core->fifoout0.num == 0;
 }

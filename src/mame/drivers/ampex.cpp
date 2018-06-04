@@ -206,8 +206,8 @@ void ampex_state::machine_start()
 }
 
 MACHINE_CONFIG_START(ampex_state::ampex)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(23'814'000) / 9) // clocked by 8224?
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(23'814'000) / 9) // clocked by 8224?
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000) / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250)
@@ -215,17 +215,17 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 
 	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2 / CHAR_WIDTH)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(ampex_state, vsyn_w))
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(*this, ampex_state, vsyn_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE(ampex_state, so_w))
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ampex_state, dav_w))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(*this, ampex_state, so_w))
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ampex_state, dav_w))
 	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay31015_device, write_rcp))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart", ay31015_device, write_tcp))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay31015_device, write_rcp))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("uart", ay31015_device, write_tcp))
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )
@@ -245,4 +245,4 @@ ROM_START( dialog80 )
 	ROM_LOAD( "417129-010.u87",  0x0100, 0x0100, NO_DUMP )
 ROM_END
 
-COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, 0, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )
+COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )

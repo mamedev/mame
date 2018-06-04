@@ -205,9 +205,9 @@ ROM_START( gametree )
 ROM_END
 
 
-GAME( 1976, bazooka,    0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, bazookabr,  bazooka, pse, 0, pse_state,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, dpatrol,    0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, dpatrola,   dpatrol, pse, 0, pse_state,  0, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1978, gametree,   0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1976, knightar, 0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, bazooka,    0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, bazookabr,  bazooka, pse, 0, pse_state, empty_init, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrol,    0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrola,   dpatrol, pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1978, gametree,   0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )
+//GAME( 1976, knightar, 0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )

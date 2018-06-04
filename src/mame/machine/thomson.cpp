@@ -523,21 +523,21 @@ to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char
 MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
 	/// THIS PIO is part of CC 90-232 expansion
 	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(to7_io_line_device, porta_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(to7_io_line_device, porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("^mainfirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("^mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, to7_io_line_device, porta_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, to7_io_line_device, porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("^mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("^mainfirq", input_merger_device, in_w<1>))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(to7_io_line_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(to7_io_line_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(to7_io_line_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, to7_io_line_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, to7_io_line_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, to7_io_line_device, write_dsr))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(THOM_PIA_IO, pia6821_device, cb1_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(to7_io_line_device, write_centronics_busy))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(THOM_PIA_IO, pia6821_device, cb1_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, to7_io_line_device, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

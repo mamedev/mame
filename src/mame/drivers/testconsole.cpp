@@ -75,30 +75,36 @@ class whouse_testcons_state : public driver_device
 public:
 	whouse_testcons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_dsp(*this, "dsp%u", 0)
+		, m_dsp(*this, "dsp%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
 	{
-	}
-
-	DECLARE_DRIVER_INIT(whousetc)
-	{
-	}
-
-	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
-	{
-		output().set_digit_value((Dsp << 2) | offset, data);
 	}
 
 	void whousetc(machine_config &config);
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+
 protected:
+	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
+	{
+		m_digit[(Dsp << 2) | offset] = data;
+	}
+
+	virtual void machine_start() override
+	{
+		m_digit.resolve();
+	}
+
 	virtual void machine_reset() override
 	{
 		for (required_device<dl1416_device> const &dsp : m_dsp)
 			dsp->cu_w(1);
 	}
 
+	void io_map(address_map &map);
+	void program_map(address_map &map);
+
+private:
 	required_device_array<dl1416_device, 4> m_dsp;
+	output_finder<16> m_digit;
 };
 
 
@@ -171,25 +177,25 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(program_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(program_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("i8155", I8155, 6.144_MHz_XTAL)
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 
-	MCFG_DEVICE_ADD("dsp0", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<0>))
+	MCFG_DEVICE_ADD("dsp0", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<0>))
 
-	MCFG_DEVICE_ADD("dsp1", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<1>))
+	MCFG_DEVICE_ADD("dsp1", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<1>))
 
-	MCFG_DEVICE_ADD("dsp2", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<2>))
+	MCFG_DEVICE_ADD("dsp2", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<2>))
 
-	MCFG_DEVICE_ADD("dsp3", DL1416B, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<3>))
+	MCFG_DEVICE_ADD("dsp3", DL1416B, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<3>))
 
 	MCFG_DEFAULT_LAYOUT(layout_whousetc)
 MACHINE_CONFIG_END
@@ -203,5 +209,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE                  INIT      COMPANY         FULLNAME                  FLAGS
-COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, whousetc, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS                  INIT        COMPANY         FULLNAME                  FLAGS
+COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, empty_init, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

@@ -1352,6 +1352,24 @@ void mos8563_device::device_start()
 		data ^= 0xff;
 	}
 
+	// VICE palette
+	set_pen_color(0, rgb_t::black());
+	set_pen_color(1, rgb_t(0x55, 0x55, 0x55));
+	set_pen_color(2, rgb_t(0x00, 0x00, 0xaa));
+	set_pen_color(3, rgb_t(0x55, 0x55, 0xff));
+	set_pen_color(4, rgb_t(0x00, 0xaa, 0x00));
+	set_pen_color(5, rgb_t(0x55, 0xff, 0x55));
+	set_pen_color(6, rgb_t(0x00, 0xaa, 0xaa));
+	set_pen_color(7, rgb_t(0x55, 0xff, 0xff));
+	set_pen_color(8, rgb_t(0xaa, 0x00, 0x00));
+	set_pen_color(9, rgb_t(0xff, 0x55, 0x55));
+	set_pen_color(10, rgb_t(0xaa, 0x00, 0xaa));
+	set_pen_color(11, rgb_t(0xff, 0x55, 0xff));
+	set_pen_color(12, rgb_t(0xaa, 0x55, 0x00));
+	set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
+	set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
+	set_pen_color(15, rgb_t::white());
+
 	save_item(NAME(m_char_buffer));
 	save_item(NAME(m_attr_buffer));
 	save_item(NAME(m_attribute_addr));
@@ -1438,9 +1456,10 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 }
 
 // default address maps
-ADDRESS_MAP_START(mos8563_device::mos8563_videoram_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mos8563_device::mos8563_videoram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1505,8 +1524,8 @@ ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag,
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this)),
-		m_palette(*this, "palette")
+		device_palette_interface(mconfig, *this),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
 {
 	set_clock_scale(1.0/8);
 }
@@ -1521,34 +1540,6 @@ mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, d
 mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos8563_device(mconfig, MOS8568, tag, owner, clock)
 {
-}
-
-
-MACHINE_CONFIG_START(mos8563_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(mos8563_device, mos8563)
-MACHINE_CONFIG_END
-
-
-// VICE palette
-PALETTE_INIT_MEMBER(mos8563_device, mos8563)
-{
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, rgb_t(0x55, 0x55, 0x55));
-	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xaa));
-	palette.set_pen_color(3, rgb_t(0x55, 0x55, 0xff));
-	palette.set_pen_color(4, rgb_t(0x00, 0xaa, 0x00));
-	palette.set_pen_color(5, rgb_t(0x55, 0xff, 0x55));
-	palette.set_pen_color(6, rgb_t(0x00, 0xaa, 0xaa));
-	palette.set_pen_color(7, rgb_t(0x55, 0xff, 0xff));
-	palette.set_pen_color(8, rgb_t(0xaa, 0x00, 0x00));
-	palette.set_pen_color(9, rgb_t(0xff, 0x55, 0x55));
-	palette.set_pen_color(10, rgb_t(0xaa, 0x00, 0xaa));
-	palette.set_pen_color(11, rgb_t(0xff, 0x55, 0xff));
-	palette.set_pen_color(12, rgb_t(0xaa, 0x55, 0x00));
-	palette.set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
-	palette.set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
-	palette.set_pen_color(15, rgb_t::white());
 }
 
 
@@ -1587,8 +1578,6 @@ uint8_t mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectang
 
 MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
-
 	ra += (m_vert_scroll & 0x0f);
 	ra &= 0x0f;
 
@@ -1626,7 +1615,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
+				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
 			}
 		}
 		else
@@ -1662,7 +1651,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
+				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
 
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}

@@ -349,7 +349,7 @@ static const gfx_layout sm7238_charlayout =
 	16*8                 /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( sm7238 )
+static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -361,10 +361,10 @@ PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 }
 
 MACHINE_CONFIG_START(sm7238_state::sm7238)
-	MCFG_CPU_ADD("maincpu", I8080, 16.5888_MHz_XTAL/9)
-	MCFG_CPU_PROGRAM_MAP(sm7238_mem)
-	MCFG_CPU_IO_MAP(sm7238_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8080, 16.5888_MHz_XTAL/9)
+	MCFG_DEVICE_PROGRAM_MAP(sm7238_mem)
+	MCFG_DEVICE_IO_MAP(sm7238_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("videobank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(videobank_map)
@@ -377,61 +377,61 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm7238)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm7238)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("t_hblank", PIT8253, 0)
 	MCFG_PIT8253_CLK1(16.384_MHz_XTAL/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(sm7238_state, write_keyboard_clock))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, sm7238_state, write_keyboard_clock))
 
 	MCFG_DEVICE_ADD("t_vblank", PIT8253, 0)
 	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(sm7238_state, write_printer_clock))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, sm7238_state, write_printer_clock))
 
 	MCFG_DEVICE_ADD("t_color", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("t_iface", PIT8253, 0)
 	MCFG_PIT8253_CLK1(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("i8251line", i8251_device, write_txc))
 	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("i8251line", i8251_device, write_rxc))
 
 	// serial connection to host
 	MCFG_DEVICE_ADD("i8251line", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
 
 	// serial connection to KM-035 keyboard
 	MCFG_DEVICE_ADD("i8251kbd", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", km035_device, write_rxd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("keyboard", km035_device, write_rxd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir3_w))
 
 	MCFG_DEVICE_ADD("keyboard", KM035, 0)
-	MCFG_KM035_TX_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_rxd))
-	MCFG_KM035_RTS_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_cts))
+	MCFG_KM035_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
+	MCFG_KM035_RTS_HANDLER(WRITELINE("i8251kbd", i8251_device, write_cts))
 
 	// serial connection to printer
 	MCFG_DEVICE_ADD("i8251prn", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir3_w))
 
-	MCFG_RS232_PORT_ADD("prtr", default_rs232_devices, 0)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251prn", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251prn", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251prn", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("prtr", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251prn", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251prn", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251prn", i8251_device, write_dsr))
 MACHINE_CONFIG_END
 
 ROM_START( sm7238 )
@@ -449,5 +449,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT   COMPANY     FULLNAME       FLAGS
-COMP( 1989, sm7238,   0,      0,       sm7238,    0,       sm7238_state,     0,     "USSR",     "SM 7238",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1989, sm7238, 0,      0,      sm7238,  0,     sm7238_state, empty_init, "USSR",  "SM 7238", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )

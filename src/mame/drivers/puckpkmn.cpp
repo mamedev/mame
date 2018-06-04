@@ -281,14 +281,14 @@ void md_boot_state::puckpkmna_map(address_map &map)
 MACHINE_CONFIG_START(md_boot_state::puckpkmn)
 	md_ntsc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(puckpkmn_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(puckpkmn_map)
 
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000) / 4, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
@@ -296,16 +296,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_boot_state::puckpkmna)
 	puckpkmn(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(puckpkmna_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(puckpkmna_map)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_boot_state::jzth)
 	puckpkmn(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jzth_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jzth_map)
 
 MACHINE_CONFIG_END
 
@@ -380,16 +380,15 @@ ROM sockets U63 & U64 empty
 
 ****************************************************************************/
 
-DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
+void md_boot_state::init_puckpkmn()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	size_t len = memregion("maincpu")->bytes();
-	int i;
+	const size_t len = memregion("maincpu")->bytes();
 
-	for (i = 0; i < len; i++)
+	for (size_t i = 0; i < len; i++)
 		rom[i] = bitswap<8>(rom[i],1,4,2,0,7,5,3,6);
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
@@ -472,7 +471,7 @@ ROM_START( puckpkmnb )
 ROM_END
 
 
-
+//決戰天皇/Juézhàn tiānhuáng (Traditional Chinese)
 ROM_START( jzth )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s.y.u5", 0x000000, 0x080000, CRC(a4a526b5) SHA1(85d0299caf91ff50b6870f845b9aacbd358ed81f) )
@@ -490,7 +489,7 @@ ROM_START( jzth )
 ROM_END
 
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */  // is 'Genie 2000' part of the title, and the parent set a bootleg?
-GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, md_boot_state, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
-GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, puckpkmnb,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
-GAME( 2000, jzth,     0,        jzth,      jzth,     md_boot_state, puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
+GAME( 2000, puckpkmna, puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
+GAME( 2000, puckpkmnb, puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
+GAME( 2000, jzth,      0,        jzth,      jzth,     md_boot_state, init_puckpkmn, ROT0, "<unknown>",              "Juezhan Tianhuang", MACHINE_IMPERFECT_SOUND )

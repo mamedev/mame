@@ -223,7 +223,7 @@ public:
 	virtual void machine_reset() override;
 
 public:
-	DECLARE_DRIVER_INIT(mr);
+	void init_mr();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 	void mr(machine_config &config);
@@ -252,23 +252,24 @@ READ16_MEMBER(esqmr_state::esq5506_read_adc)
 }
 
 MACHINE_CONFIG_START(esqmr_state::mr)
-	MCFG_CPU_ADD("maincpu", M68340, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(mr_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mr_map)
 
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
 	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(esqmr_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(esqmr_state, esq5506_read_adc))
+	MCFG_ES5506_IRQ_CB(WRITELINE(*this, esqmr_state, esq5506_otto_irq)) /* irq */
+	MCFG_ES5506_READ_PORT_CB(READ16(*this, esqmr_state, esq5506_read_adc))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL(16'000'000))
+	MCFG_DEVICE_ADD("ensoniq2", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
@@ -317,9 +318,9 @@ ROM_START( mrrack )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqmr_state, mr)
+void esqmr_state::init_mr()
 {
 }
 
-CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-61 Workstation", MACHINE_NOT_WORKING )
-CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-Rack", MACHINE_NOT_WORKING )
+CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-61 Workstation", MACHINE_NOT_WORKING )
+CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-Rack",           MACHINE_NOT_WORKING )

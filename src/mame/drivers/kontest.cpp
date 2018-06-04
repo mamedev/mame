@@ -255,10 +255,10 @@ void kontest_state::machine_reset()
 MACHINE_CONFIG_START(kontest_state::kontest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(kontest_map)
-	MCFG_CPU_IO_MAP(kontest_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kontest_state,  kontest_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(kontest_map)
+	MCFG_DEVICE_IO_MAP(kontest_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kontest_state,  kontest_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -272,12 +272,13 @@ MACHINE_CONFIG_START(kontest_state::kontest)
 	MCFG_PALETTE_INIT_OWNER(kontest_state, kontest)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MAIN_CLOCK/16)
+	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/16)
+	MCFG_DEVICE_ADD("sn2", SN76489A, MAIN_CLOCK/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -296,4 +297,4 @@ ROM_START( kontest )
 	ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
-GAME( 1987?, kontest,  0,   kontest,  kontest, kontest_state,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988
+GAME( 1987?, kontest, 0, kontest, kontest, kontest_state, empty_init, ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988

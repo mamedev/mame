@@ -187,9 +187,9 @@ void rltennis_state::ramdac_map(address_map &map)
 
 MACHINE_CONFIG_START(rltennis_state::rltennis)
 
-	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
-	MCFG_CPU_PROGRAM_MAP(rltennis_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rltennis_state, interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
+	MCFG_DEVICE_PROGRAM_MAP(rltennis_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rltennis_state, interrupt)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( RLT_REFRESH_RATE )
@@ -205,13 +205,13 @@ MACHINE_CONFIG_START(rltennis_state::rltennis)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 	MCFG_RAMDAC_SPLIT_READ(1)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( rltennis )
@@ -238,4 +238,4 @@ ROM_START( rltennis )
 	ROM_LOAD( "tennis_3.u52", 0x00000, 0x80000, CRC(517dcd0e) SHA1(b2703e185ee8cf7e115ea07151e7bee8be34948b) )
 ROM_END
 
-GAME( 1993, rltennis,    0, rltennis,    rltennis, rltennis_state,    0, ROT0,  "TCH", "Reality Tennis", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, rltennis,    0, rltennis,    rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

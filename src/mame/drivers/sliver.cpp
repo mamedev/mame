@@ -514,16 +514,16 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 }
 
 MACHINE_CONFIG_START(sliver_state::sliver)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(sliver_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(sliver_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("obj_actel", sliver_state, obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
-	MCFG_CPU_ADD("audiocpu", I8051, 8000000)
-	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
-	MCFG_CPU_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sliver_state, oki_setbank))
+	MCFG_DEVICE_ADD("audiocpu", I8051, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
+	MCFG_DEVICE_IO_MAP(soundmem_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sliver_state, oki_setbank))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -536,11 +536,12 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
@@ -595,5 +596,5 @@ ROM_START( slivera )
 ROM_END
 
 
-GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

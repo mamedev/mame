@@ -24,6 +24,7 @@ public:
 		: radio86_state(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "wd1793")
+		, m_bank(*this, "bank%u", 1U)
 	{
 	}
 
@@ -31,7 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(partner_floppy_w);
 	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
 	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
-	DECLARE_DRIVER_INIT(partner);
+	void init_partner();
 	DECLARE_MACHINE_START(partner);
 	DECLARE_MACHINE_RESET(partner);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
@@ -51,6 +52,7 @@ protected:
 
 	required_device<ram_device> m_ram;
 	required_device<fd1793_device> m_fdc;
+	required_memory_bank_array<13> m_bank;
 };
 
 

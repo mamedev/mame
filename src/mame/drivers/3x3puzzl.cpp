@@ -366,7 +366,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( _3x3puzzle )
+static GFXDECODE_START( gfx_3x3puzzle )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout,     0, 3 )
@@ -388,9 +388,9 @@ void _3x3puzzle_state::machine_reset()
 MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(_3x3puzzle_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _3x3puzzle_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(_3x3puzzle_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _3x3puzzle_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -400,14 +400,14 @@ MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", _3x3puzzle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_3x3puzzle)
 
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -506,6 +506,6 @@ ROM_END
 
 
 
-GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)",     MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    _3x3puzzle_state, 0,       ROT0, "Promat",              "Casanova",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3x3puzzl,  0,        _3x3puzzle, _3x3puzzle, _3x3puzzle_state, empty_init, ROT0, "Ace Enterprise", "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 1998, 3x3puzzla, 3x3puzzl, _3x3puzzle, _3x3puzzle, _3x3puzzle_state, empty_init, ROT0, "Ace Enterprise", "3X3 Puzzle (Normal)",     MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 199?, casanova,  0,        _3x3puzzle, casanova,   _3x3puzzle_state, empty_init, ROT0, "Promat",         "Casanova",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

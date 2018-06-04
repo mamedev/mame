@@ -717,29 +717,27 @@ static const gfx_layout jtces40_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( jtces23 )
+static GFXDECODE_START( gfx_jtces23 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces23_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( jtces40 )
+static GFXDECODE_START( gfx_jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(jtc_state::basic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(UB8830D_TAG, UB8830D, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(jtc_mem)
-	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(jtc_state, p2_w))
-	MCFG_Z8_PORT_P3_READ_CB(READ8(jtc_state, p3_r))
-	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(jtc_state, p3_w))
+	MCFG_DEVICE_ADD(UB8830D_TAG, UB8830D, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jtc_mem)
+	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(*this, jtc_state, p2_w))
+	MCFG_Z8_PORT_P3_READ_CB(READ8(*this, jtc_state, p3_r))
+	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(*this, jtc_state, p3_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette")
@@ -747,7 +745,7 @@ MACHINE_CONFIG_START(jtc_state::basic)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(jtc_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtc_state::jtc)
@@ -771,8 +769,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces88_state::jtces88)
 	jtc(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es1988_mem)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -782,8 +780,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces23_state::jtces23)
 	basic(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es23_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es23_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -794,7 +792,7 @@ MACHINE_CONFIG_START(jtces23_state::jtces23)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces23)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
@@ -805,8 +803,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces40_state::jtces40)
 	basic(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es40_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es40_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -817,7 +815,7 @@ MACHINE_CONFIG_START(jtces40_state::jtces40)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces40)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces40)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(jtc_state,jtc_es40)
 
@@ -857,8 +855,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT    STATE          INIT  COMPANY             FULLNAME                    FLAGS */
-COMP( 1987, jtc,        0,       0,     jtc,    jtc,     jtc_state,     0,    "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
-COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc,     jtces88_state, 0,    "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
-COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, jtces23_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
-COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, jtces40_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME                    FLAGS */
+COMP( 1987, jtc,     0,      0,      jtc,     jtc,     jtc_state,     empty_init, "Jugend+Technik", "CompJU+TEr",               MACHINE_NOT_WORKING )
+COMP( 1988, jtces88, jtc,    0,      jtces88, jtc,     jtces88_state, empty_init, "Jugend+Technik", "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
+COMP( 1989, jtces23, jtc,    0,      jtces23, jtces23, jtces23_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
+COMP( 1990, jtces40, jtc,    0,      jtces40, jtces40, jtces40_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )

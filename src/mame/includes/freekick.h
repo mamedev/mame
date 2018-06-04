@@ -49,9 +49,9 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_l_w);
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_h_w);
 	DECLARE_READ8_MEMBER(snd_rom_r);
-	DECLARE_DRIVER_INIT(gigas);
-	DECLARE_DRIVER_INIT(gigasb);
-	DECLARE_DRIVER_INIT(pbillrds);
+	void init_gigas();
+	void init_gigasb();
+	void init_pbillrds();
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(pbillrd);
@@ -62,7 +62,7 @@ public:
 	uint32_t screen_update_pbillrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_freekick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gigas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(freekick_irqgen);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

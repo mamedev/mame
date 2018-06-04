@@ -185,7 +185,7 @@ void lr35902_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_PC).formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_F).mask(0xf0).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -362,7 +362,7 @@ void lr35902_cpu_device::execute_run()
 				/* Fetch and count cycles */
 				bool was_halted = (m_enable & HALTED);
 				check_interrupts();
-				debugger_instruction_hook(this, m_PC);
+				debugger_instruction_hook(m_PC);
 				if ( m_enable & HALTED ) {
 					cycles_passed(m_has_halt_bug ? 2 : 4);
 					m_execution_state = 1;

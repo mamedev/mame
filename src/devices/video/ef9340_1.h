@@ -37,6 +37,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	inline uint16_t ef9340_get_c_addr(uint8_t x, uint8_t y);
 	inline void ef9340_inc_c();
@@ -50,6 +51,8 @@ protected:
 	static constexpr device_timer_id TIMER_LINE = 0;
 
 	emu_timer *m_line_timer;
+
+	required_region_ptr<uint8_t> m_charset;
 
 	bitmap_ind16 m_tmp_bitmap;
 

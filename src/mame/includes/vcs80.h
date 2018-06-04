@@ -7,7 +7,7 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
@@ -21,13 +21,14 @@ class vcs80_state : public driver_device
 {
 public:
 	vcs80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_pio(*this, Z80PIO_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_bdmem(*this, "bdmem")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_pio(*this, Z80PIO_TAG)
+		, m_y0(*this, "Y0")
+		, m_y1(*this, "Y1")
+		, m_y2(*this, "Y2")
+		, m_bdmem(*this, "bdmem")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -36,6 +37,7 @@ public:
 	required_ioport m_y1;
 	required_ioport m_y2;
 	required_device<address_map_bank_device> m_bdmem;
+	output_finder<9> m_digits;
 
 	virtual void machine_start() override;
 
@@ -78,7 +80,7 @@ public:
 	/* keyboard state */
 	int m_keylatch;
 	int m_keyclk;
-	DECLARE_DRIVER_INIT(vcs80);
+	void init_vcs80();
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 	void vcs80(machine_config &config);
 	void vcs80_bd_mem(address_map &map);

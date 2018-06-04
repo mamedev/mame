@@ -215,7 +215,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( deniam )
+static GFXDECODE_START( gfx_deniam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )    /* colors 0-1023 */
 												/* sprites use colors 1024-2047 */
 GFXDECODE_END
@@ -253,13 +253,13 @@ void deniam_state::machine_reset()
 MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(deniam16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	/* video hardware */
@@ -272,30 +272,30 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(deniam16c_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16c_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
 
 	/* video hardware */
@@ -308,17 +308,17 @@ MACHINE_CONFIG_START(deniam_state::deniam16c)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -416,7 +416,7 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, init_karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )

@@ -121,8 +121,8 @@ void gokidetor_state::sound_map(address_map &map)
 
 
 MACHINE_CONFIG_START(gokidetor_state::gokidetor)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4) // divider not verified
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7
 
@@ -131,32 +131,32 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
 	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
 	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_OUT_PORT4_CB(WRITE8(gokidetor_state, out4_w))
-	MCFG_TE7750_OUT_PORT5_CB(WRITE8(gokidetor_state, out5_w))
-	MCFG_TE7750_OUT_PORT6_CB(WRITE8(gokidetor_state, out6_w))
-	MCFG_TE7750_OUT_PORT7_CB(WRITE8(gokidetor_state, out7_w))
+	MCFG_TE7750_OUT_PORT4_CB(WRITE8(*this, gokidetor_state, out4_w))
+	MCFG_TE7750_OUT_PORT5_CB(WRITE8(*this, gokidetor_state, out5_w))
+	MCFG_TE7750_OUT_PORT6_CB(WRITE8(*this, gokidetor_state, out6_w))
+	MCFG_TE7750_OUT_PORT7_CB(WRITE8(*this, gokidetor_state, out7_w))
 	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN8"))
-	MCFG_TE7750_OUT_PORT8_CB(WRITE8(gokidetor_state, out8_w))
-	MCFG_TE7750_OUT_PORT9_CB(WRITE8(gokidetor_state, out9_w))
+	MCFG_TE7750_OUT_PORT8_CB(WRITE8(*this, gokidetor_state, out8_w))
+	MCFG_TE7750_OUT_PORT9_CB(WRITE8(*this, gokidetor_state, out9_w))
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
 	MCFG_PC060HA_SLAVE_CPU("soundcpu")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gokidetor_state, ym_porta_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gokidetor_state, ym_porta_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -269,4 +269,25 @@ ROM_START( gokidetor )
 	ROM_LOAD( "d33-06.pal20l8b.ic44.jed", 0x5000, 0xd01, CRC(a1400501) SHA1(0b86d09d3e12668eaaf2c4b5a2d2b676d2e599f7) )
 ROM_END
 
-GAME( 1992, gokidetor, 0, gokidetor, gokidetor, gokidetor_state, 0, ROT0, "Taito", "Gokidetor", MACHINE_IS_SKELETON_MECHANICAL )
+ROM_START( gokidetor2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic2.rom", 0, 0x20000, CRC(03bf24d1) SHA1(ef63a5be25d77ac20984402cc45137d292a9fa1d) )
+	// 8000-FFFF appears to be graphics; 10000-1FFFF is unused
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "ic34.rom", 0, 0x10000, CRC(fd06305d) SHA1(7889f0c360650bfd0fe593c522685a978879bfee) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "ic87.rom", 0, 0x40000, CRC(adb9fd16) SHA1(59aae5ac26cae30b961b30e17fd494094aa7aa15) )
+
+	ROM_REGION( 0x8000, "pals", 0 ) // unprotected
+	ROM_LOAD( "d33-01.pal16l8a.ic20.jed", 0x0000, 0xb01, CRC(7d614a54) SHA1(e79b6ac99f46ff69ea0565e89d6807667c9e0547) ) // PALs missing for this board, using the one from the parent.
+	ROM_LOAD( "d33-02.pal16l8b.ic62.jed", 0x1000, 0xb01, CRC(6653423f) SHA1(ac93acccf649b97a3252aedf398310be90fe5d2d) )
+	ROM_LOAD( "d33-03.pal16l8a.ic70.jed", 0x2000, 0xb01, CRC(abfd9a01) SHA1(c76cc16842231c2f688ddd46a17f3a6df92a9580) )
+	ROM_LOAD( "d33-04.pal16l8b.ic81.jed", 0x3000, 0xb01, CRC(bf17aa05) SHA1(0cbbb2ee49c31e94ed7ea3a25f85e3d33c6b68fb) )
+	ROM_LOAD( "d33-05.pal16l8b.ic93.jed", 0x4000, 0xb01, CRC(2df9105e) SHA1(d28fc48588727e4bd3ec2377b383160329c261c3) )
+	ROM_LOAD( "d33-06.pal20l8b.ic44.jed", 0x5000, 0xd01, CRC(a1400501) SHA1(0b86d09d3e12668eaaf2c4b5a2d2b676d2e599f7) )
+ROM_END
+
+GAME( 1992, gokidetor,          0, gokidetor, gokidetor, gokidetor_state, empty_init, ROT0, "Taito", "Gokidetor (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, gokidetor2, gokidetor, gokidetor, gokidetor, gokidetor_state, empty_init, ROT0, "Taito", "Gokidetor (set 2)", MACHINE_IS_SKELETON_MECHANICAL )

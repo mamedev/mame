@@ -4448,7 +4448,7 @@ void i860_cpu_device::execute_run()
 #endif
 
 		savepc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		decode_exec (ifetch (m_pc), 1);
 
 		m_exiting_ifetch = 0;

@@ -269,7 +269,7 @@ void h6280_device::device_start()
 	save_item(NAME(m_io_buffer));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 
 	/* clear pending interrupts */
@@ -301,7 +301,7 @@ void h6280_device::device_reset()
 	m_io_buffer = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	/* set I and B flags */
@@ -2265,6 +2265,17 @@ uint32_t h6280_device::execute_input_lines() const
 
 
 //-------------------------------------------------
+//  execute_input_edge_triggered - return true if
+//  the input line has an asynchronous edge trigger
+//-------------------------------------------------
+
+bool h6280_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == H6280_NMI_STATE;
+}
+
+
+//-------------------------------------------------
 //  execute_set_input - act on a changed input/
 //  interrupt line
 //-------------------------------------------------
@@ -2375,7 +2386,7 @@ void h6280_device::pull(uint8_t &value)
  ***************************************************************/
 uint8_t h6280_device::read_opcode()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 /***************************************************************
@@ -2383,7 +2394,7 @@ uint8_t h6280_device::read_opcode()
  ***************************************************************/
 uint8_t h6280_device::read_opcode_arg()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 
@@ -2406,7 +2417,7 @@ void h6280_device::execute_run()
 	{
 		m_ppc = m_pc;
 
-		debugger_instruction_hook(this, PCW);
+		debugger_instruction_hook(PCW);
 
 		/* Execute 1 instruction */
 		in = read_opcode();

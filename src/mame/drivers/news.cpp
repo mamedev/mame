@@ -113,7 +113,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( news )
+static GFXDECODE_START( gfx_news )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -132,9 +132,9 @@ void news_state::machine_reset()
 MACHINE_CONFIG_START(news_state::news)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(news_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", news_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(news_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", news_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -146,15 +146,15 @@ MACHINE_CONFIG_START(news_state::news)
 	MCFG_SCREEN_UPDATE_DRIVER(news_state, screen_update_news)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", news)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_news)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -184,5 +184,5 @@ ROM_START( newsa )
 	ROM_LOAD( "virus.1", 0x00000, 0x40000, CRC(41f5935a) SHA1(1566d243f165019660cd4dd69df9f049e0130f15) )
 ROM_END
 
-GAME( 1993, news,  0,    news, news,  news_state, 0, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, newsa, news, news, newsa, news_state, 0, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, news,  0,    news, news,  news_state, empty_init, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, newsa, news, news, newsa, news_state, empty_init, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )

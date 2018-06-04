@@ -185,16 +185,16 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(h89_state::h89)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
-	MCFG_CPU_PROGRAM_MAP(h89_mem)
-	MCFG_CPU_IO_MAP(h89_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
+	MCFG_DEVICE_PROGRAM_MAP(h89_mem)
+	MCFG_DEVICE_IO_MAP(h89_io)
 
 	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, rx_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", h89_state, h89_irq_timer, attotime::from_hz(100))
 MACHINE_CONFIG_END
@@ -212,5 +212,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT     COMPANY      FULLNAME        FLAGS */
-COMP( 1979, h89,    0,      0,       h89,       h89,   h89_state,  0,       "Heath Inc", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME        FLAGS */
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Inc", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

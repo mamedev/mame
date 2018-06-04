@@ -97,13 +97,13 @@ cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 	virtual void machine_start () override { LOGSETUP("%s\n", FUNCNAME); }
 //  virtual void machine_reset () override;
 
-	DECLARE_DRIVER_INIT(cpu20)      { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21s)     { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21)      { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21a)     { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21ya)    { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21b)     { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21yb)    { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu20()      { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21s()     { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21()      { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21a()     { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21ya()    { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21b()     { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21yb()    { LOGSETUP("%s\n", FUNCNAME); }
 	void cpu21(machine_config &config);
 	void cpu20(machine_config &config);
 	void cpu21yb(machine_config &config);
@@ -118,33 +118,40 @@ static INPUT_PORTS_START (cpu20)
 INPUT_PORTS_END
 
 /* Slot interfaces */
-static SLOT_INTERFACE_START(cpu20_vme_cards)
-	SLOT_INTERFACE("fccpu20", VME_FCCPU20)
-SLOT_INTERFACE_END
+static void cpu20_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu20", VME_FCCPU20);
+}
 
-static SLOT_INTERFACE_START(cpu21s_vme_cards)
-	SLOT_INTERFACE("fccpu21s", VME_FCCPU21S)
-SLOT_INTERFACE_END
+static void cpu21s_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21s", VME_FCCPU21S);
+}
 
-static SLOT_INTERFACE_START(cpu21_vme_cards)
-	SLOT_INTERFACE("fccpu21", VME_FCCPU21)
-SLOT_INTERFACE_END
+static void cpu21_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21", VME_FCCPU21);
+}
 
-static SLOT_INTERFACE_START(cpu21a_vme_cards)
-	SLOT_INTERFACE("fccpu21a", VME_FCCPU21A)
-SLOT_INTERFACE_END
+static void cpu21a_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21a", VME_FCCPU21A);
+}
 
-static SLOT_INTERFACE_START(cpu21ya_vme_cards)
-	SLOT_INTERFACE("fccpu21ya", VME_FCCPU21YA)
-SLOT_INTERFACE_END
+static void cpu21ya_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21ya", VME_FCCPU21YA);
+}
 
-static SLOT_INTERFACE_START(cpu21b_vme_cards)
-	SLOT_INTERFACE("fccpu21b", VME_FCCPU21B)
-SLOT_INTERFACE_END
+static void cpu21b_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21b", VME_FCCPU21B);
+}
 
-static SLOT_INTERFACE_START(cpu21yb_vme_cards)
-	SLOT_INTERFACE("fccpu21yb", VME_FCCPU21YB)
-SLOT_INTERFACE_END
+static void cpu21yb_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21yb", VME_FCCPU21YB);
+}
 
 /* Machine configurations */
 MACHINE_CONFIG_START(cpu20_state::cpu20)
@@ -194,11 +201,11 @@ ROM_START(fccpu20sbc)   ROM_END
 #define rom_fccpu21ybsbc    rom_fccpu20sbc
 
 /* Driver */
-/*    YEAR  NAME          PARENT    COMPAT MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
-COMP (1986, fccpu20sbc,    0,          0,  cpu20,          cpu20,    cpu20_state,   0,           "Force Computers GmbH",   "SYS68K/CPU-20",        MACHINE_NO_SOUND_HW )
-COMP (1986, fccpu21ssbc,   fccpu20sbc, 0,  cpu21s,         cpu20,    cpu20_state,   cpu21s,      "Force Computers GmbH",   "SYS68K/CPU-21S",       MACHINE_NO_SOUND_HW )
-COMP (1986, fccpu21sbc,    fccpu20sbc, 0,  cpu21,          cpu20,    cpu20_state,   cpu21,       "Force Computers GmbH",   "SYS68K/CPU-21",        MACHINE_NO_SOUND_HW )
-COMP (1986, fccpu21asbc,   fccpu20sbc, 0,  cpu21a,         cpu20,    cpu20_state,   cpu21a,      "Force Computers GmbH",   "SYS68K/CPU-21A",       MACHINE_NO_SOUND_HW )
-COMP (1986, fccpu21yasbc,  fccpu20sbc, 0,  cpu21ya,        cpu20,    cpu20_state,   cpu21ya,     "Force Computers GmbH",   "SYS68K/CPU-21YA",      MACHINE_NO_SOUND_HW )
-COMP (1986, fccpu21bsbc,   fccpu20sbc, 0,  cpu21b,         cpu20,    cpu20_state,   cpu21b,      "Force Computers GmbH",   "SYS68K/CPU-21B",       MACHINE_NO_SOUND_HW )
-COMP (1986, fccpu21ybsbc,  fccpu20sbc, 0,  cpu21yb,        cpu20,    cpu20_state,   cpu21yb,     "Force Computers GmbH",   "SYS68K/CPU-21YB",      MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME          PARENT      COMPAT MACHINE  INPUT  CLASS        INIT          COMPANY                 FULLNAME           FLAGS */
+COMP( 1986, fccpu20sbc,   0,          0,     cpu20,   cpu20, cpu20_state, empty_init,   "Force Computers GmbH", "SYS68K/CPU-20",   MACHINE_NO_SOUND_HW )
+COMP( 1986, fccpu21ssbc,  fccpu20sbc, 0,     cpu21s,  cpu20, cpu20_state, init_cpu21s,  "Force Computers GmbH", "SYS68K/CPU-21S",  MACHINE_NO_SOUND_HW )
+COMP( 1986, fccpu21sbc,   fccpu20sbc, 0,     cpu21,   cpu20, cpu20_state, init_cpu21,   "Force Computers GmbH", "SYS68K/CPU-21",   MACHINE_NO_SOUND_HW )
+COMP( 1986, fccpu21asbc,  fccpu20sbc, 0,     cpu21a,  cpu20, cpu20_state, init_cpu21a,  "Force Computers GmbH", "SYS68K/CPU-21A",  MACHINE_NO_SOUND_HW )
+COMP( 1986, fccpu21yasbc, fccpu20sbc, 0,     cpu21ya, cpu20, cpu20_state, init_cpu21ya, "Force Computers GmbH", "SYS68K/CPU-21YA", MACHINE_NO_SOUND_HW )
+COMP( 1986, fccpu21bsbc,  fccpu20sbc, 0,     cpu21b,  cpu20, cpu20_state, init_cpu21b,  "Force Computers GmbH", "SYS68K/CPU-21B",  MACHINE_NO_SOUND_HW )
+COMP( 1986, fccpu21ybsbc, fccpu20sbc, 0,     cpu21yb, cpu20, cpu20_state, init_cpu21yb, "Force Computers GmbH", "SYS68K/CPU-21YB", MACHINE_NO_SOUND_HW )

@@ -209,7 +209,7 @@ WRITE8_MEMBER( c80_state::pio1_pb_w )
 
 	if (!m_pio1_a5)
 	{
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 	}
 
 	m_keylatch = data;
@@ -244,6 +244,7 @@ static const z80_daisy_config c80_daisy_chain[] =
 
 void c80_state::machine_start()
 {
+	m_digits.resolve();
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_digit));
@@ -255,9 +256,9 @@ void c80_state::machine_start()
 
 MACHINE_CONFIG_START(c80_state::c80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
-	MCFG_CPU_PROGRAM_MAP(c80_mem)
-	MCFG_CPU_IO_MAP(c80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2500000) /* U880D */
+	MCFG_DEVICE_PROGRAM_MAP(c80_mem)
+	MCFG_DEVICE_IO_MAP(c80_io)
 	MCFG_Z80_DAISY_CHAIN(c80_daisy_chain)
 
 	/* video hardware */
@@ -266,10 +267,10 @@ MACHINE_CONFIG_START(c80_state::c80)
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 2500000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(c80_state, pio1_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(c80_state, pio1_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(c80_state, pio1_pb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(c80_state, pio1_brdy_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, c80_state, pio1_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, c80_state, pio1_pa_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, c80_state, pio1_pb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, c80_state, pio1_brdy_w))
 
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 2500000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -277,9 +278,8 @@ MACHINE_CONFIG_START(c80_state::c80)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -296,5 +296,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS       INIT  COMPANY           FULLNAME  FLAGS */
-COMP( 1986, c80,    0,      0,      c80,    c80,   c80_state,  0,    "Joachim Czepa", "C-80",    MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME  FLAGS */
+COMP( 1986, c80,  0,      0,      c80,     c80,   c80_state, empty_init, "Joachim Czepa", "C-80",   MACHINE_SUPPORTS_SAVE )

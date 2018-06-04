@@ -62,7 +62,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
-	DECLARE_DRIVER_INIT(sys2900);
+	void init_sys2900();
 	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sys2900(machine_config &config);
 	void io_map(address_map &map);
@@ -123,7 +123,7 @@ void sys2900_state::machine_reset()
 	timer_set(attotime::from_usec(5), TIMER_BOOT);
 }
 
-DRIVER_INIT_MEMBER(sys2900_state,sys2900)
+void sys2900_state::init_sys2900()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf000);
@@ -140,9 +140,9 @@ uint32_t sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind1
 
 MACHINE_CONFIG_START(sys2900_state::sys2900)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -169,5 +169,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY          FULLNAME       FLAGS
-COMP( 1981, sys2900, 0,      0,       sys2900,   sys2900, sys2900_state, sys2900, "Systems Group", "System 2900", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY          FULLNAME       FLAGS
+COMP( 1981, sys2900, 0,      0,      sys2900, sys2900, sys2900_state, init_sys2900, "Systems Group", "System 2900", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

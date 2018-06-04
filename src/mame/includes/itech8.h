@@ -122,14 +122,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 
-	DECLARE_DRIVER_INIT(rimrockn);
-	DECLARE_DRIVER_INIT(grmatch);
-	DECLARE_DRIVER_INIT(peggle);
-	DECLARE_DRIVER_INIT(slikshot);
-	DECLARE_DRIVER_INIT(neckneck);
-	DECLARE_DRIVER_INIT(arligntn);
-	DECLARE_DRIVER_INIT(hstennis);
-	DECLARE_DRIVER_INIT(sstrike);
+	void init_rimrockn();
+	void init_grmatch();
+	void init_peggle();
+	void init_slikshot();
+	void init_neckneck();
+	void init_arligntn();
+	void init_hstennis();
+	void init_sstrike();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -142,7 +142,8 @@ public:
 	uint32_t screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(generate_nmi);
+	DECLARE_WRITE_LINE_MEMBER(generate_nmi);
+	DECLARE_WRITE_LINE_MEMBER(ninclown_irq);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);

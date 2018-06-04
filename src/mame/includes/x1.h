@@ -14,7 +14,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
@@ -131,7 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER(x1_porta_w);
 	DECLARE_WRITE8_MEMBER(x1_portb_w);
 	DECLARE_WRITE8_MEMBER(x1_portc_w);
-	DECLARE_DRIVER_INIT(x1_kanji);
+	void init_x1_kanji();
 	DECLARE_MACHINE_START(x1);
 	DECLARE_MACHINE_RESET(x1);
 	DECLARE_VIDEO_START(x1);

@@ -291,7 +291,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_dmaout(CLEAR_LINE),
 		m_program(nullptr),
 		m_io(nullptr),
-		m_direct(nullptr)
+		m_cache(nullptr)
 {
 	for (auto & elem : m_ef)
 		elem = CLEAR_LINE;
@@ -338,7 +338,7 @@ void cosmac_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	// register our state for the debugger
@@ -385,7 +385,7 @@ void cosmac_device::device_start()
 	save_item(NAME(m_q));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -505,7 +505,7 @@ std::unique_ptr<util::disasm_interface> cdp1802_device::create_disassembler()
 
 inline uint8_t cosmac_device::read_opcode(offs_t pc)
 {
-	return m_direct->read_byte(pc);
+	return m_cache->read_byte(pc);
 }
 
 
@@ -766,7 +766,7 @@ inline void cosmac_device::debug()
 {
 	if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debugger_instruction_hook(this, R[P]);
+		debugger_instruction_hook(R[P]);
 	}
 }
 

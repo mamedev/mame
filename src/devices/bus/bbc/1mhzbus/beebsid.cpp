@@ -31,8 +31,8 @@ DEFINE_DEVICE_TYPE(BBC_BEEBSID, bbc_beebsid_device, "beebsid", "BeebSID")
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_beebsid_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(MOS8580_TAG, MOS8580, XTAL(16'000'000) / 16)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD(MOS8580_TAG, MOS8580, XTAL(16'000'000) / 16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_BBC_PASSTHRU_1MHZBUS_SLOT_ADD()
@@ -62,17 +62,6 @@ bbc_beebsid_device::bbc_beebsid_device(const machine_config &mconfig, const char
 void bbc_beebsid_device::device_start()
 {
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfc20, 0xfc3f, read8_delegate(FUNC(mos8580_device::read), (mos8580_device*)m_sid), write8_delegate(FUNC(mos8580_device::write), (mos8580_device*)m_sid));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_beebsid_device::device_reset()
-{
-	m_sid->reset();
 }

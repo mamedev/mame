@@ -93,17 +93,17 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( neptunp2 )
+static GFXDECODE_START( gfx_neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
-	MCFG_CPU_PROGRAM_MAP(neptunp2_map)
-	MCFG_CPU_IO_MAP(neptunp2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
+	MCFG_DEVICE_PROGRAM_MAP(neptunp2_map)
+	MCFG_DEVICE_IO_MAP(neptunp2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -114,11 +114,11 @@ MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", neptunp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_neptunp2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 
@@ -144,4 +144,4 @@ ROM_START( neptunp2 )
 ROM_END
 
 
-GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

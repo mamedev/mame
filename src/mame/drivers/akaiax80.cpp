@@ -91,9 +91,9 @@ void ax80_state::ax80_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(ax80_state::ax80)
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(ax80_map)
-	//MCFG_CPU_IO_MAP(ax80_io)
+	MCFG_DEVICE_ADD("maincpu", UPD7810, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ax80_map)
+	//MCFG_DEVICE_IO_MAP(ax80_io)
 
 	MCFG_DEVICE_ADD(PIT0_TAG, PIT8253, 0)
 	MCFG_DEVICE_ADD(PIT1_TAG, PIT8253, 0)
@@ -107,9 +107,9 @@ MACHINE_CONFIG_START(ax80_state::ax80)
 
 	MCFG_DEVICE_ADD("kdc", I8279, 6554800 / 8) // Keyboard/Display Controller
 	//MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", UPD7810_INTF1))   // irq
-	//MCFG_I8279_OUT_SL_CB(WRITE8(ax80_state, scanlines_w))          // scan SL lines
-	//MCFG_I8279_OUT_DISP_CB(WRITE8(ax80_state, digit_w))            // display A&B
-	//MCFG_I8279_IN_RL_CB(READ8(ax80_state, kbd_r))                  // kbd RL lines
+	//MCFG_I8279_OUT_SL_CB(WRITE8(*this, ax80_state, scanlines_w))          // scan SL lines
+	//MCFG_I8279_OUT_DISP_CB(WRITE8(*this, ax80_state, digit_w))            // display A&B
+	//MCFG_I8279_IN_RL_CB(READ8(*this, ax80_state, kbd_r))                  // kbd RL lines
 	//MCFG_I8279_IN_SHIFT_CB(VCC) // not connected
 	//MCFG_I8279_IN_CTRL_CB(VCC)  // not connected
 MACHINE_CONFIG_END
@@ -123,11 +123,11 @@ ROM_START( ax80 )
 	ROM_LOAD( "akai ax80 main cpu mask rom.ic2", 0x000000, 0x001000, CRC(241c078f) SHA1(7f5d0d718f2d03ec446568ae440beaff0aac6bfd) )
 	// external program EPROM
 	ROM_SYSTEM_BIOS( 0, "k", "REV.K" )
-	ROMX_LOAD( "ax-80k.ic4", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(1) )
+	ROMX_LOAD( "ax-80k.ic4", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "l", "REV.L" )
-	ROMX_LOAD( "ax-80l.ic4", 0x001000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(2) )
+	ROMX_LOAD( "ax-80l.ic4", 0x001000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "i", "REV.I" )
-	ROMX_LOAD( "ax-80i.ic4", 0x001000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(3) )
+	ROMX_LOAD( "ax-80i.ic4", 0x001000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(2) )
 ROM_END
 
-CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, 0, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, empty_init, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

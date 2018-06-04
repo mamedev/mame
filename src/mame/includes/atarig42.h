@@ -14,6 +14,7 @@
 #include "machine/atarigen.h"
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/asic65.h"
 
 class atarig42_state : public atarigen_state
@@ -26,6 +27,7 @@ public:
 		m_alpha_tilemap(*this, "alpha"),
 		m_rle(*this, "rle"),
 		m_asic65(*this, "asic65"),
+		m_adc(*this, "adc"),
 		m_mo_command(*this, "mo_command")
 	{ }
 
@@ -34,9 +36,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(special_port2_r);
-	DECLARE_WRITE16_MEMBER(a2d_select_w);
-	DECLARE_READ16_MEMBER(a2d_data_r);
+	DECLARE_WRITE8_MEMBER(a2d_select_w);
+	DECLARE_READ8_MEMBER(a2d_data_r);
 	DECLARE_WRITE16_MEMBER(io_latch_w);
 	DECLARE_WRITE16_MEMBER(mo_command_w);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -53,6 +54,7 @@ protected:
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_rle_objects_device> m_rle;
 	required_device<asic65_device> m_asic65;
+	optional_device<adc0808_device> m_adc;
 
 	uint16_t          m_playfield_base;
 
@@ -62,7 +64,6 @@ protected:
 	uint16_t          m_playfield_xscroll;
 	uint16_t          m_playfield_yscroll;
 
-	uint8_t           m_analog_data;
 	required_shared_ptr<uint16_t> m_mo_command;
 
 	int             m_sloop_bank;
@@ -78,7 +79,7 @@ class atarig42_0x200_state : public atarig42_state
 {
 public:
 	using atarig42_state::atarig42_state;
-	DECLARE_DRIVER_INIT(roadriot);
+	void init_roadriot();
 	void atarig42_0x200(machine_config &config);
 
 protected:
@@ -91,7 +92,7 @@ class atarig42_0x400_state : public atarig42_state
 {
 public:
 	using atarig42_state::atarig42_state;
-	DECLARE_DRIVER_INIT(guardian);
+	void init_guardian();
 	void atarig42_0x400(machine_config &config);
 
 protected:

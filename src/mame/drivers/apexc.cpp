@@ -34,7 +34,7 @@ public:
 
 	int m_letters;
 	int m_pos;
-	DECLARE_DRIVER_INIT(apexc);
+	void init_apexc();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(apexc);
@@ -117,7 +117,7 @@ image_init_result apexc_cylinder_image_device::call_load()
 	fread( machine().root_device().memshare("maincpu")->ptr(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
-		uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
+		uint32_t *RAM = (uint32_t *)(machine().root_device().memshare("maincpu")->ptr());
 
 		for (int i=0; i < 0x0400; i++)
 			RAM[i] = big_endianize_int32(RAM[i]);
@@ -138,14 +138,14 @@ void apexc_cylinder_image_device::call_unload()
 		fseek(0, SEEK_SET);
 #ifdef LSB_FIRST
 		{   /* fix endianness */
-			uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
+			uint32_t *RAM = (uint32_t *)(machine().root_device().memshare("maincpu")->ptr());
 
 			for (int i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = big_endianize_int32(RAM[i]);
 		}
 #endif
 		/* write */
-		fwrite(machine().root_device().memregion("maincpu")->base(), /*0x8000*/0x1000);
+		fwrite(machine().root_device().memshare("maincpu")->ptr(), /*0x8000*/0x1000);
 	}
 }
 
@@ -727,10 +727,8 @@ enum
 };
 
 /* apexc driver init : builds a font for use by the teletyper */
-DRIVER_INIT_MEMBER(apexc_state,apexc)
+void apexc_state::init_apexc()
 {
-	uint8_t *dst;
-
 	static const unsigned char fontdata6x8[apexcfontdata_size] =
 	{   /* ASCII characters */
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00,
@@ -823,7 +821,7 @@ DRIVER_INIT_MEMBER(apexc_state,apexc)
 		0x00
 	};
 
-	dst = memregion("chargen")->base();
+	uint8_t *dst = memregion("chargen")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }
@@ -839,7 +837,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( apexc )
+static GFXDECODE_START( gfx_apexc )
 	GFXDECODE_ENTRY( "chargen", 0, fontlayout, 0, 2 )
 GFXDECODE_END
 
@@ -855,12 +853,12 @@ MACHINE_CONFIG_START(apexc_state::apexc)
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
-	MCFG_CPU_ADD("maincpu", APEXC, 2000)
-	MCFG_CPU_PROGRAM_MAP(apexc_mem_map)
-	MCFG_APEXC_TAPE_READ_CB(READ8(apexc_state, tape_read))
-	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(apexc_state, tape_write))
+	MCFG_DEVICE_ADD("maincpu", APEXC, 2000)
+	MCFG_DEVICE_PROGRAM_MAP(apexc_mem_map)
+	MCFG_APEXC_TAPE_READ_CB(READ8(*this, apexc_state, tape_read))
+	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(*this, apexc_state, tape_write))
 	/* dummy interrupt: handles the control panel */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
 
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
@@ -872,7 +870,7 @@ MACHINE_CONFIG_START(apexc_state::apexc)
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apexc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apexc)
 	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
 
@@ -890,6 +888,6 @@ ROM_START(apexc)
 		/* space filled with our font */
 ROM_END
 
-//     YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT  STATE         INIT   COMPANY                FULLNAME */
-//COMP(  1951,    apexc53,    0,        0,      apexc53,    apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP(  1955,    apexc,      0,        0,      apexc,      apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                FULLNAME */
+//COMP( 1951, apexc53, 0,      0,      apexc53, apexc, apexc_state, init_apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1955, apexc,   0,      0,      apexc,   apexc, apexc_state, init_apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , MACHINE_NO_SOUND_HW)

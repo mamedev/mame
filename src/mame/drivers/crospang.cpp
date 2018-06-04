@@ -321,7 +321,7 @@ static const gfx_layout tlayout =
 };
 
 
-static GFXDECODE_START( crospang )
+static GFXDECODE_START( gfx_crospang )
 	//GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 256, 16 )    /* Characters 8x8 */
 	//GFXDECODE_ENTRY( "gfx1", 0, tlayout,     512, 16 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
@@ -344,13 +344,13 @@ void crospang_state::machine_reset()
 MACHINE_CONFIG_START(crospang_state::crospang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(14'318'181)/2) /* 68000P10 @ 7.15909MHz */
-	MCFG_CPU_PROGRAM_MAP(crospang_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(14'318'181)/2) /* 68000P10 @ 7.15909MHz */
+	MCFG_DEVICE_PROGRAM_MAP(crospang_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(crospang_sound_map)
-	MCFG_CPU_IO_MAP(crospang_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(crospang_sound_map)
+	MCFG_DEVICE_IO_MAP(crospang_sound_io_map)
 
 
 	/* video hardware */
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crospang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crospang)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
@@ -375,15 +375,15 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/16, PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -391,8 +391,8 @@ MACHINE_CONFIG_START(crospang_state::bestri)
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bestri_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bestri_map)
 
 MACHINE_CONFIG_END
 
@@ -400,13 +400,13 @@ MACHINE_CONFIG_START(crospang_state::bestria)
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bestria_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bestria_map)
 
 MACHINE_CONFIG_END
 
 
-ROM_START( crospang )
+ROM_START( crospang ) /* Developed April 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "p1.bin", 0x00001, 0x20000, CRC(0bcbbaad) SHA1(807f07be340d7af0aad8d49461b5a7f0221ea3b7) )
 	ROM_LOAD16_BYTE( "p2.bin", 0x00000, 0x20000, CRC(0947d204) SHA1(35e7e277c51888a66d305994bf05c3f6bfc3c29e) )
@@ -529,7 +529,7 @@ ud17.e12 D
 
 */
 
-ROM_START( bestri )
+ROM_START( bestri ) /* Developed March 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.i3", 0x00001, 0x80000, CRC(9e94023d) SHA1(61a07eb835d324cb4fe7e3d366dd3907838b2554) )
 	ROM_LOAD16_BYTE( "ua03.i5", 0x00000, 0x80000, CRC(08cfa8d8) SHA1(684729887bf2dd2fe22e5bd2e32073169d426e02) )
@@ -566,7 +566,7 @@ ROM_START( bestri )
 	ROM_LOAD16_BYTE( "ud17.e12", 0x100001, 0x80000, CRC(3a3a3f1a) SHA1(48843140cd63c9387e09b84bd41b13dba35f48ad) )
 ROM_END
 
-ROM_START( bestria )
+ROM_START( bestria ) /* Developed March 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "o_ua02.i3", 0x00001, 0x80000, CRC(035c86f6) SHA1(d501553ed7fdb462c9c26fff6473cefe71424e26) )
 	ROM_LOAD16_BYTE( "e_ua03.i5", 0x00000, 0x80000, CRC(7c53d9f8) SHA1(92dc92471497292d3ba90f3f2fb35f7b4fba240c) )
@@ -625,12 +625,12 @@ void crospang_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(crospang_state,crospang)
+void crospang_state::init_crospang()
 {
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1998, crospang,        0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, heuksun,         0, crospang,  heuksun, crospang_state, crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestri,          0,   bestri,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestria,    bestri,  bestria,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, crospang, 0,      crospang, crospang, crospang_state, init_crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, heuksun,  0,      crospang, heuksun,  crospang_state, init_crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestri,   0,      bestri,   bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestria,  bestri, bestria,  bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

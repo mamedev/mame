@@ -22,18 +22,19 @@ FLOPPY_FORMATS_MEMBER( sv801_device::floppy_formats )
 	FLOPPY_SVI_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( svi_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void svi_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sv801_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(sv801_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(sv801_device, drq_w))
+	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, sv801_device, intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, sv801_device, drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", svi_floppies, "dd", sv801_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", svi_floppies, "dd", sv801_device::floppy_formats)

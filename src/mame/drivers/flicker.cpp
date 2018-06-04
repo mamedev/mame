@@ -53,9 +53,19 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_testport(*this, "TEST")
 		, m_coinport(*this, "COIN")
-		, m_switch(*this, "SWITCH.%X", 0)
+		, m_switch(*this, "SWITCH.%X", 0U)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	DECLARE_CUSTOM_INPUT_MEMBER(coins_in);
+
+	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
+
+	void flicker(machine_config &config);
+
+protected:
+	virtual void driver_start() override;
 
 	DECLARE_WRITE8_MEMBER(ram0_out) { m_ram0_output = data; }
 	DECLARE_WRITE8_MEMBER(rom0_out) { m_rom0_output = data; }
@@ -65,24 +75,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cm_ram1_w);
 	DECLARE_WRITE_LINE_MEMBER(cm_ram2_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coins_in);
-
-	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
-
-	void flicker(machine_config &config);
 	void flicker_memory(address_map &map);
 	void flicker_ram_ports(address_map &map);
 	void flicker_rom(address_map &map);
 	void flicker_rom_ports(address_map &map);
 	void flicker_status(address_map &map);
-protected:
-	virtual void driver_start() override;
 
 private:
 	required_device<i4004_cpu_device>   m_maincpu;
 	required_ioport                     m_testport;
 	required_ioport                     m_coinport;
 	required_ioport_array<16>           m_switch;
+	output_finder<16>                   m_digits;
 
 	bool    m_cm_ram1 = false, m_cm_ram2 = false;
 	u8      m_ram0_output = 0U, m_rom0_output = 0U, m_rom1_output = 0U;
@@ -122,7 +126,7 @@ static INPUT_PORTS_START( flicker )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Door Slam")     PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 	PORT_BIT(0x001c, IP_ACTIVE_HIGH, IPT_UNKNOWN)  // called "two coins", "three coins", "four coins" in patent, purpose unknown
-	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, flicker_state, coins_in, nullptr)
+	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, flicker_state, coins_in, nullptr)
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_TILT)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Credit Button")                         PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 	PORT_BIT(0x6000, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -302,7 +306,7 @@ WRITE_LINE_MEMBER(flicker_state::cm_ram1_w)
 	if (!m_cm_ram1 && !state)
 	{
 		m_mux_col = m_ram0_output;
-		output().set_digit_value(m_mux_col, led_digits[m_rom0_output]);
+		m_digits[m_mux_col] = led_digits[m_rom0_output];
 		if (ARRAY_LENGTH(lamp_matrix) > m_mux_col)
 		{
 			if (lamp_matrix[m_mux_col][0])
@@ -381,6 +385,8 @@ INPUT_CHANGED_MEMBER(flicker_state::test_changed)
 
 void flicker_state::driver_start()
 {
+	m_digits.resolve();
+
 	save_item(NAME(m_cm_ram1));
 	save_item(NAME(m_cm_ram2));
 	save_item(NAME(m_ram0_output));
@@ -392,14 +398,14 @@ void flicker_state::driver_start()
 
 MACHINE_CONFIG_START(flicker_state::flicker)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I4004, 5_MHz_XTAL / 8)
+	MCFG_DEVICE_ADD("maincpu", I4004, 5_MHz_XTAL / 8)
 	MCFG_I4004_ROM_MAP(flicker_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(flicker_memory)
 	MCFG_I4004_ROM_PORTS_MAP(flicker_rom_ports)
 	MCFG_I4004_RAM_STATUS_MAP(flicker_status)
 	MCFG_I4004_RAM_PORTS_MAP(flicker_ram_ports)
-	MCFG_I4004_CM_RAM1_CB(WRITELINE(flicker_state, cm_ram1_w))
-	MCFG_I4004_CM_RAM2_CB(WRITELINE(flicker_state, cm_ram2_w))
+	MCFG_I4004_CM_RAM1_CB(WRITELINE(*this, flicker_state, cm_ram1_w))
+	MCFG_I4004_CM_RAM2_CB(WRITELINE(*this, flicker_state, cm_ram2_w))
 
 	// video
 	MCFG_DEFAULT_LAYOUT(layout_flicker)
@@ -414,5 +420,5 @@ ROM_START(flicker)
 	ROM_LOAD("flicker.rom", 0x0000, 0x0400, CRC(c692e586) SHA1(5cabb28a074d18b589b5b8f700c57e1610071c68))
 ROM_END
 
-//    YEAR   GAME      PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION  COMPANY                            DESCRIPTION            FLAGS
-GAME( 1974,  flicker,  0,      flicker,  flicker, flicker_state,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR   GAME      PARENT  MACHINE   INPUT    CLASS           INIT        ORIENTATION  COMPANY                            DESCRIPTION            FLAGS
+GAME( 1974,  flicker,  0,      flicker,  flicker, flicker_state,  empty_init, ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

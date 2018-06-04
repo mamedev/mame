@@ -510,7 +510,7 @@ static const gfx_layout macrossp_char16x16x8layout =
 	16*128
 };
 
-static GFXDECODE_START( macrossp )
+static GFXDECODE_START( gfx_macrossp )
 	GFXDECODE_ENTRY( "gfx1", 0, macrossp_char16x16x8layout,   0x000, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx2", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx3", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
@@ -544,12 +544,12 @@ void macrossp_state::machine_reset()
 MACHINE_CONFIG_START(macrossp_state::macrossp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
-	MCFG_CPU_PROGRAM_MAP(macrossp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(macrossp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
 
-	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(macrossp_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(macrossp_sound_map)
 
 
 	/* video hardware */
@@ -559,25 +559,26 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	MCFG_SCREEN_SIZE(32*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 0*16, 15*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(macrossp_state, screen_vblank_macrossp))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, macrossp_state, screen_vblank_macrossp))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macrossp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macrossp)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RGBX)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ensoniq", ES5506, 16000000)
+	MCFG_DEVICE_ADD("ensoniq", ES5506, 16000000)
 	MCFG_ES5506_REGION0("ensoniq.0")
 	MCFG_ES5506_REGION1("ensoniq.1")
 	MCFG_ES5506_REGION2("ensoniq.2")
 	MCFG_ES5506_REGION3("ensoniq.3")
 	MCFG_ES5506_CHANNELS(1)               /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(macrossp_state, irqhandler))
+	MCFG_ES5506_IRQ_CB(WRITELINE(*this, macrossp_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
@@ -713,17 +714,17 @@ WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 }
 #endif
 
-DRIVER_INIT_MEMBER(macrossp_state,macrossp)
+void macrossp_state::init_macrossp()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf10158, 0xf1015b, write32_delegate(FUNC(macrossp_state::macrossp_speedup_w),this));
 }
 
-DRIVER_INIT_MEMBER(macrossp_state,quizmoon)
+void macrossp_state::init_quizmoon()
 {
 #ifdef UNUSED_FUNCTION
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00020, 0xf00023, write32_delegate(FUNC(macrossp_state::quizmoon_speedup_w),this));
 #endif
 }
 
-GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, init_macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, init_quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

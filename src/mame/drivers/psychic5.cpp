@@ -707,13 +707,13 @@ static const gfx_layout spritelayout =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( psychic5 )
+static GFXDECODE_START( gfx_psychic5 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( bombsa )
+static GFXDECODE_START( gfx_bombsa )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0*16,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   16*16, 16 )
@@ -723,8 +723,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
@@ -734,9 +734,9 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
-	MCFG_CPU_IO_MAP(psychic5_soundport_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_sound_map)
+	MCFG_DEVICE_IO_MAP(psychic5_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
 
@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psychic5)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -756,18 +756,18 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -777,8 +777,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
@@ -788,9 +788,9 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) )
-	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
-	MCFG_CPU_IO_MAP(bombsa_soundport_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_sound_map)
+	MCFG_DEVICE_IO_MAP(bombsa_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -801,25 +801,25 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombsa)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
@@ -980,6 +980,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
-GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, empty_init, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

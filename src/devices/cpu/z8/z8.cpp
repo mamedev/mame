@@ -165,13 +165,15 @@ DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(z8_device::program_2kb)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void z8_device::program_2kb(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
-ADDRESS_MAP_START(z8_device::program_4kb)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void z8_device::program_4kb(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
 z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map)
@@ -259,7 +261,7 @@ uint16_t z8_device::mask_external_address(uint16_t addr)
 uint8_t z8_device::fetch()
 {
 	uint16_t real_pc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
-	uint8_t data = m_direct->read_byte(real_pc);
+	uint8_t data = m_cache->read_byte(real_pc);
 
 	m_pc++;
 
@@ -270,9 +272,9 @@ uint8_t z8_device::fetch()
 uint8_t z8_device::fetch_opcode()
 {
 	m_ppc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
-	debugger_instruction_hook(this, m_ppc);
+	debugger_instruction_hook(m_ppc);
 
-	uint8_t data = m_direct->read_byte(m_ppc);
+	uint8_t data = m_cache->read_byte(m_ppc);
 
 	m_pc++;
 
@@ -778,7 +780,7 @@ void z8_device::device_start()
 
 	/* find address spaces */
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_data = has_space(AS_DATA) ? &space(AS_DATA) : m_program;
 
 	/* allocate timers */
@@ -809,7 +811,7 @@ void z8_device::device_start()
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_irq_taken));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 /***************************************************************************
@@ -837,8 +839,8 @@ void z8_device::take_interrupt(int irq)
 	stack_push_byte(m_r[Z8_REGISTER_FLAGS]);
 
 	// branch to the vector
-	m_pc = m_direct->read_byte(vector) << 8;
-	m_pc |= m_direct->read_byte(vector + 1);
+	m_pc = m_cache->read_byte(vector) << 8;
+	m_pc |= m_cache->read_byte(vector + 1);
 }
 
 void z8_device::process_interrupts()

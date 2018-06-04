@@ -215,10 +215,10 @@ static INPUT_PORTS_START( pencil2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ready_r, " ")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ready_r, " ")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ack_r, " ")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ack_r, " ")
 
 	PORT_START("E1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j') PORT_CHAR('@')
@@ -310,9 +310,9 @@ void pencil2_state::machine_start()
 
 MACHINE_CONFIG_START(pencil2_state::pencil2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
@@ -321,11 +321,10 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(10'738'635)/3) // guess
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(10'738'635)/3) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -336,8 +335,8 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pencil2_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pencil2_state, write_centronics_busy))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pencil2_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pencil2_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -353,5 +352,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY    FULLNAME     FLAGS
-COMP( 1983, pencil2, 0,      0,      pencil2,  pencil2, pencil2_state, 0,    "Hanimex", "Pencil II", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME     FLAGS
+COMP( 1983, pencil2, 0,      0,      pencil2, pencil2, pencil2_state, empty_init, "Hanimex", "Pencil II", 0 )

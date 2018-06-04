@@ -27,7 +27,7 @@
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "babbage.lh"
 
 #define MAIN_CLOCK 25e5
@@ -42,6 +42,7 @@ public:
 		, m_pio_2(*this, "z80pio_2")
 		, m_ctc(*this, "z80ctc")
 		, m_keyboard(*this, "X%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void babbage(machine_config &config);
@@ -63,11 +64,13 @@ private:
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio_1;
 	required_device<z80pio_device> m_pio_2;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport_array<4> m_keyboard;
+	output_finder<33> m_digits;
 };
 
 
@@ -179,7 +182,7 @@ WRITE8_MEMBER( babbage_state::pio2_b_w )
 	}
 	else
 	{
-		output().set_digit_value(data, m_segment);
+		m_digits[data] = m_segment;
 	}
 }
 
@@ -229,9 +232,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 MACHINE_CONFIG_START(babbage_state::babbage)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
-	MCFG_CPU_PROGRAM_MAP(babbage_map)
-	MCFG_CPU_IO_MAP(babbage_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
+	MCFG_DEVICE_PROGRAM_MAP(babbage_map)
+	MCFG_DEVICE_IO_MAP(babbage_io)
 	MCFG_Z80_DAISY_CHAIN(babbage_daisy_chain)
 
 	/* video hardware */
@@ -240,18 +243,18 @@ MACHINE_CONFIG_START(babbage_state::babbage)
 	/* Devices */
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, MAIN_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(babbage_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(babbage_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(babbage_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, babbage_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, babbage_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, babbage_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MAIN_CLOCK)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(babbage_state, pio1_b_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, babbage_state, pio1_b_w))
 
 	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, MAIN_CLOCK)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(babbage_state, pio2_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(babbage_state, pio2_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, babbage_state, pio2_a_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, babbage_state, pio2_b_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", babbage_state, keyboard_callback, attotime::from_hz(30))
 MACHINE_CONFIG_END
@@ -269,5 +272,5 @@ ROM_START(babbage)
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY               FULLNAME        FLAGS
-COMP( 1986, babbage,  0,      0,      babbage,    babbage, babbage_state, 0,    "Mr Takafumi Aihara", "Babbage-2nd" , MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME       FLAGS
+COMP( 1986, babbage, 0,      0,      babbage, babbage, babbage_state, empty_init, "Mr Takafumi Aihara", "Babbage-2nd", MACHINE_NO_SOUND_HW )

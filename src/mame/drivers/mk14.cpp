@@ -54,6 +54,7 @@ public:
 		, m_keyboard(*this, "X.%u", 0)
 		, m_cass(*this, "cassette")
 		, m_dac(*this, "dac")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -65,10 +66,12 @@ public:
 	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_keyboard;
 	required_device<cassette_image_device> m_cass;
 	required_device<dac_bit_interface> m_dac;
+	output_finder<8> m_digits;
 };
 
 /*
@@ -100,7 +103,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 WRITE8_MEMBER( mk14_state::display_w )
 {
 	if (offset < 8 )
-		output().set_digit_value(offset, data);
+		m_digits[offset] = data;
 	else
 	{
 		//logerror("write %02x to %02x\n",data,offset);
@@ -191,30 +194,34 @@ void mk14_state::machine_reset()
 {
 }
 
+void mk14_state::machine_start()
+{
+	m_digits.resolve();
+}
+
 MACHINE_CONFIG_START(mk14_state::mk14)
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
-	MCFG_CPU_ADD("maincpu", INS8060, XTAL(4'433'619))
-	MCFG_SCMP_CONFIG(WRITELINE(mk14_state, cass_w), NOOP, READLINE(mk14_state, cass_r), NOOP, READLINE(mk14_state, cass_r), NOOP)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", INS8060, XTAL(4'433'619))
+	MCFG_SCMP_CONFIG(WRITELINE(*this, mk14_state, cass_w), NOOP, READLINE(*this, mk14_state, cass_r), NOOP, READLINE(*this, mk14_state, cass_r), NOOP)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mk14)
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05)
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac8", ZN425E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // Ferranti ZN425E
+	SPEAKER(config, "speaker").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.05);
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac8", ZN425E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // Ferranti ZN425E
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_DEVICE_ADD("ic8", INS8154, 0)
-	MCFG_INS8154_OUT_A_CB(WRITE8(mk14_state, port_a_w))
-	MCFG_INS8154_OUT_B_CB(DEVWRITE8("dac8", dac_byte_interface, write))
+	MCFG_INS8154_OUT_A_CB(WRITE8(*this, mk14_state, port_a_w))
+	MCFG_INS8154_OUT_B_CB(WRITE8("dac8", dac_byte_interface, write))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
@@ -228,5 +235,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT  COMPANY                 FULLNAME  FLAGS
-COMP( 1977, mk14,  0,      0,      mk14,      mk14,  mk14_state, 0,    "Science of Cambridge", "MK-14",  0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                 FULLNAME  FLAGS
+COMP( 1977, mk14, 0,      0,      mk14,    mk14,  mk14_state, empty_init, "Science of Cambridge", "MK-14",  0 )

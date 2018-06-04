@@ -31,9 +31,10 @@ class nsm_state : public driver_device
 {
 public:
 	nsm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
@@ -41,16 +42,14 @@ public:
 	void nsm(machine_config &config);
 	void nsm_io_map(address_map &map);
 	void nsm_map(address_map &map);
-protected:
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
 private:
 	uint8_t m_cru_data[9];
 	uint8_t m_cru_count;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<60> m_digits;
 };
 
 void nsm_state::nsm_map(address_map &map)
@@ -111,7 +110,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 				for (j = 0; j < 5; j++)
 				{
 					segments = m_cru_data[8-j]^0xff;
-					output().set_digit_value(j * 10 + i, bitswap<16>(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
+					m_digits[j * 10 + i] = bitswap<16>(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7);
 				}
 			}
 		}
@@ -134,10 +133,11 @@ MACHINE_CONFIG_START(nsm_state::nsm)
 	MCFG_DEFAULT_LAYOUT(layout_nsm)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ay1", AY8912, 11052000/8)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ay1", AY8912, 11052000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ADD("ay2", AY8912, 11052000/8)
+	MCFG_DEVICE_ADD("ay2", AY8912, 11052000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
@@ -163,4 +163,4 @@ ROM_END
 / The Games (1985)
 /-------------------------------------------------------------------*/
 
-GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, 0,  ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

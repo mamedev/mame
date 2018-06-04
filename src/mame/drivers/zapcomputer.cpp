@@ -37,6 +37,7 @@ public:
 	zapcomp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -49,6 +50,7 @@ private:
 	uint8_t decode7seg(uint8_t data);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
+	output_finder<6> m_digits;
 };
 
 uint8_t zapcomp_state::decode7seg(uint8_t data)
@@ -71,22 +73,11 @@ uint8_t zapcomp_state::decode7seg(uint8_t data)
 
 WRITE8_MEMBER( zapcomp_state::display_7seg_w )
 {
-	switch (offset){
-		case 0: //Port 0x05 : address HI
-			output().set_digit_value(0, decode7seg(data >> 4));
-			output().set_digit_value(1, decode7seg(data));
-			break;
-		case 1: //Port 0x06 : address LOW
-			output().set_digit_value(2, decode7seg(data >> 4));
-			output().set_digit_value(3, decode7seg(data));
-			break;
-		case 2: //Port 0x07 : data
-			output().set_digit_value(4, decode7seg(data >> 4));
-			output().set_digit_value(5, decode7seg(data));
-			break;
-		default:
-			break;
-	}
+	//Port 0x05 : address HI
+	//Port 0x06 : address LOW
+	//Port 0x07 : data
+	m_digits[offset*2] = decode7seg(data >> 4);
+	m_digits[offset*2+1] = decode7seg(data);
 }
 
 READ8_MEMBER( zapcomp_state::keyboard_r )
@@ -159,13 +150,14 @@ INPUT_PORTS_END
 
 void zapcomp_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 MACHINE_CONFIG_START(zapcomp_state::zapcomp)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(zapcomp_mem)
-	MCFG_CPU_IO_MAP(zapcomp_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(zapcomp_mem)
+	MCFG_DEVICE_IO_MAP(zapcomp_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_zapcomputer)
@@ -176,5 +168,5 @@ ROM_START( zapcomp )
 	ROM_LOAD("zap.rom", 0x0000, 0x0400, CRC(3f4416e9) SHA1(d6493707bfba1a1e1e551f8144194afa5bda3316) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT  COMPANY                               FULLNAME                            FLAGS
-COMP( 1981, zapcomp, 0,      0,      zapcomp, zapcomp, zapcomp_state, 0,    "Steve Ciarcia / BYTE / McGRAW-HILL", "ZAP - Z80 Applications Processor", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                               FULLNAME                            FLAGS
+COMP( 1981, zapcomp, 0,      0,      zapcomp, zapcomp, zapcomp_state, empty_init, "Steve Ciarcia / BYTE / McGRAW-HILL", "ZAP - Z80 Applications Processor", MACHINE_NO_SOUND_HW )

@@ -53,7 +53,7 @@ public:
 		, m_acia1(*this, "acia1")
 	{ }
 
-	DECLARE_DRIVER_INIT(jupiter2);
+	void init_jupiter2();
 
 	void jupiter2(machine_config &config);
 	void jupiter2_mem(address_map &map);
@@ -76,7 +76,7 @@ public:
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(jupiter3);
+	void init_jupiter3();
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -236,9 +236,10 @@ uint32_t jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static SLOT_INTERFACE_START( jupiter_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void jupiter_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 
 //**************************************************************************
@@ -277,8 +278,8 @@ void jupiter3_state::machine_reset()
 
 MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	// basic machine hardware
-	MCFG_CPU_ADD(MCM6571AP_TAG, M6800, 2000000)
-	MCFG_CPU_PROGRAM_MAP(jupiter2_mem)
+	MCFG_DEVICE_ADD(MCM6571AP_TAG, M6800, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(jupiter2_mem)
 
 	// devices
 	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
@@ -286,20 +287,20 @@ MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL(2'000'000)) // unknown frequency
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial0", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial0", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("serial0", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("serial0", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia0", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia0", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL(2'000'000)) // unknown frequency
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial1", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial1", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("serial1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("serial1", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -313,9 +314,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(jupiter3_mem)
-	MCFG_CPU_IO_MAP(jupiter3_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(jupiter3_mem)
+	MCFG_DEVICE_IO_MAP(jupiter3_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -387,7 +388,7 @@ ROM_END
 //  DRIVER_INIT( jupiter )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(jupiter2_state,jupiter2)
+void jupiter2_state::init_jupiter2()
 {
 	uint8_t *rom = memregion(MCM6571AP_TAG)->base();
 	uint8_t inverted[0x1000];
@@ -409,7 +410,7 @@ DRIVER_INIT_MEMBER(jupiter2_state,jupiter2)
 //  DRIVER_INIT( jupiter3 )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(jupiter3_state,jupiter3)
+void jupiter3_state::init_jupiter3()
 {
 	uint8_t *rom = memregion(Z80_TAG)->base();
 	uint8_t inverted[0x1000];
@@ -430,6 +431,6 @@ DRIVER_INIT_MEMBER(jupiter3_state,jupiter3)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE           INIT       COMPANY      FULLNAME       FLAGS
-COMP( 1976, jupiter2, 0,      0,       jupiter2,  jupiter, jupiter2_state, jupiter2, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1976, jupiter3, 0,      0,       jupiter3,  jupiter, jupiter3_state, jupiter3, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT           COMPANY      FULLNAME       FLAGS
+COMP( 1976, jupiter2, 0,      0,      jupiter2, jupiter, jupiter2_state, init_jupiter2, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, jupiter3, 0,      0,      jupiter3, jupiter, jupiter3_state, init_jupiter3, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

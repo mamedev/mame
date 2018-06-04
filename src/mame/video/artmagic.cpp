@@ -102,7 +102,7 @@ void artmagic_state::execute_blit()
 	static FILE *f;
 
 	logerror("%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-				machine.describe_context(), offset, x, y, w, h,
+				machine().describe_context(), offset, x, y, w, h,
 				m_blitter_data[0], m_blitter_data[1],
 				m_blitter_data[2], m_blitter_data[3],
 				m_blitter_data[4], m_blitter_data[5],
@@ -120,7 +120,7 @@ void artmagic_state::execute_blit()
 
 		fprintf(f, "----------------------\n"
 					"%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-					machine.describe_context(), offset, x, y, w, h,
+					machine().describe_context(), offset, x, y, w, h,
 					m_blitter_data[0], m_blitter_data[1],
 					m_blitter_data[2], m_blitter_data[3],
 					m_blitter_data[4], m_blitter_data[5],
@@ -339,7 +339,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(artmagic_state::scanline)
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	uint16_t *vram = address_to_vram(&offset);
 	uint32_t *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 

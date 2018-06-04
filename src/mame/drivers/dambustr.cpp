@@ -70,7 +70,7 @@ public:
 
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
-	DECLARE_DRIVER_INIT(dambustr);
+	void init_dambustr();
 	void dambustr(machine_config &config);
 	void dambustr_map(address_map &map);
 };
@@ -207,65 +207,68 @@ static const gfx_layout dambustr_spritelayout =
 };
 
 
-static GFXDECODE_START( dambustr )
+static GFXDECODE_START( gfx_dambustr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_spritelayout, 0, 8 )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(dambustr_state,dambustr)
+void dambustr_state::init_dambustr()
 {
-	int i, j, tmp;
 	int tmpram[16];
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *usr = memregion("user1")->base();
 	uint8_t *gfx = memregion("gfx1")->base();
 
 	// Bit swap addresses
-	for(i=0; i<4096*4; i++) {
+	for (int i = 0; i < 4096*4; i++){
 		rom[i] = usr[bitswap<16>(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
-	};
+	}
 
 	// Swap program ROMs
-	for(i=0; i<0x1000; i++) {
-		tmp = rom[0x5000+i];
+	for (int i = 0; i < 0x1000; i++)
+	{
+		uint8_t tmp = rom[0x5000+i];
 		rom[0x5000+i] = rom[0x6000+i];
 		rom[0x6000+i] = rom[0x1000+i];
 		rom[0x1000+i] = tmp;
-	};
+	}
 
 	// Bit swap in $1000-$1fff and $4000-$5fff
-	for(i=0; i<0x1000; i++) {
+	for (int i = 0; i < 0x1000; i++)
+	{
 		rom[0x1000+i] = bitswap<8>(rom[0x1000+i],7,6,5,1,3,2,4,0);
 		rom[0x4000+i] = bitswap<8>(rom[0x4000+i],7,6,5,1,3,2,4,0);
 		rom[0x5000+i] = bitswap<8>(rom[0x5000+i],7,6,5,1,3,2,4,0);
-	};
+	}
 
 	// Swap graphics ROMs
-	for(i=0;i<0x4000;i+=16) {
-		for(j=0; j<16; j++)
+	for (int i = 0; i < 0x4000; i += 16)
+	{
+		for (int j = 0; j < 16; j++)
 			tmpram[j] = gfx[i+j];
-		for(j=0; j<8; j++) {
+		for (int j = 0; j < 8; j++)
+		{
 			gfx[i+j] = tmpram[j*2];
 			gfx[i+j+8] = tmpram[j*2+1];
-		};
-	};
+		}
+	}
 }
 
 
 
 MACHINE_CONFIG_START(dambustr_state::dambustr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(dambustr_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dambustr_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(dambustr_state,galaxold_7474_9m_1_callback))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, dambustr_state,galaxold_7474_9m_1_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(dambustr_state,galaxold_7474_9m_2_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, dambustr_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
 
@@ -279,14 +282,14 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	MCFG_SCREEN_UPDATE_DRIVER(dambustr_state, screen_update_dambustr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dambustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dambustr)
 	MCFG_PALETTE_ADD("palette", 32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
 	MCFG_PALETTE_INIT_OWNER(dambustr_state,dambustr)
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	galaxian_audio(config);
 MACHINE_CONFIG_END
@@ -373,6 +376,6 @@ ROM_START( dambustruk )
 ROM_END
 
 
-GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
-GAME( 1981, dambustra,  dambustr, dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
-GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)",        0 )
+GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr_state, init_dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+GAME( 1981, dambustra,  dambustr, dambustr, dambustr,   dambustr_state, init_dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, init_dambustr, ROT90, "South West Research", "Dambusters (UK)",        0 )

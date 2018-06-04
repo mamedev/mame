@@ -69,9 +69,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fr_w )
 	// S1602 RRC/TRC
 }
 
-static SLOT_INTERFACE_START( s100_dj2db_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void s100_dj2db_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {
@@ -102,12 +103,12 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s100_dj2db_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
+	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, 5.0688_MHz_XTAL)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, s100_dj2db_device, fr_w))
 
-	MCFG_MB8866_ADD(MB8866_TAG, XTAL(10'000'000)/5)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_drq_w))
+	MCFG_DEVICE_ADD(MB8866_TAG, MB8866, 10_MHz_XTAL / 5)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, s100_dj2db_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, s100_dj2db_device, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)

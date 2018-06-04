@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "sharcdsm.h"
 
+#include <stdexcept>
+
+
 const char sharc_disassembler::ureg_names[256][16] =
 {
 	"R0",       "R1",       "R2",       "R3",       "R4",       "R5",       "R6",       "R7",
@@ -1215,7 +1218,7 @@ sharc_disassembler::sharc_disassembler()
 			{
 				if (sharcdasm_table[i] != &sharc_disassembler::dasm_invalid)
 				{
-					fatalerror("build_dasm_table: table already filled! (i=%04X, j=%d)\n", i, j);
+					throw std::logic_error(util::string_format("build_dasm_table: table already filled! (i=%04X, j=%d)\n", i, j));
 				}
 				else
 				{

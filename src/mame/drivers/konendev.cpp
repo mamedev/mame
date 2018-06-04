@@ -53,8 +53,8 @@ public:
 		, m_eeprom(*this, "eeprom")
 	{ }
 
-	DECLARE_DRIVER_INIT(konendev);
-	DECLARE_DRIVER_INIT(enchlamp);
+	void init_konendev();
+	void init_enchlamp();
 
 	void konendev(machine_config &config);
 
@@ -306,9 +306,9 @@ INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
 
 MACHINE_CONFIG_START(konendev_state::konendev)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GCX, 32000000) // Clock unknown
-	MCFG_CPU_PROGRAM_MAP(konendev_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konendev_state, vbl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", PPC403GCX, 32000000) // Clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(konendev_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konendev_state, vbl_interrupt)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gcu", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(konendev_state, gcu_interrupt))
+	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, konendev_state, gcu_interrupt))
 
 	MCFG_NVRAM_ADD_0FILL("nvram0")
 	MCFG_NVRAM_ADD_0FILL("nvram1")
@@ -330,9 +330,10 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400) // Clock unknown
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400) // Clock unknown
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -482,11 +483,11 @@ ROM_START( konzero )
 	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )          // empty eeprom with Konami header
 ROM_END
 
-DRIVER_INIT_MEMBER(konendev_state,konendev)
+void konendev_state::init_konendev()
 {
 }
 
-DRIVER_INIT_MEMBER(konendev_state,enchlamp)
+void konendev_state::init_enchlamp()
 {
 	uint32_t *rom = (uint32_t*)memregion("program")->base();
 	rom[0x24/4] = 0x00002743;       // patch flash checksum for now
@@ -501,22 +502,22 @@ DRIVER_INIT_MEMBER(konendev_state,enchlamp)
 }
 
 // has a flash dump?
-GAME( 200?, enchlamp,   0,        konendev,    konendev, konendev_state,    enchlamp, ROT0,  "Konami", "Enchanted Lamp (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, enchlamp, 0, konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Enchanted Lamp (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // missing flash but has other interesting files
-GAME( 200?, whiterus,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "White Russia (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, whiterus, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "White Russia (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // partial sets
-GAME( 200?, aadvent,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "African Adventure (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, dragnfly,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Dragonfly (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, gypmagic,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Gypsy Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, incanp,     0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Incan Pyramids (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, jestmagi,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Jester Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, luckfoun,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Lucky Fountain (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, mohicans,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Mohican Sun (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, monshow,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "The Monster Show (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, romanl,     0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Roman Legions (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, safemon,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Safe Money (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, showqn,     0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Show Queen (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, spiceup,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Spice It Up (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, sultanw,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Sultan's Wish (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, konzero,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // doesn't seem to have a title string in it?
+GAME( 200?, aadvent,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "African Adventure (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, dragnfly, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Dragonfly (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, gypmagic, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Gypsy Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, incanp,   0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Incan Pyramids (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, jestmagi, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Jester Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, luckfoun, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Lucky Fountain (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, mohicans, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Mohican Sun (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, monshow,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "The Monster Show (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, romanl,   0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Roman Legions (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, safemon,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Safe Money (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, showqn,   0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Show Queen (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, spiceup,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Spice It Up (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, sultanw,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Sultan's Wish (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, konzero,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // doesn't seem to have a title string in it?

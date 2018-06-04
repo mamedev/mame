@@ -116,8 +116,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(aim65_40_state::aim65_40)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M6502_TAG, M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(aim65_40_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(aim65_40_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_aim65_40)
@@ -130,15 +130,15 @@ MACHINE_CONFIG_START(aim65_40_state::aim65_40)
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 1000000)
 	MCFG_DEVICE_ADD(M6551_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(M6551_TAG, mos6551_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(M6551_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -157,5 +157,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1981, aim65_40, 0,      0,      aim65_40, aim65_40, aim65_40_state, 0,    "Rockwell", "AIM-65/40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME     FLAGS
+COMP( 1981, aim65_40, 0,      0,      aim65_40, aim65_40, aim65_40_state, empty_init, "Rockwell", "AIM-65/40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

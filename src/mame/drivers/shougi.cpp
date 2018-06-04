@@ -373,22 +373,22 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 MACHINE_CONFIG_START(shougi_state::shougi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(10'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(readport_sub)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(10'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(readport_sub)
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // 0: sharedram = sub, 1: sharedram = main (TODO!)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(shougi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, shougi_state, nmi_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, mcu_start_w)) // start/halt ALPHA-8201
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, bus_dir_w)) MCFG_DEVCB_INVERT // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("alpha_8201", alpha_8201_device, mcu_start_w)) // start/halt ALPHA-8201
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("alpha_8201", alpha_8201_device, bus_dir_w)) MCFG_DEVCB_INVERT // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // nothing? connected to +5v via resistor
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -409,9 +409,9 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	MCFG_PALETTE_INIT_OWNER(shougi_state, shougi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -469,6 +469,6 @@ ROM_START( shougi2 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT  MONITOR  COMPANY                              FULLNAME          FLAGS */
-GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS */
+GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

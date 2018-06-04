@@ -307,7 +307,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( wc90b )
+static GFXDECODE_START( gfx_wc90b )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       0x100, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x02000, tilelayout,       0x200, 0x10 )
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 	if(m_toggle)
 	{
 		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
@@ -356,16 +356,16 @@ void wc90b_state::machine_start()
 MACHINE_CONFIG_START(wc90b_state::wc90b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wc90b_map1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wc90b_map1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wc90b_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("sub", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wc90b_map2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
@@ -377,24 +377,24 @@ MACHINE_CONFIG_START(wc90b_state::wc90b)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wc90b)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd1", YM2203, YM2203_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd1", YM2203, YM2203_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ymsnd2", YM2203, YM2203_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd2", YM2203, YM2203_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(wc90b_state, adpcm_int))      /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, MSM5205_CLOCK)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wc90b_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -537,6 +537,6 @@ ROM_START( twcup90ba )
 ROM_END
 
 
-GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, empty_init, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(pingpong_videoram_w);
 	DECLARE_WRITE8_MEMBER(pingpong_colorram_w);
-	DECLARE_DRIVER_INIT(cashquiz);
-	DECLARE_DRIVER_INIT(merlinmm);
+	void init_cashquiz();
+	void init_merlinmm();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pingpong);

@@ -9,6 +9,7 @@ public:
 	dynduke_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_slave(*this, "slave"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -19,6 +20,7 @@ public:
 		m_fore_data(*this, "fore_data") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_slave;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -57,7 +59,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void dynduke(machine_config &config);
 	void dbldyn(machine_config &config);
 	void master_map(address_map &map);

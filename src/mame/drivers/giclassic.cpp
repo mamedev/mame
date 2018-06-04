@@ -270,7 +270,7 @@ void giclassicsvr_state::server_main(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x080000, 0x08ffff).ram();
 	map(0x090000, 0x093fff).ram();
-	map(0x100000, 0x107fff).ram().ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram();
 	map(0x280000, 0x281fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES
@@ -297,9 +297,9 @@ void giclassicsvr_state::machine_reset()
 MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
-	MCFG_CPU_PROGRAM_MAP(satellite_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_DEVICE_PROGRAM_MAP(satellite_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,16 +316,16 @@ MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassic_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
-	MCFG_CPU_PROGRAM_MAP(server_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
+	MCFG_DEVICE_PROGRAM_MAP(server_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassicsvr_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
@@ -379,5 +379,5 @@ ROM_START( giclassvr )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END
 
-GAME( 1998, giclasex,  0, giclassic, giclassic, giclassic_state,    0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
-GAME( 1998, giclassvr, 0, giclassvr, giclassvr, giclassicsvr_state, 0, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclasex, 0, giclassic, giclassic, giclassic_state,    empty_init, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclassvr,0, giclassvr, giclassvr, giclassicsvr_state, empty_init, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)

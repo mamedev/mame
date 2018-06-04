@@ -120,7 +120,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
 
-	DECLARE_DRIVER_INIT(mc1000);
+	void init_mc1000();
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
 	void mc1000(machine_config &config);
 	void mc1000_banking_mem(address_map &map);
@@ -542,10 +542,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(mc1000_mem)
-	MCFG_CPU_OPCODES_MAP(mc1000_banking_mem)
-	MCFG_CPU_IO_MAP(mc1000_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(mc1000_mem)
+	MCFG_DEVICE_OPCODES_MAP(mc1000_banking_mem)
+	MCFG_DEVICE_IO_MAP(mc1000_io)
 
 	/* timers */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555clear", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
@@ -559,17 +559,17 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
 	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(mc1000_state, hs_w))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(mc1000_state, fs_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(mc1000_state, videoram_r))
+	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, mc1000_state, hs_w))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, mc1000_state, fs_w))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc1000_state, videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 3579545/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 3579545/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(2.2), 0, 0)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mc1000_state, keydata_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mc1000_state, keylatch_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mc1000_state, keydata_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mc1000_state, keylatch_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(mc1000_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mc1000_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -601,5 +601,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY   FULLNAME        FLAGS */
-COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state, 0,    "CCE",    "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1985, mc1000, 0,      0,      mc1000,  mc1000, mc1000_state, empty_init, "CCE",   "MC-1000", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

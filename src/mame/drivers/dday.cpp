@@ -229,7 +229,7 @@ static const gfx_layout layout_3bpp =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( dday )
+static GFXDECODE_START( gfx_dday )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_3bpp, 0,       256/8 )   /* background */
 	GFXDECODE_ENTRY( "gfx2", 0, layout_2bpp, 8*4,     8 )       /* foreground */
 	GFXDECODE_ENTRY( "gfx3", 0, layout_2bpp, 8*4+8*4, 8 )       /* text */
@@ -257,8 +257,8 @@ void dday_state::machine_reset()
 MACHINE_CONFIG_START(dday_state::dday)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(dday_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(dday_map)
 
 
 	/* video hardware */
@@ -270,19 +270,19 @@ MACHINE_CONFIG_START(dday_state::dday)
 	MCFG_SCREEN_UPDATE_DRIVER(dday_state, screen_update_dday)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dday)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256) /* HACK!!! */
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_INIT_OWNER(dday_state, dday)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -359,5 +359,5 @@ ROM_START( ddayc )
 ROM_END
 
 
-GAME( 1982, dday,  0,    dday, dday,  dday_state, 0, ROT0, "Olympia",                   "D-Day",           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, ddayc, dday, dday, ddayc, dday_state, 0, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dday,  0,    dday, dday,  dday_state, empty_init, ROT0, "Olympia",                   "D-Day",           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, ddayc, dday, dday, ddayc, dday_state, empty_init, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

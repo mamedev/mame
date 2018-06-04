@@ -138,6 +138,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 50; }
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -314,9 +315,8 @@ protected:
 	uint8_t   m_test_state;
 
 	address_space *m_program, *m_opcodes;
-	direct_read_data<0> *m_direct, *m_direct_opcodes;
+	std::function<u8 (offs_t)> m_or8;
 	address_space *m_io;
-	offs_t m_fetch_xor;
 	int m_icount;
 
 	uint32_t m_prefix_seg;   /* the latest prefix segment */

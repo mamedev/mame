@@ -33,6 +33,15 @@ Bugs
 #include "aim65.lh"
 
 
+/** R6502 Clock.
+ *
+ * The R6502 on AIM65 operates at 1 MHz. The frequency reference is a 4 MHz
+ * crystal controlled oscillator. Dual D-type flip-flop Z10 divides the 4 MHz
+ * signal by four to drive the R6502 phase 0 (O0) input with a 1 MHz clock.
+ */
+static constexpr XTAL AIM65_CLOCK(4_MHz_XTAL / 4);
+
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -179,38 +188,37 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 
 MACHINE_CONFIG_START(aim65_state::aim65)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
-	MCFG_CPU_PROGRAM_MAP(aim65_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(aim65_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<1>))
-	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<2>))
-	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<3>))
-	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<4>))
-	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<5>))
+	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<1>))
+	MCFG_DEVICE_ADD("ds2", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<2>))
+	MCFG_DEVICE_ADD("ds3", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<3>))
+	MCFG_DEVICE_ADD("ds4", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<4>))
+	MCFG_DEVICE_ADD("ds5", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(aim65_state, aim65_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(aim65_state, aim65_riot_b_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, aim65_state, aim65_riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_READPB_HANDLER(READ8(aim65_state, aim65_pb_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, aim65_state, aim65_pb_r))
 	// in CA1 printer ready?
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pb_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pb_w))
 	// out CB1 printer start
 	// out CA2 cass control (H=in)
 	// out CB2 turn printer on
@@ -220,8 +228,8 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pia_b_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aim65_state, aim65_pia_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pia_b_w))
 
 	// Deck 1 can play and record
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -277,11 +285,11 @@ MACHINE_CONFIG_END
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "aim65",  "Rockwell AIM-65")
-	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
-	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(1))
+	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(0))
+	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "dynatem",  "Dynatem AIM-65")
-	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(2))
-	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(2))
+	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
+	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(1))
 ROM_END
 
 /* Currently dumped and available software:
@@ -307,5 +315,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT    COMPANY    FULLNAME  FLAGS
-COMP(1977, aim65,       0,      0,      aim65,   aim65, aim65_state,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+//   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP(1977, aim65, 0,      0,      aim65,   aim65, aim65_state, empty_init, "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

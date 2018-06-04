@@ -443,7 +443,7 @@ static const gfx_layout charlayout =
 	128*8
 };
 
-static GFXDECODE_START( shangha3 )
+static GFXDECODE_START( gfx_shangha3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )
 GFXDECODE_END
 
@@ -451,9 +451,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(shangha3_state::shangha3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
-	MCFG_CPU_PROGRAM_MAP(shangha3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
+	MCFG_DEVICE_PROGRAM_MAP(shangha3_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -466,21 +466,21 @@ MACHINE_CONFIG_START(shangha3_state::shangha3)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 48_MHz_XTAL/32) // 1.5MHz
+	MCFG_DEVICE_ADD("aysnd", YM2149, 48_MHz_XTAL/32) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -488,13 +488,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shangha3_state::heberpop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16 like the others??
-	MCFG_CPU_PROGRAM_MAP(heberpop_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16 like the others??
+	MCFG_DEVICE_PROGRAM_MAP(heberpop_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 48_MHz_XTAL/8)  /* 6 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 48_MHz_XTAL/8)  /* 6 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(heberpop_sound_map)
+	MCFG_DEVICE_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -507,24 +507,24 @@ MACHINE_CONFIG_START(shangha3_state::heberpop)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
+	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -532,13 +532,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shangha3_state::blocken)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
-	MCFG_CPU_PROGRAM_MAP(blocken_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
+	MCFG_DEVICE_PROGRAM_MAP(blocken_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 48_MHz_XTAL/8)   /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 48_MHz_XTAL/8)   /* 6 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(heberpop_sound_map)
+	MCFG_DEVICE_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -551,24 +551,24 @@ MACHINE_CONFIG_START(shangha3_state::blocken)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
+	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -732,14 +732,14 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(shangha3_state,shangha3)
+void shangha3_state::init_shangha3()
 {
 	m_do_shadows = 1;
 
 	save_item(NAME(m_prot_count));
 }
 
-DRIVER_INIT_MEMBER(shangha3_state,heberpop)
+void shangha3_state::init_heberpop()
 {
 	m_do_shadows = 0;
 
@@ -747,9 +747,9 @@ DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 	m_audiocpu->set_input_line_vector(0, 0xff);  /* RST 38h */
 }
 
-GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3u,  shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3up, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3j,  shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, heberpop,   0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blocken,    0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3u,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3up, shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3j,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, heberpop,   0,        heberpop, heberpop, shangha3_state, init_heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blocken,    0,        blocken,  blocken,  shangha3_state, init_heberpop, ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

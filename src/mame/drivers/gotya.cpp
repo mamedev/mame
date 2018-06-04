@@ -33,6 +33,29 @@ TODO: Emulated sound
 
  so despite the fact that 'gotya' might look like its a bootleg of thehand,
  its more likely just a prototype / alternate version, its hard to tell
+
+ ----
+According to Andrew Welburn:
+
+'The Hand' is the original game, GAT licensed it for US manufacture.
+It wasn't a runaway seller, they didn't make many, but they had to
+change certain aspect of the game to 'localise' it and re-badge it as
+their own. There are at least 3-4 scans of manuals online, if it was
+proto, a full manual would be rare, and then having several independent
+people find and scan the manual would be super rare.
+
+The hand labelling of ROMs is entirely normal for small-run games. The
+wire patching is on the underside and is minor tracking changes, common
+on small-runs of PCBs.
+
+The games themselves show the most obvious changes. The classic layout
+at the top of the screen for 'The hand' with the 'hi-score' is replaced
+with 'Got-Ya' in text, a fairly minor hack. The Copyright symbol is
+still there in Got-Ya but with the company name scrubbed out.
+
+All in all, Got-Ya should NOT be marked as a prototype in MAME, its a
+US territory license hack of another game 'The Hand'. Nothing about it
+says prototype, and the original base game is 'The Hand'.
 ****************************************************************************/
 
 #include "emu.h"
@@ -132,7 +155,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( gotya )
+static GFXDECODE_START( gfx_gotya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -189,9 +212,9 @@ void gotya_state::machine_reset()
 MACHINE_CONFIG_START(gotya_state::gotya)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(gotya_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(gotya_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -204,15 +227,15 @@ MACHINE_CONFIG_START(gotya_state::gotya)
 	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotya)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotya)
 	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -280,5 +303,5 @@ ROM_START( gotya )
 	ROM_LOAD( "gb-07.bin",  0x7000, 0x1000, CRC(92a9f8bf) SHA1(9231cd86f24f1e6a585c3a919add50c1f8e42a4c) )
 ROM_END
 
-GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, 0, ROT270, "T.I.C.",      "The Hand",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981, prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, empty_init, ROT270, "T.I.C.",      "The Hand",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, empty_init, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

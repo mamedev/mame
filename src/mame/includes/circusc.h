@@ -61,14 +61,14 @@ public:
 	DECLARE_WRITE8_MEMBER(circusc_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
-	DECLARE_DRIVER_INIT(circusc);
+	void init_circusc();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(circusc);
 	uint32_t screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

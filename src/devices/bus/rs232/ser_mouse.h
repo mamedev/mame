@@ -10,6 +10,7 @@
 #define MAME_BUS_RS232_SER_MOUSE_H
 
 #include "rs232.h"
+#include "diserial.h"
 
 class serial_mouse_device :
 		public device_t,

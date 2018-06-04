@@ -523,7 +523,7 @@ uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 
 
 INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 {
-//  m_maincpu->set_input_line(UPD7810_INTFE1, PULSE_LINE);
+//  m_maincpu->pulse_input_line(UPD7810_INTFE1, attotime::zero);
 }
 
 void pasogo_state::machine_reset()
@@ -542,11 +542,11 @@ void pasogo_state::machine_reset()
 
 MACHINE_CONFIG_START(pasogo_state::pasogo)
 
-	MCFG_CPU_ADD("maincpu", V30, XTAL(32'220'000)/2)
-	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
-	MCFG_CPU_IO_MAP(pasogo_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(32'220'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(pasogo_mem)
+	MCFG_DEVICE_IO_MAP(pasogo_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("ems", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(emsbank_map)
@@ -582,5 +582,5 @@ ROM_START( pasogo )
 	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )
 ROM_END
 
-//    YEAR   NAME    PARENT  COMPAT    MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, pasogo_state, 0,    "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+CONS( 1996, pasogo, 0,      0,      pasogo,  pasogo, pasogo_state, empty_init, "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)

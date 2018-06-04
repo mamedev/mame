@@ -143,7 +143,7 @@ static const gfx_layout char16layout =
 	16*8
 };
 
-static GFXDECODE_START( sbugger )
+static GFXDECODE_START( gfx_sbugger )
 	GFXDECODE_ENTRY( "gfx1", 0, char16layout,   0, 256  )
 GFXDECODE_END
 
@@ -216,9 +216,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(sbugger_state::sbugger)
 
-	MCFG_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
-	MCFG_CPU_PROGRAM_MAP(sbugger_map)
-	MCFG_CPU_IO_MAP(sbugger_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
+	MCFG_DEVICE_PROGRAM_MAP(sbugger_map)
+	MCFG_DEVICE_IO_MAP(sbugger_io_map)
 
 	MCFG_DEVICE_ADD("i8156", I8156, 200000)     /* freq is an approximation */
 	MCFG_I8155_IN_PORTA_CB(IOPORT("INPUTS"))
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	MCFG_I8155_IN_PORTC_CB(IOPORT("DSW2"))
 	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_RST75_LINE))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbugger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbugger)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -240,12 +240,12 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	MCFG_PALETTE_INIT_OWNER(sbugger_state, sbugger)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn76489.1", SN76489, 3000000)
+	MCFG_DEVICE_ADD("sn76489.1", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn76489.2", SN76489, 3000000)
+	MCFG_DEVICE_ADD("sn76489.2", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -281,5 +281,5 @@ ROM_START( sbuggera )
 	ROM_LOAD( "spbugger.gfx", 0x0000, 0x1000, CRC(d3f345b5) SHA1(a5082ffc3043352e9b731af95770bdd62fb928bf) )
 ROM_END
 
-GAME( 1981, sbugger,  0,        sbugger,  sbugger, sbugger_state,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, sbugger_state,  0, ROT270, "Game-A-Tron", "Space Bugger (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sbugger,  0,        sbugger,  sbugger, sbugger_state, empty_init, ROT270, "Game-A-Tron", "Space Bugger (set 1)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, sbugger_state, empty_init, ROT270, "Game-A-Tron", "Space Bugger (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

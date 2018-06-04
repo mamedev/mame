@@ -418,22 +418,22 @@ void changela_state::machine_reset()
 
 MACHINE_CONFIG_START(changela_state::changela)
 
-	MCFG_CPU_ADD("maincpu", Z80,5000000)
-	MCFG_CPU_PROGRAM_MAP(changela_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,5000000)
+	MCFG_DEVICE_PROGRAM_MAP(changela_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", changela_state, changela_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("mcu", M68705P3, 2500000)
+	MCFG_DEVICE_ADD("mcu", M68705P3, 2500000)
 	MCFG_M68705_PORTB_R_CB(IOPORT("MCU"))
-	MCFG_M68705_PORTA_W_CB(WRITE8(changela_state, changela_68705_port_a_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(changela_state, changela_68705_port_c_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, changela_state, changela_68705_port_a_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, changela_state, changela_68705_port_c_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U44 on Sound I/O Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(changela_state, collision_reset_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(changela_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(changela_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(changela_state, mcu_pc_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(changela_state, collision_reset_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, changela_state, collision_reset_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, changela_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, changela_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, changela_state, mcu_pc_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, changela_state, collision_reset_1_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -447,14 +447,14 @@ MACHINE_CONFIG_START(changela_state::changela)
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1250000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1250000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWC"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWD"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -496,4 +496,4 @@ ROM_START( changela )
 	ROM_LOAD( "cl88",   0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
 ROM_END
 
-GAMEL( 1983, changela, 0, changela, changela, changela_state, 0,   ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )
+GAMEL( 1983, changela, 0, changela, changela, changela_state, empty_init, ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )

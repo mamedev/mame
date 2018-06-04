@@ -54,8 +54,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tvcapcom_state::tvcapcom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC603, 72900000) // IBM PowerPC Broadway CPU @ 729 MHz  ?
-	MCFG_CPU_PROGRAM_MAP(gc_map)
+	MCFG_DEVICE_ADD("maincpu", PPC603, 72900000) // IBM PowerPC Broadway CPU @ 729 MHz  ?
+	MCFG_DEVICE_PROGRAM_MAP(gc_map)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -85,4 +85,4 @@ ROM_START( tvcapcom )
 
 ROM_END
 
-GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, tvcapcom_state, 0, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_IS_SKELETON )
+GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, tvcapcom_state, empty_init, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_IS_SKELETON )

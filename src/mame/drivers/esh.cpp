@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	DECLARE_DRIVER_INIT(esh);
+	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
@@ -331,7 +331,7 @@ static const gfx_layout esh_gfx_layout =
 	8*8
 };
 
-static GFXDECODE_START( esh )
+static GFXDECODE_START( gfx_esh )
 	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
 	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
@@ -357,15 +357,15 @@ void esh_state::machine_start()
 /* DRIVER */
 MACHINE_CONFIG_START(esh_state::esh)
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
-	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
-	MCFG_CPU_IO_MAP(z80_0_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
+	MCFG_DEVICE_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
+	MCFG_DEVICE_PROGRAM_MAP(z80_0_mem)
+	MCFG_DEVICE_IO_MAP(z80_0_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(esh_state, ld_command_strobe_cb))
+	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(*this, esh_state, ld_command_strobe_cb))
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, esh_state, screen_update_esh)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
@@ -375,16 +375,17 @@ MACHINE_CONFIG_START(esh_state::esh)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(esh_state, esh)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esh)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -466,11 +467,11 @@ ROM_START( eshb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(esh_state,esh)
+void esh_state::init_esh()
 {
 }
 
-//    YEAR  NAME   PARENT   MACHINE  INPUT  STATE      INIT     MONITOR  COMPANY          FULLNAME                     FLAGS
-GAME( 1983, esh,   0,       esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
-GAME( 1983, esha,  esh,     esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
-GAME( 1983, eshb,  esh,     esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+//    YEAR  NAME   PARENT   MACHINE  INPUT  STATE      INIT      MONITOR  COMPANY          FULLNAME                     FLAGS
+GAME( 1983, esh,   0,       esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, esha,  esh,     esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, eshb,  esh,     esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)

@@ -606,7 +606,7 @@ MACHINE_START_MEMBER(route16_state, ttmahjng)
 	save_item(NAME(m_ttmahjng_port_select));
 }
 
-DRIVER_INIT_MEMBER(route16_state, route16)
+void route16_state::init_route16()
 {
 	save_item(NAME(m_protection_data));
 }
@@ -614,13 +614,13 @@ DRIVER_INIT_MEMBER(route16_state, route16)
 MACHINE_CONFIG_START(route16_state::route16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(route16_cpu1_map)
-	MCFG_CPU_IO_MAP(cpu1_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", route16_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(route16_cpu1_map)
+	MCFG_DEVICE_IO_MAP(cpu1_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", route16_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("cpu2", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(route16_cpu2_map)
+	MCFG_DEVICE_ADD("cpu2", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(route16_cpu2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -633,8 +633,8 @@ MACHINE_CONFIG_START(route16_state::route16)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("ay8910", AY8910, 10000000/8)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
@@ -643,8 +643,8 @@ MACHINE_CONFIG_START(route16_state::routex)
 	route16(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(routex_cpu1_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(routex_cpu1_map)
 MACHINE_CONFIG_END
 
 
@@ -652,11 +652,11 @@ MACHINE_CONFIG_START(route16_state::stratvox)
 	route16(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(stratvox_cpu1_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu1_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(stratvox_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu2_map)
 
 
 	/* video hardware */
@@ -664,10 +664,10 @@ MACHINE_CONFIG_START(route16_state::stratvox)
 	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_ttmahjng)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("ay8910")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
+	MCFG_DEVICE_MODIFY("ay8910")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(150), CAP_U(0.001)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(3.3))                  // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1), RES_K(4.7))    // attack_decay_cap + attack_res
@@ -683,9 +683,9 @@ MACHINE_CONFIG_START(route16_state::stratvox)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -693,8 +693,8 @@ MACHINE_CONFIG_START(route16_state::speakres)
 	stratvox(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(speakres_cpu1_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(speakres_cpu1_map)
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, speakres)
 MACHINE_CONFIG_END
@@ -704,15 +704,15 @@ MACHINE_CONFIG_START(route16_state::spacecho)
 	speakres(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PERIODIC_INT_DRIVER(route16_state, irq0_line_hold, 48*60)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(route16_state, irq0_line_hold, 48*60)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(route16_state::ttmahjng)
 	route16(config);
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, ttmahjng)
@@ -1092,19 +1092,19 @@ READ8_MEMBER(route16_state::route16_prot_read)
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
-GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, 0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16,  route16_state, 0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16a, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, speakres, 0,        speakres, speakres, route16_state, 0,        ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, 0,        ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, speakres, 0,        speakres, speakres, route16_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, empty_init,    ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

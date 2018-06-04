@@ -857,7 +857,7 @@ static const gfx_layout charlayout =
 };
 
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx slot */
-static GFXDECODE_START( wgp )
+static GFXDECODE_START( gfx_wgp )
 	GFXDECODE_ENTRY( "gfx3", 0x0, wgp_tilelayout,  0, 256 )     /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0x0, wgp_tile2layout,  0, 256 )    /* piv */
@@ -908,16 +908,16 @@ void wgp_state::machine_start()
 MACHINE_CONFIG_START(wgp_state::wgp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wgp_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state, cpub_interrupt)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wgp_state, cpub_interrupt)
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
@@ -927,7 +927,7 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(wgp_state, coins_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, wgp_state, coins_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -939,7 +939,7 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wgp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wgp)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -950,9 +950,10 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	MCFG_TC0100SCN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // assumes Z80 sandwiched between 68Ks
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1179,7 +1180,7 @@ ROM_START( wgp2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(wgp_state,wgp)
+void wgp_state::init_wgp()
 {
 #if 0
 	/* Patch for coding error that causes corrupt data in
@@ -1189,7 +1190,7 @@ DRIVER_INIT_MEMBER(wgp_state,wgp)
 #endif
 }
 
-DRIVER_INIT_MEMBER(wgp_state,wgp2)
+void wgp_state::init_wgp2()
 {
 	/* Code patches to prevent failure in memory checks */
 	uint16_t *ROM = (uint16_t *)memregion("sub")->base();
@@ -1199,8 +1200,8 @@ DRIVER_INIT_MEMBER(wgp_state,wgp2)
 
 /* Working Games with some graphics problems - e.g. missing rotation */
 
-GAME( 1989, wgp,      0,      wgp,    wgp,    wgp_state, wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp_state, wgp2,   ROT0, "Taito Corporation",         "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgp,      0,      wgp,    wgp,    wgp_state, init_wgp,  ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp_state, init_wgp2, ROT0, "Taito Corporation",         "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

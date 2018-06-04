@@ -191,11 +191,11 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(qsound_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", DSP16A, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_IO_MAP(dsp_io_map)
-	MCFG_DSP16_OCK_CB(WRITELINE(qsound_device, dsp_ock_w))
-	MCFG_DSP16_PIO_R_CB(READ16(qsound_device, dsp_pio_r))
-	MCFG_DSP16_PIO_W_CB(WRITE16(qsound_device, dsp_pio_w))
+	MCFG_DEVICE_ADD("dsp", DSP16A, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_IO_MAP(dsp_io_map)
+	MCFG_DSP16_OCK_CB(WRITELINE(*this, qsound_device, dsp_ock_w))
+	MCFG_DSP16_PIO_R_CB(READ16(*this, qsound_device, dsp_pio_r))
+	MCFG_DSP16_PIO_W_CB(WRITE16(*this, qsound_device, dsp_pio_w))
 MACHINE_CONFIG_END
 
 

@@ -14,30 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/namco.h"
-#include "sound/discrete.h"
 #include "screen.h"
-
-struct filter2_context
-{
-	filter2_context() :
-		x0(0.0),
-		x1(0.0),
-		x2(0.0),
-		y0(0.0),
-		y1(0.0),
-		y2(0.0),
-		a1(0.0),
-		a2(0.0),
-		b0(0.0),
-		b1(0.0),
-		b2(0.0)
-	{}
-
-	double x0, x1, x2;  /* x[k], x[k-1], x[k-2], current and previous 2 input values */
-	double y0, y1, y2;  /* y[k], y[k-1], y[k-2], current and previous 2 output values */
-	double a1, a2;      /* digital filter coefficients, denominator */
-	double b0, b1, b2;  /* digital filter coefficients, numerator */
-};
 
 
 class polepos_state : public driver_device
@@ -94,7 +71,6 @@ public:
 	DECLARE_READ8_MEMBER(polepos_adc_r);
 	DECLARE_READ8_MEMBER(polepos_ready_r);
 	DECLARE_WRITE_LINE_MEMBER(iosel_w);
-	DECLARE_WRITE_LINE_MEMBER(clson_w);
 	DECLARE_WRITE_LINE_MEMBER(gasel_w);
 	DECLARE_WRITE_LINE_MEMBER(sb0_w);
 	DECLARE_WRITE_LINE_MEMBER(chacl_w);
@@ -113,7 +89,6 @@ public:
 	DECLARE_READ8_MEMBER(polepos_view_r);
 	DECLARE_WRITE8_MEMBER(polepos_view_w);
 	DECLARE_WRITE16_MEMBER(polepos_view16_hscroll_w);
-	DECLARE_WRITE8_MEMBER(polepos_chacl_w);
 	DECLARE_READ16_MEMBER(polepos_alpha16_r);
 	DECLARE_WRITE16_MEMBER(polepos_alpha16_w);
 	DECLARE_READ8_MEMBER(polepos_alpha_r);
@@ -127,7 +102,7 @@ public:
 	DECLARE_READ8_MEMBER(steering_changed_r);
 	DECLARE_READ8_MEMBER(steering_delta_r);
 	DECLARE_WRITE8_MEMBER(bootleg_soundlatch_w);
-	DECLARE_DRIVER_INIT(polepos2);
+	void init_polepos2();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	DECLARE_MACHINE_RESET(polepos);
@@ -150,40 +125,5 @@ public:
 	void z80_io(address_map &map);
 	void z80_map(address_map &map);
 };
-
-
-/*----------- defined in audio/polepos.c -----------*/
-
-class polepos_sound_device : public device_t,
-								public device_sound_interface
-{
-public:
-	polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~polepos_sound_device() { }
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
-public:
-	DECLARE_WRITE8_MEMBER( polepos_engine_sound_lsb_w );
-	DECLARE_WRITE8_MEMBER( polepos_engine_sound_msb_w );
-
-private:
-	uint32_t m_current_position;
-	int m_sample_msb;
-	int m_sample_lsb;
-	int m_sample_enable;
-	sound_stream *m_stream;
-	filter2_context m_filter_engine[3];
-};
-
-DECLARE_DEVICE_TYPE(POLEPOS, polepos_sound_device)
-
-DISCRETE_SOUND_EXTERN( polepos );
 
 #endif // MAME_INCLUDES_POLEPOS_H

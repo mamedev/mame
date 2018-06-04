@@ -193,11 +193,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tek440x_state::tek4404)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(40'000'000) / 4) // MC68010L10
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, XTAL(40'000'000) / 4) // MC68010L10
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("fdccpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(fdccpu_map)
+	MCFG_DEVICE_ADD("fdccpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(fdccpu_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -212,19 +212,19 @@ MACHINE_CONFIG_START(tek440x_state::tek4404)
 
 	MCFG_DEVICE_ADD("aica", MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("timer", AM9513, XTAL(40'000'000) / 4 / 10) // from CPU E output
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aica", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("aica", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("aica", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("aica", mos6551_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("aica", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("aica", mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("aica", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("aica", mos6551_device, write_cts))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76496, VIDEO_CLOCK / 8)
+	MCFG_DEVICE_ADD("snsnd", SN76496, VIDEO_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -253,5 +253,5 @@ ROM_END
  *  Game driver(s)
  *
  *************************************/
-//    YEAR  NAME      PARENT  COMPAT   MACHINE  INPUT    DEVICE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, tek4404,  0,      0,       tek4404, tek4404, tek440x_state, 0,    "Tektronix", "4404 Artificial Intelligence System",   MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                               FLAGS
+COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_NOT_WORKING )

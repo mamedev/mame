@@ -73,11 +73,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_hopper(*this, "hopper")
 		, m_in(*this, "IN%u", 1)
+		, m_lamp(*this, "lamp")
 	{ }
 
 	void big10(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
@@ -90,6 +92,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
+	output_finder<> m_lamp;
 };
 
 
@@ -106,7 +109,7 @@ WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
 	m_hopper->motor_w(BIT(data, 6));
-	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
+	m_lamp = BIT(~data, 7); // maybe a coin counter?
 }
 
 READ8_MEMBER(big10_state::mux_r)
@@ -230,9 +233,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(big10_state::big10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -242,11 +245,11 @@ MACHINE_CONFIG_START(big10_state::big10)
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(big10_state, mux_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, big10_state, mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
@@ -269,5 +272,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT    ROT      COMPANY     FULLNAME   FLAGS  */
-GAME( 1985, big10,    0,        big10,    big10,    big10_state,   0,      ROT0,   "Success",  "Big 10",   0 )
+/*    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT      COMPANY     FULLNAME   FLAGS  */
+GAME( 1985, big10, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",  "Big 10",   0 )

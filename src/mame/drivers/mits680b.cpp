@@ -65,20 +65,20 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mits680b_state::mits680b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(1'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(1'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -89,5 +89,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     STATE           INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1976, mits680b, 0,      0,      mits680b,  mits680b, mits680b_state, 0,    "MITS",  "Altair 680b", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1976, mits680b, 0,      0,      mits680b, mits680b, mits680b_state, empty_init, "MITS",  "Altair 680b", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -226,7 +226,7 @@ void busicom_state::machine_reset()
 
 MACHINE_CONFIG_START(busicom_state::busicom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I4004, 750000)
+	MCFG_DEVICE_ADD("maincpu", I4004, 750000)
 	MCFG_I4004_ROM_MAP(busicom_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(busicom_mem)
 	MCFG_I4004_ROM_PORTS_MAP(busicom_rp)
@@ -260,5 +260,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT COMPANY                          FULLNAME          FLAGS
-COMP( 1974, busicom,  0,       0,   busicom,    busicom, busicom_state, 0,   "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS
+COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

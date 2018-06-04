@@ -4,6 +4,7 @@
 #include "machine/tmp68301.h"
 #include "screen.h"
 #include "audio/nichisnd.h"
+#include "machine/nb1413m3.h"
 
 #define VRAM_MAX    3
 
@@ -82,7 +83,7 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 
-	DECLARE_DRIVER_INIT(niyanpai);
+	void init_niyanpai();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(musobana);
 
@@ -95,7 +96,7 @@ public:
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void musobana(machine_config &config);
 	void zokumahj(machine_config &config);

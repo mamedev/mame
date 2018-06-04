@@ -66,6 +66,10 @@ protected:
 	virtual uint16_t read_port_word(uint16_t port) override;
 	virtual void write_port_byte(uint16_t port, uint8_t data) override;
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
+	virtual uint8_t read_byte(uint32_t addr) override;
+	virtual uint16_t read_word(uint32_t addr) override;
+	virtual void write_byte(uint32_t addr, uint8_t data) override;
+	virtual void write_word(uint32_t addr, uint16_t data) override;
 
 	static const uint8_t m_i80186_timing[200];
 

@@ -87,6 +87,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram"),
 		m_in(*this, {"IN1", "IN0"}),
+		m_lamps(*this, "lamp%u", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
@@ -95,18 +96,26 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void init_feversoc();
+	void feversoc(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(in_r);
+	DECLARE_WRITE16_MEMBER(output_w);
+	DECLARE_WRITE16_MEMBER(output2_w);
+	void feversoc_map(address_map &map);
+	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(feversoc_irq);
+	DECLARE_WRITE16_MEMBER(feversoc_irq_ack);
+	virtual void machine_start() override;
+
 	required_shared_ptr<uint32_t> m_mainram1;
 	required_shared_ptr<uint32_t> m_mainram2;
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_ioport_array<2> m_in;
-	DECLARE_READ16_MEMBER(in_r);
-	DECLARE_WRITE16_MEMBER(output_w);
-	DECLARE_WRITE16_MEMBER(output2_w);
-	DECLARE_DRIVER_INIT(feversoc);
-	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(feversoc_irq);
-	DECLARE_WRITE16_MEMBER(feversoc_irq_ack);
+	output_finder<7> m_lamps;
+
 	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -114,8 +123,6 @@ public:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void feversoc(machine_config &config);
-	void feversoc_map(address_map &map);
 };
 
 
@@ -180,13 +187,8 @@ WRITE16_MEMBER( feversoc_state::output_w )
 
 WRITE16_MEMBER( feversoc_state::output2_w )
 {
-	machine().output().set_lamp_value(1, BIT(data, 0)); // LAMP1
-	machine().output().set_lamp_value(2, BIT(data, 1)); // LAMP2
-	machine().output().set_lamp_value(3, BIT(data, 2)); // LAMP3
-	machine().output().set_lamp_value(4, BIT(data, 3)); // LAMP4
-	machine().output().set_lamp_value(5, BIT(data, 4)); // LAMP5
-	machine().output().set_lamp_value(6, BIT(data, 5)); // LAMP6
-	machine().output().set_lamp_value(7, BIT(data, 6)); // LAMP7
+	for (int n = 0; n < 7; n++)
+		m_lamps[n] = BIT(data, n); // LAMP1-LAMP7
 
 	machine().bookkeeping().coin_counter_w(2, data & 0x2000); // key in
 	//data & 0x4000 key out
@@ -226,7 +228,7 @@ static const gfx_layout spi_spritelayout =
 };
 
 
-static GFXDECODE_START( feversoc )
+static GFXDECODE_START( gfx_feversoc )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_spritelayout,   0, 0x40 )
 GFXDECODE_END
 
@@ -238,9 +240,9 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In (Service)")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("rtc", rtc4543_device, data_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rtc", rtc4543_device, data_r)
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION( "DIP1:1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -266,9 +268,10 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(feversoc_state::feversoc_irq)
+WRITE_LINE_MEMBER(feversoc_state::feversoc_irq)
 {
-	m_maincpu->set_input_line(8, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(8, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
@@ -276,12 +279,16 @@ WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
 	m_maincpu->set_input_line(8, CLEAR_LINE);
 }
 
+void feversoc_state::machine_start()
+{
+	m_lamps.resolve();
+}
+
 MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(feversoc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", feversoc_state, feversoc_irq)
+	MCFG_DEVICE_ADD("maincpu",SH2,MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(feversoc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -291,15 +298,16 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
 	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, feversoc_state, feversoc_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", feversoc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_feversoc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
@@ -333,7 +341,7 @@ ROM_START( feversoc )
 	ROM_LOAD( "pcm.u0743", 0x00000, 0x80000, CRC(20b0c0e3) SHA1(dcf2f620a8fe695688057dbaf5c431a32a832440) )
 ROM_END
 
-DRIVER_INIT_MEMBER(feversoc_state,feversoc)
+void feversoc_state::init_feversoc()
 {
 	uint32_t *rom = (uint32_t *)memregion("maincpu")->base();
 
@@ -347,4 +355,4 @@ DRIVER_INIT_MEMBER(feversoc_state,feversoc)
 	m_maincpu->sh2drc_add_fastram(0x0203e000, 0x0203ffff, 0, &m_spriteram[0]);
 }
 
-GAME( 2004, feversoc,  0,       feversoc,  feversoc, feversoc_state,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )
+GAME( 2004, feversoc, 0, feversoc, feversoc, feversoc_state, init_feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

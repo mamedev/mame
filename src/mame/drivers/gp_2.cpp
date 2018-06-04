@@ -12,7 +12,7 @@ the first high score at which a free credit is awarded. Then press 9 to set the
 back to normal operation. If this setup is not done, each player will get 3 free
 games at the start of ball 1.
 
-All the Z80 "maincpu" code is copied from gp_1.c
+All the Z80 "maincpu" code is copied from gp_1.cpp
 Any bug fixes need to be applied both here and there.
 
 Sound boards: (each game has its own custom sounds)
@@ -36,7 +36,7 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
@@ -58,9 +58,10 @@ public:
 		, m_io_x9(*this, "X9")
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(gp_2);
+	void init_gp_2();
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
@@ -73,6 +74,7 @@ private:
 	uint8_t m_digit;
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_io_dsw0;
@@ -84,6 +86,7 @@ private:
 	required_ioport m_io_x9;
 	required_ioport m_io_xa;
 	required_ioport m_io_xb;
+	output_finder<40> m_digits;
 };
 
 
@@ -543,11 +546,11 @@ WRITE8_MEMBER( gp_2_state::porta_w )
 	else
 	if (m_u14 == 7)
 	{
-		output().set_digit_value(m_digit, patterns[m_segment[7]]);
-		output().set_digit_value(m_digit+8, patterns[m_segment[8]]);
-		output().set_digit_value(m_digit+16, patterns[m_segment[9]]);
-		output().set_digit_value(m_digit+24, patterns[m_segment[10]]);
-		output().set_digit_value(m_digit+32, patterns[m_segment[11]]);
+		m_digits[m_digit] = patterns[m_segment[7]];
+		m_digits[m_digit+8] = patterns[m_segment[8]];
+		m_digits[m_digit+16] = patterns[m_segment[9]];
+		m_digits[m_digit+24] = patterns[m_segment[10]];
+		m_digits[m_digit+32] = patterns[m_segment[11]];
 	}
 }
 
@@ -578,9 +581,9 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(gp_2_state::gp_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2457600)
-	MCFG_CPU_PROGRAM_MAP(gp_2_map)
-	MCFG_CPU_IO_MAP(gp_2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2457600)
+	MCFG_DEVICE_PROGRAM_MAP(gp_2_map)
+	MCFG_DEVICE_IO_MAP(gp_2_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -593,9 +596,9 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_2_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(gp_2_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_2_state, portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_2_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_2_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_2_state, portc_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset
@@ -814,24 +817,24 @@ ROM_START(suprnova)
 ROM_END
 
 // GP1 dips
-GAME(1979,  sshootep,   0,          gp_2,   gp_1, gp_2_state, 0,   ROT0,   "Game Plan", "Sharpshooter",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1979,  coneyis,    0,          gp_2,   gp_1, gp_2_state, 0,   ROT0,   "Game Plan", "Old Coney Island!", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1980,  lizard,     0,          gp_2,   gp_1, gp_2_state, 0,   ROT0,   "Game Plan", "Pinball Lizard",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1982,  suprnova,   0,          gp_2,   gp_1, gp_2_state, 0,   ROT0,   "Game Plan", "Super Nova",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1983,  sshootr2,   0,          gp_2,   gp_1, gp_2_state, 0,   ROT0,   "Game Plan", "Sharp Shooter II",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, sshootep,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Sharpshooter",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, coneyis,   0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Old Coney Island!", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, lizard,    0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Pinball Lizard",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, suprnova,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Super Nova",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, sshootr2,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Sharp Shooter II",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // GP2 dips
-GAME(1981,  gwarfare,   0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Global Warfare", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1982,  mbossy,     0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Mike Bossy",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  attila,     0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Attila The Hun", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, gwarfare,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Global Warfare", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, mbossy,    0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Mike Bossy",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, attila,    0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Attila The Hun", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // revolving match
-GAME(1984,  agent777,   0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Agents 777",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1985,  cpthook,    0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Captain Hook",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1985,  ladyshot,   0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Lady Sharpshooter (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1985,  ladyshota,  ladyshot,   gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Lady Sharpshooter (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, agent777,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Agents 777",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, cpthook,   0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Captain Hook",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ladyshot,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Lady Sharpshooter (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ladyshota, ladyshot, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Lady Sharpshooter (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // credit (start) button not working
-GAME(1985,  andromep,   0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Andromeda (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  andromepa,  andromep,   gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Andromeda (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  cyclopes,   0,          gp_2,   gp_2, gp_2_state, 0,   ROT0,   "Game Plan", "Cyclopes",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, andromep,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, andromepa, andromep, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, cyclopes,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Cyclopes",          MACHINE_IS_SKELETON_MECHANICAL)

@@ -315,7 +315,7 @@
 
 ***********************************************************************************************************************************************/
 
-#define MAIN_CLOCK  XTAL(12'000'000)
+#define MAIN_CLOCK  12_MHz_XTAL
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -363,7 +363,12 @@ public:
 		m_samples(*this, "samples"),
 		m_mkiv_vram(*this, "mkiv_vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_credit_spend_meter(*this, "creditspendmeter"),
+		m_credit_out_meter(*this, "creditoutmeter"),
+		m_hopper_motor_out(*this, "hopper_motor"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -374,6 +379,11 @@ public:
 	required_shared_ptr<uint8_t> m_mkiv_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	output_finder<> m_credit_spend_meter;
+	output_finder<> m_credit_out_meter;
+	output_finder<> m_hopper_motor_out;
+	output_finder<21> m_lamps;
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
@@ -420,7 +430,7 @@ public:
 	DECLARE_READ8_MEMBER(pa1_r);
 	DECLARE_READ8_MEMBER(pb1_r);
 	DECLARE_READ8_MEMBER(pc1_r);
-	DECLARE_DRIVER_INIT(aristmk4);
+	void init_aristmk4();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -555,8 +565,8 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 	int u3_p2_ret= ioport("5002")->read();
 	int u3_p3_ret= ioport("5003")->read();
 
-	output().set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
-	output().set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
+	m_lamps[19] = BIT(u3_p2_ret, 4);
+	m_lamps[20] = BIT(u3_p3_ret, 2);
 
 	if (m_u3_p0_w&0x20) // DOPTE on
 	{
@@ -710,10 +720,10 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 			switch(i+1)
 			{
 				case 4:
-					output().set_value("creditspendmeter", emet[i]);
+					m_credit_spend_meter = emet[i];
 					break;
 				case 5:
-					output().set_value("creditoutmeter", emet[i]);
+					m_credit_out_meter = emet[i];
 					break;
 				default:
 					printf("Unhandled Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
@@ -728,10 +738,10 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 			switch(i+1)
 			{
 				case 4:
-					output().set_value("creditspendmeter", 0);
+					m_credit_spend_meter = 0;
 					break;
 				case 5:
-					output().set_value("creditoutmeter", 0);
+					m_credit_out_meter = 0;
 					break;
 				default:
 					break;
@@ -763,7 +773,7 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::coin_input_reset)
 TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 {
 	m_hopper_motor = 0x01;
-	output().set_value("hopper_motor", m_hopper_motor);
+	m_hopper_motor_out = 1;
 }
 
 // Port A read (SW1)
@@ -822,8 +832,8 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	case 0x00:
 		ret=ret^0x40;
 		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
-		m_hopper_motor=0x02;
-		output().set_value("hopper_motor", m_hopper_motor);
+		m_hopper_motor = 0x02;
+		m_hopper_motor_out = 2;
 		break;
 	case 0x01:
 		break; //default
@@ -928,47 +938,47 @@ WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
 	// as soon as it is 1, HOPCO1 to remain 'ON'
 
-	if (state==0x01)
-		m_hopper_motor=state;
-	else if (m_hopper_motor<0x02)
-		m_hopper_motor=state;
+	if (state == 0x01)
+		m_hopper_motor = state;
+	else if (m_hopper_motor < 0x02)
+		m_hopper_motor = state;
 
-	output().set_value("hopper_motor", m_hopper_motor); // stop motor
+	m_hopper_motor_out = m_hopper_motor;
 }
 
 // Lamp output
 
 WRITE8_MEMBER(aristmk4_state::pblp_out)
 {
-	output().set_lamp_value(1, (data) & 1);
-	output().set_lamp_value(5, (data >> 1) & 1);
-	output().set_lamp_value(9, (data >> 2) & 1);
-	output().set_lamp_value(11,(data >> 3) & 1);
-	output().set_lamp_value(3, (data >> 4) & 1);
-	output().set_lamp_value(4, (data >> 5) & 1);
-	output().set_lamp_value(2, (data >> 6) & 1);
-	output().set_lamp_value(10,(data >> 7) & 1);
+	m_lamps[ 1] = BIT(data, 0);
+	m_lamps[ 5] = BIT(data, 1);
+	m_lamps[ 9] = BIT(data, 2);
+	m_lamps[11] = BIT(data, 3);
+	m_lamps[ 3] = BIT(data, 4);
+	m_lamps[ 4] = BIT(data, 5);
+	m_lamps[ 2] = BIT(data, 6);
+	m_lamps[10] = BIT(data, 7);
 	//logerror("Lights port A %02X\n",data);
 }
 
 WRITE8_MEMBER(aristmk4_state::pbltlp_out)
 {
-	output().set_lamp_value(8,  (data) & 1);
-	output().set_lamp_value(12, (data >> 1) & 1);
-	output().set_lamp_value(6,  (data >> 2) & 1);
-	output().set_lamp_value(7,  (data >> 3) & 1);
-	output().set_lamp_value(14, (data >> 4) & 1); // light tower
-	output().set_lamp_value(15, (data >> 5) & 1); // light tower
-	output().set_lamp_value(16, (data >> 6) & 1); // light tower
-	output().set_lamp_value(17, (data >> 7) & 1); // light tower
+	m_lamps[ 8] = BIT(data, 0);
+	m_lamps[12] = BIT(data, 1);
+	m_lamps[ 6] = BIT(data, 2);
+	m_lamps[ 7] = BIT(data, 3);
+	m_lamps[14] = BIT(data, 4); // light tower
+	m_lamps[15] = BIT(data, 5); // light tower
+	m_lamps[16] = BIT(data, 6); // light tower
+	m_lamps[17] = BIT(data, 7); // light tower
 	//logerror("Lights port B: %02X\n",data);
 }
 
 WRITE8_MEMBER(aristmk4_state::mlamps)
 {
 	/* TAKE WIN AND GAMBLE LAMPS */
-	output().set_lamp_value(18, (data >> 5) & 1);
-	output().set_lamp_value(13, (data >> 6) & 1);
+	m_lamps[18] = BIT(data, 5);
+	m_lamps[13] = BIT(data, 6);
 }
 
 WRITE8_MEMBER(aristmk4_state::zn434_w)
@@ -1654,7 +1664,7 @@ static const gfx_layout layout8x8x6 =
 	8*8
 };
 
-static GFXDECODE_START(aristmk4)
+static GFXDECODE_START(gfx_aristmk4)
 	GFXDECODE_ENTRY("tile_gfx",0x0,layout8x8x6, 0, 8 )
 GFXDECODE_END
 
@@ -1702,7 +1712,7 @@ PALETTE_INIT_MEMBER(aristmk4_state, aristmk4)
 	}
 }
 
-DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
+void aristmk4_state::init_aristmk4()
 {
 	m_shapeRomPtr = (uint8_t *)memregion("tile_gfx")->base();
 	memcpy(m_shapeRom,m_shapeRomPtr,sizeof(m_shapeRom)); // back up
@@ -1712,6 +1722,10 @@ DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 void aristmk4_state::machine_start()
 {
 	save_pointer(NAME(m_nvram.get()), 0x1000); // m_nvram
+	m_credit_spend_meter.resolve();
+	m_credit_out_meter.resolve();
+	m_hopper_motor_out.resolve();
+	m_lamps.resolve();
 }
 
 void aristmk4_state::machine_reset()
@@ -1754,9 +1768,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 
 MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK/8) // M68B09E @ 1.5 MHz
-	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK/8) // M68B09E @ 1.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(aristmk4_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("power_fail", aristmk4_state, aristmk4_pf, attotime::from_hz(1))
@@ -1770,31 +1784,31 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aristmk4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aristmk4)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state, aristmk4)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(aristmk4_state, pa1_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(aristmk4_state, pb1_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(aristmk4_state, pc1_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, aristmk4_state, pa1_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, aristmk4_state, pb1_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, aristmk4_state, pc1_r))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, MAIN_CLOCK/8) // R65C22P2
-	MCFG_VIA6522_READPA_HANDLER(READ8(aristmk4_state, via_a_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(aristmk4_state, via_b_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(aristmk4_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aristmk4_state, via_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(aristmk4_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(aristmk4_state, via_cb2_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, aristmk4_state, via_a_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, aristmk4_state, via_b_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, aristmk4_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, aristmk4_state, via_b_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, aristmk4_state, via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, aristmk4_state, via_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	// CA1 is connected to +5V, CB1 is not connected.
 
 	MCFG_DEVICE_ADD("pia6821_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(aristmk4_state, mkiv_pia_ina))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outa))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outb))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_ca2))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_cb2))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, aristmk4_state, mkiv_pia_ina))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aristmk4_state, mkiv_pia_outa))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, aristmk4_state, mkiv_pia_outb))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, aristmk4_state, mkiv_pia_ca2))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, aristmk4_state, mkiv_pia_cb2))
 
 	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8) // TODO: type is unknown
 	/* in fact is a mc6845 driving 4 pixels by memory address.
@@ -1802,22 +1816,22 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 
-	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
+	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
-	MCFG_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay1", AY8910 , MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(aristmk4_state, zn434_w)) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, aristmk4_state, zn434_w)) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(aristmk4_state, pblp_out))   // Port A write - goes to lamps on the buttons x8
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(aristmk4_state, pbltlp_out))  // Port B write - goes to lamps on the buttons x4 and light tower x4
+	MCFG_DEVICE_ADD("ay2", AY8910 , MAIN_CLOCK/8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, aristmk4_state, pblp_out))   // Port A write - goes to lamps on the buttons x8
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, aristmk4_state, pbltlp_out))  // Port B write - goes to lamps on the buttons x4 and light tower x4
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)  /* one for each meter - can pulse simultaneously */
 	MCFG_SAMPLES_NAMES(meter_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
@@ -1827,9 +1841,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aristmk4_state::aristmk4_poker)
 	aristmk4(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aristmk4_poker_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 /* same as Aristocrat Mark-IV HW color offset 7 */
@@ -2508,31 +2522,31 @@ ROM_START( 86lions )
 	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-GAMEL( 1985, 86lions,  0,        _86lions, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, layout_topgear )
-GAMEL( 1996, eforest,  0,        aristmk4, eforest,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  ) // 92.778%
-GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, layout_aristmk4 ) // 10c, $1 = 10 credits, 90.483%
-GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)", 0, layout_arimk4nz ) // 5c, $2 = 40 credits, 88.43%
-GAMEL( 1996, 3bagflvt, 0,        aristmk4, 3bagflvt, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",          0, layout_3bagflvt ) // 5c, $1 = 20 credits, 90.018%
-GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",      0, layout_3bagflnz ) // 5c, $2 = 40 credits, 88.22%
-GAMEL( 1996, kgbird,   0,        aristmk4, kgbird,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 5c)",    0, layout_kgbird   ) // 5c, $2 = 40 credits, 87.98%
-GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 10c)",   0, layout_kgbird   ) // 10c, $2 = 20 credits, 91.97%
-GAMEL( 1996, blkrhino, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.96%
-GAMEL( 1996, topgear,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",          0, layout_topgear  ) // 10c, 10c = 1 credit, 87.471%
-GAMEL( 1996, wtigernz, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.99%
-GAMEL( 1998, phantomp, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",     0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.95%
-GAMEL( 1998, ffortune, 0,        aristmk4, goldenc,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",  0, layout_goldenc  ) // 5c, $2 = 40 credits, 87.90%
-GAMEL( 1998, swtht2nz, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Sweethearts II (1VXFC5461, New Zealand)",   0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.13%
-GAMEL( 1996, goldenc,  0,        aristmk4, goldenc,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",  0, layout_goldenc  ) // 2c, $2 = 100 credits, 87.30%
-GAMEL( 1999, autmoon,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.27%
-GAMEL( 2000, coralr2,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",  0, layout_arimk4nz ) // 2c, $2 = 100 credits, 87.13%
-GAMEL( 1995, cgold2,   0,        aristmk4, cgold2,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, USA)",       0, layout_cgold2   ) // 92.858%
-GAMEL( 1996, fhunter,  0,        aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, USA)",          0, layout_fhunter  ) // 90.018%
-GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, USA)",          0, layout_fhunter  ) // 92.047%
-GAMEL( 1996, arcwins,  0,        aristmk4, arcwins,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, layout_arcwins  ) // 90.361%
-GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, layout_wildone  ) // 20c, $2 = 10 credits, video poker, 88.00%
-GAMEL( 1993, gunnrose, 0,  aristmk4_poker, gunnrose, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, NSW)",          MACHINE_WRONG_COLORS, layout_gunnrose ) // 20c, $1 = 5 credits
-GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, layout_gldnpkr ) // 20c, 20c = 1 credit, video poker
-GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, layout_topgear ) // 20c, 20c = 1 credit, 87.138%
-GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, layout_topgear )
-GAMEL( 1986, cgold,    0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, layout_topgear ) // 25c, 25c = 1 credit
-GAMEL( 1986, fvrpitch, 0,        aristmk4, fvrpitch, aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch (2VXEC534, NSW)",  0, layout_fvrpitch ) // 5c, $1 = 20 credits, 90.360%
+GAMEL( 1985, 86lions,  0,        _86lions,       aristmk4, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, layout_topgear )
+GAMEL( 1996, eforest,  0,        aristmk4,       eforest,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  ) // 92.778%
+GAMEL( 1995, eforesta, eforest,  aristmk4,       aristmk4, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, layout_aristmk4 ) // 10c, $1 = 10 credits, 90.483%
+GAMEL( 1996, eforestb, eforest,  aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)", 0, layout_arimk4nz ) // 5c, $2 = 40 credits, 88.43%
+GAMEL( 1996, 3bagflvt, 0,        aristmk4,       3bagflvt, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",          0, layout_3bagflvt ) // 5c, $1 = 20 credits, 90.018%
+GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4,       3bagflnz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",      0, layout_3bagflnz ) // 5c, $2 = 40 credits, 88.22%
+GAMEL( 1996, kgbird,   0,        aristmk4,       kgbird,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 5c)",    0, layout_kgbird   ) // 5c, $2 = 40 credits, 87.98%
+GAMEL( 1996, kgbirda,  kgbird,   aristmk4,       kgbird,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 10c)",   0, layout_kgbird   ) // 10c, $2 = 20 credits, 91.97%
+GAMEL( 1996, blkrhino, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.96%
+GAMEL( 1996, topgear,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",          0, layout_topgear  ) // 10c, 10c = 1 credit, 87.471%
+GAMEL( 1996, wtigernz, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.99%
+GAMEL( 1998, phantomp, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",     0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.95%
+GAMEL( 1998, ffortune, 0,        aristmk4,       goldenc,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",  0, layout_goldenc  ) // 5c, $2 = 40 credits, 87.90%
+GAMEL( 1998, swtht2nz, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Sweethearts II (1VXFC5461, New Zealand)",   0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.13%
+GAMEL( 1996, goldenc,  0,        aristmk4,       goldenc,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",  0, layout_goldenc  ) // 2c, $2 = 100 credits, 87.30%
+GAMEL( 1999, autmoon,  0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.27%
+GAMEL( 2000, coralr2,  0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",  0, layout_arimk4nz ) // 2c, $2 = 100 credits, 87.13%
+GAMEL( 1995, cgold2,   0,        aristmk4,       cgold2,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, USA)",       0, layout_cgold2   ) // 92.858%
+GAMEL( 1996, fhunter,  0,        aristmk4,       fhunter,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, USA)",          0, layout_fhunter  ) // 90.018%
+GAMEL( 1996, fhuntera, fhunter,  aristmk4,       fhunter,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, USA)",          0, layout_fhunter  ) // 92.047%
+GAMEL( 1996, arcwins,  0,        aristmk4,       arcwins,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, layout_arcwins  ) // 90.361%
+GAMEL( 1997, wildone,  0,        aristmk4_poker, wildone,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, layout_wildone  ) // 20c, $2 = 10 credits, video poker, 88.00%
+GAMEL( 1993, gunnrose, 0,        aristmk4_poker, gunnrose, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, NSW)",          MACHINE_WRONG_COLORS, layout_gunnrose ) // 20c, $1 = 5 credits
+GAMEL( 1986, gldnpkr,  0,        aristmk4_poker, gldnpkr,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, layout_gldnpkr ) // 20c, 20c = 1 credit, video poker
+GAMEL( 1986, gtroppo,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, layout_topgear ) // 20c, 20c = 1 credit, 87.138%
+GAMEL( 1986, clkwise,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, layout_topgear )
+GAMEL( 1986, cgold,    0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, layout_topgear ) // 25c, 25c = 1 credit
+GAMEL( 1986, fvrpitch, 0,        aristmk4,       fvrpitch, aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch (2VXEC534, NSW)",  0, layout_fvrpitch ) // 5c, $1 = 20 credits, 90.360%

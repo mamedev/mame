@@ -17,7 +17,7 @@ public:
 		: wpc_dot_state(mconfig, type, tag)
 	{ }
 public:
-	DECLARE_DRIVER_INIT(wpc_flip1);
+	void init_wpc_flip1();
 	void wpc_flip1(machine_config &config);
 	void wpc_flip1_map(address_map &map);
 };

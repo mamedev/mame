@@ -181,13 +181,12 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	uint8_t led_data = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */
 	if (digit > 3) digit++;
 
-	output().set_digit_value(8 - digit, led_data);
+	m_digits[8 - digit] = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 }
 
 /* Z80 Daisy Chain */
@@ -202,6 +201,8 @@ static const z80_daisy_config vcs80_daisy_chain[] =
 
 void vcs80_state::machine_start()
 {
+	m_digits.resolve();
+
 	m_pio->strobe_a(1);
 	m_pio->strobe_b(1);
 
@@ -214,9 +215,9 @@ void vcs80_state::machine_start()
 
 MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(5'000'000)/2) /* U880D */
-	MCFG_CPU_PROGRAM_MAP(vcs80_mem)
-	MCFG_CPU_IO_MAP(vcs80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(5'000'000)/2) /* U880D */
+	MCFG_DEVICE_PROGRAM_MAP(vcs80_mem)
+	MCFG_DEVICE_IO_MAP(vcs80_io)
 	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
 
 	/* keyboard timer */
@@ -228,8 +229,8 @@ MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(5'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(vcs80_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(vcs80_state, pio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, vcs80_state, pio_pa_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, vcs80_state, pio_pb_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -252,5 +253,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE         INIT  COMPANY             FULLNAME  FLAGS */
-COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80,  vcs80_state,  0,    "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY             FULLNAME  FLAGS */
+COMP( 1983, vcs80, 0,      0,      vcs80,   vcs80, vcs80_state, empty_init, "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

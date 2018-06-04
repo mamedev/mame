@@ -119,36 +119,36 @@ MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 
 MACHINE_CONFIG_START(mcb216_state::mcb216)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(mcb216_mem)
-	MCFG_CPU_IO_MAP(mcb216_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mcb216_mem)
+	MCFG_DEVICE_IO_MAP(mcb216_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
-	MCFG_TMS5501_XMT_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_TMS5501_XMT_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("tms5501", tms5501_device, rcv_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("tms5501", tms5501_device, rcv_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mcb216_state::cb308)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(cb308_mem)
-	MCFG_CPU_IO_MAP(mcb216_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cb308_mem)
+	MCFG_DEVICE_IO_MAP(mcb216_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
-	MCFG_TMS5501_XMT_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_TMS5501_XMT_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("tms5501", tms5501_device, rcv_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("tms5501", tms5501_device, rcv_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -174,6 +174,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY      FULLNAME  FLAGS */
-COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, mcb216_state,  0,    "Cromemco", "MCB-216", MACHINE_NO_SOUND_HW )
-COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, mcb216_state,  0,    "Cromemco", "CB-308",  MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME   FLAGS */
+COMP( 1979, mcb216, 0,      0,      mcb216,  mcb216, mcb216_state, empty_init, "Cromemco", "MCB-216", MACHINE_NO_SOUND_HW )
+COMP( 1977, cb308,  mcb216, 0,      cb308,   mcb216, mcb216_state, empty_init, "Cromemco", "CB-308",  MACHINE_NO_SOUND_HW )

@@ -80,7 +80,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
 	int scanline = param;
 
 	if(scanline == 240 && m_main_nmi_enabled) // vblank-out irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if(scanline == 16) // timer irq, checks soundlatch port then updates some sound related work RAM buffers
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -311,7 +311,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( espial )
+static GFXDECODE_START( gfx_espial )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 64 )
 GFXDECODE_END
@@ -322,14 +322,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(espial_state::espial)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(espial_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(espial_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", espial_state, espial_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
-	MCFG_CPU_PROGRAM_MAP(espial_sound_map)
-	MCFG_CPU_IO_MAP(espial_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
+	MCFG_DEVICE_PROGRAM_MAP(espial_sound_map)
+	MCFG_DEVICE_IO_MAP(espial_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -342,17 +342,17 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", espial)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_espial)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -361,8 +361,8 @@ MACHINE_CONFIG_START(espial_state::netwars)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(netwars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(netwars_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -451,6 +451,6 @@ ROM_END
 
 
 
-GAME( 1983, espial,  0,      espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, espialu, espial, espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, netwars, 0,      netwars, netwars, espial_state, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espial,  0,      espial,  espial,  espial_state, empty_init, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espialu, espial, espial,  espial,  espial_state, empty_init, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, netwars, 0,      netwars, netwars, espial_state, empty_init, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )

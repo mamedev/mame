@@ -1760,8 +1760,8 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 MACHINE_CONFIG_START(pokemini_state::pokemini)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MINX, 4000000)
-	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)
+	MCFG_DEVICE_ADD("maincpu", MINX, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(pokemini_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1782,8 +1782,8 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(3, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1802,4 +1802,4 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, empty_init, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

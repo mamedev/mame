@@ -24,7 +24,7 @@ public:
 		, nvram_bank(*this, "nvram_bank")
 	{ }
 
-	DECLARE_DRIVER_INIT(stratos);
+	void init_stratos();
 	DECLARE_WRITE8_MEMBER(p2000_w);
 	DECLARE_READ8_MEMBER(p2200_r);
 	DECLARE_WRITE8_MEMBER(p2200_w);
@@ -54,7 +54,7 @@ private:
 	required_memory_bank nvram_bank;
 };
 
-DRIVER_INIT_MEMBER( stratos_state, stratos )
+void stratos_state::init_stratos()
 {
 	nvram_data = std::make_unique<uint8_t[]>(0x2000);
 	nvram->set_base(nvram_data.get(), 0x2000);
@@ -122,7 +122,7 @@ uint32_t stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if(machine().input().code_pressed(KEYCODE_W)) {
 		if(!nmi) {
-			maincpu->set_input_line(M65C02_NMI_LINE, PULSE_LINE);
+			maincpu->pulse_input_line(M65C02_NMI_LINE, attotime::zero);
 			nmi = true;
 		}
 	} else
@@ -347,8 +347,8 @@ static INPUT_PORTS_START( stratos )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(stratos_state::stratos)
-	MCFG_CPU_ADD("maincpu", M65C02, 5670000)
-	MCFG_CPU_PROGRAM_MAP(stratos_mem)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 5670000)
+	MCFG_DEVICE_PROGRAM_MAP(stratos_mem)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -371,5 +371,5 @@ ROM_START( stratos )
 	ROM_FILL(0x00000, 0x10000, 0xff)
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS          INIT     COMPANY    FULLNAME                           FLAGS */
-CONS(  1986, stratos,  0,       0,      stratos,   stratos,  stratos_state, stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME                           FLAGS */
+CONS(  1986, stratos, 0,      0,      stratos, stratos, stratos_state, init_stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

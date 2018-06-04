@@ -630,10 +630,10 @@ protected:
 	uint32_t          m_next_pc;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 
-	direct_read_data<0> *m_datadirect;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_datacache;
 	address_space *m_io;
 
 	typedef void ( am29000_cpu_device::*opcode_func ) ();

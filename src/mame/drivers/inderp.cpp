@@ -197,11 +197,11 @@ WRITE_LINE_MEMBER( inderp_state::clock_tick )
 
 MACHINE_CONFIG_START(inderp_state::inderp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
 	MCFG_DEVICE_ADD("cpoint_clock", CLOCK, 200) // crosspoint detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(inderp_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, inderp_state, clock_tick))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
@@ -231,5 +231,5 @@ ROM_START(centauri2)
 ROM_END
 
 
-GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, 0, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, 0, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )

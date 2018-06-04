@@ -251,12 +251,9 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 {
-	if (BIT(m_lednum, 5)) output().set_digit_value(0, param);
-	if (BIT(m_lednum, 4)) output().set_digit_value(1, param);
-	if (BIT(m_lednum, 3)) output().set_digit_value(2, param);
-	if (BIT(m_lednum, 2)) output().set_digit_value(3, param);
-	if (BIT(m_lednum, 1)) output().set_digit_value(4, param);
-	if (BIT(m_lednum, 0)) output().set_digit_value(5, param);
+	for (int digit = 0; digit < 6; digit++)
+		if (BIT(m_lednum, 5 - digit))
+			m_digits[digit] = param;
 }
 
 READ8_MEMBER( mpf1_state::ppi_pa_r )
@@ -264,12 +261,9 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	uint8_t data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
-	if (!BIT(m_lednum, 0)) data &= m_pc0->read();
-	if (!BIT(m_lednum, 1)) data &= m_pc1->read();
-	if (!BIT(m_lednum, 2)) data &= m_pc2->read();
-	if (!BIT(m_lednum, 3)) data &= m_pc3->read();
-	if (!BIT(m_lednum, 4)) data &= m_pc4->read();
-	if (!BIT(m_lednum, 5)) data &= m_pc5->read();
+	for (int row = 0; row < 6; row++)
+		if (!BIT(m_lednum, row))
+			data &= m_pc[row]->read();
 
 	/* bit 6, user key */
 	data &= m_special->read() & 1 ? 0xff : 0xbf;
@@ -305,7 +299,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	}
 
 	/* bit 7, tape output, tone and led */
-	output().set_led_value(0, !BIT(data, 7));
+	m_leds[0] = !BIT(data, 7);
 	m_speaker->level_w(BIT(data, 7));
 	m_cassette->output( BIT(data, 7) ? 1.0 : -1.0);
 }
@@ -339,12 +333,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
 	int64_t led_halt = m_maincpu->state_int(Z80_HALT);
-	output().set_led_value(1, led_halt);
+	m_leds[1] = led_halt;
 }
 
 void mpf1_state::machine_start()
 {
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpf1_state::led_refresh),this));
+	m_digits.resolve();
+	m_leds.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_break));
@@ -362,10 +358,10 @@ void mpf1_state::machine_reset()
 MACHINE_CONFIG_START(mpf1_state::mpf1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
-	MCFG_CPU_PROGRAM_MAP(mpf1_map)
-	MCFG_CPU_OPCODES_MAP(mpf1_step)
-	MCFG_CPU_IO_MAP(mpf1_io_map)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
+	MCFG_DEVICE_PROGRAM_MAP(mpf1_map)
+	MCFG_DEVICE_OPCODES_MAP(mpf1_step)
+	MCFG_DEVICE_IO_MAP(mpf1_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* devices */
@@ -376,9 +372,9 @@ MACHINE_CONFIG_START(mpf1_state::mpf1)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mpf1_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mpf1_state, ppi_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mpf1_state, ppi_pc_w))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
@@ -387,8 +383,8 @@ MACHINE_CONFIG_START(mpf1_state::mpf1)
 	MCFG_DEFAULT_LAYOUT(layout_mpf1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
@@ -396,10 +392,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
-	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
-	MCFG_CPU_OPCODES_MAP(mpf1_step)
-	MCFG_CPU_IO_MAP(mpf1b_io_map)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
+	MCFG_DEVICE_PROGRAM_MAP(mpf1b_map)
+	MCFG_DEVICE_OPCODES_MAP(mpf1_step)
+	MCFG_DEVICE_IO_MAP(mpf1b_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* devices */
@@ -410,9 +406,9 @@ MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mpf1_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mpf1_state, ppi_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mpf1_state, ppi_pc_w))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
@@ -421,11 +417,11 @@ MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	MCFG_DEFAULT_LAYOUT(layout_mpf1b)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD(TMS5220_TAG, TMS5220, 680000L)
+	MCFG_DEVICE_ADD(TMS5220_TAG, TMS5220, 680000L)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
@@ -433,10 +429,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
-	MCFG_CPU_OPCODES_MAP(mpf1_step)
-	MCFG_CPU_IO_MAP(mpf1p_io_map)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(mpf1p_map)
+	MCFG_DEVICE_OPCODES_MAP(mpf1_step)
+	MCFG_DEVICE_IO_MAP(mpf1p_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* video hardware */
@@ -450,16 +446,16 @@ MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mpf1_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mpf1_state, ppi_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mpf1_state, ppi_pc_w))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
@@ -488,11 +484,11 @@ ROM_END
 
 /* System Drivers */
 
-DRIVER_INIT_MEMBER(mpf1_state,mpf1)
+void mpf1_state::init_mpf1()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, mpf1, "Multitech", "Micro Professor 1",      0 )
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B",     0 )
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, init_mpf1, "Multitech", "Micro Professor 1",      0 )
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, init_mpf1, "Multitech", "Micro Professor 1B",     0 )
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, init_mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )

@@ -167,29 +167,35 @@ DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 ***************************************************************************/
 
 /* FIXME: the memory maps should probably support rom banking for EA */
-ADDRESS_MAP_START(mcs48_cpu_device::program_10bit)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_11bit)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_12bit)
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_12bit(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_6bit)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_7bit)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_8bit)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_8bit(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
@@ -355,7 +361,7 @@ uint8_t mcs48_cpu_device::opcode_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -368,7 +374,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -1072,7 +1078,7 @@ void mcs48_cpu_device::device_start()
 	m_ea = (m_int_rom_size ? 0 : 1);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = (m_feature_mask & EXT_BUS_FEATURE) != 0 ? &space(AS_IO) : nullptr;
 
@@ -1149,7 +1155,7 @@ void mcs48_cpu_device::device_start()
 
 	save_item(NAME(m_a11));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1293,7 +1299,7 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 
 		/* process opcode and count cycles */

@@ -256,7 +256,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( cball )
+static GFXDECODE_START( gfx_cball )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 4, 1 )
 GFXDECODE_END
@@ -265,8 +265,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cball_state::cball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(12'096'000) / 16) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 16) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* video hardware */
@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(cball_state::cball)
 	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cball)
 	MCFG_PALETTE_ADD("palette", 6)
 	MCFG_PALETTE_INIT_OWNER(cball_state, cball)
 
@@ -307,4 +307,4 @@ ROM_START( cball )
 ROM_END
 
 
-GAME( 1976, cball, 0, cball, cball, cball_state, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, cball, 0, cball, cball, cball_state, empty_init, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

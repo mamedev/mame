@@ -63,6 +63,13 @@
 
 #define SH_FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
+/* SR shift values */
+#define T_SHIFT 0
+#define S_SHIFT 1
+#define I_SHIFT 4
+#define Q_SHIFT 8
+#define M_SHIFT 9
+
 #define REGFLAG_R(n)                    (1 << (n))
 
 /* register flags 1 */
@@ -110,7 +117,6 @@ public:
 		, m_interrupt(nullptr)
 		, m_nocode(nullptr)
 		, m_out_of_cycles(nullptr)
-		, m_xor(0)
 	{ }
 
 	// Data that needs to be stored close to the generated DRC code
@@ -139,6 +145,25 @@ public:
 		uint32_t  vbr;
 
 		uint32_t  m_delay;
+
+		// SH3/4 additional DRC "near" state
+		uint32_t  m_ppc;
+		uint32_t  m_spc;
+		uint32_t  m_ssr;
+		uint32_t  m_rbnk[2][8];
+		uint32_t  m_sgr;
+		uint32_t  m_fr[16];
+		uint32_t  m_xf[16];
+		uint32_t  m_cpu_off;
+		uint32_t  m_pending_irq;
+		uint32_t  m_test_irq;
+		uint32_t  m_fpscr;
+		uint32_t  m_fpul;
+		uint32_t  m_dbr;
+
+		int     m_frt_input;
+		int     m_fpu_sz;
+		int     m_fpu_pr;
 	};
 
 	internal_sh2_state *m_sh2_state;
@@ -149,6 +174,9 @@ public:
 	virtual void WB(offs_t A, uint8_t V) = 0;
 	virtual void WW(offs_t A, uint16_t V) = 0;
 	virtual void WL(offs_t A, uint32_t V) = 0;
+
+	virtual void set_frt_input(int state) = 0;
+	void pulse_frt_input() { set_frt_input(ASSERT_LINE); set_frt_input(CLEAR_LINE); }
 
 protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?
@@ -354,7 +382,8 @@ public:
 
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
-	direct_read_data<0> *m_direct;
+	std::function<u16 (offs_t)> m_pr16;
+	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_program;
 
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
@@ -419,7 +448,6 @@ public:
 	int m_cpu_type;
 	uint32_t m_am;
 	bool m_isdrc;
-	int m_xor;
 
 	void sh2drc_set_options(uint32_t options);
 	void sh2drc_add_pcflush(offs_t address);

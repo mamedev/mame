@@ -7,9 +7,6 @@
 #pragma once
 
 
-#define NEC_INPUT_LINE_INTP0 10
-#define NEC_INPUT_LINE_INTP1 11
-#define NEC_INPUT_LINE_INTP2 12
 #define NEC_INPUT_LINE_POLL 20
 
 enum
@@ -25,7 +22,7 @@ class nec_common_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,7 +32,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 80; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -62,7 +60,6 @@ private:
 	};
 
 	necbasicregs m_regs;
-	offs_t  m_fetch_xor;
 	uint16_t  m_sregs[4];
 
 	uint16_t  m_ip;
@@ -88,7 +85,7 @@ private:
 	uint8_t   m_halted;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u8 (offs_t address)> m_dr8;
 	address_space *m_io;
 	int     m_icount;
 

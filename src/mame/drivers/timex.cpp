@@ -682,16 +682,16 @@ static const gfx_layout ts2068_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ts2068 )
+static GFXDECODE_START( gfx_ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(spectrum_state::ts2068)
 	spectrum_128(config);
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
-	MCFG_CPU_PROGRAM_MAP(ts2068_mem)
-	MCFG_CPU_IO_MAP(ts2068_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ts2068_mem)
+	MCFG_DEVICE_IO_MAP(ts2068_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, ts2068 )
@@ -702,14 +702,14 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_timex))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ts2068)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 
 	/* sound */
-	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL(14'112'000)/8)        /* From Schematic; 1.764 MHz */
+	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'112'000)/8)        /* From Schematic; 1.764 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
@@ -735,9 +735,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spectrum_state::tc2048)
 	spectrum(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tc2048_mem)
-	MCFG_CPU_IO_MAP(tc2048_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tc2048_mem)
+	MCFG_DEVICE_IO_MAP(tc2048_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, tc2048 )
 
@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(spectrum_state::tc2048)
 	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_tc2048)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_timex))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
@@ -781,7 +781,7 @@ ROM_START(uk2086)
 	ROM_LOAD("ts2068_x.rom",0x14000,0x2000, CRC(ae16233a) SHA1(7e265a2c1f621ed365ea23bdcafdedbc79c1299c))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     STATE           INIT  COMPANY               FULLNAME             FLAGS
-COMP( 1984, tc2048,   spectrum, 0,      tc2048,  spectrum, spectrum_state, 0,    "Timex of Portugal",  "TC-2048" ,          0 )
-COMP( 1983, ts2068,   spectrum, 0,      ts2068,  spectrum, spectrum_state, 0,    "Timex Sinclair",     "TS-2068" ,          0 )
-COMP( 1986, uk2086,   spectrum, 0,      uk2086,  spectrum, spectrum_state, 0,    "Unipolbrit",         "UK-2086 ver. 1.2" , 0 )
+//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY              FULLNAME             FLAGS
+COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, spectrum_state, empty_init, "Timex of Portugal", "TC-2048" ,          0 )
+COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, spectrum_state, empty_init, "Timex Sinclair",    "TS-2068" ,          0 )
+COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, spectrum_state, empty_init, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )

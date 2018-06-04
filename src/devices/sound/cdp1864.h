@@ -57,7 +57,7 @@
 //**************************************************************************
 
 #define MCFG_CDP1864_ADD(_tag, _screen_tag, _clock, _inlace, _irq, _dma_out, _efx, _hsync, _rdata, _bdata, _gdata) \
-		MCFG_SOUND_ADD(_tag, CDP1864, _clock) \
+		MCFG_DEVICE_ADD(_tag, CDP1864, _clock) \
 		MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 		downcast<cdp1864_device *>(device)->set_inlace_callback(DEVCB_##_inlace); \
 		downcast<cdp1864_device *>(device)->set_irq_callback(DEVCB_##_irq); \

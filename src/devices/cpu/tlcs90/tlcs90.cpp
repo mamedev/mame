@@ -41,35 +41,40 @@ enum e_ir
 };
 
 
-ADDRESS_MAP_START(tlcs90_device::tmp90840_mem)
-	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
-	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+void tlcs90_device::tmp90840_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();  // 8KB ROM (internal)
+	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp90841_mem)
+void tlcs90_device::tmp90841_mem(address_map &map)
+{
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
-	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp91640_mem)
-	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+void tlcs90_device::tmp91640_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();    // 16KB ROM (internal)
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp91641_mem)
+void tlcs90_device::tmp91641_mem(address_map &map)
+{
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-ADDRESS_MAP_START(tlcs90_device::tmp90ph44_mem)
-	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB PROM (internal)
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
-ADDRESS_MAP_END
+void tlcs90_device::tmp90ph44_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();    // 16KB PROM (internal)
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+55).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w)); // TODO: has 8 more registers
+}
 
 
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
@@ -1366,7 +1371,7 @@ void tlcs90_device::execute_run()
 	do
 	{
 		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(this, m_pc.d);
+		debugger_instruction_hook(m_pc.d);
 
 		check_interrupts();
 
@@ -2849,7 +2854,7 @@ void tlcs90_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", F ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 

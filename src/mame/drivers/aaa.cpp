@@ -43,9 +43,9 @@ static INPUT_PORTS_START( aaa )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(aaa_state::aaa)
-	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
@@ -66,4 +66,4 @@ ROM_START( aaa )
 	ROM_LOAD( "202510b.bin",  0x0000, 0x1000, CRC(deda4aa4) SHA1(0bce5a8dc260ba51f3e431d8da408eac1f41acf7) )
 ROM_END
 
-COMP( 1981, aaa, 0, 0, aaa, aaa, aaa_state, 0, "Ann Arbor", "Ambassador", MACHINE_IS_SKELETON )
+COMP( 1981, aaa, 0, 0, aaa, aaa, aaa_state, empty_init, "Ann Arbor", "Ambassador", MACHINE_IS_SKELETON )

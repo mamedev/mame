@@ -199,8 +199,8 @@ static INPUT_PORTS_START( ultrsprt )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // VRAM page flip status?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // VRAM page flip status?
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -236,12 +236,12 @@ void ultrsprt_state::machine_reset()
 
 MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
-	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(ultrsprt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 8000000) // Unconfirmed
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -268,7 +268,8 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_5))
@@ -298,4 +299,4 @@ ROM_START( fiveside )
 ROM_END
 
 // Undumped: Ultra Hockey
-GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, 0, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)
+GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, empty_init, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)

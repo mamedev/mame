@@ -624,12 +624,12 @@ static const gfx_layout sprite_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( combatsc )
+static GFXDECODE_START( gfx_combatsc )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, gfxlayout, 0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
-static GFXDECODE_START( combatscb )
+static GFXDECODE_START( gfx_combatscb )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout,   0, 8*16 )
 	GFXDECODE_ENTRY( "gfx1", 0x40000, tile_layout,   0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprite_layout, 0, 8*16 )
@@ -699,12 +699,12 @@ void combatsc_state::machine_reset()
 MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(combatsc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(combatsc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(combatsc_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(combatsc_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatsc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatsc)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -736,15 +736,15 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(combatsc_state, combatsc_portA_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, combatsc_state, combatsc_portA_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -753,12 +753,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(combatscb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(combatscb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(combatscb_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(combatscb_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -773,7 +773,7 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatscb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatscb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatscb)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -781,15 +781,15 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_MSM5205_VCK_CALLBACK(ASSERTLINE("audiocpu", 0))
@@ -991,7 +991,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(combatsc_state,combatsc)
+void combatsc_state::init_combatsc()
 {
 	/* joystick instead of trackball */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x0404, 0x0404, "IN1");
@@ -1004,9 +1004,9 @@ DRIVER_INIT_MEMBER(combatsc_state,combatsc)
  *
  *************************************/
 
-GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc_state, combatsc,  ROT0, "Konami",  "Combat School (joystick)",        0 )
-GAME( 1987, combatsct, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (trackball)",       MACHINE_NOT_WORKING )
-GAME( 1987, combatscj, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
-GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 1)",               MACHINE_NOT_WORKING )
-GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 2)",               MACHINE_NOT_WORKING )
-GAME( 1988, combatscb, combatsc, combatscb, combatscb, combatsc_state, 0,         ROT0, "bootleg", "Combat School (bootleg)",         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc_state, init_combatsc, ROT0, "Konami",  "Combat School (joystick)",        0 )
+GAME( 1987, combatsct, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Combat School (trackball)",       MACHINE_NOT_WORKING )
+GAME( 1987, combatscj, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
+GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Boot Camp (set 1)",               MACHINE_NOT_WORKING )
+GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Boot Camp (set 2)",               MACHINE_NOT_WORKING )
+GAME( 1988, combatscb, combatsc, combatscb, combatscb, combatsc_state, empty_init,    ROT0, "bootleg", "Combat School (bootleg)",         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )

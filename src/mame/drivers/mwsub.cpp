@@ -225,10 +225,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(submar_state::submar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_CPU_PERIODIC_INT_DRIVER(submar_state, irq0_line_assert, 124.675) // 555 IC
-	MCFG_CPU_PROGRAM_MAP(submar_map)
-	MCFG_CPU_IO_MAP(submar_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(submar_state, irq0_line_assert, 124.675) // 555 IC
+	MCFG_DEVICE_PROGRAM_MAP(submar_map)
+	MCFG_DEVICE_IO_MAP(submar_portmap)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -253,4 +253,4 @@ ROM_START( submar )
 ROM_END
 
 
-GAMEL( 1979, submar, 0, submar, submar, submar_state, 0, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )
+GAMEL( 1979, submar, 0, submar, submar, submar_state, empty_init, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )

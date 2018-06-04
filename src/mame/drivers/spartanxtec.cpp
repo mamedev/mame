@@ -328,7 +328,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( news )
+static GFXDECODE_START( gfx_news )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 32 )
 GFXDECODE_END
@@ -364,15 +364,15 @@ PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
-	MCFG_CPU_IO_MAP(spartanxtec_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_sound_map)
+	MCFG_DEVICE_IO_MAP(spartanxtec_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
@@ -387,19 +387,19 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(spartanxtec_state,spartanxtec)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", news)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_news)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1000000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8912, 1000000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8912, 1000000)
+	MCFG_DEVICE_ADD("ay3", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
@@ -449,4 +449,4 @@ ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state, empty_init, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

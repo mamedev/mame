@@ -28,7 +28,9 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_analog_ports(*this, "AN.%u", 0),
-		m_tc0780fpa(*this, "tc0780fpa")
+		m_tc0780fpa(*this, "tc0780fpa"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_counters(*this, "counter%u", 0U)
 	{
 		m_mcu_output = 0;
 		m_speed_meter = 0;
@@ -53,6 +55,9 @@ public:
 	optional_ioport_array<8> m_analog_ports;
 
 	required_device<tc0780fpa_device> m_tc0780fpa;
+
+	output_finder<8> m_lamps;
+	output_finder<5> m_counters;
 
 	uint32_t m_dsp_rom_pos;
 
@@ -123,9 +128,9 @@ public:
 	DECLARE_READ32_MEMBER(taitojc_char_r);
 	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
 	DECLARE_WRITE32_MEMBER(taitojc_char_w);
-	DECLARE_DRIVER_INIT(dendego2);
-	DECLARE_DRIVER_INIT(dangcurv);
-	DECLARE_DRIVER_INIT(taitojc);
+	void init_dendego2();
+	void init_dangcurv();
+	void init_taitojc();
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

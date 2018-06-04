@@ -25,7 +25,7 @@ void arcompact_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 //      printf("new pc %04x\n", m_pc);
 

@@ -110,7 +110,7 @@ void sc61860_device::device_start()
 	m_2ms_tick_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_reset.resolve();
 	m_brk.resolve();
 	m_x.resolve();
@@ -172,7 +172,7 @@ void sc61860_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_debugger_temp).formatstr("%2s").noshow();
 	state_add(STATE_GENSP, "GENSP", m_r).mask(0x7f).formatstr("%02X").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -234,7 +234,7 @@ void sc61860_device::execute_run()
 	{
 		m_oldpc = m_pc;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		sc61860_instruction();
 

@@ -537,7 +537,7 @@ static const gfx_layout spritelayout2 =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( senjyo )
+static GFXDECODE_START( gfx_senjyo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 8 )    /*   0- 63 characters */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  64, 8 )    /*  64-127 background #1 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 128, 8 )    /* 128-191 background #2 */
@@ -551,23 +551,23 @@ GFXDECODE_END
 MACHINE_CONFIG_START(senjyo_state::senjyo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(senjyo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 
-	MCFG_CPU_ADD("sub", Z80, 2000000)   /* 2 MHz? */
+	MCFG_DEVICE_ADD("sub", Z80, 2000000)   /* 2 MHz? */
 	MCFG_Z80_DAISY_CHAIN(senjyo_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(senjyo_sound_map)
-	MCFG_CPU_IO_MAP(senjyo_sound_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(senjyo_sound_map)
+	MCFG_DEVICE_IO_MAP(senjyo_sound_io_map)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, 2000000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(senjyo_state, pio_pa_r))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, senjyo_state, pio_pa_r))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 2000000 /* same as "sub" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(senjyo_state, sound_line_clock))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, senjyo_state, sound_line_clock))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", senjyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_senjyo)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, senjyo_state, IIBBGGRR)
@@ -586,39 +586,39 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("sn3", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn3", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 
 MACHINE_CONFIG_START(senjyo_state::senjyox_e)
 	senjyo(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(senjyo_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(senjyo_state::senjyox_a)
 	senjyo(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(senjyo_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -627,11 +627,11 @@ MACHINE_CONFIG_START(senjyo_state::starforb)
 	senjyox_e(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(starforb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(starforb_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(starforb_sound_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(starforb_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -954,35 +954,35 @@ ROM_START( baluba )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(senjyo_state,starforc)
+void senjyo_state::init_starforc()
 {
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
 }
-DRIVER_INIT_MEMBER(senjyo_state,starfore)
+void senjyo_state::init_starfore()
 {
 	m_is_senjyo = 0;
 	m_scrollhack = 0;
 }
 
-DRIVER_INIT_MEMBER(senjyo_state,starfora)
+void senjyo_state::init_starfora()
 {
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
 }
 
-DRIVER_INIT_MEMBER(senjyo_state,senjyo)
+void senjyo_state::init_senjyo()
 {
 	m_is_senjyo = 1;
 	m_scrollhack = 0;
 }
 
 
-GAME( 1983, senjyo,    0,        senjyo,    senjyo,   senjyo_state, senjyo,   ROT90, "Tehkan",                      "Senjyo", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforc,  0,        senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan",                      "Star Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforce, starforc, senjyox_e, starforc, senjyo_state, starfore, ROT90, "Tehkan",                      "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforcb, starforc, starforb,  starforc, senjyo_state, starfore, ROT90, "bootleg",                     "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforca, starforc, senjyox_a, starforc, senjyo_state, starfora, ROT90, "Tehkan",                      "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, megaforc,  starforc, senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan",                      "Mega Force (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, megaforcu, starforc, senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, baluba,    0,        senjyo,    baluba,   senjyo_state, starforc, ROT90, "Able Corp, Ltd.",             "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, senjyo,    0,        senjyo,    senjyo,   senjyo_state, init_senjyo,   ROT90, "Tehkan",                      "Senjyo", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforc,  0,        senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Star Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforce, starforc, senjyox_e, starforc, senjyo_state, init_starfore, ROT90, "Tehkan",                      "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforcb, starforc, starforb,  starforc, senjyo_state, init_starfore, ROT90, "bootleg",                     "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforca, starforc, senjyox_a, starforc, senjyo_state, init_starfora, ROT90, "Tehkan",                      "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, megaforc,  starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Mega Force (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, megaforcu, starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, baluba,    0,        senjyo,    baluba,   senjyo_state, init_starforc, ROT90, "Able Corp, Ltd.",             "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )

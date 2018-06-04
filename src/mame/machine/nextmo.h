@@ -58,6 +58,6 @@ private:
 	void compute_ecc();
 };
 
-extern const device_type NEXTMO;
+DECLARE_DEVICE_TYPE(NEXTMO, nextmo_device)
 
 #endif // MAME_MACHINE_NEXTMO_H

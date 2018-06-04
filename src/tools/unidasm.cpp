@@ -8,12 +8,11 @@
 
 ****************************************************************************/
 
-#include "emu.h"
+// the disassemblers assume they're in MAME and emu.h is a PCH, so we minimally pander to them
+#include "disasmintf.h"
 
-#include <algorithm>
-#include <cstring>
-
-#include <ctype.h>
+using offs_t = osd::u32;
+using util::BIT;
 
 #include "cpu/8x300/8x300dasm.h"
 #include "cpu/adsp2100/2100dasm.h"
@@ -76,6 +75,7 @@
 #include "cpu/m6502/m65ce02d.h"
 #include "cpu/m6502/m740d.h"
 #include "cpu/m6502/xavixd.h"
+#include "cpu/m6502/xavix2000d.h"
 #include "cpu/m6800/6800dasm.h"
 #include "cpu/m68000/m68kdasm.h"
 #include "cpu/m6805/6805dasm.h"
@@ -149,6 +149,22 @@
 #include "cpu/z8/z8dasm.h"
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
+
+#include "corefile.h"
+#include "corestr.h"
+#include "eminline.h"
+
+#include <algorithm>
+#include <cstring>
+#include <iostream>
+#include <stdexcept>
+
+#include <ctype.h>
+
+using u8 = util::u8;
+using u16 = util::u16;
+using u32 = util::u32;
+using u64 = util::u64;
 
 // Configuration classes
 
@@ -418,6 +434,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm500",           le,  0, []() -> util::disasm_interface * { return new sm500_disassembler; } },
 	{ "sm510",           le,  0, []() -> util::disasm_interface * { return new sm510_disassembler; } },
 	{ "sm511",           le,  0, []() -> util::disasm_interface * { return new sm511_disassembler; } },
+	{ "sm530",           le,  0, []() -> util::disasm_interface * { return new sm530_disassembler; } },
 	{ "sm590",           le,  0, []() -> util::disasm_interface * { return new sm590_disassembler; } },
 	{ "sm5a",            le,  0, []() -> util::disasm_interface * { return new sm5a_disassembler; } },
 	{ "sm8500",          le,  0, []() -> util::disasm_interface * { return new sm8500_disassembler; } },
@@ -470,6 +487,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "x86_32",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 32; return new i386_disassembler(&i386_unidasm); } },
 	{ "x86_64",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 64; return new i386_disassembler(&i386_unidasm); } },
 	{ "xavix",           le,  0, []() -> util::disasm_interface * { return new xavix_disassembler; } },
+	{ "xavix2000",       le,  0, []() -> util::disasm_interface * { return new xavix2000_disassembler; } },
 	{ "z180",            le,  0, []() -> util::disasm_interface * { return new z180_disassembler; } },
 	{ "z8",              be,  0, []() -> util::disasm_interface * { return new z8_disassembler; } },
 	{ "z80",             le,  0, []() -> util::disasm_interface * { return new z80_disassembler; } },
@@ -532,7 +550,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 	if(flags & util::disasm_interface::NONLINEAR_PC) {
 		switch(entry->pcshift) {
 		case -1:
-			lr8  = [](offs_t pc) -> u8  { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
+			lr8  = [](offs_t pc) -> u8  { throw std::logic_error("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
 			lr16 = [this](offs_t pc) -> u16 {
 				const u16 *src = get_ptr<u16>(pc);
 				return src[0];

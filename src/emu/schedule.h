@@ -22,6 +22,8 @@
 //  MACROS
 //**************************************************************************
 
+#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
+
 // macro for the RC time constant on a 74LS123 with C > 1000pF
 // R is in ohms, C is in farads
 #define TIME_OF_74LS123(r,c)            (0.45 * (double)(r) * (double)(c))

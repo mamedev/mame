@@ -89,6 +89,6 @@ private:
 DECLARE_DEVICE_TYPE(SETA001_SPRITE, seta001_device)
 
 #define MCFG_SETA001_SPRITE_GFXDECODE(_gfxtag) \
-	downcast<seta001_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<seta001_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_SETA001_H

@@ -214,9 +214,9 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 
 MACHINE_CONFIG_START(myvision_state::myvision)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
-	MCFG_CPU_PROGRAM_MAP(myvision_mem)
-	MCFG_CPU_IO_MAP(myvision_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
+	MCFG_DEVICE_PROGRAM_MAP(myvision_mem)
+	MCFG_DEVICE_IO_MAP(myvision_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL(10'738'635) / 2 )  /* Exact model not verified */
@@ -226,12 +226,12 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(myvision_state, ay_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(myvision_state, ay_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(myvision_state, ay_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(myvision_state, ay_port_b_w))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, myvision_state, ay_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, myvision_state, ay_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, myvision_state, ay_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, myvision_state, ay_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
@@ -250,5 +250,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLN AME              FLAGS
-CONS( 1983, myvision, 0,      0,       myvision,  myvision, myvision_state, 0,    "Nichibutsu", "My Vision (KH-1000)", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY       FULLN AME              FLAGS
+CONS( 1983, myvision, 0,      0,      myvision, myvision, myvision_state, empty_init, "Nichibutsu", "My Vision (KH-1000)", 0 )

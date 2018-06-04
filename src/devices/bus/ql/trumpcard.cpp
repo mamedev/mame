@@ -37,15 +37,15 @@ ROM_START( ql_trump_card )
 	ROM_REGION( 0x8000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v131")
 	ROM_SYSTEM_BIOS( 0, "v121a", "v1.21A" )
-	ROMX_LOAD( "trump_card1v21a_256_bin", 0x0000, 0x8000, CRC(2eb0aa3a) SHA1(22da747afad5bc91184daf0d8b055a5e5264c67b), ROM_BIOS(1) )
+	ROMX_LOAD( "trump_card1v21a_256_bin", 0x0000, 0x8000, CRC(2eb0aa3a) SHA1(22da747afad5bc91184daf0d8b055a5e5264c67b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v125", "v1.25" )
-	ROMX_LOAD( "trumpcard-125.rom", 0x0000, 0x8000, CRC(938eaa46) SHA1(9b3458cf3a279ed86ba395dc45c8f26939d6c44d), ROM_BIOS(2) )
+	ROMX_LOAD( "trumpcard-125.rom", 0x0000, 0x8000, CRC(938eaa46) SHA1(9b3458cf3a279ed86ba395dc45c8f26939d6c44d), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v127", "v1.27" )
-	ROMX_LOAD( "trumpcard127.bin", 0x0000, 0x8000, CRC(3e053381) SHA1(69fa132cb73b9391a70e8fd3e5656890dbc0203f), ROM_BIOS(3) )
+	ROMX_LOAD( "trumpcard127.bin", 0x0000, 0x8000, CRC(3e053381) SHA1(69fa132cb73b9391a70e8fd3e5656890dbc0203f), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "v128", "v1.28" )
-	ROMX_LOAD( "trump_card_v1_28.bin", 0x0000, 0x8000, CRC(4591a924) SHA1(3ad584ee74b6a7e46685e6b7bece1abe4d6f6937), ROM_BIOS(4) )
+	ROMX_LOAD( "trump_card_v1_28.bin", 0x0000, 0x8000, CRC(4591a924) SHA1(3ad584ee74b6a7e46685e6b7bece1abe4d6f6937), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "v131", "v1.31" )
-	ROMX_LOAD( "trumpcard131.bin", 0x0000, 0x8000, CRC(584c7835) SHA1(de0f67408021a3b33b3916514a5f81d9c8edad93), ROM_BIOS(5) )
+	ROMX_LOAD( "trumpcard131.bin", 0x0000, 0x8000, CRC(584c7835) SHA1(de0f67408021a3b33b3916514a5f81d9c8edad93), ROM_BIOS(4) )
 
 	ROM_REGION( 0x100, "plds", 0 )
 	ROM_LOAD( "1u4", 0x000, 0x100, NO_DUMP )
@@ -67,9 +67,10 @@ const tiny_rom_entry *ql_trump_card_device::device_rom_region() const
 //  SLOT_INTERFACE( ql_trump_card_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( ql_trump_card_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ql_trump_card_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 //-------------------------------------------------

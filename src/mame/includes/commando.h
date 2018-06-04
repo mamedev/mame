@@ -46,15 +46,15 @@ public:
 	DECLARE_WRITE8_MEMBER(commando_scrollx_w);
 	DECLARE_WRITE8_MEMBER(commando_scrolly_w);
 	DECLARE_WRITE8_MEMBER(commando_c804_w);
-	DECLARE_DRIVER_INIT(spaceinv);
-	DECLARE_DRIVER_INIT(commando);
+	void init_spaceinv();
+	void init_commando();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_commando(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(commando_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

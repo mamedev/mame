@@ -194,8 +194,8 @@
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
 #include "machine/74123.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "video/mc6845.h"
@@ -221,43 +221,22 @@
 
 /*************************************
  *
- *  Interrupt generation
- *
- *************************************/
-
-WRITE_LINE_MEMBER(spiders_state::main_cpu_irq)
-{
-	pia6821_device *pia1 = machine().device<pia6821_device>("pia1");
-	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
-	pia6821_device *pia3 = machine().device<pia6821_device>("pia3");
-	int combined_state = pia1->irq_a_state() | pia1->irq_b_state() |
-													pia2->irq_b_state() |
-							pia3->irq_a_state() | pia3->irq_b_state();
-
-	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-/*************************************
- *
  *  PIA1 - Main CPU
  *
  *************************************/
 
 INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
 {
-	pia6821_device *pia1 = machine().device<pia6821_device>("pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia1->ca1_w(ioport("IN0")->read() & 0x02);
+	m_pia[0]->ca1_w(ioport("IN0")->read() & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia1->ca2_w(ioport("IN0")->read() & 0x01);
+	m_pia[0]->ca2_w(ioport("IN0")->read() & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia1->cb1_w(ioport("XHATCH")->read());
+	m_pia[0]->cb1_w(ioport("XHATCH")->read());
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -278,8 +257,7 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
 
 WRITE_LINE_MEMBER(spiders_state::ic60_74123_output_changed)
 {
-	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
-	pia2->ca1_w(state);
+	m_pia[1]->ca1_w(state);
 }
 
 /*************************************
@@ -541,12 +519,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(spiders_state::spiders)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 2800000)
-	MCFG_CPU_PROGRAM_MAP(spiders_main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 2800000)
+	MCFG_DEVICE_PROGRAM_MAP(spiders_main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 3000000)
-	MCFG_CPU_PROGRAM_MAP(spiders_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(spiders_audio_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -561,32 +539,35 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("ic60", ttl74123_device, a_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic60", ttl74123_device, a_w))
 
 	/* 74LS123 */
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(spiders_state,gfx_rom_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state,gfx_rom_intf_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(spiders_state,flipscreen_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, spiders_state,gfx_rom_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spiders_state,gfx_rom_intf_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, spiders_state,flipscreen_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
 
 	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spiders_state, spiders_audio_ctrl_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state, spiders_audio_command_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, spiders_state, spiders_audio_ctrl_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spiders_state, spiders_audio_command_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<3>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<4>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spiders_state, spiders_audio_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state, spiders_audio_b_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, spiders_state, spiders_audio_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spiders_state, spiders_audio_b_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("ic60", TTL74123, 0)
@@ -596,7 +577,7 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(spiders_state, ic60_74123_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, spiders_state, ic60_74123_output_changed))
 
 	/* audio hardware */
 	spiders_audio(config);
@@ -701,7 +682,7 @@ ROM_END
  *************************************/
 
 /* this is a newer version with just one bug fix */
-GAME( 1981, spiders,  0,       spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spiders2, spiders, spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spiders3, spiders, spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spinner,  spiders, spiders, spiders, spiders_state, 0, ROT270, "bootleg",                 "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders,  0,       spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders2, spiders, spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders3, spiders, spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spinner,  spiders, spiders, spiders, spiders_state, empty_init, ROT270, "bootleg",                 "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

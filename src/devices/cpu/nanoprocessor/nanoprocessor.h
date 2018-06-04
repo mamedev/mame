@@ -82,7 +82,7 @@ public:
 	// 3 cycles is for int. acknowledge + 1 instruction
 	virtual uint32_t execute_max_cycles() const override { return 3; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -114,7 +114,7 @@ private:
 	address_space_config m_io_config;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_io;
 
 	// device_t overrides
@@ -133,6 +133,6 @@ private:
 	void dc_clr(unsigned bit_no);
 };
 
-extern const device_type HP_NANOPROCESSOR;
+DECLARE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device)
 
 #endif /* _NANOPROCESSOR_H_ */

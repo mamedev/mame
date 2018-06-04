@@ -139,9 +139,9 @@ public:
 	DECLARE_WRITE8_MEMBER(glfgreat_sound_w);
 	DECLARE_WRITE8_MEMBER(tmnt_upd_start_w);
 	DECLARE_READ8_MEMBER(tmnt_upd_busy_r);
-	DECLARE_DRIVER_INIT(mia);
-	DECLARE_DRIVER_INIT(tmnt);
-	DECLARE_DRIVER_INIT(cuebrick);
+	void init_mia();
+	void init_tmnt();
+	void init_cuebrick();
 	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
 	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
 	DECLARE_MACHINE_START(common);

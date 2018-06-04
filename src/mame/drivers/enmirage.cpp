@@ -61,13 +61,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),
-		m_via(*this, "via6522")
+		m_via(*this, "via6522"),
+		m_digits(*this, "digit%u", 0U)
 	{
 	}
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
@@ -78,6 +79,7 @@ public:
 	void mirage_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void video_start() override;
 
 	required_device<mc6809e_device> m_maincpu;
@@ -88,15 +90,17 @@ protected:
 
 	uint8_t m_l_segs, m_r_segs;
 	int   m_l_hi, m_r_hi;
+	output_finder<2> m_digits;
 };
 
 FLOPPY_FORMATS_MEMBER( enmirage_state::floppy_formats )
 	FLOPPY_ESQ8IMG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ensoniq_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ensoniq_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 WRITE_LINE_MEMBER(enmirage_state::mirage_doc_irq)
 {
@@ -165,7 +169,7 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_porta)
 		}
 
 		m_l_hi = seg;
-		output().set_digit_value(0, m_l_segs);
+		m_digits[0] = m_l_segs;
 //      printf("L LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_l_hi, segconv[seg], m_l_segs);
 	}
 	// right LED selected?
@@ -183,7 +187,7 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_porta)
 		}
 
 		m_r_hi = seg;
-		output().set_digit_value(1, m_r_segs);
+		m_digits[1] = m_r_segs;
 //      printf("R LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_r_hi, segconv[seg], m_r_segs);
 	}
 }
@@ -211,29 +215,30 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_portb)
 }
 
 MACHINE_CONFIG_START(enmirage_state::mirage)
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(mirage_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
 
 	MCFG_DEFAULT_LAYOUT( layout_mirage )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ES5503_ADD("es5503", 7000000)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(enmirage_state, mirage_doc_irq))
-	MCFG_ES5503_ADC_FUNC(READ8(enmirage_state, mirage_adc_read))
+	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, enmirage_state, mirage_doc_irq))
+	MCFG_ES5503_ADC_FUNC(READ8(*this, enmirage_state, mirage_adc_read))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("via6522", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(enmirage_state, mirage_via_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(enmirage_state, mirage_via_write_portb))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, enmirage_state, mirage_via_write_porta))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, enmirage_state, mirage_via_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -250,7 +255,7 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-DRIVER_INIT_MEMBER(enmirage_state,mirage)
+void enmirage_state::init_mirage()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;
@@ -287,4 +292,4 @@ DRIVER_INIT_MEMBER(enmirage_state,mirage)
 	m_via->write_pb7(0);
 }
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )
+CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )

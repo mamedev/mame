@@ -386,7 +386,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( cmmb )
+static GFXDECODE_START( gfx_cmmb )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0x00, 4 )
 	GFXDECODE_ENTRY( "gfx", 0, spritelayout,   0x10, 4 )
 GFXDECODE_END
@@ -410,9 +410,9 @@ void cmmb_state::machine_reset()
 MACHINE_CONFIG_START(cmmb_state::cmmb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz
-	MCFG_CPU_PROGRAM_MAP(cmmb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz
+	MCFG_DEVICE_PROGRAM_MAP(cmmb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
 
 	MCFG_AT29C020_ADD("at29c020")
 
@@ -422,14 +422,14 @@ MACHINE_CONFIG_START(cmmb_state::cmmb)
 	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmmb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmmb)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRGGGBB_inverted)
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+//  SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -450,4 +450,4 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 2002, cmmb162,  0,       cmmb,  cmmb, cmmb_state,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

@@ -295,7 +295,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( ohmygod )
+static GFXDECODE_START( gfx_ohmygod )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 ) /* colors 512-767 */
 GFXDECODE_END
@@ -323,9 +323,9 @@ void ohmygod_state::machine_reset()
 MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(ohmygod_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(ohmygod_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -340,15 +340,15 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_SCREEN_UPDATE_DRIVER(ohmygod_state, screen_update_ohmygod)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ohmygod)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ohmygod)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 14000000/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 14000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -390,16 +390,16 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(ohmygod_state,ohmygod)
+void ohmygod_state::init_ohmygod()
 {
 	m_adpcm_bank_shift = 4;
 }
 
-DRIVER_INIT_MEMBER(ohmygod_state,naname)
+void ohmygod_state::init_naname()
 {
 	m_adpcm_bank_shift = 0;
 }
 
 
-GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod_state, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, naname,  0, ohmygod, naname,  ohmygod_state, naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod_state, init_ohmygod, ROT0, "Atlus", "Oh My God! (Japan)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, naname,  0, ohmygod, naname,  ohmygod_state, init_naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

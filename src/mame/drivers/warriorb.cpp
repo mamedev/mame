@@ -412,7 +412,7 @@ static const gfx_layout charlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( warriorb )
+static GFXDECODE_START( gfx_warriorb )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles (screen 1) */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* scr tiles (screen 2) */
@@ -438,23 +438,23 @@ void warriorb_state::machine_reset()
 MACHINE_CONFIG_START(warriorb_state::darius2d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
-	MCFG_CPU_PROGRAM_MAP(darius2d_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
+	MCFG_DEVICE_PROGRAM_MAP(darius2d_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(warriorb_state, coin_control_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, warriorb_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 
@@ -498,9 +498,10 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_TC0110PCR_PALETTE("palette2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -509,14 +510,10 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -527,23 +524,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(warriorb_state::warriorb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(warriorb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(warriorb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(warriorb_state, coin_control_w))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, warriorb_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 
@@ -588,9 +585,10 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_TC0110PCR_PALETTE("palette2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -599,14 +597,10 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -793,8 +787,8 @@ ROM_END
 
 /* Working Games */
 
-//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,MONITOR,COMPANY,FULLNAME,          FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, 0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,       MONITOR,COMPANY,FULLNAME,          FLAGS
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )

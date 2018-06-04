@@ -75,6 +75,10 @@ ram_device::extra_option_vector calculate_extra_options(const char *extra_option
 	bool done(false);
 	for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
 	{
+		// ignore spaces
+		while ((end > start) && (options.length() > start) && ((' ' == options[start]) || ('\t' == options[start])))
+			++start;
+
 		// parse the option
 		std::string ram_option_string(options.substr(start, (end == -1) ? -1 : end - start));
 		u32 const ram_option = parse_string(ram_option_string.c_str());
@@ -159,7 +163,7 @@ void ram_device::device_start()
 
 	// allocate space for the ram
 	m_pointer = std::make_unique<u8 []>(m_size);
-	std::fill_n(m_pointer.get(), m_size, 0);
+	std::fill_n(m_pointer.get(), m_size, m_default_value);
 
 	// register for state saving
 	save_item(NAME(m_size));
