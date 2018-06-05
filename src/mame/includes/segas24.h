@@ -22,6 +22,12 @@ public:
 		, m_palette(*this, "palette")
 		, m_generic_paletteram_16(*this, "paletteram")
 		, m_romboard(*this, "romboard")
+		, m_irq_timer(*this, "irq_timer")
+		, m_irq_timer_clear(*this, "irq_timer_clear")
+		, m_frc_cnt_timer(*this, "frc_timer")
+		, m_vtile(*this, "tile")
+		, m_vsprite(*this, "sprite")
+		, m_vmixer(*this, "mixer")
 		, m_gground_hack_timer(nullptr)
 		, m_p1(*this, "P1")
 		, m_p2(*this, "P2")
@@ -72,19 +78,19 @@ public:
 	int irq_vblank;
 	int irq_sprite;
 	attotime irq_synctime, irq_vsynctime;
-	timer_device *irq_timer;
-	timer_device *irq_timer_clear;
+	required_device<timer_device> m_irq_timer;
+	required_device<timer_device> m_irq_timer_clear;
 	//timer_device *irq_frc;
-	timer_device *frc_cnt_timer;
+	required_device<timer_device> m_frc_cnt_timer;
 	uint8_t frc_mode;
 
 	bool m_cnt1;
 
 	uint16_t *shared_ram;
 
-	segas24_tile_device *vtile;
-	segas24_sprite_device *vsprite;
-	segas24_mixer_device *vmixer;
+	required_device<segas24_tile_device> m_vtile;
+	required_device<segas24_sprite_device> m_vsprite;
+	required_device<segas24_mixer_device> m_vmixer;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_ym);
 	DECLARE_READ16_MEMBER(  sys16_paletteram_r );

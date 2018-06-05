@@ -686,13 +686,13 @@ READ8_MEMBER( segas24_state::frc_mode_r )
 WRITE8_MEMBER( segas24_state::frc_mode_w )
 {
 	/* reset frc if a write happens here */
-	frc_cnt_timer->reset();
+	m_frc_cnt_timer->reset();
 	frc_mode = data & 1;
 }
 
 READ8_MEMBER( segas24_state::frc_r )
 {
-	int32_t result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
+	int32_t result = (m_frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
 
 	result %= ((frc_mode) ? 0x67 : 0x100);
 
@@ -786,21 +786,21 @@ void segas24_state::irq_timer_start(int old_tmode)
 		if(old_tmode) {
 			irq_tval++;
 			if(irq_tval == 0x1000)
-				irq_timer->adjust(attotime::zero);
+				m_irq_timer->adjust(attotime::zero);
 			else
-				irq_timer->enable(false);
+				m_irq_timer->enable(false);
 		}
 		break;
 	case 1: {
 		int count = 0x1000 - irq_tval;
-		irq_timer->adjust(attotime::from_hz(HSYNC_CLOCK)*count);
+		m_irq_timer->adjust(attotime::from_hz(HSYNC_CLOCK)*count);
 		break;
 	}
 	case 2:
 		fatalerror("segas24_state::irq_timer_start - case 2\n");
 	case 3: {
 		int count = 0x1000 - irq_tval;
-		irq_timer->adjust(attotime::from_hz(TIMER_CLOCK)*count);
+		m_irq_timer->adjust(attotime::from_hz(TIMER_CLOCK)*count);
 		break;
 	}
 	}
@@ -857,8 +857,6 @@ void segas24_state::irq_init()
 	irq_timer_pend1 = 0;
 	irq_vblank = 0;
 	irq_sprite = 0;
-	irq_timer = machine().device<timer_device>("irq_timer");
-	irq_timer_clear = machine().device<timer_device>("irq_timer_clear");
 	irq_tval = 0;
 	irq_synctime = attotime::zero;
 	irq_vsynctime = attotime::zero;
@@ -940,7 +938,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 	else
 		return;
 
-	irq_timer_clear->adjust(attotime::from_hz(HSYNC_CLOCK));
+	m_irq_timer_clear->adjust(attotime::from_hz(HSYNC_CLOCK));
 
 	mask = 1 << irq;
 
@@ -1192,10 +1190,6 @@ void segas24_state::machine_start()
 		membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
 		membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
 	}
-
-	vtile = machine().device<segas24_tile_device>("tile");
-	vsprite = machine().device<segas24_sprite_device>("sprite");
-	vmixer = machine().device<segas24_mixer_device>("mixer");
 }
 
 void segas24_state::machine_reset()
@@ -1208,8 +1202,7 @@ void segas24_state::machine_reset()
 	irq_init();
 	mlatch = 0x00;
 	frc_mode = 0;
-	frc_cnt_timer = machine().device<timer_device>("frc_timer");
-	frc_cnt_timer->reset();
+	m_frc_cnt_timer->reset();
 }
 
 /*************************************
