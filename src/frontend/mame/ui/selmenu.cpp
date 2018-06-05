@@ -2070,7 +2070,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 			else if (ui_globals::curimage_view == TITLES_VIEW)
 			{
 				// First attempt from name list
-				std::string const pathname = software->listname + "_titles";
+				std::string const pathname = software->listname;
 				std::string fullname = software->shortname + ".png";
 				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 
