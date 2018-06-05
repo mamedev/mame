@@ -65,7 +65,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #include "includes/rltennis.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/nvram.h"
+#include "machine/eeprompar.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "screen.h"
@@ -94,7 +94,7 @@ WRITE16_MEMBER(rltennis_state::snd2_w)
 void rltennis_state::rltennis_main(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10ffff).ram().share("nvram");
+	map(0x100000, 0x103fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x200000, 0x20ffff).ram();
 	map(0x700000, 0x70000f).w(this, FUNC(rltennis_state::blitter_w));
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(rltennis_state::rltennis)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_EEPROM_2864_ADD("eeprom")
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 	MCFG_RAMDAC_SPLIT_READ(1)
