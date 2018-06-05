@@ -431,7 +431,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="4wt"> <!-- ESRB Rating: Everyone -->
+	<software name="4wt">
 		<!-- http://redump.org/disc/18633/
 		<rom name="4 Wheel Thunder (USA).gdi" size="1066" crc="3b5a27af" md5="be4f27fb70bb0b032699befd2dbccc9f" sha1="9cc0fb729d050ad59dd29547ba620e091677e008"/>
 		<rom name="4 Wheel Thunder (USA) (Track 01).bin" size="2817696" crc="2ef13cb1" md5="7e8d309edf2f9da4641c24c4a46559c2" sha1="b238bfba1a0b30fb1a2fa53546fdc8fbdda74a34"/>
@@ -470,7 +470,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	Both the German/French/Dutch (T-9706D-51) and the English/Spanish/Italian (T-9706D-61)
 	release share the same disc (T-9706D-50).
 	-->
-	<software name="4wte" cloneof="4wt"> <!-- ELSPA Rating: 3+, SELL Rating: Everyone, USK Rating: 0 -->
+	<software name="4wte" cloneof="4wt">
 		<!-- http://redump.org/disc/19672/
 		<rom name="4 Wheel Thunder (Europe) (En,Fr).gdi" size="1264" crc="7c677305" md5="5ab408da163670c3de81b36350f80819" sha1="9dd3de90fda791a6b67eeac129b9e1f9a6b8f0c1"/>
 		<rom name="4 Wheel Thunder (Europe) (En,Fr) (Track 01).bin" size="2817696" crc="c67f9d00" md5="673b843d54ca08e11a304df6f415bf90" sha1="6516c76403bcee8853826d97b580f19f1418d983"/>
@@ -508,7 +508,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="4x4evo"> <!-- ESRB Rating: Everyone -->
+	<software name="4x4evo">
 		<!-- http://redump.org/disc/24438/
 		<rom name="4x4 Evo (USA).gdi" size="565" crc="7b904cea" md5="b7e6593c685b5dfebe1447153f6b1afc" sha1="a45485d055c341c218e653b9df9c07d370211856"/>
 		<rom name="4x4 Evo (USA) (Track 01).bin" size="1425312" crc="2ebac441" md5="725de5c63f7afdb715d3d77f5def9960" sha1="ece1a9f45f34f2673a109024081e0fa1dcb1f8db"/>
@@ -579,7 +579,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="18wheelr"> <!-- ESRB Rating: Everyone -->
+	<software name="18wheelr">
 		<!-- http://redump.org/disc/18129/
 		<rom name="18 Wheeler - American Pro Trucker (USA).gdi" size="225" crc="3460f287" md5="95f6a45db8722322c1a435e76b7de72b" sha1="2d542bef13f37103723c316f99d93d2f7c1daf65"/>
 		<rom name="18 Wheeler - American Pro Trucker (USA) (Track 1).bin" size="1058400" crc="d1a18678" md5="4bd9dce3c5606b086b64b88ef9610eb7" sha1="c7794a4af576c2adfa9f099984ca91839dfbe6c7"/>
@@ -600,7 +600,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="18wheelre" cloneof="18wheelr"> <!-- ELSPA Rating: 3+, SELL Rating: Everyone, USK Rating: 6, aDeSe: Everyone -->
+	<software name="18wheelre" cloneof="18wheelr">
 		<!-- http://redump.org/disc/24418/
 		<rom name="18 Wheeler - American Pro Trucker (Europe) (En,Fr,De,Es).gdi" size="276" crc="6f1ca823" md5="7348f3f1082cbd349d4a9977ed07b7af" sha1="5b6beed05ffb6714dc2c2af0b486c070664c70ba"/>
 		<rom name="18 Wheeler - American Pro Trucker (Europe) (En,Fr,De,Es) (Track 1).bin" size="1058400" crc="a559def4" md5="202a2b7b53f8be7314d6cea6102bda10" sha1="43ba242fe1a06bf70a451fd1bcfae7853e9c4f34"/>
@@ -623,7 +623,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
-	<software name="18wheelrj" cloneof="18wheelr"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="18wheelrj" cloneof="18wheelr">
 		<!-- http://redump.org/disc/5925/
 		<rom name="18 Wheeler - American Pro Trucker (Japan).gdi" size="231" crc="ed940f74" md5="4065ae1d95d3035ffa820258f4b3e44c" sha1="aaf4804a56df2947e585472a87adbd8a723fba8a"/>
 		<rom name="18 Wheeler - American Pro Trucker (Japan) (Track 1).bin" size="1058400" crc="a00afea2" md5="df865245bce0b72fc274a4e58004d8cb" sha1="973878d419578fa851462188c243cefa987e6d61"/>
@@ -686,7 +686,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	Also released as a Dorikore version, which is identical to retail (regular edition).
 	-->
-	<software name="21twoone"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="21twoone">
 		<!-- http://redump.org/disc/41910/
 		<rom name="21 - Two One (Japan).gdi" size="168" crc="6f08fed9" md5="79053f720e65985979bb83bd04734817" sha1="01edb82340362290c1704b27ac092033048aa08d"/>
 		<rom name="21 - Two One (Japan) (Track 1).bin" size="705600" crc="13857ce2" md5="e8876fda9a55e1b05d52015a78be127b" sha1="5c086c7c66fea4255b8e08ad808f03850762975c"/>
@@ -709,7 +709,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- A promo version exists (950-0181-50 952-0166-50), it is most likely the same as retail. -->
-	<software name="90min"> <!-- ELSPA Rating: 3+, SELL Rating: Everyone, USK Rating: 0, aDeSe: Everyone -->
+	<software name="90min">
 		<!-- http://redump.org/disc/5770/
 		<rom name="90 Minutes - Sega Championship Football (Europe) (En,Fr,De,Es,It).gdi" size="303" crc="ab59bc9d" md5="a3dfa2f876e82b6317b4d5f7efe6e73c" sha1="dfb875bf8c58f47fc21db035708980c5f7899b8a"/>
 		<rom name="90 Minutes - Sega Championship Football (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="1058400" crc="1ae2cdcf" md5="892df16103f2a48874c9b1c877db3d1b" sha1="534fe69656a14148d36d9d66e9b2c6f6966c8040"/>
@@ -729,7 +729,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="jlspecso" cloneof="90min"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="jlspecso" cloneof="90min">
 		<!-- http://redump.org/disc/41872/
 		<rom name="J. League Spectacle Soccer (Japan).gdi" size="210" crc="143ad00c" md5="c5cebc6a13d38960a980da8e11450c16" sha1="c690db7afa6487c276dda8e7bae2f1d0919f4172"/>
 		<rom name="J. League Spectacle Soccer (Japan) (Track 1).bin" size="1058400" crc="2c2b7d97" md5="1fa09eb11d524018b409c5c83048bf8c" sha1="a2b50232ecdce1a6f1374027fc789f9fed1d7ef1"/>
@@ -753,7 +753,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="adai2001"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="adai2001">
 		<!-- http://redump.org/disc/45789/
 		<rom name="Advanced Daisenryaku 2001 (Japan).gdi" size="207" crc="aabcc355" md5="25fccc35fba7f28055e2fbc8a74340cb" sha1="f85869a4f7e211e449b32c8205cac00a4f7e29ef"/>
 		<rom name="Advanced Daisenryaku 2001 (Japan) (Track 1).bin" size="3843168" crc="b1a8a52e" md5="784f4a1fd6849adc06d854b02b9b9bae" sha1="4aa1e539eed8c8290c772025dd7f869a5c621ba2"/>
@@ -778,7 +778,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="adaisue"> <!-- Sega Rating: Suitable for All Ages -->
+	<!-- This is labeled "Rev. A". It is unknown if there ever was a "Rev. 0" released. -->
+	<software name="adaisue">
 		<!-- http://redump.org/disc/41732/
 		<rom name="Advanced Daisenryaku - Sturm ueber Europa - Der Deutsche Blitzkrieg (Japan).gdi" size="333" crc="356a822e" md5="0d7c41b2625ae226ac0545775ca885be" sha1="3b443572cbd2c505ad6f4e81a539d2daafbafa60"/>
 		<rom name="Advanced Daisenryaku - Sturm ueber Europa - Der Deutsche Blitzkrieg (Japan) (Track 1).bin" size="3843168" crc="bff72044" md5="42982e5e5469cfa18aa20151d8b241d8" sha1="1c01362b7c792bad8fed26ba5e8923b4b343239a"/>
@@ -803,7 +804,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerodi"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="aerodi">
 		<!-- http://redump.org/disc/43737/
 		<rom name="Aero Dancing i (Japan).gdi" size="293" crc="dca6e2f2" md5="a1381ccdbbade5c005d90e4363a1b3d5" sha1="7ec389179011b93a8f76ee4952a8ef464783267d"/>
 		<rom name="Aero Dancing i (Japan) (Track 1).bin" size="4064256" crc="4bd3ec88" md5="dedbd174be77e5be20347ea71e1fe587" sha1="30a60252b0025e2796ecbf06d7e37cda3ad6b469"/>
@@ -827,7 +828,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerodijsmm" cloneof="aerodi" > <!-- Sega Rating: Suitable for All Ages -->
+	<software name="aerodijsmm" cloneof="aerodi" >
 		<!-- http://redump.org/disc/41915/
 		<rom name="Aero Dancing i - Jikai-saku made Matemasen (Japan).gdi" size="433" crc="15e602fe" md5="a4db3a809f8edab42873cf760c16e953" sha1="83ad51211aac9dbbee67bb15a18707a88b2d6cd1"/>
 		<rom name="Aero Dancing i - Jikai-saku made Matemasen (Japan) (Track 1).bin" size="719712" crc="7bfc9cd3" md5="d808b8e61ed195281e795b6f24cdcf8d" sha1="22df00b2b6c1c0dcfbcd1c44586cb01b6a2c2296"/>
@@ -851,7 +852,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerowing"> <!-- ESRB Rating: Everyone -->
+	<software name="aerowing">
 		<!-- http://redump.org/disc/18033/
 		<rom name="AeroWings (USA).gdi" size="153" crc="de1f9cce" md5="9805e97f6c7eba3b386956a24f959177" sha1="155ffa5ce24956861379ed2e0fe48e921360b755"/>
 		<rom name="AeroWings (USA) (Track 1).bin" size="2154432" crc="0d7f17e4" md5="c74fc49de7f1c13ee6c4892c5b3b84c6" sha1="ce9d0c5c45f48da5e86b13c3a827f987a2e915f6"/>
@@ -873,7 +874,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- A promo version exists (950-0008-50), it is most likely the same as retail. -->
-	<software name="aerowinge" cloneof="aerowing"> <!-- ELSPA Rating: 3+, SELL Rating: Everyone, USK Rating: 0 -->
+	<software name="aerowinge" cloneof="aerowing">
 		<!-- http://redump.org/disc/18698/
 		<rom name="AeroWings (Europe) (En,Fr,De).gdi" size="195" crc="3d735cce" md5="64a0848df806b1b24f75d370b7c53921" sha1="1a1e0f3d51ed648e8feaad70d9586c4328fc59c8"/>
 		<rom name="AeroWings (Europe) (En,Fr,De) (Track 1).bin" size="2154432" crc="0f51258f" md5="f8fedc416112be087b191cbeef98dd19" sha1="5208ec2b6a5f8f0470bb542b8dd9cbaf31dff23f"/>
@@ -894,7 +895,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerodfbi" cloneof="aerowing"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="aerodfbi" cloneof="aerowing">
 		<!-- http://redump.org/disc/5845/
 		<rom name="Aero Dancing featuring Blue Impulse (Japan).gdi" size="237" crc="99db2c17" md5="ab1c5ddfff05ccdc69f33383063286cc" sha1="b17263eb8b4090ea5a9a404df9da8068fe9fa3e6"/>
 		<rom name="Aero Dancing featuring Blue Impulse (Japan) (Track 1).bin" size="705600" crc="3e1ace04" md5="58f4e4d058221b567c4b7e3f9919fb23" sha1="ba6e5e7ca31c6d4a8a3c231568a61a80b69f7990"/>
@@ -916,7 +917,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerodtthd" cloneof="aerowing"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="aerodtthd" cloneof="aerowing">
 		<!-- http://redump.org/disc/42728/
 		<rom name="Aero Dancing - Todoroki Taichou no Himitsu Disc (Japan).gdi" size="273" crc="4c4bca12" md5="ca4004b00c5467ec56a42490afd4ee0a" sha1="ba8ee5b72c581f2196c98d8b16616ac5a06402f3"/>
 		<rom name="Aero Dancing - Todoroki Taichou no Himitsu Disc (Japan) (Track 1).bin" size="1909824" crc="a5e0f400" md5="0b201ae31b9b6ed541f723cf4df2a3dd" sha1="c2552f9915dc030a93df018c548b6258ac9bfa9f"/>
@@ -954,50 +955,54 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<software name="aerowin2">
-		<!--
-		<rom name="AeroWings 2 - Airstrike v1.001 (2000)(Crave)(NTSC)(US)[!].gdi" size="87" md5="5b38a611e63871dc385875fb740c00e9" sha1="37d8dd96a4d81234590325844af4044c62183f5e"/>
-		<rom name="track01.bin" size="1279488" md5="83c0f100b61e627ba0face38a84c85cf" sha1="500ad059be5f9722bea1fcf7a23404e856dee00a"/>
-		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
-		<rom name="track03.bin" size="1185760800" md5="362d8bf3d92d0f6369a6d744545a6d8b" sha1="7adb934c4f47792cc7ef1d55b8fdb3c478d78e17"/>
+		<!-- http://redump.org/disc/24451/
+		<rom name="AeroWings 2 - Airstrike (USA).gdi" size="195" crc="41b14cd7" md5="c5be8144ed81311daafc81459a6fdce7" sha1="1a320c9c95ee603ae26346454aa640422ed8df76"/>
+		<rom name="AeroWings 2 - Airstrike (USA) (Track 1).bin" size="1279488" crc="85add1a8" md5="83c0f100b61e627ba0face38a84c85cf" sha1="500ad059be5f9722bea1fcf7a23404e856dee00a"/>
+		<rom name="AeroWings 2 - Airstrike (USA) (Track 2).bin" size="1589952" crc="8557fcaa" md5="824ff123fbce45b5883962eb3fa43cab" sha1="a3705cb0ce53c7adf906c5af76887406984de6a9"/>
+		<rom name="AeroWings 2 - Airstrike (USA) (Track 3).bin" size="1185760800" crc="a167ccc4" md5="362d8bf3d92d0f6369a6d744545a6d8b" sha1="7adb934c4f47792cc7ef1d55b8fdb3c478d78e17"/>
 		-->
 		<description>AeroWings 2: Airstrike (USA)</description>
 		<year>2000</year>
 		<publisher>Crave</publisher>
 		<info name="serial" value="T-40210N"/>
 		<info name="release" value="20000824"/>
+		<info name="ring_code" value="0G031C   T-40210N   maxell CA USA"/>
+		<info name="barcode" value="6 50008 79921 7"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aerowings 2 airstrike (usa)" sha1="01c920695add7b8dedb28c42548cdb92331b2f7c"/>
+				<disk name="aerowings 2 airstrike (usa)" sha1="2cb80043518a27527432799636f1ad1ff451d472"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<!-- A promo version exists (950-0121-50 952-0113-50), it is most likely the same as retail. -->
 	<software name="aerowin2e" cloneof="aerowin2">
-		<!--
-		<rom name="AeroWings 2 - Airstrike v1.001 (2000)(Crave - Ubi Soft)(PAL)(en-de)[!].gdi" size="88" md5="9cc48283141be731b3fe38793314de2f" sha1="cacb3216b183f991b3f4963ad9653906e5e44fac"/>
-		<rom name="track01.bin" size="4325328" md5="7d73c25c31db616f0279242062b20a91" sha1="72d17f8bda82d1b4fdeedc19711bcac0c873128f"/>
-		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
-		<rom name="track03.bin" size="1185760800" md5="4280fb803593ef5ba52181687db1d28f" sha1="8c698f2c7d3e4de52d2d2efe6e54ea06e8f1ab5b"/>
+		<!-- http://redump.org/disc/51254/
+		<rom name="AeroWings 2 - Airstrike (Europe) (En,De).gdi" size="228" crc="a1668cb9" md5="197d435bdf928c6d8b95fe61e3960c7f" sha1="8fffbeb48aa075865ef2bbbcf157c6847a849f38"/>
+		<rom name="AeroWings 2 - Airstrike (Europe) (En,De) (Track 1).bin" size="4325328" crc="fb1f066c" md5="7d73c25c31db616f0279242062b20a91" sha1="72d17f8bda82d1b4fdeedc19711bcac0c873128f"/>
+		<rom name="AeroWings 2 - Airstrike (Europe) (En,De) (Track 2).bin" size="14347200" crc="49e43706" md5="9cca4624e62f04dc398aed22b5370a34" sha1="a34bdc73ac1e360b13d0592b501a388e0225e994"/>
+		<rom name="AeroWings 2 - Airstrike (Europe) (En,De) (Track 3).bin" size="1185760800" crc="5a0adc89" md5="4280fb803593ef5ba52181687db1d28f" sha1="8c698f2c7d3e4de52d2d2efe6e54ea06e8f1ab5b"/>
 		-->
 		<description>AeroWings 2: Airstrike (Euro)</description>
 		<year>2000</year>
 		<publisher>Crave</publisher>
 		<info name="serial" value="T-40209D-50"/>
 		<info name="release" value="200010xx"/>
+		<info name="ring_code" value="T-40209D-0289SS EMI CD HOLLAND   @ 1"/>
+		<info name="barcode" value="3 307211 305274"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aerowings 2 airstrike (euro)" sha1="f5e822959a6c405c3cf4322ba986117bcf677071"/>
+				<disk name="aerowings 2 airstrike (euro)" sha1="e99510faf84a7eabd531802ec4a498dd3e192f47"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="aerodf" cloneof="aerowin2">
-		<!--
-		<rom name="Aero Dancing F v1.006 (2000)(CRI)(NTSC)(JP)[!].gdi" size="88" md5="a21d63aaf3c2a6d94ca25bd8e95110ac" sha1="01f2f821ae4054918638dd4b12522b2c1badfc1c"/>
-		<rom name="track01.bin" size="2154432" md5="2ea1b4a9043e477fd6913a284716c18b" sha1="85009cc39cee035fc32c423e3f4c8bb25629a735"/>
-		<rom name="track02.raw" size="37363872" md5="7e5739ff224eb362428ee604b158b770" sha1="a7250f04d17022090f6d99af23fe102ab0027bff"/>
-		<rom name="track03.bin" size="1185760800" md5="9fa073ad083749c15be2fb304482d8a2" sha1="42435d075e03ba0866da9fa921671bdb3e8ec7c4"/>
+		<!-- http://redump.org/disc/42727/
+		<rom name="Aero Dancing F (Japan).gdi" size="174" crc="ca6b653f" md5="b6faa93c03411b7f6be6c70e14438886" sha1="64cd607969a0504563316279a34a67501aff3c30"/>
+		<rom name="Aero Dancing F (Japan) (Track 1).bin" size="2154432" crc="8958d698" md5="2ea1b4a9043e477fd6913a284716c18b" sha1="85009cc39cee035fc32c423e3f4c8bb25629a735"/>
+		<rom name="Aero Dancing F (Japan) (Track 2).bin" size="37716672" crc="593fb5ea" md5="130e6981084b5c2aa9730bfe512f1f45" sha1="f96e2c38b4e665edf4396938001adfa1b5f0965e"/>
+		<rom name="Aero Dancing F (Japan) (Track 3).bin" size="1185760800" crc="9029a4a5" md5="9fa073ad083749c15be2fb304482d8a2" sha1="42435d075e03ba0866da9fa921671bdb3e8ec7c4"/>
 		-->
 		<description>Aero Dancing F (Jpn)</description>
 		<year>2000</year>
@@ -1005,15 +1010,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-6804M"/>
 		<info name="release" value="20000224"/>
 		<info name="alt_title" value="エアロダンシングF"/>
+		<info name="ring_code" value="T-6804M-0312 3"/>
+		<info name="barcode" value="4 981670 208308"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing f (jpn)" sha1="d7cfa770a6ded65be3a024775927a0cf311b376a"/>
+				<disk name="aero dancing f (jpn)" sha1="947d28cba00209641718ed6b0575efa5730ce132"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<!-- Updated Dorikore release. It does NOT contain the same disc as the original release. -->
-	<software name="aerodf1" cloneof="aerowin2"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="aerodf1" cloneof="aerowin2">
 		<!-- http://redump.org/disc/45769/
 		<rom name="Aero Dancing F (Japan) (Rev A).gdi" size="198" crc="e4470cf9" md5="c416717bec75dd6dc0c0ac2aac5507dd" sha1="8ad3db0c89a4aa1b9000c88d76b56303593a8ae5"/>
 		<rom name="Aero Dancing F (Japan) (Rev A) (Track 1).bin" size="2154432" crc="191dbf58" md5="94302507e581d154ea1e126a05001f6c" sha1="d319b87557e908df128fe0a790a560ec58e17949"/>
@@ -1055,7 +1062,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerodftthh" cloneof="aerowin2"> <!-- Sega Rating: Suitable for All Ages -->
+	<!-- This is labeled "Rev. A". It is unknown if there ever was a "Rev. 0" released. -->
+	<software name="aerodftthh" cloneof="aerowin2">
 		<!-- http://redump.org/disc/41914/
 		<rom name="Aero Dancing F - Todoroki Tsubasa no Hatsu Hikou (Japan).gdi" size="276" crc="d386ba8b" md5="ecbd5215b463d5a5a04143eb3fd8e64d" sha1="8ab03310918eff5612729e78f0f41a055c6f71b6"/>
 		<rom name="Aero Dancing F - Todoroki Tsubasa no Hatsu Hikou (Japan) (Track 1).bin" size="705600" crc="73dd6a70" md5="e9f33d301d8a0015ade3fdf625e7c206" sha1="d6de01629e27db2b9bc9e200c9749c24ccb678c9"/>
@@ -1113,7 +1121,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- The Limited Edition (T-18705M) comes in a DVD-style case and includes an embroidered St. Kirigamori High School Emblem and an audio CD. -->
-	<software name="aftersg"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="aftersg">
 		<!-- http://redump.org/disc/43364/ http://redump.org/disc/43365/
 		<rom name="After... - Wasureenu Kizuna (Japan).gdi" size="213" crc="8d86e1e4" md5="af1c02ac14468137e52976faa1024b70" sha1="64c25a23bbab61b849fb3eb636c8e61ec76c20c6"/>
 		<rom name="After... - Wasureenu Kizuna (Japan) (Track 1).bin" size="705600" crc="6e1f74fa" md5="44920ffcbe0a3f2e39181d5bcf33432a" sha1="f36dc1960e47d47a9b7ae04cbc8867b6510675dd"/>
@@ -1170,7 +1178,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- The Limited Edition (T-20131M) shares the same disc as the regular edition (T-20130M) but includes a telephone card. -->
-	<software name="aikagi"> <!-- CERO Rating: 18 and Older -->
+	<software name="aikagi">
 		<!-- http://redump.org/disc/41735/
 		<rom name="Aikagi - Hidamari to Kanojo no Heyagi (Japan).gdi" size="243" crc="a2944fce" md5="693c09a9b656cdc333dae12a0632792b" sha1="8032de9628df053dbc62bf9009d59b8b497ecc9c"/>
 		<rom name="Aikagi - Hidamari to Kanojo no Heyagi (Japan) (Track 1).bin" size="705600" crc="2e66a88b" md5="7aff73dbd727d6279387b268d1be19ab" sha1="ad17c2be5f23f89dcac17ade5553e0038e9568a8"/>
@@ -1194,7 +1202,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- This is labeled "Rev. A". It is unknown if there ever was a "Rev. 0" released. -->
-	<software name="air"> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="air">
 		<!-- http://redump.org/disc/39556/
 		<rom name="Air (Japan).gdi" size="141" crc="6b002d44" md5="560caaead3dbedae860f2b180ab513b5" sha1="1cde83dc15ed1cea30771b66e7b86042bd3f7e5b"/>
 		<rom name="Air (Japan) (Track 1).bin" size="705600" crc="a25b2951" md5="e529551cd0775e7788c53010ccafad81" sha1="ee74edc163b1828af4167f64cea57da51109dd6d"/>
@@ -19386,7 +19394,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="mt2spec">
+	<software name="mjtaika2">
 		<!--
 		<rom name="Mahjong Taikai II Special v1.003 (1999)(KOEI)(NTSC)(JP)[!].gdi" size="87" md5="0b2a05d3854733308ba981e5fffc2d44" sha1="de021d06c724c8f4944caa261a1341e4d472b7df"/>
 		<rom name="track01.bin" size="1114848" md5="6bc33d24d995fd01f058de1ac88a3070" sha1="3f54a23be491d948da424cdf3cd0fe06b0be2ba5"/>
@@ -19539,7 +19547,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="salburg">
+	<software name="marie">
 	    <description>Marie &amp; Elie no Atelier: Salburg no Renkinjutsushi 1-2 (Jpn)</description>
 	    <year>2001</year>
 	    <publisher>Kool Kizz</publisher>
@@ -19562,7 +19570,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- The Limited Edition (T-5201M) shares the same disc as the regular edition (T-5202M) but includes a dress-up paper doll. -->
-	<software name="maricomp">
+	<software name="marionet">
 		<!--
 		<rom name="Marionette Company v1.001 (1999)(Microcabin)(NTSC)(JP)[!].gdi" size="87" md5="2d6f7e9ca26b6982ca776c45c62cd2b2" sha1="3b01da239f4c7d86c08c351dd371c42ca3ff430e"/>
 		<rom name="track01.bin" size="1227744" md5="3a292fe1663e73117a8fa80537efd7f3" sha1="06446676731cd712ef0fc4a0625dada949ae894a"/>
@@ -19582,7 +19590,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="maricomp2">
+	<software name="mariont2">
 		<!--
 		<rom name="Marionette Company 2 v1.001 (2000)(Microcabin)(NTSC)(JP)[!].gdi" size="149" md5="119d36ec462982fb91185a0273e34d63" sha1="fca954123ac5fe7acb1b3e3f1430319c2ae5d7a5"/>
 		<rom name="track01.bin" size="1994496" md5="d5fe7777a5073a02b2487a04aa3796ed" sha1="a7f05a8152d4e87adf73733cb226956780a89876"/>
@@ -19653,7 +19661,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="marsmatr">
+	<software name="mmatrix">
 		<!--
 		<rom name="Mars Matrix v1.000 (2000)(Capcom)(NTSC)(US)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
 		<rom name="track01.bin" size="1232448" md5="cb47f3fbc0012c8e8a55474540da5e89" sha1="899fe528ef0102c6abc388dcd160ece55d2d590e"/>
@@ -19672,7 +19680,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="marsmatrj" cloneof="marsmatr">
+	<software name="mmatrixj" cloneof="mmatrix">
 		<description>Mars Matrix (Jpn)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
@@ -19687,7 +19695,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="mvc">
+	<software name="mvsc">
 		<!--
 		<rom name="Marvel vs. Capcom - Clash of Super Heroes v1.000 (1999)(Capcom)(NTSC)(US)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="b21479c1f887b159acc3f65d47e275d4" sha1="f9354b0aab7fbdeda6cc716b3a962ee7d4c23b95"/>
@@ -19707,7 +19715,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Both the English/Spanish/Italian (T-7002D-61) and German/French/Dutch (T-7002D-51) release share the same disc (T-7002D-50). -->
-	<software name="mvce" cloneof="mvc">
+	<software name="mvsce" cloneof="mvsc">
 		<!--
 		<rom name="Marvel vs. Capcom - Clash of Super Heroes v1.000 (1999)(Virgin)(PAL)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
 		<rom name="track01.bin" size="1232448" md5="74725f8adc78446292f82e33b5b5f97a" sha1="6634743c2abdb85a30a61ace8496b5e7eb633e8e"/>
@@ -19726,7 +19734,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="mvcj" cloneof="mvc">
+	<software name="mvscj" cloneof="mvsc">
 		<!--
 		<rom name="Marvel vs. Capcom - Clash of Super Heroes v1.003 (1999)(Capcom)(NTSC)(JP)(en)[!][T-1202M-0047 HJ224G, HJ225A].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
 		<rom name="track01.bin" size="1232448" md5="7d5515ad13e0659b607e03e2c9cd92e6" sha1="ce0a1e878ab4c55d3039e0df1470f4dc71595ccf"/>
@@ -19748,7 +19756,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="mvctt" cloneof="mvc">
+	<software name="mvsctt" cloneof="mvsc">
 		<description>Marvel vs. Capcom: Clash of Super Heroes - Tentou Taikenban (Jpn)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
@@ -19762,7 +19770,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="mvc2">
+	<software name="mvsc2">
 		<!--
 		<rom name="Marvel vs. Capcom 2 v1.001 (2000)(Capcom)(NTSC)(US)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
 		<rom name="track01.bin" size="705600" md5="9ada8a77c2e73a9fcc5b2b823fc44017" sha1="c0b0dda107324ed9027f4fb86c8ca58cd5dfb312"/>
@@ -19782,7 +19790,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- A promo version exists (P830-0125-50 T-7010D-50), it is most likely the same as retail. -->
-	<software name="mvc2e" cloneof="mvc2">
+	<software name="mvsc2e" cloneof="mvsc2">
 		<!--
 		<rom name="Marvel vs. Capcom 2 - New Age of Heroes v1.000 (2000)(Virgin)(PAL)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="0704d22d24a353bae2ed4df1a3f9c810" sha1="df8a01aeb61313a26ccb5e808ad2b68fa6009f2a"/>
@@ -19801,7 +19809,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="mvc2j" cloneof="mvc2">
+	<software name="mvsc2j" cloneof="mvsc2">
 		<!--
 		<rom name="Marvel vs. Capcom 2 - New Age of Heroes v2.000 (2000)(Capcom)(NTSC)(JP)(en)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="fdb3b365ccd0aeb94b57745838b3b877" sha1="4df00dddea71cd70a88ad19626dc5ee12777cee9"/>
@@ -19822,7 +19830,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="mvc2tt" cloneof="mvc">
+	<software name="mvsc2tt" cloneof="mvsc2">
 		<description>Marvel vs. Capcom 2: New Age of Heroes - Tentou Taikenban (Jpn)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
@@ -19836,7 +19844,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="mhpb">
+	<software name="hoffbmx">
 		<!--
 		<rom name="Mat Hoffman's Pro BMX v1.000 (2001)(Activision)(NTSC)(US)[!].gdi" size="149" md5="2dbd634b602bbd211d87ee4eae8cd536" sha1="680f6e5b744596bd8794a86dd531d49169b65b21"/>
 		<rom name="track01.bin" size="705600" md5="17934fc28c011a011c98abbb6e08a2f2" sha1="a0e32c088816f48b6cc0d62a8ac6cd9aa00b5849"/>
@@ -20152,7 +20160,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
-	<software name="mercurius">
+	<software name="mercur">
 		<!--
 		<rom name="Mercurius Pretty - End of the Century v1.003 (2000)(NEC InterChannel)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
 		<rom name="track01.bin" size="705600" md5="09daa0e3caa5d96030eeb33f4fdd1037" sha1="7a8a85d9b12eb9228466965008dbb5328d94d0f0"/>
@@ -20254,7 +20262,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="midway1">
+	<software name="midwaygh">
 		<!--
 		<rom name="Midway's Greatest Arcade Hits Volume 1 v1.001 (2000)(Midway)(NTSC)(US)[!][compilation].gdi" size="149" md5="21d3cbdc100c101f1bc588b3e5c35380" sha1="3ccb6636b9a91c64e0d71791483715e7bbed3da7"/>
 		<rom name="track01.bin" size="1578192" md5="b503270a54c93cef508360084744335f" sha1="b3696f0a3f0ecaef3d4053534f68e6af73a58b1b"/>
@@ -20275,7 +20283,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="midway1e" cloneof="midway1">
+	<software name="midwayghe" cloneof="midwaygh">
 		<!--
 		<rom name="Midway's Greatest Arcade Hits Volume 1 v1.000 (2000)(Midway)(PAL)[!][compilation].gdi" size="149" md5="e796c9d04b04649590ad02bc91c34368" sha1="97ffe5bbf814ec70f23e4f41407e100a7e71941e"/>
 		<rom name="track01.bin" size="1578192" md5="a0d196758abdf90c7dbb6b94e7c8ab3d" sha1="5946f74af328eefb0f19383c01b9e9185916d9f0"/>
@@ -20296,7 +20304,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="midway2">
+	<software name="midwaygh2">
 		<!--
 		<rom name="Midway's Greatest Arcade Hits Volume 2 v1.001 (2001)(Midway)(NTSC)(US)[!][compilation].gdi" size="946" md5="973b014d181a4c54a46c8cd73790a1fa" sha1="1eb9bc29db576cf67eb4ae79b9b6fb1104d00767"/>
 		<rom name="track01.bin" size="1425312" md5="2a503092463c362493fda1610ff5e2f6" sha1="4630f719428294410b32d0e89ad3f9e1598e9510"/>
@@ -21133,7 +21141,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="mrdrill">
+	<software name="mrdrillr">
 		<!--
 		<rom name="Mr Driller v1.001 (2000)(Namco)(NTSC)(US)[!].gdi" size="914" md5="1c548c8c9c9091dc4dbddc517e7ecc7a" sha1="215cc892a8a6cce5c7fbc9dd584ca8d462888bad"/>
 		<rom name="track01.bin" size="1058400" md5="9caa59c4b837f42e78dc0bf552e97616" sha1="2d952d0bcf2c012eef48838e5e86b469a52b9402"/>
@@ -21179,7 +21187,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- A promo version exists (P830-0211-50 PT-7020D-50), it is most likely the same as retail. -->
-	<software name="mrdrille" cloneof="mrdrill">
+	<software name="mrdrillre" cloneof="mrdrillr">
 		<!--
 		<rom name="Mr Driller v1.001 (2000)(Virgin)(PAL)(M5)[!].gdi" size="914" md5="3739aa37afa2f82106867586b287e812" sha1="4340b8e0ff280a4506e52b2ce86c905102fe1578"/>
 		<rom name="track01.bin" size="1058400" md5="961f8fba69b64d5286d3ec4f7bb02109" sha1="b5b39be24dbc7f6dbe84988bb91295b74f37d5b2"/>
@@ -21225,7 +21233,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="mrdrillj" cloneof="mrdrill">
+	<software name="mrdrillrj" cloneof="mrdrillr">
 		<description>Mr. Driller (Jpn)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
@@ -21241,7 +21249,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
-	<software name="mrdrillp" cloneof="mrdrill">
+	<software name="mrdrillrp" cloneof="mrdrillr">
 		<!--
 		<rom name="MR.DRILLER.gdi" size="884" md5="050821364ccff3bacb121d07fe5a51dd" sha1="cbed3ccb5926e885bf7d9decbf6e637d6f810fa9"/>
 		<rom name="track01.iso" size="   921600" md5="f52cb55c0577796c32c556e693140d9c" sha1="be8c69a250e153fefce4261bb0d4a7d827af7553"/>
@@ -21358,6 +21366,20 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			</diskarea>
 		</part>
 	</software>
+
+	<!--
+	<software name="msrea" cloneof="msr">
+		<description>MSR: Metropolis Street Racer (Euro, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-51022-50"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="msr metropolis street racer (euro, rev. a)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
 
 	<software name="msreb" cloneof="msr">
 		<!--
@@ -21535,7 +21557,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="namcomus">
+	<software name="namcoms">
 		<!--
 		<rom name="Namco Museum v1.010 (2000)(Namco)(NTSC)(US)[!][compilation].gdi" size="149" md5="f1cf6ccf63a1d53523698b30aaceffbd" sha1="8c3c67e8a505d8485ddeee28f5ff8acd8063840e"/>
 		<rom name="track01.bin" size="1425312" md5="3c947c330009bcd8e6cfdeaed4fec9cc" sha1="ccdf657b8453c49d3328920116615a731c650639"/>
@@ -21855,7 +21877,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="nbaonnbc">
+	<software name="nbashowt">
 		<!--
 		<rom name="NBA Showtime - NBA on NBC v1.003 (1999)(Midway)(NTSC)(US)[!].gdi" size="149" md5="3dd8dbf7f9f68997102bf571ff05eef4" sha1="905d96ea8a015058eb2721b1c6ccc92cffba416b"/>
 		<rom name="track01.bin" size="1342992" md5="411e3686e69e5425e1899972b9d41470" sha1="8d8755731becf36205e659ebe2f7950f77f9b7c2"/>
@@ -21876,7 +21898,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="nbaonnbce" cloneof="nbaonnbc">
+	<software name="nbashowte" cloneof="nbashowt">
 		<!--
 		<rom name="NBA Showtime - NBA on NBC v1.001 (1999)(Midway)(PAL)[!].gdi" size="149" md5="3dd8dbf7f9f68997102bf571ff05eef4" sha1="905d96ea8a015058eb2721b1c6ccc92cffba416b"/>
 		<rom name="track01.bin" size="1342992" md5="d5ddef5be603b15d23f2421a44f6dc01" sha1="3f4532f1a111df234aff341383249f275a934798"/>
@@ -22505,7 +22527,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Also released with a NFL 2K1 Bible. It is unknown whether it is a different revision or not. -->
-	<software name="nfl2k1">
+	<software name="nfl2k1j" cloneof="nfl2k1">
 		<!--
 		<rom name="NFL 2K1 v1.000 (2001)(Sega)(NTSC)(JP)(en)[!].gdi" size="87" md5="fd4d9a5d43a530d229ee0076d32506fb" sha1="eecb4856b5bc0c31573ce72b705cf0519e90c7f6"/>
 		<rom name="track01.bin" size="1996848" md5="7774291898ec7880ac0da0885d46eb1b" sha1="32809c0f71cf1867bcefba4eb968764744716004"/>
@@ -22875,7 +22897,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="nightcr2">
+	<software name="ncreatr2">
 		<!--
 		<rom name="Nightmare Creatures II v1.000 (2000)(Konami)(NTSC)(US)[!].gdi" size="2835" md5="2d249189fb5ce86919ec1130ce35353c" sha1="2ff51c8a754a99608d12a2cf1800171ece4af2f5"/>
 		<rom name="track01.bin" size="4798080" md5="9998f1ff9bb5dabb507e61066709744f" sha1="fe61b55530f04152d4c18f8b750f98814522c3c5"/>
@@ -22981,7 +23003,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--  Both the German/French/Italian (T-9502D-87) and English/Spanish/Dutch (T-9502D-76) release share the same disc (T-9502D-50). -->
-	<software name="nightcr2e" cloneof="nightcr2">
+	<software name="ncreatr2e" cloneof="ncreatr2">
 		<!--
 		<rom name="Nightmare Creatures II v1.004 (2000)(Konami)(PAL)(M4)[!].gdi" size="2867" md5="50ea8dc03d7912d790afcef93190854f" sha1="a86dbd67794c8354f65c823356385d54bafb9f4a"/>
 		<rom name="track01.bin" size="4798080" md5="41754af250aae1c145640be25464bec3" sha1="1fadba297ae15aa58f589164185afab02175cc18"/>
@@ -23087,7 +23109,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="nightcr2p1" cloneof="nightcr2">
+	<software name="ncreatr2p1" cloneof="ncreatr2">
 		<!-- http://hiddenpalace.org/Nightmare_Creatures_II_(May_9,_2000_prototype)
 		<rom name="Nightmare Creatures II (With Mike device support) [GD-R] (US).gdi" size="2867" md5="6b41633d96b4db6be971497b9187c281" sha1="056de0f2907cd576c3b73081cbb183f5ff1278c1"/>
 		<rom name="track01.bin" size="4798080" md5="8fed3a23af866679c30dfd781c45da51" sha1="351a280a85496b5d590db9fa3d0e2fa600818d8c"/>
@@ -23193,7 +23215,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
-	<software name="nightcr2p2" cloneof="nightcr2">
+	<software name="ncreatr2p2" cloneof="ncreatr2">
 		<!-- http://hiddenpalace.org/Nightmare_Creatures_II_(Jul_21,_2000_prototype)
 		<rom name="NIGHTMARE_CREATURES_II.gdi" size="2776" md5="a402c55cbc0c43d83c0129840bce956a" sha1="5952a3f1bb651ae0fc63661e73e4524c4449122e"/>
 		<rom name="track01.iso" size="4177920" md5="46544e838ff9573ca1f65241ac461863" sha1="8da47165d0aeb7ad07502c6af3876ebe660238b1"/>
@@ -23379,7 +23401,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="reppuden">
+	<software name="nobur">
 		<description>Nobunaga no Yabou: Reppuden (Jpn)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
@@ -23394,7 +23416,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="shousei">
+	<software name="nobuspuk">
 		<!--
 		<rom name="Nobunaga no Yabou - Shouseiroku with Power-Up Kit v1.000 (1999)(KOEI)(NTSC)(JP)[!].gdi" size="87" md5="0b2a05d3854733308ba981e5fffc2d44" sha1="de021d06c724c8f4944caa261a1341e4d472b7df"/>
 		<rom name="track01.bin" size="1114848" md5="be9bb2eea6a0713f2a6b16088807606d" sha1="1806a0373cd175211481edea32264f23c69ffccf"/>
