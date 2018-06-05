@@ -4,8 +4,8 @@
 
     Calcune (Japan, prototype)
 
-    CPUs are HD68HC000CP8 and TMP84C00AU-6 QFP types. Other ICs include two
-    Sega 315-5560-02 VDPs and a YMZ280B-F for sound.
+    CPUs are HD68HC000CP8 and TMPZ84C00AU-6 QFP types. Other ICs include
+    two Sega 315-5660-02 VDPs and a YMZ280B-F for sound.
 
     Oscillators: 53.693MHz (OSC1), 16.9444 (XL1), 14.318 (XL3).
 
