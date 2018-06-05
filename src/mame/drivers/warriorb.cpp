@@ -475,8 +475,7 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_1")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr_1", TC0110PCR, 0, "palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -494,8 +493,7 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette2")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_2")
-	MCFG_TC0110PCR_PALETTE("palette2")
+	MCFG_DEVICE_ADD("tc0110pcr_2", TC0110PCR, 0, "palette2")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -561,8 +559,7 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_1")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr_1", TC0110PCR, 0, "palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -581,8 +578,7 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette2")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_2")
-	MCFG_TC0110PCR_PALETTE("palette2")
+	MCFG_DEVICE_ADD("tc0110pcr_2", TC0110PCR, 0, "palette2")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -778,9 +778,8 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segahang_state, sub_control_adc_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, segahang_state, adc_status_r))
 
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
-	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segahang)
@@ -798,7 +797,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segahang_state::hangon_base)
 	shared_base(config);
 	// video hardware
-	MCFG_SEGA_HANGON_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_HANGON_SPRITES, 0)
 MACHINE_CONFIG_END
 
 
@@ -814,7 +813,7 @@ MACHINE_CONFIG_START(segahang_state::sharrier_base)
 	MCFG_DEVICE_CLOCK(MASTER_CLOCK_10MHz)
 
 	// video hardware
-	MCFG_SEGA_SHARRIER_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_SHARRIER_SPRITES, 0)
 MACHINE_CONFIG_END
 
 

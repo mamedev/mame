@@ -3742,9 +3742,8 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -3893,7 +3892,7 @@ MACHINE_CONFIG_START(segas16b_state::fpointbl)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
 	MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(-2) // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
@@ -3938,9 +3937,8 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -1359,9 +1359,8 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas18)
 	MCFG_PALETTE_ADD("palette", 2048*3+2048 + 64*3)
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

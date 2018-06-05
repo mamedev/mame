@@ -884,8 +884,7 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -947,8 +946,7 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1023,8 +1021,7 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1086,8 +1083,7 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1157,8 +1153,7 @@ MACHINE_CONFIG_START(asuka_state::eto)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

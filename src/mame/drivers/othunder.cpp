@@ -651,8 +651,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

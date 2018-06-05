@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(stfight_state::stfight)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")
+	MCFG_DEVICE_ADD("stfight_vid", STFIGHT_VIDEO, 0)
 MACHINE_CONFIG_END
 
 

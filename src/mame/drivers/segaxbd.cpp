@@ -1709,12 +1709,11 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SCREEN_UPDATE_DRIVER(segaxbd_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_XBOARD_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_XBOARD_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
+	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

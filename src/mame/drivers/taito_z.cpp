@@ -3227,8 +3227,7 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
@@ -3302,8 +3301,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
@@ -3379,8 +3377,7 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3622,8 +3619,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
@@ -3699,8 +3695,7 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3779,8 +3774,7 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
