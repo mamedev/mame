@@ -131,6 +131,12 @@ public:
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
 
+	void stop();
+	void pause();
+	bool paused() const { return m_paused; }
+	void play();
+	void toggle_loop() { m_loop = !m_loop; }
+
 private:
 	struct rom_block {
 		offs_t start_address;
@@ -146,7 +152,10 @@ private:
 	address_space_config m_file_config, m_io_config, m_io16_config;
 	address_space *m_file, *m_io, *m_io16;
 
-	int m_icount, m_state;
+	int m_icount;
+	int m_state;
+	bool m_paused;
+	bool m_loop;
 
 	uint32_t m_pc;
 
@@ -172,6 +181,15 @@ private:
 
 DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
 
+enum vgmplay_inputs : uint8_t
+{
+	VGMPLAY_STOP,
+	VGMPLAY_PAUSE,
+	VGMPLAY_PLAY,
+	VGMPLAY_RESTART,
+	VGMPLAY_LOOP,
+};
+
 class vgmplay_state : public driver_device
 {
 public:
@@ -181,6 +199,7 @@ public:
 
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_READ8_MEMBER(file_size_r);
+	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
@@ -209,6 +228,9 @@ public:
 private:
 	std::vector<uint8_t> m_file_data;
 	required_device<bitbanger_device> m_file;
+	required_device<vgmplay_device> m_vgmplay;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
 	required_device<ym2612_device>  m_ym2612;
 	required_device<ym2151_device>  m_ym2151;
 	required_device<ym2413_device>  m_ym2413;
@@ -268,9 +290,30 @@ void vgmplay_device::device_reset()
 {
 	m_pc = 0;
 	m_state = RESET;
+	m_paused = false;
+	m_loop = true;
 
 	m_ym2612_stream_offset = 0;
 	blocks_clear();
+}
+
+void vgmplay_device::stop()
+{
+	device_reset();
+	m_paused = true;
+}
+
+void vgmplay_device::pause()
+{
+	m_paused = !m_paused;
+}
+
+void vgmplay_device::play()
+{
+	if (m_paused && m_state != DONE)
+		m_paused = false;
+	else
+		device_reset();
 }
 
 uint32_t vgmplay_device::execute_min_cycles() const
@@ -355,6 +398,16 @@ void vgmplay_device::execute_run()
 			break;
 		}
 		case RUN: {
+			if (m_paused)
+			{
+				machine().sound().system_mute(1);
+				m_icount = 0;
+				return;
+			}
+			else
+			{
+				machine().sound().system_mute(0);
+			}
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 				debugger_instruction_hook(m_pc);
 			uint8_t code = m_file->read_byte(m_pc);
@@ -634,14 +687,23 @@ void vgmplay_device::execute_run()
 			}
 			break;
 		}
-		case DONE: {
+		case DONE:
+		{
 			static bool done = false;
-			if(!done) {
+			if(!done && !m_loop)
+			{
 				logerror("done\n");
 				done = true;
 			}
-			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debugger_instruction_hook(m_pc);
+			else if (m_loop)
+			{
+				device_reset();
+			}
+			else
+			{
+				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+					debugger_instruction_hook(m_pc);
+			}
 			m_icount = 0;
 			break;
 		}
@@ -1075,6 +1137,9 @@ READ8_MEMBER(vgmplay_device::c352_rom_r)
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
 	, m_file(*this, "file")
+	, m_vgmplay(*this, "vgmplay")
+	, m_lspeaker(*this, "lspeaker")
+	, m_rspeaker(*this, "rspeaker")
 	, m_ym2612(*this, "ym2612")
 	, m_ym2151(*this, "ym2151")
 	, m_ym2413(*this, "ym2413")
@@ -1479,7 +1544,39 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 	}
 }
 
+INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
+{
+	if (!newval)
+		return;
+
+	int val = (uint8_t)(uintptr_t)param;
+	switch (val)
+	{
+		case VGMPLAY_STOP:
+			m_vgmplay->stop();
+			break;
+		case VGMPLAY_PAUSE:
+			m_vgmplay->pause();
+			break;
+		case VGMPLAY_PLAY:
+			m_vgmplay->play();
+			break;
+		case VGMPLAY_RESTART:
+			m_vgmplay->device_reset();
+			break;
+		case VGMPLAY_LOOP:
+			m_vgmplay->toggle_loop();
+			break;
+	}
+}
+
 static INPUT_PORTS_START( vgmplay )
+	PORT_START("CONTROLS")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)		PORT_NAME("Stop")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)		PORT_NAME("Pause")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)		PORT_NAME("Play")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)		PORT_NAME("Restart")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)		PORT_NAME("Loop")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)
