@@ -3117,6 +3117,36 @@ ROM_START( bubblem )
 	ROM_LOAD( "bubblem.nv", 0x0000, 0x0080, CRC(9a59326e) SHA1(071dbfbfd77f7020476ddb54c93f5fafa7a08159) )
 ROM_END
 
+ROM_START( bubblemu )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("e21-17.20", 0x000000, 0x080000, CRC(0b72e8f1) SHA1(1b0289cafb1d4d3387c6ec42c0e8599229c79bba) )
+	ROM_LOAD32_BYTE("e21-16.19", 0x000001, 0x080000, CRC(b47354cc) SHA1(08e66573cae3ce21a6dbdbd79e32a2ab050f9bbd) )
+	ROM_LOAD32_BYTE("e21-15.18", 0x000002, 0x080000, CRC(64bf2c24) SHA1(be2d81fdc307841340a86a4ca0409a2bdbd35532) )
+	ROM_LOAD32_BYTE("e21-14.17", 0x000003, 0x080000, CRC(48aecd47) SHA1(3d2b7d3474968b0450731644e593338c9cf6f5b0) )
+
+	ROM_REGION(0x800000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("e21-02.rom", 0x000000, 0x200000, CRC(b7cb9232) SHA1(ba71cb98d49eadebb26d9f53bbaec1dc211077f5) )
+	ROM_LOAD16_BYTE("e21-01.rom", 0x000001, 0x200000, CRC(a11f2f99) SHA1(293c5996600cad05bf98f936f5f820d93d546099) )
+	ROM_FILL       (              0x400000, 0x400000, 0x00 )
+
+	ROM_REGION(0x400000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("e21-07.rom", 0x000000, 0x100000, CRC(7789bf7c) SHA1(bc8ef1696adac99a1fabae9b79afcd3461cf323b) )
+	ROM_LOAD16_BYTE("e21-06.rom", 0x000001, 0x100000, CRC(997fc0d7) SHA1(58a546f739072fedebfe7c972fe85f72107726b2) )
+	ROM_LOAD       ("e21-05.rom", 0x300000, 0x100000, CRC(07eab58f) SHA1(ae2d7b839b39d88d11652df74804a39230674467) )
+	ROM_FILL       (              0x200000, 0x100000, 0x00 )
+
+	ROM_REGION(0x180000, "taito_en:audiocpu", 0) /* Sound CPU */
+	ROM_LOAD16_BYTE("e21-12.32", 0x100000, 0x40000, CRC(34093de1) SHA1(d69d6b5f10b8fe86f727d739ed5aecceb15e01f7) )
+	ROM_LOAD16_BYTE("e21-13.33", 0x100001, 0x40000, CRC(9e9ec437) SHA1(b0265b688846c642d240b2f3677d2330d31eaa87) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("e21-03.rom", 0x000000, 0x200000, CRC(54c5f83d) SHA1(10a993199c8d5a1361bd29a4b92c404451c6da01) )    // C8 C9 CA CB
+	ROM_LOAD16_BYTE("e21-04.rom", 0x400000, 0x200000, CRC(e5af2a2d) SHA1(62a49504decc7160b710260218920d2d6d2af8f0) )    // CC CD -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "bubblemu.nv", 0x0000, 0x0080, CRC(a503276c) SHA1(f07dd49decee7e8e7551e37b9b0f612bfaf8a2b0) )
+ROM_END
+
 ROM_START( bubblemj )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("e21-11.20", 0x000000, 0x080000, CRC(df0eeae4) SHA1(4cc8d350da881947c1b9c4e0b8fbe220494f6c38) )
@@ -4265,6 +4295,7 @@ GAME( 1995, tcobra2,  0,        f3,      f3, taito_f3_state, init_ktiger2,  ROT2
 GAME( 1995, tcobra2u, tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito America Corporation", "Twin Cobra II (Ver 2.1A 1995/11/30)", 0 )
 GAME( 1995, ktiger2,  tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito Corporation",         "Kyukyoku Tiger II (Ver 2.1J 1995/11/30)", 0 )
 GAME( 1995, bubblem,  0,        f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation Japan",   "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.4O 1996/02/15)", 0 )
+GAME( 1995, bubblemu, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito America Corporation", "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.5A 1996/02/21)", 0 )
 GAME( 1995, bubblemj, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation",         "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)", 0 )
 GAME( 1996, cleopatr, 0,        f3_224a, f3, taito_f3_state, init_cleopatr, ROT0,   "Taito Corporation",         "Cleopatra Fortune (Ver 2.1J 1996/09/05)", 0 )
 GAME( 1996, pbobble3, 0,        f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1O 1996/09/27)", 0 )
