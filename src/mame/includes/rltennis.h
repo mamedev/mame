@@ -16,7 +16,10 @@ public:
 		m_samples(*this, "samples%u", 1U),
 		m_gfx(*this, "gfx"),
 		m_data760000(0), m_data740000(0), m_dac_counter(0),
-		m_offset_shift(0) { std::fill(std::begin(m_sample_rom_offset), std::end(m_sample_rom_offset), 0); }
+		m_offset_shift(0)
+	{
+		std::fill(std::begin(m_sample_rom_offset), std::end(m_sample_rom_offset), 0);
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<dac_byte_interface, 2> m_dac;
