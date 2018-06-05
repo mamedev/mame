@@ -492,12 +492,12 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 			{
 			case 1:
 				ret |= 0x0c;
-				if(m_flop0->get_device()->exists())
+				if(m_flop[0]->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 2:
 				ret |= 0x0c;
-				if(m_flop1->get_device()->exists())
+				if(m_flop[1]->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 3:
@@ -510,9 +510,9 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 		case 0x0e: // DRVCHG
 			logerror("FDC: read from offset 0x0e\n");
 			if(m_towns_selected_drive == 1)
-				return m_flop0->get_device()->dskchg_r();
+				return m_flop[0]->get_device()->dskchg_r();
 			if(m_towns_selected_drive == 2)
-				return m_flop1->get_device()->dskchg_r();
+				return m_flop[1]->get_device()->dskchg_r();
 			return 0x00;
 		default:
 			logerror("FDC: read from invalid or unimplemented register %02x\n",offset);
@@ -522,7 +522,7 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 
 WRITE8_MEMBER(towns_state::towns_floppy_w)
 {
-	floppy_image_device* sel[4] = { m_flop0->get_device(), m_flop1->get_device(), nullptr, nullptr };
+	floppy_image_device* sel[4] = { m_flop[0]->get_device(), m_flop[1]->get_device(), nullptr, nullptr };
 
 	switch(offset)
 	{
@@ -1147,7 +1147,7 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 READ8_MEMBER( towns_state::towns_cmos_low_r )
 {
 	if(m_towns_mainmem_enable != 0)
-		return m_messram->pointer()[offset + 0xd8000];
+		return m_ram->pointer()[offset + 0xd8000];
 
 	if(m_nvram)
 		return m_nvram[offset];
@@ -1158,7 +1158,7 @@ READ8_MEMBER( towns_state::towns_cmos_low_r )
 WRITE8_MEMBER( towns_state::towns_cmos_low_w )
 {
 	if(m_towns_mainmem_enable != 0)
-		m_messram->pointer()[offset+0xd8000] = data;
+		m_ram->pointer()[offset+0xd8000] = data;
 	else
 		if(m_nvram)
 			m_nvram[offset] = data;
@@ -1188,42 +1188,42 @@ void towns_state::towns_update_video_banks(address_space& space)
 
 	if(m_towns_mainmem_enable != 0)  // first MB is RAM
 	{
-//      membank(1)->set_base(m_messram->pointer()+0xc0000);
-//      membank(2)->set_base(m_messram->pointer()+0xc8000);
-//      membank(3)->set_base(m_messram->pointer()+0xc9000);
-//      membank(4)->set_base(m_messram->pointer()+0xca000);
-//      membank(5)->set_base(m_messram->pointer()+0xca000);
-//      membank(10)->set_base(m_messram->pointer()+0xca800);
-		m_bank_cb000_r->set_base(m_messram->pointer()+0xcb000);
-		m_bank_cb000_w->set_base(m_messram->pointer()+0xcb000);
+//      membank(1)->set_base(m_ram->pointer()+0xc0000);
+//      membank(2)->set_base(m_ram->pointer()+0xc8000);
+//      membank(3)->set_base(m_ram->pointer()+0xc9000);
+//      membank(4)->set_base(m_ram->pointer()+0xca000);
+//      membank(5)->set_base(m_ram->pointer()+0xca000);
+//      membank(10)->set_base(m_ram->pointer()+0xca800);
+		m_bank_cb000_r->set_base(m_ram->pointer()+0xcb000);
+		m_bank_cb000_w->set_base(m_ram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			m_bank_f8000_r->set_base(m_messram->pointer()+0xf8000);
+			m_bank_f8000_r->set_base(m_ram->pointer()+0xf8000);
 		else
 			m_bank_f8000_r->set_base(ROM+0x238000);
-		m_bank_f8000_w->set_base(m_messram->pointer()+0xf8000);
+		m_bank_f8000_w->set_base(m_ram->pointer()+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
 	{
 //      membank(1)->set_base(towns_gfxvram+(towns_vram_rplane*0x8000));
 //      membank(2)->set_base(towns_txtvram);
-//      membank(3)->set_base(m_messram->pointer()+0xc9000);
+//      membank(3)->set_base(m_ram->pointer()+0xc9000);
 //      if(towns_ankcg_enable != 0)
 //          membank(4)->set_base(ROM+0x180000+0x3d000);  // ANK CG 8x8
 //      else
 //          membank(4)->set_base(towns_txtvram+0x2000);
 //      membank(5)->set_base(towns_txtvram+0x2000);
-//      membank(10)->set_base(m_messram->pointer()+0xca800);
+//      membank(10)->set_base(m_ram->pointer()+0xca800);
 		if(m_towns_ankcg_enable != 0)
 			m_bank_cb000_r->set_base(ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			m_bank_cb000_r->set_base(m_messram->pointer()+0xcb000);
-		m_bank_cb000_w->set_base(m_messram->pointer()+0xcb000);
+			m_bank_cb000_r->set_base(m_ram->pointer()+0xcb000);
+		m_bank_cb000_w->set_base(m_ram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			m_bank_f8000_r->set_base(m_messram->pointer()+0xf8000);
+			m_bank_f8000_r->set_base(m_ram->pointer()+0xf8000);
 		else
 			m_bank_f8000_r->set_base(ROM+0x238000);
-		m_bank_f8000_w->set_base(m_messram->pointer()+0xf8000);
+		m_bank_f8000_w->set_base(m_ram->pointer()+0xf8000);
 		return;
 	}
 }
@@ -2658,7 +2658,7 @@ void towns_state::driver_start()
 	memset(&m_towns_cd,0,sizeof(struct towns_cdrom_controller));
 	m_towns_cd.status = 0x01;  // CDROM controller ready
 	m_towns_cd.buffer_ptr = -1;
-	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
+	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)m_dma_1.target());
 
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);
@@ -2675,17 +2675,13 @@ void marty_state::driver_start()
 
 void towns_state::machine_start()
 {
-	m_flop0->get_device()->set_rpm(360);
-	m_flop1->get_device()->set_rpm(360);
+	m_flop[0]->get_device()->set_rpm(360);
+	m_flop[1]->get_device()->set_rpm(360);
 }
 
 void towns_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	m_messram = m_ram;
-	m_cdrom = machine().device<cdrom_image_device>("cdrom");
-	m_cdda = machine().device<cdda_device>("cdda");
-	m_scsi = machine().device<fmscsi_device>("fmscsi");
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
 	m_nmi_mask = 0x00;

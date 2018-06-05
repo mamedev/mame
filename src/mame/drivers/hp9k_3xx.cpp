@@ -356,13 +356,13 @@ READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_lastpc = machine().device<cpu_device>("maincpu")->pc();
+	m_lastpc = m_maincpu->pc();
 	return 0;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
-	if (m_lastpc == machine().device<cpu_device>("maincpu")->pc()) {
+	if (m_lastpc == m_maincpu->pc()) {
 		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
 		return;
 	}
@@ -375,13 +375,13 @@ READ32_MEMBER(hp9k3xx_state::buserror_r)
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_lastpc = machine().device<cpu_device>("maincpu")->pc();
+	m_lastpc = m_maincpu->pc();
 	return 0;
 }
 
 WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 {
-	if (m_lastpc == machine().device<cpu_device>("maincpu")->pc()) {
+	if (m_lastpc == m_maincpu->pc()) {
 		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
 		return;
 	}
