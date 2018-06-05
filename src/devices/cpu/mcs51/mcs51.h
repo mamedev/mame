@@ -61,9 +61,10 @@
 
 enum
 {
-	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPTR, MCS51_DPH, MCS51_DPL, MCS51_IE,
+	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPTR, MCS51_DPH, MCS51_DPL, MCS51_IE, MCS51_IP,
 	MCS51_P0, MCS51_P1, MCS51_P2, MCS51_P3,
-	MCS51_R0, MCS51_R1, MCS51_R2, MCS51_R3, MCS51_R4, MCS51_R5, MCS51_R6, MCS51_R7, MCS51_RB
+	MCS51_R0, MCS51_R1, MCS51_R2, MCS51_R3, MCS51_R4, MCS51_R5, MCS51_R6, MCS51_R7, MCS51_RB,
+	MCS51_TCON, MCS51_TMOD, MCS51_TL0, MCS51_TL1, MCS51_TH0, MCS51_TH1
 };
 
 enum
@@ -118,7 +119,6 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 20; }
 	virtual uint32_t execute_input_lines() const override { return 6; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -180,7 +180,7 @@ protected:
 
 	/* Memory spaces */
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -360,7 +360,7 @@ DECLARE_DEVICE_TYPE(I8051, i8051_device)
 DECLARE_DEVICE_TYPE(I8751, i8751_device)
 /* variants 8k internal rom and 256 byte internal memory and more registers */
 DECLARE_DEVICE_TYPE(I8052, i8052_device)
-DECLARE_DEVICE_TYPE(I8752, i8751_device)
+DECLARE_DEVICE_TYPE(I8752, i8752_device)
 /* cmos variants */
 DECLARE_DEVICE_TYPE(I80C31, i80c31_device)
 DECLARE_DEVICE_TYPE(I80C51, i80c51_device)

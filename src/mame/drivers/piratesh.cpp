@@ -29,19 +29,19 @@
 
 #include "emu.h"
 #include "speaker.h"
-#include "video/k053250_ps.h"
-#include "machine/nvram.h"
-#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/k054539.h"
 #include "includes/konamigx.h" // TODO: WHY?
-#include "video/konami_helper.h"
-#include "machine/ticket.h"
 #include "machine/gen_latch.h"
 #include "machine/k053252.h"
-#include "video/k055555.h"
-#include "video/k054000.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "machine/timer.h"
+#include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
+#include "video/k053250_ps.h"
+#include "video/k054000.h"
+#include "video/k055555.h"
+#include "video/konami_helper.h"
 
 class piratesh_state : public driver_device
 {
@@ -56,6 +56,8 @@ public:
 	m_k055555(*this, "k055555"),
 //  m_k053246(*this, "k053246"),
 	m_k054539(*this, "k054539"),
+	m_tickets(*this, "ticket"),
+	m_hopper(*this, "hopper"),
 	m_spriteram(*this,"spriteram")
 	{ }
 
@@ -68,6 +70,9 @@ public:
 	required_device<k055555_device> m_k055555;
 	required_device<k054539_device> m_k054539;
 //  required_device<k053247_device> m_k053246;
+
+	required_device<ticket_dispenser_device> m_tickets;
+	required_device<ticket_dispenser_device> m_hopper;
 
 	optional_shared_ptr<uint16_t> m_spriteram;
 
@@ -376,8 +381,8 @@ WRITE16_MEMBER(piratesh_state::control3_w)
 		printf("CTRL1 W: %x %x %x\n", offset, data, mem_mask);
 
 //  printf("CTRL 1: %x\n", data & 0x0010);
-	machine().device<ticket_dispenser_device>("ticket")->motor_w(data & 0x0010 ? 1 : 0);
-	machine().device<ticket_dispenser_device>("hopper")->motor_w(data & 0x0020 ? 1 : 0);
+	m_tickets->motor_w(data & 0x0010 ? 1 : 0);
+	m_hopper->motor_w(data & 0x0020 ? 1 : 0);
 
 	m_control = data;
 }
@@ -586,8 +591,8 @@ MACHINE_RESET_MEMBER(piratesh_state,piratesh)
 MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(piratesh_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(piratesh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", piratesh_state, piratesh_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -618,7 +623,7 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(piratesh_state, piratesh_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
@@ -636,17 +641,17 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	//MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
 	//MCFG_K053246_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
 	MCFG_K054338_ALPHAINV(1)
-	MCFG_K054338_MIXER("k055555")
 
 	MCFG_VIDEO_START_OVERRIDE(piratesh_state, piratesh)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(piratesh_state, k054539_nmi_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, piratesh_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -680,4 +685,4 @@ ROM_START( piratesh )
 ROM_END
 
 //    year  name        parent    machine   input     state           init
-GAME( 1995, piratesh,   0,        piratesh, piratesh, piratesh_state, 0, ROT90,  "Konami", "Pirate Ship (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, piratesh,   0,        piratesh, piratesh, piratesh_state, empty_init, ROT90,  "Konami", "Pirate Ship (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )

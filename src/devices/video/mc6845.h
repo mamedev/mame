@@ -429,12 +429,11 @@ protected:
 };
 
 class mos8563_device : public mc6845_device,
-						public device_memory_interface
+						public device_memory_interface,
+						public device_palette_interface
 {
 public:
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual space_config_vector memory_space_config() const override;
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( status_r );
@@ -450,13 +449,17 @@ protected:
 	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 16; }
+
 	const address_space_config      m_videoram_space_config;
-	required_device<palette_device> m_palette;
 
 	uint8_t m_char_buffer[80];
 	uint8_t m_attr_buffer[80];
@@ -489,8 +492,6 @@ protected:
 	static const device_timer_id TIMER_BLOCK_COPY = 9;
 
 	emu_timer *m_block_copy_timer;
-
-	DECLARE_PALETTE_INIT(mos8563);
 
 	void mos8563_videoram_map(address_map &map);
 };

@@ -369,7 +369,7 @@ static const gfx_layout gfxlayout =
 	8*64,
 };
 
-static GFXDECODE_START( culture )
+static GFXDECODE_START( gfx_cultures )
 	GFXDECODE_ENTRY("bg0", 0, gfxlayout, 0x0000, 16 )
 	GFXDECODE_ENTRY("bg1", 0, gfxlayout, 0x1000, 8 )
 	GFXDECODE_ENTRY("bg2", 0, gfxlayout, 0x1000, 8 )
@@ -406,10 +406,10 @@ void cultures_state::machine_reset()
 MACHINE_CONFIG_START(cultures_state::cultures)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(cultures_map)
-	MCFG_CPU_IO_MAP(cultures_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cultures_map)
+	MCFG_DEVICE_IO_MAP(cultures_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
@@ -428,14 +428,14 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", culture)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cultures)
 	MCFG_PALETTE_ADD("palette", 0x3000/2)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MCLK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, MCLK/8, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
@@ -505,4 +505,4 @@ ROM_START( cultures )
 ROM_END
 
 
-GAME( 1994, cultures, 0, cultures, cultures, cultures_state, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cultures, 0, cultures, cultures, cultures_state, empty_init, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )

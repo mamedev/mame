@@ -428,9 +428,9 @@ void alphasmart_state::machine_reset()
 
 MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
-	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
-	MCFG_CPU_IO_MAP(alphasmart_io)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	MCFG_DEVICE_PROGRAM_MAP(alphasmart_mem)
+	MCFG_DEVICE_IO_MAP(alphasmart_io)
 	MCFG_MC68HC11_CONFIG(0, 192, 0x00)
 
 	MCFG_KS0066_F05_ADD("ks0066_0")
@@ -459,8 +459,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(asma2k_state::asma2k)
 	alphasmart(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(asma2k_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -477,15 +477,15 @@ ROM_START( asma2k )
 	    which is integrated onto one plcc44 chip called a zpsd211r.
 	*/
 	ROM_SYSTEM_BIOS( 0, "v314", "v3.14" )
-	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(1) )
+	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
-	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(2) )
+	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
 
 	ROM_REGION( 0x8000, "spellcheck", 0 )
 	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       STATE             INIT  COMPANY                           FULLNAME           FLAGS
-COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, 0,    "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     0,    "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS
+COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, empty_init, "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

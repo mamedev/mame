@@ -38,100 +38,11 @@ public:
 		, m_gfx_region6(*this, "gfx6")
 		, m_gfx_region7(*this, "gfx7")
 		, m_gfx_region8(*this, "gfx8")
+		, m_led(*this, "led0")
 	{
 	}
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<okim6295_device> m_oki;
-	optional_device<msm5205_device> m_msm;
-	optional_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<address_map_bank_device> m_bankdev;
-	optional_device<ls259_device> m_mainlatch;
-	optional_device<rst_pos_buffer_device> m_mainirq;
-	optional_device<rst_pos_buffer_device> m_soundirq;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_region_ptr<uint8_t> m_gfx_region1;
-	optional_region_ptr<uint8_t> m_gfx_region2;
-	optional_region_ptr<uint8_t> m_gfx_region3;
-	optional_region_ptr<uint8_t> m_gfx_region4;
-	optional_region_ptr<uint8_t> m_gfx_region5;
-	optional_region_ptr<uint8_t> m_gfx_region6;
-	optional_region_ptr<uint8_t> m_gfx_region7;
-	optional_region_ptr<uint8_t> m_gfx_region8;
-
-	memory_region * m_gfxregions[8];
-
-	// up to 8 layers, 2 images per layer (interleaved on screen)
-	std::unique_ptr<uint8_t[]>  m_pixmap[8][2];
-
-	/* irq */
 	typedef void (dynax_state::*irq_func)();    // some games trigger IRQ at blitter end, some don't
-	irq_func m_update_irq_func;
-	bool m_blitter_irq;
-	bool m_blitter_irq_mask;
-	bool m_blitter2_irq;
-	bool m_blitter2_irq_mask;
-
-	/* blitters */
-	int m_blit_scroll_x;
-	int m_blit2_scroll_x;
-	int m_blit_scroll_y;
-	int m_blit2_scroll_y;
-	int m_blit_wrap_enable;
-	int m_blit2_wrap_enable;
-	int m_blit_x;
-	int m_blit_y;
-	int m_blit2_x;
-	int m_blit2_y;
-	int m_blit_src;
-	int m_blit2_src;
-	int m_blit_romregion;
-	int m_blit2_romregion;
-	int m_blit_dest;
-	int m_blit2_dest;
-	int m_blit_pen;
-	int m_blit2_pen;
-	int m_blit_palbank;
-	int m_blit2_palbank;
-	int m_blit_palettes;
-	int m_blit2_palettes;
-	int m_layer_enable;
-	int m_blit_backpen;
-
-	int m_hanamai_layer_half;
-	int m_hnoridur_layer_half2;
-
-	int m_extra_scroll_x;
-	int m_extra_scroll_y;
-	int m_flipscreen;
-
-	int m_layer_layout;
-
-	const int *m_priority_table;
-	int m_hanamai_priority;
-
-	/* input */
-	uint8_t m_input_sel;
-	uint8_t m_dsw_sel;
-	uint8_t m_keyb;
-	uint8_t m_coins;
-	uint8_t m_hopper;
-
-	/* misc */
-	uint8_t m_palette_ram[16*256*2];
-	int m_palbank;
-	int m_msm5205next;
-	int m_resetkludge;
-	int m_toggle;
-	int m_toggle_cpu1;
-	int m_rombank;
-	uint8_t m_tenkai_p5_val;
-	int m_tenkai_6c;
-	int m_tenkai_70;
-	uint8_t m_gekisha_val[2];
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
@@ -238,12 +149,12 @@ public:
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
 	DECLARE_WRITE8_MEMBER(mjembase_priority_w);
 
-	DECLARE_DRIVER_INIT(mjelct3);
-	DECLARE_DRIVER_INIT(blktouch);
-	DECLARE_DRIVER_INIT(mjelct3a);
-	DECLARE_DRIVER_INIT(maya_common);
-	DECLARE_DRIVER_INIT(mayac);
-	DECLARE_DRIVER_INIT(maya);
+	void init_mjelct3();
+	void init_blktouch();
+	void init_mjelct3a();
+	void init_maya_common();
+	void init_mayac();
+	void init_maya();
 
 	uint32_t screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -358,4 +269,98 @@ public:
 	void yarunara_banked_map(address_map &map);
 	void yarunara_io_map(address_map &map);
 	void yarunara_mem_map(address_map &map);
+
+protected:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<msm5205_device> m_msm;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<address_map_bank_device> m_bankdev;
+	optional_device<ls259_device> m_mainlatch;
+	optional_device<rst_pos_buffer_device> m_mainirq;
+	optional_device<rst_pos_buffer_device> m_soundirq;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_region_ptr<uint8_t> m_gfx_region1;
+	optional_region_ptr<uint8_t> m_gfx_region2;
+	optional_region_ptr<uint8_t> m_gfx_region3;
+	optional_region_ptr<uint8_t> m_gfx_region4;
+	optional_region_ptr<uint8_t> m_gfx_region5;
+	optional_region_ptr<uint8_t> m_gfx_region6;
+	optional_region_ptr<uint8_t> m_gfx_region7;
+	optional_region_ptr<uint8_t> m_gfx_region8;
+	output_finder<> m_led;
+
+	memory_region * m_gfxregions[8];
+
+	// up to 8 layers, 2 images per layer (interleaved on screen)
+	std::unique_ptr<uint8_t[]>  m_pixmap[8][2];
+
+	/* irq */
+	irq_func m_update_irq_func;
+	bool m_blitter_irq;
+	bool m_blitter_irq_mask;
+	bool m_blitter2_irq;
+	bool m_blitter2_irq_mask;
+
+	/* blitters */
+	int m_blit_scroll_x;
+	int m_blit2_scroll_x;
+	int m_blit_scroll_y;
+	int m_blit2_scroll_y;
+	int m_blit_wrap_enable;
+	int m_blit2_wrap_enable;
+	int m_blit_x;
+	int m_blit_y;
+	int m_blit2_x;
+	int m_blit2_y;
+	int m_blit_src;
+	int m_blit2_src;
+	int m_blit_romregion;
+	int m_blit2_romregion;
+	int m_blit_dest;
+	int m_blit2_dest;
+	int m_blit_pen;
+	int m_blit2_pen;
+	int m_blit_palbank;
+	int m_blit2_palbank;
+	int m_blit_palettes;
+	int m_blit2_palettes;
+	int m_layer_enable;
+	int m_blit_backpen;
+
+	int m_hanamai_layer_half;
+	int m_hnoridur_layer_half2;
+
+	int m_extra_scroll_x;
+	int m_extra_scroll_y;
+	int m_flipscreen;
+
+	int m_layer_layout;
+
+	const int *m_priority_table;
+	int m_hanamai_priority;
+
+	/* input */
+	uint8_t m_input_sel;
+	uint8_t m_dsw_sel;
+	uint8_t m_keyb;
+	uint8_t m_coins;
+	uint8_t m_hopper;
+
+	/* misc */
+	uint8_t m_palette_ram[16*256*2];
+	int m_palbank;
+	int m_msm5205next;
+	int m_resetkludge;
+	int m_toggle;
+	int m_toggle_cpu1;
+	int m_rombank;
+	uint8_t m_tenkai_p5_val;
+	int m_tenkai_6c;
+	int m_tenkai_70;
+	uint8_t m_gekisha_val[2];
+
 };

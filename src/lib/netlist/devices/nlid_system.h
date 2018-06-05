@@ -128,6 +128,10 @@ namespace netlist
 				m_off = netlist_time::from_double(m_offset());
 
 				unsigned long pati[32];
+				for (int pI = 0; pI < 32; pI++)
+				{
+					pati[pI] = 0;
+				}
 				m_size = static_cast<std::uint8_t>(pat.size());
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)

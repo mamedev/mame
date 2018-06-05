@@ -265,7 +265,7 @@ static const gfx_layout tile_layout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( shootout )
+static GFXDECODE_START( gfx_shootout )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,   16*4+8*8, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 16*4,     8  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
@@ -279,11 +279,11 @@ void shootout_state::machine_reset ()
 MACHINE_CONFIG_START(shootout_state::shootout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(shootout_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(shootout_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000) / 8) // 1.5 MHz
-	MCFG_CPU_PROGRAM_MAP(shootout_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(12'000'000) / 8) // 1.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(shootout_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -294,16 +294,16 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shootout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -312,8 +312,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shootout_state::shootouj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_CPU_PROGRAM_MAP(shootouj_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_DEVICE_PROGRAM_MAP(shootouj_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -324,19 +324,19 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shootout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shootout_state, bankswitch_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shootout_state, flipscreen_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shootout_state, bankswitch_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shootout_state, flipscreen_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -344,8 +344,8 @@ MACHINE_CONFIG_START(shootout_state::shootouk)
 	shootouj(config);
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_CPU_PROGRAM_MAP(shootouj_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_DEVICE_PROGRAM_MAP(shootouj_map)
 MACHINE_CONFIG_END
 
 
@@ -433,12 +433,12 @@ ROM_START( shootoutb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(shootout_state,shootout)
+void shootout_state::init_shootout()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
 
-GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, shootout, ROT0, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, init_shootout, ROT0, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, init_shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, init_shootout, ROT0, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )

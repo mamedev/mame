@@ -57,16 +57,21 @@ http://www.zzzaccaria.com/manuals/GalaxiaSchematics.zip
 The manual for Astro Wars can also be found at:
 http://www.opdenkelder.com/Astrowars_manual.zip
 
-HW has many similarities with quasar.c / cvs.c / zac2650.c
+HW has many similarities with quasar.cpp / cvs.cpp / zac2650.cpp
+real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
 ---
 
 TODO:
-- speed is wrong for all games. needs investigation, interrupt related?
-  real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
-- correct color/star generation using info from Galaxia technical manual and schematics
+- go through everything in the schematics for astrowar / galaxia
+- video rewrite to:
+   * support RAW_PARAMS, blanking is much like how laserbat hardware does it
+   and is needed to correct the speed in all machines
+   * improve bullets
+   * provide correct color/star generation, using info from Galaxia technical
+   manual and schematics
+   * provide accurate sprite/bg sync in astrowar
+- what is the PROM for? schematics are too burnt to tell anything
 - add sound board emulation
-- improve bullets
-- accurate sprite/bg sync in astrowar
 
 */
 
@@ -112,13 +117,17 @@ WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
 
 WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
 {
-	// d0/d1: maybe coincounter
+	// d0: triggers on every new credit
+	// d1: coin counter? if you put a coin in slot A, galaxia constantly
+	// strobes sets and clears the bit. if you put a coin in slot B
+	// however, the bit is set and cleared only once.
+	// d5: set as soon as the game completes selftest
 	// other bits: unknown
 }
 
 WRITE8_MEMBER(galaxia_state::galaxia_dataport_w)
 {
-	// cvs-style video fx? or lamps?
+	// seems to be related to sound board comms
 }
 
 READ8_MEMBER(galaxia_state::galaxia_collision_r)
@@ -282,11 +291,11 @@ static const gfx_layout tiles8x8x2_layout =
 	8*8
 };
 
-static GFXDECODE_START( galaxia )
+static GFXDECODE_START( gfx_galaxia )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x2_layout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( astrowar )
+static GFXDECODE_START( gfx_astrowar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x1_layout, 0, 8 )
 GFXDECODE_END
 
@@ -294,25 +303,25 @@ GFXDECODE_END
 MACHINE_CONFIG_START(galaxia_state::galaxia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_CPU_PROGRAM_MAP(galaxia_mem_map)
-	MCFG_CPU_IO_MAP(galaxia_io_map)
-	MCFG_CPU_DATA_MAP(galaxia_data_map)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
+	MCFG_DEVICE_PROGRAM_MAP(galaxia_mem_map)
+	MCFG_DEVICE_IO_MAP(galaxia_io_map)
+	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(60) // wrong
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_galaxia)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaxia_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxia)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
@@ -331,19 +340,19 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(galaxia_state::astrowar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_CPU_PROGRAM_MAP(astrowar_mem_map)
-	MCFG_CPU_IO_MAP(galaxia_io_map)
-	MCFG_CPU_DATA_MAP(galaxia_data_map)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
+	MCFG_DEVICE_PROGRAM_MAP(astrowar_mem_map)
+	MCFG_DEVICE_IO_MAP(galaxia_io_map)
+	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -354,9 +363,9 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_astrowar)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaxia_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrowar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrowar)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
@@ -367,7 +376,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
@@ -480,8 +489,8 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.3d",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
 ROM_END
 
-GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1980, astrowar, 0,       astrowar, galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1980, astrowar, 0,       astrowar, galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Astro Wars", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

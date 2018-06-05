@@ -879,13 +879,13 @@ static const gfx_layout robokid_layout16x16 =
 	128*8
 };
 
-static GFXDECODE_START( ninjakd2 )
+static GFXDECODE_START( gfx_ninjakd2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,    0x200, 16)    // fg
 	GFXDECODE_ENTRY( "gfx2", 0, layout16x16,  0x100, 16)    // sprites
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16,  0x000, 16)    // bg
 GFXDECODE_END
 
-static GFXDECODE_START( robokid )
+static GFXDECODE_START( gfx_robokid )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,           0x300, 16) // fg
 	GFXDECODE_ENTRY( "gfx2", 0, robokid_layout16x16, 0x200, 16) // sprites
 	GFXDECODE_ENTRY( "gfx3", 0, robokid_layout16x16, 0x000, 16) // bg0
@@ -933,12 +933,12 @@ MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
 MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_main_cpu)
 
-	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)     /* verified */
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK_5)     /* verified */
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -946,33 +946,33 @@ MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_ninjakd2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ninjakd2_state, screen_vblank_ninjakd2))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ninjakd2_state, screen_vblank_ninjakd2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakd2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakd2)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
+	MCFG_DEVICE_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)       /* verified */
+	MCFG_DEVICE_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)       /* verified */
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pcm", SAMPLES, 0)
+	MCFG_DEVICE_ADD("pcm", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(ninjakd2_state, ninjakd2_init_samples)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -980,28 +980,28 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ninjakd2_state::ninjakd2)
 	ninjakd2_core(config);
-	MCFG_CPU_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ninjakd2_state::ninjakd2b)
 	ninjakd2_core(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ninjakd2_state::mnight)
 	ninjakd2_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mnight_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,mnight)
@@ -1013,11 +1013,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ninjakd2_state::arkarea)
 	ninjakd2_core(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mnight_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,arkarea)
@@ -1030,14 +1030,14 @@ MACHINE_CONFIG_START(ninjakd2_state::robokid)
 	mnight(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(robokid_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(robokid_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", robokid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_robokid)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x400)  // RAM is this large, but still only 0x300 colors used
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
@@ -1052,11 +1052,11 @@ MACHINE_CONFIG_START(ninjakd2_state::omegaf)
 	robokid(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(omegaf_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(omegaf_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
 	MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
@@ -1642,21 +1642,21 @@ void ninjakd2_state::gfx_unscramble()
 }
 
 
-DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
+void ninjakd2_state::init_ninjakd2()
 {
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_decrypted_opcodes, 0x8000);
 
 	gfx_unscramble();
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
+void ninjakd2_state::init_bootleg()
 {
 	memcpy(m_decrypted_opcodes, memregion("soundcpu")->base() + 0x10000, 0x8000);
 
 	gfx_unscramble();
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,mnight)
+void ninjakd2_state::init_mnight()
 {
 	gfx_unscramble();
 }
@@ -1687,12 +1687,12 @@ void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(ninjakd2_state::robokid_motion_error_verbose_r), this));
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,robokid)
+void ninjakd2_state::init_robokid()
 {
 	robokid_motion_error_kludge(0x5247);
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
+void ninjakd2_state::init_robokidj()
 {
 	robokid_motion_error_kludge(0x5266);
 }
@@ -1705,23 +1705,23 @@ DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjakd2,  0,        ninjakd2, ninjakd2, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, bootleg, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, bootleg, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2c, ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
-GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, jt104,     ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, ninjakd2,  0,        ninjakd2,  ninjakd2, ninjakd2_state, init_ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, init_bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
+GAME( 1987, rdaction,  ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mnightj,   mnight,   mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnight,    0,        mnight,    mnight,   ninjakd2_state, init_mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnightj,   mnight,   mnight,    mnight,   ninjakd2_state, init_mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, arkarea,   0,        arkarea,  arkarea,  ninjakd2_state, mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, arkarea,   0,        arkarea,   arkarea,  ninjakd2_state, init_mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
-GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj3, robokid,  robokid,  robokidj, ninjakd2_state, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokid,   0,        robokid,   robokid,  ninjakd2_state, init_robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
+GAME( 1988, robokidj,  robokid,  robokid,   robokidj, ninjakd2_state, init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj2, robokid,  robokid,   robokidj, ninjakd2_state, init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj3, robokid,  robokid,   robokidj, ninjakd2_state, empty_init,    ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1989, omegaf,    0,        omegaf,   omegaf,   ninjakd2_state, 0,        ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf,   ninjakd2_state, 0,        ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegaf,    0,        omegaf,    omegaf,   ninjakd2_state, empty_init,    ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegafs,   omegaf,   omegaf,    omegaf,   ninjakd2_state, empty_init,    ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )

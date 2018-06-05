@@ -137,12 +137,12 @@ MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov2_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)    // 55857F
-	MCFG_CPU_PROGRAM_MAP(_55857F_arm7_map)
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857F
+	MCFG_DEVICE_PROGRAM_MAP(_55857F_arm7_map)
 MACHINE_CONFIG_END
 
 
@@ -175,7 +175,7 @@ WRITE32_MEMBER(pgm_arm_type2_state::kov2p_arm_region_w )
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2)
+void pgm_arm_type2_state::init_kov2()
 {
 	pgm_basic_init();
 	pgm_kov2_decrypt(machine());
@@ -186,7 +186,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2)
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2p)
+void pgm_arm_type2_state::init_kov2p()
 {
 	// this hacks the identification of the kov2 rom to return the string required for kov2p
 	// this isn't guaranteed to work properly (and definitely wouldn't on real hardware due to the internal
@@ -208,7 +208,7 @@ WRITE32_MEMBER(pgm_arm_type2_state::martmast_arm_region_w )
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,martmast)
+void pgm_arm_type2_state::init_martmast()
 {
 	pgm_basic_init();
 	pgm_mm_decrypt(machine());
@@ -254,7 +254,7 @@ READ16_MEMBER(pgm_arm_type2_state::ddp2_main_speedup_r )
 
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
+void pgm_arm_type2_state::init_ddp2()
 {
 	pgm_basic_init();
 	pgm_ddp2_decrypt(machine());
@@ -265,14 +265,14 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,dw2001)
+void pgm_arm_type2_state::init_dw2001()
 {
 	pgm_basic_init();
 	kov2_latch_init();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,dwpc)
+void pgm_arm_type2_state::init_dwpc()
 {
 	pgm_basic_init();
 	kov2_latch_init();

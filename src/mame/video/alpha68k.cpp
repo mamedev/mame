@@ -15,9 +15,9 @@ void alpha68k_state::alpha68k_flipscreen_w( int flip )
 	m_flipscreen = flip;
 }
 
-void alpha68k_state::alpha68k_V_video_bank_w( int bank )
+WRITE8_MEMBER(alpha68k_state::video_bank_w)
 {
-	m_bank_base = bank & 0xf;
+	m_bank_base = data & 0xf;
 }
 
 /******************************************************************************/
@@ -140,56 +140,18 @@ uint32_t alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap
 
 */
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_II_video_bank_w)
+/* Graphics flags?  Not related to fix chars anyway */
+WRITE_LINE_MEMBER(alpha68k_state::video_control2_w)
 {
-	switch (offset)
-	{
-		case 0x10: /* Reset */
-			m_bank_base = m_buffer_28 = m_buffer_60 = m_buffer_68 = 0;
-			return;
-		case 0x14:
-			if (m_buffer_60) m_bank_base=1; else m_bank_base=0;
-			m_buffer_28 = 1;
-			return;
-		case 0x18:
-			if (m_buffer_68) {if (m_buffer_60) m_bank_base = 3; else m_bank_base = 2; }
-			if (m_buffer_28) {if (m_buffer_60) m_bank_base = 1; else m_bank_base = 0; }
-			return;
-		case 0x30:
-			m_buffer_28 = m_buffer_68 = 0; m_bank_base = 1;
-			m_buffer_60 = 1;
-			return;
-		case 0x34:
-			if (m_buffer_60) m_bank_base = 3; else m_bank_base = 2;
-			m_buffer_68 = 1;
-			return;
-		case 0x38:
-			if (m_buffer_68) {if (m_buffer_60) m_bank_base = 7; else m_bank_base = 6; }
-			if (m_buffer_28) {if (m_buffer_60) m_bank_base = 5; else m_bank_base = 4; }
-			return;
-		case 0x08: /* Graphics flags?  Not related to fix chars anyway */
-		case 0x0c:
-		case 0x28:
-		case 0x2c:
-			return;
-	}
+	logerror("%s: Q2 changed to %d\n", machine().describe_context(), state);
+}
 
-	logerror("%04x \n",offset);
+WRITE_LINE_MEMBER(alpha68k_state::video_control3_w)
+{
+	logerror("%s: Q3 changed to %d\n", machine().describe_context(), state);
 }
 
 /******************************************************************************/
-
-WRITE16_MEMBER(alpha68k_state::alpha68k_V_video_control_w)
-{
-	switch (offset)
-	{
-		case 0x08: /* Graphics flags?  Not related to fix chars anyway */
-		case 0x0c:
-		case 0x28:
-		case 0x2c:
-			return;
-	}
-}
 
 void alpha68k_state::draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask )
 {

@@ -52,7 +52,7 @@ public:
 
 	uint32_t m_idle_skip_ram;
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(voyager);
+	void init_voyager();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -500,15 +500,15 @@ void voyager_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(voyager_state::voyager)
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
-	MCFG_CPU_PROGRAM_MAP(voyager_map)
-	MCFG_CPU_IO_MAP(voyager_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(voyager_map)
+	MCFG_DEVICE_IO_MAP(voyager_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, voyager_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -518,10 +518,11 @@ MACHINE_CONFIG_START(voyager_state::voyager)
 	pcvideo_trident_vga(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(voyager_state,voyager)
+void voyager_state::init_voyager()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
@@ -572,6 +573,6 @@ ROM_START( policet2 )
 	DISK_IMAGE_READONLY( "pt2", 0, SHA1(11d29548c685f12bc9bc1db7791957cd5e62db10))
 ROM_END
 
-GAME( 2002, voyager,  0, voyager, voyager, voyager_state,  voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2002, voyagers, voyager, voyager, voyager, voyager_state,  voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2003, policet2, 0, voyager, voyager, voyager_state,  voyager, ROT0, "Team Play/Phantom Entertainment", "Police Trainer 2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2002, voyager,  0,       voyager, voyager, voyager_state, init_voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2002, voyagers, voyager, voyager, voyager, voyager_state, init_voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2003, policet2, 0,       voyager, voyager, voyager_state, init_voyager, ROT0, "Team Play/Phantom Entertainment", "Police Trainer 2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

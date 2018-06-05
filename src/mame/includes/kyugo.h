@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scroll_y_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_DRIVER_INIT(srdmissn);
+	void init_srdmissn();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);

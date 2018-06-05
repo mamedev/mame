@@ -172,7 +172,7 @@ public:
 
 	void casloopy(machine_config &config);
 
-	DECLARE_DRIVER_INIT(casloopy);
+	void init_casloopy();
 
 protected:
 	virtual void machine_start() override;
@@ -519,11 +519,11 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",SH2A,8000000)
-	MCFG_CPU_PROGRAM_MAP(casloopy_map)
+	MCFG_DEVICE_ADD("maincpu",SH2A,8000000)
+	MCFG_DEVICE_PROGRAM_MAP(casloopy_map)
 
-//  MCFG_CPU_ADD("subcpu",V60,8000000)
-//  MCFG_CPU_PROGRAM_MAP(casloopy_sub_map)
+//  MCFG_DEVICE_ADD("subcpu",V60,8000000)
+//  MCFG_DEVICE_PROGRAM_MAP(casloopy_sub_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "loopy_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ic1")
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","casloopy")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -568,14 +568,14 @@ ROM_START( casloopy )
 	ROM_LOAD( "bios2.lsi352", 0x0000, 0x80000, CRC(8f51fa17) SHA1(99f50be06b083fdb07e08f30b0b26d9037afc869) )
 ROM_END
 
-DRIVER_INIT_MEMBER(casloopy_state,casloopy)
+void casloopy_state::init_casloopy()
 {
 	/* load hand made bios data*/
 	m_bios_rom[0/4] = 0x6000480;//0x600af3c;//0x6000964; //SPC
 	m_bios_rom[4/4] = 0x0000000; //SSP
 
-	for(int i=0x400/4;i<0x8000/4;i++)
+	for(int i = 0x400/4; i < 0x8000/4; i++)
 		m_bios_rom[i] = 0x000b0009; // RTS + NOP
 }
 
-CONS( 1995, casloopy,  0,   0,   casloopy,  casloopy, casloopy_state,  casloopy,  "Casio", "Loopy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_PRINTER )
+CONS( 1995, casloopy, 0, 0, casloopy, casloopy, casloopy_state, init_casloopy, "Casio", "Loopy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_PRINTER )

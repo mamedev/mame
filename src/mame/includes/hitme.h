@@ -5,6 +5,10 @@
     Hitme hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_HITME_H
+#define MAME_INCLUDES_HITME_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "screen.h"
@@ -62,4 +66,6 @@ public:
 
 
 /*----------- defined in audio/hitme.c -----------*/
-DISCRETE_SOUND_EXTERN( hitme );
+DISCRETE_SOUND_EXTERN( hitme_discrete );
+
+#endif // MAME_INCLUDES_HITME_H

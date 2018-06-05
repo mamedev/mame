@@ -98,7 +98,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(protection_data_w);
-	DECLARE_DRIVER_INIT(enigma2);
+	void init_enigma2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -602,12 +602,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(enigma2_state::enigma2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(enigma2_main_cpu_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_main_cpu_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(enigma2_audio_cpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */
@@ -618,11 +618,11 @@ MACHINE_CONFIG_START(enigma2_state::enigma2)
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(enigma2_state, protection_data_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -630,13 +630,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(enigma2_state::enigma2a)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(enigma2a_main_cpu_map)
-	MCFG_CPU_IO_MAP(enigma2a_main_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2a_main_cpu_map)
+	MCFG_DEVICE_IO_MAP(enigma2a_main_cpu_io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(enigma2_audio_cpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */
@@ -645,11 +645,11 @@ MACHINE_CONFIG_START(enigma2_state::enigma2a)
 	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2a)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(enigma2_state, protection_data_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -703,12 +703,10 @@ ROM_START( enigma2b )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(enigma2_state,enigma2)
+void enigma2_state::init_enigma2()
 {
-	offs_t i;
 	uint8_t *rom = memregion("audiocpu")->base();
-
-	for(i = 0; i < 0x2000; i++)
+	for (offs_t i = 0; i < 0x2000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i],4,5,6,0,7,1,3,2);
 	}
@@ -716,6 +714,6 @@ DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 
 
 
-GAME( 1981, enigma2,  0,       enigma2,  enigma2,  enigma2_state, enigma2, ROT270, "Game Plan (Zilec Electronics license)", "Enigma II",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics",                     "Enigma II (Space Invaders hardware)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1981, enigma2b, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics",                     "Phantoms II (Space Invaders hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, enigma2,  0,       enigma2,  enigma2,  enigma2_state, init_enigma2, ROT270, "Game Plan (Zilec Electronics license)", "Enigma II",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2_state, init_enigma2, ROT270, "Zilec Electronics",                     "Enigma II (Space Invaders hardware)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, enigma2b, enigma2, enigma2a, enigma2a, enigma2_state, init_enigma2, ROT270, "Zilec Electronics",                     "Phantoms II (Space Invaders hardware)", MACHINE_SUPPORTS_SAVE )

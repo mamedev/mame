@@ -310,7 +310,7 @@ static const gfx_layout balllayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( bking )
+static GFXDECODE_START( gfx_bking )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0,           4  ) /* playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, crowlayout, 4*8,         4  ) /* crow */
 	GFXDECODE_ENTRY( "gfx3", 0, balllayout, 4*8+4*4,     4  ) /* ball 1 */
@@ -392,18 +392,18 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 MACHINE_CONFIG_START(bking_state::bking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("main_cpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(bking_map)
-	MCFG_CPU_IO_MAP(bking_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bking_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("main_cpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bking_map)
+	MCFG_DEVICE_IO_MAP(bking_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(6'000'000)/2)  /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(bking_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(6'000'000)/2)  /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bking_audio_map)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
 	/* - NMI triggered by the main CPU */
 	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_CPU_PERIODIC_INT_DRIVER(bking_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bking_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -414,41 +414,41 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bking_state, screen_vblank_bking))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bking_state, screen_vblank_bking))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bking)
 	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
 	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bking_state, port_b_w))
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bking_state, port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bking_state::bking3)
 	bking(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("main_cpu")
-	MCFG_CPU_IO_MAP(bking3_io_map)
+	MCFG_DEVICE_MODIFY("main_cpu")
+	MCFG_DEVICE_IO_MAP(bking3_io_map)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(3'000'000))      /* xtal is 3MHz, divided by 4 internally */
 
@@ -748,6 +748,6 @@ ROM_START( bking3 )
 ROM_END
 
 
-GAME( 1982, bking,  0, bking,  bking,  bking_state, 0, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bking2, 0, bking,  bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bking3, 0, bking3, bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bking,  0, bking,  bking,  bking_state, empty_init, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, bking_state, empty_init, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, bking_state, empty_init, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )

@@ -98,6 +98,6 @@ protected:
 DECLARE_DEVICE_TYPE(AMIGA_KEYBOARD_INTERFACE, amiga_keyboard_bus_device)
 
 // supported devices
-SLOT_INTERFACE_EXTERN( amiga_keyboard_devices );
+void amiga_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_AMIGA_KEYBOARD_H

@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(unknown_w);
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
-	DECLARE_DRIVER_INIT(jongkyo);
+	void init_jongkyo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -500,11 +500,11 @@ void jongkyo_state::machine_reset()
 MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(jongkyo_memmap)
-	MCFG_CPU_IO_MAP(jongkyo_portmap)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(jongkyo_memmap)
+	MCFG_DEVICE_IO_MAP(jongkyo_portmap)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
 	MCFG_SEGACRPT_SET_SIZE(0x6c00)
 	MCFG_SEGACRPT_SET_NUMBANKS(8)
 	MCFG_SEGACRPT_SET_BANKSIZE(0x400)
@@ -523,10 +523,10 @@ MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(jongkyo_state, jongkyo)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(jongkyo_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(jongkyo_state, input_2p_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jongkyo_state, input_1p_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jongkyo_state, input_2p_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
@@ -564,7 +564,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
+void jongkyo_state::init_jongkyo()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -602,4 +602,4 @@ DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
  *
  *************************************/
 
-GAME( 1985, jongkyo,  0,    jongkyo, jongkyo, jongkyo_state,  jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, jongkyo, 0, jongkyo, jongkyo, jongkyo_state, init_jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

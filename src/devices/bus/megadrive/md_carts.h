@@ -13,6 +13,6 @@
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN(md_cart);
+void md_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_MEGADRIVE_MD_CARTS_H

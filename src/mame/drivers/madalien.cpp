@@ -153,33 +153,31 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(madalien_state::madalien)
 
 	/* main CPU */
-	MCFG_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK / 8)        /* 512kHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK / 8)        /* 512kHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	madalien_video(config);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // 7400 at 3A used as R/S latch
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(madalien_state, madalien_portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(madalien_state, madalien_portB_w))
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
+	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK / 4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, madalien_state, madalien_portA_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, madalien_state, madalien_portB_w))
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(madalien)
-
+	MCFG_DEVICE_ADD("discrete", DISCRETE, madalien_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -453,6 +451,6 @@ ROM_START( madalienb )
 ROM_END
 
 /*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madaliena,madalien, madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madalienb,madalien, madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madalien, 0,        madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madaliena,madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madalienb,madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )

@@ -135,7 +135,7 @@ void hng64_state::hng_comm_io_map(address_map &map)
 
 void hng64_state::reset_net()
 {
-//  m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  m_comm->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // reset the CPU and let 'er rip
 //  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	m_mmub[0] = 0;
@@ -143,7 +143,7 @@ void hng64_state::reset_net()
 }
 
 MACHINE_CONFIG_START(hng64_state::hng64_network)
-	MCFG_CPU_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
-	MCFG_CPU_PROGRAM_MAP(hng_comm_map)
-	MCFG_CPU_IO_MAP(hng_comm_io_map)
+	MCFG_DEVICE_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
+	MCFG_DEVICE_PROGRAM_MAP(hng_comm_map)
+	MCFG_DEVICE_IO_MAP(hng_comm_io_map)
 MACHINE_CONFIG_END

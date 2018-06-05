@@ -287,13 +287,13 @@ static const gfx_layout spritelayout_alt =
 	128*8
 };
 
-static GFXDECODE_START( inufuku )
+static GFXDECODE_START( gfx_inufuku )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 256*16 )  // sprite
 GFXDECODE_END
 
-static GFXDECODE_START( _3on3dunk )
+static GFXDECODE_START( gfx_3on3dunk )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_alt,  0, 256*16 )  // sprite
@@ -336,13 +336,13 @@ void inufuku_state::machine_reset()
 MACHINE_CONFIG_START(inufuku_state::inufuku)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(inufuku_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_sound_map)
-	MCFG_CPU_IO_MAP(inufuku_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(inufuku_sound_map)
+	MCFG_DEVICE_IO_MAP(inufuku_sound_io_map)
 								/* IRQs are triggered by the YM2610 */
 
 
@@ -355,7 +355,7 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	MCFG_SCREEN_SIZE(2048, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(inufuku_state, screen_vblank_inufuku))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, inufuku_state, screen_vblank_inufuku))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
@@ -365,18 +365,18 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", inufuku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_inufuku)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 32000000/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
@@ -386,7 +386,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
 	inufuku(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_3on3dunk)
 MACHINE_CONFIG_END
 
 
@@ -461,5 +461,5 @@ ROM_END
 
 ******************************************************************************/
 
-GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)
+GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)

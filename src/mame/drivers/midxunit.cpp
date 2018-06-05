@@ -244,8 +244,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midxunit_state::midxunit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34020, 40000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34020, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(419);
 
 	MCFG_ADC0848_ADD("adc")
-	MCFG_ADC0848_INTR_CB(WRITELINE(midxunit_state, adc_int_w)) // ADC INT passed through PLSI1032
+	MCFG_ADC0848_INTR_CB(WRITELINE(*this, midxunit_state, adc_int_w)) // ADC INT passed through PLSI1032
 	MCFG_ADC0848_CH1_CB(IOPORT("AN0"))
 	MCFG_ADC0848_CH2_CB(IOPORT("AN1"))
 	MCFG_ADC0848_CH3_CB(IOPORT("AN2"))
@@ -431,5 +431,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, revx,     0,    midxunit, revx, midxunit_state, revx, ROT0, "Midway",   "Revolution X (rev 1.0 6/16/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, revxp5,   revx, midxunit, revx, midxunit_state, revx, ROT0, "Midway",   "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revx,     0,    midxunit, revx, midxunit_state, init_revx, ROT0, "Midway",   "Revolution X (rev 1.0 6/16/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revxp5,   revx, midxunit, revx, midxunit_state, init_revx, ROT0, "Midway",   "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )

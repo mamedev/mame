@@ -35,7 +35,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(jvh);
+	void init_jvh();
 };
 
 
@@ -115,7 +115,7 @@ void jvh_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(jvh_state,jvh)
+void jvh_state::init_jvh()
 {
 }
 
@@ -123,8 +123,8 @@ MACHINE_CONFIG_START(jvh_state::jvh)
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4) // MC6802 E clock
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
@@ -134,8 +134,8 @@ MACHINE_CONFIG_START(jvh_state::jvh2)
 	// CPU TMS9980At; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
@@ -168,5 +168,5 @@ ROM_START(movmastr)
 ROM_END
 
 
-GAME(1987,  escape,    0,  jvh,  jvh, jvh_state,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Escape",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(19??,  movmastr,  0,  jvh2, jvh, jvh_state,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, escape,   0, jvh,  jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL)

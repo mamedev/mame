@@ -20,7 +20,7 @@
 
 #define MCFG_DECO_IRQ_ADD(_tag, _screen_tag) \
 	MCFG_DEVICE_ADD(_tag, DECO_IRQ, 0) \
-	downcast<deco_irq_device &>(*device).set_screen_tag("^" _screen_tag);
+	downcast<deco_irq_device &>(*device).set_screen_tag(_screen_tag);
 
 #define MCFG_DECO_IRQ_LIGHTGUN1_CB(_devcb) \
 	devcb = &downcast<deco_irq_device &>(*device).set_lightgun1_callback(DEVCB_##_devcb);

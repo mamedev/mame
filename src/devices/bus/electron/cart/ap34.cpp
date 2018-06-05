@@ -34,10 +34,11 @@ FLOPPY_FORMATS_MEMBER(electron_ap34_device::floppy_formats)
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(ap34_floppies)
-	SLOT_INTERFACE("35dd",  FLOPPY_35_DD)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void ap34_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd",  FLOPPY_35_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -45,7 +46,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(electron_ap34_device::device_add_mconfig)
 	/* fdc */
-	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", WD1770, 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ap34_floppies, "525qd", electron_ap34_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ap34_floppies, nullptr, electron_ap34_device::floppy_formats)

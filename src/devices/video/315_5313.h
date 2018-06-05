@@ -36,7 +36,7 @@
 	downcast<sega315_5313_device &>(*device).set_palwrite_base(_data);
 
 #define MCFG_SEGA315_5313_PALETTE(_palette_tag) \
-	downcast<sega315_5313_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<sega315_5313_device &>(*device).set_palette_tag(_palette_tag);
 
 
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
@@ -64,7 +64,7 @@ public:
 	template <class Object> devcb_base &set_lv4irqline_callback(Object &&cb) { return m_lv4irqline_callback.set_callback(std::forward<Object>(cb)); }
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
 	void set_palwrite_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	template <typename Object> void set_md_32x_scanline(Object &&cb) { m_32x_scanline_func = std::forward<Object>(cb); }
 	template <typename Object> void set_md_32x_interrupt(Object &&cb) { m_32x_interrupt_func = std::forward<Object>(cb); }

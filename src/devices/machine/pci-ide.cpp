@@ -5,11 +5,10 @@
 
 DEFINE_DEVICE_TYPE(IDE_PCI, ide_pci_device, "ide_pci", "PCI IDE interface")
 
-ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, IDE_PCI, tag, owner, clock),
+ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, IDE_PCI, tag, owner, clock),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
-	m_irq_num(-1),
 	m_irq_handler(*this),
 	m_legacy_top(0x000),
 	m_pif(0x8a)
@@ -55,26 +54,17 @@ void ide_pci_device::bus_master_map(address_map &map)
 
 MACHINE_CONFIG_START(ide_pci_device::device_add_mconfig)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(ide_pci_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, ide_pci_device, ide_interrupt))
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":pci:00.0", AS_DATA)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "hdd", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(ide_pci_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, ide_pci_device, ide_interrupt))
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":pci:00.0", AS_DATA)
 MACHINE_CONFIG_END
 
-void ide_pci_device::set_irq_info(const char *tag, const int irq_num)
-{
-	m_cpu_tag = tag;
-	m_irq_num = irq_num;
-}
-
 void ide_pci_device::device_start()
 {
-	if (m_irq_num != -1)
-		m_cpu = machine().device<cpu_device>(m_cpu_tag);
-
 	pci_device::device_start();
 
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan1_data_command_map));
@@ -151,10 +141,6 @@ WRITE32_MEMBER(ide_pci_device::ide2_write_cs1)
 
 WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 {
-	// Assert/Clear the interrupt if the irq num is set.
-	if (m_irq_num != -1) {
-		m_cpu->set_input_line(m_irq_num, state);
-	}
 	// Call the callback
 	m_irq_handler(state);
 
@@ -166,7 +152,7 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 			m_config_data[0x10 / 4] &= ~0x4;
 	}
 	if (0)
-		logerror("%s:ide_interrupt %i set to %i\n", machine().describe_context(), m_irq_num, state);
+		logerror("%s:ide_interrupt set to %i\n", machine().describe_context(), state);
 }
 
 WRITE8_MEMBER(ide_pci_device::prog_if_w)

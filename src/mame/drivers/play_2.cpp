@@ -78,7 +78,7 @@ public:
 	DECLARE_READ8_MEMBER(psg_r);
 	DECLARE_WRITE8_MEMBER(psg_w);
 	DECLARE_READ8_MEMBER(sound_in_r);
-	DECLARE_DRIVER_INIT(zira);
+	void init_zira();
 
 	void play_2(machine_config &config);
 	void zira(machine_config &config);
@@ -364,14 +364,14 @@ WRITE8_MEMBER( play_2_state::psg_w )
 // **************** Machine *****************************
 MACHINE_CONFIG_START(play_2_state::play_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, XTAL(2'950'000))
-	MCFG_CPU_PROGRAM_MAP(play_2_map)
-	MCFG_CPU_IO_MAP(play_2_io)
+	MCFG_DEVICE_ADD("maincpu", CDP1802, XTAL(2'950'000))
+	MCFG_DEVICE_PROGRAM_MAP(play_2_map)
+	MCFG_DEVICE_IO_MAP(play_2_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(play_2_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(play_2_state, ef1_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(play_2_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(DEVWRITELINE("4013a", ttl7474_device, clear_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_2_state, clear_r))
+	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, play_2_state, ef1_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, play_2_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE("4013a", ttl7474_device, clear_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -379,44 +379,44 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	MCFG_DEFAULT_LAYOUT(layout_play_2)
 
 	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(2'950'000) / 8) // TPB line from CPU
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_2_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_2_state, clock2_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock2_w))
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
 	MCFG_DEVICE_ADD("4013a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("4013a", ttl7474_device, d_w))
-	MCFG_7474_OUTPUT_CB(WRITELINE(play_2_state, q4013a_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE("4013a", ttl7474_device, d_w))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, play_2_state, q4013a_w))
 
 	MCFG_DEVICE_ADD("4013b", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, ef2_w))
-	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
+	MCFG_7474_OUTPUT_CB(WRITELINE("maincpu", cosmac_device, ef2_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
 
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_2_state::zira)
 	play_2(config);
-	MCFG_CPU_ADD("cop402", COP402, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
+	MCFG_DEVICE_ADD("cop402", COP402, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_D_CB(WRITE8(play_2_state, sound_d_w))
-	MCFG_COP400_WRITE_G_CB(WRITE8(play_2_state, sound_g_w))
-	MCFG_COP400_READ_L_CB(READ8(play_2_state, psg_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(play_2_state, psg_w))
-	MCFG_COP400_READ_IN_CB(READ8(play_2_state, sound_in_r))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, play_2_state, sound_d_w))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, play_2_state, sound_g_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, play_2_state, psg_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, play_2_state, psg_w))
+	MCFG_COP400_READ_IN_CB(READ8(*this, play_2_state, sound_in_r))
 
-	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL(2'000'000))
+	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(2'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( play_2_state, zira )
+void play_2_state::init_zira()
 {
 	/* setup COP402 memory banking */
 	membank("bank1")->configure_entries(0, 2, memregion("cop402")->base(), 0x400);
@@ -518,11 +518,11 @@ ROM_START(madrace)
 ROM_END
 
 
-GAME(1979,  antar,     0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  antar2,    antar, play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  evlfight,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  attack,    0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  blkfever,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1982,  cerberup,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1985,  madrace,   0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980,  zira,      0,     zira,   play_2, play_2_state, zira, ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1979,  antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1982,  cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1985,  madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980,  zira,      0,     zira,   play_2, play_2_state, init_zira,  ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

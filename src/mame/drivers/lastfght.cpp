@@ -99,7 +99,7 @@ public:
 	DECLARE_WRITE16_MEMBER(c00006_w);
 	DECLARE_READ16_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_DRIVER_INIT(lastfght);
+	void init_lastfght();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void lastfght(machine_config &config);
@@ -553,9 +553,9 @@ void lastfght_state::machine_reset()
 MACHINE_CONFIG_START(lastfght_state::lastfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP( lastfght_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", H83044, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -592,7 +592,7 @@ ROM_START( lastfght )
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 ROM_END
 
-DRIVER_INIT_MEMBER(lastfght_state,lastfght)
+void lastfght_state::init_lastfght()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -603,4 +603,4 @@ DRIVER_INIT_MEMBER(lastfght_state,lastfght)
 	rom[0x01b86 / 2] = 0x5670;
 }
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

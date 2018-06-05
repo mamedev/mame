@@ -78,7 +78,7 @@ DECLARE_DEVICE_TYPE(INTVECS_CONTROL_PORT, intvecs_control_port_device)
 
 
 
-SLOT_INTERFACE_EXTERN( intvecs_control_port_devices );
+void intvecs_control_port_devices(device_slot_interface &device);
 
 
 //**************************************************************************

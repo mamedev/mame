@@ -969,8 +969,8 @@ PALETTE_INIT_MEMBER(laser3k_state, laser3k)
 
 MACHINE_CONFIG_START(laser3k_state::laser3k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1021800)
-	MCFG_CPU_PROGRAM_MAP(laser3k_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1021800)
+	MCFG_DEVICE_PROGRAM_MAP(laser3k_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1019,15 +1019,15 @@ MACHINE_CONFIG_START(laser3k_state::laser3k)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(laser3k_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(laser3k_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(laser3k_state, ay3600_data_ready_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, laser3k_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, laser3k_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, laser3k_state, ay3600_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("sn76489", SN76489, 1020484)
+	MCFG_DEVICE_ADD("sn76489", SN76489, 1020484)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1042,5 +1042,5 @@ ROM_START(las3000)
 	ROM_LOAD ( "l3kdisk.rom", 0x0000, 0x0100, CRC(2d4b1584) SHA1(989780b77e100598124df7b72663e5a31a3339c0))
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE           INIT  COMPANY             FULLNAME      FLAGS
-COMP( 1983, las3000, 0,      0,      laser3k, laser3k, laser3k_state,  0,    "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME      FLAGS
+COMP( 1983, las3000, 0,      0,      laser3k, laser3k, laser3k_state, empty_init, "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )

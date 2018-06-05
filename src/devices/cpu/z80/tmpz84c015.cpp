@@ -51,9 +51,7 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
 
-	m_zc0_cb(*this),
-	m_zc1_cb(*this),
-	m_zc2_cb(*this),
+	m_zc_cb{ {*this}, {*this}, {*this}, {*this} },
 
 	m_in_pa_cb(*this),
 	m_out_pa_cb(*this),
@@ -99,9 +97,8 @@ void tmpz84c015_device::device_start()
 	m_out_rxdrqb_cb.resolve_safe();
 	m_out_txdrqb_cb.resolve_safe();
 
-	m_zc0_cb.resolve_safe();
-	m_zc1_cb.resolve_safe();
-	m_zc2_cb.resolve_safe();
+	for (unsigned i = 0; i < 4; i++)
+		m_zc_cb[i].resolve_safe();
 
 	m_in_pa_cb.resolve_safe(0);
 	m_out_pa_cb.resolve_safe();
@@ -186,38 +183,39 @@ MACHINE_CONFIG_START(tmpz84c015_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("tmpz84c015_sio", Z80SIO0, DERIVED_CLOCK(1,1))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(tmpz84c015_device, out_txda_cb_trampoline_w))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(tmpz84c015_device, out_dtra_cb_trampoline_w))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(tmpz84c015_device, out_rtsa_cb_trampoline_w))
-	MCFG_Z80DART_OUT_WRDYA_CB(WRITELINE(tmpz84c015_device, out_wrdya_cb_trampoline_w))
-	MCFG_Z80DART_OUT_SYNCA_CB(WRITELINE(tmpz84c015_device, out_synca_cb_trampoline_w))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, tmpz84c015_device, out_txda_cb_trampoline_w))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(*this, tmpz84c015_device, out_dtra_cb_trampoline_w))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(*this, tmpz84c015_device, out_rtsa_cb_trampoline_w))
+	MCFG_Z80DART_OUT_WRDYA_CB(WRITELINE(*this, tmpz84c015_device, out_wrdya_cb_trampoline_w))
+	MCFG_Z80DART_OUT_SYNCA_CB(WRITELINE(*this, tmpz84c015_device, out_synca_cb_trampoline_w))
 
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(tmpz84c015_device, out_txdb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(tmpz84c015_device, out_dtrb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(tmpz84c015_device, out_rtsb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(tmpz84c015_device, out_wrdyb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_SYNCB_CB(WRITELINE(tmpz84c015_device, out_syncb_cb_trampoline_w))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(*this, tmpz84c015_device, out_txdb_cb_trampoline_w))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, tmpz84c015_device, out_dtrb_cb_trampoline_w))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(*this, tmpz84c015_device, out_rtsb_cb_trampoline_w))
+	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(*this, tmpz84c015_device, out_wrdyb_cb_trampoline_w))
+	MCFG_Z80DART_OUT_SYNCB_CB(WRITELINE(*this, tmpz84c015_device, out_syncb_cb_trampoline_w))
 
-	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(tmpz84c015_device, out_rxdrqa_cb_trampoline_w))
-	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(tmpz84c015_device, out_txdrqa_cb_trampoline_w))
-	MCFG_Z80DART_OUT_RXDRQB_CB(WRITELINE(tmpz84c015_device, out_rxdrqb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_TXDRQB_CB(WRITELINE(tmpz84c015_device, out_txdrqb_cb_trampoline_w))
+	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(*this, tmpz84c015_device, out_rxdrqa_cb_trampoline_w))
+	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(*this, tmpz84c015_device, out_txdrqa_cb_trampoline_w))
+	MCFG_Z80DART_OUT_RXDRQB_CB(WRITELINE(*this, tmpz84c015_device, out_rxdrqb_cb_trampoline_w))
+	MCFG_Z80DART_OUT_TXDRQB_CB(WRITELINE(*this, tmpz84c015_device, out_txdrqb_cb_trampoline_w))
 
 	MCFG_DEVICE_ADD("tmpz84c015_ctc", Z80CTC, DERIVED_CLOCK(1,1) )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(tmpz84c015_device, zc0_cb_trampoline_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(tmpz84c015_device, zc1_cb_trampoline_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(tmpz84c015_device, zc2_cb_trampoline_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<0>))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<1>))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<2>))
+	MCFG_Z80CTC_ZC3_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<3>))
 
 	MCFG_DEVICE_ADD("tmpz84c015_pio", Z80PIO, DERIVED_CLOCK(1,1) )
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 
-	MCFG_Z80PIO_IN_PA_CB(READ8(tmpz84c015_device, in_pa_cb_trampoline_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(tmpz84c015_device, out_pa_cb_trampoline_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(tmpz84c015_device, out_ardy_cb_trampoline_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, tmpz84c015_device, in_pa_cb_trampoline_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, tmpz84c015_device, out_pa_cb_trampoline_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, tmpz84c015_device, out_ardy_cb_trampoline_w))
 
-	MCFG_Z80PIO_IN_PB_CB(READ8(tmpz84c015_device, in_pb_cb_trampoline_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(tmpz84c015_device, out_pb_cb_trampoline_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(tmpz84c015_device, out_brdy_cb_trampoline_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, tmpz84c015_device, in_pb_cb_trampoline_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, tmpz84c015_device, out_pb_cb_trampoline_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, tmpz84c015_device, out_brdy_cb_trampoline_w))
 MACHINE_CONFIG_END

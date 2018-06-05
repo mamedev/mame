@@ -641,20 +641,20 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(prodigy_state::prodigy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 	MCFG_DEFAULT_LAYOUT(layout_prodigy)
 
 	MCFG_DEVICE_ADD("io_74145", TTL74145, 0)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(2'000'000))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(prodigy_state, irq_handler));
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(prodigy_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(prodigy_state, via_pb_w))
-	MCFG_VIA6522_READPA_HANDLER(READ8(prodigy_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(prodigy_state, via_pb_r))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(prodigy_state, via_cb1_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(prodigy_state, via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, prodigy_state, irq_handler));
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, prodigy_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, prodigy_state, via_pb_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, prodigy_state, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, prodigy_state, via_pb_r))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, prodigy_state, via_cb1_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, prodigy_state, via_cb2_w))
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, XTAL(2'000'000) * 30)
 	MCFG_NETLIST_SETUP(prodigy)
@@ -717,5 +717,5 @@ ROM_START(prodigy)
 	ROM_LOAD("0x2000.bin",  0x0000, 0x02000, CRC(8d60345a) SHA1(fff18ff12e1b1be91f8eac1178605a682564eff2))
 ROM_END
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY,                FULLNAME,              FLAGS
-CONS( 1981, prodigy,    0,        0,      prodigy,   prodigy,   prodigy_state, 0,    "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY                 FULLNAME               FLAGS
+CONS( 1981, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )

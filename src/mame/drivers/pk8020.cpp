@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "includes/pk8020.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "imagedev/flopdrv.h"
@@ -162,7 +163,7 @@ static const gfx_layout pk8020_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( pk8020 )
+static GFXDECODE_START( gfx_pk8020 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pk8020_charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -171,19 +172,31 @@ FLOPPY_FORMATS_MEMBER( pk8020_state::floppy_formats )
 	FLOPPY_PK8020_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pk8020_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void pk8020_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
-
+/*
+ * interrupts
+ *
+ * 0    external devices
+ * 1    uart rx ready
+ * 2    uart tx ready
+ * 3    lan
+ * 4    vblank
+ * 5    timer ch2
+ * 6    printer
+ * 7    floppy
+ */
 /* Machine driver */
 MACHINE_CONFIG_START(pk8020_state::pk8020)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(20'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(pk8020_mem)
-	MCFG_CPU_IO_MAP(pk8020_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8080, 20_MHz_XTAL / 8)
+	MCFG_DEVICE_PROGRAM_MAP(pk8020_mem)
+	MCFG_DEVICE_IO_MAP(pk8020_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -194,36 +207,46 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pk8020)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pk8020)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pk8020_state, pk8020_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pk8020_state, pk8020_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pk8020_state, pk8020_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8020_state, pk8020_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8020_state, pk8020_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pk8020_state, pk8020_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pk8020_state, pk8020_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8020_state, pk8020_2_portc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_2_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(20'000'000) / 10)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(pk8020_state,pk8020_pit_out0))
-	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 10)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pk8020_state,pk8020_pit_out1))
-	MCFG_PIT8253_CLK2((XTAL(20'000'000) / 8) / 164)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_PIT8253_CLK0(20_MHz_XTAL / 10)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out0))
+	MCFG_PIT8253_CLK1(20_MHz_XTAL / 10)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out1))
+	MCFG_PIT8253_CLK2((20_MHz_XTAL / 8) / 164)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259", pic8259_device, ir5_w))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("rs232", I8251, 0)
-	MCFG_DEVICE_ADD("lan", I8251, 0)
+	MCFG_DEVICE_ADD("i8251line", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
 
-	MCFG_FD1793_ADD("wd1793", XTAL(20'000'000) / 20)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
+
+	MCFG_DEVICE_ADD("i8251lan", I8251, 0)
+
+	MCFG_DEVICE_ADD("wd1793", FD1793, 20_MHz_XTAL / 20)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
@@ -233,11 +256,9 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "korvet_flop")
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
@@ -254,11 +275,11 @@ ROM_START( korvet )
 	ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v11")
 	ROM_SYSTEM_BIOS(0, "v11", "v1.1")
-	ROMX_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81bdc2af) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9), ROM_BIOS(1))
+	ROMX_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81bdc2af) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v20", "v2.0")
-	ROMX_LOAD( "korvet20.rom", 0x10000, 0x6000, CRC(d6c36a45) SHA1(dba67e63457251814ad5c0fe6bb6d584eea5c7d2), ROM_BIOS(2))
+	ROMX_LOAD( "korvet20.rom", 0x10000, 0x6000, CRC(d6c36a45) SHA1(dba67e63457251814ad5c0fe6bb6d584eea5c7d2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "cpm", "cpm")
-	ROMX_LOAD( "cpm.rom",      0x10000, 0x4000, CRC(7a38d7f6) SHA1(fec6623291a38990b003e818683cd5edfb494c36), ROM_BIOS(3))
+	ROMX_LOAD( "cpm.rom",      0x10000, 0x4000, CRC(7a38d7f6) SHA1(fec6623291a38990b003e818683cd5edfb494c36), ROM_BIOS(2))
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "korvet2.fnt", 0x0000, 0x2000, CRC(fb1cd3d4) SHA1(58f1d6e393253b1e8b497ce0880b6eff6d85b42a))
 ROM_END
@@ -275,9 +296,9 @@ ROM_END
 ROM_START( kontur )
 	ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "v1")
-	ROMX_LOAD( "kontur.rom",  0x10000, 0x2000, CRC(92cd441e) SHA1(9a0f9079256cefc6169ae4ba2114841d1f380480), ROM_BIOS(1))
+	ROMX_LOAD( "kontur.rom",  0x10000, 0x2000, CRC(92cd441e) SHA1(9a0f9079256cefc6169ae4ba2114841d1f380480), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "v2")
-	ROMX_LOAD( "kontur2.rom", 0x10000, 0x2000, CRC(5256d101) SHA1(22022a3c6882dbc5ea28d7815f00c182bbaef9e1), ROM_BIOS(2))
+	ROMX_LOAD( "kontur2.rom", 0x10000, 0x2000, CRC(5256d101) SHA1(22022a3c6882dbc5ea28d7815f00c182bbaef9e1), ROM_BIOS(1))
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "kontur.fnt", 0x0000, 0x2000, CRC(14d33790) SHA1(6d5fcb214805c5fc44ef98a97219158ff7826ac0))
 ROM_END
@@ -293,8 +314,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE         INIT    COMPANY      FULLNAME         FLAGS */
-COMP( 1987, korvet,  0,      0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "PK8020 Korvet", 0)
-COMP( 1987, neiva,   korvet, 0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "PK8020 Neiva",  0)
-COMP( 1987, kontur,  korvet, 0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "PK8020 Kontur", 0)
-COMP( 1987, bk8t,    korvet, 0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "BK-8T",         0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME         FLAGS */
+COMP( 1987, korvet, 0,      0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Korvet", 0)
+COMP( 1987, neiva,  korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Neiva",  0)
+COMP( 1987, kontur, korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Kontur", 0)
+COMP( 1987, bk8t,   korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "BK-8T",         0)

@@ -40,7 +40,7 @@ public:
 		m_dma8257(*this, "dma"),
 		m_maincpu(*this, "maincpu"){ }
 
-	DECLARE_DRIVER_INIT(sagitta180);
+	void init_sagitta180();
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
@@ -84,7 +84,7 @@ const gfx_layout sagitta180_charlayout =
 	8*16                /* space between characters */
 };
 
-static GFXDECODE_START( sagitta180 )
+static GFXDECODE_START( gfx_sagitta180 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sagitta180_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -173,33 +173,33 @@ READ8_MEMBER(sagitta180_state::memory_read_byte)
 MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(10'000'000)) /* guessed ! */
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_IO_MAP(maincpu_io_map)
-//        MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(10'000'000)) /* guessed ! */
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_IO_MAP(maincpu_io_map)
+//        MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
 	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'745'600)) /* guessed xtal */
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(sagitta180_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(sagitta180_state, memory_read_byte))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8("crtc", i8275_device, dack_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, sagitta180_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, sagitta180_state, memory_read_byte))
 
 	MCFG_DEVICE_ADD( "uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19218) // 19218 / 19222 ? guesses...
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 //  MCFG_DEVICE_ADD("intlatch", I8212, 0)
 //  MCFG_I8212_MD_CALLBACK(GND) // guessed !
-//  MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
+//  MCFG_I8212_DI_CALLBACK(READ8("picu", i8214_device, vector_r))
 //  MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE)) // guessed !
 
 	/* video hardware */
@@ -209,12 +209,12 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*5, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sagitta180 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sagitta180 )
 
 	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8) /* guessed xtal */
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(sagitta180_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma" , i8257_device , dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma" , i8257_device , dreq2_w))
 	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu" , I8085_INTR_LINE))
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_PALETTE_ADD("palette", 3)
@@ -233,5 +233,5 @@ ROM_START( sagitta180 )
 	ROM_LOAD("cga.chr",  0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card (Actual IC is a 2708 that I was not able to dump yet)
 ROM_END
 
-//    YEAR    NAME       PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY   FULLNAME       FLAGS */
-COMP( 1979?, sagitta180, 0,      0,      sagitta180, sagitta180, sagitta180_state, 0,    "Scopus", "Sagitta 180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR    NAME       PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY   FULLNAME       FLAGS */
+COMP( 1979?, sagitta180, 0,      0,      sagitta180, sagitta180, sagitta180_state, empty_init, "Scopus", "Sagitta 180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

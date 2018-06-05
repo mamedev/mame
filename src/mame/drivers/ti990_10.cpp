@@ -88,7 +88,7 @@ public:
 		m_ckon_state(0) { }
 
 	device_t *m_terminal;
-	DECLARE_DRIVER_INIT(ti990_10);
+	void init_ti990_10();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -323,16 +323,16 @@ MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 
 	// VDT 911 terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(ti990_10_state, key_interrupt))
-	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_10_state, line_interrupt))
+	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(*this, ti990_10_state, key_interrupt))
+	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(*this, ti990_10_state, line_interrupt))
 
 	// Hard disk
 	MCFG_DEVICE_ADD("hdc", TI990_HDC, 0)
-	MCFG_TI990_HDC_INT_CALLBACK(WRITELINE(ti990_10_state, ti990_set_int13))
+	MCFG_TI990_HDC_INT_CALLBACK(WRITELINE(*this, ti990_10_state, ti990_set_int13))
 
 	// Tape controller
 	MCFG_DEVICE_ADD("tpc", TI990_TAPE_CTRL, 0)
-	MCFG_TI990_TAPE_INT_HANDLER(WRITELINE(ti990_10_state, tape_interrupt))
+	MCFG_TI990_TAPE_INT_HANDLER(WRITELINE(*this, ti990_10_state, tape_interrupt))
 MACHINE_CONFIG_END
 
 
@@ -380,7 +380,7 @@ ROM_START(ti990_10)
 
 ROM_END
 
-DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
+void ti990_10_state::init_ti990_10()
 {
 #if 0
 	/* load specific ti990/12 rom page */
@@ -390,5 +390,5 @@ DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
 #endif
 }
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE           INIT      COMPANY              FULLNAME                               FLAGS
-COMP( 1975, ti990_10,   0,      0,      ti990_10,   0,     ti990_10_state, ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY              FULLNAME                               FLAGS
+COMP( 1975, ti990_10, 0,      0,      ti990_10, 0,     ti990_10_state, init_ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )

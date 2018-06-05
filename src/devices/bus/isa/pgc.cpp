@@ -64,12 +64,12 @@ ROM_START( pgc )
 	ROM_DEFAULT_BIOS("1985")
 
 	ROM_SYSTEM_BIOS(0, "1984", "1984 firmware, P/N 6137322/3")
-	ROMX_LOAD("ibm_6137323_pgc_card_27256.bin", 0x00000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526), ROM_BIOS(1))
-	ROMX_LOAD("ibm_6137322_pgc_card_27256.bin", 0x08000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5), ROM_BIOS(1))
+	ROMX_LOAD("ibm_6137323_pgc_card_27256.bin", 0x00000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526), ROM_BIOS(0))
+	ROMX_LOAD("ibm_6137322_pgc_card_27256.bin", 0x08000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "1985", "1985 firmware, P/N 59X7354/5")
-	ROMX_LOAD("pgc_u44.bin", 0x00000, 0x8000, CRC(71280241) SHA1(7042ccd4ebd03f576a256a433b8aa38d1b4fefa8), ROM_BIOS(2))
-	ROMX_LOAD("pgc_u43.bin", 0x08000, 0x8000, CRC(923f5ea3) SHA1(2b2a55d64b20d3a613b00c51443105aa03eca5d6), ROM_BIOS(2))
+	ROMX_LOAD("pgc_u44.bin", 0x00000, 0x8000, CRC(71280241) SHA1(7042ccd4ebd03f576a256a433b8aa38d1b4fefa8), ROM_BIOS(1))
+	ROMX_LOAD("pgc_u43.bin", 0x08000, 0x8000, CRC(923f5ea3) SHA1(2b2a55d64b20d3a613b00c51443105aa03eca5d6), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "commarea", ROMREGION_ERASE00)
 
@@ -135,7 +135,7 @@ static const gfx_layout pgc_charlayout =
 	8*16                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( pgc )
+static GFXDECODE_START( gfx_pgc )
 	GFXDECODE_REVERSEBITS("chargen", 0, pgc_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -152,10 +152,10 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(pgc_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(pgc_map)
 #if 0
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
 #endif
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", isa8_pgc_device, scanline_callback,
@@ -169,10 +169,10 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(isa8_pgc_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 #if 0
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(isa8_pgc_device, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, isa8_pgc_device, vblank_irq))
 #endif
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgc)
 	MCFG_PALETTE_ADD( "palette", 256 )
 MACHINE_CONFIG_END
 
@@ -378,13 +378,13 @@ WRITE8_MEMBER(isa8_pgc_device::lut_w)
 
 	if (offset & 1)
 	{
-		m_lut[o + 2] = (data & 15) << 4;
+		m_lut[o + 2] = (data & 15) * 17;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 		LOG("lut W @ %02X <- %d %d %d\n",
 			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 	} else {
-		m_lut[o    ] = data & 0xf0;
-		m_lut[o + 1] = (data & 15) << 4;
+		m_lut[o    ] = (data >> 4) * 17;
+		m_lut[o + 1] = (data & 15) * 17;
 	}
 }
 

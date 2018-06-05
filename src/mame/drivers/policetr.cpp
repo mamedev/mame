@@ -402,10 +402,10 @@ void policetr_state::machine_start()
 MACHINE_CONFIG_START(policetr_state::policetr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("maincpu", R3041, MASTER_CLOCK/2)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(policetr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
+	MCFG_DEVICE_PROGRAM_MAP(policetr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
@@ -422,7 +422,8 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_BSMT2000_ADD("bsmt", MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -434,8 +435,8 @@ MACHINE_CONFIG_START(policetr_state::sshooter)
 	policetr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sshooter_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sshooter_map)
 MACHINE_CONFIG_END
 
 
@@ -685,14 +686,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(policetr_state,policetr)
+void policetr_state::init_policetr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028ac;
 	m_speedup_data = m_rambase + 0xfc8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,plctr13b)
+void policetr_state::init_plctr13b()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028bc;
@@ -700,14 +701,14 @@ DRIVER_INIT_MEMBER(policetr_state,plctr13b)
 }
 
 
-DRIVER_INIT_MEMBER(policetr_state,sshooter)
+void policetr_state::init_sshooter()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc03470;
 	m_speedup_data = m_rambase + 0x18fd8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,sshoot12)
+void policetr_state::init_sshoot12()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc033e0;
@@ -722,14 +723,14 @@ DRIVER_INIT_MEMBER(policetr_state,sshoot12)
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
 
-GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
+GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )

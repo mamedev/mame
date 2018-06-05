@@ -177,7 +177,7 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( ecbbus_cards );
+void ecbbus_cards(device_slot_interface &device);
 
 
 

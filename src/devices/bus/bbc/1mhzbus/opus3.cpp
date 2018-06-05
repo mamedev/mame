@@ -60,20 +60,21 @@ FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
 	FLOPPY_OPUS_DDCPM_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(bbc_floppies)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void bbc_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 ROM_START( opus3 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
 	ROM_DEFAULT_BIOS("ch103")
 	ROM_SYSTEM_BIOS(0, "ch100", "Challenger 1.00")
-	ROMX_LOAD("ch100.rom", 0x0000, 0x4000, CRC(740a8335) SHA1(f3c75c21bcd7d4a4dfff922fd287230dcdb91d0e), ROM_BIOS(1))
+	ROMX_LOAD("ch100.rom", 0x0000, 0x4000, CRC(740a8335) SHA1(f3c75c21bcd7d4a4dfff922fd287230dcdb91d0e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ch101", "Challenger 1.01")
-	ROMX_LOAD("ch101.rom", 0x0000, 0x4000, CRC(2f64503d) SHA1(37ee3f20bed50555720703b279f62aab0ed28922), ROM_BIOS(2))
+	ROMX_LOAD("ch101.rom", 0x0000, 0x4000, CRC(2f64503d) SHA1(37ee3f20bed50555720703b279f62aab0ed28922), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "ch103", "Challenger 1.03")
-	ROMX_LOAD("ch103.rom", 0x0000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33), ROM_BIOS(3))
+	ROMX_LOAD("ch103.rom", 0x0000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33), ROM_BIOS(2))
 ROM_END
 
 //-------------------------------------------------
@@ -82,8 +83,8 @@ ROM_END
 
 MACHINE_CONFIG_START(bbc_opus3_device::device_add_mconfig)
 	/* fdc */
-	MCFG_WD1770_ADD("wd1770", XTAL(16'000'000) / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opus3_device, fdc_drq_w))
+	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opus3_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies, "525qd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies, nullptr, floppy_formats)

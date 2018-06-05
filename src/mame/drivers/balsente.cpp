@@ -1295,13 +1295,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(balsente_state::balsente)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(20'000'000)/16) /* xtal verified but not speed */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(20'000'000)/16) /* xtal verified but not speed */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* xtal verified but not speed */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(cpu2_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* xtal verified but not speed */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(cpu2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -1316,15 +1316,15 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U9H
 	// these outputs are generally used to control the various lamps
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(balsente_state, out0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(balsente_state, out1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(balsente_state, out2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(balsente_state, out3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(balsente_state, out4_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(balsente_state, out5_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(balsente_state, out6_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, balsente_state, out0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, balsente_state, out1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, balsente_state, out2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, balsente_state, out3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, balsente_state, out4_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, balsente_state, out5_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, balsente_state, out6_w))
 	// special case is output 7, which recalls the NVRAM data
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(balsente_state, nvrecall_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, balsente_state, nvrecall_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1337,7 +1337,7 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_CEM3394_ADD("cem1", 0)
 	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_0)
@@ -1382,8 +1382,8 @@ MACHINE_CONFIG_START(balsente_state::shrike)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("68k", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(shrike68k_map)
+	MCFG_DEVICE_ADD("68k", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(shrike68k_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END
@@ -2316,11 +2316,11 @@ inline void balsente_state::config_shooter_adc(uint8_t shooter, uint8_t adc_shif
 	m_adc_shift = adc_shift;
 }
 
-DRIVER_INIT_MEMBER(balsente_state,sentetst)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,cshift)    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,gghost)    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
-DRIVER_INIT_MEMBER(balsente_state,hattrick)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,teamht)
+void balsente_state::init_sentetst()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_cshift()    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_gghost()    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+void balsente_state::init_hattrick()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_teamht()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	expand_roms(EXPAND_ALL);
@@ -2330,62 +2330,62 @@ DRIVER_INIT_MEMBER(balsente_state,teamht)
 
 }
 
-DRIVER_INIT_MEMBER(balsente_state,otwalls)   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
-DRIVER_INIT_MEMBER(balsente_state,snakepit)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
-DRIVER_INIT_MEMBER(balsente_state,snakjack)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
-DRIVER_INIT_MEMBER(balsente_state,stocker)   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
-DRIVER_INIT_MEMBER(balsente_state,triviag1)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,triviag2)
+void balsente_state::init_otwalls()   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
+void balsente_state::init_snakepit()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+void balsente_state::init_snakjack()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+void balsente_state::init_stocker()   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
+void balsente_state::init_triviag1()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_triviag2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
 	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
 	expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */);
 }
-DRIVER_INIT_MEMBER(balsente_state,triviaes)  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,gimeabrk)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
-DRIVER_INIT_MEMBER(balsente_state,minigolf)  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 2); }
-DRIVER_INIT_MEMBER(balsente_state,minigolf2) { expand_roms(0x0c);        config_shooter_adc(false, 2); }
-DRIVER_INIT_MEMBER(balsente_state,toggle)    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,nametune)
+void balsente_state::init_triviaes()  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_gimeabrk()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+void balsente_state::init_minigolf()  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 2); }
+void balsente_state::init_minigolf2() { expand_roms(0x0c);        config_shooter_adc(false, 2); }
+void balsente_state::init_toggle()    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_nametune()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
 	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */);
 }
-DRIVER_INIT_MEMBER(balsente_state,nstocker)
+void balsente_state::init_nstocker()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
 	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(true, 1);
 }
-DRIVER_INIT_MEMBER(balsente_state,sfootbal)
+void balsente_state::init_sfootbal()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
 	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 0);
 }
-DRIVER_INIT_MEMBER(balsente_state,spiker)
+void balsente_state::init_spiker()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0x9f80, 0x9f8f, read8_delegate(FUNC(balsente_state::spiker_expand_r),this), write8_delegate(FUNC(balsente_state::spiker_expand_w),this));
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
 	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 1);
 }
-DRIVER_INIT_MEMBER(balsente_state,stompin)
+void balsente_state::init_stompin()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
 	expand_roms(0x0c | SWAP_HALVES); config_shooter_adc(false, 32);
 }
-DRIVER_INIT_MEMBER(balsente_state,rescraid)  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,grudge)
+void balsente_state::init_rescraid()  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_grudge()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler(0x9400, 0x9400, read8_delegate(FUNC(balsente_state::grudge_steering_r),this));
 	expand_roms(EXPAND_NONE); config_shooter_adc(false, 0);
 }
-DRIVER_INIT_MEMBER(balsente_state,shrike)
+void balsente_state::init_shrike()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0x9e00, 0x9fff, read8_delegate(FUNC(balsente_state::shrike_shared_6809_r),this), write8_delegate(FUNC(balsente_state::shrike_shared_6809_w),this));
@@ -2404,54 +2404,54 @@ DRIVER_INIT_MEMBER(balsente_state,shrike)
  *************************************/
 
 /* Board: Unknown */
-GAME( 1984, sentetst, 0,        balsente, sentetst, balsente_state, sentetst, ROT0, "Bally/Sente",  "Sente Diagnostic Cartridge", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, cshift,   0,        balsente, cshift,   balsente_state, cshift,   ROT0, "Bally/Sente",  "Chicken Shift", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gghost,   0,        balsente, gghost,   balsente_state, gghost,   ROT0, "Bally/Sente",  "Goalie Ghost", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sentetst,  0,        balsente, sentetst, balsente_state, init_sentetst, ROT0, "Bally/Sente",  "Sente Diagnostic Cartridge", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, cshift,    0,        balsente, cshift,   balsente_state, init_cshift,   ROT0, "Bally/Sente",  "Chicken Shift", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gghost,    0,        balsente, gghost,   balsente_state, init_gghost,   ROT0, "Bally/Sente",  "Goalie Ghost", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8003-01-0D Rev D */
-GAME( 1984, hattrick, 0,        balsente, hattrick, balsente_state, hattrick, ROT0, "Bally/Sente",  "Hat Trick", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, trivia12, triviag1, balsente, triviag1, balsente_state, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hattrick,  0,        balsente, hattrick, balsente_state, init_hattrick, ROT0, "Bally/Sente",  "Hat Trick", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trivia12,  triviag1, balsente, triviag1, balsente_state, init_triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
-GAME( 1984, otwalls,  0,        balsente, otwalls,  balsente_state, otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, snakepit, 0,        balsente, sentetst, balsente_state, snakepit, ROT0, "Bally/Sente",  "Snake Pit", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, snakepit2,snakepit, balsente, sentetst, balsente_state, snakepit, ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", MACHINE_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
-GAME( 1984, snakjack, 0,        balsente, snakjack, balsente_state, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, otwalls,   0,        balsente, otwalls,  balsente_state, init_otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, snakepit,  0,        balsente, sentetst, balsente_state, init_snakepit, ROT0, "Bally/Sente",  "Snake Pit", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, snakepit2, snakepit, balsente, sentetst, balsente_state, init_snakepit, ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", MACHINE_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
+GAME( 1984, snakjack,  0,        balsente, snakjack, balsente_state, init_snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
-GAMEL(1984, stocker,  0,        balsente, stocker,  balsente_state, stocker,  ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
-GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, balsente_state, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolf, 0,        balsente, minigolf, balsente_state, minigolf, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolf2,minigolf, balsente, minigolf2,balsente_state, minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviabb, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, grudge,   0,        balsente, grudge,   balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
-GAME( 198?, grudgep,  grudge,   balsente, grudgep,  balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
+GAMEL(1984, stocker,   0,        balsente, stocker,  balsente_state, init_stocker,  ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
+GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolf2, minigolf, balsente, minigolf2,balsente_state, init_minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviabb,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, grudge,    0,        balsente, grudge,   balsente_state, init_grudge,   ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
+GAME( 198?, grudgep,   grudge,   balsente, grudgep,  balsente_state, init_grudge,   ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
-GAME( 1984, triviag1, 0,        balsente, triviag1, balsente_state, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviag2, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviasp, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviayp, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, triviaes, 0,        balsente, triviaes, balsente_state, triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, toggle,   0,        balsente, toggle,   balsente_state, toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nametune, 0,        balsente, nametune, balsente_state, nametune, ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviag2,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune, ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8030-01-0A Rev A */
-GAME( 1986, nametune2,nametune, balsente, nametune, balsente_state, nametune, ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune2, nametune, balsente, nametune, balsente_state, init_nametune, ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8027-01-0B Rev B */
-GAME( 1986, nstocker, 0,        balsente, nstocker, balsente_state, nstocker, ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nstocker2,nstocker, balsente, nstocker, balsente_state, nstocker, ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sfootbal, 0,        balsente, sfootbal, balsente_state, sfootbal, ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker,   0,        balsente, spiker,   balsente_state, spiker,   ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker2,  spiker,   balsente, spiker,   balsente_state, spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker3,  spiker,   balsente, spiker,   balsente_state, spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stompin,  0,        balsente, stompin,  balsente_state, stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstocker,  0,        balsente, nstocker, balsente_state, init_nstocker, ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstocker2, nstocker, balsente, nstocker, balsente_state, init_nstocker, ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sfootbal,  0,        balsente, sfootbal, balsente_state, init_sfootbal, ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker,    0,        balsente, spiker,   balsente_state, init_spiker,   ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker2,   spiker,   balsente, spiker,   balsente_state, init_spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker3,   spiker,   balsente, spiker,   balsente_state, init_spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stompin,   0,        balsente, stompin,  balsente_state, init_stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
-GAME( 1987, rescraid, 0,        balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraid,  0,        balsente, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown */
-GAME( 1986, shrike,   0,        shrike,   shrike,   balsente_state, shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rescraida,rescraid, balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teamht,   0,        balsente, teamht,   balsente_state, teamht,   ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shrike,    0,        shrike,   shrike,   balsente_state, init_shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraida, rescraid, balsente, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teamht,    0,        balsente, teamht,   balsente_state, init_teamht,   ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )

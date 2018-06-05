@@ -208,6 +208,9 @@ private:
 
 class ngarcade_base_state : public neogeo_base_state
 {
+public:
+	DECLARE_CUSTOM_INPUT_MEMBER(startsel_edge_joy_r);
+
 protected:
 	ngarcade_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: neogeo_base_state(mconfig, type, tag)

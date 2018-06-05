@@ -482,21 +482,21 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 MACHINE_CONFIG_START(exelv_state::exl100)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL(4'915'200))
-	MCFG_CPU_PROGRAM_MAP(tms7020_mem)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
+	MCFG_DEVICE_ADD("maincpu", TMS7020_EXL, XTAL(4'915'200))
+	MCFG_DEVICE_PROGRAM_MAP(tms7020_mem)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7020_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7020_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
-	MCFG_CPU_ADD("tms7041", TMS7041, XTAL(4'915'200))
-	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
-	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))
-	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(exelv_state, tms7041_portc_w))
-	MCFG_TMS7000_IN_PORTD_CB(READ8(exelv_state, tms7041_portd_r))
-	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(exelv_state, tms7041_portd_w))
+	MCFG_DEVICE_ADD("tms7041", TMS7041, XTAL(4'915'200))
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7041_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7041_portb_w))
+	MCFG_TMS7000_IN_PORTC_CB(READ8(*this, exelv_state, tms7041_portc_r))
+	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(*this, exelv_state, tms7041_portc_w))
+	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, exelv_state, tms7041_portd_r))
+	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, exelv_state, tms7041_portd_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -522,8 +522,8 @@ MACHINE_CONFIG_START(exelv_state::exl100)
 	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5220c", TMS5220C, 640000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
 	// MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -538,21 +538,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(exelv_state::exeltel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS7040, XTAL(4'915'200))
-	MCFG_CPU_PROGRAM_MAP(tms7040_mem)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
+	MCFG_DEVICE_ADD("maincpu", TMS7040, XTAL(4'915'200))
+	MCFG_DEVICE_PROGRAM_MAP(tms7040_mem)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7020_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7020_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
-	MCFG_CPU_ADD("tms7042", TMS7042, XTAL(4'915'200))
-	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
-	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))
-	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(exelv_state, tms7041_portc_w))
-	MCFG_TMS7000_IN_PORTD_CB(READ8(exelv_state, tms7041_portd_r))
-	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(exelv_state, tms7041_portd_w))
+	MCFG_DEVICE_ADD("tms7042", TMS7042, XTAL(4'915'200))
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7041_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7041_portb_w))
+	MCFG_TMS7000_IN_PORTC_CB(READ8(*this, exelv_state, tms7041_portc_r))
+	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(*this, exelv_state, tms7041_portc_w))
+	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, exelv_state, tms7041_portd_r))
+	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, exelv_state, tms7041_portd_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -578,8 +578,8 @@ MACHINE_CONFIG_START(exelv_state::exeltel)
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5220c", TMS5220C, 640000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -607,15 +607,15 @@ ROM_START(exeltel)
 
 	ROM_REGION(0x10000,"user1",0)
 	ROM_SYSTEM_BIOS( 0, "french", "French v1.4" )
-	ROMX_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89), ROM_BIOS(1))  /* French system ROM v1.4 */
+	ROMX_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89), ROM_BIOS(0))  /* French system ROM v1.4 */
 	ROM_SYSTEM_BIOS( 1, "spanish", "Spanish" )
-	ROMX_LOAD("amper.bin", 0x0000, 0x10000, CRC(45af256c) SHA1(3bff16542f8ac55b9841084ea38034132459facb), ROM_BIOS(2)) /* Spanish system rom */
+	ROMX_LOAD("amper.bin", 0x0000, 0x10000, CRC(45af256c) SHA1(3bff16542f8ac55b9841084ea38034132459facb), ROM_BIOS(1)) /* Spanish system rom */
 
 	ROM_REGION(0x8000, "vsm", 0)
 	ROM_LOAD("cm62312.bin", 0x0000, 0x4000, CRC(93b817de) SHA1(03863087a071b8f22d36a52d18243f1c33e17ff7)) /* system speech ROM */
 ROM_END
 
 
-//   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT  STATE         INIT    COMPANY         FULLNAME    FLAGS
-COMP(1984,  exl100,  0,          0,      exl100,     exelv, exelv_state,  0,      "Exelvision",   "EXL 100",  MACHINE_NOT_WORKING)
-COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, exelv_state,  0,      "Exelvision",   "Exeltel",  MACHINE_NOT_WORKING)
+//   YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME   FLAGS
+COMP(1984,  exl100,  0,      0,      exl100,  exelv, exelv_state, empty_init, "Exelvision", "EXL 100", MACHINE_NOT_WORKING)
+COMP(1986,  exeltel, exl100, 0,      exeltel, exelv, exelv_state, empty_init, "Exelvision", "Exeltel", MACHINE_NOT_WORKING)

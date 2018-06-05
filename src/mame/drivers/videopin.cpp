@@ -81,6 +81,7 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 void videopin_state::machine_start()
 {
+	m_led.resolve();
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
 
 	save_item(NAME(m_time_pushed));
@@ -156,7 +157,7 @@ WRITE8_MEMBER(videopin_state::led_w)
 	output().set_value(matrix[i][3], (data >> 3) & 1);
 
 	if (i == 7)
-		output().set_led_value(0, data & 8);   /* start button */
+		m_led = BIT(data, 3);   /* start button */
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -346,7 +347,7 @@ static const gfx_layout ball_layout =
 };
 
 
-static GFXDECODE_START( videopin )
+static GFXDECODE_START( gfx_videopin )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, ball_layout, 0, 1 )
 GFXDECODE_END
@@ -362,8 +363,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(videopin_state::videopin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -375,15 +376,14 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	MCFG_SCREEN_UPDATE_DRIVER(videopin_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopin)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(videopin)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, videopin_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -466,5 +466,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, 0, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
-GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, 0, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )

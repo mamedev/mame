@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/jedi.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "speaker.h"
 
@@ -136,8 +135,7 @@ WRITE8_MEMBER(jedi_state::speech_strobe_w)
 
 	if ((new_speech_strobe_state != m_speech_strobe_state) && new_speech_strobe_state)
 	{
-		tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-		tms5220->data_w(space, 0, *m_speech_data);
+		m_tms->data_w(space, 0, *m_speech_data);
 	}
 	m_speech_strobe_state = new_speech_strobe_state;
 }
@@ -145,8 +143,7 @@ WRITE8_MEMBER(jedi_state::speech_strobe_w)
 
 READ8_MEMBER(jedi_state::speech_ready_r)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	return (tms5220->readyq_r()) << 7;
+	return m_tms->readyq_r() << 7;
 }
 
 
@@ -193,30 +190,31 @@ void jedi_state::audio_map(address_map &map)
 
 MACHINE_CONFIG_START(jedi_state::jedi_audio)
 
-	MCFG_CPU_ADD("audiocpu", M6502, JEDI_AUDIO_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, JEDI_AUDIO_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, JEDI_POKEY_CLOCK)
+	MCFG_DEVICE_ADD("pokey1", POKEY, JEDI_POKEY_CLOCK)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, JEDI_POKEY_CLOCK)
+	MCFG_DEVICE_ADD("pokey2", POKEY, JEDI_POKEY_CLOCK)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, JEDI_POKEY_CLOCK)
+	MCFG_DEVICE_ADD("pokey3", POKEY, JEDI_POKEY_CLOCK)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, JEDI_POKEY_CLOCK)
+	MCFG_DEVICE_ADD("pokey4", POKEY, JEDI_POKEY_CLOCK)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("tms", TMS5220, JEDI_TMS5220_CLOCK)
+	MCFG_DEVICE_ADD("tms", TMS5220, JEDI_TMS5220_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

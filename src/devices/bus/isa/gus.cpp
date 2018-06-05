@@ -1251,31 +1251,32 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa16_gus_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("gf1",GGF1,GF1_CLOCK)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("gf1",GGF1,GF1_CLOCK)
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
 
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_GF1_TXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
-	MCFG_GF1_RXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
-	MCFG_GF1_WAVE_IRQ_HANDLER(WRITELINE(isa16_gus_device, wavetable_irq))
-	MCFG_GF1_RAMP_IRQ_HANDLER(WRITELINE(isa16_gus_device, volumeramp_irq))
-	MCFG_GF1_TIMER1_IRQ_HANDLER(WRITELINE(isa16_gus_device, timer1_irq))
-	MCFG_GF1_TIMER2_IRQ_HANDLER(WRITELINE(isa16_gus_device, timer2_irq))
-	MCFG_GF1_SB_IRQ_HANDLER(WRITELINE(isa16_gus_device, sb_irq))
-	MCFG_GF1_DMA_IRQ_HANDLER(WRITELINE(isa16_gus_device, dma_irq))
-	MCFG_GF1_DRQ1_HANDLER(WRITELINE(isa16_gus_device, drq1_w))
-	MCFG_GF1_DRQ2_HANDLER(WRITELINE(isa16_gus_device, drq2_w))
-	MCFG_GF1_NMI_HANDLER(WRITELINE(isa16_gus_device, nmi_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_GF1_TXIRQ_HANDLER(WRITELINE(*this, isa16_gus_device, midi_txirq))
+	MCFG_GF1_RXIRQ_HANDLER(WRITELINE(*this, isa16_gus_device, midi_txirq))
+	MCFG_GF1_WAVE_IRQ_HANDLER(WRITELINE(*this, isa16_gus_device, wavetable_irq))
+	MCFG_GF1_RAMP_IRQ_HANDLER(WRITELINE(*this, isa16_gus_device, volumeramp_irq))
+	MCFG_GF1_TIMER1_IRQ_HANDLER(WRITELINE(*this, isa16_gus_device, timer1_irq))
+	MCFG_GF1_TIMER2_IRQ_HANDLER(WRITELINE(*this, isa16_gus_device, timer2_irq))
+	MCFG_GF1_SB_IRQ_HANDLER(WRITELINE(*this, isa16_gus_device, sb_irq))
+	MCFG_GF1_DMA_IRQ_HANDLER(WRITELINE(*this, isa16_gus_device, dma_irq))
+	MCFG_GF1_DRQ1_HANDLER(WRITELINE(*this, isa16_gus_device, drq1_w))
+	MCFG_GF1_DRQ2_HANDLER(WRITELINE(*this, isa16_gus_device, drq2_w))
+	MCFG_GF1_NMI_HANDLER(WRITELINE(*this, isa16_gus_device, nmi_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("gf1", acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE("gf1", acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa16_gus_device, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isa16_gus_device, write_acia_clock))
 MACHINE_CONFIG_END
 
 ioport_constructor isa16_gus_device::device_input_ports() const

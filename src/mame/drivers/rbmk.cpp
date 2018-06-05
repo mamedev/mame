@@ -69,14 +69,17 @@ class rbmk_state : public driver_device
 {
 public:
 	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_vidram2(*this, "vidram2"),
-		m_vidram(*this, "vidram"),
-		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
-		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_vidram2(*this, "vidram2")
+		, m_vidram(*this, "vidram")
+		, m_maincpu(*this, "maincpu")
+		, m_mcu(*this, "mcu")
+		, m_eeprom(*this, "eeprom")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_ymsnd(*this, "ymsnd")
+	{
+	}
 
 	void rbmk(machine_config &config);
 	void rbspm(machine_config &config);
@@ -93,6 +96,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ym2151_device> m_ymsnd;
 
 	uint16_t m_tilebank;
 	uint8_t m_mux_data;
@@ -114,7 +118,6 @@ private:
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mcu_irq);
 };
 
 
@@ -210,7 +213,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 {
 	if(m_mux_data & 8)
 	{
-		return machine().device<ym2151_device>("ymsnd")->read(space, offset & 1);
+		return m_ymsnd->read(space, offset & 1);
 	}
 	else if(m_mux_data & 4)
 	{
@@ -226,7 +229,7 @@ READ8_MEMBER(rbmk_state::mcu_io_r)
 
 WRITE8_MEMBER(rbmk_state::mcu_io_w)
 {
-	if(m_mux_data & 8) { machine().device<ym2151_device>("ymsnd")->write(space, offset & 1, data); }
+	if(m_mux_data & 8) { m_ymsnd->write(space, offset & 1, data); }
 	else if(m_mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);
@@ -520,7 +523,7 @@ static const gfx_layout rbmk8_layout =
 };
 
 
-static GFXDECODE_START( rbmk )
+static GFXDECODE_START( gfx_rbmk )
 	GFXDECODE_ENTRY( "gfx1", 0, rbmk32_layout,   0x0, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, rbmk8_layout,   0x100, 16  )
 GFXDECODE_END
@@ -561,23 +564,17 @@ uint32_t rbmk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
-{
-	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 MACHINE_CONFIG_START(rbmk_state::rbmk)
-	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
-	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 22000000 /2)
+	MCFG_DEVICE_PROGRAM_MAP(rbmk_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
-	MCFG_CPU_PROGRAM_MAP(mcu_mem)
-	MCFG_CPU_IO_MAP(mcu_io)
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(rbmk_state, mcu_io_mux_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
+	MCFG_DEVICE_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
+	MCFG_DEVICE_PROGRAM_MAP(mcu_mem)
+	MCFG_DEVICE_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, rbmk_state, mcu_io_mux_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbmk)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -593,23 +590,24 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
-	MCFG_YM2151_ADD("ymsnd", 22000000 / 8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 22000000 / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rbmk_state::rbspm)
 	rbmk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rbspm_mem)
 
-	MCFG_CPU_MODIFY("mcu")
+	MCFG_DEVICE_MODIFY("mcu")
 	MCFG_DEVICE_DISABLE() // until decapped
 
 	// PIC16F84 but no CPU core available
@@ -673,5 +671,5 @@ ROM_START( rbspm )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
-GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
+GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

@@ -248,7 +248,7 @@ static const gfx_layout tilelayout8 =
 	8*8
 };
 
-static GFXDECODE_START( metlclsh )
+static GFXDECODE_START( gfx_metlclsh )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x00, 2 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout16, 0x10, 1 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout8,  0x20, 4 ) // [2] Foreground
@@ -278,12 +278,12 @@ void metlclsh_state::machine_reset()
 MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        // ?
-	MCFG_CPU_PROGRAM_MAP(metlclsh_master_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, 1500000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(metlclsh_master_map)
 	// IRQ by YM3526, NMI by cpu #2
 
-	MCFG_CPU_ADD("sub", M6809, 1500000)        // ?
-	MCFG_CPU_PROGRAM_MAP(metlclsh_slave_map)
+	MCFG_DEVICE_ADD("sub", M6809, 1500000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(metlclsh_slave_map)
 	// IRQ by cpu #1, NMI by coins insertion
 
 
@@ -296,20 +296,20 @@ MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlclsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlclsh)
 	MCFG_PALETTE_ADD("palette", 3 * 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -418,4 +418,4 @@ ROM_START( metlclsh )
 	ROM_LOAD( "82s123.prm",   0x0000, 0x20, CRC(6844cc88) SHA1(89d23367aa6ff541205416e82781fe938dfeeb52) )
 ROM_END
 
-GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, 0, ROT0, "Data East", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, empty_init, ROT0, "Data East", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )

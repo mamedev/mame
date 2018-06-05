@@ -11,7 +11,6 @@
     TODO:
 
     - double spaced rows
-    - blanking of top and bottom rows when underline MSB is set
     - end of row/screen - stop dma
     - preset counters - how it affects DMA and HRTC?
 
@@ -120,7 +119,6 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 	m_rvv(0),
 	m_lten(0),
 	m_scanline(0),
-	m_du(false),
 	m_dma_stop(false),
 	m_end_of_screen(false),
 	m_preset(false),
@@ -175,7 +173,6 @@ void i8275_device::device_start()
 	save_item(NAME(m_irq_scanline));
 	save_item(NAME(m_vrtc_scanline));
 	save_item(NAME(m_vrtc_drq_scanline));
-	save_item(NAME(m_du));
 	save_item(NAME(m_dma_stop));
 	save_item(NAME(m_end_of_screen));
 	save_item(NAME(m_preset));
@@ -196,6 +193,50 @@ void i8275_device::device_reset()
 	m_status &= ~ST_IE;
 
 	m_write_irq(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  vrtc_start - update for beginning of vertical
+//  retrace period
+//-------------------------------------------------
+
+void i8275_device::vrtc_start()
+{
+	//LOG("I8275 y %u x %u VRTC 1\n", y, x);
+	m_write_vrtc(1);
+
+	if (m_status & ST_VE)
+	{
+		// reset field attributes
+		m_hlgt = 0;
+		m_vsp = 0;
+		m_gpa = 0;
+		m_rvv = 0;
+		m_lten = 0;
+
+		m_dma_stop = false;
+		m_end_of_screen = false;
+
+		m_cursor_blink++;
+		m_cursor_blink &= 0x1f;
+
+		m_char_blink++;
+		m_char_blink &= 0x3f;
+		m_stored_attr = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  vrtc_end - update for end of vertical retrace
+//  period
+//-------------------------------------------------
+
+void i8275_device::vrtc_end()
+{
+	//LOG("I8275 y %u x %u VRTC 0\n", y, x);
+	m_write_vrtc(0);
 }
 
 
@@ -227,10 +268,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_write_hrtc(0);
 
 		if (m_scanline == 0)
-		{
-			//LOG("I8275 y %u x %u VRTC 0\n", y, x);
-			m_write_vrtc(0);
-		}
+			vrtc_end();
 
 		if ((m_status & ST_VE) && m_scanline <= (m_vrtc_scanline - SCANLINES_PER_ROW))
 		{
@@ -239,14 +277,17 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				if (m_dma_idx < CHARACTERS_PER_ROW)
 				{
 					m_status |= ST_DU;
-					m_du = true;
+					m_dma_stop = true;
+
+					// blank screen until after VRTC
+					m_end_of_screen = true;
 
 					//LOG("I8275 y %u x %u DMA Underrun\n", y, x);
 
 					m_write_drq(0);
 				}
 
-				if (!m_du && !m_dma_stop)
+				if (!m_dma_stop)
 				{
 					// swap line buffers
 					m_buffer_dma = !m_buffer_dma;
@@ -263,42 +304,15 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			}
 		}
 
-		if (m_scanline == m_irq_scanline)
+		if ((m_status & ST_IE) && m_scanline == m_irq_scanline)
 		{
-			if (m_status & ST_IE)
-			{
-				//LOG("I8275 y %u x %u IRQ 1\n", y, x);
-				m_status |= ST_IR;
-				m_write_irq(ASSERT_LINE);
-			}
+			//LOG("I8275 y %u x %u IRQ 1\n", y, x);
+			m_status |= ST_IR;
+			m_write_irq(ASSERT_LINE);
 		}
 
 		if (m_scanline == m_vrtc_scanline)
-		{
-			//LOG("I8275 y %u x %u VRTC 1\n", y, x);
-			m_write_vrtc(1);
-
-			if (m_status & ST_VE)
-			{
-				// reset field attributes
-				m_hlgt = 0;
-				m_vsp = 0;
-				m_gpa = 0;
-				m_rvv = 0;
-				m_lten = 0;
-
-				m_du = false;
-				m_dma_stop = false;
-				m_end_of_screen = false;
-
-				m_cursor_blink++;
-				m_cursor_blink &= 0x1f;
-
-				m_char_blink++;
-				m_char_blink &= 0x3f;
-				m_stored_attr = 0;
-			}
-		}
+			vrtc_start();
 
 		if ((m_status & ST_VE) && m_scanline == m_vrtc_drq_scanline)
 		{
@@ -316,6 +330,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		{
 			int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
 			bool end_of_row = false;
+			bool blank_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
 			int fifo_idx = 0;
 			m_hlgt = (m_stored_attr & FAC_H) ? 1 : 0;
 			m_vsp = (m_stored_attr & FAC_B) ? 1 : 0;
@@ -429,7 +444,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					}
 				}
 
-				if (end_of_row || m_end_of_screen)
+				if (blank_row || end_of_row || m_end_of_screen)
 				{
 					vsp = 1;
 				}
@@ -463,32 +478,38 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 READ8_MEMBER( i8275_device::read )
 {
-	uint8_t data;
-
 	if (offset & 0x01)
 	{
-		data = m_status;
+		uint8_t status = m_status;
 
-		if (m_status & ST_IR)
+		if (!machine().side_effects_disabled())
 		{
-			//LOG("I8275 IRQ 0\n");
-			m_write_irq(CLEAR_LINE);
+			if (m_status & ST_IR)
+			{
+				//LOG("I8275 IRQ 0\n");
+				m_write_irq(CLEAR_LINE);
+			}
+
+			m_status &= ~(ST_IR | ST_LP | ST_IC | ST_DU | ST_FO);
 		}
 
-		m_status &= ~(ST_IR | ST_LP | ST_IC | ST_DU | ST_FO);
+		return status;
 	}
 	else
 	{
-		data = m_param[m_param_idx];
-		m_param_idx++;
+		uint8_t data = m_param[m_param_idx];
 
-		if (m_param_idx > m_param_end)
+		if (!machine().side_effects_disabled())
 		{
-			m_status |= ST_IC;
+			m_param_idx++;
+			if (m_param_idx > m_param_end)
+			{
+				m_status |= ST_IC;
+			}
 		}
-	}
 
-	return data;
+		return data;
+	}
 }
 
 

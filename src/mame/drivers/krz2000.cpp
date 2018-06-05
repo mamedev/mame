@@ -62,14 +62,15 @@ void k2000_state::k2000_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(k2000_state::k2000)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(k2000_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(k2000_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( k2000 )
@@ -98,5 +99,5 @@ ROM_START( k2000 )
 	ROM_LOAD( "godot_v5.u10.gal20v8a.jed", 0x002000, 0x00066f, CRC(c6517456) SHA1(b82530d46afdca5f6460e77ac11710cad55a6b89) )
 ROM_END
 
-CONS( 1990, k2000, 0, 0, k2000, k2000, k2000_state, 0, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1990, k2000, 0, 0, k2000, k2000, k2000_state, empty_init, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 

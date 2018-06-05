@@ -93,24 +93,24 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(tricep_state::tricep)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(tricep_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(tricep_mem)
 
 	MCFG_DEVICE_ADD("pci0", MC2661, 4915200)
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
 
 	MCFG_DEVICE_ADD("pci1", MC2661, 4915200)
 	MCFG_DEVICE_ADD("pci2", MC2661, 4915200)
 	MCFG_DEVICE_ADD("pci3", MC2661, 4915200)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("pci0", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("pci0", mc2661_device, dsr_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("pci0", mc2661_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("pci0", mc2661_device, cts_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("pci0", mc2661_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("pci0", mc2661_device, dsr_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("pci0", mc2661_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("pci0", mc2661_device, cts_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -122,5 +122,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY           FULLNAME  FLAGS
-COMP( 1985, tricep, 0,      0,       tricep,    tricep, tricep_state, 0,    "Morrow Designs", "Tricep", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME  FLAGS
+COMP( 1985, tricep, 0,      0,      tricep,  tricep, tricep_state, empty_init, "Morrow Designs", "Tricep", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

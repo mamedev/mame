@@ -137,9 +137,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tamag1_state::tama)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E0C6S46, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", E0C6S46, 32.768_kHz_XTAL)
 	MCFG_E0C6S46_PIXEL_UPDATE_CB(tamag1_state, pixel_update)
-	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(tamag1_state, speaker_w))
+	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(*this, tamag1_state, speaker_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -155,8 +155,8 @@ MACHINE_CONFIG_START(tamag1_state::tama)
 	MCFG_PALETTE_INIT_OWNER(tamag1_state, tama)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -177,5 +177,5 @@ ROM_START( tama )
 ROM_END
 
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE      INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1997, tama, 0,      0, tama,   tama, tamag1_state, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY,  FULLNAME,           FLAGS
+CONS( 1997, tama, 0,      0,      tama,    tama,  tamag1_state, empty_init, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

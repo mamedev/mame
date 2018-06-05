@@ -173,14 +173,14 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 MACHINE_CONFIG_START(ajax_state::ajax)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 12/4 MHz*/
-	MCFG_CPU_PROGRAM_MAP(ajax_main_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 12/4 MHz*/
+	MCFG_DEVICE_PROGRAM_MAP(ajax_main_map)
 
-	MCFG_CPU_ADD("sub", HD6309E, 3000000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(ajax_sub_map)
+	MCFG_DEVICE_ADD("sub", HD6309E, 3000000) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(ajax_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* 3.58 MHz */
-	MCFG_CPU_PROGRAM_MAP(ajax_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)  /* 3.58 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ajax_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -214,23 +214,24 @@ MACHINE_CONFIG_START(ajax_state::ajax)
 	MCFG_K051316_CB(ajax_state, zoom_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(ajax_state, volume_callback0))
+	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, ajax_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(ajax_state, volume_callback1))
+	MCFG_DEVICE_ADD("k007232_2", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, ajax_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -380,6 +381,6 @@ ROM_START( ajaxj )
 ROM_END
 
 
-GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )

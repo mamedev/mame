@@ -180,9 +180,9 @@ INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
 
 MACHINE_CONFIG_START(gameplan_state::trvquest)
 
-	MCFG_CPU_ADD("maincpu", M6809,XTAL(6'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gameplan_state, trvquest_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6809,XTAL(6'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gameplan_state, trvquest_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_MACHINE_START_OVERRIDE(gameplan_state,trvquest)
@@ -192,30 +192,30 @@ MACHINE_CONFIG_START(gameplan_state::trvquest)
 	trvquest_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/2)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/2)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000)/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, video_data_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, gameplan_video_command_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, video_command_trigger_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, gameplan_state, video_data_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gameplan_state, gameplan_video_command_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gameplan_state, video_command_trigger_w))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(6'000'000)/4)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_coin_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gameplan_state, trvquest_coin_w))
 
 	MCFG_DEVICE_ADD("via6522_2", VIA6522, XTAL(6'000'000)/4)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("UNK"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_misc_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(gameplan_state, via_irq))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gameplan_state, trvquest_misc_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, gameplan_state, via_irq))
 MACHINE_CONFIG_END
 
 ROM_START( trvquest )
@@ -239,4 +239,4 @@ ROM_START( trvquest )
 	ROM_LOAD( "roma", 0x16000, 0x2000, CRC(b4bcaf33) SHA1(c6b08fb8d55b2834d0c6c5baff9f544c795e4c15) )
 ROM_END
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, gameplan_state, 0, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvquest, 0, trvquest, trvquest, gameplan_state, empty_init, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )

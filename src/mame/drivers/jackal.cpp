@@ -302,7 +302,7 @@ static const gfx_layout spritelayout8 =
 	32*8
 };
 
-static GFXDECODE_START( jackal )
+static GFXDECODE_START( gfx_jackal )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER(jackal_state::vblank_irq)
 	if (state && m_irq_enable)
 	{
 		m_mastercpu->set_input_line(0, HOLD_LINE);
-		m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -360,11 +360,11 @@ void jackal_state::machine_reset()
 MACHINE_CONFIG_START(jackal_state::jackal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 
-	MCFG_CPU_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -378,9 +378,9 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackal_state, screen_update_jackal)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jackal_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jackal_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackal)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -388,9 +388,10 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK) // verified on pcb
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -573,9 +574,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
-GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
-GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
-GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )

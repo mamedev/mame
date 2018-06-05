@@ -49,8 +49,6 @@ public:
 	DECLARE_WRITE32_MEMBER(disk_asic_w);
 	DECLARE_READ32_MEMBER(disk_asic_jr_r);
 	DECLARE_WRITE32_MEMBER(disk_asic_jr_w);
-	DECLARE_READ32_MEMBER(crusnexo_leds_r);
-	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
 	DECLARE_READ32_MEMBER(firewire_r);
 	DECLARE_WRITE32_MEMBER(firewire_w);
 	DECLARE_READ32_MEMBER(tms32031_control_r);
@@ -66,10 +64,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
 	DECLARE_READ32_MEMBER(grid_keypad_r);
 	DECLARE_READ32_MEMBER(trackball_r);
-	DECLARE_DRIVER_INIT(invasn);
-	DECLARE_DRIVER_INIT(mk4);
-	DECLARE_DRIVER_INIT(thegrid);
-	DECLARE_DRIVER_INIT(crusnexo);
+	void init_invasn();
+	void init_mk4();
 	DECLARE_MACHINE_START(midzeus);
 	DECLARE_MACHINE_RESET(midzeus);
 	DECLARE_VIDEO_START(midzeus);

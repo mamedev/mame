@@ -487,19 +487,19 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( monzagp )
+static GFXDECODE_START( gfx_monzagp )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, char_layout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, sprite_layout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,   0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(monzagp_state::monzagp)
-	MCFG_CPU_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
-	MCFG_CPU_PROGRAM_MAP(monzagp_map)
-	MCFG_CPU_IO_MAP(monzagp_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(monzagp_state, port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(monzagp_state, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(monzagp_state, port2_w))
+	MCFG_DEVICE_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(monzagp_map)
+	MCFG_DEVICE_IO_MAP(monzagp_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, monzagp_state, port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, monzagp_state, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monzagp_state, port2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", monzagp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_monzagp)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("time_tick_timer", monzagp_state, time_tick_timer, attotime::from_hz(4))
 
@@ -597,5 +597,5 @@ ROM_START( monzagpb )
 ROM_END
 
 
-GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, 0, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
-GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, empty_init, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, empty_init, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )

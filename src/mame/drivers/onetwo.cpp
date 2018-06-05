@@ -338,7 +338,7 @@ static const gfx_layout tiles8x8x6_layout =
 	16*8
 };
 
-static GFXDECODE_START( onetwo )
+static GFXDECODE_START( gfx_onetwo )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x6_layout, 0, 2 )
 GFXDECODE_END
 
@@ -360,14 +360,14 @@ void onetwo_state::machine_start()
 MACHINE_CONFIG_START(onetwo_state::onetwo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
-	MCFG_CPU_IO_MAP(main_cpu_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", onetwo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
+	MCFG_DEVICE_IO_MAP(main_cpu_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", onetwo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
-	MCFG_CPU_IO_MAP(sound_cpu_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_IO_MAP(sound_cpu_io)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -380,22 +380,22 @@ MACHINE_CONFIG_START(onetwo_state::onetwo)
 	MCFG_SCREEN_UPDATE_DRIVER(onetwo_state, screen_update_onetwo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", onetwo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_onetwo)
 	MCFG_PALETTE_ADD("palette", 0x80)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, MASTER_CLOCK)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000*2, PIN7_LOW) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000*2, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -443,5 +443,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, empty_init, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, empty_init, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )

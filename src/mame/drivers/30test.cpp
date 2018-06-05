@@ -60,10 +60,23 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
 		, m_digits(*this, "digit%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 		{ }
+
+	void _30test(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
+	output_finder<72> m_digits;
+	output_finder<8> m_lamps;
 
 	uint8_t m_mux_data;
 	uint8_t m_oki_bank;
+
 	DECLARE_WRITE8_MEMBER(namco_30test_led_w);
 	DECLARE_WRITE8_MEMBER(namco_30test_led_rank_w);
 	DECLARE_WRITE8_MEMBER(namco_30test_lamps_w);
@@ -72,14 +85,9 @@ public:
 	DECLARE_WRITE8_MEMBER(hc11_mux_w);
 	DECLARE_READ8_MEMBER(hc11_okibank_r);
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki;
-	void _30test(machine_config &config);
+
 	void namco_30test_io(address_map &map);
 	void namco_30test_map(address_map &map);
-	output_finder<72> m_digits;
 };
 
 
@@ -105,7 +113,7 @@ WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
 {
 	// d0-d5: ranking, d6: game over, d7: assume marquee lamp
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, data >> i & 1);
+		m_lamps[i] = BIT(data, i);
 }
 
 READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
@@ -240,30 +248,26 @@ INPUT_PORTS_END
 void namco_30test_state::machine_start()
 {
 	m_digits.resolve();
+	m_lamps.resolve();
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_oki_bank));
 }
 
-void namco_30test_state::machine_reset()
-{
-}
-
-
 MACHINE_CONFIG_START(namco_30test_state::_30test)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC68HC11,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(namco_30test_map)
-	MCFG_CPU_IO_MAP(namco_30test_io)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namco_30test_map)
+	MCFG_DEVICE_IO_MAP(namco_30test_io)
 	MCFG_MC68HC11_CONFIG( 0, 768, 0x00 )
 
 
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -281,4 +285,4 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAMEL( 1997, 30test,  0,   _30test,  30test, namco_30test_state,  0, ROT0, "Namco", "30 Test (Remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )
+GAMEL( 1997, 30test, 0, _30test, 30test, namco_30test_state, empty_init, ROT0, "Namco", "30 Test (Remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )

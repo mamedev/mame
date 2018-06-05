@@ -16,7 +16,7 @@
 #define MAME_MACHINE_TMS9901_H
 
 
-extern const device_type TMS9901;
+DECLARE_DEVICE_TYPE(TMS9901, tms9901_device)
 
 /***************************************************************************
     MACROS

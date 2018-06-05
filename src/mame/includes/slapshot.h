@@ -44,7 +44,7 @@ public:
 
 	void opwolf3(machine_config &config);
 	void slapshot(machine_config &config);
-	DECLARE_DRIVER_INIT(slapshot);
+	void init_slapshot();
 
 protected:
 	virtual void machine_start() override;

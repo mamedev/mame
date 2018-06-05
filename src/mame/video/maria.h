@@ -66,10 +66,10 @@ private:
 DECLARE_DEVICE_TYPE(ATARI_MARIA, atari_maria_device)
 
 #define MCFG_MARIA_SCREEN(screen_tag) \
-	downcast<atari_maria_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<atari_maria_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_MARIA_DMACPU(cpu_tag) \
-	downcast<atari_maria_device &>(*device).set_cpu_tag(("^" cpu_tag));
+	downcast<atari_maria_device &>(*device).set_cpu_tag(cpu_tag);
 
 
 #endif // MAME_VIDEO_MARIA_H

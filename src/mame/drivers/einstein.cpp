@@ -12,8 +12,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "cpu/z80/z80daisy_generic.h"
+#include "machine/z80daisy.h"
+#include "machine/z80daisy_generic.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
@@ -41,8 +41,8 @@
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
 
-#define XTAL_X001  XTAL(10'738'635)
-#define XTAL_X002  XTAL(8'000'000)
+#define XTAL_X001  10.738635_MHz_XTAL
+#define XTAL_X002  8_MHz_XTAL
 
 #define IC_I001  "i001"  /* Z8400A */
 #define IC_I030  "i030"  /* AY-3-8910 */
@@ -565,20 +565,21 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START( einstein_floppies )
-	SLOT_INTERFACE("3ss", TEAC_FD_30A)
-	SLOT_INTERFACE("3ds", FLOPPY_3_DSDD)
-	SLOT_INTERFACE("525ssqd", FLOPPY_525_SSQD)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-	SLOT_INTERFACE("35ssdd", FLOPPY_35_SSDD)
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void einstein_floppies(device_slot_interface &device)
+{
+	device.option_add("3ss", TEAC_FD_30A);
+	device.option_add("3ds", FLOPPY_3_DSDD);
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("35ssdd", FLOPPY_35_SSDD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 MACHINE_CONFIG_START(einstein_state::einstein)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(IC_I001, Z80, XTAL_X002 / 2)
-	MCFG_CPU_PROGRAM_MAP(einstein_mem)
-	MCFG_CPU_IO_MAP(einstein_io)
+	MCFG_DEVICE_ADD(IC_I001, Z80, XTAL_X002 / 2)
+	MCFG_DEVICE_PROGRAM_MAP(einstein_mem)
+	MCFG_DEVICE_IO_MAP(einstein_io)
 	MCFG_Z80_DAISY_CHAIN(einstein_daisy_chain)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
@@ -586,48 +587,48 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(einstein_state, int_w<0>))
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(einstein_state, ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("user", einstein_userport_device, read))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("user", einstein_userport_device, write))
-	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE("user", einstein_userport_device, brdy_w))
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, einstein_state, int_w<0>))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, einstein_state, ardy_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8("user", einstein_userport_device, read))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("user", einstein_userport_device, write))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE("user", einstein_userport_device, brdy_w))
 
 	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(einstein_state, int_w<1>))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(IC_I060, i8251_device, write_txc))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(IC_I060, i8251_device, write_rxc))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(IC_I058, z80ctc_device, trg3))
+	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, einstein_state, int_w<1>))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(IC_I060, i8251_device, write_txc))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(IC_I060, i8251_device, write_rxc))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(IC_I058, z80ctc_device, trg3))
 
 	MCFG_CLOCK_ADD("ctc_trigger", XTAL_X002 / 4)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(IC_I058, z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(IC_I058, z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(IC_I058, z80ctc_device, trg2))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(IC_I058, z80ctc_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(IC_I058, z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(IC_I058, z80ctc_device, trg2))
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_Z80DAISY_GENERIC_ADD("keyboard_daisy", 0xf7)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<2>))
+	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<2>))
 	MCFG_Z80DAISY_GENERIC_ADD("adc_daisy", 0xfb)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<3>))
+	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<3>))
 	MCFG_Z80DAISY_GENERIC_ADD("fire_daisy", 0xfd)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<4>))
+	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL(10'738'635) / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9129, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9129_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(IC_I030, AY8910, XTAL_X002 / 4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(einstein_state, keyboard_data_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(einstein_state, keyboard_line_write))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(IC_I030, AY8910, XTAL_X002 / 4)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, einstein_state, keyboard_data_read))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(DEVWRITELINE("adc_daisy", z80daisy_generic_device, int_w))
+	MCFG_ADC0844_INTR_CB(WRITELINE("adc_daisy", z80daisy_generic_device, int_w))
 	MCFG_ADC0844_CH1_CB(IOPORT("analogue_1_x"))
 	MCFG_ADC0844_CH2_CB(IOPORT("analogue_1_y"))
 	MCFG_ADC0844_CH3_CB(IOPORT("analogue_2_x"))
@@ -635,10 +636,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(IC_I063, z80pio_device, strobe_a))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(einstein_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(einstein_state, write_centronics_perror))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(einstein_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_a))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, einstein_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, einstein_state, write_centronics_perror))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, einstein_state, write_centronics_fault))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -646,18 +647,18 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	// uart
 	MCFG_DEVICE_ADD(IC_I060, I8251, XTAL_X002 / 4)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(IC_I060, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(IC_I060, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
 
 	// floppy
-	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
+	MCFG_DEVICE_ADD(IC_I042, WD1770, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
@@ -678,7 +679,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	// user port
 	MCFG_EINSTEIN_USERPORT_ADD("user")
-	MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(DEVWRITELINE(IC_I063, z80pio_device, strobe_b))
+	MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_b))
 MACHINE_CONFIG_END
 
 
@@ -695,9 +696,9 @@ ROM_START( einstein )
 	ROM_REGION(0x8000, "bios", 0)
 	/* i023 */
 	ROM_SYSTEM_BIOS(0,  "mos12",  "MOS 1.2")
-	ROMX_LOAD("mos12.i023", 0, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(1))
+	ROMX_LOAD("mos12.i023", 0, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1,  "mos121",  "MOS 1.21")
-	ROMX_LOAD("mos121.i023", 0, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(2))
+	ROMX_LOAD("mos121.i023", 0, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(1))
 	ROM_RELOAD(0x2000, 0x2000)
 	/* i024 */
 	ROM_FILL(0x4000, 0x4000, 0xff)
@@ -713,6 +714,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY   FULLNAME          FLAGS
-COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein TC-01", 0 )
-COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME          FLAGS
+COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein TC-01", 0 )
+COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )

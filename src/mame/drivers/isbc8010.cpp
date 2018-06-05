@@ -137,7 +137,7 @@ const gfx_layout sdk80_charlayout =
 	8 * 8               /* 8 8-bit pixel rows per character */
 };
 
-static GFXDECODE_START( isbc8010 )
+static GFXDECODE_START( gfx_isbc8010 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sdk80_charlayout, 0, 1 )
 GFXDECODE_END
 #endif
@@ -172,26 +172,26 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
-	MCFG_CPU_PROGRAM_MAP(isbc8010_mem)
-	MCFG_CPU_IO_MAP(isbc8010_io)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
+	MCFG_DEVICE_PROGRAM_MAP(isbc8010_mem)
+	MCFG_DEVICE_IO_MAP(isbc8010_io)
 
 	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
 	MCFG_DEVICE_ADD(I8255A_2_TAG, I8255A, 0)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(18'432'000)/60)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isbc8010_state, usart_clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isbc8010_state, usart_clock_tick))
 
 	/* video hardware */
 	// 96364 crt controller
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  MCFG_SCREEN_UPDATE_DRIVER(sdk80_state, screen_update)
 //  MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", sdk80)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sdk80)
 
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -219,15 +219,15 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 //  MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 //  MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-//  MCFG_AY51013_READ_SI_CB(READ8(sdk80_state, nascom1_hd6402_si))
-//  MCFG_AY51013_WRITE_SO_CB(WRITE8(sdk80_state, nascom1_hd6402_so))
+//  MCFG_AY51013_READ_SI_CB(READ8(*this, sdk80_state, nascom1_hd6402_si))
+//  MCFG_AY51013_WRITE_SO_CB(WRITE8(*this, sdk80_state, nascom1_hd6402_so))
 
 	/* Devices */
 //  MCFG_DEVICE_ADD("i8279", I8279, 3100000) // based on divider
 //  MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-//  MCFG_I8279_OUT_SL_CB(WRITE8(sdk80_state, scanlines_w))          // scan SL lines
-//  MCFG_I8279_OUT_DISP_CB(WRITE8(sdk80_state, digit_w))            // display A&B
-//  MCFG_I8279_IN_RL_CB(READ8(sdk80_state, kbd_r))                  // kbd RL lines
+//  MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk80_state, scanlines_w))          // scan SL lines
+//  MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk80_state, digit_w))            // display A&B
+//  MCFG_I8279_IN_RL_CB(READ8(*this, sdk80_state, kbd_r))                  // kbd RL lines
 //  MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
 //  MCFG_I8279_IN_CTRL_CB(VCC)
 
@@ -236,15 +236,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(isbc8010_state::isbc8010a)
 	isbc8010(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(isbc8010a_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(isbc8010a_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc8010_state::isbc8010b)
 	isbc8010(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(isbc8010b_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(isbc8010b_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -252,14 +252,14 @@ ROM_START( isbc8010 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mon11")
 	ROM_SYSTEM_BIOS( 0, "mon11", "80/10 Monitor v1.1" )
-	ROMX_LOAD( "sbc80p.a23", 0x0000, 0x0400, CRC(bd49a7d6) SHA1(3b2f18abf35efe05f38eb08bf0c6d0f45fa7ae0a), ROM_BIOS(1))
-	ROMX_LOAD( "sbc80p.a24", 0x0400, 0x0400, CRC(18131631) SHA1(6fb29df38e056c966dcc95885bc59c2a3caf4baf), ROM_BIOS(1))
+	ROMX_LOAD( "sbc80p.a23", 0x0000, 0x0400, CRC(bd49a7d6) SHA1(3b2f18abf35efe05f38eb08bf0c6d0f45fa7ae0a), ROM_BIOS(0))
+	ROMX_LOAD( "sbc80p.a24", 0x0400, 0x0400, CRC(18131631) SHA1(6fb29df38e056c966dcc95885bc59c2a3caf4baf), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "bas80", "BASIC-80" )
-	ROMX_LOAD( "basic_blc_1.a24", 0x0000, 0x0400, CRC(b5e75aee) SHA1(6bd1eb9586d72544e8afb4ae43ecedcefa14da33), ROM_BIOS(2))
-	ROMX_LOAD( "basic_blc_2.a25", 0x0400, 0x0400, CRC(0a9ad1ed) SHA1(92c47eadcf8b18eeedcccaa3deb9f1518aaceeae), ROM_BIOS(2))
-	ROMX_LOAD( "basic_blc_3.a26", 0x0800, 0x0400, CRC(bc898e4b) SHA1(adc000534db0f736a75fbceed360dc220e02c30d), ROM_BIOS(2))
-	ROMX_LOAD( "basic_blc_4.a27", 0x0c00, 0x0400, CRC(568e8b6d) SHA1(22960193d3b0ae1b5d876d8c3b3f3b40db01358c), ROM_BIOS(2))
+	ROMX_LOAD( "basic_blc_1.a24", 0x0000, 0x0400, CRC(b5e75aee) SHA1(6bd1eb9586d72544e8afb4ae43ecedcefa14da33), ROM_BIOS(1))
+	ROMX_LOAD( "basic_blc_2.a25", 0x0400, 0x0400, CRC(0a9ad1ed) SHA1(92c47eadcf8b18eeedcccaa3deb9f1518aaceeae), ROM_BIOS(1))
+	ROMX_LOAD( "basic_blc_3.a26", 0x0800, 0x0400, CRC(bc898e4b) SHA1(adc000534db0f736a75fbceed360dc220e02c30d), ROM_BIOS(1))
+	ROMX_LOAD( "basic_blc_4.a27", 0x0c00, 0x0400, CRC(568e8b6d) SHA1(22960193d3b0ae1b5d876d8c3b3f3b40db01358c), ROM_BIOS(1))
 
 	/* 512-byte Signetics 2513 character generator ROM at location D2-D3 */
 	ROM_REGION(0x0200, "gfx1",0)
@@ -273,7 +273,7 @@ ROM_END
 #define rom_isbc8010a rom_isbc8010
 #define rom_isbc8010b rom_isbc8010
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10",  MACHINE_NO_SOUND_HW )
-COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10A", MACHINE_NO_SOUND_HW )
-COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10B", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS */
+COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010, isbc8010_state, empty_init, "Intel", "iSBC 80/10",  MACHINE_NO_SOUND_HW )
+COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010, isbc8010_state, empty_init, "Intel", "iSBC 80/10A", MACHINE_NO_SOUND_HW )
+COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010, isbc8010_state, empty_init, "Intel", "iSBC 80/10B", MACHINE_NO_SOUND_HW )

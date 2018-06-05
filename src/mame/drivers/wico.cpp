@@ -440,10 +440,10 @@ void wico_state::machine_reset()
 
 MACHINE_CONFIG_START(wico_state::wico)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("ccpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U51
-	MCFG_CPU_PROGRAM_MAP(ccpu_map)
-	MCFG_CPU_ADD("hcpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U24
-	MCFG_CPU_PROGRAM_MAP(hcpu_map)
+	MCFG_DEVICE_ADD("ccpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U51
+	MCFG_DEVICE_PROGRAM_MAP(ccpu_map)
+	MCFG_DEVICE_ADD("hcpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U24
+	MCFG_DEVICE_PROGRAM_MAP(hcpu_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", wico_state, irq_housekeeping, attotime::from_hz(120)) // zero crossing
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq", wico_state, firq_housekeeping, attotime::from_hz(750)) // time generator
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -453,8 +453,8 @@ MACHINE_CONFIG_START(wico_state::wico)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -474,4 +474,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

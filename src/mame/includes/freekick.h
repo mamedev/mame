@@ -49,9 +49,9 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_l_w);
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_h_w);
 	DECLARE_READ8_MEMBER(snd_rom_r);
-	DECLARE_DRIVER_INIT(gigas);
-	DECLARE_DRIVER_INIT(gigasb);
-	DECLARE_DRIVER_INIT(pbillrds);
+	void init_gigas();
+	void init_gigasb();
+	void init_pbillrds();
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(pbillrd);

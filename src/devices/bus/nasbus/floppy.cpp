@@ -28,17 +28,18 @@ FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
 	FLOPPY_NASCOM_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( nascom_floppies )
-	SLOT_INTERFACE("55e", TEAC_FD_55E)
-	SLOT_INTERFACE("55f", TEAC_FD_55F)
-SLOT_INTERFACE_END
+static void nascom_floppies(device_slot_interface &device)
+{
+	device.option_add("55e", TEAC_FD_55E);
+	device.option_add("55f", TEAC_FD_55F);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(nascom_fdc_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fd1793", XTAL(16'000'000) / 4 / 4)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 16_MHz_XTAL / 4 / 4)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)

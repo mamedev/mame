@@ -125,7 +125,7 @@ protected:
 	uint32_t m_info_flags;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 
 	bool m_irq_state[2];
@@ -172,8 +172,8 @@ protected:
 	inline uint16_t read_mem16(uint16_t address) { return m_program->read_byte(address) << 8 | m_program->read_byte((address + 1) & 0xffff); }
 	inline void write_mem16(uint16_t address, uint16_t data) { m_program->write_byte(address, data >> 8 & 0xff); m_program->write_byte((address + 1) & 0xffff, data & 0xff); }
 
-	inline uint8_t imm8() { return m_direct->read_byte(m_pc++); }
-	inline uint16_t imm16() { uint16_t ret = m_direct->read_byte(m_pc++) << 8; return ret | m_direct->read_byte(m_pc++); }
+	inline uint8_t imm8() { return m_cache->read_byte(m_pc++); }
+	inline uint16_t imm16() { uint16_t ret = m_cache->read_byte(m_pc++) << 8; return ret | m_cache->read_byte(m_pc++); }
 
 	inline uint8_t pull8() { return m_program->read_byte(m_sp--); }
 	inline void push8(uint8_t data) { m_program->write_byte(++m_sp, data); }

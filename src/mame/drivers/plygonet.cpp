@@ -504,7 +504,7 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static GFXDECODE_START( plygonet )
+static GFXDECODE_START( gfx_plygonet )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
@@ -554,16 +554,16 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 
 MACHINE_CONFIG_START(polygonet_state::plygonet)
 
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state, polygonet_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", polygonet_state, polygonet_interrupt)
 
-	MCFG_CPU_ADD("dsp", DSP56156, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_DEVICE_ADD("dsp", DSP56156, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(dsp_program_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plygonet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plygonet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -588,12 +588,13 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(polygonet_state, k054539_nmi_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, polygonet_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -663,7 +664,7 @@ INPUT_PORTS_END
 
 
 /**********************************************************************************/
-DRIVER_INIT_MEMBER(polygonet_state,polygonet)
+void polygonet_state::init_polygonet()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
@@ -725,5 +726,5 @@ ROM_START( polynetw )
 ROM_END
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT      STATE            INIT
-GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, init_polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, init_polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

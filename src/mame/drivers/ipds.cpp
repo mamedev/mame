@@ -121,7 +121,7 @@ static const gfx_layout ipds_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( ipds )
+static GFXDECODE_START( gfx_ipds )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ipds_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -133,9 +133,9 @@ void ipds_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(ipds_state::ipds)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
-	MCFG_CPU_PROGRAM_MAP(ipds_mem)
-	MCFG_CPU_IO_MAP(ipds_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ipds_mem)
+	MCFG_DEVICE_IO_MAP(ipds_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(ipds_state::ipds)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ipds)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ipds)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(19'660'800) / 4)
@@ -173,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT   COMPANY   FULLNAME  FLAGS */
-COMP( 1982, ipds,  0,      0,       ipds,    ipds,  ipds_state,  0,     "Intel",  "iPDS",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1982, ipds, 0,      0,      ipds,    ipds,  ipds_state, empty_init, "Intel", "iPDS",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

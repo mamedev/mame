@@ -407,10 +407,10 @@ void ecb_grip21_device::kb_w(uint8_t data)
 
 MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
 	MCFG_Z80_DAISY_CHAIN(grip_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(grip_mem)
-	MCFG_CPU_IO_MAP(grip_io)
+	MCFG_DEVICE_PROGRAM_MAP(grip_mem)
+	MCFG_DEVICE_IO_MAP(grip_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::white())
@@ -423,8 +423,8 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -433,27 +433,27 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ecb_grip21_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, i1_w))
-	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, i1_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(Z80STI_TAG, z80sti_device, i1_w))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(Z80STI_TAG, z80sti_device, i1_w))
 
 //  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL(16'000'000)/4)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecb_grip21_device, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecb_grip21_device, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecb_grip21_device, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecb_grip21_device, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecb_grip21_device, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecb_grip21_device, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecb_grip21_device, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecb_grip21_device, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(Z80STI_TAG, Z80STI, XTAL(16'000'000)/4)
 	MCFG_Z80STI_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80STI_IN_GPIO_CB(READ8(ecb_grip21_device, sti_gpio_r))
-	MCFG_Z80STI_OUT_TBO_CB(WRITELINE(ecb_grip21_device, speaker_w))
-	MCFG_Z80STI_OUT_TCO_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, tc_w))
-	MCFG_Z80STI_OUT_TDO_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, tc_w))
+	MCFG_Z80STI_IN_GPIO_CB(READ8(*this, ecb_grip21_device, sti_gpio_r))
+	MCFG_Z80STI_OUT_TBO_CB(WRITELINE(*this, ecb_grip21_device, speaker_w))
+	MCFG_Z80STI_OUT_TCO_CB(WRITELINE(Z80STI_TAG, z80sti_device, tc_w))
+	MCFG_Z80STI_OUT_TDO_CB(WRITELINE(Z80STI_TAG, z80sti_device, tc_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(ecb_grip21_device, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(ecb_grip21_device, write_centronics_fault))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ecb_grip21_device, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, ecb_grip21_device, write_centronics_fault))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

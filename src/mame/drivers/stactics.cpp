@@ -311,15 +311,15 @@ void stactics_state::machine_start()
 MACHINE_CONFIG_START(stactics_state::stactics)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 1933560)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stactics_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8080, 1933560)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stactics_state,  interrupt)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 50
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, coin_lockout_1_w)) // COIN REJECT 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, coin_lockout_2_w)) // COIN REJECT 2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, palette_bank_w)) // FLM COL 0
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(stactics_state, palette_bank_w)) // FLM COL 1
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, stactics_state, coin_lockout_1_w)) // COIN REJECT 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, stactics_state, coin_lockout_2_w)) // COIN REJECT 2
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, stactics_state, palette_bank_w)) // FLM COL 0
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, stactics_state, palette_bank_w)) // FLM COL 1
 
 	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // 58 - TODO: implement these switches
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // MUTE
@@ -328,17 +328,17 @@ MACHINE_CONFIG_START(stactics_state::stactics)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // UFO
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // INVADER
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // EMEGENCY (sic)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, motor_w)) // overlaps rocket sound
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, stactics_state, motor_w)) // overlaps rocket sound
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // SOUND ON
 
 	MCFG_DEVICE_ADD("lamplatch", LS259, 0) // 96
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, base_lamp_w<4>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, base_lamp_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(stactics_state, base_lamp_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stactics_state, base_lamp_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(stactics_state, base_lamp_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(stactics_state, start_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, barrier_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<4>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<3>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, stactics_state, start_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, stactics_state, barrier_lamp_w))
 
 	/* video hardware */
 	stactics_video(config);
@@ -382,4 +382,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, stactics, 0, stactics, stactics, stactics_state, 0, ORIENTATION_FLIP_X, "Sega", "Space Tactics", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_stactics )
+GAMEL( 1981, stactics, 0, stactics, stactics, stactics_state, empty_init, ORIENTATION_FLIP_X, "Sega", "Space Tactics", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_stactics )

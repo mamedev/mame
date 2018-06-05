@@ -271,7 +271,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( megazone )
+static GFXDECODE_START( gfx_megazone )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -301,26 +301,26 @@ WRITE_LINE_MEMBER(megazone_state::vblank_irq)
 MACHINE_CONFIG_START(megazone_state::megazone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/9)        /* 2.048 MHz */
-	MCFG_CPU_PROGRAM_MAP(megazone_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/9)        /* 2.048 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megazone_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)     /* Z80 Clock is derived from the H1 signal */
-	MCFG_CPU_PROGRAM_MAP(megazone_sound_map)
-	MCFG_CPU_IO_MAP(megazone_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)     /* Z80 Clock is derived from the H1 signal */
+	MCFG_DEVICE_PROGRAM_MAP(megazone_sound_map)
+	MCFG_DEVICE_IO_MAP(megazone_sound_io_map)
 
-	MCFG_CPU_ADD("daccpu", I8039, XTAL(14'318'181)/2)    /* 7.15909MHz */
-	MCFG_CPU_PROGRAM_MAP(megazone_i8039_map)
-	MCFG_CPU_IO_MAP(megazone_i8039_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(megazone_state, i8039_irqen_and_status_w))
+	MCFG_DEVICE_ADD("daccpu", I8039, XTAL(14'318'181)/2)    /* 7.15909MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megazone_i8039_map)
+	MCFG_DEVICE_IO_MAP(megazone_i8039_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, megazone_state, i8039_irqen_and_status_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 13A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(megazone_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(megazone_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(megazone_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(megazone_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, megazone_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, megazone_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, megazone_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, megazone_state, irq_mask_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -332,34 +332,34 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megazone_state, screen_update_megazone)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megazone_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megazone_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megazone)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megazone)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(megazone_state, megazone)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(14'318'181)/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(megazone_state, megazone_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(megazone_state, megazone_port_b_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(14'318'181)/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, megazone_state, megazone_port_a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, megazone_state, megazone_port_b_w))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_FILTER_RC_ADD("filter.0.0", 0)
+	MCFG_DEVICE_ADD("filter.0.0", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.1", 0)
+	MCFG_DEVICE_ADD("filter.0.1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.2", 0)
+	MCFG_DEVICE_ADD("filter.0.2", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -565,9 +565,9 @@ ROM_END
 
 
 
-GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, 0, ROT90, "Konami",                               "Mega Zone (program code L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonej, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (program code J)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami",                               "Mega Zone (program code I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneh, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Kosuka license)",              "Mega Zone (program code H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonea, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (unknown program code 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneb, megazone, megazone, megazona, megazone_state, 0, ROT90, "Konami",                               "Mega Zone (unknown program code 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (program code L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonej, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (program code J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneh, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Kosuka license)",              "Mega Zone (program code H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonea, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (unknown program code 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneb, megazone, megazone, megazona, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (unknown program code 2)", MACHINE_SUPPORTS_SAVE )

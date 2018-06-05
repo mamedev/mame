@@ -59,8 +59,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(sanremmg_state::sanremmg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
-	MCFG_CPU_PROGRAM_MAP(sanremmg_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
+	MCFG_DEVICE_PROGRAM_MAP(sanremmg_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -94,5 +94,5 @@ ROM_START( elsypokr )
 	// there is space for what looks like a 3rd rom
 ROM_END
 
-GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )
-GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_IS_SKELETON )
+GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )
+GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_IS_SKELETON )

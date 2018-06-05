@@ -104,39 +104,39 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(seattle_comp_state::seattle)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(24'000'000) / 3) // 8 MHz or 4 MHz selectable
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(24'000'000) / 3) // 8 MHz or 4 MHz selectable
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic1", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_INT0))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(seattle_comp_state, pic_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, seattle_comp_state, pic_slave_ack))
 
 	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic1", pic8259_device, ir1_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic1", pic8259_device, ir1_w))
 
 	MCFG_DEVICE_ADD("stc", AM9513, XTAL(4'000'000)) // dedicated XTAL
-	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir0_w))
-	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir4_w))
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir7_w))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
+	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("pic2", pic8259_device, ir0_w))
+	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("pic2", pic8259_device, ir4_w))
+	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("pic2", pic8259_device, ir7_w))
+	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("stc", am9513_device, source1_w))
 	// FOUT not shown on schematics, which inexplicably have Source 1 tied to Gate 5
 
 	MCFG_DEVICE_ADD("uart", I8251, XTAL(24'000'000) / 12) // CLOCK on line 49
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic2", pic8259_device, ir1_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic2", pic8259_device, ir5_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic2", pic8259_device, ir1_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic2", pic8259_device, ir5_w))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -147,5 +147,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS               INIT    COMPANY            FULLNAME    FLAGS
-COMP( 1986, scp300f, 0,      0,       seattle,  seattle, seattle_comp_state, 0,    "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS               INIT        COMPANY            FULLNAME    FLAGS
+COMP( 1986, scp300f, 0,      0,      seattle, seattle, seattle_comp_state, empty_init, "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW )

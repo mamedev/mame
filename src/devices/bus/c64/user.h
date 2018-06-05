@@ -28,6 +28,6 @@
 
 #include "bus/pet/user.h"
 
-SLOT_INTERFACE_EXTERN( c64_user_port_cards );
+void c64_user_port_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_C64_USER_H

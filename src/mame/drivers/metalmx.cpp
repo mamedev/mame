@@ -693,25 +693,25 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(metalmx_state::metalmx)
 
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("adsp", ADSP2105, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2105, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
-	MCFG_CPU_ADD("gsp", TMS34020, 40000000)         /* Unverified */
-	MCFG_CPU_PROGRAM_MAP(gsp_map)
+	MCFG_DEVICE_ADD("gsp", TMS34020, 40000000)         /* Unverified */
+	MCFG_DEVICE_PROGRAM_MAP(gsp_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_OUTPUT_INT_CB(INPUTLINE("maincpu", 4))
 
-	MCFG_CPU_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
-	MCFG_CPU_PROGRAM_MAP(dsp32c_1_map)
+	MCFG_DEVICE_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
+	MCFG_DEVICE_PROGRAM_MAP(dsp32c_1_map)
 
-	MCFG_CPU_ADD("dsp32c_2", DSP32C, 40000000)      /* Unverified */
-	MCFG_CPU_PROGRAM_MAP(dsp32c_2_map)
+	MCFG_DEVICE_ADD("dsp32c_2", DSP32C, 40000000)      /* Unverified */
+	MCFG_DEVICE_PROGRAM_MAP(dsp32c_2_map)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -726,11 +726,11 @@ MACHINE_CONFIG_START(metalmx_state::metalmx)
 
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0) // TODO: speedup address
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(metalmx_state,cage_irq_callback))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, metalmx_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(metalmx_state,metalmx)
+void metalmx_state::init_metalmx()
 {
 	uint8_t *adsp_boot = (uint8_t*)memregion("adsp")->base();
 
@@ -861,4 +861,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, init_metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

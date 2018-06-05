@@ -704,7 +704,7 @@ uint8_t *apple3_state::apple3_get_indexed_addr(offs_t offset)
 	return result;
 }
 
-DRIVER_INIT_MEMBER(apple3_state,apple3)
+void apple3_state::init_apple3()
 {
 	m_enable_mask = 0;
 

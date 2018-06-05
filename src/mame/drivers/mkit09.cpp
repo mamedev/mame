@@ -197,23 +197,22 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 
 MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mkit09_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(mkit09_state, pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(mkit09_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mkit09_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mkit09_state, pb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, mkit09_state, pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, mkit09_state, pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mkit09_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mkit09_state, pb_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -222,23 +221,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mkit09a_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(mkit09_state, pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(mkit09_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mkit09_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mkit09_state, pb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, mkit09_state, pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, mkit09_state, pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mkit09_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mkit09_state, pb_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -258,6 +256,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT  COMPANY       FULLNAME                    FLAGS
-COMP( 1983, mkit09,  0,      0,       mkit09,     mkit09, mkit09_state,  0,    "Multitech",  "Microkit09",               MACHINE_NO_SOUND_HW )
-COMP( 1983, mkit09a, mkit09, 0,       mkit09a,    mkit09, mkit09_state,  0,    "Multitech",  "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME                    FLAGS
+COMP( 1983, mkit09,  0,      0,      mkit09,  mkit09, mkit09_state, empty_init, "Multitech", "Microkit09",               MACHINE_NO_SOUND_HW )
+COMP( 1983, mkit09a, mkit09, 0,      mkit09a, mkit09, mkit09_state, empty_init, "Multitech", "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

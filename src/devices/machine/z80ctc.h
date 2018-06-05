@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 //**************************************************************************
@@ -46,6 +46,10 @@
 
 #define MCFG_Z80CTC_ZC2_CB(_devcb) \
 	devcb = &downcast<z80ctc_device &>(*device).set_zc_callback<2>(DEVCB_##_devcb);
+
+// not supported on a standard ctc, only used for the tmpz84c015
+#define MCFG_Z80CTC_ZC3_CB(_devcb) \
+	devcb = &downcast<z80ctc_device &>(*device).set_zc_callback<3>(DEVCB_##_devcb);
 
 
 //**************************************************************************

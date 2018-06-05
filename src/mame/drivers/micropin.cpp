@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p50a_w);
 	DECLARE_WRITE8_MEMBER(p50b_w);
 	DECLARE_WRITE8_MEMBER(p51a_w);
-	DECLARE_DRIVER_INIT(micropin);
+	void init_micropin();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void pentacup2(machine_config &config);
 	void micropin(machine_config &config);
@@ -291,15 +291,15 @@ void micropin_state::machine_reset()
 		m_led_time[i] = 5;
 }
 
-DRIVER_INIT_MEMBER( micropin_state, micropin )
+void micropin_state::init_micropin()
 {
 }
 
 MACHINE_CONFIG_START(micropin_state::micropin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(micropin_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
+	MCFG_DEVICE_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(micropin_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -308,36 +308,36 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 387)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia50", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(micropin_state, p50a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(micropin_state, p50a_w))
-	//MCFG_PIA_READPB_HANDLER(READ8(micropin_state, p50b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(micropin_state, p50b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(micropin_state, p50ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(micropin_state, p50cb2_w))
+	//MCFG_PIA_READPA_HANDLER(READ8(*this, micropin_state, p50a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, micropin_state, p50a_w))
+	//MCFG_PIA_READPB_HANDLER(READ8(*this, micropin_state, p50b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, micropin_state, p50b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, micropin_state, p50ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, micropin_state, p50cb2_w))
 
 	MCFG_DEVICE_ADD("pia51", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(micropin_state, p51a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(micropin_state, p51a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(micropin_state, p51b_r))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(micropin_state, p51b_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(micropin_state, p51ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(micropin_state, p51cb2_w))
+	//MCFG_PIA_READPA_HANDLER(READ8(*this, micropin_state, p51a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, micropin_state, p51a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, micropin_state, p51b_r))
+	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, micropin_state, p51b_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, micropin_state, p51ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, micropin_state, p51cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", micropin_state, timer_a, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(micropin_state::pentacup2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v2cpu", I8085A, 2000000)
-	MCFG_CPU_PROGRAM_MAP(pentacup2_map)
-	MCFG_CPU_IO_MAP(pentacup2_io)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
+	MCFG_DEVICE_ADD("v2cpu", I8085A, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(pentacup2_map)
+	MCFG_DEVICE_IO_MAP(pentacup2_io)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -369,5 +369,5 @@ ROM_START(pentacup2)
 ROM_END
 
 
-GAME(1978,  pentacup,  0,         micropin,   micropin, micropin_state,  micropin,  ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  pentacup2, pentacup,  pentacup2,  micropin, micropin_state,  micropin,  ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  pentacup,  0,         micropin,   micropin, micropin_state, init_micropin, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  pentacup2, pentacup,  pentacup2,  micropin, micropin_state, init_micropin, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL)

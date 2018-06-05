@@ -136,7 +136,7 @@ static const gfx_layout intvkbd_charlayout =
 	8 * 8
 };
 
-static GFXDECODE_START( intvkbd )
+static GFXDECODE_START( gfx_intvkbd )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, intvkbd_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -463,9 +463,9 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 
 MACHINE_CONFIG_START(intv_state::intv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
-	MCFG_CPU_PROGRAM_MAP(intv_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
+	MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
+	MCFG_DEVICE_PROGRAM_MAP(intv_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -488,10 +488,10 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_INTV_CONTROL_PORT_ADD("iopt_left_ctrl", intv_control_port_devices, "handctrl")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* cartridge */
@@ -504,14 +504,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intv2)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intv2_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intv2_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvoice)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intvoice_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intvoice_mem)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
@@ -519,13 +519,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvecs)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intvecs_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intvecs_mem)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_DEVICE_ADD("ecs", INTV_ROM_ECS, 0)
 
-	MCFG_SOUND_ADD("speech", SP0256, 3120000)
+	MCFG_DEVICE_ADD("speech", SP0256, 3120000)
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -541,17 +541,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvkbd)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intvkbd_mem)
 
-	MCFG_CPU_ADD("keyboard", M6502, XTAL(7'159'090)/8)
-	MCFG_CPU_PROGRAM_MAP(intvkbd2_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
+	MCFG_DEVICE_ADD("keyboard", M6502, XTAL(7'159'090)/8)
+	MCFG_DEVICE_PROGRAM_MAP(intvkbd2_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intvkbd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_intvkbd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
@@ -642,14 +642,14 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))
 ROM_END
 
-DRIVER_INIT_MEMBER(intv_state,intv)
+void intv_state::init_intv()
 {
 	m_stic->set_x_scale(INTV_X_SCALE);
 	m_stic->set_y_scale(INTV_Y_SCALE);
 	m_is_keybd = 0;
 }
 
-DRIVER_INIT_MEMBER(intv_state,intvkbd)
+void intv_state::init_intvkbd()
 {
 	m_stic->set_x_scale(INTVKBD_X_SCALE);
 	m_stic->set_y_scale(INTVKBD_Y_SCALE);
@@ -663,12 +663,12 @@ DRIVER_INIT_MEMBER(intv_state,intvkbd)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY   FULLNAME */
-CONS( 1979, intv,       0,      0,      intv,       0,       intv_state,    intv,       "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, intvsrs,    intv,   0,      intv,       0,       intv_state,    intv,       "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd, intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 1982, intv2,      intv,   0,      intv2,      0,       intv_state,    intv,       "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY   FULLNAME */
+CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions
-COMP( 1982, intvoice,   intv,   0,      intvoice,   0,       intv_state,    intv,       "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, intvecs,    intv,   0,      intvecs,    0,       intv_state,    intv,       "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )

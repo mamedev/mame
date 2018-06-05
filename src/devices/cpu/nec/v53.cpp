@@ -492,51 +492,51 @@ MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
 	MCFG_PIT8253_CLK0(16000000) // manual implicitly claims that these runs at same speed as the CPU
 	MCFG_PIT8253_CLK1(16000000)
 	MCFG_PIT8253_CLK2(16000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE( v53_base_device, tcu_out0_trampoline_cb ))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( v53_base_device, tcu_out1_trampoline_cb ))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( v53_base_device, tcu_out2_trampoline_cb ))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE( *this, v53_base_device, tcu_out0_trampoline_cb ))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( *this, v53_base_device, tcu_out1_trampoline_cb ))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( *this, v53_base_device, tcu_out2_trampoline_cb ))
 
 
 	MCFG_DEVICE_ADD("upd71071dma", V53_DMAU, 4000000)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(v53_base_device, hreq_trampoline_cb))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(v53_base_device, eop_trampoline_cb))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(v53_base_device, dma_memr_trampoline_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(v53_base_device, dma_memw_trampoline_w))
-	MCFG_AM9517A_IN_IOR_0_CB(READ8(v53_base_device, dma_io_0_trampoline_r))
-	MCFG_AM9517A_IN_IOR_1_CB(READ8(v53_base_device, dma_io_1_trampoline_r))
-	MCFG_AM9517A_IN_IOR_2_CB(READ8(v53_base_device, dma_io_2_trampoline_r))
-	MCFG_AM9517A_IN_IOR_3_CB(READ8(v53_base_device, dma_io_3_trampoline_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(v53_base_device, dma_io_0_trampoline_w))
-	MCFG_AM9517A_OUT_IOW_1_CB(WRITE8(v53_base_device, dma_io_1_trampoline_w))
-	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(v53_base_device, dma_io_2_trampoline_w))
-	MCFG_AM9517A_OUT_IOW_3_CB(WRITE8(v53_base_device, dma_io_3_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(v53_base_device, dma_dack0_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_1_CB(WRITELINE(v53_base_device, dma_dack1_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(v53_base_device, dma_dack2_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(v53_base_device, dma_dack3_trampoline_w))
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, v53_base_device, hreq_trampoline_cb))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, v53_base_device, eop_trampoline_cb))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, v53_base_device, dma_memr_trampoline_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, v53_base_device, dma_memw_trampoline_w))
+	MCFG_AM9517A_IN_IOR_0_CB(READ8(*this, v53_base_device, dma_io_0_trampoline_r))
+	MCFG_AM9517A_IN_IOR_1_CB(READ8(*this, v53_base_device, dma_io_1_trampoline_r))
+	MCFG_AM9517A_IN_IOR_2_CB(READ8(*this, v53_base_device, dma_io_2_trampoline_r))
+	MCFG_AM9517A_IN_IOR_3_CB(READ8(*this, v53_base_device, dma_io_3_trampoline_r))
+	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(*this, v53_base_device, dma_io_0_trampoline_w))
+	MCFG_AM9517A_OUT_IOW_1_CB(WRITE8(*this, v53_base_device, dma_io_1_trampoline_w))
+	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(*this, v53_base_device, dma_io_2_trampoline_w))
+	MCFG_AM9517A_OUT_IOW_3_CB(WRITE8(*this, v53_base_device, dma_io_3_trampoline_w))
+	MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(*this, v53_base_device, dma_dack0_trampoline_w))
+	MCFG_AM9517A_OUT_DACK_1_CB(WRITELINE(*this, v53_base_device, dma_dack1_trampoline_w))
+	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(*this, v53_base_device, dma_dack2_trampoline_w))
+	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(*this, v53_base_device, dma_dack3_trampoline_w))
 
 
 	MCFG_DEVICE_ADD("upd71059pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(v53_base_device, internal_irq_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, v53_base_device, internal_irq_w))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(v53_base_device, get_pic_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, v53_base_device, get_pic_ack))
 
 
 
 	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(v53_base_device, scu_txd_trampoline_cb))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(v53_base_device, scu_dtr_trampoline_cb))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(v53_base_device, scu_rts_trampoline_cb))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(v53_base_device,scu_rxrdy_trampoline_cb))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(v53_base_device,scu_txrdy_trampoline_cb))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(v53_base_device, scu_txempty_trampoline_cb))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(v53_base_device, scu_syndet_trampoline_cb))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, v53_base_device, scu_txd_trampoline_cb))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, v53_base_device, scu_dtr_trampoline_cb))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, v53_base_device, scu_rts_trampoline_cb))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_rxrdy_trampoline_cb))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_txrdy_trampoline_cb))
+	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, v53_base_device, scu_txempty_trampoline_cb))
+	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, v53_base_device, scu_syndet_trampoline_cb))
 
 MACHINE_CONFIG_END
 
 
-v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
-	: nec_common_device(mconfig, type, tag, owner, clock, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
+v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+	: nec_common_device(mconfig, type, tag, owner, clock, true, prefetch_size, prefetch_cycles, chip_type),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(v53_base_device::v53_internal_port_map), this) ),
 	m_v53tcu(*this, "pit"),
 	m_v53dmau(*this, "upd71071dma"),
@@ -576,12 +576,12 @@ v53_base_device::v53_base_device(const machine_config &mconfig, device_type type
 
 
 v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53, tag, owner, clock, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53, tag, owner, clock, 6, 1, V33_TYPE)
 {
 }
 
 
 v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53A, tag, owner, clock, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53A, tag, owner, clock, 6, 1, V33_TYPE)
 {
 }

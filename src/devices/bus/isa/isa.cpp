@@ -31,7 +31,7 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *ta
 isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_owner(nullptr), m_isa_tag(nullptr)
+	m_isa_bus(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -41,12 +41,15 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type ty
 
 void isa8_slot_device::device_start()
 {
-	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
+	device_isa8_card_interface *const dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
 	const device_isa16_card_interface *intf;
 	if (get_card_device() && get_card_device()->interface(intf))
 		fatalerror("ISA16 device in ISA8 slot\n");
 
-	if (dev) dev->set_isabus(m_owner->subdevice(m_isa_tag));
+	if (dev) dev->set_isabus(m_isa_bus);
+
+	// tell isa bus that there is one slot with the specified tag
+	downcast<isa8_device &>(*m_isa_bus).add_slot(tag());
 }
 
 
@@ -75,8 +78,10 @@ isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *
 
 void isa16_slot_device::device_start()
 {
-	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	if (dev) dev->set_isabus(m_owner->subdevice(m_isa_tag));
+	device_isa8_card_interface *const dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
+	if (dev) dev->set_isabus(m_isa_bus);
+	// tell isa bus that there is one slot with the specified tag
+	dynamic_cast<isa8_device &>(*m_isa_bus).add_slot(tag());
 }
 
 
@@ -109,6 +114,9 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_iospace(nullptr),
 	m_memspace(nullptr),
+	m_iowidth(0),
+	m_memwidth(0),
+	m_allocspaces(false),
 	m_out_irq2_cb(*this),
 	m_out_irq3_cb(*this),
 	m_out_irq4_cb(*this),
@@ -118,16 +126,11 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_out_drq1_cb(*this),
 	m_out_drq2_cb(*this),
 	m_out_drq3_cb(*this),
+	m_nmi_enabled(false),
 	m_write_iochck(*this)
 {
-	for(int i=0;i<8;i++)
-	{
-		m_dma_device[i] = nullptr;
-		m_dma_eop[i] = false;
-	}
-	m_nmi_enabled = false;
-	m_iowidth = m_memwidth = 0;
-	m_allocspaces = false;
+	std::fill(std::begin(m_dma_device), std::end(m_dma_device), nullptr);
+	std::fill(std::begin(m_dma_eop), std::end(m_dma_eop), false);
 }
 
 device_memory_interface::space_config_vector isa8_device::memory_space_config() const
@@ -174,6 +177,28 @@ void isa8_device::set_dma_channel(uint8_t channel, device_isa8_card_interface *d
 {
 	m_dma_device[channel] = dev;
 	m_dma_eop[channel] = do_eop;
+}
+
+void isa8_device::add_slot(const char *tag)
+{
+	device_t *dev = subdevice(tag);
+	//printf(tag);
+	add_slot(dynamic_cast<device_slot_interface *>(dev));
+}
+
+void isa8_device::add_slot(device_slot_interface *slot)
+{
+	m_slot_list.push_front(slot);
+}
+
+void isa8_device::remap(int space_id, offs_t start, offs_t end)
+{
+	for (device_slot_interface *sl : m_slot_list)
+	{
+		device_t *dev = sl->get_card_device();
+		device_isa8_card_interface *isadev = dynamic_cast<device_isa8_card_interface *>(dev);
+		isadev->remap(space_id, start, end);
+	}
 }
 
 //-------------------------------------------------
@@ -351,7 +376,7 @@ void isa8_device::nmi()
 	{
 		if (m_nmi_enabled)
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 	else
@@ -552,6 +577,26 @@ void isa16_device::dack16_w(int line,uint16_t data)
 {
 	if (m_dma_device[line])
 		return dynamic_cast<device_isa16_card_interface *>(m_dma_device[line])->dack16_w(line,data);
+}
+
+void isa16_device::remap(int space_id, offs_t start, offs_t end)
+{
+	for (device_slot_interface *sl : m_slot_list)
+	{
+		device_t *dev = sl->get_card_device();
+
+		if (dev)
+		{
+			device_isa8_card_interface *isadev8 = dynamic_cast<device_isa8_card_interface *>(dev);
+			device_isa16_card_interface *isadev16 = dynamic_cast<device_isa16_card_interface *>(dev);
+
+			if (isadev16)
+				isadev16->remap(space_id, start, end);
+			else
+				if (isadev8)
+					isadev8->remap(space_id, start, end);
+		}
+	}
 }
 
 //-------------------------------------------------

@@ -38,6 +38,8 @@ public:
 		, m_digitalker(*this, "digitalker")
 		, m_aysnd(*this, "aysnd")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{
 	}
 
@@ -87,6 +89,8 @@ private:
 	required_device<digitalker_device> m_digitalker;
 	optional_device<ay8910_device> m_aysnd; // only faceoffh
 	output_finder<4> m_digits;
+	output_finder<3> m_leds;
+	output_finder<2> m_lamps;
 };
 
 
@@ -151,9 +155,9 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	m_digits[3] = patterns[(m_shift >>  (8+0)) & 0xf];
 
 	// Leds (period being played)
-	output().set_led_value(0, BIT(m_shift,2));
-	output().set_led_value(1, BIT(m_shift,1));
-	output().set_led_value(2, BIT(m_shift,0));
+	m_leds[0] = BIT(m_shift,2);
+	m_leds[1] = BIT(m_shift,1);
+	m_leds[2] = BIT(m_shift,0);
 
 //  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
@@ -190,8 +194,8 @@ void chexx_state::chexx83_map(address_map &map)
 WRITE8_MEMBER(chexx_state::lamp_w)
 {
 	m_lamp = data;
-	output().set_lamp_value(0, BIT(m_lamp,0));
-	output().set_lamp_value(1, BIT(m_lamp,1));
+	m_lamps[0] = BIT(m_lamp,0);
+	m_lamps[1] = BIT(m_lamp,1);
 }
 
 WRITE8_MEMBER(chexx_state::ay_w)
@@ -262,6 +266,8 @@ INPUT_PORTS_END
 void chexx_state::machine_start()
 {
 	m_digits.resolve();
+	m_leds.resolve();
+	m_lamps.resolve();
 }
 
 void chexx_state::digitalker_set_bank(uint8_t bank)
@@ -326,39 +332,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
 MACHINE_CONFIG_START(chexx_state::chexx83)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(chexx83_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(chexx83_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("update", chexx_state, update, attotime::from_hz(60))
 
 	// via
 	MCFG_DEVICE_ADD("via6522", VIA6522, MAIN_CLOCK/4)
 
-	MCFG_VIA6522_READPA_HANDLER(READ8(chexx_state, via_a_in))
-	MCFG_VIA6522_READPB_HANDLER(READ8(chexx_state, via_b_in))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, chexx_state, via_a_in))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, chexx_state, via_b_in))
 
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(chexx_state, via_a_out))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(chexx_state, via_b_out))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, chexx_state, via_a_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, chexx_state, via_b_out))
 
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(chexx_state, via_ca2_out))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(chexx_state, via_cb1_out))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(chexx_state, via_cb2_out))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(chexx_state, via_irq_out))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, chexx_state, via_ca2_out))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, chexx_state, via_cb1_out))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, chexx_state, via_cb2_out))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, chexx_state, via_irq_out))
 
 	// Layout
 	MCFG_DEFAULT_LAYOUT(layout_chexx)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DIGITALKER_ADD("digitalker", MAIN_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chexx_state::faceoffh)
 	chexx83(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(faceoffh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(faceoffh_map)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/2)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -431,5 +437,5 @@ ROM_START( faceoffh )
 	ROM_FILL(         0xe000, 0x2000, 0xff ) // unpopulated
 ROM_END
 
-GAME( 1983, chexx83,  0,       chexx83,  chexx83, chexx_state, 0, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1983, faceoffh, chexx83, faceoffh, chexx83, chexx_state, 0, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, chexx83,  0,       chexx83,  chexx83, chexx_state, empty_init, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 1983, faceoffh, chexx83, faceoffh, chexx83, chexx_state, empty_init, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

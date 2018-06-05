@@ -79,7 +79,7 @@ class atarig42_0x200_state : public atarig42_state
 {
 public:
 	using atarig42_state::atarig42_state;
-	DECLARE_DRIVER_INIT(roadriot);
+	void init_roadriot();
 	void atarig42_0x200(machine_config &config);
 
 protected:
@@ -92,7 +92,7 @@ class atarig42_0x400_state : public atarig42_state
 {
 public:
 	using atarig42_state::atarig42_state;
-	DECLARE_DRIVER_INIT(guardian);
+	void init_guardian();
 	void atarig42_0x400(machine_config &config);
 
 protected:

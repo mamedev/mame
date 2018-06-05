@@ -182,7 +182,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( scotrsht )
+static GFXDECODE_START( gfx_scotrsht )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 16*8 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16*8, 16*8 ) /* sprites */
 GFXDECODE_END
@@ -190,12 +190,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(scotrsht_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scotrsht_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(scotrsht_sound_map)
-	MCFG_CPU_IO_MAP(scotrsht_sound_port)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scotrsht_sound_map)
+	MCFG_DEVICE_IO_MAP(scotrsht_sound_port)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -207,19 +207,19 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(scotrsht_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, scotrsht_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scotrsht)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scotrsht)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(scotrsht_state, scotrsht)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 18432000/6)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -254,4 +254,4 @@ ROM_START( scotrsht )
 	ROM_LOAD( "gx545_6301_8f.bin", 0x0400, 0x0100, CRC(c1c7cf58) SHA1(08452228bf13e43ce4a05806f79e9cd1542416f1) ) /* sprites lookup */
 ROM_END
 
-GAME( 1985, scotrsht, 0, scotrsht, scotrsht, scotrsht_state, 0, ROT90,"Konami", "Scooter Shooter", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, scotrsht, 0, scotrsht, scotrsht, scotrsht_state, empty_init, ROT90,"Konami", "Scooter Shooter", MACHINE_SUPPORTS_SAVE )

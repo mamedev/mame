@@ -59,8 +59,8 @@ void hapyfish_state::video_start()
 MACHINE_CONFIG_START(hapyfish_state::hapyfish)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU
-	MCFG_CPU_PROGRAM_MAP(hapyfish_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU
+	MCFG_DEVICE_PROGRAM_MAP(hapyfish_map)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -85,4 +85,4 @@ ROM_START( hapyfsh2 )
 	ROM_LOAD( "flash.u28",        0x00000000, 0x84000000, CRC(f00a25cd) SHA1(9c33f8e26b84cea957d9c37fb83a686b948c6834) )
 ROM_END
 
-GAME( 201?, hapyfsh2,         0,    hapyfish,    hapyfish, hapyfish_state,    0,       ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_IS_SKELETON )
+GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_IS_SKELETON )

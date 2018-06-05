@@ -203,7 +203,7 @@ public:
 	DECLARE_WRITE16_MEMBER( vram_w );
 
 	DECLARE_MACHINE_START(nevada);
-	DECLARE_DRIVER_INIT(nevada);
+	void init_nevada();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -272,7 +272,7 @@ WRITE16_MEMBER( nevada_state::vram_w )
 }
 
 /***************************************************************************/
-static GFXDECODE_START( nevada )
+static GFXDECODE_START( gfx_nevada )
 	/* Todo  , just for sample */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 GFXDECODE_END
@@ -583,8 +583,8 @@ MACHINE_START_MEMBER(nevada_state, nevada)
 
 MACHINE_CONFIG_START(nevada_state::nevada)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CPU)
-	MCFG_CPU_PROGRAM_MAP(nevada_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CPU)
+	MCFG_DEVICE_PROGRAM_MAP(nevada_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nevada)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nevada)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(nevada_state, nevada)
 
@@ -611,9 +611,9 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_ADD("duart18", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
@@ -626,10 +626,10 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 
 	MCFG_DEVICE_ADD("duart40", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart40", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart40", mc68681_device, rx_a_w) )
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
@@ -663,7 +663,7 @@ ROM_END
 /*************************
 *      Driver Init       *
 *************************/
-DRIVER_INIT_MEMBER(nevada_state,nevada)
+void nevada_state::init_nevada()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -690,5 +690,5 @@ DRIVER_INIT_MEMBER(nevada_state,nevada)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT    ROT   COMPANY     FULLNAME             FLAGS
-GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT         ROT   COMPANY     FULLNAME             FLAGS
+GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, init_nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

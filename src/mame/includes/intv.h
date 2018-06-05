@@ -102,9 +102,9 @@ public:
 	int m_tape_interrupts_enabled;
 	int m_tape_motor_mode;
 
-	DECLARE_DRIVER_INIT(intvecs);
-	DECLARE_DRIVER_INIT(intvkbd);
-	DECLARE_DRIVER_INIT(intv);
+	void init_intvecs();
+	void init_intvkbd();
+	void init_intv();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

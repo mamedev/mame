@@ -64,7 +64,7 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	DECLARE_DRIVER_INIT(sym1);
+	void init_sym1();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
@@ -277,7 +277,7 @@ WRITE8_MEMBER( sym1_state::via3_a_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( sym1_state, sym1 )
+void sym1_state::init_sym1()
 {
 	// wipe expansion memory banks that are not installed
 	if (m_ram->size() < 4*1024)
@@ -326,48 +326,48 @@ void sym1_state::sym1_map(address_map &map)
 
 MACHINE_CONFIG_START(sym1_state::sym1)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, SYM1_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sym1_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, SYM1_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sym1_map)
 
 	MCFG_DEFAULT_LAYOUT(layout_sym1)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// devices
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, SYM1_CLOCK)
-	MCFG_MOS6530n_IN_PA_CB(READ8(sym1_state, riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(sym1_state, riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(sym1_state, riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(sym1_state, riot_b_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, sym1_state, riot_a_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, sym1_state, riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, sym1_state, riot_b_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, sym1_state, riot_b_w))
 
 	MCFG_DEVICE_ADD("ttl74145", TTL74145, 0)
-	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(sym1_state, sym1_74145_output_0_w))
-	MCFG_TTL74145_OUTPUT_LINE_1_CB(WRITELINE(sym1_state, sym1_74145_output_1_w))
-	MCFG_TTL74145_OUTPUT_LINE_2_CB(WRITELINE(sym1_state, sym1_74145_output_2_w))
-	MCFG_TTL74145_OUTPUT_LINE_3_CB(WRITELINE(sym1_state, sym1_74145_output_3_w))
-	MCFG_TTL74145_OUTPUT_LINE_4_CB(WRITELINE(sym1_state, sym1_74145_output_4_w))
-	MCFG_TTL74145_OUTPUT_LINE_5_CB(WRITELINE(sym1_state, sym1_74145_output_5_w))
-	MCFG_TTL74145_OUTPUT_LINE_6_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(*this, sym1_state, sym1_74145_output_0_w))
+	MCFG_TTL74145_OUTPUT_LINE_1_CB(WRITELINE(*this, sym1_state, sym1_74145_output_1_w))
+	MCFG_TTL74145_OUTPUT_LINE_2_CB(WRITELINE(*this, sym1_state, sym1_74145_output_2_w))
+	MCFG_TTL74145_OUTPUT_LINE_3_CB(WRITELINE(*this, sym1_state, sym1_74145_output_3_w))
+	MCFG_TTL74145_OUTPUT_LINE_4_CB(WRITELINE(*this, sym1_state, sym1_74145_output_4_w))
+	MCFG_TTL74145_OUTPUT_LINE_5_CB(WRITELINE(*this, sym1_state, sym1_74145_output_5_w))
+	MCFG_TTL74145_OUTPUT_LINE_6_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 	// lines 7-9 not connected
 
 	MCFG_DEVICE_ADD("via1", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("via2", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("via3", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(sym1_state, via3_a_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, sym1_state, via3_a_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq") // wire-or connection
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	MCFG_RS232_PORT_ADD("crt", default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, nullptr) // actually a 20 mA current loop; 110 bps assumed
+	MCFG_DEVICE_ADD("crt", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("tty", RS232_PORT, default_rs232_devices, nullptr) // actually a 20 mA current loop; 110 bps assumed
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -383,9 +383,9 @@ MACHINE_CONFIG_END
 ROM_START( sym1 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "ver10",  "Version 1.0")
-	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(1))
+	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ver11",  "Version 1.1")
-	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(2))
+	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(1))
 	ROM_LOAD("rae_b000", 0xb000, 0x1000, CRC(f6429326) SHA1(6f2f10649b54f54217bb35c8c453b5d05434bd86) )
 	ROM_LOAD("bas_c000", 0xc000, 0x1000, CRC(c168fe70) SHA1(7447a5e229140cbbde4cf90886966a5d93aa24e1) )
 	ROM_LOAD("bas_d000", 0xd000, 0x1000, CRC(8375a978) SHA1(240301bf8bb8ddb99b65a585f17895e1ad872631) )
@@ -397,5 +397,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY                   FULLNAME          FLAGS
-COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                   FULLNAME          FLAGS
+COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, init_sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )

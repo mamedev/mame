@@ -148,12 +148,17 @@ class magictg_state : public driver_device
 {
 public:
 	magictg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mips(*this, "mips"),
-		m_adsp(*this, "adsp"),
-		m_pci(*this, "pcibus"),
-		m_adsp_pram(*this, "adsp_pram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_mips(*this, "mips")
+		, m_adsp(*this, "adsp")
+		, m_pci(*this, "pcibus")
+		, m_adsp_pram(*this, "adsp_pram")
+		, m_voodoo(*this, "voodoo_%u", 0U)
+	{ }
 
+	void magictg(machine_config &config);
+
+private:
 	required_device<cpu_device>         m_mips;
 	required_device<adsp2181_device>    m_adsp;
 	required_device<pci_bus_legacy_device>      m_pci;
@@ -182,7 +187,7 @@ public:
 
 
 	/* 3Dfx Voodoo */
-	voodoo_device*                           m_voodoo[2];
+	required_device_array<voodoo_device, 2> m_voodoo;
 
 	struct
 	{
@@ -226,7 +231,6 @@ public:
 
 	void zr36120_reset();
 
-	void magictg(machine_config &config);
 	void adsp_data_map(address_map &map);
 	void adsp_io_map(address_map &map);
 	void adsp_program_map(address_map &map);
@@ -259,8 +263,6 @@ public:
 
 void magictg_state::machine_start()
 {
-	m_voodoo[0] = (voodoo_device*)machine().device("voodoo_0");
-	m_voodoo[1] = (voodoo_device*)machine().device("voodoo_1");
 }
 
 
@@ -824,7 +826,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 				m_adsp_regs.bdma_control |= ((src_addr >> 14) & 0xff) << 8;
 
 				if (m_adsp_regs.bdma_control & 8)
-					m_adsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+					m_adsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			}
 			break;
 		}
@@ -909,22 +911,23 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(magictg_state::magictg)
-	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
+	MCFG_DEVICE_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
 	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */
-	MCFG_CPU_PROGRAM_MAP(magictg_map)
+	MCFG_DEVICE_PROGRAM_MAP(magictg_map)
 
-	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2181, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
@@ -1024,5 +1027,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -108,9 +108,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(lx387_control_r);
 	DECLARE_READ8_MEMBER(lx387_data_r);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
-	DECLARE_DRIVER_INIT(z80net);
-	DECLARE_DRIVER_INIT(z80netb);
-	DECLARE_DRIVER_INIT(z80ne);
+	void init_z80net();
+	void init_z80netb();
+	void init_z80ne();
 	DECLARE_MACHINE_START(z80ne);
 	DECLARE_MACHINE_RESET(z80ne);
 	DECLARE_MACHINE_START(z80netb);
@@ -180,7 +180,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(z80netf);
+	void init_z80netf();
 	void z80netf(machine_config &config);
 private:
 	void z80netf_io(address_map &map);

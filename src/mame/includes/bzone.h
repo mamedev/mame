@@ -29,7 +29,7 @@ public:
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	DECLARE_DRIVER_INIT(bradley);
+	void init_bradley();
 	void bzone(machine_config &config);
 
 protected:

@@ -960,18 +960,19 @@ static const ay8910_interface ay8910_config =
 };
 #endif
 
-static SLOT_INTERFACE_START(bml3_cards)
-	SLOT_INTERFACE("bml3mp1802", BML3BUS_MP1802)  /* MP-1802 Floppy Controller Card */
-	SLOT_INTERFACE("bml3mp1805", BML3BUS_MP1805)  /* MP-1805 Floppy Controller Card */
-	SLOT_INTERFACE("bml3kanji",  BML3BUS_KANJI)
-SLOT_INTERFACE_END
+static void bml3_cards(device_slot_interface &device)
+{
+	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
+	device.option_add("bml3mp1805", BML3BUS_MP1805); // MP-1805 Floppy Controller Card
+	device.option_add("bml3kanji",  BML3BUS_KANJI);
+}
 
 
 MACHINE_CONFIG_START(bml3_state::bml3_common)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809, CPU_CLOCK)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
-//  MCFG_CPU_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
+	MCFG_DEVICE_ADD("maincpu",M6809, CPU_CLOCK)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(bml3_state,bml3)
 
@@ -998,32 +999,30 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(bml3_state, bml3_piaA_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, bml3_state, bml3_piaA_w))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bml3_state, bml3_acia_tx_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bml3_state, bml3_acia_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bml3_state, bml3_acia_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_tx_w))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_rts_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_irq_w))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* slot devices */
 	MCFG_DEVICE_ADD("bml3bus", BML3BUS, 0)
 	MCFG_BML3BUS_CPU("maincpu")
-	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(bml3_state, bml3bus_nmi_w))
-	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(bml3_state, bml3bus_irq_w))
-	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(bml3_state, bml3bus_firq_w))
+	MCFG_BML3BUS_OUT_NMI_CB(WRITELINE(*this, bml3_state, bml3bus_nmi_w))
+	MCFG_BML3BUS_OUT_IRQ_CB(WRITELINE(*this, bml3_state, bml3bus_irq_w))
+	MCFG_BML3BUS_OUT_FIRQ_CB(WRITELINE(*this, bml3_state, bml3bus_firq_w))
 	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
 	   the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
@@ -1040,13 +1039,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bml3_state::bml3)
 	bml3_common(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(bml3_mem)
 
 #if 0
 	// TODO: slot device for sound card
 	// audio
-	MCFG_SOUND_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
+	MCFG_DEVICE_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -1057,16 +1056,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bml3_state::bml3mk2)
 	bml3_common(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3mk2_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(bml3mk2_mem)
 
 	// TODO: anything to add here?
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bml3_state::bml3mk5)
 	bml3_common(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3mk5_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(bml3mk5_mem)
 
 	// TODO: anything to add here?
 MACHINE_CONFIG_END
@@ -1120,7 +1119,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY    FULLNAME                               FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,  bml3_state, 0,    "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
-COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,  bml3_state, 0,    "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
-COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,  bml3_state, 0,    "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY    FULLNAME                               FLAGS */
+COMP( 1980, bml3,    0,     0,      bml3,    bml3,  bml3_state, empty_init, "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
+COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,  bml3_state, empty_init, "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
+COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3,  bml3_state, empty_init, "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)

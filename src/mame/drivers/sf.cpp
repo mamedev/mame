@@ -135,7 +135,7 @@ WRITE8_MEMBER(sf_state::coin_w)
 WRITE8_MEMBER(sf_state::soundcmd_w)
 {
 	m_soundlatch->write(space, offset, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
@@ -516,7 +516,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( sf )
+static GFXDECODE_START( gfx_sf )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 512, 16 )
@@ -543,17 +543,17 @@ void sf_state::machine_reset()
 MACHINE_CONFIG_START(sf_state::sfan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(sfan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sfan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(sound2_map)
-	MCFG_CPU_IO_MAP(sound2_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
+	MCFG_DEVICE_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound2_map)
+	MCFG_DEVICE_IO_MAP(sound2_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -564,27 +564,28 @@ MACHINE_CONFIG_START(sf_state::sfan)
 	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sf)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -595,8 +596,8 @@ MACHINE_CONFIG_START(sf_state::sfus)
 	sfan(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sfus_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sfus_map)
 MACHINE_CONFIG_END
 
 
@@ -604,8 +605,8 @@ MACHINE_CONFIG_START(sf_state::sfjp)
 	sfan(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sfjp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sfjp_map)
 MACHINE_CONFIG_END
 
 
@@ -613,8 +614,8 @@ MACHINE_CONFIG_START(sf_state::sfp)
 	sfan(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1101,10 +1102,10 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,  sfus, sfus, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
-GAME( 1987, sfua, sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
-GAME( 1987, sfj,  sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfjan,sf, sfan, sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfan, sf, sfan, sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfp,  sf, sfp,  sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfw,  sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (World) (protected)", MACHINE_SUPPORTS_SAVE )  // Shows Capcom copyright
+GAME( 1987, sf,   0,  sfus, sfus, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
+GAME( 1987, sfua, sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
+GAME( 1987, sfj,  sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfjan,sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfan, sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfp,  sf, sfp,  sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfw,  sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (World) (protected)", MACHINE_SUPPORTS_SAVE )  // Shows Capcom copyright

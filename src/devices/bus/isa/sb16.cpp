@@ -410,22 +410,23 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
-	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL(24'000'000))
-	MCFG_CPU_IO_MAP(sb16_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(sb16_lle_device, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sb16_lle_device, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(sb16_lle_device, p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(sb16_lle_device, p2_w))
+	MCFG_DEVICE_ADD("sb16_cpu", I80C52, XTAL(24'000'000))
+	MCFG_DEVICE_IO_MAP(sb16_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, sb16_lle_device, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sb16_lle_device, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, sb16_lle_device, p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, sb16_lle_device, p2_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymf262", YMF262, XTAL(14'318'181))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
@@ -601,7 +602,7 @@ WRITE8_MEMBER( sb16_lle_device::dsp_reset_w )
 	if(data & 1)
 	{
 		device_reset();
-		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 }
 

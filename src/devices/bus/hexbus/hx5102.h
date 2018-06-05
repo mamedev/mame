@@ -37,6 +37,8 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	ioport_constructor device_input_ports() const override;
+
 	void crumap(address_map &map);
 	void memmap(address_map &map);
 	DECLARE_WRITE8_MEMBER(external_operation);
@@ -87,8 +89,10 @@ private:
 
 	void update_readyff_input();
 
-	// Link to the attached floppy drive
-	floppy_image_device*    m_floppy;
+	// Link to the attached floppy drives
+	floppy_image_device*    m_floppy[2];
+	floppy_image_device*    m_current_floppy;
+	int m_floppy_select, m_floppy_select_last;
 
 	required_device<ibc_device> m_hexbus_ctrl;
 	required_device<i8272a_device> m_floppy_ctrl;

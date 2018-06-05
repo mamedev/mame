@@ -332,6 +332,7 @@ public:
 	m_p2_mouse_x(*this, "p2_mouse_x"),
 	m_p2_mouse_y(*this, "p2_mouse_y"),
 	m_hvpos(*this, "HVPOS"),
+	m_power_led(*this, "power_led"),
 	m_chip_ram_mask(0),
 	m_cia_0_irq(0),
 	m_cia_1_irq(0),
@@ -595,6 +596,7 @@ protected:
 	optional_ioport m_p2_mouse_y;
 	optional_ioport m_hvpos;
 
+	output_finder<> m_power_led;
 	memory_array m_chip_ram;
 	uint32_t m_chip_ram_mask;
 

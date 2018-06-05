@@ -280,13 +280,15 @@ READ8_MEMBER(pg685_state::f9f3f_r)
 //  FLOPPY
 //**************************************************************************
 
-static SLOT_INTERFACE_START( pg675_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void pg675_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START( pg685_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void pg685_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 READ8_MEMBER(pg685_state::f9f24_r)
@@ -409,7 +411,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685_module)
 	MCFG_DEVICE_ADD("fdc", FD1797, XTAL(4'000'000) / 2) // divider guessed
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("mainpic", pic8259_device, ir4_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("mainpic", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("modppi1", I8255, 0)
 	MCFG_DEVICE_ADD("modppi2", I8255, 0)
@@ -422,9 +424,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg675)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(pg675_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(pg675_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
@@ -455,13 +457,13 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 
 	// keyboard
 	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
+	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
 
 	// floppy
-	// MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(zorba_state, fdc_intrq_w))
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
+	// MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_intrq_w))
+	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -471,9 +473,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", V20, XTAL(15'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(pg685_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V20, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(pg685_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
@@ -505,26 +507,26 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 
 	// keyboard
 	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
+	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
 
 	// floppy
 
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
+	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
+	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pg685oua12_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
@@ -556,19 +558,19 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 
 	// keyboard
 	MCFG_DEVICE_ADD("kbdc", I8279, 12288000 / 6) // wrong
-	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
+	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
 
 	// floppy
 
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
+	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
+	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
 
 MACHINE_CONFIG_END
 
@@ -598,7 +600,7 @@ ROM_END
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS          INIT     COMPANY    FULLNAME               FLAGS
-COMP( 198?, pg675,      0,        0,      pg675,      pg685,      pg685_state,   0,       "Siemens", "Simatic PG675",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, pg685,      0,        0,      pg685,      pg685,      pg685_state,   0,       "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, pg685oua12, pg685,    0,      pg685oua12, pg685,      pg685_state,   0,       "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  CLASS        INIT        COMPANY    FULLNAME               FLAGS
+COMP( 198?, pg675,      0,      0,      pg675,      pg685, pg685_state, empty_init, "Siemens", "Simatic PG675",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, pg685,      0,      0,      pg685,      pg685, pg685_state, empty_init, "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, pg685oua12, pg685,  0,      pg685oua12, pg685, pg685_state, empty_init, "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

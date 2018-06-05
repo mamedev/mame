@@ -296,7 +296,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 		for (util::xml::data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
 		{
 			const char *cputag_name = cpunode->get_attribute_string("tag", "");
-			device_t *device = m_machine.device(cputag_name);
+			device_t *device = m_machine.root_device().subdevice(cputag_name);
 			if (device != nullptr)
 			{
 				if(is_inline == false)
@@ -482,39 +482,20 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 
 void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
-	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
-	if (!WORD_ALIGNED(address))
-	{
-		if (space.endianness() == ENDIANNESS_LITTLE)
-		{
-			write_byte(space, address + 0, data >> 0, apply_translation);
-			write_byte(space, address + 1, data >> 8, apply_translation);
-		}
-		else
-		{
-			write_byte(space, address + 0, data >> 8, apply_translation);
-			write_byte(space, address + 1, data >> 0, apply_translation);
-		}
-	}
+	/* translate if necessary; if not mapped, we're done */
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+		;
 
-	/* otherwise, this proceeds like the byte case */
+	/* otherwise, call the byte reading function for the translated address */
 	else
-	{
-		device_memory_interface &memory = space.device().memory();
+		space.write_word_unaligned(address, data);
 
-		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			;
-
-		/* otherwise, call the byte reading function for the translated address */
-		else
-			space.write_word(address, data);
-
-		m_memory_modified = true;
-	}
+	m_memory_modified = true;
 }
 
 
@@ -525,39 +506,20 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 
 void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
-	/* if this is a misaligned write, or if there are no dword writers, just read two words */
-	if (!DWORD_ALIGNED(address))
-	{
-		if (space.endianness() == ENDIANNESS_LITTLE)
-		{
-			write_word(space, address + 0, data >> 0, apply_translation);
-			write_word(space, address + 2, data >> 16, apply_translation);
-		}
-		else
-		{
-			write_word(space, address + 0, data >> 16, apply_translation);
-			write_word(space, address + 2, data >> 0, apply_translation);
-		}
-	}
+	/* translate if necessary; if not mapped, we're done */
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+		;
 
-	/* otherwise, this proceeds like the byte case */
+	/* otherwise, call the byte reading function for the translated address */
 	else
-	{
-		device_memory_interface &memory = space.device().memory();
+		space.write_dword_unaligned(address, data);
 
-		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			;
-
-		/* otherwise, call the byte reading function for the translated address */
-		else
-			space.write_dword(address, data);
-
-		m_memory_modified = true;
-	}
+	m_memory_modified = true;
 }
 
 
@@ -568,39 +530,20 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 
 void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, bool apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logaddrmask();
 
-	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
-	if (!QWORD_ALIGNED(address))
-	{
-		if (space.endianness() == ENDIANNESS_LITTLE)
-		{
-			write_dword(space, address + 0, data >> 0, apply_translation);
-			write_dword(space, address + 4, data >> 32, apply_translation);
-		}
-		else
-		{
-			write_dword(space, address + 0, data >> 32, apply_translation);
-			write_dword(space, address + 4, data >> 0, apply_translation);
-		}
-	}
+	/* translate if necessary; if not mapped, we're done */
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+		;
 
-	/* otherwise, this proceeds like the byte case */
+	/* otherwise, call the byte reading function for the translated address */
 	else
-	{
-		device_memory_interface &memory = space.device().memory();
+		space.write_qword_unaligned(address, data);
 
-		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			;
-
-		/* otherwise, call the byte reading function for the translated address */
-		else
-			space.write_qword(address, data);
-
-		m_memory_modified = true;
-	}
+	m_memory_modified = true;
 }
 
 
@@ -634,19 +577,6 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 
 	/* keep in logical range */
 	address &= space.logaddrmask();
-
-	/* if we're bigger than the address bus, break into smaller pieces */
-	if (size > space.data_width() / 8)
-	{
-		int halfsize = size / 2;
-		u64 r0 = read_opcode(space, address + 0, halfsize);
-		u64 r1 = read_opcode(space, address + halfsize, halfsize);
-
-		if (space.endianness() == ENDIANNESS_LITTLE)
-			return r0 | (r1 << (8 * halfsize));
-		else
-			return r1 | (r0 << (8 * halfsize));
-	}
 
 	/* translate to physical first */
 	if (!memory.translate(space.spacenum(), TRANSLATE_FETCH_DEBUG, address))
@@ -762,7 +692,7 @@ device_t* debugger_cpu::expression_get_device(const char *tag)
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
 	std::string fullname(tag);
 	strmakelower(fullname);
-	return m_machine.device(fullname.c_str());
+	return m_machine.root_device().subdevice(fullname.c_str());
 }
 
 

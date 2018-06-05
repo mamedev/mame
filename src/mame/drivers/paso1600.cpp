@@ -269,7 +269,7 @@ static const gfx_layout paso1600_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( paso1600 )
+static GFXDECODE_START( gfx_paso1600 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, paso1600_charlayout, 0, 4 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, paso1600_charlayout, 0, 4 )
 GFXDECODE_END
@@ -303,10 +303,10 @@ WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 
 MACHINE_CONFIG_START(paso1600_state::paso1600)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
-	MCFG_CPU_PROGRAM_MAP(paso1600_map)
-	MCFG_CPU_IO_MAP(paso1600_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 16000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(paso1600_map)
+	MCFG_DEVICE_IO_MAP(paso1600_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(paso1600_state::paso1600)
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", paso1600)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paso1600)
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
 
@@ -330,8 +330,8 @@ MACHINE_CONFIG_START(paso1600_state::paso1600)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("8237dma", AM9517A, 16000000/4)
-	MCFG_I8237_IN_MEMR_CB(READ8(paso1600_state, pc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(paso1600_state, pc_dma_write_byte))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, paso1600_state, pc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, paso1600_state, pc_dma_write_byte))
 MACHINE_CONFIG_END
 
 ROM_START( paso1600 )
@@ -349,5 +349,5 @@ ROM_START( paso1600 )
 ROM_END
 
 
-//    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT     STATE           INIT   COMPANY     FULLNAME        FLAGS
-COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600, paso1600_state, 0,     "Toshiba",  "Pasopia 1600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME        FLAGS
+COMP( 198?, paso1600, 0,      0,      paso1600, paso1600, paso1600_state, empty_init, "Toshiba", "Pasopia 1600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

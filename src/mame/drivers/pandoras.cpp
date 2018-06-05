@@ -269,7 +269,7 @@ static const gfx_layout spritelayout =
 	32*4*8
 };
 
-static GFXDECODE_START( pandoras )
+static GFXDECODE_START( gfx_pandoras )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -309,30 +309,30 @@ READ8_MEMBER(pandoras_state::pandoras_portB_r)
 MACHINE_CONFIG_START(pandoras_state::pandoras)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6)  /* CPU A */
-	MCFG_CPU_PROGRAM_MAP(pandoras_master_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/6)  /* CPU A */
+	MCFG_DEVICE_PROGRAM_MAP(pandoras_master_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, MASTER_CLOCK/6)      /* CPU B */
-	MCFG_CPU_PROGRAM_MAP(pandoras_slave_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, MASTER_CLOCK/6)      /* CPU B */
+	MCFG_DEVICE_PROGRAM_MAP(pandoras_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(pandoras_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(pandoras_sound_map)
 
-	MCFG_CPU_ADD("mcu", I8039, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(pandoras_i8039_map)
-	MCFG_CPU_IO_MAP(pandoras_i8039_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pandoras_state, i8039_irqen_and_status_w))
+	MCFG_DEVICE_ADD("mcu", I8039, SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(pandoras_i8039_map)
+	MCFG_DEVICE_IO_MAP(pandoras_i8039_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pandoras_state, i8039_irqen_and_status_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pandoras_state, cpua_irq_enable_w)) // ENA
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pandoras_state, cpua_irq_enable_w)) // ENA
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // OFSET - unknown
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(pandoras_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pandoras_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pandoras_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pandoras_state, cpub_irq_enable_w)) // ENB
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pandoras_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pandoras_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pandoras_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pandoras_state, cpub_irq_enable_w)) // ENB
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // RESETB
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -345,27 +345,27 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pandoras_state, screen_update_pandoras)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pandoras_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pandoras_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pandoras)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pandoras)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pandoras_state, pandoras)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(pandoras_state, pandoras_portA_r))   // not used
-	MCFG_AY8910_PORT_B_READ_CB(READ8(pandoras_state, pandoras_portB_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pandoras_state, pandoras_portA_r))   // not used
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pandoras_state, pandoras_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -407,4 +407,4 @@ ROM_START( pandoras )
 ROM_END
 
 
-GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, 0, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, empty_init, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )

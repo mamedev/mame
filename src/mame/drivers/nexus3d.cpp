@@ -43,7 +43,7 @@ public:
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
 
-	DECLARE_DRIVER_INIT(nexus3d);
+	void init_nexus3d();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -121,8 +121,8 @@ void nexus3d_state::machine_reset()
 MACHINE_CONFIG_START(nexus3d_state::nexus3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM920T, 200000000)
-	MCFG_CPU_PROGRAM_MAP(nexus3d_map)
+	MCFG_DEVICE_ADD("maincpu", ARM920T, 200000000)
+	MCFG_DEVICE_PROGRAM_MAP(nexus3d_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -170,11 +170,11 @@ ROM_START( acheartf )
 //  ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // missing from this set, but should be the same
 ROM_END
 
-DRIVER_INIT_MEMBER(nexus3d_state,nexus3d)
+void nexus3d_state::init_nexus3d()
 {
 	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy( m_mainram, memregion("flash")->base(), 4 * 1024);
+	memcpy(m_mainram, memregion("flash")->base(), 4 * 1024);
 }
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )

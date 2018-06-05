@@ -325,10 +325,10 @@ void clayshoo_state::machine_reset()
 MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,5068000/4)      /* 5.068/4 Mhz (divider is a guess) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,5068000/4)      /* 5.068/4 Mhz (divider is a guess) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -343,8 +343,8 @@ MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(clayshoo_state, input_port_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(clayshoo_state, input_port_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, clayshoo_state, input_port_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, clayshoo_state, input_port_r))
 MACHINE_CONFIG_END
 
 
@@ -372,4 +372,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, clayshoo, 0, clayshoo, clayshoo, clayshoo_state, 0, ROT0, "Allied Leisure", "Clay Shoot", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, clayshoo, 0, clayshoo, clayshoo, clayshoo_state, empty_init, ROT0, "Allied Leisure", "Clay Shoot", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

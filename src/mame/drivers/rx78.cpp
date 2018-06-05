@@ -84,7 +84,7 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(rx78);
+	void init_rx78();
 	void rx78(machine_config &config);
 
 protected:
@@ -465,17 +465,17 @@ static const gfx_layout rx78_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( rx78 )
+static GFXDECODE_START( gfx_rx78 )
 	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(rx78_state::rx78)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
-	MCFG_CPU_PROGRAM_MAP(rx78_mem)
-	MCFG_CPU_IO_MAP(rx78_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
+	MCFG_DEVICE_PROGRAM_MAP(rx78_mem)
+	MCFG_DEVICE_IO_MAP(rx78_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -502,12 +502,11 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */
@@ -522,7 +521,7 @@ ROM_START( rx78 )
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(rx78_state,rx78)
+void rx78_state::init_rx78()
 {
 	uint32_t ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
@@ -533,5 +532,5 @@ DRIVER_INIT_MEMBER(rx78_state,rx78)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS       INIT   COMPANY     FULLNAME     FLAGS */
-COMP( 1983, rx78,   0,      0,       rx78,      rx78,    rx78_state, rx78,  "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY   FULLNAME     FLAGS */
+COMP( 1983, rx78, 0,      0,      rx78,    rx78,  rx78_state, init_rx78, "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )

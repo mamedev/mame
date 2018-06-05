@@ -147,7 +147,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/i8255.h"
 #include "sound/dac.h"
@@ -386,22 +386,22 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(jankenmn_map)
-	MCFG_CPU_IO_MAP(jankenmn_port_map)
+	MCFG_DEVICE_PROGRAM_MAP(jankenmn_map)
+	MCFG_DEVICE_IO_MAP(jankenmn_port_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	/* (10-13) Mode 0 - Ports A & B set as input, high C & low C as output. */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps3_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps3_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jankenmn_state, lamps1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps2_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jankenmn_state, lamps1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps2_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -409,11 +409,11 @@ MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	/* NO VIDEO */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", AD7523, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", AD7523, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -438,5 +438,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, empty_init, ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )

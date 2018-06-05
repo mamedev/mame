@@ -273,9 +273,9 @@ void borisdpl_state::machine_start()
 
 MACHINE_CONFIG_START(chesstrv_state::chesstrv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
-	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
-	MCFG_CPU_IO_MAP( chesstrv_io )
+	MCFG_DEVICE_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
+	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
+	MCFG_DEVICE_IO_MAP( chesstrv_io )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_chesstrv )
@@ -283,9 +283,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(borisdpl_state::borisdpl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
-	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
-	MCFG_CPU_IO_MAP( borisdpl_io )
+	MCFG_DEVICE_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
+	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
+	MCFG_DEVICE_IO_MAP( borisdpl_io )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_borisdpl )
@@ -309,6 +309,6 @@ ROM_START( borisdpl )
 ROM_END
 
 
-//    YEAR   NAME       PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY             FULLNAME           FLAGS
-CONS( 1980,  chesstrv,  0,      0,      chesstrv, chesstrv, chesstrv_state, 0,    "Acetronic",        "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-CONS( 1979,  borisdpl,  0,      0,      borisdpl, borisdpl, borisdpl_state, 0,    "Applied Concepts", "Boris Diplomat",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY             FULLNAME           FLAGS
+CONS( 1980,  chesstrv, 0,      0,      chesstrv, chesstrv, chesstrv_state, empty_init, "Acetronic",        "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+CONS( 1979,  borisdpl, 0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

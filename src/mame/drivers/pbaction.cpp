@@ -282,7 +282,7 @@ static const gfx_layout spritelayout2 =
 
 
 
-static GFXDECODE_START( pbaction )
+static GFXDECODE_START( gfx_pbaction )
 	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )    /*   0-127 characters */
 	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )    /* 128-255 background */
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )    /*   0-127 normal sprites */
@@ -324,12 +324,12 @@ static const z80_daisy_config daisy_chain[] =
 MACHINE_CONFIG_START(pbaction_state::pbaction)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(pbaction_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(pbaction_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
-	MCFG_CPU_PROGRAM_MAP(pbaction_sound_map)
-	MCFG_CPU_IO_MAP(pbaction_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)
+	MCFG_DEVICE_PROGRAM_MAP(pbaction_sound_map)
+	MCFG_DEVICE_IO_MAP(pbaction_sound_io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 3072000)
@@ -343,24 +343,24 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pbaction_state, screen_update_pbaction)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pbaction_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pbaction_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbaction)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbaction)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay3", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -368,15 +368,15 @@ MACHINE_CONFIG_START(pbaction_state::pbaction2)
 	pbaction(config);
 
 	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(pbaction2_sound_map)
-	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(pbaction_state, sound_irq_clear))
+	MCFG_DEVICE_PROGRAM_MAP(pbaction2_sound_map)
+	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(*this, pbaction_state, sound_irq_clear))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pbaction_state::pbactionx)
 	pbaction2(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(pbaction_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(pbaction_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -535,13 +535,12 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 	return m_work_ram[0];
 }
 
-DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
+void pbaction_state::init_pbactio3()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
-	for (i = 0; i < 0xc000; i++)
+	for (int i = 0; i < 0xc000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
 	}
@@ -553,8 +552,8 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 
 
 
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, init_pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )

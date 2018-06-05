@@ -8,7 +8,7 @@
 #include "bus/ecbbus/ecbbus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/prof80mmu.h"
 #include "machine/74259.h"
 #include "machine/ram.h"

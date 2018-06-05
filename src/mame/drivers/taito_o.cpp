@@ -213,7 +213,7 @@ static const gfx_layout parentj_layout =
 	1*128
 };
 
-static GFXDECODE_START( parentj )
+static GFXDECODE_START( gfx_parentj )
 	GFXDECODE_ENTRY( "gfx1", 0, parentj_layout,  0x0, 0x400/16  )
 GFXDECODE_END
 
@@ -235,8 +235,8 @@ void taitoo_state::machine_start()
 
 MACHINE_CONFIG_START(taitoo_state::parentj)
 
-	MCFG_CPU_ADD("maincpu", M68000,12000000 )       /*?? MHz */
-	MCFG_CPU_PROGRAM_MAP(parentj_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000 )       /*?? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(parentj_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitoo_state, parentj_interrupt, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", parentj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_parentj)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -260,9 +260,9 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 2000000) /*?? MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000) /*?? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(0, "mono",  0.25)
@@ -290,4 +290,4 @@ ROM_START( parentj )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-GAME( 1989, parentj,  0,        parentj,  parentj, taitoo_state,  0,        ROT0,    "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, driver_init, ROT0, "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

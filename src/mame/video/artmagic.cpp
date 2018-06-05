@@ -339,7 +339,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(artmagic_state::scanline)
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	uint16_t *vram = address_to_vram(&offset);
 	uint32_t *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 

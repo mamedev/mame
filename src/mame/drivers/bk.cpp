@@ -166,10 +166,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bk_state::bk0010)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", T11, 3000000)
+	MCFG_DEVICE_ADD("maincpu", T11, 3000000)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
-	MCFG_CPU_PROGRAM_MAP(bk0010_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(bk_state,bk0010_irq_callback)
+	MCFG_DEVICE_PROGRAM_MAP(bk0010_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(bk_state,bk0010_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -183,9 +183,8 @@ MACHINE_CONFIG_START(bk_state::bk0010)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
@@ -197,8 +196,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bk_state::bk0010fd)
 	bk0010(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bk0010fd_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bk0010fd_mem)
 MACHINE_CONFIG_END
 
 
@@ -236,8 +235,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE      INIT    COMPANY        FULLNAME        FLAGS */
-COMP( 1985, bk0010,     0,       0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010",      0)
-COMP( 1986, bk001001,   bk0010,  0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010-01",   0)
-COMP( 1986, bk0010fd,   bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0010 FDD",  MACHINE_NOT_WORKING)
-COMP( 1986, bk0011m,    bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0011M",     MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS     INIT        COMPANY        FULLNAME       FLAGS */
+COMP( 1985, bk0010,   0,      0,      bk0010,   bk0010, bk_state, empty_init, "Elektronika", "BK 0010",     0)
+COMP( 1986, bk001001, bk0010, 0,      bk0010,   bk0010, bk_state, empty_init, "Elektronika", "BK 0010-01",  0)
+COMP( 1986, bk0010fd, bk0010, 0,      bk0010fd, bk0010, bk_state, empty_init, "Elektronika", "BK 0010 FDD", MACHINE_NOT_WORKING)
+COMP( 1986, bk0011m,  bk0010, 0,      bk0010fd, bk0010, bk_state, empty_init, "Elektronika", "BK 0011M",    MACHINE_NOT_WORKING)

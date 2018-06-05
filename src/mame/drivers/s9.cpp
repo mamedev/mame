@@ -78,7 +78,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s9);
-	DECLARE_DRIVER_INIT(s9);
+	void init_s9();
 	void s9(machine_config &config);
 	void s9_audio_map(address_map &map);
 	void s9_main_map(address_map &map);
@@ -206,14 +206,14 @@ INPUT_CHANGED_MEMBER( s9_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( s9_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( s9_state::sound_w )
@@ -312,7 +312,7 @@ MACHINE_RESET_MEMBER( s9_state, s9 )
 {
 }
 
-DRIVER_INIT_MEMBER( s9_state, s9 )
+void s9_state::init_s9()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
@@ -320,8 +320,8 @@ DRIVER_INIT_MEMBER( s9_state, s9 )
 
 MACHINE_CONFIG_START(s9_state::s9)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(s9_main_map)
+	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(s9_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
 	/* Video */
@@ -332,56 +332,56 @@ MACHINE_CONFIG_START(s9_state::s9)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s9_state, sound_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(s9_state, pia21_ca1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s9_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, sol2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s9_state, pia21_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s9_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s9_state, sound_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, s9_state, pia21_ca1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s9_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s9_state, sol2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s9_state, pia21_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s9_state, pia21_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s9_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s9_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, lamp1_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s9_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s9_state, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s9_state, lamp1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s9_state, pia24_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s9_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s9_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s9_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s9_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s9_state, dig0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s9_state, dig1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s9_state, pia28_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s9_state, pia28_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s9_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s9_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s9_state, switch_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s9_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s9_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s9_state, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s9_state, switch_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s9_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s9_state, pia_irq))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(s9_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(s9_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SPEAKER_STANDARD_MONO("speech")
-	MCFG_SOUND_ADD("hc55516", HC55516, 0)
+	SPEAKER(config, "speech").front_center();
+	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s9_state, sound_r))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, clock_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("hc55516", hc55516_device, digit_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s9_state, sound_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("hc55516", hc55516_device, clock_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("hc55516", hc55516_device, digit_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 MACHINE_CONFIG_END
@@ -518,13 +518,13 @@ ROM_START(alcat_l7)
 ROM_END
 
 
-GAME( 1983, ratrc_l1, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Rat Race (L-1)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, sorcr_l2, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Sorcerer (L-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1984, sshtl_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-7)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1984, sshtl_l3, sshtl_l7, s9, s9, s9_state, s9, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, comet_l4, comet_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-4)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, comet_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Comet (L-5)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1984, szone_l5, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, szone_l2, szone_l5, s9, s9, s9_state, s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1985, alcat_l7, 0,        s9, s9, s9_state, s9, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1983, ratrc_l1, 0,        s9, s9, s9_state, init_s9, ROT0, "Williams", "Rat Race (L-1)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, s9_state, init_s9, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1985, sorcr_l2, 0,        s9, s9, s9_state, init_s9, ROT0, "Williams", "Sorcerer (L-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, sshtl_l7, 0,        s9, s9, s9_state, init_s9, ROT0, "Williams", "Space Shuttle (L-7)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, sshtl_l3, sshtl_l7, s9, s9, s9_state, init_s9, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1985, comet_l4, comet_l5, s9, s9, s9_state, init_s9, ROT0, "Williams", "Comet (L-4)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1985, comet_l5, 0,        s9, s9, s9_state, init_s9, ROT0, "Williams", "Comet (L-5)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, szone_l5, 0,        s9, s9, s9_state, init_s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, szone_l2, szone_l5, s9, s9, s9_state, init_s9, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1985, alcat_l7, 0,        s9, s9, s9_state, init_s9, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

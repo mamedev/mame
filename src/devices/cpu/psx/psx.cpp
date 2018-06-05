@@ -1448,7 +1448,7 @@ void psxcpu_device::update_cop0( int reg )
 		( m_cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
 		( m_cp0r[ CP0_SR ] & m_cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
 	{
-		m_op = m_direct->read_dword( m_pc );
+		m_op = m_cache->read_dword( m_pc );
 		execute_unstoppable_instructions( 1 );
 		exception( EXC_INT );
 	}
@@ -1475,11 +1475,11 @@ void psxcpu_device::fetch_next_op()
 	{
 		uint32_t safepc = m_delayv & ~m_bad_word_address_mask;
 
-		m_op = m_direct->read_dword( safepc );
+		m_op = m_cache->read_dword( safepc );
 	}
 	else
 	{
-		m_op = m_direct->read_dword( m_pc + 4 );
+		m_op = m_cache->read_dword( m_pc + 4 );
 	}
 }
 
@@ -1819,7 +1819,7 @@ void psxcpu_device::device_start()
 {
 	// get our address spaces
 	m_program = &space( AS_PROGRAM );
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	save_item( NAME( m_op ) );
 	save_item( NAME( m_pc ) );
@@ -2331,7 +2331,7 @@ void psxcpu_device::execute_run()
 		}
 		else
 		{
-			m_op = m_direct->read_dword(m_pc);
+			m_op = m_cache->read_dword(m_pc);
 
 			if( m_berr )
 			{
@@ -3433,22 +3433,22 @@ MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 
 	MCFG_DEVICE_ADD( "dma", PSX_DMA, 0 )
-	MCFG_PSX_DMA_IRQ_HANDLER( DEVWRITELINE("irq", psxirq_device, intin3 ) )
+	MCFG_PSX_DMA_IRQ_HANDLER( WRITELINE("irq", psxirq_device, intin3 ) )
 
 	MCFG_DEVICE_ADD( "mdec", PSX_MDEC, 0 )
 	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psxdma_device::write_delegate(&psxmdec_device::dma_write, (psxmdec_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psxdma_device::read_delegate(&psxmdec_device::dma_read, (psxmdec_device *) device ) )
 
 	MCFG_DEVICE_ADD( "rcnt", PSX_RCNT, 0 )
-	MCFG_PSX_RCNT_IRQ0_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin4 ) )
-	MCFG_PSX_RCNT_IRQ1_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin5 ) )
-	MCFG_PSX_RCNT_IRQ2_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin6 ) )
+	MCFG_PSX_RCNT_IRQ0_HANDLER( WRITELINE( "irq", psxirq_device, intin4 ) )
+	MCFG_PSX_RCNT_IRQ1_HANDLER( WRITELINE( "irq", psxirq_device, intin5 ) )
+	MCFG_PSX_RCNT_IRQ2_HANDLER( WRITELINE( "irq", psxirq_device, intin6 ) )
 
 	MCFG_DEVICE_ADD( "sio0", PSX_SIO0, 0 )
-	MCFG_PSX_SIO_IRQ_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin7 ) )
+	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin7 ) )
 
 	MCFG_DEVICE_ADD( "sio1", PSX_SIO1, 0 )
-	MCFG_PSX_SIO_IRQ_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin8 ) )
+	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin8 ) )
 
 	MCFG_RAM_ADD( "ram" )
 	MCFG_RAM_DEFAULT_VALUE( 0x00 )

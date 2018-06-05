@@ -963,10 +963,10 @@ void hp2645_state::cpu_io_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(hp2645_state::hp2645)
-	MCFG_CPU_ADD("cpu" , I8080A , SYS_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
-	MCFG_CPU_IO_MAP(cpu_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp2645_state , irq_callback)
+	MCFG_DEVICE_ADD("cpu" , I8080A , SYS_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
+	MCFG_DEVICE_IO_MAP(cpu_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp2645_state , irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD("timer_10ms" , hp2645_state , timer_10ms_exp)
 	MCFG_TIMER_DRIVER_ADD("timer_cursor_blink_inh" , hp2645_state , timer_cursor_blink_inh)
@@ -984,18 +984,18 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_DEFAULT_LAYOUT(layout_hp2640)
 
 	// RS232
-	MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , nullptr)
+	MCFG_DEVICE_ADD("rs232" , RS232_PORT, default_rs232_devices , nullptr)
 
 	// UART (TR1602B)
 	MCFG_DEVICE_ADD("uart", AY51013, 0)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
-	MCFG_AY51013_WRITE_DAV_CB(WRITELINE(hp2645_state , async_dav_w))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232" , rs232_port_device , rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE(*this, hp2645_state , async_txd_w))
+	MCFG_AY51013_WRITE_DAV_CB(WRITELINE(*this, hp2645_state , async_dav_w))
 	MCFG_AY51013_AUTO_RDAV(true)
 
 	// Beep
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep" , BEEP , BEEP_FREQUENCY)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beep" , BEEP , BEEP_FREQUENCY)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 	MCFG_TIMER_DRIVER_ADD("timer_beep" , hp2645_state , timer_beep_exp)
 
@@ -1029,4 +1029,4 @@ ROM_START(hp2645)
 	ROM_LOAD("1816-1425.bin", 0x0000, 0x400, CRC(69a34fef) SHA1(816929cadd53c2fe42b3ca561c029cb1ccd4ca24))
 ROM_END
 
-COMP(1976 , hp2645 , 0 , 0 , hp2645 , hp2645 , hp2645_state , 0 , "HP" , "HP 2645A" , 0)
+COMP( 1976, hp2645, 0, 0, hp2645, hp2645, hp2645_state, empty_init, "HP", "HP 2645A", 0)

@@ -283,15 +283,15 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	DECLARE_DRIVER_INIT(cpu30x);
-	DECLARE_DRIVER_INIT(cpu30xa);
-	DECLARE_DRIVER_INIT(cpu30za);
-	DECLARE_DRIVER_INIT(cpu30zbe);
-	DECLARE_DRIVER_INIT(cpu30be8);
-	DECLARE_DRIVER_INIT(cpu30be16);
-	DECLARE_DRIVER_INIT(cpu30lite4);
-	DECLARE_DRIVER_INIT(cpu30lite8);
-	DECLARE_DRIVER_INIT(cpu33);
+	void init_cpu30x();
+	void init_cpu30xa();
+	void init_cpu30za();
+	void init_cpu30zbe();
+	void init_cpu30be8();
+	void init_cpu30be16();
+	void init_cpu30lite4();
+	void init_cpu30lite8();
+	void init_cpu33();
 	void cpu30(machine_config &config);
 	void cpu30x(machine_config &config);
 	void cpu30zbe(machine_config &config);
@@ -382,15 +382,15 @@ void cpu30_state::machine_reset ()
 }
 
 /*                                                                              setup board ID */
-DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu33 )       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
+void cpu30_state::init_cpu30x()      { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30xa()     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30za()     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30zbe()    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30be8()    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30be16()   { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30lite4()  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30lite8()  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu33()       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Mock FDC driver */
 READ8_MEMBER (cpu30_state::fdc_r){
@@ -647,19 +647,20 @@ void cpu30_state::update_irq_to_maincpu()
 	}
 }
 
-static SLOT_INTERFACE_START(fccpu30_vme_cards)
-	SLOT_INTERFACE("fcisio", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-SLOT_INTERFACE_END
+static void fccpu30_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fcisio", VME_FCISIO1);
+	device.option_add("fcscsi", VME_FCSCSI1);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(cpu30_state::cpu30)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68030, XTAL(25'000'000))
-	MCFG_CPU_PROGRAM_MAP (cpu30_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
+	MCFG_DEVICE_ADD ("maincpu", M68030, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (cpu30_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VME_DEVICE_ADD("vme")
@@ -688,70 +689,70 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 
 	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0 )
 	/* Port 1 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
 	/* Port 4 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
 	/* DUSCC1 interrupt signal REQN is connected to LOCAL IRQ4 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq4_w))
+	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq4_w))
 
 	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
 	/* Port 2 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
 	/* Port 3 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq5_w))
+	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq5_w))
 
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD (RS232P3_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD (RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD (RS232P4_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsa_w))
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
 	MCFG_DEVICE_ADD ("pit1", PIT68230, XTAL(16'000'000) / 2) // The PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PA_INPUT_CB(READ8(cpu30_state, rotary_rd))
-	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu30_state, flop_dmac_r))
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(cpu30_state, flop_dmac_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(cpu30_state, pit1c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(cpu30_state, pit1c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, rotary_rd))
+	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, flop_dmac_r))
+	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, cpu30_state, flop_dmac_w))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit1c_r))
+	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit1c_w))
+//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL(16'000'000) / 2) // Th PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu30_state, board_mem_id_rd))
-	MCFG_PIT68230_PA_INPUT_CB(READ8(cpu30_state, pit2a_r))
-	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(cpu30_state, pit2a_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(cpu30_state, pit2c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(cpu30_state, pit2c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("fga002", fga002_device, lirq3_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, board_mem_id_rd))
+	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, pit2a_r))
+	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2a_w))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit2c_r))
+	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2c_w))
+//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq3_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
 	MCFG_FGA002_ADD("fga002", 0)
-	MCFG_FGA002_OUT_INT_CB(WRITELINE(cpu30_state, fga_irq_callback))
-	MCFG_FGA002_OUT_LIACK4_CB(DEVREAD8("duscc",  duscc_device, iack))
-	MCFG_FGA002_OUT_LIACK5_CB(DEVREAD8("duscc2",  duscc_device, iack))
+	MCFG_FGA002_OUT_INT_CB(WRITELINE(*this, cpu30_state, fga_irq_callback))
+	MCFG_FGA002_OUT_LIACK4_CB(READ8("duscc",  duscc_device, iack))
+	MCFG_FGA002_OUT_LIACK5_CB(READ8("duscc2",  duscc_device, iack))
 
 	// RTC
 	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL(32'768)) // Fake crystal value, the 72423 uses it own internal crystal
-	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("fga002", fga002_device, lirq0_w))
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("fga002", fga002_device, lirq0_w))
 
 	// dual ported ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1042,30 +1043,30 @@ void fga002_device::check_interrupts()()
  */
 
 /* Driver */
-/*    YEAR  NAME          PARENT     COMPAT  MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
-COMP (1988, fccpu30,      0,         0,      cpu30,          cpu30,    cpu30_state,   0,           "Force Computers GmbH",   "SYS68K/CPU-30",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1988, fccpu30x,     fccpu30,   0,      cpu30x,         cpu30,    cpu30_state,   cpu30x,      "Force Computers GmbH",   "SYS68K/CPU-30X",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1988, fccpu30xa,    fccpu30,   0,      cpu30xa,        cpu30,    cpu30_state,   cpu30xa,     "Force Computers GmbH",   "SYS68K/CPU-30XA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1988, fccpu30za,    fccpu30,   0,      cpu30za,        cpu30,    cpu30_state,   cpu30za,     "Force Computers GmbH",   "SYS68K/CPU-30ZA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1996, fccpu30zbe,   fccpu30,   0,      cpu30zbe,       cpu30,    cpu30_state,   cpu30zbe,    "Force Computers GmbH",   "SYS68K/CPU-30ZBE",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1996, fccpu30be8,   fccpu30,   0,      cpu30be8,       cpu30,    cpu30_state,   cpu30be8,    "Force Computers GmbH",   "SYS68K/CPU-30BE/8",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1996, fccpu30be16,  fccpu30,   0,      cpu30be16,      cpu30,    cpu30_state,   cpu30be16,   "Force Computers GmbH",   "SYS68K/CPU-30BE/16",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1996, fccpu30lite4, fccpu30,   0,      cpu30lite4,     cpu30,    cpu30_state,   cpu30lite4,  "Force Computers GmbH",   "SYS68K/CPU-30Lite/4",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (1996, fccpu30lite8, fccpu30,   0,      cpu30lite8,     cpu30,    cpu30_state,   cpu30lite8,  "Force Computers GmbH",   "SYS68K/CPU-30Lite/8",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP (199?, fccpu33,      fccpu30,   0,      cpu33,          cpu30,    cpu30_state,   cpu33,       "Force Computers GmbH",   "SYS68K/CPU-33",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME            PARENT   COMPAT  MACHINE        INPUT  CLASS        INIT             COMPANY                 FULLNAME                  FLAGS */
+COMP( 1988, fccpu30,        0,       0,      cpu30,         cpu30, cpu30_state, empty_init,      "Force Computers GmbH", "SYS68K/CPU-30",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1988, fccpu30x,       fccpu30, 0,      cpu30x,        cpu30, cpu30_state, init_cpu30x,     "Force Computers GmbH", "SYS68K/CPU-30X",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1988, fccpu30xa,      fccpu30, 0,      cpu30xa,       cpu30, cpu30_state, init_cpu30xa,    "Force Computers GmbH", "SYS68K/CPU-30XA",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1988, fccpu30za,      fccpu30, 0,      cpu30za,       cpu30, cpu30_state, init_cpu30za,    "Force Computers GmbH", "SYS68K/CPU-30ZA",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1996, fccpu30zbe,     fccpu30, 0,      cpu30zbe,      cpu30, cpu30_state, init_cpu30zbe,   "Force Computers GmbH", "SYS68K/CPU-30ZBE",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1996, fccpu30be8,     fccpu30, 0,      cpu30be8,      cpu30, cpu30_state, init_cpu30be8,   "Force Computers GmbH", "SYS68K/CPU-30BE/8",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1996, fccpu30be16,    fccpu30, 0,      cpu30be16,     cpu30, cpu30_state, init_cpu30be16,  "Force Computers GmbH", "SYS68K/CPU-30BE/16",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1996, fccpu30lite4,   fccpu30, 0,      cpu30lite4,    cpu30, cpu30_state, init_cpu30lite4, "Force Computers GmbH", "SYS68K/CPU-30Lite/4",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1996, fccpu30lite8,   fccpu30, 0,      cpu30lite8,    cpu30, cpu30_state, init_cpu30lite8, "Force Computers GmbH", "SYS68K/CPU-30Lite/8",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 199?, fccpu33,        fccpu30, 0,      cpu33,         cpu30, cpu30_state, init_cpu33,      "Force Computers GmbH", "SYS68K/CPU-33",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 
 /* Below are not fully configured variants defaulting to generic cpu30 */
 
 /* The following boards were manufactured for Ericsson to be used in their fixed network switches. They support hot swap and the Ericsson APNbus */
 /* SYS68K/CPU-30SEN-R/32 assumed as generic until spec is found. 25 MHz 68030 based CPU board with DMAC, 32 MByte Shared RAM capacity and VMEPROM.
    4 MByte System Flash memory, SCSI via on-board EAGLE Controller FC68165 with DMA, 2 serial I/O ports, APNbus interface, VMEPROM firmware */
-COMP (1997, fccpu30senr,    0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-30SEN-R", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1997, fccpu30senr,    0,       0,       cpu30,        cpu30, cpu30_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-30SEN-R",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 /* SYS68K/CPU-30SEN-R-501/4 assumed as generic until spec is found. 25 MHz 68030 based CPU board with DMAC, 4 MByte Shared RAM capacity and VMEPROM.
    48V DC/DC onboard, metric backplane connectors, BYB501 PCB formfactor (TVJ807). 4 MByte System Flash memory, SCSI via onboard EAGLEController
    FC68165 with DMA, 2 serial I/O ports, APNbus interface, VMEPROM firmware*/
-COMP (1997, fccpu30senr501, 0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-30SEN-R-501", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1997, fccpu30senr501, 0,       0,       cpu30,        cpu30, cpu30_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-30SEN-R-501", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 
 /*CPU-33XB MC68030 25MHz CPU, 68882 FPC, 1MB, 2 SERIAL, RS-232, VME BOARD*/
-//COMP (1990, cpu33xb,      0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-33XB",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1990, cpu33xb,        0,       0,       cpu30,        cpu30, cpu30_state, 0,          "Force Computers GmbH", "SYS68K/CPU-33XB",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 /*CPU-33B/4 MC68030 25MHz CPU, 68882 FPC, 1MB, 2 SERIAL, RS-232, VME BOARD*/
-//COMP (1990, cpu30b4,      0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-33B/4",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1990, cpu30b4,        0,       0,       cpu30,        cpu30, cpu30_state, 0,          "Force Computers GmbH", "SYS68K/CPU-33B/4",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

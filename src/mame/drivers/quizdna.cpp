@@ -428,7 +428,7 @@ static const gfx_layout objlayout =
 	16*16*4
 };
 
-static GFXDECODE_START( quizdna )
+static GFXDECODE_START( gfx_quizdna )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, fglayout,  0x7e0,  16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, bglayout,  0x000, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, objlayout, 0x600,  32 )
@@ -443,10 +443,10 @@ void quizdna_state::machine_start()
 MACHINE_CONFIG_START(quizdna_state::quizdna)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(quizdna_map)
-	MCFG_CPU_IO_MAP(quizdna_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizdna_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(quizdna_map)
+	MCFG_DEVICE_IO_MAP(quizdna_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizdna_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,14 +457,14 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SCREEN_UPDATE_DRIVER(quizdna_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizdna)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizdna)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MCLK/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MCLK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", (MCLK/1024)*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, (MCLK/1024)*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -481,8 +481,8 @@ MACHINE_CONFIG_START(quizdna_state::gakupara)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(gakupara_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(gakupara_io_map)
 
 MACHINE_CONFIG_END
 
@@ -491,9 +491,9 @@ MACHINE_CONFIG_START(quizdna_state::gekiretu)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gekiretu_map)
-	MCFG_CPU_IO_MAP(gekiretu_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gekiretu_map)
+	MCFG_DEVICE_IO_MAP(gekiretu_io_map)
 
 MACHINE_CONFIG_END
 
@@ -575,6 +575,6 @@ ROM_START( gekiretu )
 	ROM_LOAD( "quiz3.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 ROM_END
 
-GAME( 1991, gakupara, 0, gakupara, gakupara, quizdna_state, 0, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quizdna,  0, quizdna,  quizdna,  quizdna_state, 0, ROT0, "Face", "Quiz DNA no Hanran (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gekiretu, 0, gekiretu, gekiretu, quizdna_state, 0, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gakupara, 0, gakupara, gakupara, quizdna_state, empty_init, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quizdna,  0, quizdna,  quizdna,  quizdna_state, empty_init, ROT0, "Face", "Quiz DNA no Hanran (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gekiretu, 0, gekiretu, gekiretu, quizdna_state, empty_init, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", MACHINE_SUPPORTS_SAVE )

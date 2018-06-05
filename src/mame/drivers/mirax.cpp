@@ -150,7 +150,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 
-	DECLARE_DRIVER_INIT(mirax);
+	void init_mirax();
 	DECLARE_PALETTE_INIT(mirax);
 	virtual void machine_start() override;
 
@@ -293,7 +293,7 @@ WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
 WRITE8_MEMBER(mirax_state::sound_cmd_w)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -466,7 +466,7 @@ static const gfx_layout layout8 =
 	8*8
 };
 
-static GFXDECODE_START( mirax )
+static GFXDECODE_START( gfx_mirax )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8,     0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout16,    0, 8 )
 GFXDECODE_END
@@ -479,21 +479,21 @@ WRITE_LINE_MEMBER(mirax_state::vblank_irq)
 }
 
 MACHINE_CONFIG_START(mirax_state::mirax)
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
-	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
+	MCFG_DEVICE_PROGRAM_MAP(mirax_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
-	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4)
+	MCFG_DEVICE_PROGRAM_MAP(mirax_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // R10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mirax_state, coin_counter0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mirax_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mirax_state, coin_counter0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mirax_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
 	// One address flips X, the other flips Y, but I can't tell which is which
 	// Since the value is the same for the 2 addresses, it doesn't really matter
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mirax_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mirax_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_y_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -503,20 +503,20 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mirax_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mirax_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirax)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 12000000/4)
+	MCFG_DEVICE_ADD("ay1", AY8912, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 12000000/4)
+	MCFG_DEVICE_ADD("ay2", AY8912, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -581,21 +581,20 @@ ROM_START( miraxa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mirax_state,mirax)
+void mirax_state::init_mirax()
 {
 	uint8_t *DATA = memregion("data_code")->base();
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
-	for(i=0x0000;i<0x4000;i++)
+	for (int i = 0x0000; i < 0x4000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 
-	for(i=0x4000;i<0x8000;i++)
+	for (int i = 0x4000; i < 0x8000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 2, 1, 0, 6, 7, 5, 3, 4) ^ 0xff);
 
-	for(i=0x8000;i<0xc000;i++)
+	for (int i = 0x8000; i < 0xc000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 }
 
-GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 2)", MACHINE_SUPPORTS_SAVE )

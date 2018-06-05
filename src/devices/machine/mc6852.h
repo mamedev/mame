@@ -26,8 +26,9 @@
 
 #pragma once
 
-#include <queue>
+#include "diserial.h"
 
+#include <queue>
 
 
 //**************************************************************************

@@ -17,7 +17,7 @@ typedef device_delegate<void (int layer, int bank, int *code, int *color, int *f
 	downcast<k052109_device &>(*device).set_ram(_ram);
 
 #define MCFG_K052109_SCREEN_TAG(_tag) \
-	downcast<k052109_device &>(*device).set_screen_tag("^" _tag);
+	downcast<k052109_device &>(*device).set_screen_tag(_tag);
 
 #define MCFG_K052109_IRQ_HANDLER(_devcb) \
 	devcb = &downcast<k052109_device &>(*device).set_irq_handler(DEVCB_##_devcb);

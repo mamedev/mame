@@ -1015,7 +1015,7 @@ static const gfx_layout spritelayout =
 	32*32*4
 };
 
-static GFXDECODE_START( namcos1 )
+static GFXDECODE_START( gfx_namcos1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x0800,   8 )  /* characters */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x0000, 128 )  /* sprites 32/16/8/4 dots */
 GFXDECODE_END
@@ -1031,27 +1031,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos1_state::ns1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("subcpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("subcpu", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
 	MCFG_DEVICE_ADD("c117", NAMCO_C117, 0)
 	MCFG_DEVICE_PROGRAM_MAP(virtual_map)
 	MCFG_CUS117_CPUS("maincpu", "subcpu")
-	MCFG_CUS117_SUBRES_CB(WRITELINE(namcos1_state, subres_w))
+	MCFG_CUS117_SUBRES_CB(WRITELINE(*this, namcos1_state, subres_w))
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MCFG_QUANTUM_TIME(attotime::from_hz(38400))
@@ -1064,10 +1064,10 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos1_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos1)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1076,24 +1076,25 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_GFX_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048/2)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048/2)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac0", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
+	MCFG_DEVICE_ADD("dac0", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -2865,42 +2866,42 @@ ROM_END
 
 
 
-GAME( 1987, shadowld,  0,        ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Shadowland (YD3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, youkaidk2, shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, new version (YD2, Rev B))", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, youkaidk1, shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, old version (YD1))", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, dspirit,   0,        ns1,     dspirit,  namcos1_state, dspirit,  ROT90,  "Namco", "Dragon Spirit (new version (DS3))", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, dspirit2,  dspirit,  ns1,     dspirit,  namcos1_state, dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", MACHINE_SUPPORTS_SAVE ) /* Atari had rights to US market */
-GAME( 1987, dspirit1,  dspirit,  ns1,     dspirit,  namcos1_state, dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blazer,    0,        ns1,     ns1,      namcos1_state, blazer,   ROT90,  "Namco", "Blazer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, quester,   0,        ns1,     quester,  namcos1_state, quester,  ROT90,  "Namco", "Quester (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, questers,  quester,  ns1,     quester,  namcos1_state, quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pacmania,  0,        ns1,     pacmania, namcos1_state, pacmania, ROT270, "Namco", "Pac-Mania", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pacmaniao, pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT270, "Namco", "Pac-Mania (111187 sound program)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, galaga88,  0,        ns1,     galaga88, namcos1_state, galaga88, ROT270, "Namco", "Galaga '88", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, galaga88a, galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (02-03-88)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, galaga88j, galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, ws,       ROT180, "Namco", "World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, alice,    ROT180, "Namco", "Marchen Maze (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
-GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT180, "Namco", "World Court (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, faceoff,  ROT180, "Namco", "Face Off (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blastoff,  0,        ns1,     ns1,      namcos1_state, blastoff, ROT90,  "Namco", "Blast Off (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ws89,      ws,       ns1,     ws89,     namcos1_state, ws89,     ROT180, "Namco", "World Stadium '89 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dangseed,  0,        ns1,     dangseed, namcos1_state, dangseed, ROT90,  "Namco", "Dangerous Seed (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ws90,      ws,       ns1,     ws90,     namcos1_state, ws90,     ROT180, "Namco", "World Stadium '90 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pistoldm,  0,        ns1,     ns1,      namcos1_state, pistoldm, ROT0,   "Namco", "Pistol Daimyo no Bouken (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, boxyboy,   0,        ns1,     boxyboy,  namcos1_state, soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, soukobdx,  boxyboy,  ns1,     boxyboy,  namcos1_state, soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan, SB1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, puzlclub,  0,        ns1,     puzlclub, namcos1_state, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tankfrce,  0,        ns1,     ns1,      namcos1_state, tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tankfrce4, tankfrce, ns1,     tankfrc4, namcos1_state, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tankfrcej, tankfrce, ns1,     ns1,      namcos1_state, tankfrce, ROT0,   "Namco", "Tank Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shadowld,  0,        ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Shadowland (YD3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, youkaidk2, shadowld, ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, new version (YD2, Rev B))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, youkaidk1, shadowld, ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, old version (YD1))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dspirit,   0,        ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (new version (DS3))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dspirit2,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", MACHINE_SUPPORTS_SAVE ) /* Atari had rights to US market */
+GAME( 1987, dspirit1,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blazer,    0,        ns1,     ns1,      namcos1_state, init_blazer,   ROT90,  "Namco", "Blazer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, quester,   0,        ns1,     quester,  namcos1_state, init_quester,  ROT90,  "Namco", "Quester (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, questers,  quester,  ns1,     quester,  namcos1_state, init_quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pacmania,  0,        ns1,     pacmania, namcos1_state, init_pacmania, ROT270, "Namco", "Pac-Mania", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pacmaniao, pacmania, ns1,     pacmania, namcos1_state, init_pacmania, ROT270, "Namco", "Pac-Mania (111187 sound program)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, init_pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, galaga88,  0,        ns1,     galaga88, namcos1_state, init_galaga88, ROT270, "Namco", "Galaga '88", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, galaga88a, galaga88, ns1,     galaga88, namcos1_state, init_galaga88, ROT90,  "Namco", "Galaga '88 (02-03-88)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, galaga88j, galaga88, ns1,     galaga88, namcos1_state, init_galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, init_ws,       ROT180, "Namco", "World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
+GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, init_bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, init_wldcourt, ROT180, "Namco", "World Court (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, init_faceoff,  ROT180, "Namco", "Face Off (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blastoff,  0,        ns1,     ns1,      namcos1_state, init_blastoff, ROT90,  "Namco", "Blast Off (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ws89,      ws,       ns1,     ws89,     namcos1_state, init_ws89,     ROT180, "Namco", "World Stadium '89 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dangseed,  0,        ns1,     dangseed, namcos1_state, init_dangseed, ROT90,  "Namco", "Dangerous Seed (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ws90,      ws,       ns1,     ws90,     namcos1_state, init_ws90,     ROT180, "Namco", "World Stadium '90 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pistoldm,  0,        ns1,     ns1,      namcos1_state, init_pistoldm, ROT0,   "Namco", "Pistol Daimyo no Bouken (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, boxyboy,   0,        ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, soukobdx,  boxyboy,  ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan, SB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, puzlclub,  0,        ns1,     puzlclub, namcos1_state, init_puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tankfrce,  0,        ns1,     ns1,      namcos1_state, init_tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tankfrce4, tankfrce, ns1,     tankfrc4, namcos1_state, init_tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tankfrcej, tankfrce, ns1,     ns1,      namcos1_state, init_tankfrce, ROT0,   "Namco", "Tank Force (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -61,6 +61,8 @@ Mighty Guy board layout:
 #include "sound/3526intf.h"
 #include "screen.h"
 #include "speaker.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define MIGHTGUY_HACK    0
@@ -412,7 +414,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( cop01 )
+static GFXDECODE_START( gfx_cop01 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        16,  8 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 16+8*16, 16 )
@@ -447,14 +449,14 @@ void cop01_state::machine_reset()
 MACHINE_CONFIG_START(cop01_state::cop01)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
-	MCFG_CPU_PROGRAM_MAP(cop01_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
+	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
 
 
 	/* video hardware */
@@ -466,39 +468,40 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cop01)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cop01)
 	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(cop01_map)
-	MCFG_CPU_IO_MAP(mightguy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
+	MCFG_DEVICE_IO_MAP(mightguy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(mightguy_audio_io_map)
 
 	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
+	MCFG_NB1412M2_DAC_CB(WRITE8("dac", dac_byte_interface, write))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -509,18 +512,24 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cop01)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cop01)
 	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
+	MCFG_DEVICE_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 MACHINE_CONFIG_END
 
 
@@ -644,7 +653,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cop01_state,mightguy)
+void cop01_state::init_mightguy()
 {
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
@@ -666,6 +675,6 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, init_mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -171,9 +171,6 @@ public:
 	DECLARE_WRITE32_MEMBER(_3do_madam_w);
 	DECLARE_READ32_MEMBER(_3do_clio_r);
 	DECLARE_WRITE32_MEMBER(_3do_clio_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(_3do);
 	uint32_t screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
@@ -181,7 +178,12 @@ public:
 	void _3do(machine_config &config);
 	void _3do_pal(machine_config &config);
 	void _3do_mem(address_map &map);
+
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 

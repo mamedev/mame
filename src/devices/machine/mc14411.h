@@ -31,8 +31,6 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MC14411_ADD(_tag, _clock) MCFG_DEVICE_ADD(_tag, MC14411, _clock)
-
 #define MCFG_MC14411_F1_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 0, DEVCB_##_devcb);
 #define MCFG_MC14411_F2_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 1, DEVCB_##_devcb);
 #define MCFG_MC14411_F3_CB(_devcb)  devcb = &downcast<mc14411_device &>(*device).set_out_fx_cb( 2, DEVCB_##_devcb);

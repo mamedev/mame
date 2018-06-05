@@ -52,9 +52,10 @@ const tiny_rom_entry *sandy_super_disk_device::device_rom_region() const
 //  SLOT_INTERFACE( sandy_super_disk_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( sandy_super_disk_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void sandy_super_disk_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 //-------------------------------------------------
@@ -87,7 +88,7 @@ MACHINE_CONFIG_START(sandy_super_disk_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sandy_super_disk_device, busy_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sandy_super_disk_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD(TTL74273_TAG, CENTRONICS_TAG)
 MACHINE_CONFIG_END
 

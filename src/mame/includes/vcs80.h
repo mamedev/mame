@@ -7,7 +7,7 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
@@ -80,7 +80,7 @@ public:
 	/* keyboard state */
 	int m_keylatch;
 	int m_keyclk;
-	DECLARE_DRIVER_INIT(vcs80);
+	void init_vcs80();
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 	void vcs80(machine_config &config);
 	void vcs80_bd_mem(address_map &map);

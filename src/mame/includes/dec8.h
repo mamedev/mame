@@ -143,8 +143,8 @@ public:
 	DECLARE_WRITE8_MEMBER(lastmisn_scrolly_w);
 	DECLARE_WRITE8_MEMBER(gondo_scroll_w);
 	DECLARE_READ8_MEMBER(csilver_adpcm_reset_r);
-	DECLARE_DRIVER_INIT(dec8);
-	DECLARE_DRIVER_INIT(csilver);
+	void init_dec8();
+	void init_csilver();
 	TILE_GET_INFO_MEMBER(get_cobracom_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_oscar_fix_tile_info);

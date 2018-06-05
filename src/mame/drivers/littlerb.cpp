@@ -134,7 +134,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
 
-	DECLARE_DRIVER_INIT(littlerb);
+	void init_littlerb();
 	void littlerb(machine_config &config);
 	void littlerb_main(address_map &map);
 };
@@ -284,8 +284,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
 }
 
 MACHINE_CONFIG_START(littlerb_state::littlerb)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // 10MHz rated part, near 16Mhz XTAL
-	MCFG_CPU_PROGRAM_MAP(littlerb_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // 10MHz rated part, near 16Mhz XTAL
+	MCFG_DEVICE_PROGRAM_MAP(littlerb_main)
 
 	MCFG_INDER_VIDEO_ADD("inder_vid") // XTAL(40'000'000)
 
@@ -293,13 +293,14 @@ MACHINE_CONFIG_START(littlerb_state::littlerb)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( littlerb )
@@ -312,11 +313,11 @@ ROM_START( littlerb )
 	ROM_LOAD( "tch_4.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(littlerb_state,littlerb)
+void littlerb_state::init_littlerb()
 {
 	/* various scenes flicker to the point of graphics being invisible (eg. the map screen at the very start of a game)
 	   unless you overclock the TMS34010 to 120%, possible timing bug in the core? this is a hack */
 	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2f);
 }
 
-GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, init_littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )

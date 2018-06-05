@@ -254,7 +254,7 @@ static const gfx_layout tiles16x16_layout =
 	16*64
 };
 
-static GFXDECODE_START( ashnojoe )
+static GFXDECODE_START( gfx_ashnojoe )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 0x100 )
@@ -285,7 +285,7 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 	else
 	{
 		m_msm->data_w(m_adpcm_byte & 0xf);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	m_msm5205_vclk_toggle ^= 1;
@@ -307,13 +307,13 @@ void ashnojoe_state::machine_reset()
 MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ashnojoe_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ashnojoe_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ashnojoe_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ashnojoe_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 
 	/* video hardware */
@@ -325,23 +325,23 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	MCFG_SCREEN_UPDATE_DRIVER(ashnojoe_state, screen_update_ashnojoe)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ashnojoe)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ashnojoe)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_a))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_b))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_a))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_b))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ashnojoe_state, ashnojoe_vclk_cb))
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ashnojoe_state, ashnojoe_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -420,7 +420,7 @@ ROM_START( ashnojoe )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
+void ashnojoe_state::init_ashnojoe()
 {
 	uint8_t *ROM = memregion("adpcm")->base();
 	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
@@ -428,5 +428,5 @@ DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
 	membank("bank4")->set_entry(0);
 }
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )

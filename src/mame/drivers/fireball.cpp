@@ -493,20 +493,20 @@ TIMER_DEVICE_CALLBACK_MEMBER( fireball_state::int_0 )
 
 MACHINE_CONFIG_START(fireball_state::fireball)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8031, CPU_CLK) //
-	MCFG_CPU_PROGRAM_MAP(fireball_map)
-	MCFG_CPU_IO_MAP(fireball_io_map)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(fireball_state, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(fireball_state, p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(fireball_state, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(fireball_state, p3_w))
+	MCFG_DEVICE_ADD("maincpu", I8031, CPU_CLK) //
+	MCFG_DEVICE_PROGRAM_MAP(fireball_map)
+	MCFG_DEVICE_IO_MAP(fireball_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, fireball_state, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, fireball_state, p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, fireball_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, fireball_state, p3_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", fireball_state, int_0, attotime::from_hz(555))  //9ms from scope reading 111Hz take care of this in the handler
 
 	MCFG_EEPROM_SERIAL_X24C44_ADD("eeprom")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */
@@ -529,5 +529,5 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY  FULLNAME    FLAGS
-GAME( 1989, fireball, 0,      fireball, fireball, fireball_state, 0,    ROT0, "Valco", "Fireball", MACHINE_MECHANICAL ) //1989 by rom name
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY  FULLNAME    FLAGS
+GAME( 1989, fireball, 0,      fireball, fireball, fireball_state, empty_init, ROT0, "Valco", "Fireball", MACHINE_MECHANICAL ) //1989 by rom name

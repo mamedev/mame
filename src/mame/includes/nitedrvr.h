@@ -32,7 +32,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_led(*this, "led")
 	{ }
 
 	void nitedrvr(machine_config &config);
@@ -80,9 +81,10 @@ private:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	output_finder<> m_led;
 };
 
 /*----------- defined in audio/nitedrvr.c -----------*/
-DISCRETE_SOUND_EXTERN( nitedrvr );
+DISCRETE_SOUND_EXTERN( nitedrvr_discrete );
 
 #endif // MAME_INCLUDES_NITEDRVR_H

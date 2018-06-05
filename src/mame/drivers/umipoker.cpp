@@ -682,7 +682,7 @@ static const gfx_layout layout_8x8x4 =
 	8*8
 };
 
-static GFXDECODE_START( umipoker )
+static GFXDECODE_START( gfx_umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,     0, 0x40)
 GFXDECODE_END
 
@@ -695,12 +695,12 @@ void saiyukip_state::machine_start()
 MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(14'318'181)) // TMP68HC000-16
-	MCFG_CPU_PROGRAM_MAP(umipoker_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(14'318'181)) // TMP68HC000-16
+	MCFG_DEVICE_PROGRAM_MAP(umipoker_map)
 
-	MCFG_CPU_ADD("audiocpu",Z80, XTAL(14'318'181)/4) // 3.579545MHz
-	MCFG_CPU_PROGRAM_MAP(umipoker_audio_map)
-	MCFG_CPU_IO_MAP(umipoker_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu",Z80, XTAL(14'318'181)/4) // 3.579545MHz
+	MCFG_DEVICE_PROGRAM_MAP(umipoker_audio_map)
+	MCFG_DEVICE_IO_MAP(umipoker_audio_io_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -715,28 +715,28 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 6))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", umipoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_umipoker)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
+	MCFG_DEVICE_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_OKIM6295_ADD("oki", XTAL(2'000'000), PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(2'000'000), okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(saiyukip_state::saiyukip)
 	umipoker(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(saiyukip_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(saiyukip_map)
 MACHINE_CONFIG_END
 
 
@@ -794,6 +794,6 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE            INIT      ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
-GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state,  0,        ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
-GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state,  0,        ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
+GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
+GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )

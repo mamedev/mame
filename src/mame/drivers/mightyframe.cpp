@@ -39,8 +39,8 @@ static INPUT_PORTS_START( mightyframe )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mightyframe_state::mightyframe)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( mightyframe )
@@ -48,4 +48,4 @@ ROM_START( mightyframe )
 	ROM_LOAD( "72-01231.26c", 0x0000, 0x8000, CRC(41faf884) SHA1(d0c6f35394b4006bbe9a3f81b658ded37f41d86f) )
 ROM_END
 
-COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, 0, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )
+COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )

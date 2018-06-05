@@ -430,8 +430,8 @@ void galpani3_state::galpani3_map(address_map &map)
 
 
 MACHINE_CONFIG_START(galpani3_state::galpani3)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
-	MCFG_CPU_PROGRAM_MAP(galpani3_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
+	MCFG_DEVICE_PROGRAM_MAP(galpani3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -463,9 +463,9 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_DEVICE_ROM("rlebg")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(33'333'000) / 2)  // Confirmed from PCB
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'333'000) / 2)  // Confirmed from PCB
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -568,7 +568,7 @@ ROM_START( galpani3k ) /* Some game text in Korean, but no "For use in Korea" ty
 ROM_END
 
 
-GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Euro)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, galpani3k, galpani3, galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Korea)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, galpani3_state, 0, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Euro)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3k, galpani3, galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Korea)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

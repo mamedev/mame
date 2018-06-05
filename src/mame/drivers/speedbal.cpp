@@ -255,7 +255,7 @@ static const gfx_layout spritelayout =
 	128*8  /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( speedbal )
+static GFXDECODE_START( gfx_speedbal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  512, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 )
@@ -266,15 +266,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(speedbal_state::speedbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
+	MCFG_DEVICE_IO_MAP(main_cpu_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
-	MCFG_CPU_IO_MAP(sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
+	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -285,32 +285,32 @@ MACHINE_CONFIG_START(speedbal_state::speedbal)
 	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedbal)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(speedbal_state,speedbal)
+void speedbal_state::init_speedbal()
 {
 	// sprite tiles are in an odd order, rearrange to simplify video drawing function
 	uint8_t* rom = memregion("sprites")->base();
-	std::vector<uint8_t> temp(0x200*128);
+	uint8_t temp[0x200*128];
 
-	for (int i=0;i<0x200;i++)
+	for (int i = 0; i < 0x200; i++)
 	{
 		int j = bitswap<16>(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
-		memcpy(&temp[i*128], rom+j*128, 128);
+		memcpy(temp + i*128, rom + j*128, 128);
 	}
 
-	memcpy(rom,&temp[0],0x200*128);
+	memcpy(rom,temp,0x200*128);
 }
 
 
@@ -366,7 +366,7 @@ ROM_START( musicbal )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(speedbal_state,musicbal)
+void speedbal_state::init_musicbal()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 
@@ -388,10 +388,10 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 		rom[i] = bitswap<8>(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
 	}
 
-	DRIVER_INIT_CALL(speedbal);
+	init_speedbal();
 }
 
 
 
-GAMEL( 1987, speedbal, 0,        speedbal, speedbal, speedbal_state, speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball", MACHINE_SUPPORTS_SAVE, layout_speedbal )
-GAMEL( 1988, musicbal, 0,        speedbal, musicbal, speedbal_state, musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1987, speedbal, 0, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball", MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1988, musicbal, 0, speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", MACHINE_SUPPORTS_SAVE, layout_speedbal )

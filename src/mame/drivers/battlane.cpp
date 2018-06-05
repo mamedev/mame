@@ -53,8 +53,8 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	/*
 	if (~m_cpu_control & 0x08)
 	{
-	    m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	    m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	    m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	    m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	*/
 
@@ -88,8 +88,8 @@ INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 	/* See note in battlane_cpu_command_w */
 	if (~m_cpu_control & 0x08)
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -246,7 +246,7 @@ static const gfx_layout tilelayout2 =
 };
 
 
-static GFXDECODE_START( battlane )
+static GFXDECODE_START( gfx_battlane )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 2 )   /* colors 0x00-0x0f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   32, 4 )   /* colors 0x20-0x3f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,  32, 4 )   /* colors 0x20-0x3f */
@@ -274,12 +274,12 @@ void battlane_state::machine_reset()
 MACHINE_CONFIG_START(battlane_state::battlane)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(battlane_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", battlane_state,  battlane_cpu1_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(battlane_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", battlane_state,  battlane_cpu1_interrupt)
 
-	MCFG_CPU_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(battlane_map)
+	MCFG_DEVICE_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(battlane_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -293,14 +293,14 @@ MACHINE_CONFIG_START(battlane_state::battlane)
 	MCFG_SCREEN_UPDATE_DRIVER(battlane_state, screen_update_battlane)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlane)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlane)
 	MCFG_PALETTE_ADD("palette", 64)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -403,6 +403,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )

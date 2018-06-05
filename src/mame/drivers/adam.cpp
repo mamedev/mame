@@ -942,7 +942,7 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 {
 	if (state && !m_vdp_nmi)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	m_vdp_nmi = state;
@@ -1053,28 +1053,29 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(adam_state::adam)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(7'159'090)/2)
-	MCFG_CPU_PROGRAM_MAP(adam_mem)
-	MCFG_CPU_IO_MAP(adam_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(7'159'090)/2)
+	MCFG_DEVICE_PROGRAM_MAP(adam_mem)
+	MCFG_DEVICE_IO_MAP(adam_io)
 
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(m6801_mem)
-	MCFG_CPU_IO_MAP(m6801_io)
-	MCFG_M6801_SC2(WRITELINE(adam_state, os3_w))
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m6801_mem)
+	MCFG_DEVICE_IO_MAP(m6801_io)
+	MCFG_M6801_SC2(WRITELINE(*this, adam_state, os3_w))
 	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
 
 	// video hardware
 	MCFG_DEVICE_ADD(TMS9928A_TAG, TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(adam_state, vdc_int_w))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, adam_state, vdc_int_w))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC(SCREEN_TAG)
 	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
+	// TODO: enable when Z80 has better WAIT pin emulation
+	//MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	// devices
 	MCFG_ADAMNET_BUS_ADD()
@@ -1083,7 +1084,7 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_ADAMNET_SLOT_ADD("net3", adamnet_devices, "ddp")
 	MCFG_ADAMNET_SLOT_ADD("net4", adamnet_devices, "fdc")
 	MCFG_ADAMNET_SLOT_ADD("net5", adamnet_devices, "fdc")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fdc", drive2)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("fdc", drive2)
 	MCFG_ADAMNET_SLOT_ADD("net6", adamnet_devices, nullptr)
 	MCFG_ADAMNET_SLOT_ADD("net7", adamnet_devices, nullptr)
 	MCFG_ADAMNET_SLOT_ADD("net8", adamnet_devices, nullptr)
@@ -1103,9 +1104,9 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL(7'159'090)/2, adam_slot3_devices, "ram")
 
 	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL1_TAG, colecovision_control_port_devices, "hand")
-	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(adam_state, joy1_irq_w))
+	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy1_irq_w))
 	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL2_TAG, colecovision_control_port_devices, nullptr)
-	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(adam_state, joy2_irq_w))
+	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy2_irq_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1150,5 +1151,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE        INIT    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       adam,       adam_state,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY   FULLNAME  FLAGS
+COMP( 1982, adam, 0,      coleco, adam,    adam,  adam_state, empty_init, "Coleco", "Adam",   MACHINE_SUPPORTS_SAVE )

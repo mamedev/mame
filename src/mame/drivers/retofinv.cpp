@@ -394,7 +394,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( retofinv )
+static GFXDECODE_START( gfx_retofinv )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256*2,  64 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     64*16+256*2,  64 )
@@ -416,28 +416,28 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)   /* XTAL and divider verified, 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60) // wrong, should be ~128-132 per frame, not 120.
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)   /* XTAL and divider verified, 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60) // wrong, should be ~128-132 per frame, not 120.
 
-	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_DEVICE_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC72 - probably shared between CPUs
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(retofinv_state, irq0_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(retofinv_state, coinlockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, retofinv_state, irq0_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, retofinv_state, coinlockout_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("68705", taito68705_mcu_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(retofinv_state, irq1_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("68705", taito68705_mcu_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, retofinv_state, irq1_ack_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -451,20 +451,20 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", retofinv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_retofinv)
 	MCFG_PALETTE_ADD("palette", 256*2+64*16+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(18'432'000)/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(18'432'000)/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -478,8 +478,8 @@ MACHINE_CONFIG_END
 /* bootleg which has no mcu */
 MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
 	retofinv(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
@@ -490,8 +490,8 @@ MACHINE_CONFIG_END
 /* bootleg which has different pallete clut and also has no mcu */
 MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
 	retofinvb1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
@@ -703,8 +703,8 @@ ROM_START( retofinvb3 ) // Italian bootleg PCB. Only maincpu ROMs differ from pa
 	ROM_LOAD_NIB_LOW ( "6353-1.c",  0x0400, 0x0400, CRC(77a7aaf6) SHA1(61a474f1ad09b89ff8302f2d903b86a90823116c) )
 ROM_END
 
-GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu,  retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_state, empty_init, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu,  retofinv, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )

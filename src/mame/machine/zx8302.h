@@ -34,6 +34,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 
 ///*************************************************************************
@@ -256,7 +257,7 @@ private:
 
 
 // device type definition
-extern const device_type ZX8302;
+DECLARE_DEVICE_TYPE(ZX8302, zx8302_device)
 
 
 

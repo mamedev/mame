@@ -254,46 +254,47 @@ void m24_state::cfg_m20_format(device_t *device)
 
 MACHINE_CONFIG_START(m24_state::olivetti)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(m24_map)
-	MCFG_CPU_IO_MAP(m24_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m24_map)
+	MCFG_DEVICE_IO_MAP(m24_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb1", pc_isa8_cards, "cga_m24", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb2", pc_isa8_cards, "fdc_xt", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("mb1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_m24", true)
+	MCFG_DEVICE_ADD("mb2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_m20_format)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb3", pc_isa8_cards, "lpt", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "mb4", pc_isa8_cards, "com", true)
+	MCFG_DEVICE_ADD("mb3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
+	MCFG_DEVICE_ADD("mb4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 
-	MCFG_CPU_ADD("kbc", TMS7000, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(kbc_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(m24_state, pa_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(m24_state, pb_w))
+	MCFG_DEVICE_ADD("kbc", TMS7000, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(kbc_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, m24_state, pa_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, m24_state, pb_w))
 
 	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
-	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(m24_state, kbcin_w))
+	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(*this, m24_state, kbcin_w))
 
 	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // ?
 	MCFG_MM58274C_DAY1(1)   // ?
 
 	MCFG_DEVICE_ADD("z8000_apb", M24_Z8000, 0)
-	MCFG_M24_Z8000_HALT(WRITELINE(m24_state, halt_i86_w))
+	MCFG_M24_Z8000_HALT(WRITELINE(*this, m24_state, halt_i86_w))
 	MCFG_DEVICE_MODIFY("mb:dma8237")
-	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE(":", m24_state, dma_hrq_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, m24_state, dma_hrq_w))
 	MCFG_DEVICE_MODIFY("mb:pic8259")
-	devcb = &downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_DEVWRITELINE(":", m24_state, int_w));
+	devcb = &downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_WRITELINE(*this, m24_state, int_w));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -318,5 +319,5 @@ ROM_START( m240 )
 	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
-COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M24",  MACHINE_NOT_WORKING )
-COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M240", MACHINE_NOT_WORKING )
+COMP( 1983, m24,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M24",  MACHINE_NOT_WORKING )
+COMP( 1987, m240, ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M240", MACHINE_NOT_WORKING )

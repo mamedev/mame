@@ -332,7 +332,7 @@ static const gfx_layout gfxlayout =
 };
 
 
-static GFXDECODE_START( fgoal )
+static GFXDECODE_START( gfx_fgoal )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x00, 8 ) /* foreground */
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x80, 1 ) /* background */
 GFXDECODE_END
@@ -368,8 +368,8 @@ void fgoal_state::machine_reset()
 MACHINE_CONFIG_START(fgoal_state::fgoal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 10065000 / 10) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* add shifter */
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(fgoal_state::fgoal)
 	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fgoal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fgoal)
 	MCFG_PALETTE_ADD("palette", 128 + 16 + 1)
 	MCFG_PALETTE_INIT_OWNER(fgoal_state, fgoal)
 
@@ -438,5 +438,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fgoala, fgoal, fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, fgoal_state, empty_init, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fgoala, fgoal, fgoal, fgoal, fgoal_state, empty_init, ROT90, "Taito", "Field Goal (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

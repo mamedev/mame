@@ -118,7 +118,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /****************************************************************************/
@@ -397,7 +397,7 @@ static const gfx_layout layout_spr =
 	16*16*4
 };
 
-static GFXDECODE_START( himesiki )
+static GFXDECODE_START( gfx_himesiki )
 	GFXDECODE_ENTRY( "bgtiles",   0, layout_bg, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_spr, 0x200, 16 )
 	GFXDECODE_ENTRY( "spr_p103a", 0, layout_p103a, 0x200, 16 )
@@ -429,14 +429,14 @@ void himesiki_state::machine_reset()
 MACHINE_CONFIG_START(himesiki_state::himesiki)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
-	MCFG_CPU_PROGRAM_MAP(himesiki_prm0)
-	MCFG_CPU_IO_MAP(himesiki_iom0)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", himesiki_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm0)
+	MCFG_DEVICE_IO_MAP(himesiki_iom0)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", himesiki_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, CLK2/2) /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
-	MCFG_CPU_PROGRAM_MAP(himesiki_prm1)
-	MCFG_CPU_IO_MAP(himesiki_iom1)
+	MCFG_DEVICE_ADD("sub", Z80, CLK2/2) /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm1)
+	MCFG_DEVICE_IO_MAP(himesiki_iom1)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("1P"))
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(himesiki_state, himesiki_rombank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, himesiki_state, himesiki_rombank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,17 +457,17 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_himesiki)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ??
+	MCFG_DEVICE_ADD("ym2203", YM2203, CLK2/4) // ??
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
@@ -567,8 +567,8 @@ ROM_START( androidp )
 ROM_END
 
 
-GAME( 1989, himesiki, 0,         himesiki, himesiki,  himesiki_state, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, himesiki,  0,        himesiki, himesiki,  himesiki_state, empty_init, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // the game changed significantly between these 2 versions, it is possible the later build was actually released
-GAME( 1987, androidp,  0,          himesiki, androidp,  himesiki_state, 0, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE ) // shows 1987 copyright after staff list during ending
-GAME( 198?, androidpo, androidp,   himesiki, androidpo, himesiki_state, 0, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, androidp,  0,        himesiki, androidp,  himesiki_state, empty_init, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE ) // shows 1987 copyright after staff list during ending
+GAME( 198?, androidpo, androidp, himesiki, androidpo, himesiki_state, empty_init, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )

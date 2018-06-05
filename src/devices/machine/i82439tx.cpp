@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "i82439tx.h"
 
-DEFINE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device, "i82439tx_new", "Intel 82439TX northbridge")
+DEFINE_DEVICE_TYPE(I82439TX, i82439tx_host_device, "i82439tx", "Intel 82439TX northbridge")
 
 void i82439tx_host_device::config_map(address_map &map)
 {
@@ -24,13 +24,9 @@ void i82439tx_host_device::config_map(address_map &map)
 }
 
 i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, I82439TX_NEW, tag, owner, clock)
+	: pci_host_device(mconfig, I82439TX, tag, owner, clock)
+	, cpu(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void i82439tx_host_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
 }
 
 void i82439tx_host_device::set_ram_size(int _ram_size)
@@ -41,7 +37,6 @@ void i82439tx_host_device::set_ram_size(int _ram_size)
 void i82439tx_host_device::device_start()
 {
 	pci_host_device::device_start();
-	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
 

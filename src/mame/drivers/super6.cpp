@@ -395,9 +395,10 @@ WRITE8_MEMBER(super6_state::io_write_byte)
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( super6_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void super6_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_QD);
+}
 
 WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
 {
@@ -479,56 +480,56 @@ void super6_state::machine_reset()
 
 MACHINE_CONFIG_START(super6_state::super6)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(24'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(super6_mem)
-	MCFG_CPU_IO_MAP(super6_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(super6_mem)
+	MCFG_DEVICE_IO_MAP(super6_io)
 	MCFG_Z80_DAISY_CHAIN(super6_daisy_chain)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(24'000'000)/4)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 24_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(XTAL(24'000'000)/16))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(24_MHz_XTAL / 16))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(24'000'000)/6)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 24_MHz_XTAL / 6)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(super6_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(super6_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(super6_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(super6_state, io_write_byte))
+	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, super6_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, super6_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super6_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super6_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(24'000'000)/4)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 24_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_WD2793_ADD(WD2793_TAG, 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(super6_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(super6_state, fdc_drq_w))
+	MCFG_DEVICE_ADD(WD2793_TAG, WD2793, 1000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(24'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, 24_MHz_XTAL / 4)
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
-	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, 5.0688_MHz_XTAL)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -552,9 +553,9 @@ ROM_START( super6 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v36" )
 	ROM_SYSTEM_BIOS( 0, "v36", "ADC S6 v3.6" )
-	ROMX_LOAD( "adcs6_v3.6.u29", 0x000, 0x800, CRC(386fd22a) SHA1(9c177990aa180ab93be9c4641e92ae934627e661), ROM_BIOS(1) )
+	ROMX_LOAD( "adcs6_v3.6.u29", 0x000, 0x800, CRC(386fd22a) SHA1(9c177990aa180ab93be9c4641e92ae934627e661), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v12", "Digitex Monitor v1.2a" )
-	ROMX_LOAD( "digitex monitor 1.2a 6oct1983.u29", 0x000, 0x800, CRC(a4c33ce4) SHA1(46dde43ea51d295f2b3202c2d0e1883bde1a8da7), ROM_BIOS(2) )
+	ROMX_LOAD( "digitex monitor 1.2a 6oct1983.u29", 0x000, 0x800, CRC(a4c33ce4) SHA1(46dde43ea51d295f2b3202c2d0e1883bde1a8da7), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "plds", 0 )
 	ROM_LOAD( "pal16l8.u16", 0x000, 0x800, NO_DUMP )
@@ -567,5 +568,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT    COMPANY                         FULLNAME     FLAGS
-COMP( 1983, super6,  0,      0,      super6,  super6, super6_state, 0,      "Advanced Digital Corporation", "Super Six", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                         FULLNAME     FLAGS
+COMP( 1983, super6, 0,      0,      super6,  super6, super6_state, empty_init, "Advanced Digital Corporation", "Super Six", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

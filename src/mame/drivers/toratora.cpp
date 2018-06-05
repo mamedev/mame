@@ -396,26 +396,26 @@ void toratora_state::machine_reset()
 MACHINE_CONFIG_START(toratora_state::toratora)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 250) /* timer counting at 250 Hz */
+	MCFG_DEVICE_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 250) /* timer counting at 250 Hz */
 
 	MCFG_DEVICE_ADD("pia_u1", PIA6821, 0)
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,port_b_u1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, toratora_state,port_b_u1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, toratora_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, toratora_state,main_cpu_irq))
 
 	MCFG_DEVICE_ADD("pia_u3", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state, sn1_port_a_u3_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state, sn1_port_b_u3_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state, sn1_ca2_u3_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, toratora_state, sn1_port_a_u3_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, toratora_state, sn1_port_b_u3_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, toratora_state, sn1_ca2_u3_w))
 
 	MCFG_DEVICE_ADD("pia_u2", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state,sn2_port_a_u2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,sn2_port_b_u2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state,sn2_ca2_u2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(toratora_state,cb2_u2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, toratora_state,sn2_port_a_u2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, toratora_state,sn2_port_b_u2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, toratora_state,sn2_ca2_u2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, toratora_state,cb2_u2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -426,9 +426,9 @@ MACHINE_CONFIG_START(toratora_state::toratora)
 	MCFG_SCREEN_UPDATE_DRIVER(toratora_state, screen_update_toratora)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn1", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(470), CAP_P(470)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(toratora_state::toratora)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn2", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(470), CAP_P(470)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
@@ -525,5 +525,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0,        toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, toratorab,toratora, toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0,        toratora, toratora, toratora_state, empty_init, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratorab,toratora, toratora, toratora, toratora_state, empty_init, ROT90, "Game Plan", "Tora Tora (set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

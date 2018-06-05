@@ -1062,22 +1062,22 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( mgakuen )
+static GFXDECODE_START( gfx_mgakuen )
 	GFXDECODE_ENTRY( "gfx1", 0, marukin_charlayout, 0,  64 ) /* colors 0-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( marukin )
+static GFXDECODE_START( gfx_marukin )
 	GFXDECODE_ENTRY( "gfx1", 0, marukin_charlayout, 0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( pkladiesbl )
+static GFXDECODE_START( gfx_pkladiesbl )
 	GFXDECODE_ENTRY( "gfx1", 0, pkladiesbl_charlayout, 0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( mitchell )
+static GFXDECODE_START( gfx_mitchell )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
@@ -1108,7 +1108,7 @@ static const gfx_layout mstworld_spritelayout =
 };
 
 
-static GFXDECODE_START( mstworld )
+static GFXDECODE_START( gfx_mstworld )
 	GFXDECODE_ENTRY( "gfx1", 0, mstworld_charlayout,   0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, mstworld_spritelayout, 0x000, 0x40 )
 GFXDECODE_END
@@ -1164,9 +1164,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 MACHINE_CONFIG_START(mitchell_state::mgakuen)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
-	MCFG_CPU_PROGRAM_MAP(mgakuen_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_PROGRAM_MAP(mgakuen_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1183,7 +1183,7 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgakuen)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgakuen)
 
 	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1191,12 +1191,12 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1204,10 +1204,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mitchell_state::pang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1224,7 +1224,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mitchell)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mitchell)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1232,12 +1232,12 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1259,7 +1259,7 @@ static const gfx_layout blcharlayout =
 };
 
 
-static GFXDECODE_START( spangbl )
+static GFXDECODE_START( gfx_spangbl )
 	GFXDECODE_ENTRY( "gfx1", 0, blcharlayout,     0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
@@ -1280,36 +1280,36 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 MACHINE_CONFIG_START(mitchell_state::spangbl)
 	pangnv(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spangbl_map)
-	MCFG_CPU_IO_MAP(spangbl_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spangbl_map)
+	MCFG_DEVICE_IO_MAP(spangbl_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
-	MCFG_CPU_PROGRAM_MAP(spangbl_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(spangbl_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spangbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spangbl)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_SOUND_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
+	MCFG_DEVICE_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mitchell_state::pangba)
 	spangbl(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(pangba_sound_map)
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1321,14 +1321,14 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
 	  the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
 	  more likely wrong.. the game appears to run too fast anyway .. */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000*4)
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mstworld_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000*4)
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mstworld_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mstworld_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(mstworld_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
@@ -1342,7 +1342,7 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mstworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mstworld)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1350,11 +1350,11 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 990000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 990000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1362,10 +1362,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mitchell_state::marukin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1379,7 +1379,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marukin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marukin)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1387,12 +1387,12 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1417,10 +1417,10 @@ Vsync is 59.09hz
 MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1434,7 +1434,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkladiesbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkladiesbl)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1442,12 +1442,12 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2315,109 +2315,108 @@ void mitchell_state::configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, 
 }
 
 
-DRIVER_INIT_MEMBER(mitchell_state,dokaben)
+void mitchell_state::init_dokaben()
 {
 	m_input_type = 0;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pang)
+void mitchell_state::init_pang()
 {
 	m_input_type = 0;
 	configure_banks(pang_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pangb)
+void mitchell_state::init_pangb()
 {
 	m_input_type = 0;
 	bootleg_decode();
 }
-DRIVER_INIT_MEMBER(mitchell_state,cworld)
+void mitchell_state::init_cworld()
 {
 	m_input_type = 0;
 	configure_banks(cworld_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,hatena)
+void mitchell_state::init_hatena()
 {
 	m_input_type = 0;
 	configure_banks(hatena_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,spang)
+void mitchell_state::init_spang()
 {
 	m_input_type = 3;
 	configure_banks(spang_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangbl)
+void mitchell_state::init_spangbl()
 {
 	m_input_type = 3;
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangj)
+void mitchell_state::init_spangj()
 {
 	m_input_type = 3;
 	configure_banks(spangj_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,sbbros)
+void mitchell_state::init_sbbros()
 {
 	m_input_type = 3;
 	configure_banks(sbbros_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qtono1)
+void mitchell_state::init_qtono1()
 {
 	m_input_type = 0;
 	configure_banks(qtono1_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qsangoku)
+void mitchell_state::init_qsangoku()
 {
 	m_input_type = 0;
 	configure_banks(qsangoku_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
+void mitchell_state::init_mgakuen()
 {
 	m_input_type = 1;
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_maincpu->space(AS_IO).install_read_port(0x03, 0x03, "DSW0");
 	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSW1");
 }
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen2)
+void mitchell_state::init_mgakuen2()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladies)
+void mitchell_state::init_pkladies()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladiesbl)
+void mitchell_state::init_pkladiesbl()
 {
 	m_input_type = 1;
 	bootleg_decode();
 }
-DRIVER_INIT_MEMBER(mitchell_state,marukin)
+void mitchell_state::init_marukin()
 {
 	m_input_type = 1;
 	configure_banks(marukin_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,block)
+void mitchell_state::init_block()
 {
 	m_input_type = 2;
 	configure_banks(block_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,blockbl)
+void mitchell_state::init_blockbl()
 {
 	m_input_type = 2;
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mstworld)
+void mitchell_state::init_mstworld()
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();
 	std::vector<uint8_t> source(len);
 	uint8_t* dst = memregion("maincpu")->base() ;
-	int x;
 
 	static const int tablebank[]=
 	{
@@ -2444,7 +2443,7 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 	};
 
 	memcpy(&source[0], dst, len);
-	for (x = 0; x < 40; x += 2)
+	for (int x = 0; x < 40; x += 2)
 	{
 		if (tablebank[x] != -1)
 		{
@@ -2463,35 +2462,35 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
  *
  *************************************/
 
-GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,  mitchell_state, mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,  mitchell_state, mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgakuen2,    0,        marukin,    marukin,  mitchell_state, mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladies,    0,        marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladies, mitchell_state, pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 1)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
-GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? gets further than the above
-GAME( 1989, dokaben,     0,        pang,       pang,     mitchell_state, dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pang,        0,        pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbros,       pang,     pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pompingw,    pang,     pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb,       pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbold,    pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,      pang,     pangba,     pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb2,      pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbb,      pang,     spangbl,    pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cworld,      0,        pang,       qtono1,   mitchell_state, cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatena,      0,        pang,       qtono1,   mitchell_state, hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spang,       0,        pangnv,     pang,     mitchell_state, spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, sbbros,      spang,    pangnv,     pang,     mitchell_state, sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangj,      spang,    pangnv,     pang,     mitchell_state, spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangbl,     spang,    spangbl,    spangbl,  mitchell_state, spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
-GAME( 1994, mstworld,    0,        mstworld,   mstworld, mitchell_state, mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, marukin,     0,        marukin,    marukin,  mitchell_state, marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qtono1,      0,        pang,       qtono1,   mitchell_state, qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qsangoku,    0,        pang,       qtono1,   mitchell_state, qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, block,       0,        pangnv,     blockjoy, mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr1,     block,    pangnv,     blockjoy, mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr2,     block,    pangnv,     block,    mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockj,      block,    pangnv,     block,    mitchell_state, block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockbl,     block,    pangnv,     block,    mitchell_state, blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,  mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,  mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgakuen2,    0,        marukin,    marukin,  mitchell_state, init_mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladies,    0,        marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 1)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? gets further than the above
+GAME( 1989, dokaben,     0,        pang,       pang,     mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pang,        0,        pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbros,       pang,     pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pompingw,    pang,     pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb,       pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbold,    pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,      pang,     pangba,     pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb2,      pang,     pang,       pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbb,      pang,     spangbl,    pang,     mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cworld,      0,        pang,       qtono1,   mitchell_state, init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatena,      0,        pang,       qtono1,   mitchell_state, init_hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spang,       0,        pangnv,     pang,     mitchell_state, init_spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, sbbros,      spang,    pangnv,     pang,     mitchell_state, init_sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangj,      spang,    pangnv,     pang,     mitchell_state, init_spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangbl,     spang,    spangbl,    spangbl,  mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1994, mstworld,    0,        mstworld,   mstworld, mitchell_state, init_mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, marukin,     0,        marukin,    marukin,  mitchell_state, init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qtono1,      0,        pang,       qtono1,   mitchell_state, init_qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qsangoku,    0,        pang,       qtono1,   mitchell_state, init_qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, block,       0,        pangnv,     blockjoy, mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr1,     block,    pangnv,     blockjoy, mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr2,     block,    pangnv,     block,    mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockj,      block,    pangnv,     block,    mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockbl,     block,    pangnv,     block,    mitchell_state, init_blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -94,14 +94,18 @@
 #include "machine/clock.h"
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
+#include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
+#include "machine/315_5649.h"
 #include "machine/model1io.h"
+#include "machine/model1io2.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
 
+#include "model1io2.lh"
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 READ32_MEMBER(model2_state::timers_r)
@@ -154,14 +158,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timerrun[tnum] = 0;
 }
 
-MACHINE_START_MEMBER(model2_state,model2)
+MACHINE_START_MEMBER( model2_state, model2 )
 {
-	m_port_1c00004 = 1;
-	m_port_1c00006 = 2;
-	m_port_1c00010 = 0;
-	m_port_1c00012 = 1;
-	m_port_1c00014 = 2;
-
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
 
@@ -172,7 +170,6 @@ MACHINE_START_MEMBER(model2_state,model2)
 	save_item(NAME(m_geoctl));
 	save_item(NAME(m_geocnt));
 	save_item(NAME(m_ctrlmode));
-	save_item(NAME(m_analog_channel));
 	save_item(NAME(m_timervals[0]));
 	save_item(NAME(m_timervals[1]));
 	save_item(NAME(m_timervals[2]));
@@ -253,40 +250,7 @@ MACHINE_START_MEMBER(model2c_state,model2c)
 							[    ]() { });
 }
 
-MACHINE_START_MEMBER(model2_tgp_state,srallyc)
-{
-	MACHINE_START_CALL_MEMBER(model2_tgp);
-
-	m_port_1c00004 = 2;
-	m_port_1c00006 = 3;
-	m_port_1c00010 = 0;
-	m_port_1c00012 = 1;
-	m_port_1c00014 = 4;
-}
-
-MACHINE_START_MEMBER(model2b_state,srallyc)
-{
-	MACHINE_START_CALL_MEMBER(model2b);
-
-	m_port_1c00004 = 2;
-	m_port_1c00006 = 3;
-	m_port_1c00010 = 0;
-	m_port_1c00012 = 1;
-	m_port_1c00014 = 4;
-}
-
-MACHINE_START_MEMBER(model2c_state,srallyc)
-{
-	MACHINE_START_CALL_MEMBER(model2c);
-
-	m_port_1c00004 = 2;
-	m_port_1c00006 = 3;
-	m_port_1c00010 = 0;
-	m_port_1c00012 = 1;
-	m_port_1c00014 = 4;
-}
-
-MACHINE_RESET_MEMBER(model2_state,model2_common)
+MACHINE_RESET_MEMBER( model2_state, model2_common )
 {
 	int i;
 
@@ -297,7 +261,6 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 	m_geoctl = 0;
 	m_geocnt = 0;
 	m_ctrlmode = 0;
-	m_analog_channel = 0;
 
 	m_timervals[0] = 0xfffff;
 	m_timervals[1] = 0xfffff;
@@ -306,10 +269,6 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 
 	m_timerrun[0] = m_timerrun[1] = m_timerrun[2] = m_timerrun[3] = 0;
 
-	m_timers[0] = machine().device<timer_device>("timer0");
-	m_timers[1] = machine().device<timer_device>("timer1");
-	m_timers[2] = machine().device<timer_device>("timer2");
-	m_timers[3] = machine().device<timer_device>("timer3");
 	for (i=0; i<4; i++)
 		m_timers[i]->reset();
 
@@ -399,22 +358,11 @@ READ16_MEMBER(model2_state::colorxlat_r)
 	return m_colorxlat[offset];
 }
 
-WRITE32_MEMBER(model2_state::ctrl0_w)
+// Apparently original Model 2 doesn't have fifo control?
+READ32_MEMBER(model2o_state::fifo_control_2o_r)
 {
-	if(ACCESSING_BITS_0_7)
-	{
-		m_ctrlmode = data & 0x01;
-		m_eeprom->di_write((data & 0x20) >> 5);
-		m_eeprom->clk_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->cs_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	return 0xffffffff;
 }
-
-WRITE32_MEMBER(model2_state::analog_2b_w)
-{
-	m_analog_channel = (data >> 16) & 0x07;
-}
-
 
 READ32_MEMBER(model2_state::fifo_control_2a_r)
 {
@@ -446,205 +394,6 @@ READ32_MEMBER(model2_state::videoctl_r)
 WRITE32_MEMBER(model2_state::videoctl_w)
 {
 	COMBINE_DATA(&m_videocontrol);
-}
-
-// 315-5649
-READ8_MEMBER(model2_state::model2_crx_in_r)
-{
-	uint8_t input = 0xff;
-
-	switch (offset)
-	{
-	case 0x01:
-		input = m_in[0]->read();
-		if (m_ctrlmode != 0)
-			input = (input & ~0x0030) | 0x00d0 | (m_eeprom->do_read() << 5);
-		break;
-	case 0x02:
-		input = m_in[m_port_1c00004]->read();
-		break;
-	case 0x03:
-		input = m_in[m_port_1c00006]->read();
-		break;
-	// port G
-	case 0x06:
-		input = m_dsw->read();
-		break;
-	case 0x08:
-		input = m_in[m_port_1c00010]->read();
-		break;
-	case 0x09:
-		input = m_in[m_port_1c00012]->read();
-		break;
-	case 0x0a:
-		input = m_in[m_port_1c00014]->read();
-		break;
-	case 0x0c:
-		if (m_lightgun_mux < 8)
-			input = lightgun_coords_r(space, m_lightgun_mux);
-		else
-			input = lightgun_offscreen_r(space, 0);
-		break;
-	case 0x0d:
-		input = 0x0c; // lightgun latches?
-		break;
-	case 0x0e:
-		// these must be high
-		input &= ~0x1a;
-		break;
-	case 0x0f:
-		if (m_analog_channel < 4)
-		{
-			input = m_analog_ports[m_analog_channel].read_safe(0);
-			++m_analog_channel;
-		}
-		break;
-	}
-
-	return input;
-}
-
-/*  PORT_DIPSETTING(    0x00, "0" ) // 0: neutral
-    PORT_DIPSETTING(    0x10, "1" ) // 2nd gear
-    PORT_DIPSETTING(    0x20, "2" ) // 1st gear
-    PORT_DIPSETTING(    0x30, "3" )
-    PORT_DIPSETTING(    0x40, "4" )
-    PORT_DIPSETTING(    0x50, "5" ) // 4th gear
-    PORT_DIPSETTING(    0x60, "6" ) // 3rd gear
-    PORT_DIPSETTING(    0x70, "7" )*/
-
-/* Used by Sega Rally and Daytona USA, others might be different */
-CUSTOM_INPUT_MEMBER(model2_state::daytona_gearbox_r)
-{
-	uint8_t res = m_gears.read_safe(0);
-	int i;
-	const uint8_t gearvalue[5] = { 0, 2, 1, 6, 5 };
-
-	for(i=0;i<5;i++)
-	{
-		if(res & 1<<i)
-		{
-			m_gearsel = i;
-			return gearvalue[i];
-		}
-	}
-
-	return gearvalue[m_gearsel];
-}
-
-/*
-    Rail Chase 2 "Drive I/O BD" documentation
-
-    Aux board 837-11694, Z80 (4Mhz) with program rom EPR-17895
-
-    commands 0x2* are for device status bits (all of them active low)
-
-    command 0x27 (4 port valve rear cylinder)
-    ---- --xx Cylinder Position (00 - neutral, 01 - up, 10 - down, 11 - error)
-
-    command 0x29
-    ---- -x-- Compressor Motor
-    ---- --x- Unloader Valve
-    ---- ---x Compression Valve
-
-    command 0x2a (4 port valve left cylinder)
-    ---- -x-- Rev Valve
-    ---- --x- Down Valve
-    ---- ---x Up Valve
-
-    command 0x2b (4 port valve right cylinder)
-    ---- -x-- Rev Valve
-    ---- --x- Down Valve
-    ---- ---x Up Valve
-
-    command 0x2e
-    ---- --xx Compression SW (00 - error, 01 - low, 10 - high, 11 - error)
-
-    command 0x2f
-    ---- x--- Emergency SW
-    ---- ---x Safety Sensor
-
-    These are all used on network check, probably some specific data port R/Ws
-
-    command 0x3b
-    command 0xe0
-    command 0xd0
-    command 0xb0
-    command 0x70
-    command 0x0e
-    command 0x0d
-    command 0x0b
-    command 0x07
-
-    Every other write of this controls devices behaviour:
-
-    command 0x4f (left up valve off)
-    command 0x5b (left down valve off)
-    command 0x5d (compression valve on)
-    command 0x5e (left rev valve on)
-    command 0x5f (left Cylinder reset)
-
-    command 0x6f (right up valve off)
-    command 0x7b (right down valve off)
-    command 0x7d (compression valve on)
-    command 0x7e (right rev valve on)
-    command 0x7f (right Cylinder reset)
-
-    command 0x84 (reset up/down valves of rear cylinder)
-    command 0x85 (rear up valve on)
-    command 0x86 (rear down valve on)
-
-    command 0x8b (compression valve on)
-    command 0x8d (left rev valve is on)
-    command 0x8e (right rev valve is on)
-    command 0x8f (reset 4 port valve left / right cylinders and compression valve)
-
-*/
-
-// simulate this so that it passes the initial checks
-CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
-{
-	uint8_t res;
-
-	res = 0xff;
-
-	if(m_cmd_data == 0xe0 || m_cmd_data == 0x0e)
-		res &= ~1;
-	if(m_cmd_data == 0xd0 || m_cmd_data == 0x0d)
-		res &= ~2;
-	if(m_cmd_data == 0xb0 || m_cmd_data == 0x0b)
-		res &= ~4;
-	if(m_cmd_data == 0x70 || m_cmd_data == 0x07)
-		res &= ~8;
-
-	return res;
-}
-
-WRITE32_MEMBER(model2_state::rchase2_devices_w)
-{
-	/*
-	0x00040000 start 1 lamp
-	0x00080000 start 2 lamp
-	*/
-
-	if(mem_mask == 0x0000ffff)
-		m_cmd_data = data;
-}
-
-
-WRITE32_MEMBER(model2_state::srallyc_devices_w)
-{
-	/*
-	0x00040000 start 1 lamp
-	0x00200000 vr lamp
-	0x00800000 leader lamp
-	*/
-
-	if(mem_mask == 0x000000ff || mem_mask == 0x0000ffff)
-	{
-		m_driveio_comm_data = data & 0xff;
-		m_drivecpu->set_input_line(0, HOLD_LINE);
-	}
 }
 
 // Coprocessor - Common
@@ -847,7 +596,7 @@ void model2_tgp_state::copro_halt()
 void model2_tgp_state::copro_boot()
 {
 	m_copro_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	m_copro_tgp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_copro_tgp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 READ32_MEMBER(model2_tgp_state::copro_fifo_r)
@@ -1432,6 +1181,7 @@ void model2_state::model2_5881_mem(address_map &map)
 	map(0x01d90000, 0x01d9ffff).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_le));
 }
 
+
 //**************************************************************************
 //  LIGHTGUN
 //**************************************************************************
@@ -1439,9 +1189,23 @@ void model2_state::model2_5881_mem(address_map &map)
 // Interface board ID: 837-12079
 // ALTERA FLEX + Sega 315-5338A
 
-READ8_MEMBER( model2_state::lightgun_coords_r )
+READ8_MEMBER( model2_state::lightgun_data_r )
 {
-	return (m_lightgun_ports[offset >> 1].read_safe(0) >> ((offset & 1)*8)) & 0xff;
+	uint16_t data = m_lightgun_ports[offset >> 1].read_safe(0);
+	return BIT(offset, 0) ? (data >> 8) : data;
+}
+
+READ8_MEMBER( model2_state::lightgun_mux_r )
+{
+	if (m_lightgun_mux < 8)
+		return lightgun_data_r(space, m_lightgun_mux);
+	else
+		return lightgun_offscreen_r(space, 0);
+}
+
+WRITE8_MEMBER( model2_state::lightgun_mux_w )
+{
+	m_lightgun_mux = data;
 }
 
 // handles offscreen gun trigger detection here
@@ -1476,16 +1240,6 @@ READ8_MEMBER( model2_state::lightgun_offscreen_r )
 	return (data >> ((offset & 1)*8)) & 0xff;
 }
 
-WRITE8_MEMBER( model2_state::lightgun_mux_w )
-{
-	m_lightgun_mux = data;
-}
-
-/* Apparently original Model 2 doesn't have fifo control? */
-READ32_MEMBER(model2o_state::fifo_control_2o_r)
-{
-	return 0xffffffff;
-}
 
 //**************************************************************************
 //  OUTPUTS
@@ -1537,70 +1291,9 @@ WRITE8_MEMBER( model2o_state::vcop_output_w )
 //  I/O BOARD
 //**************************************************************************
 
-READ32_MEMBER( model2o_state::dpram_r )
-{
-	uint32_t data = m_dpram[offset] & mem_mask;
-
-	// intercept reads for the lightgun ports
-	// needs to be done because the vcop ioboard isn't emulated
-	// can be removed once that's done (837-11130 + 837-11131)
-
-	if (offset >= 0x100/4 && offset <= 0x10f/4)
-	{
-		if (ACCESSING_BITS_16_31)
-		{
-			data &= 0x0000ffff;
-			data |= (m_lightgun_ports[offset & 0x03].read_safe(0) >> 8) << 16;
-		}
-		if (ACCESSING_BITS_0_15)
-		{
-			data &= 0xffff0000;
-			data |= m_lightgun_ports[offset & 0x03].read_safe(0) & 0xff;
-		}
-	}
-
-	if (offset >= 0x110/4 && offset <= 0x113/4)
-	{
-		if (ACCESSING_BITS_0_15)
-		{
-			data &= 0xffff0000;
-			data |= lightgun_offscreen_r(space, 0);
-		}
-	}
-
-	return data;
-}
-
-WRITE32_MEMBER( model2o_state::dpram_w )
-{
-	COMBINE_DATA(&m_dpram[offset]);
-}
-
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
 // emulated yet, data just gets written to RAM.
-
-READ8_MEMBER( model2o_state::io_r )
-{
-	if ((offset & 1) == 0)
-		return m_dpram[offset >> 1];
-	else
-		return m_dpram[offset >> 1] >> 16;
-}
-
-WRITE8_MEMBER( model2o_state::io_w )
-{
-	if ((offset & 1) == 0)
-	{
-		m_dpram[offset >> 1] &= 0x00ff0000;
-		m_dpram[offset >> 1] |= data;
-	}
-	else
-	{
-		m_dpram[offset >> 1] &= 0x000000ff;
-		m_dpram[offset >> 1] |= data << 16;
-	}
-}
 
 /* model 2/2a common memory map */
 void model2_tgp_state::model2_tgp_mem(address_map &map)
@@ -1627,7 +1320,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00200000, 0x0021ffff).ram();
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
-	map(0x01c00000, 0x01c007ff).rw(this, FUNC(model2o_state::dpram_r), FUNC(model2o_state::dpram_w)).share("dpram"); // 2k*8-bit dual port ram
+	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 }
 
@@ -1714,13 +1407,7 @@ void model2a_state::model2a_crx_mem(address_map &map)
 	model2_tgp_mem(map);
 
 	map(0x00200000, 0x0023ffff).ram();
-
-	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2a_state::model2_crx_in_r)).umask32(0x00ff00ff);
-	map(0x01c00000, 0x01c00003).w(this, FUNC(model2a_state::ctrl0_w));
-	map(0x01c00008, 0x01c0000f).nopw();
-	map(0x01c00010, 0x01c00013).nopw();
-	map(0x01c00014, 0x01c00017).w(this, FUNC(model2a_state::lightgun_mux_w)).umask32(0x000000ff);
-	map(0x01c0001c, 0x01c0001f).w(this, FUNC(model2a_state::analog_2b_w));
+	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w));
 }
@@ -1760,12 +1447,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x11400000, 0x1140ffff).rw(this, FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w));    // polygon "luma" RAM (2b/2c)
 	map(0x12800000, 0x1281ffff).rw(this, FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
 
-	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2b_state::model2_crx_in_r)).umask32(0x00ff00ff);
-	map(0x01c00000, 0x01c00003).w(this, FUNC(model2b_state::ctrl0_w));
-	map(0x01c00008, 0x01c0000b).nopw();
-	map(0x01c00010, 0x01c00013).nopw(); // gunblade
-	map(0x01c00014, 0x01c00017).w(this, FUNC(model2b_state::lightgun_mux_w)).umask32(0x000000ff);
-	map(0x01c0001c, 0x01c0001f).w(this, FUNC(model2b_state::analog_2b_w));
+	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 }
@@ -1797,12 +1479,7 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x11400000, 0x1140ffff).rw(this, FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w));    // polygon "luma" RAM (2b/2c)
 	map(0x12800000, 0x1281ffff).rw(this, FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
 
-	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2c_state::model2_crx_in_r)).umask32(0x00ff00ff);
-	map(0x01c00000, 0x01c00003).w(this, FUNC(model2c_state::ctrl0_w));
-	map(0x01c00008, 0x01c0000b).nopw();
-	map(0x01c00010, 0x01c00013).nopw();
-	map(0x01c00014, 0x01c00017).w(this, FUNC(model2c_state::lightgun_mux_w)).umask32(0x000000ff);
-	map(0x01c0001c, 0x01c0001f).w(this, FUNC(model2c_state::analog_2b_w));
+	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
 }
 
@@ -1813,12 +1490,228 @@ void model2c_state::model2c_5881_mem(address_map &map)
 }
 
 
+//**************************************************************************
+//  DRIVE BOARD
+//**************************************************************************
 
-/***********************************
- *
- * Input definitions
- *
- **********************************/
+/*
+    Rail Chase 2 "Drive I/O BD" documentation
+
+    Aux board 837-11694, Z80 (4Mhz) with program rom EPR-17895
+
+    commands 0x2* are for device status bits (all of them active low)
+
+    command 0x27 (4 port valve rear cylinder)
+    ---- --xx Cylinder Position (00 - neutral, 01 - up, 10 - down, 11 - error)
+
+    command 0x29
+    ---- -x-- Compressor Motor
+    ---- --x- Unloader Valve
+    ---- ---x Compression Valve
+
+    command 0x2a (4 port valve left cylinder)
+    ---- -x-- Rev Valve
+    ---- --x- Down Valve
+    ---- ---x Up Valve
+
+    command 0x2b (4 port valve right cylinder)
+    ---- -x-- Rev Valve
+    ---- --x- Down Valve
+    ---- ---x Up Valve
+
+    command 0x2e
+    ---- --xx Compression SW (00 - error, 01 - low, 10 - high, 11 - error)
+
+    command 0x2f
+    ---- x--- Emergency SW
+    ---- ---x Safety Sensor
+
+    These are all used on network check, probably some specific data port R/Ws
+
+    command 0x3b
+    command 0xe0
+    command 0xd0
+    command 0xb0
+    command 0x70
+    command 0x0e
+    command 0x0d
+    command 0x0b
+    command 0x07
+
+    Every other write of this controls devices behaviour:
+
+    command 0x4f (left up valve off)
+    command 0x5b (left down valve off)
+    command 0x5d (compression valve on)
+    command 0x5e (left rev valve on)
+    command 0x5f (left Cylinder reset)
+
+    command 0x6f (right up valve off)
+    command 0x7b (right down valve off)
+    command 0x7d (compression valve on)
+    command 0x7e (right rev valve on)
+    command 0x7f (right Cylinder reset)
+
+    command 0x84 (reset up/down valves of rear cylinder)
+    command 0x85 (rear up valve on)
+    command 0x86 (rear down valve on)
+
+    command 0x8b (compression valve on)
+    command 0x8d (left rev valve is on)
+    command 0x8e (right rev valve is on)
+    command 0x8f (reset 4 port valve left / right cylinders and compression valve)
+
+*/
+
+// simulate this so that it passes the initial checks
+READ8_MEMBER( model2_state::rchase2_drive_board_r )
+{
+	uint8_t data = 0xff;
+
+	if(m_cmd_data == 0xe0 || m_cmd_data == 0x0e)
+		data &= ~1;
+	if(m_cmd_data == 0xd0 || m_cmd_data == 0x0d)
+		data &= ~2;
+	if(m_cmd_data == 0xb0 || m_cmd_data == 0x0b)
+		data &= ~4;
+	if(m_cmd_data == 0x70 || m_cmd_data == 0x07)
+		data &= ~8;
+
+	return data;
+}
+
+WRITE8_MEMBER( model2_state::rchase2_drive_board_w )
+{
+	m_cmd_data = data;
+}
+
+WRITE8_MEMBER( model2_state::drive_board_w )
+{
+	m_driveio_comm_data = data;
+	m_drivecpu->set_input_line(0, HOLD_LINE);
+}
+
+
+//**************************************************************************
+//  INPUT HANDLING
+//**************************************************************************
+
+WRITE8_MEMBER( model2_state::eeprom_w )
+{
+	m_ctrlmode = BIT(data, 0);
+
+	m_eeprom->di_write(BIT(data, 5));
+	m_eeprom->clk_write(BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER( model2_state::in0_r )
+{
+	uint8_t data = m_in0->read();
+
+	if (m_ctrlmode)
+		return (0xc0) | (m_eeprom->do_read() << 5) | (0x10) | (data & 0x0f);
+	else
+		return data;
+}
+
+/*  PORT_DIPSETTING(    0x00, "0" ) // 0: neutral
+    PORT_DIPSETTING(    0x10, "1" ) // 2nd gear
+    PORT_DIPSETTING(    0x20, "2" ) // 1st gear
+    PORT_DIPSETTING(    0x30, "3" )
+    PORT_DIPSETTING(    0x40, "4" )
+    PORT_DIPSETTING(    0x50, "5" ) // 4th gear
+    PORT_DIPSETTING(    0x60, "6" ) // 3rd gear
+    PORT_DIPSETTING(    0x70, "7" )
+*/
+
+// Used by Sega Rally and Daytona USA, others might be different
+CUSTOM_INPUT_MEMBER(model2_state::daytona_gearbox_r)
+{
+	uint8_t res = m_gears.read_safe(0);
+	int i;
+	const uint8_t gearvalue[5] = { 0, 2, 1, 6, 5 };
+
+	for(i=0;i<5;i++)
+	{
+		if(res & 1<<i)
+		{
+			m_gearsel = i;
+			return gearvalue[i];
+		}
+	}
+
+	return gearvalue[m_gearsel];
+}
+
+
+//**************************************************************************
+//  INPUT PORT DEFINITIONS
+//**************************************************************************
+
+static INPUT_PORTS_START( model2 )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4)        PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1)
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4)        PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ioboard_dipswitches )
+	PORT_START("ioboard:dsw1")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW1:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_START("ioboard:dsw2")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_START("ioboard:dsw3")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "DSW3:8")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( gears )
 	PORT_START("GEARS") // fake to handle gear bits
@@ -1830,23 +1723,22 @@ static INPUT_PORTS_START( gears )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daytona )
+	PORT_INCLUDE(model2)
 	PORT_INCLUDE(gears)
 
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6)  PORT_NAME("VR1 (Red)")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON7)  PORT_NAME("VR2 (Blue)")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON8)  PORT_NAME("VR3 (Yellow)")
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9)  PORT_NAME("VR4 (Green)")
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state, daytona_gearbox_r, nullptr)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("STEER")
 	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
@@ -1856,25 +1748,27 @@ static INPUT_PORTS_START( daytona )
 
 	PORT_START("BRAKE")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( desert )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("VR1 (Blue)")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("VR2 (Green)")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("VR3 (Red)")
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Shift") PORT_TOGGLE
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Machine Gun")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Cannon")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("STEER")
 	PORT_BIT(0xff, 0x80, IPT_PADDLE)     PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
@@ -1884,28 +1778,24 @@ static INPUT_PORTS_START( desert )
 
 	PORT_START("BRAKE")
 	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Y) PORT_SENSITIVITY(60) PORT_KEYDELTA(20)
+
+	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vcop )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_INCLUDE(model2)
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("IN2")
-	PORT_DIPNAME(0x02, 0x02, "No enemies") PORT_DIPLOCATION("DEBUG:1")
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x02, 0x02, "No Enemies") // I/O board connector CN5
 	PORT_DIPSETTING(   0x02, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-	PORT_BIT(0xfd, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P1_X")
 	PORT_BIT(0x3ff, 0x17c, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x083, 0x276) PORT_SENSITIVITY(50) PORT_KEYDELTA(13) PORT_PLAYER(1)
@@ -1918,87 +1808,92 @@ static INPUT_PORTS_START( vcop )
 
 	PORT_START("P2_Y")
 	PORT_BIT(0x3ff, 0x0e8, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x027, 0x1a9) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_INCLUDE(ioboard_dipswitches)
+
+	PORT_MODIFY("ioboard:dsw1")
+	PORT_DIPNAME(0x01, 0x01, "Reloading")       PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(   0x01, "Normal")
+	PORT_DIPSETTING(   0x00, "Auto Reload")
+	PORT_DIPNAME(0x02, 0x02, "Enemy Character") PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(   0x02, "Normal")
+	PORT_DIPSETTING(   0x00, "Robot")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( model2 )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
-
-	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-
-	PORT_START("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( zerogun )
-	PORT_INCLUDE( model2 )
+INPUT_PORTS_START( vf2 )
+	PORT_INCLUDE(model2)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Punch")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Kick")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Guard")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Punch")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Guard")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
 
-	PORT_MODIFY("DSW")
-	// in service mode, enables scroll check, polygon check, bg check, stage select
-	PORT_DIPNAME( 0x01, 0x01, "Enable Debug Menu" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+static INPUT_PORTS_START( manxtt )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start / VR")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(KEYCODE_UP)   PORT_NAME("Shift Up")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Shift Down")
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("THROTTLE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_START("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_START("BANK")
+	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( srallyc )
+	PORT_INCLUDE(model2)
+	PORT_INCLUDE(gears)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("VR")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state, daytona_gearbox_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL3) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_NAME("Hand Brake")
+
+	PORT_START("STEER")
+	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+
+	PORT_START("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_NAME("Accelerate Pedal")
+
+	PORT_START("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vcop2 )
 	PORT_INCLUDE(vcop)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("P1_X")
 	PORT_BIT(0x3ff, 0x17f, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(137, 630) PORT_SENSITIVITY(50) PORT_KEYDELTA(13) PORT_PLAYER(1)
@@ -2011,155 +1906,325 @@ static INPUT_PORTS_START( vcop2 )
 
 	PORT_MODIFY("P2_Y")
 	PORT_BIT(0x3ff, 0x0e6, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 36, 425) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gunblade )
-	PORT_INCLUDE( vcop2 )
-
-	PORT_MODIFY("P1_X")
-	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P1_Y")
-	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P2_X")
-	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P2_Y")
-	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
-
-	PORT_START("ANA1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
-
-	PORT_START("ANA2")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START("ANA3")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2) PORT_REVERSE
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( manxtt )
-	PORT_INCLUDE( model2 )
+static INPUT_PORTS_START( skytargt )
+	PORT_INCLUDE(model2)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start / VR")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View Change")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Machine Gun")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Missile")
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shift Up")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Down")
-	PORT_BIT(0xcf, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("STICKX")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE
 
-	PORT_START("IN4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("STICKY")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20)
+INPUT_PORTS_END
 
-	PORT_START("ANA0")  // throttle
-	PORT_BIT(0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+INPUT_PORTS_START( doa )
+	PORT_INCLUDE(model2)
 
-	PORT_START("ANA1")  // brake
-	PORT_BIT(0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Hold")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Punch")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Kick")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("ANA2")  // bank
-	PORT_BIT(0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_REVERSE
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Hold")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Punch")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( zerogun )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("DSW")
+	// in service mode, enables scroll check, polygon check, bg check, stage select
+	PORT_DIPNAME(0x01, 0x01, "Enable Debug Menu") PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( motoraid )
-	PORT_INCLUDE( manxtt )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Punch")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Kick")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( srallyc )
-	PORT_INCLUDE( model2 )
-	PORT_INCLUDE( gears )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("VR") // VR
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x90, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE(manxtt)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Punch")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Kick")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dynamcop )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Punch")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Kick")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Jump")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
-	PORT_BIT(0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Punch")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Jump")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
 
-	PORT_START("IN3")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_NAME("P1 Hand Brake")
+static INPUT_PORTS_START( pltkids )
+	PORT_INCLUDE(model2)
 
-	PORT_START("IN4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("ANA0")  // steer
-	PORT_BIT(0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_NAME("P1 Steering Wheel")
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
 
-	PORT_START("ANA1")  // accel
-	PORT_BIT(0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_NAME("P1 Accelerate Pedal")
+static INPUT_PORTS_START( rchase2 )
+	PORT_INCLUDE(model2)
 
-	PORT_START("ANA2")  // brake
-	PORT_BIT(0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_NAME("P1 Brake Pedal")
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("P1_X")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
+
+	PORT_START("P1_Y")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
+
+	PORT_START("P2_X")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
+
+	PORT_START("P2_Y")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vstriker )
+	PORT_INCLUDE(model2)
+
+	// oddly enough service mode returns standard 1-2-3 layout but actual ingame is 2-3-1
+	// also bit 3 repeats bit 2 functionality.
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Long Pass")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Short Pass")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Long Pass")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Shoot")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Short Pass")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gunblade )
+	PORT_INCLUDE(rchase2)
+
+	PORT_MODIFY("P1_X")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_MODIFY("P2_X")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( indy500 )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View 1 (Zoom In)")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("View 2 (Zoom Out)")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+	// notice that these are exclusive inputs, also if bit 6 or 7 are enabled then shifting doesn't work
+	// (i.e. they probably took the gearbox device and modded over it)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(KEYCODE_UP)   PORT_NAME("Shift Up")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Shift Down")
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("STEER")
+	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+
+	PORT_START("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( von )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 Left Shot")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P1 Left Dash")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("P1 Right Shot")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("P1 Right Dash")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( schamp )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Punch")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Kick")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Barrier")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Punch")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Barrier")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgt24h )
-	PORT_INCLUDE( srallyc )
+	PORT_INCLUDE(indy500)
 
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View 1")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dynabb )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View Button")
-	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	// notice that these are exclusive inputs, also if bit 6 or 7 are enabled then shifting doesn't work
-	// (i.e. they probably took the gearbox device and modded over it)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Up")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Down")
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_MODIFY("IN3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("BAT1")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1) PORT_NAME("P1 Bat Swing")
 
-	PORT_MODIFY("GEARS")
-	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("BAT2")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(2) PORT_NAME("P2 Bat Swing")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( overrev )
+	PORT_INCLUDE(indy500)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View 1")
+	// optional, enableable when hardware type isn't in "normal (2in1)" mode (overrev)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("View 2")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( skisuprg )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Select 3")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Zoom In")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Select 1")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Select 2")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Zoom Out")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	// TODO: what are these exactly? Enables/disables when all four bits are on
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Foot Sensor (R)")
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_NAME("Foot Sensor (L)")
+
+	PORT_START("INCLINING")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_NAME("Inclining")
+
+	PORT_START("SWING")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_NAME("Swing")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( waverunr )
+	PORT_INCLUDE(model2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x32, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("View")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	// TODO: safety sensor
+	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	// TODO: requires LEFT/RIGHT_AD_STICK in framework
+	PORT_START("HANDLE")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Handle Bar")
+
+	PORT_START("ROLL")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Roll")
+
+	PORT_START("THROTTLE")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Throttle Lever") PORT_REVERSE
+
+	PORT_START("PITCH")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Pitch") PORT_REVERSE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bel )
+	PORT_INCLUDE(gunblade)
+
+	PORT_MODIFY("IN0")
+	// they reversed these two for some reason
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Missile")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Missile")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotd )
@@ -2178,250 +2243,50 @@ static INPUT_PORTS_START( hotd )
 	PORT_BIT(0x3ff, 0x0e9, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 87, 380) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( overrev )
-	PORT_INCLUDE( sgt24h )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 1 Button")
-	// optional, enableable when hardware type isn't in "normal (2in1)" mode (overrev)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 2 Button")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( bel )
-	PORT_INCLUDE( gunblade )
-
-	PORT_MODIFY("IN0")
-	// they reversed these two for some reason
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Missile")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Missile")
-//  PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( rchase2 )
-	PORT_INCLUDE( gunblade )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
-
-	// reversed p1 and p2 wrt Gunblade
-	PORT_MODIFY("ANA0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2) PORT_REVERSE
-
-	PORT_MODIFY("ANA1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_MODIFY("ANA2")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2) PORT_REVERSE
-
-	PORT_MODIFY("ANA3")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1) PORT_REVERSE
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( skytargt )
-	PORT_INCLUDE( model2 )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 View Change")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Machine Gun")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Missile")
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START("ANA1")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ANA2")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START("ANA3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( dynabb )
-	PORT_INCLUDE( model2 )
-
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1) PORT_NAME("P1 Bat Swing")
-
-	PORT_START("ANA1")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(2) PORT_NAME("P2 Bat Swing")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vstriker )
-	PORT_INCLUDE( model2 )
-
-	// oddly enough service mode returns standard 1-2-3 layout but actual ingame is 2-3-1
-	// also bit 3 repeats bit 2 functionality.
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Long Pass") PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Shoot") PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Short Pass") PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Long Pass") PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Shoot") PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Short Pass") PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( von )
-	PORT_INCLUDE( model2 )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Left Shot")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Left Dash")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Shot")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Right Dash")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(1)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( skisuprg )
-	PORT_INCLUDE( model2 )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select 3 Button")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Zoom In Button")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select 1 Button")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select 2 Button")
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Zoom Out Button")
-	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("IN2")
-	// TODO: what are these exactly? Enables/disables when all four bits are on
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Foot Sensor (R)")
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Foot Sensor (L)")
-
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START("ANA1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( stcc )
-	PORT_INCLUDE( sgt24h )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 1 Button (Zoom In)")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 2 Button (Zoom Out)")
-	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Shift Up")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Shift Down")
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( waverunr )
-	PORT_INCLUDE( model2 )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("View Button")
-	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("IN2")
-	// TODO: safety sensor
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )
-	PORT_BIT(0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	// TODO: requires LEFT/RIGHT_AD_STICK in framework
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Handle Bar")
-
-	PORT_START("ANA1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Roll")
-
-	PORT_START("ANA2")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Throttle Lever") PORT_REVERSE
-
-	PORT_START("ANA3")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Pitch") PORT_REVERSE
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( segawski )
-	PORT_INCLUDE( model2 )
+	PORT_INCLUDE(model2)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select (Down) Button")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x32, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Select (Down)")
 
 	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Set Button")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select (Up) Button")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Pitch Left")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Pitch Right")
-	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Set")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Select (Up)")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Pitch Left")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Pitch Right")
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Slide")
+	PORT_START("SLIDE")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Slide")
 INPUT_PORTS_END
 
 // TODO: has testable service / test on board buttons
 static INPUT_PORTS_START( topskatr )
-	PORT_INCLUDE( model2 )
+	PORT_INCLUDE(model2)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Select Right Button")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Jump Front")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Left Button")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Select Right")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Jump Front")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Select Left")
 
 	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Jump Tail")
-	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Jump Tail")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	// TODO: requires LEFT/RIGHT_AD_STICK in framework
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Curving")
+	PORT_START("CURVING")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Curving")
 
-	PORT_START("ANA1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Slide")
+	PORT_START("SLIDE")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Slide")
 INPUT_PORTS_END
 
 
@@ -2556,8 +2421,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2_state::model2_screen)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
-	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(model2_state, horizontal_sync_w))
-	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(model2_state, vertical_sync_w))
+	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(*this, model2_state, horizontal_sync_w))
+	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(*this, model2_state, vertical_sync_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -2569,35 +2434,36 @@ MACHINE_CONFIG_START(model2_state::model2_screen)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2_state::model2_scsp)
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2_snd)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
+	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-//  MCFG_I8251_RXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
-//  MCFG_I8251_TXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+//  MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
+//  MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* original Model 2 */
 MACHINE_CONFIG_START(model2o_state::model2o)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2o_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2o_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_tgp", MB86234, 16000000)
-	MCFG_CPU_PROGRAM_MAP(copro_tgp_prog_map)
-	MCFG_CPU_DATA_MAP(copro_tgp_data_map)
-	MCFG_CPU_IO_MAP(copro_tgp_io_map)
+	MCFG_DEVICE_ADD("copro_tgp", MB86234, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_prog_map)
+	MCFG_DEVICE_DATA_MAP(copro_tgp_data_map)
+	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
 	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
@@ -2618,23 +2484,25 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
 	MCFG_DEVICE_BIOS("epr14869c");
-	MCFG_MODEL1IO_READ_CB(READ8(model2o_state, io_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8(model2o_state, io_w))
+	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO_IN0_CB(IOPORT("IN0"))
 	MCFG_MODEL1IO_IN1_CB(IOPORT("IN1"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	model2_timers(config);
 	model2_screen(config);
 
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2671,15 +2539,15 @@ void model2_state::drive_io_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(model2_state::sj25_0207_01)
-	MCFG_CPU_ADD("drivecpu", Z80, XTAL(8'000'000)/2) // confirmed
-	MCFG_CPU_PROGRAM_MAP(drive_map)
-	MCFG_CPU_IO_MAP(drive_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("drivecpu", Z80, XTAL(8'000'000)/2) // confirmed
+	MCFG_DEVICE_PROGRAM_MAP(drive_map)
+	MCFG_DEVICE_IO_MAP(drive_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(model2_state, driveio_port_w))
-	MCFG_315_5296_IN_PORTG_CB(READ8(model2_state, driveio_portg_r))
-	MCFG_315_5296_IN_PORTH_CB(READ8(model2_state, driveio_porth_r))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, model2_state, driveio_port_w))
+	MCFG_315_5296_IN_PORTG_CB(READ8(*this, model2_state, driveio_portg_r))
+	MCFG_315_5296_IN_PORTH_CB(READ8(*this, model2_state, driveio_porth_r))
 
 	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 0) // unknown clock
 
@@ -2691,24 +2559,25 @@ MACHINE_CONFIG_START(model2o_state::daytona)
 	sj25_0207_01(config);
 
 	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_DRIVE_WRITE_CB(WRITE8(*this, model2o_state, drive_board_w))
 	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, daytona_output_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, daytona_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
 	daytona(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2o_maxx_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2o_maxx_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_gtx_state::daytona_gtx)
 	daytona(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2o_gtx_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2o_gtx_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_state::desert)
@@ -2718,27 +2587,40 @@ MACHINE_CONFIG_START(model2o_state::desert)
 	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, desert_output_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, desert_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_state::vcop)
 	model2o(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_IN2_CB(IOPORT("IN2"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, vcop_output_w))
+	MCFG_DEVICE_REMOVE("ioboard")
+
+	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
+	MCFG_DEVICE_BIOS("epr17181");
+	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
+	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN0"))
+	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN1"))
+	MCFG_MODEL1IO2_IN2_CB(IOPORT("IN2"))
+	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
+	MCFG_MODEL1IO2_LIGHTGUN_P1X_TAG("P1_X")
+	MCFG_MODEL1IO2_LIGHTGUN_P1Y_TAG("P1_Y")
+	MCFG_MODEL1IO2_LIGHTGUN_P2X_TAG("P2_X")
+	MCFG_MODEL1IO2_LIGHTGUN_P2Y_TAG("P2_Y")
+
+	MCFG_DEFAULT_LAYOUT(layout_model1io2)
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
 MACHINE_CONFIG_START(model2a_state::model2a)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2a_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_tgp", MB86234, 16000000)
-	MCFG_CPU_PROGRAM_MAP(copro_tgp_prog_map)
-	MCFG_CPU_DATA_MAP(copro_tgp_data_map)
-	MCFG_CPU_IO_MAP(copro_tgp_io_map)
+	MCFG_DEVICE_ADD("copro_tgp", MB86234, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_prog_map)
+	MCFG_DEVICE_DATA_MAP(copro_tgp_data_map)
+	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
 	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
@@ -2758,6 +2640,12 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
+	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
+	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2a_state, eeprom_w))
+	MCFG_315_5649_IN_PB_CB(READ8(*this, model2a_state, in0_r))
+	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
+	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+
 	model2_timers(config);
 	model2_screen(config);
 	model2_scsp(config);
@@ -2767,16 +2655,48 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2a_state::manxtt)
 	model2a(config);
-	MCFG_MACHINE_START_OVERRIDE(model2a_state,srallyc)
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("THROTTLE"))
+	MCFG_315_5649_AN1_CB(IOPORT("BRAKE"))
+	MCFG_315_5649_AN2_CB(IOPORT("BANK"))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2a_state::manxttdx) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
+// Includes a Model 1 Sound board for additional sounds - Deluxe version only
+MACHINE_CONFIG_START(model2a_state::manxttdx)
 	manxtt(config);
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2a_state::srallyc )
+	model2a(config);
+	sj25_0207_01(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2a_state, drive_board_w))
+	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
+	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
+	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2a_state::vcop2 )
+	model2a(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2a_state, lightgun_mux_r))
+	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2a_state, lightgun_mux_w))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2a_state::skytargt )
+	model2a(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("STICKY"))
+	MCFG_315_5649_AN2_CB(IOPORT("STICKX"))
 MACHINE_CONFIG_END
 
 uint16_t model2_state::crypt_read_callback(uint32_t addr)
@@ -2788,8 +2708,8 @@ uint16_t model2_state::crypt_read_callback(uint32_t addr)
 MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	model2a(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2a_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2a_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
@@ -2801,25 +2721,26 @@ MACHINE_CONFIG_START(model2a_state::model2a_0229)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2a_state::srallyc)
-	model2a(config);
-	MCFG_MACHINE_START_OVERRIDE(model2a_state,srallyc)
-	sj25_0207_01(config);
+MACHINE_CONFIG_START( model2a_state::zeroguna )
+	model2a_5881(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_IN_PG_CB(IOPORT("DSW"))
 MACHINE_CONFIG_END
 
 /* 2B-CRX */
 MACHINE_CONFIG_START(model2b_state::model2b)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2b_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_adsp", ADSP21062, 40000000)
+	MCFG_DEVICE_ADD("copro_adsp", ADSP21062, 40000000)
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
-	MCFG_CPU_DATA_MAP(copro_sharc_map)
+	MCFG_DEVICE_DATA_MAP(copro_sharc_map)
 
-	//MCFG_CPU_ADD("dsp2", ADSP21062, 40000000)
+	//MCFG_DEVICE_ADD("dsp2", ADSP21062, 40000000)
 	//MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
-	//MCFG_CPU_DATA_MAP(geo_sharc_map)
+	//MCFG_DEVICE_DATA_MAP(geo_sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))
 
@@ -2832,6 +2753,12 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
+	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
+	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2b_state, eeprom_w))
+	MCFG_315_5649_IN_PB_CB(READ8(*this, model2b_state, in0_r))
+	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
+	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+
 	model2_timers(config);
 	model2_screen(config);
 	model2_scsp(config);
@@ -2839,12 +2766,11 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
-
 MACHINE_CONFIG_START(model2b_state::model2b_5881)
 	model2b(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2b_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2b_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
@@ -2858,7 +2784,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2b_state::indy500)
 	model2b(config);
-	MCFG_MACHINE_START_OVERRIDE(model2b_state,srallyc)
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
+	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
+	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
 MACHINE_CONFIG_END
 
 
@@ -2874,26 +2804,60 @@ void model2b_state::rchase2_ioport_map(address_map &map)
 	map(0x00, 0x07).rw("ioexp", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 }
 
-MACHINE_CONFIG_START(model2b_state::rchase2)
+MACHINE_CONFIG_START( model2b_state::rchase2 )
 	model2b(config);
-	MCFG_CPU_ADD("iocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(rchase2_iocpu_map)
-	MCFG_CPU_IO_MAP(rchase2_ioport_map)
+
+	MCFG_DEVICE_ADD("iocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(rchase2_iocpu_map)
+	MCFG_DEVICE_IO_MAP(rchase2_ioport_map)
 
 	MCFG_DEVICE_ADD("ioexp", CXD1095, 0)
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_IN_PD_CB(READ8(*this, model2b_state, rchase2_drive_board_r))
+	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2b_state, rchase2_drive_board_w))
+	MCFG_315_5649_AN0_CB(IOPORT("P2_X"))
+	MCFG_315_5649_AN1_CB(IOPORT("P1_X"))
+	MCFG_315_5649_AN2_CB(IOPORT("P2_Y"))
+	MCFG_315_5649_AN3_CB(IOPORT("P1_Y"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2b_state::gunblade )
+	model2b(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("P1_X"))
+	MCFG_315_5649_AN1_CB(IOPORT("P2_X"))
+	MCFG_315_5649_AN2_CB(IOPORT("P1_Y"))
+	MCFG_315_5649_AN3_CB(IOPORT("P2_Y"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2b_state::dynabb )
+	model2b(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("BAT1"))
+	MCFG_315_5649_AN1_CB(IOPORT("BAT2"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2b_state::zerogun )
+	model2b_5881(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_IN_PG_CB(IOPORT("DSW"))
 MACHINE_CONFIG_END
 
 /* 2C-CRX */
 MACHINE_CONFIG_START(model2c_state::model2c)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2c_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2c_state, model2c_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_tgpx4", MB86235, 40000000)
-	MCFG_CPU_PROGRAM_MAP(copro_tgpx4_map)
-	MCFG_CPU_DATA_MAP(copro_tgpx4_data_map)
-	MCFG_MB86235_FIFOIN(":copro_fifo_in")
-	MCFG_MB86235_FIFOOUT0(":copro_fifo_out")
+	MCFG_DEVICE_ADD("copro_tgpx4", MB86235, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(copro_tgpx4_map)
+	MCFG_DEVICE_DATA_MAP(copro_tgpx4_data_map)
+	MCFG_MB86235_FIFOIN("copro_fifo_in")
+	MCFG_MB86235_FIFOOUT0("copro_fifo_out")
 
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
@@ -2904,6 +2868,12 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
+	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
+	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2c_state, eeprom_w))
+	MCFG_315_5649_IN_PB_CB(READ8(*this, model2c_state, in0_r))
+	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
+	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+
 	model2_timers(config);
 	model2_screen(config);
 	model2_scsp(config);
@@ -2911,29 +2881,90 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2c_state::stcc)
+MACHINE_CONFIG_START( model2c_state::skisuprg )
 	model2c(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("SWING"))
+	MCFG_315_5649_AN1_CB(IOPORT("INCLINING"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2c_state::stcc )
+	model2c(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
+	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
+	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
+
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2c_state::waverunr )
+	model2c(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("HANDLE"))
+	MCFG_315_5649_AN1_CB(IOPORT("ROLL"))
+	MCFG_315_5649_AN2_CB(IOPORT("THROTTLE"))
+	MCFG_315_5649_AN3_CB(IOPORT("PITCH"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2c_state::bel )
+	model2c(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("P1_X"))
+	MCFG_315_5649_AN1_CB(IOPORT("P2_X"))
+	MCFG_315_5649_AN2_CB(IOPORT("P1_Y"))
+	MCFG_315_5649_AN3_CB(IOPORT("P2_Y"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2c_state::hotd )
+	model2c(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2c_state, lightgun_mux_r))
+	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2c_state, lightgun_mux_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	model2c(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2c_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2c_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2c_state::overrev2c)
+MACHINE_CONFIG_START( model2c_state::overrev2c )
 	model2c(config);
-	MCFG_MACHINE_START_OVERRIDE(model2c_state,srallyc)
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
+	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
+	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2c_state::segawski )
+	model2c(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("SLIDE"))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( model2c_state::topskatr )
+	model2c(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5649_AN0_CB(IOPORT("CURVING"))
+	MCFG_315_5649_AN1_CB(IOPORT("SLIDE"))
 MACHINE_CONFIG_END
 
 
@@ -6391,9 +6422,6 @@ ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
 	ROM_LOAD32_WORD( "mpr-17158.25", 0x000000, 0x200000, CRC(1108d1ec) SHA1(e95d4166bd4b26c5f21b85821b410f53045f4309) )
 	ROM_LOAD32_WORD( "mpr-17157.24", 0x000002, 0x200000, CRC(cf31e33d) SHA1(0cb62d4f28b5ad8a7e4c82b0ca8aea3037b05455) )
 
-	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
-	ROM_LOAD32_WORD( "epr-17181.6", 0x000000, 0x010000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede) )
-
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17170.7", 0x000000, 0x020000, CRC(06a38ae2) SHA1(a2c3d14d9266449ebfc6d976a956e0a8a602cfb0) )
 	ROM_LOAD16_WORD_SWAP( "epr-17171.8", 0x020000, 0x020000, CRC(b5e436f8) SHA1(1da3cb52d64f52d03a8de9954afffbc6e1549a5b) )
@@ -6433,9 +6461,6 @@ ROM_START( vcopa ) /* Virtua Cop Revision A, Model 2 */
 	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-17158.25", 0x000000, 0x200000, CRC(1108d1ec) SHA1(e95d4166bd4b26c5f21b85821b410f53045f4309) )
 	ROM_LOAD32_WORD( "mpr-17157.24", 0x000002, 0x200000, CRC(cf31e33d) SHA1(0cb62d4f28b5ad8a7e4c82b0ca8aea3037b05455) )
-
-	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
-	ROM_LOAD32_WORD( "epr-17181.6", 0x000000, 0x010000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede) )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17170.7", 0x000000, 0x020000, CRC(06a38ae2) SHA1(a2c3d14d9266449ebfc6d976a956e0a8a602cfb0) )
@@ -6496,28 +6521,28 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-DRIVER_INIT_MEMBER(model2_state,pltkids)
+void model2_state::init_pltkids()
 {
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,zerogun)
+void model2_state::init_zerogun()
 {
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,sgt24h)
+void model2_state::init_sgt24h()
 {
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,doa)
+void model2_state::init_doa()
 {
 	m_0229crypt->install_doa_protection();
 
@@ -6526,93 +6551,82 @@ DRIVER_INIT_MEMBER(model2_state,doa)
 	ROM[0x808/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,rchase2)
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::rchase2_devices_w), this));
-}
-
-DRIVER_INIT_MEMBER(model2_state,srallyc)
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::srallyc_devices_w), this));
-}
-
-
 // Model 2 (TGPs, Model 1 sound board)
-GAME( 1994, daytona,   0,       daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonase, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, daytona93, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonas,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994?,daytonat,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994?,daytonata, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, daytonam,  daytona, daytona_maxx,daytona, model2o_maxx_state,  srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, daytonagtx,daytona, daytona_gtx, daytona, model2o_gtx_state,   srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (GTX 2004 Edition)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, desert,    0,       desert,      desert,  model2o_state,       0,       ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vcop,      0,       vcop,        vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vcopa,     vcop,    vcop,        vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytona,    0,       daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonase,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, daytona93,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonas,   daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994?,daytonat,   daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994?,daytonata,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, daytonam,   daytona, daytona_maxx, daytona, model2o_maxx_state, empty_init, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, daytonagtx, daytona, daytona_gtx,  daytona, model2o_gtx_state,  empty_init, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (GTX 2004 Edition)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, desert,     0,       desert,       desert,  model2o_state,  empty_init,   ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vcop,       0,       vcop,         vcop,    model2o_state,  empty_init,   ROT0, "Sega", "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vcopa,      vcop,    vcop,         vcop,    model2o_state,  empty_init,   ROT0, "Sega", "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
-GAME( 1994, vf2,       0,       model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, vf2b,      vf2,     model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, vf2a,      vf2,     model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, vf2o,      vf2,     model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, manxtt,    0,       manxttdx,     manxtt,   model2a_state, 0,       ROT0, "Sega",   "Manx TT Superbike - DX (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, manxttc,   0,       manxtt,       manxtt,   model2a_state, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallyc,   0,       srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallycb,  srallyc, srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallycdx, srallyc, srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - DX (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, srallycdxa,srallyc, srallyc,      srallyc,  model2a_state, srallyc, ROT0, "Sega",   "Sega Rally Championship - DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, vcop2,     0,       model2a,      vcop2,    model2a_state, 0,       ROT0, "Sega",   "Virtua Cop 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, skytargt,  0,       model2a,      skytargt, model2a_state, 0,       ROT0, "Sega",   "Sky Target", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, doaa,      doa,     model2a_0229, model2,   model2a_state, doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zeroguna,  zerogun, model2a_5881, zerogun,  model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogunaj, zerogun, model2a_5881, zerogun,  model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, motoraid,  0,       manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, motoraiddx,motoraid,manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcop,  0,       model2a_5881, model2,   model2a_state, 0,       ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dyndeka2,  dynamcop,model2a_5881, model2,   model2a_state, 0,       ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, pltkidsa,  pltkids, model2a_5881, model2,   model2a_state, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vf2,       0,        model2a,      vf2,      model2a_state, empty_init,   ROT0, "Sega",   "Virtua Fighter 2 (Version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, vf2b,      vf2,      model2a,      vf2,      model2a_state, empty_init,   ROT0, "Sega",   "Virtua Fighter 2 (Revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, vf2a,      vf2,      model2a,      vf2,      model2a_state, empty_init,   ROT0, "Sega",   "Virtua Fighter 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, vf2o,      vf2,      model2a,      vf2,      model2a_state, empty_init,   ROT0, "Sega",   "Virtua Fighter 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, manxtt,    0,        manxttdx,     manxtt,   model2a_state, empty_init,   ROT0, "Sega",   "Manx TT Superbike - DX (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, manxttc,   0,        manxtt,       manxtt,   model2a_state, empty_init,   ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallyc,   0,        srallyc,      srallyc,  model2a_state, empty_init,   ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallycb,  srallyc,  srallyc,      srallyc,  model2a_state, empty_init,   ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallycdx, srallyc,  srallyc,      srallyc,  model2a_state, empty_init,   ROT0, "Sega",   "Sega Rally Championship - DX (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, srallycdxa,srallyc,  srallyc,      srallyc,  model2a_state, empty_init,   ROT0, "Sega",   "Sega Rally Championship - DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, vcop2,     0,        vcop2,        vcop2,    model2a_state, empty_init,   ROT0, "Sega",   "Virtua Cop 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, skytargt,  0,        skytargt,     skytargt, model2a_state, empty_init,   ROT0, "Sega",   "Sky Target", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, doaa,      doa,      model2a_0229, doa,      model2a_state, init_doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zeroguna,  zerogun,  zeroguna,     zerogun,  model2a_state, init_zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogunaj, zerogun,  zeroguna,     zerogun,  model2a_state, init_zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, motoraid,  0,        manxtt,       motoraid, model2a_state, empty_init,   ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, motoraiddx,motoraid, manxtt,       motoraid, model2a_state, empty_init,   ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcop,  0,        model2a_5881, dynamcop, model2a_state, empty_init,   ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dyndeka2,  dynamcop, model2a_5881, dynamcop, model2a_state, empty_init,   ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, pltkidsa,  pltkids,  model2a_5881, pltkids,  model2a_state, init_pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2B-CRX (SHARC, SCSP sound board)
-GAME( 1994, rchase2,   0,        rchase2,      rchase2,   model2b_state, rchase2,  ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-GAME( 1994, vstriker,  0,        model2b,      vstriker,  model2b_state, 0,        ROT0, "Sega",   "Virtua Striker (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vstrikero, vstriker, model2b,      vstriker,  model2b_state, 0,        ROT0, "Sega",   "Virtua Striker", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fvipers,   0,        model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fvipersb,  fvipers,  model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, gunblade,  0,        model2b,      gunblade,  model2b_state, 0,        ROT0, "Sega",   "Gunblade NY (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500,   0,        indy500,      overrev,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500d,  indy500,  indy500,      overrev,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500to, indy500,  indy500,      overrev,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, von,       0,        model2b,      von,       model2b_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, vonj,      von,      model2b,      von,       model2b_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, schamp,    0,        model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, sfight,    schamp,   model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lastbrnx,  0,        model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lastbrnxu, lastbrnx, model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lastbrnxj, lastbrnx, model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, doa,       0,        model2b_0229, model2,    model2b_state, doa,      ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, sgt24h,    0,        indy500,      sgt24h,   model2b_state, sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, dynabb,    0,        model2b,      dynabb,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, dynabb97,  0,        model2b,      dynabb,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrevb,  overrev,  indy500,      overrev,   model2b_state, 0,        ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogun,   0,        model2b_5881, zerogun,   model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogunj,  zerogun,  model2b_5881, zerogun,   model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcopb, dynamcop, model2b_5881, model2,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, pltkids,   0,        model2b_5881, model2,    model2b_state, pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, rchase2,   0,        rchase2,      rchase2,   model2b_state, empty_init,    ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1994, vstriker,  0,        model2b,      vstriker,  model2b_state, empty_init,    ROT0, "Sega",   "Virtua Striker (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vstrikero, vstriker, model2b,      vstriker,  model2b_state, empty_init,    ROT0, "Sega",   "Virtua Striker", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fvipers,   0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fvipersb,  fvipers,  model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, gunblade,  0,        gunblade,     gunblade,  model2b_state, empty_init,    ROT0, "Sega",   "Gunblade NY (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500,   0,        indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500d,  indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500to, indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, von,       0,        model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, vonj,      von,      model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, schamp,    0,        model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sfight,    schamp,   model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, lastbrnx,  0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, lastbrnxu, lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, lastbrnxj, lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, doa,       0,        model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sgt24h,    0,        indy500,      sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, dynabb,    0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, dynabb97,  0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrevb,  overrev,  indy500,      overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogun,   0,        zerogun,      zerogun,   model2b_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogunj,  zerogun,  zerogun,      zerogun,   model2b_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcopb, dynamcop, model2b_5881, dynamcop,  model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dyndeka2b, dynamcop, model2b_5881, dynamcop,  model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, pltkids,   0,        model2b_5881, pltkids,   model2b_state, init_pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
-GAME( 1996, skisuprg,  0,        model2c,      skisuprg, model2c_state, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, stcc,      0,        stcc,         stcc,     model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stccb,     stcc,     stcc,         stcc,     model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stcca,     stcc,     stcc,         stcc,     model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, waverunr,  0,        model2c,      waverunr, model2c_state, 0,       ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, bel,       0,        model2c,      bel,      model2c_state, 0,       ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, hotd,      0,        model2c,      hotd,     model2c_state, 0,       ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrev,   0,        overrev2c,    overrev,  model2c_state, 0,       ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, segawski,  0,        model2c,      segawski, model2c_state, 0,       ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatr,  0,        model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatru, topskatr, model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatruo,topskatr, model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatrj, topskatr, model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, dynamcopc, dynamcop, model2c_5881, model2,   model2c_state, 0,       ROT0, "Sega",   "Dynamite Cop (USA, Model 2C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, skisuprg,  0,        skisuprg,     skisuprg, model2c_state, empty_init, ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, stcc,      0,        stcc,         indy500,  model2c_state, empty_init, ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stccb,     stcc,     stcc,         indy500,  model2c_state, empty_init, ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stcca,     stcc,     stcc,         indy500,  model2c_state, empty_init, ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, waverunr,  0,        waverunr,     waverunr, model2c_state, empty_init, ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, bel,       0,        bel,          bel,      model2c_state, empty_init, ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hotd,      0,        hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrev,   0,        overrev2c,    overrev,  model2c_state, empty_init, ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, empty_init, ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, segawski,  0,        segawski,     segawski, model2c_state, empty_init, ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatr,  0,        topskatr,     topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatru, topskatr, model2c,      topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatruo,topskatr, model2c,      topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatrj, topskatr, model2c,      topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, dynamcopc, dynamcop, model2c_5881, dynamcop, model2c_state, empty_init, ROT0, "Sega",   "Dynamite Cop (USA, Model 2C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

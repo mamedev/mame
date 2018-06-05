@@ -138,7 +138,6 @@ private:
 		template<typename T> void log_mem_write(offs_t address, T val);
 		template<typename T> T direct_mem_read(offs_t address);
 		template<typename T> void direct_mem_write(offs_t address, T val);
-		const char *name() const { return space.name(); }
 
 		address_space &space;
 		device_memory_interface &dev;

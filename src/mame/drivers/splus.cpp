@@ -84,7 +84,7 @@ public:
 	DECLARE_READ8_MEMBER(splus_registers_r);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(splus_reel_optics_r);
-	DECLARE_DRIVER_INIT(splus);
+	void init_splus();
 	void splus(machine_config &config);
 	void splus_iomap(address_map &map);
 	void splus_map(address_map &map);
@@ -569,7 +569,7 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(splus_state,splus)
+void splus_state::init_splus()
 {
 	uint8_t *reel_data = memregion( "reeldata" )->base();
 
@@ -674,11 +674,11 @@ INPUT_PORTS_END
 *************************/
 
 MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(splus_map)
-	MCFG_CPU_IO_MAP(splus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(splus_state, splus_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(splus_state, splus_p3_r))
+	MCFG_DEVICE_ADD("maincpu", I80C32, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(splus_map)
+	MCFG_DEVICE_IO_MAP(splus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, splus_state, splus_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
 
 	// Fill NVRAM
 	MCFG_NVRAM_ADD_0FILL("cmosl")
@@ -697,9 +697,9 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_X2404P_ADD("i2cmem")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -719,5 +719,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//     YEAR  NAME        PARENT  MACHINE  INPUT  STATE         INIT     ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
-GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )
+//     YEAR  NAME      PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
+GAMEL( 1994, spss4240, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(hvyunit_state::screen_vblank)
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 {
-	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
@@ -584,7 +584,7 @@ static const gfx_layout tile_layout =
 	4*8*32
 };
 
-static GFXDECODE_START( hvyunit )
+static GFXDECODE_START( gfx_hvyunit )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
@@ -617,30 +617,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 
 MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 
-	MCFG_CPU_ADD("master", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(master_memory)
-	MCFG_CPU_IO_MAP(master_io)
+	MCFG_DEVICE_ADD("master", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(master_memory)
+	MCFG_DEVICE_IO_MAP(master_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hvyunit_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(slave_memory)
-	MCFG_CPU_IO_MAP(slave_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("slave", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(slave_memory)
+	MCFG_DEVICE_IO_MAP(slave_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(sound_memory)
-	MCFG_CPU_IO_MAP(sound_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memory)
+	MCFG_DEVICE_IO_MAP(sound_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("mermaid", I80C51, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(hvyunit_state, mermaid_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(hvyunit_state, mermaid_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(hvyunit_state, mermaid_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hvyunit_state, mermaid_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(hvyunit_state, mermaid_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(hvyunit_state, mermaid_p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(hvyunit_state, mermaid_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hvyunit_state, mermaid_p3_w))
+	MCFG_DEVICE_ADD("mermaid", I80C51, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, hvyunit_state, mermaid_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, hvyunit_state, mermaid_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, hvyunit_state, mermaid_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, hvyunit_state, mermaid_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p3_w))
 
 	MCFG_GENERIC_LATCH_8_ADD("mermaidlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mermaid", INPUT_LINE_IRQ0))
@@ -655,10 +655,10 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hvyunit_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hvyunit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvyunit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvyunit)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -666,12 +666,12 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* 3MHz verified on PCB */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* 3MHz verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -799,7 +799,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, hvyunit, 0,        hvyunit, hvyunit,  hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitjo,hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitu, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunit,   0,       hvyunit, hvyunit,  hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitj,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitjo, hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitu,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

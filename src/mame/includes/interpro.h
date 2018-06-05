@@ -31,6 +31,7 @@
 #include "bus/interpro/sr/sr.h"
 #include "bus/interpro/sr/sr_cards.h"
 #include "bus/interpro/keyboard/keyboard.h"
+#include "bus/interpro/mouse/mouse.h"
 
 #include "formats/pc_dsk.h"
 #include "softlist.h"
@@ -47,6 +48,7 @@
 #define INTERPRO_SERIAL_PORT1_TAG  "serial1"
 #define INTERPRO_SERIAL_PORT2_TAG  "serial2"
 #define INTERPRO_KEYBOARD_PORT_TAG "kbd"
+#define INTERPRO_MOUSE_PORT_TAG    "mse"
 #define INTERPRO_RTC_TAG           "rtc"
 #define INTERPRO_SCSI_TAG          "scsi"
 #define INTERPRO_SCSI_ADAPTER_TAG  "host"
@@ -59,7 +61,7 @@
 #define INTERPRO_EPROM_TAG         "eprom"
 #define INTERPRO_FLASH_TAG         "flash"
 
-#define INTERPRO_SRBUS_TAG         "sr"
+#define INTERPRO_SLOT_TAG          "slot"
 
 class interpro_state : public driver_device
 {
@@ -94,7 +96,7 @@ public:
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
 
-	DECLARE_DRIVER_INIT(common);
+	void init_common();
 
 	enum sreg_error_mask
 	{
@@ -170,6 +172,7 @@ protected:
 	virtual void machine_reset() override;
 
 	output_finder<> m_led;
+	emu_timer *m_reset_timer;
 
 	u16 m_sreg_error;
 	u16 m_sreg_status;
@@ -178,6 +181,31 @@ protected:
 	u16 m_sreg_ctrl2;
 
 	u16 m_sreg_ctrl3;
+};
+
+class emerald_state : public interpro_state
+{
+public:
+	emerald_state(const machine_config &mconfig, device_type type, const char *tag)
+		: interpro_state(mconfig, type, tag)
+		, m_d_cammu(*this, INTERPRO_MMU_TAG "_d")
+		, m_i_cammu(*this, INTERPRO_MMU_TAG "_i")
+		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
+	{
+	}
+
+	DECLARE_WRITE8_MEMBER(sreg_error_w) { m_sreg_error = data; }
+
+	required_device<cammu_c3_device> m_d_cammu;
+	required_device<cammu_c3_device> m_i_cammu;
+	required_device<ncr53c90a_device> m_scsi;
+
+	void emerald(machine_config &config);
+	void ip6000(machine_config &config);
+	void interpro_82586_map(address_map &map);
+	void emerald_base_map(address_map &map);
+	void emerald_main_map(address_map &map);
+	void emerald_io_map(address_map &map);
 };
 
 class turquoise_state : public interpro_state
@@ -231,8 +259,12 @@ public:
 	void sapphire(machine_config &config);
 	void ip2500(machine_config &config);
 	void ip2400(machine_config &config);
-	void ip2800(machine_config &config);
 	void ip2700(machine_config &config);
+	void ip2800(machine_config &config);
+	void ip6400(machine_config &config);
+	void ip6700(machine_config &config);
+	void ip6800(machine_config &config);
+
 	void interpro_82596_map(address_map &map);
 	void sapphire_base_map(address_map &map);
 	void sapphire_main_map(address_map &map);

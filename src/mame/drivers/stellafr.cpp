@@ -92,19 +92,19 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(stellafr_state::stellafr)
-	MCFG_CPU_ADD("maincpu", M68000, 10000000 ) //?
-	MCFG_CPU_PROGRAM_MAP(stellafr_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(stellafr_state, irq_ack)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000 ) //?
+	MCFG_DEVICE_PROGRAM_MAP(stellafr_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(stellafr_state, irq_ack)
 
 	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_2)) // ?
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(stellafr_state, duart_output_w))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, stellafr_state, duart_output_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(stellafr_state, ay8910_portb_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, stellafr_state, ay8910_portb_w))
 MACHINE_CONFIG_END
 
 
@@ -122,5 +122,5 @@ ROM_START( st_vulkn )
 ROM_END
 
 
-GAME(199?,  st_ohla,   0,  stellafr,  stellafr, stellafr_state,  0,  ROT0,  "Stella",    "Oh La La (Stella)",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, stellafr_state,  0,  ROT0,  "Stella",    "Vulkan (Stella)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(199?,  st_ohla,   0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La (Stella)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan (Stella)",      MACHINE_IS_SKELETON_MECHANICAL )

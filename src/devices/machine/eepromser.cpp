@@ -28,10 +28,10 @@
           1       01    aaaaaaaaa   ddddddd     WRITE data
           1       10    aaaaaaaaa               READ data
           1       11    aaaaaaaaa               ERASE data
-          1       00    00xxxxxxx               WREN = WRite ENable
+          1       00    11xxxxxxx               WREN = WRite ENable
           1       00    01xxxxxxx   ddddddd     WRAL = WRite ALl cells
           1       00    10xxxxxxx               ERAL = ERase ALl cells
-          1       00    11xxxxxxx               WRDS = WRite DiSable
+          1       00    00xxxxxxx               WRDS = WRite DiSable
 
     The number of address bits (a) clocked varies based on the size of the
     chip, though it does not always map 1:1 with the size of the chip.

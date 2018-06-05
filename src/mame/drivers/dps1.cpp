@@ -43,7 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(dps1);
+	void init_dps1();
 	DECLARE_MACHINE_RESET(dps1);
 
 	void dps1(machine_config &config);
@@ -176,7 +176,7 @@ MACHINE_RESET_MEMBER( dps1_state, dps1 )
 	floppy->mon_w(0);
 }
 
-DRIVER_INIT_MEMBER( dps1_state, dps1 )
+void dps1_state::init_dps1()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -188,27 +188,28 @@ DRIVER_INIT_MEMBER( dps1_state, dps1 )
 static INPUT_PORTS_START( dps1 )
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( floppies )
-	SLOT_INTERFACE( "floppy0", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void floppies(device_slot_interface &device)
+{
+	device.option_add("floppy0", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC2661_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart",mc2661_device,rx_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart",mc2661_device,cts_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart",mc2661_device,rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart",mc2661_device,cts_w))
 
 	MCFG_DEVICE_ADD("am9519a", AM9519, 0)
 
@@ -216,8 +217,8 @@ MACHINE_CONFIG_START(dps1_state::dps1)
 
 	// floppy
 	MCFG_UPD765A_ADD("fdc", false, true)
-	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(dps1_state, fdc_int_w)) // doesn't appear to be used
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(dps1_state, fdc_drq_w))
+	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_int_w)) // doesn't appear to be used
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats)
@@ -232,4 +233,4 @@ ROM_START( dps1 )
 	ROM_LOAD( "boot 1280", 0x000, 0x400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
 ROM_END
 
-COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, dps1, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW )
+COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, init_dps1, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW )

@@ -128,9 +128,9 @@ public:
 	DECLARE_READ32_MEMBER(taitojc_char_r);
 	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
 	DECLARE_WRITE32_MEMBER(taitojc_char_w);
-	DECLARE_DRIVER_INIT(dendego2);
-	DECLARE_DRIVER_INIT(dangcurv);
-	DECLARE_DRIVER_INIT(taitojc);
+	void init_dendego2();
+	void init_dangcurv();
+	void init_taitojc();
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

@@ -397,7 +397,7 @@ static const gfx_layout mcr68_sprite_layout =
 	32*32
 };
 
-static GFXDECODE_START( zwackery )
+static GFXDECODE_START( gfx_zwackery )
 	GFXDECODE_ENTRY( "gfx1",    0, zwackery_layout,     0,     16 )
 	GFXDECODE_ENTRY( "sprites", 0, mcr68_sprite_layout, 0x800, 32 )
 	GFXDECODE_ENTRY( "gfx1",    0, zwackery_layout,     0,     16 )  // yes, an extra copy
@@ -494,8 +494,8 @@ void zwackery_state::machine_start()
 
 MACHINE_CONFIG_START(zwackery_state::zwackery)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
-	MCFG_CPU_PROGRAM_MAP(zwackery_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
+	MCFG_DEVICE_PROGRAM_MAP(zwackery_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -504,18 +504,18 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zwackery_state, pia0_porta_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(zwackery_state, pia0_irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(zwackery_state, pia0_irq_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zwackery_state, pia0_porta_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, zwackery_state, pia0_irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, zwackery_state, pia0_irq_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia1_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zwackery_state, pia1_porta_w))
-	MCFG_PIA_READPB_HANDLER(READ8(zwackery_state, pia1_portb_r))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("csd", midway_cheap_squeak_deluxe_device, sirq_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, zwackery_state, pia1_porta_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zwackery_state, pia1_porta_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, zwackery_state, pia1_portb_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("csd", midway_cheap_squeak_deluxe_device, sirq_w))
 
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia2_porta_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, zwackery_state, pia2_porta_r))
 	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
 
 	// video hardware
@@ -529,15 +529,15 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", zwackery_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zwackery)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zwackery)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
 
 	MCFG_VIDEO_START_OVERRIDE(zwackery_state, zwackery)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -610,5 +610,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT  ROTATION  COMPANY         FULLNAME    FLAGS
-GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, 0,    ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY         FULLNAME    FLAGS
+GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, empty_init, ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )

@@ -134,8 +134,8 @@ void odyssey_state::machine_reset()
 MACHINE_CONFIG_START(odyssey_state::odyssey)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.
-	MCFG_CPU_PROGRAM_MAP(odyssey_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.
+	MCFG_DEVICE_PROGRAM_MAP(odyssey_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -202,5 +202,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME    FLAGS  */
-GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, 0,     ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT        ROT   COMPANY           FULLNAME    FLAGS  */
+GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, empty_init, ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )

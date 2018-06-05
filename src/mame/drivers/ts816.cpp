@@ -20,7 +20,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port78_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
 	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_DRIVER_INIT(ts816);
+	void init_ts816();
 
 	void ts816(machine_config &config);
 	void ts816_io(address_map &map);
@@ -241,7 +241,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-DRIVER_INIT_MEMBER( ts816_state, ts816 )
+void ts816_state::init_ts816()
 {
 	uint8_t *roms = memregion("roms")->base();
 	uint8_t *rams = memregion("rams")->base();
@@ -262,9 +262,9 @@ DRIVER_INIT_MEMBER( ts816_state, ts816 )
 
 MACHINE_CONFIG_START(ts816_state::ts816)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(ts816_mem)
-	MCFG_CPU_IO_MAP(ts816_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ts816_mem)
+	MCFG_DEVICE_IO_MAP(ts816_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
@@ -294,9 +294,9 @@ MACHINE_CONFIG_START(ts816_state::ts816)
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_Z80PIO_IN_PA_CB(READ8(ts816_state, porta_r))
-	//MCFG_Z80PIO_IN_PB_CB(READ8(ts816_state, portb_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(ts816_state, portb_w))
+	//MCFG_Z80PIO_IN_PA_CB(READ8(*this, ts816_state, porta_r))
+	//MCFG_Z80PIO_IN_PB_CB(READ8(*this, ts816_state, portb_r))
+	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, ts816_state, portb_w))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(ts816_state::ts816)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
-	//MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(ts816_state, busreq_w))
+	//MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, ts816_state, busreq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
@@ -318,5 +318,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT       COMPANY      FULLNAME  FLAGS
-COMP( 1980, ts816,  0,      0,       ts816,     ts816, ts816_state,  ts816,    "Televideo", "TS816",  MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1980, ts816, 0,      0,      ts816,   ts816, ts816_state, init_ts816, "Televideo", "TS816",  MACHINE_IS_SKELETON )

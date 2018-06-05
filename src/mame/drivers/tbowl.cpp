@@ -96,7 +96,7 @@ void tbowl_state::_6206B_map(address_map &map)
 WRITE8_MEMBER(tbowl_state::trigger_nmi)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void tbowl_state::_6206C_map(address_map &map)
@@ -390,7 +390,7 @@ static const gfx_layout sprite8layout =
 	8*32    /* offset to next tile */
 };
 
-static GFXDECODE_START( tbowl )
+static GFXDECODE_START( gfx_tbowl )
 	GFXDECODE_ENTRY( "characters", 0, charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 768, 16 )
 	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 512, 16 )
@@ -433,23 +433,23 @@ void tbowl_state::machine_reset()
 MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 	/* CPU on Board '6206B' */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_CPU_PROGRAM_MAP(_6206B_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MCFG_DEVICE_PROGRAM_MAP(_6206B_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206C' */
-	MCFG_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_CPU_PROGRAM_MAP(_6206C_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MCFG_DEVICE_PROGRAM_MAP(_6206C_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206A' */
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
-	MCFG_CPU_PROGRAM_MAP(_6206A_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
+	MCFG_DEVICE_PROGRAM_MAP(_6206A_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tbowl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tbowl)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -475,27 +475,27 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* something for the samples? */
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_1))    /* interrupt function */
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_1))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_2))    /* interrupt function */
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_2))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -745,7 +745,7 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206a-2.l16",    0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
-GAME( 1987, tbowl,    0,        tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tbowla,   tbowl,    tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, set 2)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
-GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowl,    0,        tbowl,    tbowl,  tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (World, set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowla,   tbowl,    tbowl,    tbowl,  tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (World, set 2)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl,  tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
+GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (Japan)",             MACHINE_SUPPORTS_SAVE )

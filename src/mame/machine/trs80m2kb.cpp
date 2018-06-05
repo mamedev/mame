@@ -52,11 +52,11 @@ const tiny_rom_entry *trs80m2_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(trs80m2_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8021_TAG, I8021, 3000000) // 1000uH inductor connected across the XTAL inputs
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(trs80m2_keyboard_device, kb_t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(trs80m2_keyboard_device, kb_p0_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(trs80m2_keyboard_device, kb_p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(trs80m2_keyboard_device, kb_p2_w))
+	MCFG_DEVICE_ADD(I8021_TAG, I8021, 3000000) // 1000uH inductor connected across the XTAL inputs
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, trs80m2_keyboard_device, kb_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, trs80m2_keyboard_device, kb_p0_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, trs80m2_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, trs80m2_keyboard_device, kb_p2_w))
 	MCFG_DEVICE_DISABLE() // TODO
 MACHINE_CONFIG_END
 
@@ -211,6 +211,7 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 	device_t(mconfig, TRS80M2_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8021_TAG),
 	m_y(*this, "Y%u", 0),
+	m_leds(*this, "led%u", 0U),
 	m_write_clock(*this),
 	m_busy(1),
 	m_data(1),
@@ -225,6 +226,7 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 
 void trs80m2_keyboard_device::device_start()
 {
+	m_leds.resolve();
 	// resolve callbacks
 	m_write_clock.resolve_safe();
 
@@ -321,8 +323,8 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
 		m_clk = clk;
 	}
 
-	machine().output().set_led_value(LED_0, BIT(data, 2));
-	machine().output().set_led_value(LED_1, BIT(data, 4));
+	m_leds[LED_0] = BIT(data, 2);
+	m_leds[LED_1] = BIT(data, 4);
 }
 
 

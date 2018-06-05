@@ -147,7 +147,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( safarir )
+static GFXDECODE_START( gfx_safarir )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 8 )
 GFXDECODE_END
@@ -304,8 +304,8 @@ static const char *const safarir_sample_names[] =
 
 
 MACHINE_CONFIG_START(safarir_state::safarir_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(safarir_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -406,14 +406,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(safarir_state::safarir)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000)/12)  /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000)/12)  /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2*8)
 	MCFG_PALETTE_INIT_OWNER(safarir_state, safarir)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", safarir)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_safarir)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -504,5 +504,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, 0, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, 0, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, empty_init, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, empty_init, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

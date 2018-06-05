@@ -926,29 +926,29 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mlanding_state::mlanding)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state, irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mlanding_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("subcpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("subcpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(audio_map_prog)
-	MCFG_CPU_IO_MAP(audio_map_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(audio_map_prog)
+	MCFG_DEVICE_IO_MAP(audio_map_io)
 
-	MCFG_CPU_ADD("mechacpu", Z80, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(mecha_map_prog)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("mechacpu", Z80, 4000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(mecha_map_prog)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mlanding_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025, 32000000) // ?
-	MCFG_CPU_PROGRAM_MAP(dsp_map_prog)
-	MCFG_CPU_DATA_MAP(dsp_map_data)
-	MCFG_TMS32025_HOLD_IN_CB(READ16(mlanding_state, dsp_hold_signal_r))
+	MCFG_DEVICE_ADD("dsp", TMS32025, 32000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(dsp_map_prog)
+	MCFG_DEVICE_DATA_MAP(dsp_map_data)
+	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, mlanding_state, dsp_hold_signal_r))
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(mlanding_state, z80ctc_to0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, mlanding_state, z80ctc_to0))
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -970,20 +970,20 @@ MACHINE_CONFIG_START(mlanding_state::mlanding)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(mlanding_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, mlanding_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mlanding_state, msm5205_1_vck)) // VCK function
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mlanding_state, msm5205_1_vck)) // VCK function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -1034,4 +1034,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )

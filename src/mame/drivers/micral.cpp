@@ -72,7 +72,7 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
-	DECLARE_DRIVER_INIT(micral);
+	void init_micral();
 	DECLARE_MACHINE_RESET(micral);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
@@ -345,7 +345,7 @@ uint32_t micral_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-DRIVER_INIT_MEMBER( micral_state, micral )
+void micral_state::init_micral()
 {
 	//uint8_t *main = memregion("maincpu")->base();
 
@@ -375,12 +375,12 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 
 MACHINE_CONFIG_START(micral_state::micral)
 	// basic machine hardware
-	MCFG_CPU_ADD( "maincpu", Z80, XTAL(4'000'000) )
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD( "maincpu", Z80, XTAL(4'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	// no i/o ports on main cpu
-	MCFG_CPU_ADD( "keyboard", Z80, XTAL(1'000'000) ) // freq unknown
-	MCFG_CPU_PROGRAM_MAP(mem_kbd)
-	MCFG_CPU_IO_MAP(io_kbd)
+	MCFG_DEVICE_ADD( "keyboard", Z80, XTAL(1'000'000) ) // freq unknown
+	MCFG_DEVICE_PROGRAM_MAP(mem_kbd)
+	MCFG_DEVICE_IO_MAP(io_kbd)
 
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
@@ -393,24 +393,24 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000 / 8)  // xtal freq unknown
 	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown
-	//MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
+	//MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(TMS5501_TAG, tms5501_device, sens_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	//MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // CDP6402
 	MCFG_AY51013_TX_CLOCK(153600)
 	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 MACHINE_CONFIG_END
 
 ROM_START( micral )
@@ -429,5 +429,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT     COMPANY     FULLNAME         FLAGS
-COMP( 1981, micral, 0,      0,      micral,    micral,  micral_state,  micral,  "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME         FLAGS
+COMP( 1981, micral, 0,      0,      micral,  micral, micral_state, init_micral, "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )

@@ -79,10 +79,12 @@ class novag6502_state : public novagbase_state
 public:
 	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: novagbase_state(mconfig, type, tag),
-		m_hlcd0538(*this, "hlcd0538")
+		m_hlcd0538(*this, "hlcd0538"),
+		m_rombank(*this, "rombank")
 	{ }
 
 	optional_device<hlcd0538_device> m_hlcd0538;
+	optional_memory_bank m_rombank;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
@@ -111,7 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
 	DECLARE_MACHINE_RESET(sexpert);
-	DECLARE_DRIVER_INIT(sexpert);
+	void init_sexpert();
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_map(address_map &map);
 	void sexpert_set_cpu_freq();
@@ -143,6 +145,7 @@ void novagbase_state::machine_start()
 	m_led_select = 0;
 	m_led_data = 0;
 	m_lcd_control = 0;
+	m_lcd_data = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -157,6 +160,7 @@ void novagbase_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_lcd_control));
+	save_item(NAME(m_lcd_data));
 }
 
 void novagbase_state::machine_reset()
@@ -401,14 +405,15 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 	// d0: HD44780 RS
 	// d1: HD44780 R/W
 	// d2: HD44780 E
+	if (m_lcd_control & ~data & 4 && ~data & 2)
+		m_lcd->write(space, m_lcd_control & 1, m_lcd_data);
 	m_lcd_control = data & 7;
 }
 
 WRITE8_MEMBER(novag6502_state::sexpert_lcd_data_w)
 {
 	// d0-d7: HD44780 data
-	if (m_lcd_control & 4 && ~m_lcd_control & 2)
-		m_lcd->write(space, m_lcd_control & 1, data);
+	m_lcd_data = data;
 }
 
 WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
@@ -420,7 +425,7 @@ WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
 WRITE8_MEMBER(novag6502_state::sexpert_mux_w)
 {
 	// d0: rom bankswitch
-	membank("bank1")->set_entry(data & 1);
+	m_rombank->set_entry(data & 1);
 
 	// d3: enable beeper
 	m_beeper->set_state(data >> 3 & 1);
@@ -455,12 +460,12 @@ MACHINE_RESET_MEMBER(novag6502_state, sexpert)
 	novagbase_state::machine_reset();
 
 	sexpert_set_cpu_freq();
-	membank("bank1")->set_entry(0);
+	m_rombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(novag6502_state, sexpert)
+void novag6502_state::init_sexpert()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 }
 
 
@@ -472,7 +477,7 @@ DRIVER_INIT_MEMBER(novag6502_state, sexpert)
 WRITE8_MEMBER(novag6502_state::sforte_lcd_control_w)
 {
 	// d3: rom bankswitch
-	membank("bank1")->set_entry(data >> 3 & 1);
+	m_rombank->set_entry(data >> 3 & 1);
 
 	// assume same as sexpert
 	sexpert_lcd_control_w(space, 0, data);
@@ -537,7 +542,7 @@ void novag6502_state::sforte_map(address_map &map)
 	map(0x1ff7, 0x1ff7).w(this, FUNC(novag6502_state::sforte_lcd_data_w));
 	map(0x1ffc, 0x1fff).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x2000, 0x7fff).rom();
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr("rombank");
 }
 
 void novag6502_state::sexpert_map(address_map &map)
@@ -865,9 +870,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 8_MHz_XTAL/2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
-	MCFG_CPU_PROGRAM_MAP(supercon_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 8_MHz_XTAL/2)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_PROGRAM_MAP(supercon_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -875,16 +880,16 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 	MCFG_DEFAULT_LAYOUT(layout_novag_supercon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1024) // guessed
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 1024) // guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(cforte_map)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(cforte_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
@@ -893,22 +898,22 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("hlcd0538", HLCD0538, 0)
-	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(novag6502_state, cforte_lcd_output_w))
+	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(*this, novag6502_state, cforte_lcd_output_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
-	MCFG_CPU_PROGRAM_MAP(sexpert_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
+	MCFG_DEVICE_PROGRAM_MAP(sexpert_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)) // active for 21.5us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
@@ -916,12 +921,12 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_DEVICE_ADD("acia", MOS6551, 0) // R65C51P2 - RTS to CTS, DCD to GND
 	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -946,8 +951,8 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_DEFAULT_LAYOUT(layout_novag_sexpert)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -955,8 +960,8 @@ MACHINE_CONFIG_START(novag6502_state::sforte)
 	sexpert(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sforte_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sforte_map)
 	MCFG_TIMER_MODIFY("irq_on")
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
 
@@ -1052,18 +1057,18 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE            INIT     COMPANY, FULLNAME, FLAGS
-CONS( 1984, supercon,  0,        0, supercon, supercon, novag6502_state, 0,       "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS            INIT          COMPANY  FULLNAME               FLAGS
+CONS( 1984, supercon,  0,        0,      supercon, supercon, novag6502_state, empty_init,   "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1986, cfortea,   0,        0, cforte,   cforte,   novag6502_state, 0,       "Novag", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, cforteb,   cfortea,  0, cforte,   cforte,   novag6502_state, 0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, cfortea,   0,        0,      cforte,   cforte,   novag6502_state, empty_init,   "Novag", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, cforteb,   cfortea,  0,      cforte,   cforte,   novag6502_state, empty_init,   "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1987, sfortea,   0,        0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, sfortea1,  sfortea,  0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, sforteb,   sfortea,  0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sfortec,   sfortea,  0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sfortea,   0,        0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sfortea1,  sfortea,  0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, sforteb,   sfortea,  0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, sfortec,   sfortea,  0,      sforte,   sforte,   novag6502_state, init_sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1987, sexperta,  0,        0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, sexpertb,  sexperta, 0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sexpertc,  sexperta, 0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sexpertc1, sexperta, 0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sexperta,  0,        0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, sexpertb,  sexperta, 0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, sexpertc,  sexperta, 0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, sexpertc1, sexperta, 0,      sexpert,  sexpert,  novag6502_state, init_sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

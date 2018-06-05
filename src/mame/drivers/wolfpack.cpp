@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {
 	int scanline = param;
 
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	scanline += 64;
 
@@ -43,6 +43,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 
 void wolfpack_state::machine_start()
 {
+	m_led.resolve();
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 }
 
@@ -117,7 +118,7 @@ WRITE8_MEMBER(wolfpack_state::attract_w)
 
 WRITE8_MEMBER(wolfpack_state::credit_w)
 {
-	output().set_led_value(0, !(data & 1));
+	m_led = BIT(~data, 0);
 }
 
 
@@ -297,7 +298,7 @@ static const gfx_layout torpedo_layout =
 };
 
 
-static GFXDECODE_START( wolfpack )
+static GFXDECODE_START( gfx_wolfpack )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, ship_layout, 6, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, pt_layout, 0, 1 )
@@ -308,8 +309,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -319,17 +320,17 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wolfpack_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wolfpack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wolfpack)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -364,4 +365,4 @@ ROM_START( wolfpack )
 ROM_END
 
 
-GAME( 1978, wolfpack, 0, wolfpack, wolfpack, wolfpack_state, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, wolfpack, 0, wolfpack, wolfpack, wolfpack_state, empty_init, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

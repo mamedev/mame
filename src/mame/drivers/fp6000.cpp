@@ -280,7 +280,7 @@ static const gfx_layout fp6000_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( fp6000 )
+static GFXDECODE_START( gfx_fp6000 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, fp6000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -296,9 +296,9 @@ void fp6000_state::machine_reset()
 
 MACHINE_CONFIG_START(fp6000_state::fp6000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
-	MCFG_CPU_PROGRAM_MAP(fp6000_map)
-	MCFG_CPU_IO_MAP(fp6000_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 16000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(fp6000_map)
+	MCFG_DEVICE_IO_MAP(fp6000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(fp6000_state::fp6000)
 
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp6000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp6000)
 
 MACHINE_CONFIG_END
 
@@ -332,5 +332,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT   COMPANY    FULLNAME   FLAGS */
-COMP( 1985, fp6000, 0,      0,       fp6000,    fp6000,  fp6000_state,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1985, fp6000, 0,      0,      fp6000,  fp6000, fp6000_state, empty_init, "Casio", "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

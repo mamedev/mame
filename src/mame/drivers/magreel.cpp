@@ -121,8 +121,8 @@ void magreel_state::machine_reset()
 MACHINE_CONFIG_START(magreel_state::magreel)
 
 	/* basic machine hardware - all information unknown */
-//  MCFG_CPU_ADD("maincpu",m68000,MAIN_CLOCK/12)
-//  MCFG_CPU_PROGRAM_MAP(magreel_map)
+//  MCFG_DEVICE_ADD("maincpu",m68000,MAIN_CLOCK/12)
+//  MCFG_DEVICE_PROGRAM_MAP(magreel_map)
 
 	/* video hardware */
 //  MCFG_SCREEN_ADD("screen", RASTER)
@@ -134,13 +134,13 @@ MACHINE_CONFIG_START(magreel_state::magreel)
 //  MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
 //  MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", magreel)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magreel)
 
 //  MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT_OWNER(magreel_state, magreel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
@@ -162,4 +162,4 @@ ROM_START( magreel ) // roms have not been looked at
 	ROM_LOAD( "m28c64.ic20",  0xb02000, 0x002000, CRC(4e6abd42) SHA1(5b1741b755f0fddd94e16d41d5d39a03f37fb23b) )
 ROM_END
 
-GAME( 199?, magreel,  0,   magreel,  magreel, magreel_state,  0,       ROT0, "Play System",      "Magic Reels", MACHINE_IS_SKELETON )
+GAME( 199?, magreel, 0, magreel, magreel, magreel_state, empty_init, ROT0, "Play System",      "Magic Reels", MACHINE_IS_SKELETON )

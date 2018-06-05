@@ -80,7 +80,7 @@ static const gfx_layout tek4107a_charlayout =
 	16*8
 };
 
-static GFXDECODE_START( tek4107a )
+static GFXDECODE_START( gfx_tek4107a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tek4107a_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -94,9 +94,9 @@ void tek4107a_state::machine_start()
 
 MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I80188_TAG, I80188, 21000000)
-	MCFG_CPU_PROGRAM_MAP(tek4107a_mem)
-	MCFG_CPU_IO_MAP(tek4107a_io)
+	MCFG_DEVICE_ADD(I80188_TAG, I80188, 21000000)
+	MCFG_DEVICE_PROGRAM_MAP(tek4107a_mem)
+	MCFG_DEVICE_IO_MAP(tek4107a_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -107,7 +107,7 @@ MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tek4107a)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tek4107a)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tek4107a_state::tek4109a)
@@ -152,6 +152,6 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1983, tek4107a, 0,        0,      tek4107a, tek4107a, tek4107a_state, empty_init, "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, tek4109a, tek4107a, 0,      tek4109a, tek4107a, tek4107a_state, empty_init, "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

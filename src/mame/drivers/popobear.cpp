@@ -174,7 +174,7 @@ static const gfx_layout char_layout =
 	8*64
 };
 
-GFXDECODE_START(popobear)
+GFXDECODE_START(gfx_popobear)
 	GFXDECODE_RAM( "vram", 0, char_layout, 0, 1 )
 GFXDECODE_END
 
@@ -640,11 +640,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
 }
 
 MACHINE_CONFIG_START(popobear_state::popobear)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(42'000'000)/4)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_CPU_PROGRAM_MAP(popobear_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(42'000'000)/4)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_DEVICE_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popobear_state, irq, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -659,14 +659,14 @@ MACHINE_CONFIG_START(popobear_state::popobear)
 	MCFG_PALETTE_ADD("palette", 256*2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popobear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popobear)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(42'000'000)/16)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000)/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(42'000'000)/32, PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000)/32, okim6295_device::PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -684,4 +684,4 @@ ROM_START( popobear )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
-GAME( 2000, popobear,    0, popobear,    popobear, popobear_state,    0, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, popobear,    0, popobear,    popobear, popobear_state, empty_init, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

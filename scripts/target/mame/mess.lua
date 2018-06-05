@@ -278,7 +278,8 @@ SOUNDS["UPD934G"] = true
 
 VIDEOS["SEGA315_5124"] = true
 VIDEOS["SEGA315_5313"] = true
---VIDEOS+= BUFSPRITE"] = true
+--VIDEOS["BUFSPRITE"] = true
+VIDEOS["BT45X"] = true
 VIDEOS["BT459"] = true
 VIDEOS["CDP1861"] = true
 VIDEOS["CDP1862"] = true
@@ -295,14 +296,14 @@ VIDEOS["EF9364"] = true
 VIDEOS["EF9365"] = true
 --VIDEOS["EF9369"] = true
 VIDEOS["GF4500"] = true
---VIDEOS+= EPIC12"] = true
---VIDEOS+= FIXFREQ"] = true
+--VIDEOS["EPIC12"] = true
+--VIDEOS["FIXFREQ"] = true
 VIDEOS["NT7534"] = true
 VIDEOS["HD44102"] = true
 VIDEOS["HD44352"] = true
 VIDEOS["HD44780"] = true
 VIDEOS["HD61830"] = true
---VIDEOS+= HD63484"] = true
+--VIDEOS["HD63484"] = true
 VIDEOS["HD66421"] = true
 VIDEOS["HLCD0515"] = true
 VIDEOS["HLCD0538"] = true
@@ -316,9 +317,9 @@ VIDEOS["HUC6272"] = true
 VIDEOS["I8244"] = true
 VIDEOS["I82730"] = true
 VIDEOS["I8275"] = true
---VIDEOS+= M50458"] = true
---VIDEOS+= MB90082"] = true
---VIDEOS+= MB_VCU"] = true
+--VIDEOS["M50458"] = true
+--VIDEOS["MB90082"] = true
+--VIDEOS["MB_VCU"] = true
 VIDEOS["MC6845"] = true
 VIDEOS["MC6847"] = true
 VIDEOS["MSM6222B"] = true
@@ -326,7 +327,7 @@ VIDEOS["MSM6255"] = true
 VIDEOS["MOS6566"] = true
 VIDEOS["PC_VGA"] = true
 VIDEOS["PCD8544"] = true
---VIDEOS+= POLY"] = true
+--VIDEOS["POLY"] = true
 VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
 VIDEOS["S2636"] = true
@@ -339,17 +340,19 @@ VIDEOS["SNES_PPU"] = true
 VIDEOS["STVVDP"] = true
 VIDEOS["T6A04"] = true
 VIDEOS["TEA1002"] = true
---VIDEOS+= TLC34076"] = true
---VIDEOS+= TMS34061"] = true
+--VIDEOS["TLC34076"] = true
+--VIDEOS["TMS34061"] = true
 VIDEOS["TMS3556"] = true
 VIDEOS["TMS9927"] = true
 VIDEOS["TMS9928A"] = true
+VIDEOS["TOPCAT"] = true
+VIDEOS["NEREID"] = true
 VIDEOS["UPD3301"] = true
 VIDEOS["UPD7220"] = true
 VIDEOS["UPD7227"] = true
 VIDEOS["V9938"] = true
 VIDEOS["VIC4567"] = true
---VIDEOS+= VOODOO"] = true
+--VIDEOS["VOODOO"] = true
 VIDEOS["SCN2674"] = true
 VIDEOS["GB_LCD"] = true
 VIDEOS["GBA_LCD"] = true
@@ -514,6 +517,7 @@ MACHINES["NMC9306"] = true
 MACHINES["NSC810"] = true
 MACHINES["NSCSI"] = true
 MACHINES["OMTI5100"] = true
+MACHINES["OUTPUT_LATCH"] = true
 MACHINES["PC_FDC"] = true
 MACHINES["PC_LPT"] = true
 MACHINES["PCCARD"] = true
@@ -565,6 +569,7 @@ MACHINES["TMS5501"] = true
 MACHINES["TMS6100"] = true
 MACHINES["TMS9901"] = true
 MACHINES["TMS9902"] = true
+MACHINES["TMS9914"] = true
 MACHINES["TPI6525"] = true
 MACHINES["TTL7400"] = true
 MACHINES["TTL7404"] = true
@@ -617,6 +622,7 @@ MACHINES["DIABLO_HD"] = true
 MACHINES["TMS1024"] = true
 MACHINES["NSC810"] = true
 MACHINES["VT82C496"] = true
+MACHINES["FDC37C93X"] = true
 MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
@@ -632,6 +638,7 @@ MACHINES["INPUT_MERGER"] = true
 MACHINES["ADC0844"] = true
 MACHINES["28FXXX"] = true
 -- MACHINES["GEN_FIFO"] = true
+MACHINES["Z80DAISY"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -695,6 +702,7 @@ BUSES["IMI7000"] = true
 BUSES["INTELLEC4"] = true
 BUSES["INTERPRO_SR"] = true
 BUSES["INTERPRO_KEYBOARD"] = true
+BUSES["INTERPRO_MOUSE"] = true
 BUSES["INTV"] = true
 BUSES["INTV_CTRL"] = true
 BUSES["IQ151"] = true
@@ -2040,6 +2048,8 @@ files {
 createMESSProjects(_target, _subtarget, "fairlight")
 files {
 	MAME_DIR .. "src/mame/drivers/cmi.cpp",
+	MAME_DIR .. "src/mame/audio/cmi01a.cpp",
+	MAME_DIR .. "src/mame/audio/cmi01a.h",
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")
@@ -2714,6 +2724,8 @@ files {
 createMESSProjects(_target, _subtarget, "poly")
 files {
 	MAME_DIR .. "src/mame/drivers/poly.cpp",
+	MAME_DIR .. "src/mame/includes/poly.h",
+	MAME_DIR .. "src/mame/machine/poly.cpp",
 	MAME_DIR .. "src/mame/drivers/proteus.cpp",
 }
 
@@ -3564,6 +3576,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/cit101.cpp",
+	MAME_DIR .. "src/mame/machine/cit101_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/cit101_kbd.h",
 	MAME_DIR .. "src/mame/drivers/cit220.cpp",
 	MAME_DIR .. "src/mame/drivers/codata.cpp",
 	MAME_DIR .. "src/mame/drivers/controlid.cpp",

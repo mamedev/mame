@@ -340,8 +340,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(beathead_state::beathead)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	MCFG_PALETTE_MEMBITS(16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_III_ADD("jsa", NOOP)
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
@@ -408,4 +408,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, beathead, 0, beathead, beathead, beathead_state, 0, ROT0, "Atari Games", "BeatHead (prototype)", 0 )
+GAME( 1993, beathead, 0, beathead, beathead, beathead_state, empty_init, ROT0, "Atari Games", "BeatHead (prototype)", 0 )

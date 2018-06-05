@@ -386,8 +386,8 @@ protected:
 	    @param trackbuf track input buffer.
 	    @param track_size in cells, not bytes.
 	    @param image
-		@param subtrack subtrack index, 0-3
-		@param splice write splice position
+	    @param subtrack subtrack index, 0-3
+	    @param splice write splice position
 	*/
 	void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack = 0, int splice = 0);
 

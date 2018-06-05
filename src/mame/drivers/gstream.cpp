@@ -184,8 +184,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
-	DECLARE_DRIVER_INIT(gstream);
-	DECLARE_DRIVER_INIT(x2222);
+	void init_gstream();
+	void init_x2222();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -544,7 +544,7 @@ static const gfx_layout layout32x32 =
 	32*32*8,
 };
 
-static GFXDECODE_START( gstream )
+static GFXDECODE_START( gfx_gstream )
 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0x1000, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0x1400, 4 )
 	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0x1800, 4 )
@@ -552,7 +552,7 @@ static GFXDECODE_START( gstream )
 GFXDECODE_END
 
 
-static GFXDECODE_START( x2222 )
+static GFXDECODE_START( gfx_x2222 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0, 0x80 )
@@ -826,10 +826,10 @@ void gstream_state::machine_reset()
 MACHINE_CONFIG_START(gstream_state::gstream)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(gstream_32bit_map)
-	MCFG_CPU_IO_MAP(gstream_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(gstream_32bit_map)
+	MCFG_DEVICE_IO_MAP(gstream_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -845,24 +845,24 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstream)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gstream)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki2", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gstream_state::x2222)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(x2222_32bit_map)
-	MCFG_CPU_IO_MAP(x2222_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(x2222_32bit_map)
+	MCFG_DEVICE_IO_MAP(x2222_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -876,13 +876,13 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 
 	MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x2222)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x2222)
 
 	// unknown sound hw (no sound roms dumped)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -1086,7 +1086,7 @@ READ32_MEMBER(gstream_state::x2222_speedup2_r)
 }
 
 
-DRIVER_INIT_MEMBER(gstream_state,gstream)
+void gstream_state::init_gstream()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
 
@@ -1114,7 +1114,7 @@ void gstream_state::rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t*
 	}
 }
 
-DRIVER_INIT_MEMBER(gstream_state,x2222)
+void gstream_state::init_x2222()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this)); // older
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(FUNC(gstream_state::x2222_speedup2_r), this)); // newer
@@ -1128,6 +1128,6 @@ DRIVER_INIT_MEMBER(gstream_state,x2222)
 }
 
 
-GAME( 2002, gstream, 0,     gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft Japan",    "G-Stream G2020",            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, x2222,   0,     x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (final debug?)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-GAME( 2000, x2222o,  x2222, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (5-level prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 2002, gstream, 0,     gstream, gstream, gstream_state, init_gstream, ROT270, "Oriental Soft Japan",    "G-Stream G2020",            MACHINE_SUPPORTS_SAVE )
+GAME( 2000, x2222,   0,     x2222,   x2222,   gstream_state, init_x2222,   ROT270, "Oriental Soft / Promat", "X2222 (final debug?)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 2000, x2222o,  x2222, x2222,   x2222,   gstream_state, init_x2222,   ROT270, "Oriental Soft / Promat", "X2222 (5-level prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

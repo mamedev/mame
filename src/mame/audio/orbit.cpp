@@ -65,7 +65,7 @@ static const discrete_lfsr_desc orbit_lfsr =
 #define ORBIT_ANOTE2_SND    NODE_14
 #define ORBIT_WARNING_SND   NODE_15
 
-DISCRETE_SOUND_START(orbit)
+DISCRETE_SOUND_START(orbit_discrete)
 	/************************************************/
 	/* orbit  Effects Relataive Gain Table          */
 	/*                                              */

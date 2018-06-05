@@ -193,9 +193,9 @@ F3853_INTERRUPT_REQ_CB(novagf8_state::f3853_interrupt)
 MACHINE_CONFIG_START(novagf8_state::delta1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, 2000000) // LC circuit, measured 2MHz
-	MCFG_CPU_PROGRAM_MAP(delta1_map)
-	MCFG_CPU_IO_MAP(delta1_io)
+	MCFG_DEVICE_ADD("maincpu", F8, 2000000) // LC circuit, measured 2MHz
+	MCFG_DEVICE_PROGRAM_MAP(delta1_map)
+	MCFG_DEVICE_IO_MAP(delta1_io)
 
 	MCFG_DEVICE_ADD("f3853", F3853, 2000000)
 	MCFG_F3853_EXT_INPUT_CB(novagf8_state, f3853_interrupt)
@@ -221,5 +221,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  CMP MACHINE  INPUT    STATE          INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccdelta1, 0,       0, delta1,  delta1,  novagf8_state, 0,    "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY  FULLNAME                   FLAGS
+CONS( 1979, ccdelta1, 0,      0,      delta1,  delta1, novagf8_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

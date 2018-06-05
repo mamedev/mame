@@ -57,7 +57,7 @@ public:
 	DECLARE_READ16_MEMBER(pedal_1_r);
 	DECLARE_READ8_MEMBER(audio_io_r);
 	DECLARE_WRITE8_MEMBER(audio_io_w);
-	DECLARE_DRIVER_INIT(badlands);
+	void init_badlands();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(badlands);
 	DECLARE_MACHINE_RESET(badlands);

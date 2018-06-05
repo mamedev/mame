@@ -144,7 +144,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
 	DECLARE_READ8_MEMBER(bbc_fe_r);
 
-	DECLARE_DRIVER_INIT(bbc);
+	void init_bbc();
 	DECLARE_VIDEO_START(bbc);
 
 	DECLARE_MACHINE_START(bbca);

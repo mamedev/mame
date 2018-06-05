@@ -504,7 +504,7 @@ static const gfx_layout multi8_kanjilayout =
 	16*16
 };
 
-static GFXDECODE_START( multi8 )
+static GFXDECODE_START( gfx_multi8 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x0000, multi8_kanjilayout, 0, 1 )
 GFXDECODE_END
@@ -566,9 +566,9 @@ void multi8_state::machine_reset()
 
 MACHINE_CONFIG_START(multi8_state::multi8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(multi8_mem)
-	MCFG_CPU_IO_MAP(multi8_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(multi8_mem)
+	MCFG_DEVICE_IO_MAP(multi8_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -579,14 +579,14 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multi8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_multi8)
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(multi8_state, ym2203_porta_w))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, multi8_state, ym2203_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("beeper", BEEP, 1200) // guesswork
+	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	/* devices */
@@ -598,13 +598,13 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_MC6845_UPDATE_ROW_CB(multi8_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(multi8_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(multi8_state, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(multi8_state, portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, multi8_state, porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, multi8_state, portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, multi8_state, portc_w))
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0) // for cassette
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -638,5 +638,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY       FULLNAME                FLAGS
-COMP( 1983, multi8, 0,      0,       multi8,    multi8, multi8_state,  0,     "Mitsubishi", "Multi 8 (Mitsubishi)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY       FULLNAME                FLAGS
+COMP( 1983, multi8, 0,      0,      multi8,  multi8, multi8_state, empty_init, "Mitsubishi", "Multi 8 (Mitsubishi)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

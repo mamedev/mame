@@ -37,8 +37,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(lckydraw_state::lckydraw)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", I8035, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
@@ -57,4 +57,4 @@ ROM_START(lckydraw)
 ROM_END
 
 
-GAME( 1979, lckydraw, 0, lckydraw, lckydraw, lckydraw_state, 0, ROT0, "Mirco", "Lucky Draw (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, lckydraw, 0, lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

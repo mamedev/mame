@@ -64,29 +64,29 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(jade_state::jade)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(4'000'000))
 
 	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
 
 	MCFG_DEVICE_ADD("trg0", CLOCK, XTAL(4'000'000) / 2)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc2", z80ctc_device, trg0))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc2", z80ctc_device, trg0))
 
 	/* Devices */
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -97,5 +97,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT      COMPANY               FULLNAME   FLAGS
-COMP( 1983, jgz80,   0,      0,       jade,    jade,  jade_state, 0,    "Jade Computer Products",  "JGZ80",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME  FLAGS
+COMP( 1983, jgz80, 0,      0,      jade,    jade,  jade_state, empty_init, "Jade Computer Products", "JGZ80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

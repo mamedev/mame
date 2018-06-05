@@ -46,7 +46,7 @@ VIDEO_START_MEMBER(midyunit_state,common)
 	m_local_videoram = make_unique_clear<uint16_t[]>(0x80000/2);
 	m_pen_map = std::make_unique<pen_t[]>(65536);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), 0x2000 * 4);
+	m_nvram->set_base(m_cmos_ram.get(), 0x2000 * 4);
 
 	m_dma_timer = timer_alloc(TIMER_DMA);
 	m_autoerase_line_timer = timer_alloc(TIMER_AUTOERASE_LINE);

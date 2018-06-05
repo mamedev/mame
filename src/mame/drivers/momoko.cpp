@@ -214,7 +214,7 @@ static const gfx_layout charlayout1 =
 	8*1
 };
 
-static GFXDECODE_START( momoko )
+static GFXDECODE_START( gfx_momoko )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout1,      0,  24 ) /* TEXT */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tilelayout,     256,  16 ) /* BG */
 	GFXDECODE_ENTRY( "gfx3", 0x0000, charlayout,       0,   1 ) /* FG */
@@ -258,12 +258,12 @@ void momoko_state::machine_reset()
 MACHINE_CONFIG_START(momoko_state::momoko)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)   /* 5.0MHz */
-	MCFG_CPU_PROGRAM_MAP(momoko_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", momoko_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/2)   /* 5.0MHz */
+	MCFG_DEVICE_PROGRAM_MAP(momoko_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", momoko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(10'000'000)/4)  /* 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(momoko_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/4)  /* 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(momoko_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -276,24 +276,24 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	MCFG_SCREEN_UPDATE_DRIVER(momoko_state, screen_update_momoko)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", momoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_momoko)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(10'000'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(10'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(10'000'000)/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -425,6 +425,6 @@ ROM_START( momokob ) // bootleg board, almost exact copy of an original one
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END
 
-GAME( 1986, momoko,       0, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, 0, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momoko,       0, momoko, momoko, momoko_state, empty_init, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, empty_init, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, empty_init, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )

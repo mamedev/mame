@@ -248,23 +248,23 @@ static const gfx_layout gfx_layout =
 };
 
 
-static GFXDECODE_START( clpoker )
+static GFXDECODE_START( gfx_clpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_layout,   0x0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(clpoker_state::clpoker)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 3) // Z0840004PSC, divider not verified
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 3) // Z0840004PSC, divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // HY6116ALP-12
 
 	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0) // M5L8255AP-5
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(clpoker_state, output_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(clpoker_state, output_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(clpoker_state, output_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, clpoker_state, output_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, clpoker_state, output_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, clpoker_state, output_c_w))
 
 	MCFG_DEVICE_ADD("ppi_inputs", I8255, 0) // M5L8255AP-5
 	MCFG_I8255_IN_PORTA_CB(IOPORT("INA"))
@@ -280,16 +280,16 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1) // probably right
 	MCFG_SCREEN_UPDATE_DRIVER(clpoker_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(clpoker_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, clpoker_state, vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HM86171
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clpoker)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000) / 8) // AY38910A/P, divider not verified
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000) / 8) // AY38910A/P, divider not verified
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -315,4 +315,4 @@ ROM_START( clpoker )
 ROM_END
 
 
-GAME( 1994, clpoker,  0, clpoker, clpoker, clpoker_state, 0, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM
+GAME( 1994, clpoker, 0, clpoker, clpoker, clpoker_state, empty_init, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM

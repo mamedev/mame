@@ -293,27 +293,27 @@ static const gfx_layout CGA_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( photoply )
+static GFXDECODE_START( gfx_photoply )
 	GFXDECODE_ENTRY( "video_bios", 0x6000+0xa5*8+7, CGA_charlayout,              0, 256 )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 
 MACHINE_CONFIG_START(photoply_state::photoply)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486DX4, 75000000) /* I486DX4, 75 or 100 Mhz */
-	MCFG_CPU_PROGRAM_MAP(photoply_map)
-	MCFG_CPU_IO_MAP(photoply_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I486DX4, 75000000) /* I486DX4, 75 or 100 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(photoply_map)
+	MCFG_DEVICE_IO_MAP(photoply_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vga", photoply )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vga", gfx_photoply)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir7_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(5, DEVICE_SELF, photoply_state, sis_pcm_r, sis_pcm_w)
@@ -368,5 +368,5 @@ ROM_START(photoply2k4)
 ROM_END
 
 
-GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, 0, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, 0, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )

@@ -1754,8 +1754,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PXA255,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(zaurus_map)
+	MCFG_DEVICE_ADD("maincpu",PXA255,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(zaurus_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL(32'768)))
 
@@ -1770,8 +1770,8 @@ MACHINE_CONFIG_START(zaurus_state::zaurus)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -1813,9 +1813,9 @@ ROM_START( zslc1000 )
 	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
 ROM_END
 
-COMP( 2002, zsl5500,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
-COMP( 2002, zsl5600,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
-COMP( 2003, zslc750,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 2004, zslc760,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
-COMP( 200?, zslc3000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
-COMP( 200?, zslc1000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 2002, zsl5500,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
+COMP( 2002, zsl5600,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
+COMP( 2003, zslc750,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2004, zslc760,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
+COMP( 200?, zslc3000, 0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 200?, zslc1000, 0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )

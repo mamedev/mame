@@ -147,7 +147,7 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
-	DECLARE_DRIVER_INIT(apc);
+	void init_apc();
 
 	int m_dack;
 	uint8_t m_dma_offset[4];
@@ -784,7 +784,7 @@ static const gfx_layout charset_pcg =
 };
 #endif
 
-static GFXDECODE_START( apc )
+static GFXDECODE_START( gfx_apc )
 	GFXDECODE_ENTRY( "gfx", 0x0000, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x0800, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, charset_8x16, 0, 128 )
@@ -916,51 +916,52 @@ static const floppy_format_type apc_floppy_formats[] = {
 	nullptr
 };
 
-static SLOT_INTERFACE_START( apc_floppies )
-	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void apc_floppies(device_slot_interface &device)
+{
+	device.option_add("8", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(apc_state::apc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(apc_map)
-	MCFG_CPU_IO_MAP(apc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu",I8086,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(apc_map)
+	MCFG_DEVICE_IO_MAP(apc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir3_w))
 	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
 	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(apc_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, apc_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w)) // TODO: check ir7_w
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w)) // TODO: check ir7_w
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("i8237", AM9517A, MAIN_CLOCK)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apc_state, apc_dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(apc_state, apc_tc_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(apc_state, apc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(apc_state, apc_dma_write_byte))
-	MCFG_I8237_IN_IOR_1_CB(READ8(apc_state, fdc_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(apc_state, fdc_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(apc_state, apc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(apc_state, apc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(apc_state, apc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apc_state, apc_dack3_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apc_state, apc_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, apc_state, apc_tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, apc_state, apc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, apc_state, apc_dma_write_byte))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, apc_state, fdc_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, apc_state, fdc_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, apc_state, apc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, apc_state, apc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apc_state, apc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apc_state, apc_dack3_w))
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
 	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq1_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("i8237", am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", apc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8", apc_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
@@ -975,7 +976,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apc)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
@@ -986,8 +987,8 @@ MACHINE_CONFIG_START(apc_state::apc)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD( "upd1771c", UPD1771C, MAIN_CLOCK ) //uPD1771C-006
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "upd1771c", UPD1771C, MAIN_CLOCK ) //uPD1771C-006
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
@@ -1012,9 +1013,9 @@ ROM_START( apc )
 	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(apc_state,apc)
+void apc_state::init_apc()
 {
 	// ...
 }
 
-COMP( 1982, apc,  0,   0, apc,  apc, apc_state,  apc,      "NEC",      "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, apc, 0, 0, apc, apc, apc_state, init_apc, "NEC", "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

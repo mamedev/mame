@@ -406,9 +406,9 @@ void dai3wksi_state::machine_reset()
 MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dai3wksi_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dai3wksi_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -420,16 +420,16 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 #if (USE_SAMPLES)
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(dai3wksi_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #else
 	// Invader Hit
-	MCFG_SOUND_ADD("ic76", SN76477, 0)
+	MCFG_DEVICE_ADD("ic76", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(RES_K(4.7))                   // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	// Ship Movement
-	MCFG_SOUND_ADD("ic77", SN76477, 0)
+	MCFG_DEVICE_ADD("ic77", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(RES_K(4.7))                   // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
@@ -463,7 +463,7 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	// Danger
-	MCFG_SOUND_ADD("ic78", SN76477, 0)
+	MCFG_DEVICE_ADD("ic78", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), 0, 0)           // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(200))                   // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	// Invader Marching Noise
-	MCFG_SOUND_ADD("ic79", SN76477, 0)
+	MCFG_DEVICE_ADD("ic79", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(RES_K(56))                    // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.1), RES_K(4.7))   // attack_decay_cap + attack_res
@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	// Big Planet Explosion
-	MCFG_SOUND_ADD("ic80", SN76477, 0)
+	MCFG_DEVICE_ADD("ic80", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(4.7))   // attack_decay_cap + attack_res
@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	// Plane Shoot noise
-	MCFG_SOUND_ADD("ic81", SN76477, 0)
+	MCFG_DEVICE_ADD("ic81", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                    // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(RES_K(200))                    // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(4.7))     // attack_decay_cap + attack_res
@@ -554,4 +554,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, dai3wksi_state, 0, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

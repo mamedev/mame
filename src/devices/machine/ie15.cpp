@@ -562,27 +562,27 @@ static const gfx_layout ie15_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ie15 )
+static GFXDECODE_START( gfx_ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
 MACHINE_CONFIG_START(ie15_device::ie15core)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL(30'800'000)/10)
-	MCFG_CPU_PROGRAM_MAP(ie15_mem)
-	MCFG_CPU_IO_MAP(ie15_io)
+	MCFG_DEVICE_ADD("maincpu", IE15_CPU, XTAL(30'800'000)/10)
+	MCFG_DEVICE_PROGRAM_MAP(ie15_mem)
+	MCFG_DEVICE_IO_MAP(ie15_io)
 
 	MCFG_DEFAULT_LAYOUT(layout_ie15)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
-	MCFG_IE15_KEYBOARD_CB(WRITE16(ie15_device, kbd_put))
+	MCFG_IE15_KEYBOARD_CB(WRITE16(*this, ie15_device, kbd_put))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ie15_device, serial_rx_callback))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, ie15_device, serial_rx_callback))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -591,9 +591,9 @@ ROM_START( ie15 )
 	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("5chip")
 	ROM_SYSTEM_BIOS(0, "5chip", "5-chip firmware (newer)")
-	ROMX_LOAD("dump1.bin", 0x0000, 0x1000, CRC(14b82284) SHA1(5ac4159fbb1c3b81445605e26cd97a713ae12b5f), ROM_BIOS(1))
+	ROMX_LOAD("dump1.bin", 0x0000, 0x1000, CRC(14b82284) SHA1(5ac4159fbb1c3b81445605e26cd97a713ae12b5f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "6chip", "6-chip firmware (older)")
-	ROMX_LOAD("dump5.bin", 0x0000, 0x1000, CRC(01f2e065) SHA1(2b72dc0594e38a528400cd25aed0c47e0c432895), ROM_BIOS(2))
+	ROMX_LOAD("dump5.bin", 0x0000, 0x1000, CRC(01f2e065) SHA1(2b72dc0594e38a528400cd25aed0c47e0c432895), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "video", ROMREGION_ERASE00)
 
@@ -610,7 +610,7 @@ MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ie15)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 

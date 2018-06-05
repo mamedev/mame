@@ -102,23 +102,20 @@ class junofrst_state : public tutankhm_state
 {
 public:
 	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tutankhm_state(mconfig, type, tag),
-			m_audiocpu(*this, "audiocpu"),
-			m_i8039(*this, "mcu"),
-			m_filter_0_0(*this, "filter.0.0"),
-			m_filter_0_1(*this, "filter.0.1"),
-			m_filter_0_2(*this, "filter.0.2") { }
+		: tutankhm_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
+		, m_i8039(*this, "mcu")
+		, m_filter_0_0(*this, "filter.0.0")
+		, m_filter_0_1(*this, "filter.0.1")
+		, m_filter_0_2(*this, "filter.0.2")
+	{
+	}
 
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_i8039;
-	required_device<filter_rc_device> m_filter_0_0;
-	required_device<filter_rc_device> m_filter_0_1;
-	required_device<filter_rc_device> m_filter_0_2;
+	void init_junofrst();
 
-	uint8_t    m_blitterdata[4];
-	int      m_i8039_status;
-	int      m_last_irq;
+	void junofrst(machine_config &config);
 
+protected:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(bankselect_w);
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
@@ -127,16 +124,25 @@ public:
 	DECLARE_READ8_MEMBER(portA_r);
 	DECLARE_WRITE8_MEMBER(portB_w);
 
-	DECLARE_DRIVER_INIT(junofrst);
-	DECLARE_MACHINE_START(junofrst);
-	DECLARE_MACHINE_RESET(junofrst);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(_30hz_irq);
-	void junofrst(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void mcu_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_i8039;
+	required_device<filter_rc_device> m_filter_0_0;
+	required_device<filter_rc_device> m_filter_0_1;
+	required_device<filter_rc_device> m_filter_0_2;
+
+	uint8_t  m_blitterdata[4];
+	int      m_i8039_status;
+	int      m_last_irq;
 };
 
 
@@ -364,8 +370,9 @@ static INPUT_PORTS_START( junofrst )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(junofrst_state,junofrst)
+void junofrst_state::machine_start()
 {
+	// note that base class version is not called
 	save_item(NAME(m_i8039_status));
 	save_item(NAME(m_last_irq));
 	save_item(NAME(m_irq_toggle));
@@ -375,8 +382,9 @@ MACHINE_START_MEMBER(junofrst_state,junofrst)
 	save_item(NAME(m_blitterdata));
 }
 
-MACHINE_RESET_MEMBER(junofrst_state,junofrst)
+void junofrst_state::machine_reset()
 {
+	// note that base class version is not called
 	m_i8039_status = 0;
 	m_last_irq = 0;
 	m_blitterdata[0] = 0;
@@ -399,30 +407,27 @@ WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
 MACHINE_CONFIG_START(junofrst_state::junofrst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_CPU_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(junofrst_state, i8039_irqen_and_status_w))
+	MCFG_DEVICE_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, junofrst_state, i8039_irqen_and_status_w))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(junofrst_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(junofrst_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(junofrst_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, junofrst_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, junofrst_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, junofrst_state, coin_counter_1_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(junofrst_state, flip_screen_x_w)) // HFF
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(junofrst_state, flip_screen_y_w)) // VFLIP
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, junofrst_state, flip_screen_x_w)) // HFF
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, junofrst_state, flip_screen_y_w)) // VFLIP
 
 	MCFG_WATCHDOG_ADD("watchdog")
-
-	MCFG_MACHINE_START_OVERRIDE(junofrst_state,junofrst)
-	MCFG_MACHINE_RESET_OVERRIDE(junofrst_state,junofrst)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
@@ -434,30 +439,30 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
 	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(junofrst_state, _30hz_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, junofrst_state, _30hz_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(junofrst_state, portA_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(junofrst_state, portB_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, junofrst_state, portA_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, junofrst_state, portB_w))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_FILTER_RC_ADD("filter.0.0", 0)
+	MCFG_DEVICE_ADD("filter.0.0", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.1", 0)
+	MCFG_DEVICE_ADD("filter.0.1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.2", 0)
+	MCFG_DEVICE_ADD("filter.0.2", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -514,11 +519,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(junofrst_state,junofrst)
+void junofrst_state::init_junofrst()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
 
-GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junofrstg,junofrst, junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrst,  0,        junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrstg, junofrst, junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )

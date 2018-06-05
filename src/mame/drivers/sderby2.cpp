@@ -55,7 +55,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_DRIVER_INIT(sderby2);
+	void init_sderby2();
 	DECLARE_PALETTE_INIT(sderby2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -271,7 +271,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( sderby2 )
+static GFXDECODE_START( gfx_sderby2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1024 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1024 )
 GFXDECODE_END
@@ -294,15 +294,15 @@ void sderby2_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(sderby2_state::sderby2)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(main_program_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sub_program_map)
-	MCFG_CPU_IO_MAP(sub_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sub_program_map)
+	MCFG_DEVICE_IO_MAP(sub_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(sderby2_state::sderby2)
 	MCFG_PALETTE_ADD("palette", 256+256*3)
 	MCFG_PALETTE_INIT_OWNER(sderby2_state,sderby2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby2)
 
 	// sound hardware
 MACHINE_CONFIG_END
@@ -401,7 +401,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(sderby2_state, sderby2)
+void sderby2_state::init_sderby2()
 {
 
 }
@@ -413,4 +413,4 @@ DRIVER_INIT_MEMBER(sderby2_state, sderby2)
  *
  *************************************/
 
-GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, sderby2,  ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, init_sderby2, ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

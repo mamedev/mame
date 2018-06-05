@@ -58,10 +58,10 @@ void m20_8086_device::i86_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(m20_8086_device::device_add_mconfig)
-	MCFG_CPU_ADD("8086", I8086, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(i86_prog)
-	MCFG_CPU_IO_MAP(i86_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(m20_8086_device, int_cb)
+	MCFG_DEVICE_ADD("8086", I8086, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(i86_prog)
+	MCFG_DEVICE_IO_MAP(i86_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m20_8086_device, int_cb)
 MACHINE_CONFIG_END
 
 READ16_MEMBER(m20_8086_device::z8000_io_r)
@@ -104,13 +104,13 @@ WRITE16_MEMBER(m20_8086_device::handshake_w)
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_8086_halt = true;
 	}
 	else
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_8086->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_8086->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_8086_halt = false;
 	}

@@ -21,7 +21,6 @@
 
 #include "emu.h"
 #include "disksys.h"
-#include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
 #include "formats/nes_dsk.h"
 
@@ -60,9 +59,9 @@ MACHINE_CONFIG_END
 ROM_START( disksys )
 	ROM_REGION(0x2000, "drive", 0)
 	ROM_SYSTEM_BIOS( 0, "2c33a-01a", "Famicom Disk System Bios")
-	ROMX_LOAD( "rp2c33a-01a.bin", 0x0000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62), ROM_BIOS(1)) // newer, Nintendo logo has no shadow
+	ROMX_LOAD( "rp2c33a-01a.bin", 0x0000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62), ROM_BIOS(0)) // newer, Nintendo logo has no shadow
 	ROM_SYSTEM_BIOS( 1, "2c33-01", "Famicom Disk System Bios, older")
-	ROMX_LOAD( "rp2c33-01.bin", 0x0000, 0x2000, CRC(1c7ae5d5) SHA1(af5af53f66982e749643fdf8b2acbb7d4d3ed229), ROM_BIOS(2)) // older, Nintendo logo has shadow
+	ROMX_LOAD( "rp2c33-01.bin", 0x0000, 0x2000, CRC(1c7ae5d5) SHA1(af5af53f66982e749643fdf8b2acbb7d4d3ed229), ROM_BIOS(1)) // older, Nintendo logo has shadow
 ROM_END
 
 //-------------------------------------------------
@@ -117,7 +116,7 @@ void nes_disksys_device::device_start()
 	m_disk->floppy_install_unload_proc(nes_disksys_device::unload_proc);
 
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_fds_motor_on));
 	save_item(NAME(m_fds_door_closed));
@@ -206,7 +205,7 @@ READ8_MEMBER(nes_disksys_device::read_m)
 void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (m_irq_transfer)
-		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		hold_irq_line();
 }
 
 WRITE8_MEMBER(nes_disksys_device::write_ex)
@@ -372,7 +371,7 @@ void nes_disksys_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			m_irq_count--;
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				hold_irq_line();
 				m_irq_enable = 0;
 				m_fds_status0 |= 0x01;
 				m_irq_count_latch = 0;  // used in Kaettekita Mario Bros

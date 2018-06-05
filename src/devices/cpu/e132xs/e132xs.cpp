@@ -228,6 +228,10 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 {
 }
 
+hyperstone_device::~hyperstone_device()
+{
+}
+
 
 //-------------------------------------------------
 //  e116t_device - constructor
@@ -1119,7 +1123,31 @@ void hyperstone_device::init(int scale_mask)
 	m_instruction_length = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if (m_program->data_width() == 16)
+	{
+		auto cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		if (ENDIANNESS_NATIVE != ENDIANNESS_BIG)
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+				if(!(address & 2))
+					ptr++;
+				return ptr;
+			};
+		else
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+				if(address & 2)
+					ptr++;
+				return ptr;
+			};
+	}
 	m_io = &space(AS_IO);
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyperstone_device::timer_callback), this));
@@ -1305,94 +1333,76 @@ void hyperstone_device::init(int scale_mask)
 void e116t_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = 0;
 }
 
 void e116xt_device::device_start()
 {
 	init(3);
-	m_core->opcodexor = 0;
 }
 
 void e116xs_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = 0;
 }
 
 void e116xsr_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = 0;
 }
 
 void gms30c2116_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = 0;
 }
 
 void gms30c2216_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = 0;
 }
 
 void e132n_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132t_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xn_device::device_start()
 {
 	init(3);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xt_device::device_start()
 {
 	init(3);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xs_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xsr_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void gms30c2132_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void gms30c2232_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void hyperstone_device::device_reset()
 {
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
-
-	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
-	m_io = &space(AS_IO);
 
 	m_core->tr_clocks_per_tick = 2;
 

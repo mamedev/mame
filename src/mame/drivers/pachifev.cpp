@@ -357,19 +357,19 @@ MACHINE_CONFIG_START(pachifev_state::pachifev)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pachifev_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pachifev_state, vblank_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 #if USE_MSM
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))  /* guess */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(pachifev_state,pf_adpcm_int))    /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))  /* guess */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pachifev_state,pf_adpcm_int))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)    /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
-	MCFG_SOUND_ADD("y2404_1", Y2404, XTAL(10'738'635)/3) /* guess */
+	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(10'738'635)/3) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_SOUND_ADD("y2404_2", Y2404, XTAL(10'738'635)/3) /* guess */
+	MCFG_DEVICE_ADD("y2404_2", Y2404, XTAL(10'738'635)/3) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -388,4 +388,4 @@ ROM_START( pachifev )
 
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state, empty_init, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

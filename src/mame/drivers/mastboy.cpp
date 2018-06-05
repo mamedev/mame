@@ -599,7 +599,7 @@ WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 
 	m_m5205_part ^= 1;
 	if(!m_m5205_part)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -782,7 +782,7 @@ static const gfx_layout tiles8x8_layout_2 =
 };
 
 
-static GFXDECODE_START( mastboy )
+static GFXDECODE_START( gfx_mastboy )
 	GFXDECODE_RAM(   "vram", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "vrom", 0, tiles8x8_layout_2, 0, 16 )
 GFXDECODE_END
@@ -808,18 +808,18 @@ void mastboy_state::machine_reset()
 
 
 MACHINE_CONFIG_START(mastboy_state::mastboy)
-	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
-	MCFG_CPU_PROGRAM_MAP(mastboy_map)
-	MCFG_CPU_IO_MAP(mastboy_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
+	MCFG_DEVICE_PROGRAM_MAP(mastboy_map)
+	MCFG_DEVICE_IO_MAP(mastboy_io_map)
 
 	MCFG_EEPROM_2816_ADD("earom")
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC17
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mastboy_state, irq0_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("msm", msm5205_device, s2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("msm", msm5205_device, s1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mastboy_state, irq0_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, s2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, s1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
 
 	MCFG_DEVICE_ADD("bank_c000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_c000_map)
@@ -836,18 +836,18 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mastboy_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mastboy_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboy)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 6000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mastboy_state, adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -997,8 +997,8 @@ ROM_START( mastboyia )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboya, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboy,   0,       mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboya,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A, hack?)", MACHINE_SUPPORTS_SAVE )
 // are the Italian sets legitimate, or also hacked, the startup display is incorrect displaying 'MARK' instead of 'PLAYMARK' Maybe the internal ROM should differ instead?
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyi,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyia, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )

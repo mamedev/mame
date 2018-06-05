@@ -307,9 +307,9 @@ protected:
 DECLARE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( abc80_cards );
-SLOT_INTERFACE_EXTERN( abcbus_cards );
-SLOT_INTERFACE_EXTERN( abc1600bus_cards );
+void abc80_cards(device_slot_interface &device);
+void abcbus_cards(device_slot_interface &device);
+void abc1600bus_cards(device_slot_interface &device);
 
 
 typedef device_type_iterator<abcbus_slot_device> abcbus_slot_device_iterator;

@@ -69,7 +69,7 @@ DECLARE_DEVICE_TYPE(INTV_CONTROL_PORT, intv_control_port_device)
 
 
 
-SLOT_INTERFACE_EXTERN( intv_control_port_devices );
+void intv_control_port_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_INTV_CTRL_CTRL_H

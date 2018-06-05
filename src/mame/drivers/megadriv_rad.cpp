@@ -135,24 +135,24 @@ MACHINE_RESET_MEMBER(megadriv_radica_state, megadriv_radica)
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_ntsc)
 	md_ntsc(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(megadriv_radica_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
 	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_pal)
 	md_pal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(megadriv_radica_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
 	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_6button_pal)
 	md_pal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(megadriv_radica_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(megadriv_radica_map)
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_6button)
 	MCFG_MACHINE_RESET_OVERRIDE(megadriv_radica_state, megadriv_radica)
 MACHINE_CONFIG_END
@@ -175,18 +175,18 @@ ROM_START( rad_ssoc )
 	ROM_LOAD( "sensiblesoccer.bin", 0x000000, 0x400000,  CRC(b8745ab3) SHA1(0ab3f26e5ffd288e5a3a5db676951b9095299eb0) ) // should be byteswapped?
 ROM_END
 
-DRIVER_INIT_MEMBER(megadriv_radica_state,megadriv_radica_6button_pal)
+void megadriv_radica_state::init_megadriv_radica_6button_pal()
 {
-	DRIVER_INIT_CALL(megadrie);
+	init_megadrie();
 	// 6 button game, so overwrite 3 button io handlers
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_6button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);
 }
 
 // NTSC releases
-CONS( 2004, rad_gen1,0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state,  megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_gen1, 0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
 
 // PAL releases
-CONS( 2004, rad_sf,  0, 0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state,  megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0) // SF2 game is region locked,  US version ROM is definitely different
-CONS( 2004, rad_ssoc,0, 0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state,  megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)  // still branded as Arcade Legends even if none of these were ever arcade games
+CONS( 2004, rad_sf,   0, 0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0) // SF2 game is region locked,  US version ROM is definitely different
+CONS( 2004, rad_ssoc, 0, 0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)  // still branded as Arcade Legends even if none of these were ever arcade games
 

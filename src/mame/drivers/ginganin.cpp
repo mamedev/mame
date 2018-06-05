@@ -219,7 +219,7 @@ layout16x16(tilelayout,  0x20000)
 layout8x8  (txtlayout,   0x04000)
 layout16x16(spritelayout,0x50000)
 
-static GFXDECODE_START( ginganin )
+static GFXDECODE_START( gfx_ginganin )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  256*3, 16 ) /* [0] bg */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  256*2, 16 ) /* [1] fg */
 	GFXDECODE_ENTRY( "gfx3", 0, txtlayout,   256*0, 16 ) /* [2] txt */
@@ -248,17 +248,17 @@ WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ginganin_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ginganin_state,  irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ginganin_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ginganin_state,  irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MCFG_CPU_ADD("audiocpu", MC6809, SOUND_CLOCK) // MBL68B09?
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, SOUND_CLOCK) // MBL68B09?
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, SOUND_CLOCK/2)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(ginganin_state, ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, ginganin_state, ptm_irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -269,19 +269,19 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	MCFG_SCREEN_UPDATE_DRIVER(ginganin_state, screen_update_ginganin)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ginganin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ginganin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("psg", YM2149, SOUND_CLOCK / 2)
+	MCFG_DEVICE_ADD("psg", YM2149, SOUND_CLOCK / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
+	MCFG_DEVICE_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -364,12 +364,10 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(ginganin_state,ginganin)
+void ginganin_state::init_ginganin()
 {
-	uint16_t *rom;
-
 	/* main cpu patches */
-	rom = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
 	rom[0x408 / 2] = 0x6000;
 	rom[0x40a / 2] = 0x001c;
@@ -381,5 +379,5 @@ DRIVER_INIT_MEMBER(ginganin_state,ginganin)
 }
 
 
-GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin_state, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin_state, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin_state, init_ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin_state, init_ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
 #include "sound/dac.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 
@@ -89,10 +89,10 @@ public:
 	DECLARE_PALETTE_DECODER(IIBBGGRR);
 	DECLARE_PALETTE_INIT(radar);
 
-	DECLARE_DRIVER_INIT(starfora);
-	DECLARE_DRIVER_INIT(senjyo);
-	DECLARE_DRIVER_INIT(starfore);
-	DECLARE_DRIVER_INIT(starforc);
+	void init_starfora();
+	void init_senjyo();
+	void init_starfore();
+	void init_starforc();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);

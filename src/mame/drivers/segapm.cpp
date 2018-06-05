@@ -57,8 +57,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segapm_state::segapm)
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??
-	MCFG_CPU_PROGRAM_MAP(segapm_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // ??
+	MCFG_DEVICE_PROGRAM_MAP(segapm_map)
 
 	// + 2 sh2s on 32x board
 
@@ -83,5 +83,5 @@ ROM_START( segapm ) // was more than one cartridge available? if so softlist the
 	// todo, sh2 bios roms etc.
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS           INIT  COMPANY  FULLNAME         FLAGS
-CONS( 1996, segapm, 0,      0,      segapm, segapm, segapm_state,   0,    "Sega",  "Picture Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME         FLAGS
+CONS( 1996, segapm, 0,      0,      segapm,  segapm, segapm_state, empty_init, "Sega",  "Picture Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -163,39 +163,39 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(mice_state::mice)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mice_mem)
-	MCFG_CPU_IO_MAP(mice_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mice_mem)
+	MCFG_DEVICE_IO_MAP(mice_io)
 
 	MCFG_DEVICE_ADD("uart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
 	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
 
 	MCFG_DEVICE_ADD("rpt", I8155, 6.144_MHz_XTAL / 2)
 	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
-	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mice_state::mice2)
 	mice(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mice2_mem)
-	MCFG_CPU_IO_MAP(mice2_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mice2_mem)
+	MCFG_DEVICE_IO_MAP(mice2_io)
 
 	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice2_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice2_terminal)
 
 	MCFG_DEVICE_ADD("rttppi1", I8255, 0)
 	MCFG_DEVICE_ADD("rttppi2", I8255, 0)
@@ -242,9 +242,9 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT     COMPAT   MACHINE   INPUT   CLASS       INIT  COMPANY                   FULLNAME                   FLAGS
-COMP( 1981, mice_6502,  0,         0,       mice,     mice,   mice_state, 0,    "Microtek International", "MICE 6502 (Rev-A)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, mice2_z80,  0,         0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II Z80 (Rev-F)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_6502, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 6502 (Rev-F)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_8085, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 8085 (Rev-M)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_6809, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 6809(E) (Rev-L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY                   FULLNAME                   FLAGS
+COMP( 1981, mice_6502,  0,         0,      mice,    mice,   mice_state, empty_init, "Microtek International", "MICE 6502 (Rev-A)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, mice2_z80,  0,         0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II Z80 (Rev-F)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_6502, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 6502 (Rev-F)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_8085, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 8085 (Rev-M)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_6809, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 6809(E) (Rev-L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

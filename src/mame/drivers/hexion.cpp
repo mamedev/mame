@@ -228,7 +228,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( hexion )
+static GFXDECODE_START( gfx_hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -255,15 +255,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 MACHINE_CONFIG_START(hexion_state::hexion)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
-	MCFG_CPU_PROGRAM_MAP(hexion_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
+	MCFG_DEVICE_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(hexion_state, ccu_int_time_w))
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, hexion_state, irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, hexion_state, nmi_ack_w))
+	MCFG_K053252_INT_TIME_CB(WRITE8(*this, hexion_state, ccu_int_time_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -274,13 +274,13 @@ MACHINE_CONFIG_START(hexion_state::hexion)
 	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexion)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_K051649_ADD("k051649", XTAL(24'000'000)/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
@@ -289,12 +289,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hexion_state::hexionb)
 	hexion(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hexionb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hexionb_map)
 
 	MCFG_DEVICE_REMOVE("k051649")
 
-	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 1056000, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -352,5 +352,5 @@ ROM_START( hexionb )
 	//PAL20L10 @U31
 ROM_END
 
-GAME( 1992, hexion, 0,      hexion, hexion, hexion_state, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
-GAME( 1992, hexionb,hexion, hexionb,hexion, hexion_state, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA
+GAME( 1992, hexion,  0,      hexion,  hexion, hexion_state, empty_init, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
+GAME( 1992, hexionb, hexion, hexionb, hexion, hexion_state, empty_init, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA

@@ -268,10 +268,10 @@ PALETTE_INIT_MEMBER(pc1500_state, pc1500)
 }
 
 MACHINE_CONFIG_START(pc1500_state::pc1500)
-	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
-	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
-	MCFG_CPU_IO_MAP( pc1500_mem_io )
-	MCFG_LH5801_IN(READ8(pc1500_state,pc1500_kb_r))
+	MCFG_DEVICE_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
+	MCFG_DEVICE_PROGRAM_MAP( pc1500_mem )
+	MCFG_DEVICE_IO_MAP( pc1500_mem_io )
+	MCFG_LH5801_IN(READ8(*this, pc1500_state,pc1500_kb_r))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -286,10 +286,10 @@ MACHINE_CONFIG_START(pc1500_state::pc1500)
 	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
 
 	MCFG_DEVICE_ADD("lh5810", LH5810, 0)
-	MCFG_LH5810_PORTA_R_CB(READ8(pc1500_state, port_a_r))
-	MCFG_LH5810_PORTA_W_CB(WRITE8(pc1500_state, kb_matrix_w))
-	MCFG_LH5810_PORTB_R_CB(READ8(pc1500_state, port_b_r))
-	MCFG_LH5810_PORTC_W_CB(WRITE8(pc1500_state, port_c_w))
+	MCFG_LH5810_PORTA_R_CB(READ8(*this, pc1500_state, port_a_r))
+	MCFG_LH5810_PORTA_W_CB(WRITE8(*this, pc1500_state, kb_matrix_w))
+	MCFG_LH5810_PORTB_R_CB(READ8(*this, pc1500_state, port_b_r))
+	MCFG_LH5810_PORTC_W_CB(WRITE8(*this, pc1500_state, port_c_w))
 	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
 
 	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
@@ -303,5 +303,5 @@ ROM_START( pc1500 )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   STATE          INIT  COMPANY  FULLNAME                FLAGS
-COMP( 198?, pc1500, 0,      0,       pc1500, pc1500, pc1500_state,  0,    "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY  FULLNAME                FLAGS
+COMP( 198?, pc1500, 0,      0,      pc1500, pc1500, pc1500_state, empty_init, "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

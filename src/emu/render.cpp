@@ -1042,7 +1042,7 @@ void render_target::set_bounds(s32 width, s32 height, float pixel_aspect)
 void render_target::set_view(int viewindex)
 {
 	layout_view *view = view_by_index(viewindex);
-	if (view != nullptr)
+	if (view)
 	{
 		m_curview = view;
 		view->recompute(m_layerconfig);
@@ -1170,7 +1170,7 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 {
 	switch (m_scale_mode)
 	{
-		case SCALE_FRACTIONAL:
+	case SCALE_FRACTIONAL:
 		{
 			float width, height;
 			float scale;
@@ -1210,7 +1210,7 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			break;
 		}
 
-		default:
+	default:
 		{
 			// get source size and aspect
 			s32 src_width, src_height;
@@ -1691,13 +1691,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 
 	if (!have_default && !have_artwork)
 	{
-		if (screens == 0)
-		{
-			load_layout_file(nullptr, &layout_noscreens);
-			if (m_filelist.empty())
-				throw emu_fatalerror("Couldn't parse default layout??");
-		}
-		else if (screens == 2)
+		if (screens == 2)
 		{
 			load_layout_file(nullptr, &layout_dualhsxs);
 			if (m_filelist.empty())
@@ -1705,8 +1699,16 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		}
 	}
 
-	// generate default layouts for larger numbers of screens
-	if (screens >= 3)
+	if (screens == 0) // ensure the fallback view for systems with no screens is loaded if necessary
+	{
+		if (!view_by_index(0))
+		{
+			load_layout_file(nullptr, &layout_noscreens);
+			if (m_filelist.empty())
+				throw emu_fatalerror("Couldn't parse default layout??");
+		}
+	}
+	else if (screens >= 3) // generate default layouts for larger numbers of screens
 	{
 		util::xml::file::ptr const root(util::xml::file::create());
 		if (!root)
@@ -1959,7 +1961,7 @@ bool render_target::load_layout_file(const char *dirname, util::xml::data_node c
 	{
 		m_filelist.emplace_back(m_manager.machine(), rootnode, dirname);
 	}
-	catch (emu_fatalerror)
+	catch (emu_fatalerror &)
 	{
 		return false;
 	}

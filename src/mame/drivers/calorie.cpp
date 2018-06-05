@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
 	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(bogus_w);
-	DECLARE_DRIVER_INIT(calorieb);
+	void init_calorieb();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -438,7 +438,7 @@ static const gfx_layout tiles32x32_layout =
 	128*8
 };
 
-static GFXDECODE_START( calorie )
+static GFXDECODE_START( gfx_calorie )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
@@ -466,15 +466,15 @@ void calorie_state::machine_reset()
 MACHINE_CONFIG_START(calorie_state::calorie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_sound_map)
-	MCFG_CPU_IO_MAP(calorie_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_sound_map)
+	MCFG_DEVICE_IO_MAP(calorie_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
 
 
 	/* video hardware */
@@ -486,31 +486,31 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calorie)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calorie)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("ay3", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay3", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(calorie_state::caloriee)
 	calorie(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -587,7 +587,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(calorie_state,calorieb)
+void calorie_state::init_calorieb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
@@ -600,5 +600,5 @@ DRIVER_INIT_MEMBER(calorie_state,calorieb)
  *************************************/
 
 /* Note: the bootleg is identical to the original once decrypted */
-GAME( 1986, calorie,  0,       caloriee,calorie, calorie_state, 0,        ROT0, "Sega",    "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorie,  0,       caloriee,calorie, calorie_state, empty_init,    ROT0, "Sega",    "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, init_calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )

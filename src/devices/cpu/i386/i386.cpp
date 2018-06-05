@@ -773,7 +773,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 		if(trap_level >= 3)
 		{
 			logerror("IRQ: Triple fault. CPU reset.\n");
-			set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			return;
 		}
 
@@ -3231,7 +3231,18 @@ void i386_device::i386_common_init()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_program->data_width() == 16) {
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	} else {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address);  };
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address);  };
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	}
+
 	m_io = &space(AS_IO);
 	m_smi = false;
 	m_debugger_temp = 0;

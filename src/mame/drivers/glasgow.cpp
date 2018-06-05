@@ -313,16 +313,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(glasgow_state::glasgow)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(glasgow_mem)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_glasgow)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 44)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 44)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
@@ -332,16 +332,16 @@ MACHINE_CONFIG_START(amsterd_state::amsterd)
 	glasgow(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amsterd_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amsterd_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amsterd_state::dallas32)
 	glasgow(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68020, 14_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(dallas32_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68020, 14_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(dallas32_mem)
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", amsterd_state, update_nmi32, attotime::from_hz(50))
@@ -404,11 +404,11 @@ ROM_END
   Game drivers
 ***************************************************************************/
 
-/*     YEAR, NAME,     PARENT,   COMPAT, MACHINE,     INPUT,          CLASS,         INIT, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,      glasgow,     old_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1985, amsterd,  0,        0,      amsterd,     new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1986, dallas,   glasgow,  0,      glasgow,     old_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1986, dallas16, amsterd,  0,      amsterd,     new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1986, dallas32, amsterd,  0,      dallas32,    new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1987, roma,     amsterd,  0,      amsterd,     new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1987, roma32,   amsterd,  0,      dallas32,    new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*     YEAR, NAME,     PARENT   COMPAT  MACHINE   INPUT         CLASS          INIT        COMPANY                      FULLNAME                  FLAGS */
+CONS(  1984, glasgow,  0,       0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1985, amsterd,  0,       0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1986, dallas,   glasgow, 0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Dallas",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1986, dallas16, amsterd, 0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1986, dallas32, amsterd, 0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1987, roma,     amsterd, 0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Roma",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1987, roma32,   amsterd, 0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

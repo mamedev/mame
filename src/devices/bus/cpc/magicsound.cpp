@@ -25,17 +25,17 @@ MACHINE_CONFIG_START(al_magicsound_device::device_add_mconfig)
 	// According to the schematics, the TC pin (EOP on western chips) is connected to NMI on the expansion port.
 	// NMIs seem to occur too quickly when this is active, so either EOP is not triggered at the correct time, or
 	// the K1810WT37 is different to the i8237/AM9517A
-	//MCFG_I8237_OUT_EOP_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w)) // MCFG_DEVCB_INVERT
-	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dmac", am9517a_device, hack_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(al_magicsound_device, dma_read_byte))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(al_magicsound_device, dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(al_magicsound_device, dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(al_magicsound_device, dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(al_magicsound_device, dack3_w))
+	//MCFG_I8237_OUT_EOP_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w)) // MCFG_DEVCB_INVERT
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dmac", am9517a_device, hack_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, al_magicsound_device, dma_read_byte))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, al_magicsound_device, dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, al_magicsound_device, dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, al_magicsound_device, dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, al_magicsound_device, dack3_w))
 
 	// Timing does not seem to be correct.
 	// According to the schematics, the clock is from the clock pin on the expansion port (4MHz), and
@@ -43,23 +43,23 @@ MACHINE_CONFIG_START(al_magicsound_device::device_add_mconfig)
 	// Timer outputs to SAM0/1/2/3 are sample clocks for each sound channel, D/A0 is the low bit of the channel select.
 	MCFG_DEVICE_ADD("timer1", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(4'000'000))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device, sam0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, al_magicsound_device, sam0_w))
 	MCFG_PIT8253_CLK1(XTAL(4'000'000))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device, sam1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, al_magicsound_device, sam1_w))
 	MCFG_PIT8253_CLK2(XTAL(4'000'000))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(al_magicsound_device, sam2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, al_magicsound_device, sam2_w))
 
 	MCFG_DEVICE_ADD("timer2", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(4'000'000))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device, sam3_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, al_magicsound_device, sam3_w))
 	MCFG_PIT8253_CLK1(XTAL(4'000'000))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device, da0_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, al_magicsound_device, da0_w))
 	MCFG_PIT8253_CLK2(XTAL(4'000'000))
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	// no pass-through(?)
 MACHINE_CONFIG_END
 

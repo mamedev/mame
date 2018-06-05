@@ -456,7 +456,7 @@ static const gfx_layout spritelayout =
 	16*8*4
 };
 
-static GFXDECODE_START( superwng )
+static GFXDECODE_START( gfx_superwng )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,     0, 16 )
 GFXDECODE_END
@@ -478,13 +478,13 @@ void superwng_state::machine_reset()
 MACHINE_CONFIG_START(superwng_state::superwng)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(superwng_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(superwng_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(superwng_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(superwng_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
 
 
 	/* video hardware */
@@ -496,18 +496,18 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superwng)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superwng)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(superwng_state, superwng)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(superwng_state, superwng_sound_byte_r))
+	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, superwng_state, superwng_sound_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/12)
+	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -530,4 +530,4 @@ ROM_START( superwng )
 ROM_END
 
 
-GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?
+GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, empty_init, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?

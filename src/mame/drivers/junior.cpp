@@ -228,8 +228,8 @@ void junior_state::machine_reset()
 
 MACHINE_CONFIG_START(junior_state::junior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, 1_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(junior_mem)
+	MCFG_DEVICE_ADD("maincpu",M6502, 1_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
@@ -237,10 +237,10 @@ MACHINE_CONFIG_START(junior_state::junior)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(junior_state, junior_riot_b_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, junior_state, junior_riot_a_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, junior_state, junior_riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, junior_state, junior_riot_b_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, junior_state, junior_riot_b_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
@@ -253,16 +253,16 @@ ROM_START( junior )
 	ROM_DEFAULT_BIOS("orig")
 
 	ROM_SYSTEM_BIOS( 0, "orig", "Original ESS503" )
-	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(1))
+	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "mod-orig", "Mod-Original (2708)" )
-	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(2))
+	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732)" )
-	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(3))
+	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY                FULLNAME           FLAGS */
-COMP( 1980, junior, 0,      0,       junior,    junior, junior_state,  0,     "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME           FLAGS */
+COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

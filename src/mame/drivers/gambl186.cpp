@@ -471,9 +471,9 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(gambl186_state::gambl186)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(gambl186_map)
-	MCFG_CPU_IO_MAP(gambl186_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(gambl186_map)
+	MCFG_DEVICE_IO_MAP(gambl186_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -485,8 +485,8 @@ MACHINE_CONFIG_START(gambl186_state::gambl186)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("7759", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 MACHINE_CONFIG_END
@@ -534,6 +534,6 @@ ROM_START( gambl186b )
 ROM_END
 
 // version numbering isn't clear, rom labels don't agree with test mode display.
-GAME( 1997, gambl186,  0,        gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V398?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)
-GAME( 1997, gambl186a, gambl186, gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V399?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // same?
-GAME( 1997, gambl186b, gambl186, gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97
+GAME( 1997, gambl186,  0,        gambl186, gambl186, gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V398?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)
+GAME( 1997, gambl186a, gambl186, gambl186, gambl186, gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V399?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // same?
+GAME( 1997, gambl186b, gambl186, gambl186, gambl186, gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97

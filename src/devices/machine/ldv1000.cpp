@@ -21,7 +21,7 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 
@@ -273,24 +273,24 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
-	MCFG_CPU_ADD("ldv1000", Z80, XTAL(5'000'000)/2)
+	MCFG_DEVICE_ADD("ldv1000", Z80, XTAL(5'000'000)/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
-	MCFG_CPU_IO_MAP(ldv1000_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(ldv1000_map)
+	MCFG_DEVICE_IO_MAP(ldv1000_portmap)
 
 	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL(5'000'000)/2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
+	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, pioneer_ldv1000_device, ctc_interrupt))
 
 	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pioneer_ldv1000_device, ppi0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pioneer_ldv1000_device, ppi0_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pioneer_ldv1000_device, ppi0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi0_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pioneer_ldv1000_device, ppi0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pioneer_ldv1000_device, ppi0_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pioneer_ldv1000_device, ppi0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pioneer_ldv1000_device, ppi0_portc_w))
 
 	MCFG_DEVICE_ADD("ldvppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pioneer_ldv1000_device, ppi1_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pioneer_ldv1000_device, ppi1_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pioneer_ldv1000_device, ppi1_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pioneer_ldv1000_device, ppi1_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pioneer_ldv1000_device, ppi1_portc_w))
 MACHINE_CONFIG_END
 
 

@@ -368,9 +368,9 @@ enum tilemap_standard_mapper
 
 // primitives
 #define MCFG_TILEMAP_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TILEMAP, 0)
+	MCFG_DEVICE_ADD(_tag, TILEMAP)
 #define MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	downcast<tilemap_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tilemap_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_TILEMAP_BYTES_PER_ENTRY(_bpe) \
 	downcast<tilemap_device &>(*device).set_bytes_per_entry(_bpe);
 #define MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
@@ -711,14 +711,14 @@ private:
 // ======================> tilemap_device
 
 // device type definition
-extern const device_type TILEMAP;
+DECLARE_DEVICE_TYPE(TILEMAP, tilemap_device)
 
 class tilemap_device :  public device_t,
 						public tilemap_t
 {
 public:
 	// construction/destruction
-	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }

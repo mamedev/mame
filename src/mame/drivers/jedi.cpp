@@ -319,8 +319,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(jedi_state::jedi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(240))
 
@@ -333,13 +333,13 @@ MACHINE_CONFIG_START(jedi_state::jedi)
 	MCFG_ADC0808_IN3_CB(NOOP) // SPARE
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 14J
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jedi_state, coin_counter_left_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jedi_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jedi_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jedi_state, coin_counter_right_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // LED control - not used
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // LED control - not used
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(jedi_state, foreground_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(jedi_state, audio_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(jedi_state, video_off_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, jedi_state, foreground_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, jedi_state, audio_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, jedi_state, video_off_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -396,4 +396,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, jedi, 0, jedi, jedi, jedi_state, 0, ROT0, "Atari", "Return of the Jedi", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jedi, 0, jedi, jedi, jedi_state, empty_init, ROT0, "Atari", "Return of the Jedi", MACHINE_SUPPORTS_SAVE )

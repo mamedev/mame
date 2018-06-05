@@ -113,7 +113,7 @@ static const gfx_layout spritelayout2 =
 	1 /* every sprite takes 1 consecutive bytes */
 };
 
-static GFXDECODE_START( starcrus )
+static GFXDECODE_START( gfx_starcrus )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout1, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0040, spritelayout1, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0080, spritelayout1, 0, 1 )
@@ -143,10 +143,10 @@ static const char *const starcrus_sample_names[] =
 MACHINE_CONFIG_START(starcrus_state::starcrus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
-	MCFG_CPU_PROGRAM_MAP(starcrus_map)
-	MCFG_CPU_IO_MAP(starcrus_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", starcrus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MCFG_DEVICE_PROGRAM_MAP(starcrus_map)
+	MCFG_DEVICE_IO_MAP(starcrus_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starcrus_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -157,14 +157,14 @@ MACHINE_CONFIG_START(starcrus_state::starcrus)
 	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starcrus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starcrus)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(starcrus_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -199,4 +199,4 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, 0, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, empty_init, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -64,8 +64,7 @@ public:
 		m_tms(*this, "tms"),
 		m_nvram_1c(*this, "nvram_1c"),
 		m_nvram_1d(*this, "nvram_1d"),
-		m_mainbank(*this, "mainbank"),
-		m_leds(*this, "led%u", 0U)
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
@@ -95,10 +94,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(main_irq_clear_w);
 	DECLARE_WRITE8_MEMBER(main_firq_clear_w);
 	DECLARE_WRITE8_MEMBER(self_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(led0_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
-	DECLARE_WRITE_LINE_MEMBER(led3_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_READ8_MEMBER(riot_porta_r);
@@ -133,8 +128,6 @@ private:
 	required_device<x2212_device> m_nvram_1d;
 
 	required_memory_bank m_mainbank;
-
-	output_finder<4> m_leds;
 
 	int m_n_disc_lock;
 	int m_n_disc_data;
@@ -431,7 +424,7 @@ WRITE8_MEMBER(firefox_state::main_firq_clear_w)
 
 WRITE8_MEMBER(firefox_state::self_reset_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE );
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -440,26 +433,6 @@ WRITE8_MEMBER(firefox_state::self_reset_w)
  *  I/O
  *
  *************************************/
-
-WRITE_LINE_MEMBER(firefox_state::led0_w)
-{
-	m_leds[0] = !state;
-}
-
-WRITE_LINE_MEMBER(firefox_state::led1_w)
-{
-	m_leds[1] = !state;
-}
-
-WRITE_LINE_MEMBER(firefox_state::led2_w)
-{
-	m_leds[2] = !state;
-}
-
-WRITE_LINE_MEMBER(firefox_state::led3_w)
-{
-	m_leds[3] = !state;
-}
 
 WRITE_LINE_MEMBER(firefox_state::coin_counter_right_w)
 {
@@ -481,8 +454,6 @@ void firefox_state::firq_gen(phillips_22vp931_device &laserdisc, int state)
 
 void firefox_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x1000);
 
 	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
@@ -663,7 +634,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( firefox )
+static GFXDECODE_START( gfx_firefox )
 	GFXDECODE_ENTRY("tiles",   0, tilelayout,   0,   1)
 	GFXDECODE_ENTRY("sprites", 0, spritelayout, 256, 4)
 GFXDECODE_END
@@ -679,13 +650,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(firefox_state::firefox)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_XTAL/8) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_XTAL/8) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	/* interrupts count starting at end of VBLANK, which is 44, so add 44 */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", firefox_state, video_timer_callback, "screen", 96+44, 128)
 
-	MCFG_CPU_ADD("audiocpu", M6502, MASTER_XTAL/8)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_XTAL/8)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
@@ -694,30 +665,30 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_ADC0808_IN1_CB(IOPORT("YAW"))
 
 	MCFG_DEVICE_ADD("latch0", LS259, 0) // 7F
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("nvram_1c", x2212_device, recall))   // NVRECALL
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("nvram_1d", x2212_device, recall))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(firefox_state, sound_reset_w))          // RSTSOUND
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("nvram_1c", x2212_device, store))    // NVRSTORE
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("nvram_1d", x2212_device, store))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(firefox_state, firefox_disc_lock_w))    // LOCK
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(firefox_state, audio_enable_right_w))   // SWDSKR
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(firefox_state, audio_enable_left_w))    // SWDSKL
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(firefox_state, firefox_disc_reset_w))   // RSTDSK
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(firefox_state, firefox_disc_write_w))   // WRDSK
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("nvram_1c", x2212_device, recall))   // NVRECALL
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("nvram_1d", x2212_device, recall))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, firefox_state, sound_reset_w))          // RSTSOUND
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("nvram_1c", x2212_device, store))    // NVRSTORE
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("nvram_1d", x2212_device, store))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, firefox_state, firefox_disc_lock_w))    // LOCK
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, firefox_state, audio_enable_right_w))   // SWDSKR
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, firefox_state, audio_enable_left_w))    // SWDSKL
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, firefox_state, firefox_disc_reset_w))   // RSTDSK
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, firefox_state, firefox_disc_write_w))   // WRDSK
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0) // 1F
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(firefox_state, coin_counter_right_w))   // COIN COUNTERR
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(firefox_state, coin_counter_left_w))    // COIN COUNTERL
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(firefox_state, led0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(firefox_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(firefox_state, led2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(firefox_state, led3_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, firefox_state, coin_counter_right_w))   // COIN COUNTERR
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, firefox_state, coin_counter_left_w))    // COIN COUNTERL
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firefox)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firefox)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")
@@ -731,41 +702,42 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_X2212_ADD_AUTOSAVE("nvram_1d")
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_XTAL/8)
-	MCFG_RIOT6532_IN_PA_CB(READ8(firefox_state, riot_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(firefox_state, riot_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("tms", tms5220_device, status_r))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("tms", tms5220_device, data_w))
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, firefox_state, riot_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, firefox_state, riot_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8("tms", tms5220_device, status_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("tms", tms5220_device, data_w))
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_XTAL/8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_XTAL/8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MASTER_XTAL/8)
+	MCFG_DEVICE_ADD("pokey3", POKEY, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MASTER_XTAL/8)
+	MCFG_DEVICE_ADD("pokey4", POKEY, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("tms", TMS5220, MASTER_XTAL/2/11)
+	MCFG_DEVICE_ADD("tms", TMS5220, MASTER_XTAL/2/11)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -868,5 +840,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, firefox,  0,       firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 1)", 0 )
-GAME( 1984, firefoxa, firefox, firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 2)", 0 )
+GAME( 1984, firefox,  0,       firefox, firefox, firefox_state, empty_init, ROT0, "Atari", "Fire Fox (set 1)", 0 )
+GAME( 1984, firefoxa, firefox, firefox, firefox, firefox_state, empty_init, ROT0, "Atari", "Fire Fox (set 2)", 0 )

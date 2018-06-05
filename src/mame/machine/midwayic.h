@@ -215,8 +215,8 @@ private:
 	uint16_t  m_fifo_bytes;
 	offs_t  m_fifo_force_buffer_empty_pc;
 
-	atari_cage_device *m_cage;
-	dcs_audio_device *m_dcs;
+	optional_device<atari_cage_device> m_cage;
+	optional_device<dcs_audio_device> m_dcs;
 };
 
 

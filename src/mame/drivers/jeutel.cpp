@@ -39,18 +39,21 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(jeutel);
+	void init_jeutel();
+	void jeutel(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
 	DECLARE_WRITE8_MEMBER(ppi0b_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void jeutel(machine_config &config);
 	void jeutel_cpu2(address_map &map);
 	void jeutel_cpu3(address_map &map);
 	void jeutel_cpu3_io(address_map &map);
 	void jeutel_map(address_map &map);
+
 private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
@@ -189,22 +192,22 @@ TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
 	m_timer_a ^= 1;
 	m_cpu2->set_input_line(0, (m_timer_a) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_cpu2->state_int(Z80_HALT))
-		m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-DRIVER_INIT_MEMBER( jeutel_state, jeutel )
+void jeutel_state::init_jeutel()
 {
 }
 
 MACHINE_CONFIG_START(jeutel_state::jeutel)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3300000)
-	MCFG_CPU_PROGRAM_MAP(jeutel_map)
-	MCFG_CPU_ADD("cpu2", Z80, 3300000)
-	MCFG_CPU_PROGRAM_MAP(jeutel_cpu2)
-	MCFG_CPU_ADD("cpu3", Z80, 3300000)
-	MCFG_CPU_PROGRAM_MAP(jeutel_cpu3)
-	MCFG_CPU_IO_MAP(jeutel_cpu3_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3300000)
+	MCFG_DEVICE_PROGRAM_MAP(jeutel_map)
+	MCFG_DEVICE_ADD("cpu2", Z80, 3300000)
+	MCFG_DEVICE_PROGRAM_MAP(jeutel_cpu2)
+	MCFG_DEVICE_ADD("cpu3", Z80, 3300000)
+	MCFG_DEVICE_PROGRAM_MAP(jeutel_cpu3)
+	MCFG_DEVICE_IO_MAP(jeutel_cpu3_io)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_jeutel)
@@ -213,42 +216,42 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	genpin_audio(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 639450)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(jeutel_state,porta_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(jeutel_state,portb_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 639450)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, jeutel_state,porta_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jeutel_state,portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("tms", TMS5110A, 640000)
-	//MCFG_TMS5110_M0_CB(DEVWRITELINE("tmsprom", tmsprom_device, m0_w))
-	//MCFG_TMS5110_DATA_CB(DEVREADLINE("tmsprom", tmsprom_device, data_r))
+	MCFG_DEVICE_ADD("tms", TMS5110A, 640000)
+	//MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
+	//MCFG_TMS5110_DATA_CB(READLINE("tmsprom", tmsprom_device, data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(jeutel_state, ppi0a_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jeutel_state, ppi0a_w))
 	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jeutel_state, ppi0b_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jeutel_state, ppi0b_w))
 	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(jeutel_state, ppi0c_w))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jeutel_state, ppi0c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(jeutel_state, ppi1a_w))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jeutel_state, ppi1a_w))
 	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(jeutel_state, ppi1b_w))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jeutel_state, ppi1b_w))
 	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(jeutel_state, ppi1c_w))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jeutel_state, ppi1c_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(jeutel_state, ppi2a_w))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jeutel_state, ppi2a_w))
 	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(jeutel_state, ppi2b_w))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jeutel_state, ppi2b_w))
 	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(jeutel_state, ppi2c_w))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jeutel_state, ppi2c_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", jeutel_state, timer_a, attotime::from_hz(120))
 MACHINE_CONFIG_END
@@ -280,5 +283,5 @@ ROM_START(olympic)
 ROM_END
 
 
-GAME(1983,  leking,   0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  olympic,  0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, leking,  0, jeutel, jeutel, jeutel_state, init_jeutel, ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, olympic, 0, jeutel, jeutel, jeutel_state, init_jeutel, ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)

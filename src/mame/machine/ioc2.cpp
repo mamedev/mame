@@ -17,22 +17,22 @@
 /*static*/ const char *ioc2_device::RS232A_TAG = "rs232a";
 /*static*/ const char *ioc2_device::RS232B_TAG = "rs232b";
 
-/*static*/ const XTAL ioc2_device::SCC_PCLK = XTAL(10'000'000);
-/*static*/ const XTAL ioc2_device::SCC_RXA_CLK = XTAL(3'686'400); // Needs verification
+/*static*/ const XTAL ioc2_device::SCC_PCLK = 10_MHz_XTAL;
+/*static*/ const XTAL ioc2_device::SCC_RXA_CLK = 3.6864_MHz_XTAL; // Needs verification
 /*static*/ const XTAL ioc2_device::SCC_TXA_CLK = XTAL(0);
-/*static*/ const XTAL ioc2_device::SCC_RXB_CLK = XTAL(3'686'400); // Needs verification
+/*static*/ const XTAL ioc2_device::SCC_RXB_CLK = 3.6864_MHz_XTAL; // Needs verification
 /*static*/ const XTAL ioc2_device::SCC_TXB_CLK = XTAL(0);
 
 DEFINE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device,   "ioc2g", "SGI IOC2 (Guiness)")
 DEFINE_DEVICE_TYPE(SGI_IOC2_FULL_HOUSE, ioc2_full_house_device, "ioc2f", "SGI IOC2 (Full House)")
 
 ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ioc2_guinness_device(mconfig, SGI_IOC2_GUINNESS, tag, owner, clock)
+	: ioc2_device(mconfig, SGI_IOC2_GUINNESS, tag, owner, clock)
 {
 }
 
 ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ioc2_full_house_device(mconfig, SGI_IOC2_FULL_HOUSE, tag, owner, clock)
+	: ioc2_device(mconfig, SGI_IOC2_FULL_HOUSE, tag, owner, clock)
 {
 }
 
@@ -49,23 +49,24 @@ ioport_constructor ioc2_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
-	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value())
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD(SCC_TAG, SCC85230, SCC_PCLK)
+	MCFG_Z80SCC_OFFSETS(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value())
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, dcda_w))
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, rxa_w))
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, scc85230_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, dcda_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, dcdb_w))
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, scc85230_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, dcdb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, rxb_w))
 
 	MCFG_DEVICE_ADD(PI1_TAG, PC_LPT, 0)
 
@@ -77,11 +78,11 @@ MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
 	MCFG_PIT8253_CLK0(1000000)
 	MCFG_PIT8253_CLK1(1000000)
 	MCFG_PIT8253_CLK2(1000000)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(KBDC_TAG, kbdc8042_device, write_out2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(KBDC_TAG, kbdc8042_device, write_out2))
 MACHINE_CONFIG_END
 
 
-ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id)
+ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_scc(*this, SCC_TAG)
@@ -107,7 +108,6 @@ ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const 
 	, m_int3_err_status_reg(0)
 	, m_par_read_cnt(0)
 	, m_par_cntl(0)
-	, m_system_id(id)
 {
 }
 
@@ -196,7 +196,7 @@ READ32_MEMBER( ioc2_device::read )
 			return m_front_panel_reg;
 
 		case SYSID_REG:
-			return m_system_id;
+			return get_system_id();
 
 		case READ_REG:
 			return m_read_reg;

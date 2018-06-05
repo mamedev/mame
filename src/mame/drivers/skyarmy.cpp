@@ -315,24 +315,24 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( skyarmy )
+static GFXDECODE_START( gfx_skyarmy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 
-	MCFG_CPU_ADD("maincpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(skyarmy_map)
-	MCFG_CPU_IO_MAP(skyarmy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(skyarmy_state, nmi_source, 650)    /* Hz */
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(skyarmy_map)
+	MCFG_DEVICE_IO_MAP(skyarmy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(skyarmy_state, nmi_source, 650)    /* Hz */
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 11C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(skyarmy_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(skyarmy_state, nmi_enable_w)) // ???
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(skyarmy_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(skyarmy_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, skyarmy_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, skyarmy_state, nmi_enable_w)) // ???
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, skyarmy_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, skyarmy_state, flip_screen_y_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // video RAM buffering?
 
 	/* video hardware */
@@ -344,15 +344,15 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyarmy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyarmy)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(skyarmy_state, skyarmy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay0", AY8910, 2500000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay0", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -376,4 +376,4 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, 0, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, empty_init, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )

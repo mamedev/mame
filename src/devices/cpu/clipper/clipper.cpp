@@ -296,7 +296,7 @@ void clipper_device::execute_run()
 
 		// FIXME: some instructions take longer (significantly) than one cycle
 		// and also the timings are often slower for the C100 and C300
-		m_icount--;
+		m_icount -= 4;
 	}
 }
 
@@ -1864,17 +1864,27 @@ void clipper_c400_device::execute_instruction()
 
 	case 0x4a:
 	case 0x4b:
-		// cdb: call with delayed branch?
+		// cdb: compare and delayed branch?
 		// emulate.h: "cdb is special because it does not support all addressing modes", 2-3 parcels
 		fatalerror("cdb pc 0x%08x\n", m_info.pc);
 	case 0x4c:
 	case 0x4d:
-		// cdbeq: call with delayed branch if equal?
-		fatalerror("cdbeq pc 0x%08x\n", m_info.pc);
+		// cdbeq: compare and delayed branch if equal?
+		if (m_r[R2] == 0)
+		{
+			m_psw |= DSP_SETUP;
+			m_db_pc = m_info.address;
+		}
+		break;
 	case 0x4e:
 	case 0x4f:
-		// cdbne: call with delayed branch if not equal?
-		fatalerror("cdbne pc 0x%08x\n", m_info.pc);
+		// cdbne: compare and delayed branch if not equal?
+		if (m_r[R2] != 0)
+		{
+			m_psw |= DSP_SETUP;
+			m_db_pc = m_info.address;
+		}
+		break;
 	case 0x50:
 	case 0x51:
 		// db*: delayed branch on condition

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert,AJR
 /************************************************************************************************************
 
 Control Data Corporation CDC 721 Terminal (Viking)
@@ -10,11 +10,14 @@ Control Data Corporation CDC 721 Terminal (Viking)
 *************************************************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
+#include "machine/output_latch.h"
 #include "machine/z80ctc.h"
 #include "video/tms9927.h"
 #include "screen.h"
@@ -40,8 +43,14 @@ private:
 	DECLARE_WRITE8_MEMBER(interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(lights_w);
-	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(block_select_w);
 	DECLARE_WRITE8_MEMBER(nvram_w);
+
+	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
+	TIMER_CALLBACK_MEMBER(update_interrupts);
+	IRQ_CALLBACK_MEMBER(restart_cb);
+
+	template<int Bit> DECLARE_WRITE_LINE_MEMBER(foreign_char_bank_w);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -54,6 +63,11 @@ private:
 	virtual void machine_reset() override;
 
 	u8 m_flashcnt;
+	u8 m_foreign_char_bank;
+
+	u8 m_pending_interrupts;
+	u8 m_active_interrupts;
+	u8 m_interrupt_mask;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_bank_16k;
@@ -65,20 +79,59 @@ private:
 
 WRITE8_MEMBER(cdc721_state::interrupt_mask_w)
 {
-	logerror("%s: Interrupt mask = %02X\n", machine().describe_context(), data ^ 0xff);
+	m_interrupt_mask = data ^ 0xff;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cdc721_state::update_interrupts), this));
+}
+
+template <int Line>
+WRITE_LINE_MEMBER(cdc721_state::int_w)
+{
+	if (BIT(m_pending_interrupts, Line) == state)
+		return;
+
+	if (state)
+		m_pending_interrupts |= 0x01 << Line;
+	else
+		m_pending_interrupts &= ~(0x01 << Line);
+
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cdc721_state::update_interrupts), this));
+}
+
+TIMER_CALLBACK_MEMBER(cdc721_state::update_interrupts)
+{
+	m_active_interrupts = m_pending_interrupts & m_interrupt_mask;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_active_interrupts != 0 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(cdc721_state::restart_cb)
+{
+	// IM 2 vector is produced through a SN74LS148N priority encoder plus some buffers and a latch
+	// The CTC vector is not even fetched
+	u8 vector = 0x00;
+	u8 active = m_active_interrupts;
+	while (vector < 0x0e && !BIT(active, 0))
+	{
+		active >>= 1;
+		vector += 0x02;
+	}
+	return vector;
 }
 
 WRITE8_MEMBER(cdc721_state::misc_w)
 {
+	// 7: Stop Refresh Operation
+	// 6: Enable RAM Char Gen
+	// 5: Enable Block Cursor
+	// 4: Reverse Video
+	// 3: 132/80
+	// 2: Enable Blink
+	// 1: Enable Blinking Cursor
+	// 0: Alarm
+
 	logerror("%s: %d-column display selected\n", machine().describe_context(), BIT(data, 3) ? 132 : 80);
 }
 
-WRITE8_MEMBER(cdc721_state::lights_w)
-{
-	logerror("%s: Lights = %02X\n", machine().describe_context(), data ^ 0xff);
-}
-
-WRITE8_MEMBER(cdc721_state::bank_select_w)
+WRITE8_MEMBER(cdc721_state::block_select_w)
 {
 	logerror("%s: Bank select = %02X\n", machine().describe_context(), data);
 	for (int b = 0; b < 4; b++)
@@ -91,6 +144,15 @@ WRITE8_MEMBER(cdc721_state::bank_select_w)
 WRITE8_MEMBER(cdc721_state::nvram_w)
 {
 	m_nvram[offset] = data & 0x0f;
+}
+
+template<int Bit>
+WRITE_LINE_MEMBER(cdc721_state::foreign_char_bank_w)
+{
+	if (state)
+		m_foreign_char_bank |= 1 << Bit;
+	else
+		m_foreign_char_bank &= ~(1 << Bit);
 }
 
 void cdc721_state::mem_map(address_map &map)
@@ -109,8 +171,8 @@ void cdc721_state::block0_map(address_map &map)
 
 void cdc721_state::block4_map(address_map &map)
 {
-	map(0x0000, 0x00ff).ram().share("nvram").w(this, FUNC(cdc721_state::nvram_w));
-	map(0x0800, 0x0bff).ram().share("chargen"); // 2x P2114AL-2
+	map(0x0000, 0x00ff).mirror(0x2700).ram().share("nvram").w(this, FUNC(cdc721_state::nvram_w));
+	map(0x0800, 0x0bff).mirror(0x2400).ram().share("chargen"); // 2x P2114AL-2
 	map(0x8000, 0xbfff).rom().region("16krom", 0);
 	map(0xc000, 0xffff).ram();
 }
@@ -125,6 +187,8 @@ void cdc721_state::blockc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).ram().share("videoram");
+	map(0x4000, 0x40ff).mirror(0x2700).ram().share("nvram").w(this, FUNC(cdc721_state::nvram_w));
+	map(0x4800, 0x4bff).mirror(0x2400).ram().share("chargen");
 }
 
 void cdc721_state::io_map(address_map &map)
@@ -132,13 +196,13 @@ void cdc721_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x1f).rw("crtc", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
-	map(0x20, 0x27).rw("uart1", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x20, 0x27).rw("kbduart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x30, 0x33).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x40, 0x47).rw("uart2", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
-	map(0x50, 0x50).w(this, FUNC(cdc721_state::lights_w));
-	map(0x70, 0x70).w(this, FUNC(cdc721_state::bank_select_w));
-	map(0x80, 0x87).rw("uart3", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
-	map(0x90, 0x97).rw("uart4", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x40, 0x47).rw("comuart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x50, 0x50).w("ledlatch", FUNC(output_latch_device::write));
+	map(0x70, 0x70).w(this, FUNC(cdc721_state::block_select_w));
+	map(0x80, 0x87).rw("pauart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x90, 0x97).rw("pbuart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
 
 static INPUT_PORTS_START( cdc721 )
@@ -152,6 +216,15 @@ void cdc721_state::machine_reset()
 
 void cdc721_state::machine_start()
 {
+	m_pending_interrupts = 0;
+	m_active_interrupts = 0;
+	m_interrupt_mask = 0;
+	m_foreign_char_bank = 0;
+
+	save_item(NAME(m_pending_interrupts));
+	save_item(NAME(m_active_interrupts));
+	save_item(NAME(m_interrupt_mask));
+	save_item(NAME(m_foreign_char_bank));
 }
 
 /* F4 Character Displayer */
@@ -169,7 +242,7 @@ static const gfx_layout cdc721_charlayout =
 	8                   /* every char takes 16 x 1 bytes */
 };
 
-static GFXDECODE_START( cdc721 )
+static GFXDECODE_START( gfx_cdc721 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cdc721_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -226,18 +299,12 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static const z80_daisy_config cdc721_daisy_chain[] =
-{
-	{ "ctc" },
-	{ nullptr }
-};
-
 MACHINE_CONFIG_START(cdc721_state::cdc721)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain) // FIXME: vector is independently generated
+	MCFG_DEVICE_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cdc721_state, restart_cb)
 
 	MCFG_DEVICE_ADD("block0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, block0_map)
@@ -275,22 +342,78 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cdc721)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, 12.936_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 6_MHz_XTAL) // Zilog Z8430B
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 6_MHz_XTAL) // Zilog Z8430B (M1 pulled up)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, cdc721_state, int_w<6>))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg2))
+	//MCFG_Z80CTC_ZC2_CB(WRITELINE("comuart", ins8250_device, rclk_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(cdc721_state, interrupt_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(cdc721_state, misc_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cdc721_state, interrupt_mask_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cdc721_state, misc_w))
 
-	MCFG_DEVICE_ADD("uart1", INS8250, 1843200)
-	MCFG_DEVICE_ADD("uart2", INS8250, 1843200)
-	MCFG_DEVICE_ADD("uart3", INS8250, 1843200)
-	MCFG_DEVICE_ADD("uart4", INS8250, 1843200)
+	MCFG_DEVICE_ADD("ledlatch", OUTPUT_LATCH, 0)
+	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("error")) MCFG_DEVCB_INVERT
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("alert")) MCFG_DEVCB_INVERT
+	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lock")) MCFG_DEVCB_INVERT
+	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("message")) MCFG_DEVCB_INVERT
+	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("prog1")) MCFG_DEVCB_INVERT
+	MCFG_OUTPUT_LATCH_BIT5_HANDLER(OUTPUT("prog2")) MCFG_DEVCB_INVERT
+	MCFG_OUTPUT_LATCH_BIT6_HANDLER(OUTPUT("prog3")) MCFG_DEVCB_INVERT
+	MCFG_OUTPUT_LATCH_BIT7_HANDLER(OUTPUT("dsr")) MCFG_DEVCB_INVERT
+
+	MCFG_DEVICE_ADD("comuart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<0>))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("comm", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("comm", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("comm", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("comuart", ins8250_device, dsr_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("comuart", ins8250_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("comuart", ins8250_device, cts_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("comuart", ins8250_device, ri_w))
+
+	MCFG_DEVICE_ADD("kbduart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<5>))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<2>))
+	//MCFG_INS8250_OUT_RTS_CB(WRITELINE(*this, cdc721_state, alarm_high_low_w))
+	MCFG_INS8250_OUT_OUT1_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<1>))
+	MCFG_INS8250_OUT_OUT2_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<0>))
+
+	MCFG_DEVICE_ADD("pauart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<1>))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("cha", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("cha", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("cha", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("cha", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("pauart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("pauart", ins8250_device, dsr_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("pauart", ins8250_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("pauart", ins8250_device, cts_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("pauart", ins8250_device, ri_w))
+
+	MCFG_DEVICE_ADD("pbuart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<0>))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("chb", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("chb", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("chb", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("chb", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("pbuart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("pbuart", ins8250_device, dsr_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("pbuart", ins8250_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("pbuart", ins8250_device, cts_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("pbuart", ins8250_device, ri_w))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("int2") // 74S05 (open collector)
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cdc721_state, int_w<2>))
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )
@@ -309,4 +432,4 @@ ROM_START( cdc721 )
 	ROM_LOAD( "66307828", 0x1000, 0x1000, CRC(ac97136f) SHA1(0d280e1aa4b9502bd390d260f83af19bf24905cd) ) // foreign character ROM
 ROM_END
 
-COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, 0, "Control Data Corporation", "721 Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, empty_init, "Control Data Corporation", "721 Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

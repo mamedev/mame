@@ -195,19 +195,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mystston_state::mystston)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* video hardware */
 	mystston_video(config);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, AY8910_CLOCK)
+	MCFG_DEVICE_ADD("ay1", AY8910, AY8910_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, AY8910_CLOCK)
+	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -321,6 +321,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mystston,   0,        mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure",              MACHINE_SUPPORTS_SAVE )
-GAME( 1984, myststono,  mystston, mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, myststonoi, mystston, mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure (Itisa PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mystston,   0,        mystston, mystston, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure",              MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststono,  mystston, mystston, mystston, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststonoi, mystston, mystston, mystston, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure (Itisa PCB)", MACHINE_SUPPORTS_SAVE )

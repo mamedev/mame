@@ -41,7 +41,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(gts80);
+	void init_gts80();
 	DECLARE_READ8_MEMBER(port1a_r);
 	DECLARE_READ8_MEMBER(port2a_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -348,15 +348,15 @@ void gts80_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER( gts80_state, gts80 )
+void gts80_state::init_gts80()
 {
 }
 
 /* with Sound Board */
 MACHINE_CONFIG_START(gts80_state::gts80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(3'579'545)/4)
-	MCFG_CPU_PROGRAM_MAP(gts80_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
+	MCFG_DEVICE_PROGRAM_MAP(gts80_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
 
@@ -365,45 +365,45 @@ MACHINE_CONFIG_START(gts80_state::gts80)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port1a_r)) // sw_r
-	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port1a_w))
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port1b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port1b_w)) // sw_w
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80_state, port1a_r)) // sw_r
+	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80_state, port1a_w))
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80_state, port1b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80_state, port1b_w)) // sw_w
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port2a_r)) // pa7 - slam tilt
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port2a_w)) // digit select
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port2b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port2b_w)) // seg
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80_state, port2a_r)) // pa7 - slam tilt
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80_state, port2a_w)) // digit select
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80_state, port2b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80_state, port2b_w)) // seg
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL(3'579'545)/4)
-	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80_state, port3a_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80_state, port3a_w)) // sol, snd
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80_state, port3b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80_state, port3b_w)) // lamps
+	//MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80_state, port3a_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80_state, port3a_w)) // sol, snd
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80_state, port3b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80_state, port3b_w)) // lamps
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gts80_state::gts80_s)
 	gts80(config);
-	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
+	MCFG_DEVICE_ADD("r0sound", GOTTLIEB_SOUND_REV0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gts80_state::gts80_hh)
 	gts80(config);
-	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
+	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gts80_state::gts80_ss)
 	gts80(config);
-	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
-	//MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0) // votrax crashes
+	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
+	//MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX) // votrax crashes
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -796,28 +796,28 @@ ROM_START(s80tst)
 	ROM_LOAD("80tst-s2.snd", 0x7800, 0x0800, CRC(1a4b1e9d) SHA1(18e7ffbdbdaf83ab1c8daa5fa5201d9f54390758))
 ROM_END
 
-/* disp1 */GAME(1981, s80tst,     0,        gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, s80tst,    0,        gts80_ss, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL)
 
-/* disp1 */GAME(1980, panthera,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Panthera",                          MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1980, spidermn,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "The Amazing Spider-Man",            MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1980, circusp,    0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Circus",                            MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1980, cntforce,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Counterforce",                      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1980, starrace,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Star Race",                         MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1980, jamesb,     0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "James Bond (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1980, jamesb2,    jamesb,   gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "James Bond (3/5-Ball)",             MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1980, timeline,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Time Line",                         MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, forceii,    0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Force II",                          MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1981, pnkpnthr,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Pink Panther",                      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, marsp,      0,        gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, marspf,     marsp,    gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, marspp,     marsp,    gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, vlcno_ax,   0,        gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, vlcno_1c,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, vlcno_1b,   vlcno_1c, gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL)
-/* disp1 */GAME(1981, vlcno_1a,   vlcno_1c, gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1981, blckhole,   0,        gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Black Hole (Rev. 4)",               MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1981, blckhole2,  blckhole, gts80_ss,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Black Hole (Rev. 2)",               MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1981, blckhols,   0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Black Hole (Sound Only)",           MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1982, hh,         0,        gts80_hh,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Haunted House (Rev. 2)",            MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1982, hh_1,       hh,       gts80_hh,   gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Haunted House (Rev. 1)",            MACHINE_IS_SKELETON_MECHANICAL)
-/* disp2 */GAME(1981, eclipse,    0,        gts80_s,    gts80, gts80_state, gts80,  ROT0, "Gottlieb", "Eclipse",                           MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1980, panthera,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Panthera",                          MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1980, spidermn,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "The Amazing Spider-Man",            MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1980, circusp,   0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Circus",                            MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1980, cntforce,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Counterforce",                      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1980, starrace,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Star Race",                         MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1980, jamesb,    0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "James Bond (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1980, jamesb2,   jamesb,   gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "James Bond (3/5-Ball)",             MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1980, timeline,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Time Line",                         MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, forceii,   0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Force II",                          MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1981, pnkpnthr,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Pink Panther",                      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, marsp,     0,        gts80_ss, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Mars - God of War",                 MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, marspf,    marsp,    gts80_ss, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Mars - God of War (French speech)", MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, marspp,    marsp,    gts80_ss, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Mars - God of War (Prototype)",     MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, vlcno_ax,  0,        gts80_ss, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Volcano",                           MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, vlcno_1c,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Volcano (Sound Only set 1)",        MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, vlcno_1b,  vlcno_1c, gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Volcano (Sound Only set 2)",        MACHINE_IS_SKELETON_MECHANICAL)
+/* disp1 */GAME(1981, vlcno_1a,  vlcno_1c, gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Volcano (Sound Only set 3)",        MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1981, blckhole,  0,        gts80_ss, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Black Hole (Rev. 4)",               MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1981, blckhole2, blckhole, gts80_ss, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Black Hole (Rev. 2)",               MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1981, blckhols,  0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Black Hole (Sound Only)",           MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1982, hh,        0,        gts80_hh, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Haunted House (Rev. 2)",            MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1982, hh_1,      hh,       gts80_hh, gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Haunted House (Rev. 1)",            MACHINE_IS_SKELETON_MECHANICAL)
+/* disp2 */GAME(1981, eclipse,   0,        gts80_s,  gts80, gts80_state, init_gts80, ROT0, "Gottlieb", "Eclipse",                           MACHINE_IS_SKELETON_MECHANICAL)

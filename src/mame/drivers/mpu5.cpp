@@ -548,12 +548,13 @@ void mpu5_state::machine_start()
 
 
 MACHINE_CONFIG_START(mpu5_state::mpu5)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
-	MCFG_CPU_PROGRAM_MAP(mpu5_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // ?
+	MCFG_DEVICE_PROGRAM_MAP(mpu5_map)
 
 	MCFG_DEFAULT_LAYOUT(layout_mpu5)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
 MACHINE_CONFIG_END
 

@@ -135,7 +135,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(p2_s1);
 	DECLARE_INPUT_CHANGED_MEMBER(p2_s2);
 
-	DECLARE_DRIVER_INIT(gladiatr);
+	void init_gladiatr();
 
 	DECLARE_MACHINE_RESET(gladiator);
 	DECLARE_VIDEO_START(gladiatr);
@@ -185,7 +185,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppking_adpcm_w);
 	DECLARE_WRITE8_MEMBER(cpu2_irq_ack_w);
 
-	DECLARE_DRIVER_INIT(ppking);
+	void init_ppking();
 
 	DECLARE_MACHINE_RESET(ppking);
 	DECLARE_VIDEO_START(ppking);

@@ -61,9 +61,9 @@ void c64_cpm_cartridge_device::z80_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c64_cpm_cartridge_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 MACHINE_CONFIG_END
 
 

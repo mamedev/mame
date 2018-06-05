@@ -360,13 +360,13 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( eprom )
+static GFXDECODE_START( gfx_eprom )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )  /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout,      0, 64 )  /* characters 8x8 */
 GFXDECODE_END
 
 
-static GFXDECODE_START( guts )
+static GFXDECODE_START( gfx_guts )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )  /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout,      0, 64 )  /* characters 8x8 */
 	GFXDECODE_ENTRY( "gfx3", 0, pfmolayout,  256, 32 )  /* playfield */
@@ -383,11 +383,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(eprom_state::eprom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(extra_map)
+	MCFG_DEVICE_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(extra_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", eprom)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -418,12 +418,12 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(eprom_state, screen_update_eprom)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(eprom_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, eprom_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
@@ -435,8 +435,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(eprom_state::klaxp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", eprom)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -461,12 +461,12 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(eprom_state, screen_update_eprom)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(eprom_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, eprom_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
@@ -477,8 +477,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(eprom_state::guts)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(guts_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(guts_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", guts)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_guts)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, guts_get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -509,12 +509,12 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(eprom_state, screen_update_guts)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(eprom_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, eprom_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,guts)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
@@ -735,8 +735,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, eprom,  0,     eprom, eprom, eprom_state, 0, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, eprom2, eprom, eprom, eprom, eprom_state, 0, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxp1, klax,  klaxp, klaxp, eprom_state, 0, ROT0, "Atari Games", "Klax (prototype set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxp2, klax,  klaxp, klaxp, eprom_state, 0, ROT0, "Atari Games", "Klax (prototype set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, guts,   0,     guts,  guts,  eprom_state, 0, ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )
+GAME( 1989, eprom,  0,     eprom, eprom, eprom_state, empty_init, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, eprom2, eprom, eprom, eprom, eprom_state, empty_init, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxp1, klax,  klaxp, klaxp, eprom_state, empty_init, ROT0, "Atari Games", "Klax (prototype set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxp2, klax,  klaxp, klaxp, eprom_state, empty_init, ROT0, "Atari Games", "Klax (prototype set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, guts,   0,     guts,  guts,  eprom_state, empty_init, ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )

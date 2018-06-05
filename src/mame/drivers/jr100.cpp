@@ -262,7 +262,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jr100 )
+static GFXDECODE_START( gfx_jr100 )
 	GFXDECODE_ENTRY( "maincpu", 0xe000, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -371,8 +371,8 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 MACHINE_CONFIG_START(jr100_state::jr100)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6802, XTAL(14'318'181) / 4) // clock devided internaly by 4
-	MCFG_CPU_PROGRAM_MAP(jr100_mem)
+	MCFG_DEVICE_ADD("maincpu",M6802, XTAL(14'318'181) / 4) // clock devided internaly by 4
+	MCFG_DEVICE_PROGRAM_MAP(jr100_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -383,22 +383,20 @@ MACHINE_CONFIG_START(jr100_state::jr100)
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr100)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(14'318'181) / 16)
-	MCFG_VIA6522_READPB_HANDLER(READ8(jr100_state,jr100_via_read_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(jr100_state,jr100_via_write_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(jr100_state,jr100_via_write_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(jr100_state, jr100_via_write_cb2))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, jr100_state,jr100_via_read_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, jr100_state,jr100_via_write_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, jr100_state,jr100_via_write_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, jr100_state, jr100_via_write_cb2))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_DEVICE_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -424,6 +422,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY      FULLNAME   FLAGS
-COMP( 1981, jr100,  0,        0,      jr100,   jr100, jr100_state, 0,     "National",  "JR-100",  0 )
-COMP( 1981, jr100u, jr100,    0,      jr100,   jr100, jr100_state, 0,     "Panasonic", "JR-100U", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME   FLAGS
+COMP( 1981, jr100,  0,      0,      jr100,   jr100, jr100_state, empty_init, "National",  "JR-100",  0 )
+COMP( 1981, jr100u, jr100,  0,      jr100,   jr100, jr100_state, empty_init, "Panasonic", "JR-100U", 0 )

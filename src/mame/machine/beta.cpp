@@ -175,9 +175,10 @@ FLOPPY_FORMATS_MEMBER(beta_disk_device::floppy_formats)
 	FLOPPY_TRD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( beta_disk_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void beta_disk_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 ROM_START( beta_disk )
@@ -267,7 +268,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(beta_disk_device::device_add_mconfig)
-	MCFG_KR1818VG93_ADD("wd179x", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("wd179x", KR1818VG93, 8_MHz_XTAL / 8)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)

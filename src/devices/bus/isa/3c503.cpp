@@ -7,9 +7,9 @@
 
 MACHINE_CONFIG_START(el2_3c503_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(el2_3c503_device, el2_3c503_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(el2_3c503_device, el2_3c503_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(el2_3c503_device, el2_3c503_mem_write))
+	MCFG_DP8390D_IRQ_CB(WRITELINE(*this, el2_3c503_device, el2_3c503_irq_w))
+	MCFG_DP8390D_MEM_READ_CB(READ8(*this, el2_3c503_device, el2_3c503_mem_read))
+	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(*this, el2_3c503_device, el2_3c503_mem_write))
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(EL2_3C503, el2_3c503_device, "el2_3c503", "3C503 Network Adapter")

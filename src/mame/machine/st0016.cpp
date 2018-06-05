@@ -119,12 +119,13 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 
 /* CPU interface */
 MACHINE_CONFIG_START(st0016_cpu_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_DEVICE_ADD("stsnd", ST0016, 0)
-	MCFG_ST0016_SOUNDRAM_READ_CB(READ8(st0016_cpu_device, soundram_read))
+	MCFG_ST0016_SOUNDRAM_READ_CB(READ8(*this, st0016_cpu_device, soundram_read))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

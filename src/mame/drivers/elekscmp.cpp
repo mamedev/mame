@@ -147,8 +147,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(elekscmp_state::elekscmp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",INS8060, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu",INS8060, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_elekscmp)
@@ -165,5 +165,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT   MACHINE    INPUT     STATE            INIT  COMPANY                FULLNAME         FLAGS */
-COMP( 1977, elekscmp,  0,      0,       elekscmp,  elekscmp, elekscmp_state,  0,    "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                FULLNAME         FLAGS */
+COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)

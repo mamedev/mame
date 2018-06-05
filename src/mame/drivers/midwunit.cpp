@@ -623,8 +623,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(midwunit_state::wunit)
 
-	MCFG_CPU_ADD("maincpu", TMS34010, 50000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, 50000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -1002,8 +1002,8 @@ ROM_START( openicea ) /* PCB had alternate ROM labels showing the dates & checks
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "open_ice_l1.2.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* U2  OPEN ICE HOCKEY  R1.2  10/10/95  1900 */
 	ROM_LOAD16_BYTE( "open_ice_l1.u3",   0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) ) /* U3  OPEN ICE HOCKEY  9/1/95  4D00 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* U3  OPEN ICE HOCKEY  9/1/95  4700 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* U3  OPEN ICE HOCKEY  9/1/95  C200 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* U4  OPEN ICE HOCKEY  9/1/95  4700 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* U5  OPEN ICE HOCKEY  9/1/95  C200 */
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "open_ice_781c_r1.2a.u54", 0x00000, 0x80000, CRC(63296053) SHA1(9f6fcb1f95a09165c211b569001563b56d06876c) ) /* hand written as  781C  R1.21 - game reports as Revision 1.2A */
@@ -1222,6 +1222,37 @@ ROM_START( rmpgwt11 )
 ROM_END
 
 
+/*
+A WWF: Wrestlemania PCB with V1.3 program ROMs was seen with different styled labels:
+
+SOUND  U2  WRESTLEMANIA 5/17/95  5D00 - crossed out and hand written 6-6-95 5500
+SOUND  U3  WRESTLEMANIA 5/2/95  8300
+SOUND  U4  WRESTLEMANIA 5/2/95  0F00
+SOUND  U5  WRESTLEMANIA 5/2/95  3000
+
+U54 WRESTLEMANIA Rev1.3 8/9/95 8A5D
+U63 WRESTLEMANIA Rev1.3 8/9/95 9EFE
+
+2M.0  U133  WRESTLEMANIA REV1.0 6/5/95  3A18
+2M.1  U132  WRESTLEMANIA REV1.0 6/5/95  5B68
+2M.2  U131  WRESTLEMANIA REV1.0 6/5/95  A478
+2M.3  U130  WRESTLEMANIA REV1.0 6/5/95  E4EA
+
+4M.0  U129  WRESTLEMANIA REV1.0 6/5/95  0B0E
+4M.1  U128  WRESTLEMANIA REV1.0 6/5/95  E646
+4M.2  U127  WRESTLEMANIA REV1.0 6/5/95  74A7
+4M.3  U126  WRESTLEMANIA REV1.0 6/5/95  37FD
+
+6M.0  U125  WRESTLEMANIA REV1.0 6/5/95  5EF3
+6M.1  U124  WRESTLEMANIA REV1.0 6/5/95  8CD6
+6M.2  U123  WRESTLEMANIA REV1.0 6/5/95  70EC
+6M.3  U122  WRESTLEMANIA REV1.0 6/5/95  2B4E
+
+8M.0  U121  WRESTLEMANIA REV1.0 6/5/95  5E15
+8M.1  U120  WRESTLEMANIA REV1.0 6/5/95  0572
+8M.2  U119  WRESTLEMANIA REV1.0 6/5/95  7FD4
+8M.3  U118  WRESTLEMANIA REV1.0 6/5/95  E4F1
+*/
 ROM_START( wwfmania )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u2", 0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) ) /* These 4 are labeled as L1 */
@@ -1365,28 +1396,28 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, mk3,       0,        wunit_picsim, mk3,      midwunit_state, mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3,       0,        wunit_picsim, mk3,      midwunit_state, init_mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, init_umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
-GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniap, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (proto 2.01 06/07/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniap, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (proto 2.01 06/07/95)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbamht,    0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamht1,   nbamht,   wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht,    0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht1,   nbamht,   wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, rmpgwt,    0,        wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, rmpgwt11,  rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt,    0,        wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt11,  rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )

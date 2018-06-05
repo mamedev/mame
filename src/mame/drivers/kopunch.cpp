@@ -117,7 +117,7 @@ READ8_MEMBER(kopunch_state::sensors2_r)
 
 WRITE8_MEMBER(kopunch_state::lamp_w)
 {
-	output().set_led_value(0, ~data & 0x80);
+	m_lamp = BIT(~data, 7);
 }
 
 WRITE8_MEMBER(kopunch_state::coin_w)
@@ -214,7 +214,7 @@ static const gfx_layout bg_layout =
 	8*8
 };
 
-static GFXDECODE_START( kopunch )
+static GFXDECODE_START( gfx_kopunch )
 	GFXDECODE_ENTRY( "gfx1", 0, fg_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, bg_layout, 0, 1 )
 GFXDECODE_END
@@ -222,6 +222,8 @@ GFXDECODE_END
 
 void kopunch_state::machine_start()
 {
+	m_lamp.resolve();
+
 	// zerofill
 	m_gfxbank = 0;
 	m_scrollx = 0;
@@ -234,35 +236,35 @@ void kopunch_state::machine_start()
 MACHINE_CONFIG_START(kopunch_state::kopunch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 4000000) // 4 MHz?
-	MCFG_CPU_PROGRAM_MAP(kopunch_map)
-	MCFG_CPU_IO_MAP(kopunch_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kopunch_state, vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 4000000) // 4 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(kopunch_map)
+	MCFG_DEVICE_IO_MAP(kopunch_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kopunch_state, vblank_interrupt)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(READ8(kopunch_state, sensors1_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(kopunch_state, sensors2_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, kopunch_state, sensors1_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, kopunch_state, sensors2_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	// $34 - always $80 (PPI mode 0, ports A & B & C as output)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, coin_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, coin_w))
 	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_OUT_PORTC_CB(LOGGER("PPI8255 - unmapped write port C"))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	// $38 - always $89 (PPI mode 0, ports A & B as output, port C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, lamp_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, lamp_w))
 	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW"))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
 	// $3c - always $88 (PPI mode 0, ports A & B & lower C as output, upper C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, scroll_x_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kopunch_state, scroll_y_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, scroll_x_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kopunch_state, scroll_y_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kopunch_state, gfxbank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kopunch_state, gfxbank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -273,7 +275,7 @@ MACHINE_CONFIG_START(kopunch_state::kopunch)
 	MCFG_SCREEN_UPDATE_DRIVER(kopunch_state, screen_update_kopunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kopunch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kopunch)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(kopunch_state, kopunch)
 
@@ -314,4 +316,4 @@ ROM_START( kopunch )
 ROM_END
 
 
-GAME( 1981, kopunch, 0, kopunch, kopunch, kopunch_state, 0, ROT270, "Sega", "KO Punch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kopunch, 0, kopunch, kopunch, kopunch_state, empty_init, ROT270, "Sega", "KO Punch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

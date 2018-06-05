@@ -1273,22 +1273,22 @@ static const gfx_layout spritelayout_4bpp =
 
 
 
-static GFXDECODE_START( superpac )
+static GFXDECODE_START( gfx_superpac )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_2bpp, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( phozon )
+static GFXDECODE_START( gfx_phozon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_8x8, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( mappy )
+static GFXDECODE_START( gfx_mappy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( todruaga )
+static GFXDECODE_START( gfx_todruaga )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 64 )
 GFXDECODE_END
@@ -1302,14 +1302,16 @@ GFXDECODE_END
 
 WRITE8_MEMBER(mappy_state::out_lamps)
 {
-	output().set_led_value(0, data & 1);
-	output().set_led_value(1, data & 2);
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
 	machine().bookkeeping().coin_lockout_global_w(data & 4);
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
 void mappy_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));
@@ -1319,18 +1321,18 @@ void mappy_state::machine_start()
 MACHINE_CONFIG_START(mappy_state::superpac_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_CPU_PROGRAM_MAP(superpac_cpu1_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(superpac_cpu1_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_CPU_PROGRAM_MAP(superpac_cpu2_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(superpac_cpu2_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mappy_state, int_on_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mappy_state, int_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("namco", namco_15xx_device, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1343,7 +1345,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superpac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superpac)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
@@ -1352,14 +1354,14 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_superpac)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
+	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1376,11 +1378,11 @@ MACHINE_CONFIG_START(mappy_state::superpac)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::pacnpal)
@@ -1392,14 +1394,14 @@ MACHINE_CONFIG_START(mappy_state::pacnpal)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, mappy_state, out_lamps))
 
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_59XX, 0)
-	MCFG_NAMCO59XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO59XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
 	MCFG_NAMCO59XX_IN_1_CB(IOPORT("DSW1"))
 	MCFG_NAMCO59XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO59XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO59XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	MCFG_NAMCO59XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
 
@@ -1414,38 +1416,38 @@ MACHINE_CONFIG_START(mappy_state::grobda)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // alternate route to 15XX-related DAC?
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // alternate route to 15XX-related DAC?
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mappy_state::phozon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)  /* MAIN CPU */
-	MCFG_CPU_PROGRAM_MAP(phozon_cpu1_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)  /* MAIN CPU */
+	MCFG_DEVICE_PROGRAM_MAP(phozon_cpu1_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)  /* SOUND CPU */
-	MCFG_CPU_PROGRAM_MAP(phozon_cpu2_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)  /* SOUND CPU */
+	MCFG_DEVICE_PROGRAM_MAP(phozon_cpu2_map)
 
-	MCFG_CPU_ADD("sub2", MC6809E, PIXEL_CLOCK/4)  /* SUB CPU */
-	MCFG_CPU_PROGRAM_MAP(phozon_cpu3_map)
+	MCFG_DEVICE_ADD("sub2", MC6809E, PIXEL_CLOCK/4)  /* SUB CPU */
+	MCFG_DEVICE_PROGRAM_MAP(phozon_cpu3_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mappy_state, int_on_3_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namco58xx_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namco56xx_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mappy_state, int_on_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mappy_state, int_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mappy_state, int_on_3_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("namco", namco_15xx_device, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("namcoio_1", namco58xx_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namcoio_2", namco56xx_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
@@ -1460,18 +1462,18 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 
 	MCFG_DEVICE_ADD("dipmux", LS157, 0)
 	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phozon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
@@ -1480,14 +1482,14 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_phozon)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mappy_state, vblank_irq))   // cause IRQs on all three CPUs; also update the custom I/O chips
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on all three CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
+	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1496,19 +1498,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mappy_state::mappy_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_CPU_PROGRAM_MAP(mappy_cpu1_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mappy_cpu1_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_CPU_PROGRAM_MAP(mappy_cpu2_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mappy_cpu2_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mappy_state, mappy_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mappy_state, int_on_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mappy_state, int_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mappy_state, mappy_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("namco", namco_15xx_device, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1521,7 +1523,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mappy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mappy)
 	MCFG_PALETTE_ADD("palette", 64*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
@@ -1530,14 +1532,14 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_mappy)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
+	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1553,11 +1555,11 @@ MACHINE_CONFIG_START(mappy_state::mappy)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO58XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("DSW1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO58XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	MCFG_NAMCO58XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::digdug2)
@@ -1574,18 +1576,18 @@ MACHINE_CONFIG_START(mappy_state::digdug2)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mappy_state::todruaga)
 	digdug2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_todruaga)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END
@@ -1599,14 +1601,14 @@ MACHINE_CONFIG_START(mappy_state::motos)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, mappy_state, out_lamps))
 
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(DEVREAD8("dipmux", ls157_device, output_r))
+	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(DEVWRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
 MACHINE_CONFIG_END
 
 
@@ -2067,7 +2069,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(mappy_state,grobda)
+void mappy_state::init_grobda()
 {
 	/* The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
 	   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
@@ -2081,7 +2083,7 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 }
 
 
-DRIVER_INIT_MEMBER(mappy_state,digdug2)
+void mappy_state::init_digdug2()
 {
 	/* appears to not use the watchdog */
 	m_maincpu->space(AS_PROGRAM).nop_write(0x8000, 0x8000);
@@ -2089,25 +2091,25 @@ DRIVER_INIT_MEMBER(mappy_state,digdug2)
 
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
-GAME( 1982, superpac, 0,        superpac, superpac,  mappy_state, 0,        ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, superpacm,superpac, superpac, superpac,  mappy_state, 0,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda,   0,        grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda2,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda3,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpac,  0,        superpac, superpac,  mappy_state, empty_init,   ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpacm, superpac, superpac, superpac,  mappy_state, empty_init,   ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal,   0,        pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal2,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnchmp,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
-GAME( 1983, phozon,   0,        phozon,    phozon,   mappy_state, 0,        ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, phozons,  phozon,   phozon,    phozon,   mappy_state, 0,        ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozon,    0,        phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozons,   phozon,   phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
-GAME( 1983, mappy,    0,        mappy,     mappy,    mappy_state, 0,        ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mappyj,   mappy,    mappy,     mappy,    mappy_state, 0,        ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state, 0,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2,  0,        digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2o, digdug2,  digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, motos,    0,        motos,     motos,    mappy_state, 0,        ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappy,     0,        mappy,     mappy,    mappy_state, empty_init,   ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappyj,    mappy,    mappy,     mappy,    mappy_state, empty_init,   ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruaga,  0,        todruaga,  todruaga, mappy_state, empty_init,   ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagao, todruaga, todruaga,  todruaga, mappy_state, empty_init,   ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagas, todruaga, todruaga,  todruaga, mappy_state, empty_init,   ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2,   0,        digdug2,   digdug2,  mappy_state, init_digdug2, ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2o,  digdug2,  digdug2,   digdug2,  mappy_state, init_digdug2, ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, motos,     0,        motos,     motos,    mappy_state, empty_init,   ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )

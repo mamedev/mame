@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 
-	DECLARE_DRIVER_INIT(glass);
+	void init_glass();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
