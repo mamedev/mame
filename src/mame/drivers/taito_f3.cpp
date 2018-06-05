@@ -454,7 +454,8 @@ void taito_f3_state::machine_start()
 void taito_f3_state::machine_reset()
 {
 	/* start with sound m68k off, qtheater relies on it (otherwise main CPU tries to reset it while 68k is working with irq table vectors). */
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if(m_audiocpu)
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(taito_f3_state::f3)
