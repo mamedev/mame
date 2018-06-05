@@ -360,7 +360,7 @@ void mhavoc_state::alphaone_map(address_map &map)
 	map(0x10b0, 0x10b0).w(this, FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
 	map(0x10b4, 0x10b4).w(this, FUNC(mhavoc_state::mhavoc_rom_banksel_w));
 	map(0x10b8, 0x10b8).w(this, FUNC(mhavoc_state::mhavoc_ram_banksel_w));
-	map(0x10e0, 0x10ff).rnop().writeonly().share("colorram");  /* ColorRAM */
+	map(0x10e0, 0x10ff).nopr().writeonly().share("colorram");  /* ColorRAM */
 	map(0x1800, 0x18ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));   /* EEROM */
 	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
 	map(0x4000, 0x4fff).ram().share("vectorram").region("alpha", 0x4000); /* Vector Generator RAM */
