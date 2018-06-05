@@ -420,7 +420,7 @@ void tandy1000_state::machine_start()
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
 			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this), 0xffff);
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
 READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
@@ -642,7 +642,7 @@ void tandy1000_state::cfg_fdc_525(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-static GFXDECODE_START( t1000 )
+static GFXDECODE_START( gfx_t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
@@ -651,9 +651,9 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	downcast<t1000_mb_device &>(*device).set_cputag("maincpu");
 
 	/* video hardware */
-	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
+	MCFG_DEVICE_ADD("pcvideo_t1000", PCVIDEO_T1000, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
@@ -780,9 +780,9 @@ ROM_START( t1000 )
 	// Schematics displays 2 32KB ROMs at U9 and U10
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "v010000", "v010000" )
-	ROMX_LOAD("v010000.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("v010000.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v010100", "v010100" )
-	ROMX_LOAD("v010100.f0", 0x10000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(2))
+	ROMX_LOAD("v010100.f0", 0x10000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(1))
 
 	// Part of video array at u76?
 	ROM_REGION(0x08000,"gfx1", 0)
@@ -826,13 +826,13 @@ ROM_START( t1000sl )
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0x00000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
 	ROM_SYSTEM_BIOS( 0, "v010400", "v010400" )
-	ROMX_LOAD("v010400.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD("v010400.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v010401", "v010401" )
-	ROMX_LOAD("v010401.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD("v010401.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v010402", "v010402" )
-	ROMX_LOAD("v010402.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD("v010402.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "v020001", "v020001" )
-	ROMX_LOAD("v020001.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(4) )
+	ROMX_LOAD("v020001.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(3) )
 
 	ROM_REGION(0x08000,"gfx1", 0)
 	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
@@ -939,11 +939,11 @@ ROM_START( t1000tl2 )
 ROM_END
 
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT         STATE               INIT  COMPANY               FULLNAME          FLAGS
 // tandy 1000
-COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 HX",   0 )
-COMP( 1987, t1000sx,    ibm5150,    0,          t1000sx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SX",   0 )
-COMP( 1987, t1000tx,    ibm5150,    0,          t1000tx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TX",   0 )
-COMP( 1989, t1000rl,    ibm5150,    0,          t1000rl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 RL",   0 )
-COMP( 1989, t1000tl2,   ibm5150,    0,          t1000tl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
-COMP( 1988, t1000sl2,   ibm5150,    0,          t1000sl2,   t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT         CLASS            INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
+COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
+COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
+COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
+COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
+COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )

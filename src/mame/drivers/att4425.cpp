@@ -205,7 +205,7 @@ static const gfx_layout att4425_charlayout =
 	16*8
 };
 
-static GFXDECODE_START( att4425 )
+static GFXDECODE_START( gfx_att4425 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, att4425_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -253,7 +253,7 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_SIZE(720, 351)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 351-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", att4425)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_att4425)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	// ch.3 -- timer?
@@ -320,5 +320,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1983, att4425,  0,      0,      att4425,   att4425, att4425_state, 0,    "AT&T", "AT&T Teletype 4425", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME              FLAGS
+COMP( 1983, att4425, 0,      0,      att4425, att4425, att4425_state, empty_init, "AT&T",  "AT&T Teletype 4425", MACHINE_IS_SKELETON )

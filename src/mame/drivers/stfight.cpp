@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(stfight_state::stfight_base)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(stfight_state::stfight)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")
+	MCFG_DEVICE_ADD("stfight_vid", STFIGHT_VIDEO, 0)
 MACHINE_CONFIG_END
 
 
@@ -1065,13 +1065,13 @@ ROM_END
 
 
 // Note: Marked MACHINE_IMPERFECT_SOUND due to YM2203 clock issue
-GAME( 1986, empcity,  0,       stfight,  stfight, stfight_state,  empcity,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityu, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
-GAME( 1986, empcityj, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityi, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfight,  empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfighta, empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfightgb,empcity, stfight,  stfight, stfight_state,  stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcity,   0,       stfight,  stfight,  stfight_state, init_empcity,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityu,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
+GAME( 1986, empcityj,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityi,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfight,   empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfighta,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfightgb, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Cross Shooter uses the same base board, but different video board
-GAME( 1987, cshootert,airraid, cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshootert, airraid, cshooter, cshooter, stfight_state, init_cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

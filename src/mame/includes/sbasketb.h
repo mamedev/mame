@@ -1,8 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 
+#include "audio/trackfld.h"
+#include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
+
+#include "screen.h"
 
 class sbasketb_state : public driver_device
 {
@@ -16,8 +20,11 @@ public:
 		m_scroll(*this, "scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundbrd(*this, "trackfld_audio"),
+		m_dac(*this, "dac"),
 		m_sn(*this, "snsnd"),
 		m_vlm(*this, "vlm"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -31,8 +38,11 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<trackfld_audio_device> m_soundbrd;
+	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<sn76489_device> m_sn;
 	required_device<vlm5030_device> m_vlm;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -49,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sbasketb_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(spriteram_select_w);
-	DECLARE_DRIVER_INIT(sbasketb);
+	void init_sbasketb();
 
 	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };

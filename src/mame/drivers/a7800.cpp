@@ -172,14 +172,14 @@ class a7800_ntsc_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	DECLARE_DRIVER_INIT(a7800_ntsc);
+	void init_a7800_ntsc();
 };
 
 class a7800_pal_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	DECLARE_DRIVER_INIT(a7800_pal);
+	void init_a7800_pal();
 	void a7800_pal(machine_config &config);
 
 protected:
@@ -1395,7 +1395,7 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	MCFG_MARIA_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", 31400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1448,9 +1448,9 @@ MACHINE_CONFIG_END
 ROM_START( a7800 )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "a7800", "Atari 7800" )
-	ROMX_LOAD("7800.u7", 0x3000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
+	ROMX_LOAD("7800.u7", 0x3000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "a7800pr", "Atari 7800 (prototype with Asteroids)" )
-	ROMX_LOAD("c300558-001a.u7", 0x0000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(2))
+	ROMX_LOAD("c300558-001a.u7", 0x0000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(1))
 ROM_END
 
 ROM_START( a7800p )
@@ -1463,7 +1463,7 @@ ROM_END
  DRIVER INIT
  ***************************************************************************/
 
-DRIVER_INIT_MEMBER(a7800_ntsc_state, a7800_ntsc)
+void a7800_ntsc_state::init_a7800_ntsc()
 {
 	m_ispal = false;
 	m_lines = 263;
@@ -1472,7 +1472,7 @@ DRIVER_INIT_MEMBER(a7800_ntsc_state, a7800_ntsc)
 }
 
 
-DRIVER_INIT_MEMBER(a7800_pal_state, a7800_pal)
+void a7800_pal_state::init_a7800_pal()
 {
 	m_ispal = true;
 	m_lines = 313;
@@ -1485,6 +1485,6 @@ DRIVER_INIT_MEMBER(a7800_pal_state, a7800_pal)
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT  STATE              INIT        COMPANY   FULLNAME             FLAGS
-CONS( 1986, a7800,    0,        0,      a7800_ntsc, a7800, a7800_ntsc_state,  a7800_ntsc, "Atari",  "Atari 7800 (NTSC)", 0 )
-CONS( 1986, a7800p,   a7800,    0,      a7800_pal,  a7800, a7800_pal_state,   a7800_pal,  "Atari",  "Atari 7800 (PAL)",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT             COMPANY   FULLNAME             FLAGS
+CONS( 1986, a7800,  0,      0,      a7800_ntsc, a7800, a7800_ntsc_state, init_a7800_ntsc, "Atari",  "Atari 7800 (NTSC)", 0 )
+CONS( 1986, a7800p, a7800,  0,      a7800_pal,  a7800, a7800_pal_state,  init_a7800_pal,  "Atari",  "Atari 7800 (PAL)",  0 )

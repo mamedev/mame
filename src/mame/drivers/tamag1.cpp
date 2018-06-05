@@ -155,7 +155,7 @@ MACHINE_CONFIG_START(tamag1_state::tama)
 	MCFG_PALETTE_INIT_OWNER(tamag1_state, tama)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -177,5 +177,5 @@ ROM_START( tama )
 ROM_END
 
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE      INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1997, tama, 0,      0, tama,   tama, tamag1_state, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY,  FULLNAME,           FLAGS
+CONS( 1997, tama, 0,      0,      tama,    tama,  tamag1_state, empty_init, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

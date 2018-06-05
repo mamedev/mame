@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(xbox_state::xbox)
 	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
 
 /* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 //  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -200,7 +200,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 ROM_START( xbox )
 	ROM_REGION( 0x400, "mcpx", 0 )
@@ -241,4 +241,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

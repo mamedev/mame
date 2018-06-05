@@ -112,10 +112,10 @@
 
 WRITE8_MEMBER(victory_state::lamp_control_w)
 {
-	output().set_led_value(0, data & 0x80);
-	output().set_led_value(1, data & 0x40);
-	output().set_led_value(2, data & 0x20);
-	output().set_led_value(3, data & 0x10);
+	m_lamps[0] = BIT(data, 7);
+	m_lamps[1] = BIT(data, 6);
+	m_lamps[2] = BIT(data, 5);
+	m_lamps[3] = BIT(data, 4);
 }
 
 
@@ -136,8 +136,8 @@ void victory_state::main_map(address_map &map)
 	map(0xc800, 0xdfff).ram().share("charram");
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf7ff).ram().share("nvram");
-	map(0xf800, 0xf800).mirror(0x07fc).rw("custom", FUNC(victory_sound_device::response_r), FUNC(victory_sound_device::command_w));
-	map(0xf801, 0xf801).mirror(0x07fc).r("custom", FUNC(victory_sound_device::status_r));
+	map(0xf800, 0xf800).mirror(0x07fc).rw("soundbd", FUNC(victory_sound_device::response_r), FUNC(victory_sound_device::command_w));
+	map(0xf801, 0xf801).mirror(0x07fc).r("soundbd", FUNC(victory_sound_device::status_r));
 }
 
 
@@ -241,8 +241,7 @@ MACHINE_CONFIG_START(victory_state::victory)
 
 
 	/* audio hardware */
-	victory_audio(config);
-
+	MCFG_DEVICE_ADD("soundbd", EXIDY_VICTORY, 0)
 MACHINE_CONFIG_END
 
 
@@ -268,7 +267,7 @@ ROM_START( victory )
 	ROM_LOAD( "vic3.kl1", 0xa000, 0x1000, CRC(2b7e626f) SHA1(5a607faf05f81da44c68fe1a6efe2a7c4ac048c7) )
 	ROM_LOAD( "vic3.l1",  0xb000, 0x1000, CRC(7bb8e1f5) SHA1(0f624e859bb9c2203c0aebe89ac2f807b4fa9a47) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "vic1.7bc", 0xc000, 0x1000, CRC(d4927560) SHA1(f263419dec70b758cf429cd7e5b388258027bfde) )
 	ROM_LOAD( "vic1.7c",  0xd000, 0x1000, CRC(059efab5) SHA1(60259eb56a282a0fbab5e966a16430ab486b1492) )
 	ROM_LOAD( "vic1.7d",  0xe000, 0x1000, CRC(82c4767c) SHA1(64eac78e7dab5f435eb035be46e24e73a74f0eae) )
@@ -301,7 +300,7 @@ ROM_START( victorba )
 	ROM_LOAD( "kl1.rom", 0xa000, 0x1000, CRC(6c82ebca) SHA1(3f30e92cbdca73948d285d4509bdee85d8fa57b7) )
 	ROM_LOAD( "l1.rom",  0xb000, 0x1000, CRC(03b89d8a) SHA1(37b501e910d3c3784a6696fab7fd6ba568470a8b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "vic1.7bc", 0xc000, 0x1000, CRC(d4927560) SHA1(f263419dec70b758cf429cd7e5b388258027bfde) )
 	ROM_LOAD( "vic1.7c",  0xd000, 0x1000, CRC(059efab5) SHA1(60259eb56a282a0fbab5e966a16430ab486b1492) )
 	ROM_LOAD( "vic1.7d",  0xe000, 0x1000, CRC(82c4767c) SHA1(64eac78e7dab5f435eb035be46e24e73a74f0eae) )
@@ -326,5 +325,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, victory,  0,       victory, victory, victory_state, 0, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, victorba, victory, victory, victory, victory_state, 0, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victory,  0,       victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victorba, victory, victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )

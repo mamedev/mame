@@ -71,7 +71,7 @@ static const discrete_555_cc_desc asteroid_thump_555cc =
 #define ASTEROID_EXPLODE_SND        NODE_26
 #define ASTEROID_THRUST_SND         NODE_27
 
-static DISCRETE_SOUND_START(asteroid)
+static DISCRETE_SOUND_START(asteroid_discrete)
 	/************************************************/
 	/* Asteroid Effects Relataive Gain Table        */
 	/*                                              */
@@ -217,7 +217,7 @@ static DISCRETE_SOUND_START(asteroid)
 DISCRETE_SOUND_END
 
 
-static DISCRETE_SOUND_START(astdelux)
+static DISCRETE_SOUND_START(astdelux_discrete)
 	/************************************************/
 	/* Asteroid delux sound hardware is mostly done */
 	/* in the Pokey chip except for the thrust and  */
@@ -316,10 +316,9 @@ WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 
 
 MACHINE_CONFIG_START(asteroid_state::asteroid_sound)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(asteroid)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, asteroid_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 
 	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
@@ -333,10 +332,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(asteroid_state::astdelux_sound)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(astdelux)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, astdelux_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10

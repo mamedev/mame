@@ -130,7 +130,7 @@ std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
 
 #define CYCLES(x)       (m_icount -= x)
 
-#define ROPCODE()       m_direct->read_word(m_pc++)
+#define ROPCODE()       m_cache->read_word(m_pc++)
 
 void tms32051_device::CHANGE_PC(uint16_t new_pc)
 {
@@ -187,7 +187,7 @@ void tms32051_device::delay_slot(uint16_t startpc)
 void tms32051_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

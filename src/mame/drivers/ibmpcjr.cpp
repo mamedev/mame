@@ -105,7 +105,7 @@ public:
 	};
 
 	void machine_reset() override;
-	DECLARE_DRIVER_INIT(pcjr);
+	void init_pcjr();
 	void ibmpcjx(machine_config &config);
 	void ibmpcjr(machine_config &config);
 	void ibmpcjr_io(address_map &map);
@@ -123,7 +123,7 @@ static INPUT_PORTS_START( ibmpcjr )
 	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(pcjr_state, pcjr)
+void pcjr_state::init_pcjr()
 {
 	m_pc_int_delay_timer = timer_alloc(TIMER_IRQ_DELAY);
 	m_pcjr_watchdog = timer_alloc(TIMER_WATCHDOG);
@@ -539,7 +539,7 @@ static const gfx_layout kanji_layout =
 	16*16                   /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pcjr )
+static GFXDECODE_START( gfx_pcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
 
@@ -628,13 +628,13 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
+	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", pcjr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_pcjr:palette", gfx_pcjr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_DEVICE_ADD("sn76496", SN76496, XTAL(14'318'181)/4)
@@ -677,7 +677,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
-static GFXDECODE_START( ibmpcjx )
+static GFXDECODE_START( gfx_ibmpcjx )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
@@ -694,7 +694,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ibmpcjx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
 	/* internal ram */
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
@@ -706,9 +706,9 @@ MACHINE_CONFIG_END
 ROM_START( ibmpcjr )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "default", "Default" )
-	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(1))
+	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "quiksilver", "Quicksilver" ) // Alternate bios to boot up faster (Synectics)
-	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(2))
+	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(1))
 
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
@@ -718,10 +718,10 @@ ROM_START( ibmpcjx )
 	ROM_REGION(0x20000,"bios", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("unk")
 	ROM_SYSTEM_BIOS( 0, "5601jda", "5601jda" )
-	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
-	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
+	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(0))
+	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(0)) // boot fails due to this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
-	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
+	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(1))
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
@@ -730,7 +730,6 @@ ROM_START( ibmpcjx )
 	ROM_LOAD("kanji.rom",     0x00000, 0x38000, BAD_DUMP CRC(eaa6e3c3) SHA1(35554587d02d947fae8446964b1886fff5c9d67f)) // hand-made rom
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    STATE          INIT        COMPANY                            FULLNAME     FLAGS
-// pcjr
-COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
-COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS       INIT       COMPANY                            FULLNAME     FLAGS
+COMP( 1983, ibmpcjr, ibm5150, 0,      ibmpcjr, ibmpcjr, pcjr_state, init_pcjr, "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
+COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, init_pcjr, "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

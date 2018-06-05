@@ -473,9 +473,9 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
 
 	void saturn_init_driver(int rgn);
-	DECLARE_DRIVER_INIT(saturnus);
-	DECLARE_DRIVER_INIT(saturneu);
-	DECLARE_DRIVER_INIT(saturnjp);
+	void init_saturnus();
+	void init_saturneu();
+	void init_saturnjp();
 	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
 	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
 	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);
@@ -832,11 +832,12 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SCREEN_UPDATE_DRIVER(sat_console_state, screen_update_stv_vdp2)
 	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
 
 	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("scsp", SCSP)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
@@ -934,17 +935,17 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnus)
+void sat_console_state::init_saturnus()
 {
 	saturn_init_driver(4);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturneu)
+void sat_console_state::init_saturneu()
 {
 	saturn_init_driver(12);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnjp)
+void sat_console_state::init_saturnjp()
 {
 	saturn_init_driver(1);
 }
@@ -954,11 +955,11 @@ DRIVER_INIT_MEMBER(sat_console_state,saturnjp)
 ROM_START(saturnjp)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101", "Japan v1.01 (941228)")
-	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(1))
+	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "1003", "Japan v1.003 (941012)")
-	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(2))
+	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "100", "Japan v1.00 (940921)")
-	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
+	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(2))
 ROM_END
 
 /* Overseas Saturn */
@@ -966,18 +967,18 @@ ROM_START(saturn)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	/* Confirmed by ElBarto */
-	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
-	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(1))
 ROM_END
 
 ROM_START(saturneu)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	/* Confirmed by ElBarto */
-	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
-	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(1))
 ROM_END
 
 ROM_START(vsaturn)
@@ -988,14 +989,14 @@ ROM_END
 ROM_START(hisaturn)
 	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "102", "v1.02 (950519)")
-	ROMX_LOAD( "mpr-18100.bin", 0x000000, 0x080000, CRC(3408dbf4) SHA1(8a22710e09ce75f39625894366cafe503ed1942d), ROM_BIOS(1))
+	ROMX_LOAD("mpr-18100.bin", 0x000000, 0x080000, CRC(3408dbf4) SHA1(8a22710e09ce75f39625894366cafe503ed1942d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "101", "v1.01 (950130)")
-	ROMX_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796), ROM_BIOS(2))
+	ROMX_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796), ROM_BIOS(1))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT   STATE              INIT        COMPANY     FULLNAME            FLAGS */
-CONS( 1994, saturn,     0,      0,      saturnus, saturn, sat_console_state, saturnus,   "Sega",     "Saturn (USA)",     MACHINE_NOT_WORKING )
-CONS( 1994, saturnjp,   saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "Sega",     "Saturn (Japan)",   MACHINE_NOT_WORKING )
-CONS( 1994, saturneu,   saturn, 0,      saturneu, saturn, sat_console_state, saturneu,   "Sega",     "Saturn (PAL)",     MACHINE_NOT_WORKING )
-CONS( 1995, vsaturn,    saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "JVC",      "V-Saturn",         MACHINE_NOT_WORKING )
-CONS( 1995, hisaturn,   saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "Hitachi",  "HiSaturn",         MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS              INIT           COMPANY    FULLNAME            FLAGS */
+CONS( 1994, saturn,   0,      0,      saturnus, saturn, sat_console_state, init_saturnus, "Sega",    "Saturn (USA)",     MACHINE_NOT_WORKING )
+CONS( 1994, saturnjp, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "Sega",    "Saturn (Japan)",   MACHINE_NOT_WORKING )
+CONS( 1994, saturneu, saturn, 0,      saturneu, saturn, sat_console_state, init_saturneu, "Sega",    "Saturn (PAL)",     MACHINE_NOT_WORKING )
+CONS( 1995, vsaturn,  saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "JVC",     "V-Saturn",         MACHINE_NOT_WORKING )
+CONS( 1995, hisaturn, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "Hitachi", "HiSaturn",         MACHINE_NOT_WORKING )

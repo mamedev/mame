@@ -90,12 +90,13 @@ void i6300esb_lpc_device::internal_io_map(address_map &map)
 
 
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I6300ESB_LPC, tag, owner, clock),
-		acpi(*this, "acpi"),
-		rtc (*this, "rtc"),
-		pit (*this, "pit"),
-		m_region(*this, DEVICE_SELF)
+	: pci_device(mconfig, I6300ESB_LPC, tag, owner, clock)
+	, acpi(*this, "acpi")
+	, rtc (*this, "rtc")
+	, pit (*this, "pit")
+	, m_region(*this, DEVICE_SELF)
 {
+	set_ids(0x808625a1, 0x02, 0x060100, 0x00000000);
 }
 
 void i6300esb_lpc_device::device_start()

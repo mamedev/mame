@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
 	DECLARE_WRITE16_MEMBER(blockout_frontcolor_w);
 	DECLARE_WRITE16_MEMBER(blockout_videoram_w);
-	DECLARE_DRIVER_INIT(agress);
+	void init_agress();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

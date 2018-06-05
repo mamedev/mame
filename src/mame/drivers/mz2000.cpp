@@ -38,7 +38,7 @@
 #include "formats/mz_cas.h"
 
 
-#define MASTER_CLOCK XTAL(17'734'470)/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
+#define MASTER_CLOCK 17.73447_MHz_XTAL  / 5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 
 #define UTF8_POUND "\xc2\xa3"
 #define UTF8_YEN "\xc2\xa5"
@@ -693,7 +693,7 @@ static const gfx_layout mz2000_charlayout_16 =
 	8*16
 };
 
-static GFXDECODE_START( mz2000 )
+static GFXDECODE_START( gfx_mz2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz2000_charlayout_8, 0, 1 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, mz2000_charlayout_16, 0, 1 )
 GFXDECODE_END
@@ -822,7 +822,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	{
 		m_ipl_enable = 0;
 		/* correct? */
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	m_beeper->set_state(data & 0x04);
@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_MB8877_ADD("mb8877a", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)
@@ -922,16 +922,14 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2000)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
+	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz2000_state::mz80b)
@@ -1006,7 +1004,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT   STATE         INIT  COMPANY    FULLNAME   FLAGS
-COMP( 1981, mz80b,    0,        0,       mz80b,    mz80be, mz2000_state, 0,    "Sharp",   "MZ-80B",  MACHINE_NOT_WORKING )
-COMP( 1982, mz2000,   0,        0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2000", MACHINE_NOT_WORKING )
-COMP( 1982, mz2200,   mz2000,   0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2200", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz2000_state, empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
+COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
+COMP( 1982, mz2200, mz2000, 0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )

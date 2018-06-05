@@ -428,7 +428,8 @@ MACHINE_CONFIG_START(hp16500_state::hp1650)
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp1651)
@@ -448,7 +449,8 @@ MACHINE_CONFIG_START(hp16500_state::hp1651)
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500a)
@@ -466,7 +468,8 @@ MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500)
@@ -492,7 +495,8 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil2", hp_hil_devices, "hp_ipc_kbd")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp16500 )
@@ -524,7 +528,7 @@ ROM_START( hp16500b )
 	ROM_LOAD32_BYTE( "16500-80017.bin", 0x000003, 0x008000, CRC(e0b1096b) SHA1(426bb9a4756d8087bded4f6b61365d733ffbb09a) )
 ROM_END
 
-COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -63,7 +63,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_sub_05_r);
 	DECLARE_READ8_MEMBER(unk_sub_07_r);
 	DECLARE_WRITE8_MEMBER(unk_sub_0c_w);
-	DECLARE_DRIVER_INIT(crgolfhi);
+	void init_crgolfhi();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(crgolf);

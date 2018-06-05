@@ -320,7 +320,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 {
 	// only if it goes up
 	if (state && !m_last_state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_last_state = state;
 
@@ -399,13 +399,12 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -431,5 +430,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT COMPANY   FULLNAME    FLAGS
-CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, pv2000_state,   0,   "Casio",  "PV-2000",  MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY   FULLNAME    FLAGS
+CONS( 1983, pv2000, 0,      0,      pv2000,  pv2000, pv2000_state, empty_init, "Casio",  "PV-2000",  MACHINE_NOT_WORKING )

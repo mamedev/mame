@@ -106,7 +106,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
-	DECLARE_DRIVER_INIT(c1p);
+	void init_c1p();
 	void c1p(machine_config &config);
 	void c1p_mem(address_map &map);
 };

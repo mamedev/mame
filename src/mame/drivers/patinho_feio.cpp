@@ -15,7 +15,7 @@
 /*
     driver init function
 */
-DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
+void patinho_feio_state::init_patinho_feio()
 {
 	m_out = &output();
 	m_prev_ACC = 0;
@@ -308,5 +308,5 @@ ROM_START( patinho )
 	ROM_LOAD( "micro-pre-loader.bin", 0x000, 0x02a, CRC(1921feab) SHA1(bb063102e44e9ab963f95b45710141dc2c5046b0) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         STATE               INIT          COMPANY                                           FULLNAME         FLAGS
-COMP( 1972, patinho,  0,        0,      patinho_feio,  patinho_feio, patinho_feio_state, patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT         CLASS               INIT               COMPANY                                           FULLNAME         FLAGS
+COMP( 1972, patinho, 0,      0,      patinho_feio, patinho_feio, patinho_feio_state, init_patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

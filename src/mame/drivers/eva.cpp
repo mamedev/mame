@@ -181,7 +181,7 @@ MACHINE_CONFIG_START(eva_state::eva24)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	tms5110_route(config);
 MACHINE_CONFIG_END
@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(eva_state::eva11)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	tms5110_route(config);
 MACHINE_CONFIG_END
@@ -233,6 +233,6 @@ ROM_END
 
 
 
-//    YEAR  NAME   PARENT CMP MACHINE INPUT  STATE   INIT  COMPANY, FULLNAME, FLAGS
-SYST( 1984, eva24, 0,      0, eva24,  eva24, eva_state, 0, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-SYST( 1983, eva11, eva24,  0, eva11,  eva11, eva_state, 0, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT CMP MACHINE INPUT  CLASS      INIT        COMPANY     FULLNAME                                FLAGS
+SYST( 1984, eva24, 0,      0, eva24,  eva24, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+SYST( 1983, eva11, eva24,  0, eva11,  eva11, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

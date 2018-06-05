@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "z80daisy.h"
+#include "machine/z80daisy.h"
 
 #define MCFG_Z80_SET_IRQACK_CALLBACK(_devcb) \
 	devcb = &downcast<z80_device &>(*device).set_irqack_cb(DEVCB_##_devcb);
@@ -57,7 +57,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 2; }
 	virtual uint32_t execute_max_cycles() const override { return 16; }
 	virtual uint32_t execute_input_lines() const override { return 4; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -239,13 +240,13 @@ protected:
 
 	// address spaces
 	const address_space_config m_program_config;
-	const address_space_config m_decrypted_opcodes_config;
+	const address_space_config m_opcodes_config;
 	const address_space_config m_io_config;
 	address_space *m_program;
-	address_space *m_decrypted_opcodes;
+	address_space *m_opcodes;
 	address_space *m_io;
-	direct_read_data<0> *m_direct;
-	direct_read_data<0> *m_decrypted_opcodes_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcodes_cache;
 	devcb_write_line m_irqack_cb;
 	devcb_write8 m_refresh_cb;
 	devcb_write_line m_halt_cb;

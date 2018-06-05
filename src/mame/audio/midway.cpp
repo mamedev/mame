@@ -82,16 +82,17 @@ WRITE8_MEMBER(midway_ssio_device::write)
 
 WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
 {
-	// going high halts the CPU
 	if (state)
 	{
+		// going high halts the CPU
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-
-	// going low resets and reactivates the CPU
 	else
+	{
+		// going low resets and reactivates the CPU
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 }
 
 
@@ -403,7 +404,8 @@ const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 MACHINE_CONFIG_START(midway_ssio_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cpu", Z80, DERIVED_CLOCK(1, 2*4))
 	MCFG_DEVICE_PROGRAM_MAP(ssio_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, DERIVED_CLOCK(1, 2*16*10))
+	if (clock())
+		MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, clock() / (2*16*10))
 
 	MCFG_DEVICE_ADD("ay0", AY8910, DERIVED_CLOCK(1, 2*4))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, midway_ssio_device, porta0_w))

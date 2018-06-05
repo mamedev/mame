@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(ctstein_state::ctstein)
 	MCFG_DEFAULT_LAYOUT(layout_ctstein)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(h2hbaskbc_state::h2hbaskbc)
 	MCFG_DEFAULT_LAYOUT(layout_h2hbaskbc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(einvaderc_state::einvaderc)
 	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(unkeinv_state::unkeinv)
 	MCFG_DEFAULT_LAYOUT(layout_unkeinv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -883,7 +883,7 @@ MACHINE_CONFIG_START(lchicken_state::lchicken)
 	MCFG_DEFAULT_LAYOUT(layout_lchicken)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(funjacks_state::funjacks)
 	MCFG_DEFAULT_LAYOUT(layout_funjacks)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1086,7 +1086,7 @@ MACHINE_CONFIG_START(funrlgl_state::funrlgl)
 	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1222,7 +1222,7 @@ MACHINE_CONFIG_START(mdallas_state::mdallas)
 	MCFG_DEFAULT_LAYOUT(layout_mdallas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1304,7 +1304,7 @@ MACHINE_CONFIG_START(plus1_state::plus1)
 	/* no visual feedback! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1434,7 +1434,7 @@ MACHINE_CONFIG_START(lightfgt_state::lightfgt)
 	MCFG_DEFAULT_LAYOUT(layout_lightfgt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1589,7 +1589,7 @@ MACHINE_CONFIG_START(bship82_state::bship82)
 	MCFG_DEFAULT_LAYOUT(layout_bship82)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // see above
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -1811,7 +1811,7 @@ MACHINE_CONFIG_START(vidchal_state::vidchal)
 	MCFG_DEFAULT_LAYOUT(layout_vidchal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -1919,30 +1919,30 @@ ROM_END
 
 
 
-//    YEAR  NAME        PARENT   COMP MACHINE     INPUT       STATE          INIT COMPANY, FULLNAME, FLAGS
-CONS( 1979, ctstein,    0,         0, ctstein,    ctstein,    ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    CMP MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ctstein,    0,         0, ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, h2hbaskbc,  0,         0, h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hhockeyc, h2hhockey, 0, h2hhockeyc, h2hhockeyc, h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hsoccerc, 0,         0, h2hsoccerc, h2hsoccerc, h2hbaskbc_state, 0, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaskbc,  0,         0, h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hhockeyc, h2hhockey, 0, h2hhockeyc, h2hhockeyc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hsoccerc, 0,         0, h2hsoccerc, h2hsoccerc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, einvaderc,  einvader,  0, einvaderc,  einvaderc,  einvaderc_state, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, einvaderc,  einvader,  0, einvaderc,  einvaderc,  einvaderc_state, empty_init, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   0, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   empty_init, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
-CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  0, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   0, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
-CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  0, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
+CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1978, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1978, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   0, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

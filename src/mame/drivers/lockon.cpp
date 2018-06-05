@@ -349,7 +349,7 @@ static const gfx_layout char_layout =
 	8*8
 };
 
-static GFXDECODE_START( lockon )
+static GFXDECODE_START( gfx_lockon )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,  0, 128 )
 GFXDECODE_END
 
@@ -419,7 +419,7 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	output().set_led_value(1, !(data & 0x10));
+	m_lamp = BIT(~data, 4);
 }
 
 /*************************************
@@ -430,6 +430,8 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 
 void lockon_state::machine_start()
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_ground_ctrl));
 	save_item(NAME(m_scroll_h));
 	save_item(NAME(m_scroll_v));
@@ -500,11 +502,12 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lockon_state, screen_vblank_lockon))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockon)
 	MCFG_PALETTE_ADD("palette", 1024 + 2048)
 	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, lockon_state, ym2203_irq))
@@ -519,18 +522,12 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_SOUND_ROUTE(3, "f2203.3l", 1.0)
 	MCFG_SOUND_ROUTE(3, "f2203.3r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("f2203.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.3l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.3r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "f2203.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -771,5 +768,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, lockon,  0,      lockon,  lockon,  lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lockonc, lockon, lockon,  lockone, lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockon,  0,      lockon, lockon,  lockon_state, empty_init, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockonc, lockon, lockon, lockone, lockon_state, empty_init, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )

@@ -1784,7 +1784,7 @@ MACHINE_CONFIG_START(pet_state::pet)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(8'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(pet2001_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -2092,7 +2092,7 @@ MACHINE_CONFIG_START(pet2001b_state::pet4032f)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(M6520_1_TAG, pia6821_device, cb1_w))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -2168,7 +2168,7 @@ MACHINE_CONFIG_START(pet_state::cbm4032f)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(M6520_1_TAG, pia6821_device, cb1_w))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -2237,7 +2237,7 @@ MACHINE_CONFIG_START(pet80_state::pet80)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
 	MCFG_DEVICE_PROGRAM_MAP(pet2001_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -2257,7 +2257,7 @@ MACHINE_CONFIG_START(pet80_state::pet80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -2423,9 +2423,9 @@ ROM_START( pet2001 )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic1r" )
 	ROM_SYSTEM_BIOS( 0, "basic1o", "Original" )
-	ROMX_LOAD( "901447-01.h1", 0x3000, 0x0800, CRC(a055e33a) SHA1(831db40324113ee996c434d38b4add3fd1f820bd), ROM_BIOS(1) )
+	ROMX_LOAD( "901447-01.h1", 0x3000, 0x0800, CRC(a055e33a) SHA1(831db40324113ee996c434d38b4add3fd1f820bd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic1r", "Revised" )
-	ROMX_LOAD( "901447-09.h1", 0x3000, 0x0800, CRC(03cf16d0) SHA1(1330580c0614d3556a389da4649488ba04a60908), ROM_BIOS(2) )
+	ROMX_LOAD( "901447-09.h1", 0x3000, 0x0800, CRC(03cf16d0) SHA1(1330580c0614d3556a389da4649488ba04a60908), ROM_BIOS(1) )
 	ROM_LOAD( "901447-02.h5", 0x3800, 0x0800, CRC(69fd8a8f) SHA1(70c0f4fa67a70995b168668c957c3fcf2c8641bd) )
 	ROM_LOAD( "901447-03.h2", 0x4000, 0x0800, CRC(d349f2d4) SHA1(4bf2c20c51a63d213886957485ebef336bb803d0) )
 	ROM_LOAD( "901447-04.h6", 0x4800, 0x0800, CRC(850544eb) SHA1(d293972d529023d8fd1f493149e4777b5c253a69) )
@@ -2490,9 +2490,9 @@ ROM_START( pet4016 )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
-	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
+	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic4r", "Revised" )
-	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
+	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_LOAD( "901447-29.ud8", 0x5000, 0x0800, CRC(e5714d4c) SHA1(e88f56e5c54b0e8d8d4e8cb39a4647c803c1f51c) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
@@ -2513,9 +2513,9 @@ ROM_START( pet4032f )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
-	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
+	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic4r", "Revised" )
-	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
+	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_LOAD( "901499-01.ud7", 0x5000, 0x0800, CRC(5f85bdf8) SHA1(8cbf086c1ce4dfb2a2fe24c47476dfb878493dee) )   // Screen Editor (40 columns, CRTC 60Hz, Normal Keyb?)
@@ -2534,9 +2534,9 @@ ROM_START( cbm4016 )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
-	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
+	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic4r", "Revised" )
-	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
+	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_LOAD( "901447-29.ud8", 0x5000, 0x0800, CRC(e5714d4c) SHA1(e88f56e5c54b0e8d8d4e8cb39a4647c803c1f51c) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
@@ -2557,9 +2557,9 @@ ROM_START( cbm4032f )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
-	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
+	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic4r", "Revised" )
-	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
+	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_LOAD( "901498-01.ud7", 0x5000, 0x0800, CRC(3370e359) SHA1(05af284c914d53a52987b5f602466de75765f650) )   // Screen Editor (40 columns, CRTC 50Hz, Normal Keyb?)
@@ -2578,9 +2578,9 @@ ROM_START( pet4032b )
 	ROM_REGION( 0x7000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic4r" )
 	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
-	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
+	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic4r", "Revised" )
-	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
+	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_LOAD( "901474-02.ud8", 0x5000, 0x0800, CRC(75ff4af7) SHA1(0ca5c4e8f532f914cb0bf86ea9900f20f0a655ce) )   // Screen Editor (40 columns, no CRTC, Business Keyb)
@@ -2924,39 +2924,39 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME          PARENT      COMPAT  MACHINE     INPUT       INIT                 COMPANY                         FULLNAME        FLAGS
-COMP( 1977, pet2001,      0,          0,      pet2001,    pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, pet20018,     pet2001,    0,      pet20018,   pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n,     0,          0,      pet2001n8,  pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n16,   pet2001n,   0,      pet2001n16, pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n32,   pet2001n,   0,      pet2001n32, pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3008,      pet2001n,   0,      cbm3008,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3008",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3016,      pet2001n,   0,      cbm3016,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3032,      pet2001n,   0,      cbm3032,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b,     0,          0,      pet2001b8,  petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b16,   pet2001b,   0,      pet2001b16, petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b32,   pet2001b,   0,      pet2001b32, petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3032b,     pet2001b,   0,      cbm3032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "CBM 3032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4016,      0,          0,      pet4016,    pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4032,      pet4016,    0,      pet4032,    pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4032f,     pet4016,    0,      pet4032f,   pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1980, cbm4016,      pet4016,    0,      cbm4016,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032,      pet4016,    0,      cbm4032,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032f,     pet4016,    0,      cbm4032f,   pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1980, pet4032b,     0,          0,      pet4032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032b,     pet4032b,   0,      cbm4032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "CBM 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet8032,      0,          0,      pet8032,    petb,       pet80_state,     0,  "Commodore Business Machines",  "PET 8032",     MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032,      pet8032,    0,      pet8032,    petb,       pet80_state,     0,  "Commodore Business Machines",  "CBM 8032",     MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_de,   pet8032,    0,      pet8032,    petb_de,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_fr,   pet8032,    0,      pet8032,    petb_fr,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (France)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_se,   pet8032,    0,      pet8032,    petb_se,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    MACHINE_SUPPORTS_SAVE )
-COMP( 1981, superpet,     pet8032,    0,      superpet,   petb,       superpet_state,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000,      pet8032,    0,      superpet,   petb,       superpet_state,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000_se,   pet8032,    0,      superpet,   petb_se,    superpet_state,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8096,      pet8032,    0,      cbm8096,    petb,       cbm8096_state,   0,  "Commodore Business Machines",  "CBM 8096",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296,      0,          0,      cbm8296,    petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296ed,    cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d,     cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d_de,  cbm8296,    0,      cbm8296d,   petb_de,    cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296gd,    cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296GD",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME           PARENT    COMPAT  MACHINE     INPUT    CLASS           INIT        COMPANY                        FULLNAME        FLAGS
+COMP( 1977, pet2001,       0,        0,      pet2001,    pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, pet20018,      pet2001,  0,      pet20018,   pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n,      0,        0,      pet2001n8,  pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n16,    pet2001n, 0,      pet2001n16, pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n32,    pet2001n, 0,      pet2001n32, pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-N32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3008,       pet2001n, 0,      cbm3008,    pet,     pet_state,      empty_init, "Commodore Business Machines", "CBM 3008",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3016,       pet2001n, 0,      cbm3016,    pet,     pet_state,      empty_init, "Commodore Business Machines", "CBM 3016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032,       pet2001n, 0,      cbm3032,    pet,     pet_state,      empty_init, "Commodore Business Machines", "CBM 3032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b,      0,        0,      pet2001b8,  petb,    pet2001b_state, empty_init, "Commodore Business Machines", "PET 2001-B8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b16,    pet2001b, 0,      pet2001b16, petb,    pet2001b_state, empty_init, "Commodore Business Machines", "PET 2001-B16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b32,    pet2001b, 0,      pet2001b32, petb,    pet2001b_state, empty_init, "Commodore Business Machines", "PET 2001-B32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032b,      pet2001b, 0,      cbm3032b,   petb,    pet2001b_state, empty_init, "Commodore Business Machines", "CBM 3032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4016,       0,        0,      pet4016,    pet,     pet2001b_state, empty_init, "Commodore Business Machines", "PET 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032,       pet4016,  0,      pet4032,    pet,     pet2001b_state, empty_init, "Commodore Business Machines", "PET 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032f,      pet4016,  0,      pet4032f,   pet,     pet2001b_state, empty_init, "Commodore Business Machines", "PET 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, cbm4016,       pet4016,  0,      cbm4016,    pet,     pet_state,      empty_init, "Commodore Business Machines", "CBM 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032,       pet4016,  0,      cbm4032,    pet,     pet_state,      empty_init, "Commodore Business Machines", "CBM 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032f,      pet4016,  0,      cbm4032f,   pet,     pet_state,      empty_init, "Commodore Business Machines", "CBM 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, pet4032b,      0,        0,      pet4032b,   petb,    pet2001b_state, empty_init, "Commodore Business Machines", "PET 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032b,      pet4032b, 0,      cbm4032b,   petb,    pet2001b_state, empty_init, "Commodore Business Machines", "CBM 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet8032,       0,        0,      pet8032,    petb,    pet80_state,    empty_init, "Commodore Business Machines", "PET 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032,       pet8032,  0,      pet8032,    petb,    pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_de,    pet8032,  0,      pet8032,    petb_de, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (Germany)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_fr,    pet8032,  0,      pet8032,    petb_fr, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (France)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_se,    pet8032,  0,      pet8032,    petb_se, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, superpet,      pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "SuperPET SP-9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000,       pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "MicroMainFrame 9000",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000_se,    pet8032,  0,      superpet,   petb_se, superpet_state, empty_init, "Commodore Business Machines", "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8096,       pet8032,  0,      cbm8096,    petb,    cbm8096_state,  empty_init, "Commodore Business Machines", "CBM 8096",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296,       0,        0,      cbm8296,    petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296ed,     cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296 ExecuDesk",        MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d,      cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d_de,   cbm8296,  0,      cbm8296d,   petb_de, cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D (Germany)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296gd,     cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296GD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296dgv_de, cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D GV? (Germany)",  MACHINE_SUPPORTS_SAVE )

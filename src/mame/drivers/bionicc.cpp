@@ -71,6 +71,10 @@
         This is probably done to be pedantic about coin insertions (might be protection
         related). In fact, currently coin insertions are not consistently recognized.
 
+        We have the schematics for this board and the protection circuit, there
+        are a number of incorrect assumptions in the code which need fixing, especially
+        regarding the two MCU interrupt hookups.
+
 
 ******************************************************************************************/
 
@@ -357,7 +361,7 @@ static const gfx_layout scroll1layout_bionicc=
 	512   /* each tile takes 512 consecutive bytes */
 };
 
-static GFXDECODE_START( bionicc )
+static GFXDECODE_START( gfx_bionicc )
 	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout_bionicc,   0,  4 )    /* colors   0-  63 */
 	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout_bionicc, 256,  4 )    /* colors 256- 319 */
@@ -414,7 +418,7 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bionicc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bionicc)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
@@ -423,7 +427,7 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -707,11 +711,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bionicc,   0,       bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc1,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc2,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, topsecrt,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl, bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl2,bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc,    0,       bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc1,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc2,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, topsecrt,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl,  bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl2, bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
 // there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes

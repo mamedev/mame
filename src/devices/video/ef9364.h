@@ -43,7 +43,7 @@ public:
 	ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_nb_of_pages(int nb_bitplanes) {
 		if (nb_bitplanes > 0 && nb_bitplanes <= 8)
 		{

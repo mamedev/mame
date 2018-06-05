@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
@@ -35,6 +36,13 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+namespace emu { namespace detail {
+
+struct machine_config_replace { machine_config &config; };
+
+} } // namesapce emu::detail
+
 
 struct internal_layout
 {
@@ -109,6 +117,7 @@ public:
 		m_current_device = &device;
 		return token(*this, device);
 	}
+	emu::detail::machine_config_replace replace() { return emu::detail::machine_config_replace{ *this }; };
 	device_t *device_add(const char *tag, device_type type, u32 clock);
 	template <typename Creator>
 	device_t *device_add(const char *tag, Creator &&type, u32 clock)
@@ -132,7 +141,27 @@ public:
 		return device_add(tag, std::forward<Creator>(type), clock.value(), std::forward<Params>(args)...);
 	}
 	device_t *device_replace(const char *tag, device_type type, u32 clock);
-	device_t *device_replace(const char *tag, device_type type, const XTAL &xtal);
+	template <typename Creator>
+	device_t *device_replace(const char *tag, Creator &&type, u32 clock)
+	{
+		return device_replace(tag, device_type(type), clock);
+	}
+	template <typename Creator, typename... Params>
+	auto device_replace(const char *tag, Creator &&type, Params &&... args)
+	{
+		std::tuple<const char *, device_t *, device_t *> const existing(prepare_replace(tag));
+		auto device(type.create(*this, std::get<0>(existing), std::get<1>(existing), std::forward<Params>(args)...));
+		auto &result(*device);
+		assert(type.type() == typeid(result));
+		replace_device(std::move(device), *std::get<1>(existing), std::get<2>(existing));
+		return &result;
+	}
+	template <typename Creator, typename... Params>
+	auto device_replace(const char *tag, Creator &&type, XTAL clock, Params &&... args)
+	{
+		clock.validate(std::string("Replacing device ") + tag);
+		return device_replace(tag, std::forward<Creator>(type), clock.value(), std::forward<Params>(args)...);
+	}
 	device_t *device_remove(const char *tag);
 	device_t *device_find(device_t *owner, const char *tag);
 
@@ -141,7 +170,9 @@ private:
 
 	// internal helpers
 	std::pair<const char *, device_t *> resolve_owner(const char *tag) const;
-	device_t *add_device(std::unique_ptr<device_t> &&device, device_t *owner);
+	std::tuple<const char *, device_t *, device_t *> prepare_replace(const char *tag);
+	device_t &add_device(std::unique_ptr<device_t> &&device, device_t *owner);
+	device_t &replace_device(std::unique_ptr<device_t> &&device, device_t &owner, device_t *existing);
 	void remove_references(ATTR_UNUSED device_t &device);
 
 	// internal state
@@ -163,6 +194,16 @@ template <typename Tag, typename Creator, typename... Params>
 inline std::enable_if_t<emu::detail::is_device_interface<typename std::remove_reference_t<Creator>::exposed_type>::value, device_t *> device_add_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
 {
 	return &type(mconfig, std::forward<Tag>(tag), std::forward<Params>(args)...).device();
+}
+template <typename Tag, typename Creator, typename... Params>
+inline std::enable_if_t<emu::detail::is_device_implementation<typename std::remove_reference_t<Creator>::exposed_type>::value, typename std::remove_reference_t<Creator>::exposed_type *> device_replace_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
+{
+	return &type(mconfig.replace(), std::forward<Tag>(tag), std::forward<Params>(args)...);
+}
+template <typename Tag, typename Creator, typename... Params>
+inline std::enable_if_t<emu::detail::is_device_interface<typename std::remove_reference_t<Creator>::exposed_type>::value, device_t *> device_replace_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
+{
+	return &type(mconfig.replace(), std::forward<Tag>(tag), std::forward<Params>(args)...).device();
 }
 
 } } // namespace emu::detail
@@ -211,8 +252,8 @@ Ends a machine_config.
 // add/remove devices
 #define MCFG_DEVICE_ADD(_tag, ...) \
 	device = emu::detail::device_add_impl(config, _tag, __VA_ARGS__);
-#define MCFG_DEVICE_REPLACE(_tag, _type, _clock) \
-	device = config.device_replace(_tag, _type, _clock);
+#define MCFG_DEVICE_REPLACE(_tag, ...) \
+	device = emu::detail::device_replace_impl(config, _tag, __VA_ARGS__);
 #define MCFG_DEVICE_REMOVE(_tag) \
 	device = config.device_remove(_tag);
 #define MCFG_DEVICE_MODIFY(_tag)    \

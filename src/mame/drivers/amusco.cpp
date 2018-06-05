@@ -86,8 +86,8 @@
 #include "amusco.lh"
 
 
-#define MASTER_CLOCK        XTAL(22'118'400)     /* confirmed */
-#define SECOND_CLOCK        XTAL(15'000'000)          /* confirmed */
+#define MASTER_CLOCK        22.1184_MHz_XTAL     /* confirmed */
+#define SECOND_CLOCK        15_MHz_XTAL          /* confirmed */
 
 #define CPU_CLOCK           MASTER_CLOCK / 4    /* guess */
 #define CRTC_CLOCK          SECOND_CLOCK / 8    /* guess */
@@ -455,7 +455,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( amusco )
+static GFXDECODE_START( gfx_amusco )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 ) // current palette has only 8 colors...
 GFXDECODE_END
 
@@ -562,7 +562,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_I8155_IN_PORTB_CB(READ8(*this, amusco_state, lpt_status_r))
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
-	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
 	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, rtc_control_w))
@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amusco)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amusco)
 
 	MCFG_PALETTE_ADD("palette",8*8)
 	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_MC6845_UPDATE_ROW_CB(amusco_state, update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn", SN76489A, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -650,6 +650,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME        PARENT  MACHINE   INPUT      STATE         INIT  ROT   COMPANY      FULLNAME                       FLAGS                                                LAYOUT    */
-GAMEL( 1987, amusco,     0,      amusco,   amusco,    amusco_state, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
-GAMEL( 1988, draw88pkr,  0,      draw88pkr,draw88pkr, amusco_state, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+/*     YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY      FULLNAME                       FLAGS                                                LAYOUT    */
+GAMEL( 1987, amusco,    0,      amusco,    amusco,    amusco_state, empty_init, ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+GAMEL( 1988, draw88pkr, 0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong

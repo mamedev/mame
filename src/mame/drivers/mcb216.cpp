@@ -174,6 +174,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY      FULLNAME  FLAGS */
-COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, mcb216_state,  0,    "Cromemco", "MCB-216", MACHINE_NO_SOUND_HW )
-COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, mcb216_state,  0,    "Cromemco", "CB-308",  MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME   FLAGS */
+COMP( 1979, mcb216, 0,      0,      mcb216,  mcb216, mcb216_state, empty_init, "Cromemco", "MCB-216", MACHINE_NO_SOUND_HW )
+COMP( 1977, cb308,  mcb216, 0,      cb308,   mcb216, mcb216_state, empty_init, "Cromemco", "CB-308",  MACHINE_NO_SOUND_HW )

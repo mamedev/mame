@@ -86,6 +86,8 @@
 #include "hashfile.h"
 #include "nes_slot.h"
 
+#include "cpu/m6502/m6502.h"
+
 #define NES_BATTERY_SIZE 0x2000
 
 
@@ -111,7 +113,9 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	, m_ciram(nullptr)
 	, m_prg_size(0)
 	, m_vrom_size(0)
-	, m_maincpu(nullptr)
+	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
+	// main NES CPU here, even if it does not belong to this device.
+	, m_maincpu(*this, ":maincpu")
 	, m_mapper_sram(nullptr)
 	, m_mapper_sram_size(0)
 	, m_ce_mask(0)
@@ -565,6 +569,30 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 }
 
 //-------------------------------------------------
+//  Interrupt helpers
+//-------------------------------------------------
+
+DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
+{
+	// use hold_irq_line for HOLD_LINE semantics (not recommended)
+	assert(state == ASSERT_LINE || state == CLEAR_LINE);
+
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
+}
+
+void device_nes_cart_interface::hold_irq_line()
+{
+	// hack which requires the CPU object
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
+}
+
+void device_nes_cart_interface::reset_cpu()
+{
+	// another hack
+	m_maincpu->set_pc(0xfffc);
+}
+
+//-------------------------------------------------
 //  Other helpers
 //-------------------------------------------------
 
@@ -671,10 +699,6 @@ WRITE8_MEMBER(device_nes_cart_interface::write_h)
 
 void device_nes_cart_interface::pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted)
 {
-	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
-	// main NES CPU here, even if it does not belong to this device.
-	m_maincpu = machine.device<cpu_device>("maincpu");
-
 	if (cart_mounted)       // disksys expansion can arrive here without the memory banks!
 	{
 		// Setup PRG

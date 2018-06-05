@@ -147,6 +147,7 @@ public:
 		m_via(*this, "via6522_0"),
 		m_ram(*this, RAM_TAG),
 		m_ncr5380(*this, "ncr5380"),
+		m_iwm(*this, "fdc"),
 		m_mackbd(*this, MACKBD_TAG),
 		m_rtc(*this,"rtc"),
 		m_mouse0(*this, "MOUSE0"),
@@ -163,6 +164,7 @@ public:
 	required_device<via6522_device> m_via;
 	required_device<ram_device> m_ram;
 	optional_device<ncr5380_device> m_ncr5380;
+	required_device<applefdc_base_device> m_iwm;
 	optional_device<mackbd_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 
@@ -235,9 +237,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
-	DECLARE_DRIVER_INIT(mac128k512k);
-	DECLARE_DRIVER_INIT(mac512ke);
-	DECLARE_DRIVER_INIT(macplus);
+	void init_mac128k512k();
+	void init_mac512ke();
+	void init_macplus();
 	DECLARE_VIDEO_START(mac);
 	DECLARE_PALETTE_INIT(mac);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -634,9 +636,8 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 	 */
 
 	uint16_t result = 0;
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
-	result = fdc->read(offset >> 8);
+	result = m_iwm->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
@@ -646,15 +647,13 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 
 WRITE16_MEMBER ( mac128_state::mac_iwm_w )
 {
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
-
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
-		fdc->write((offset >> 8), data & 0xff);
+		m_iwm->write((offset >> 8), data & 0xff);
 	else
-		fdc->write((offset >> 8), data>>8);
+		m_iwm->write((offset >> 8), data>>8);
 }
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
@@ -744,12 +743,11 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 
 WRITE8_MEMBER(mac128_state::mac_via_out_a)
 {
-	device_t *fdc = machine().device("fdc");
 //  printf("%s VIA1 OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
-	sony_set_sel_line(fdc,(data & 0x20) >> 5);
+	sony_set_sel_line(m_iwm, (data & 0x20) >> 5);
 
 	m_main_buffer = ((data & 0x08) == 0x08) ? true : false;
 	m_snd_vol = data & 0x07;
@@ -1262,7 +1260,7 @@ uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bi
 }
 
 #define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(mac128_state,label)     \
+void mac128_state::init_##label()     \
 {   \
 	mac_driver_init(model); \
 }
@@ -1344,17 +1342,18 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac128_state, mac_scanline, "screen", 0, 1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD(DAC_TAG, DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
+	MCFG_RTC3430042_ADD("rtc", 32.768_kHz_XTAL)
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC85C30_ADD("scc", C7M, C3_7M, 0, C3_7M, 0)
+	MCFG_DEVICE_ADD("scc", SCC85C30, C7M)
+	MCFG_Z80SCC_OFFSETS(C3_7M, 0, C3_7M, 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, mac128_state, set_scc_interrupt))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
@@ -1503,8 +1502,8 @@ static INPUT_PORTS_START( macplus )
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT(0x0038, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 	PORT_BIT(0x0E00, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
@@ -1635,18 +1634,18 @@ ROM_END
 ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use up the buggy roms rather than destroying them.
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
-	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_FILL(0x20000, 0x2, 0xff)    // ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
-	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
-	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	/* from Technical note HW11 (https://www.fenestrated.net/mirrors/Apple%20Technotes%20(As%20of%202002)/hw/hw_11.html)
@@ -1685,33 +1684,32 @@ ROM_END
 ROM_START( macplus ) // same notes as above apply here as well
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
-	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_FILL(0x20000, 0x2, 0xff)    // ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
-	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
-	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(3, "romdisk", "mac68k.info self-boot (1/1/2015)")
-	ROMX_LOAD( "modplus-harp2.bin", 0x000000, 0x028000, CRC(ba56078d) SHA1(debdf328ac73e1662d274a044d8750224f47edef), ROM_GROUPWORD | ROM_BIOS(4) )
+	ROMX_LOAD( "modplus-harp2.bin", 0x000000, 0x028000, CRC(ba56078d) SHA1(debdf328ac73e1662d274a044d8750224f47edef), ROM_GROUPWORD | ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "romdisk2", "bigmessofwires.com ROMinator (2/25/2015)")
-	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(5) )
-	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(4) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
-//COMP( 1983, mactw,    0,        0,  mac128k,  macplus, mac128_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1984, mac128k,  0,        0,  mac128k,  macplus, mac128_state,  mac128k512k,  "Apple Computer", "Macintosh 128k",  MACHINE_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k,  0,  mac512ke, macplus, mac128_state,  mac128k512k,  "Apple Computer", "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus,  0,  mac512ke, macplus, mac128_state,  mac512ke,     "Apple Computer", "Macintosh 512ke", 0 )
-COMP( 1985, unitron,  macplus,  0,  mac512ke, macplus, mac128_state,  mac512ke,     "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1986, macplus,  0,        0,  macplus,  macplus, mac128_state,  macplus,      "Apple Computer", "Macintosh Plus",  0 )
-COMP( 1985, utrn1024, macplus,  0,  macplus,  macplus, mac128_state,  macplus,      "bootleg (Unitron)", "Unitron 1024",  0 )
-
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
+//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
+COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
+COMP( 1984, mac512k,  mac128k, 0,      mac512ke, macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 512k",  MACHINE_NOT_WORKING )
+COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", 0 )
+COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
+COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  0 )
+COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  0 )

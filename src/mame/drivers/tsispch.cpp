@@ -114,7 +114,6 @@
 #include "includes/tsispch.h"
 
 #include "cpu/i86/i86.h"
-#include "cpu/upd7725/upd7725.h"
 #include "machine/i8251.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -184,44 +183,38 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 *****************************************************************************/
 READ16_MEMBER( tsispch_state::dsp_data_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(true);
+	uint8_t temp = m_dsp->snesdsp_read(true);
 	fprintf(stderr, "dsp data read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(true);
+	return m_dsp->snesdsp_read(true);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_data_w )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP_W
 	fprintf(stderr, "dsp data write: %02x\n", data);
 #endif
-	upd7725->snesdsp_write(true, data);
+	m_dsp->snesdsp_write(true, data);
 }
 
 READ16_MEMBER( tsispch_state::dsp_status_r )
 {
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	uint8_t temp;
-	temp = upd7725->snesdsp_read(false);
+	uint8_t temp = m_dsp->snesdsp_read(false);
 	fprintf(stderr, "dsp status read: %02x\n", temp);
 	return temp;
 #else
-	return upd7725->snesdsp_read(false);
+	return m_dsp->snesdsp_read(false);
 #endif
 }
 
 WRITE16_MEMBER( tsispch_state::dsp_status_w )
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
-	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
-	upd7725->snesdsp_write(false, data);
+	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
@@ -245,7 +238,7 @@ void tsispch_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
-DRIVER_INIT_MEMBER(tsispch_state,prose2k)
+void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
@@ -266,28 +259,27 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
 	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 11 10 9  8  7
 	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
-	uint8_t byte1t;
-	uint16_t byte23t;
-		for (int i = 0; i < 0x600; i+= 3)
+	for (int i = 0; i < 0x600; i+= 3)
+	{
+		uint8_t byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
+		uint16_t byte23t;
+		// here's where things get disgusting: if the first byte was an OP or RT, do the following:
+		if ((byte1t&0x80) == 0x00) // op or rt instruction
 		{
-			byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
-			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
-			if ((byte1t&0x80) == 0x00) // op or rt instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
-			}
-			else if ((byte1t&0xC0) == 0x80) // jp instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
-			}
-			else // ld instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
-			}
-
-			*dspprg = byte1t<<24 | byte23t<<8;
-			dspprg++;
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
 		}
+		else if ((byte1t&0xC0) == 0x80) // jp instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
+		}
+		else // ld instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
+		}
+
+		*dspprg = byte1t<<24 | byte23t<<8;
+		dspprg++;
+	}
 	m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
 }
 
@@ -405,7 +397,7 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txempty_int))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -546,6 +538,6 @@ ROM_START( prose2ko )
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT     COMPANY                                FULLNAME                  FLAGS
-COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                                FULLNAME                  FLAGS
+COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

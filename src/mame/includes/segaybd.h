@@ -69,12 +69,12 @@ public:
 	void rchase_output_cb2(uint16_t data);
 
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(pdrift);
-	DECLARE_DRIVER_INIT(r360);
-	DECLARE_DRIVER_INIT(gforce2);
-	DECLARE_DRIVER_INIT(rchase);
-	DECLARE_DRIVER_INIT(gloc);
+	void init_generic();
+	void init_pdrift();
+	void init_r360();
+	void init_gforce2();
+	void init_rchase();
+	void init_gloc();
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

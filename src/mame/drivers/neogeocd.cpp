@@ -124,8 +124,8 @@ public:
 
 	uint32_t screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(neocdz);
-	DECLARE_DRIVER_INIT(neocdzj);
+	void init_neocdz();
+	void init_neocdzj();
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
@@ -372,7 +372,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		//  printf("blah %02x\n", byteValue);
 			if (byteValue == 0x00)
 			{
-				machine().device("ymsnd")->reset();
+				m_ym->reset();
 				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			else m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -847,7 +847,7 @@ void ngcd_state::machine_start()
 	// initialize the memcard data structure
 	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
 	m_meminternal_data = make_unique_clear<uint8_t[]>(0x2000);
-	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
+	subdevice<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
 	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
 	m_tempcdc->reset_cd();
@@ -1075,11 +1075,11 @@ MACHINE_CONFIG_END
 ROM_START( neocd )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "top",   "Top loading Neo-Geo CD" )
-	ROMX_LOAD( "top-sp1.bin",    0x00000, 0x80000, CRC(c36a47c0) SHA1(235f4d1d74364415910f73c10ae5482d90b4274f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROMX_LOAD("top-sp1.bin",    0x00000, 0x80000, CRC(c36a47c0) SHA1(235f4d1d74364415910f73c10ae5482d90b4274f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "front",   "Front loading Neo-Geo CD" )
-	ROMX_LOAD( "front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROMX_LOAD("front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
-	ROMX_LOAD( "uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
+	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
@@ -1103,9 +1103,9 @@ ROM_END
 ROM_START( neocdz )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "official",   "Official BIOS" )
-	ROMX_LOAD( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROMX_LOAD("neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
-	ROMX_LOAD( "uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROMX_LOAD("uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
@@ -1128,19 +1128,19 @@ ROM_END
 
 #define rom_neocdzj    rom_neocdz
 
-DRIVER_INIT_MEMBER(ngcd_state,neocdz)
+void ngcd_state::init_neocdz()
 {
 	NeoSystem = NEOCD_REGION_US;
 }
 
-DRIVER_INIT_MEMBER(ngcd_state,neocdzj)
+void ngcd_state::init_neocdzj()
 {
 	NeoSystem = NEOCD_REGION_JAPAN;
 }
 
 
-//    YEAR  NAME     PARENT  COMPAT MACHINE INPUT  STATE       INIT     COMPANY FULLNAME               FLAGS */
-CONS( 1996, neocdz,  0,      0,     neocd,  neocd, ngcd_state, neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
-CONS( 1996, neocdzj, neocdz, 0,     neocd,  neocd, ngcd_state, neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS */
+CONS( 1996, neocdz,  0,      0,      neocd,   neocd,  ngcd_state,  init_neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,      neocd,   neocd,  ngcd_state,  init_neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
-CONS( 1994, neocd,   neocdz, 0,     neocd,  neocd, ngcd_state, 0,       "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,      neocd,   neocd,  ngcd_state,  empty_init,   "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

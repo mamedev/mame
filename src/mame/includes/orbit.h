@@ -84,6 +84,6 @@ private:
 };
 /*----------- defined in audio/orbit.c -----------*/
 
-DISCRETE_SOUND_EXTERN( orbit );
+DISCRETE_SOUND_EXTERN( orbit_discrete );
 
 #endif // MAME_INCLUDES_ORBIT_H

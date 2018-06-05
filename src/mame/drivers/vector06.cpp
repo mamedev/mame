@@ -180,9 +180,8 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(vector06_state, vector06)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -200,7 +199,7 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_KR1818VG93_ADD("wd1793", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("wd1793", KR1818VG93, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)
@@ -238,17 +237,17 @@ MACHINE_CONFIG_END
 ROM_START( vector06 )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "unboot32k", "Universal Boot 32K")
-	ROMX_LOAD( "unboot32k.rt", 0x10000, 0x8000, CRC(28c9b5cd) SHA1(8cd7fb658896a7066ae93b10eaafa0f12139ad81), ROM_BIOS(1))
+	ROMX_LOAD( "unboot32k.rt", 0x10000, 0x8000, CRC(28c9b5cd) SHA1(8cd7fb658896a7066ae93b10eaafa0f12139ad81), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "unboot2k", "Universal Boot 2K")
-	ROMX_LOAD( "unboot2k.rt",  0x10000, 0x0800, CRC(4c80dc31) SHA1(7e5e3acfdbea2e52b0d64c5868821deaec383815), ROM_BIOS(2))
+	ROMX_LOAD( "unboot2k.rt",  0x10000, 0x0800, CRC(4c80dc31) SHA1(7e5e3acfdbea2e52b0d64c5868821deaec383815), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "coman", "Boot Coman")
-	ROMX_LOAD( "coman.rt",     0x10000, 0x0800, CRC(f8c4a85a) SHA1(47fa8b02f09a1d06aa63a2b90b2597b1d93d976f), ROM_BIOS(3))
+	ROMX_LOAD( "coman.rt",     0x10000, 0x0800, CRC(f8c4a85a) SHA1(47fa8b02f09a1d06aa63a2b90b2597b1d93d976f), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "bootbyte", "Boot Byte")
-	ROMX_LOAD( "bootbyte.rt",  0x10000, 0x0800, CRC(3b42fd9d) SHA1(a112f4fe519bc3dbee85b09040d4804a17c9eda2), ROM_BIOS(4))
+	ROMX_LOAD( "bootbyte.rt",  0x10000, 0x0800, CRC(3b42fd9d) SHA1(a112f4fe519bc3dbee85b09040d4804a17c9eda2), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "bootos", "Boot OS")
-	ROMX_LOAD( "bootos.rt",    0x10000, 0x0200, CRC(46bef038) SHA1(6732f4a360cd38112c53c458842d31f5b035cf59), ROM_BIOS(5))
+	ROMX_LOAD( "bootos.rt",    0x10000, 0x0200, CRC(46bef038) SHA1(6732f4a360cd38112c53c458842d31f5b035cf59), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "boot512", "Boot 512")
-	ROMX_LOAD( "boot512.rt",   0x10000, 0x0200, CRC(a0b1c6b2) SHA1(f6fe15cb0974aed30f9b7aa72133324a66d1ed3f), ROM_BIOS(6))
+	ROMX_LOAD( "boot512.rt",   0x10000, 0x0200, CRC(a0b1c6b2) SHA1(f6fe15cb0974aed30f9b7aa72133324a66d1ed3f), ROM_BIOS(5))
 ROM_END
 
 ROM_START( vec1200 )
@@ -271,8 +270,8 @@ ROM_START( krista2 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME       FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 06c",  0)
-COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
-COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
-COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME       FLAGS */
+COMP( 1987, vector06, 0,        0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 06c",  0)
+COMP( 1987, vec1200,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
+COMP( 1987, pk6128c,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
+COMP( 1987, krista2,  vector06, 0,      vector06, vector06, vector06_state, empty_init, "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)

@@ -50,6 +50,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_cart(*this, "cartslot")
 		, m_centronics(*this, CENTRONICS_TAG)
+		, m_expansions(*this, "exp%u", 1)
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "LINE.%u", 0)
 	{ }
@@ -60,10 +61,10 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
 	required_device<centronics_device> m_centronics;
+	required_device_array<tvcexp_slot_device, 4> m_expansions;
 	required_device<palette_device> m_palette;
 	required_ioport_array<16> m_keyboard;
 
-	tvcexp_slot_device *m_expansions[4];
 	memory_region *m_bios_rom;
 	memory_region *m_cart_rom;
 	memory_region *m_ext;
@@ -609,11 +610,6 @@ void tvc_state::machine_start()
 
 	m_int_flipflop = 0;
 
-	m_expansions[0] = machine().device<tvcexp_slot_device>("exp1");
-	m_expansions[1] = machine().device<tvcexp_slot_device>("exp2");
-	m_expansions[2] = machine().device<tvcexp_slot_device>("exp3");
-	m_expansions[3] = machine().device<tvcexp_slot_device>("exp4");
-
 	m_bios_rom = memregion("sys");
 	m_ext = memregion("ext");
 	m_vram = memregion("vram");
@@ -795,7 +791,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", TVC_SOUND, 0)
 	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -857,11 +853,11 @@ ROM_END
 ROM_START( tvc64p )
 	ROM_REGION( 0x4000, "sys", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v22", "v2.2")
-	ROMX_LOAD( "tvc22_d6.64k", 0x0000, 0x2000, CRC(05ac3a34) SHA1(bdc7eda5fd53f806dca8c4929ee498e8e59eb787), ROM_BIOS(1) )
-	ROMX_LOAD( "tvc22_d4.64k", 0x2000, 0x2000, CRC(ba6ad589) SHA1(e5c8a6db506836a327d901387a8dc8c681a272db), ROM_BIOS(1) )
+	ROMX_LOAD( "tvc22_d6.64k", 0x0000, 0x2000, CRC(05ac3a34) SHA1(bdc7eda5fd53f806dca8c4929ee498e8e59eb787), ROM_BIOS(0) )
+	ROMX_LOAD( "tvc22_d4.64k", 0x2000, 0x2000, CRC(ba6ad589) SHA1(e5c8a6db506836a327d901387a8dc8c681a272db), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v21", "v2.1")
-	ROMX_LOAD( "tvc21_d6.64k", 0x0000, 0x2000, CRC(f197ffce) SHA1(7b27a91504dd864170451949ada5f938d6532cae), ROM_BIOS(2) )
-	ROMX_LOAD( "tvc21_d4.64k", 0x2000, 0x2000, CRC(b054c0b2) SHA1(c8ca8d5a4d092604de01e2cafc2a2dabe94e6380), ROM_BIOS(2) )
+	ROMX_LOAD( "tvc21_d6.64k", 0x0000, 0x2000, CRC(f197ffce) SHA1(7b27a91504dd864170451949ada5f938d6532cae), ROM_BIOS(1) )
+	ROMX_LOAD( "tvc21_d4.64k", 0x2000, 0x2000, CRC(b054c0b2) SHA1(c8ca8d5a4d092604de01e2cafc2a2dabe94e6380), ROM_BIOS(1) )
 
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvc22_d7.64k", 0x2000, 0x2000, CRC(05e1c3a8) SHA1(abf119cf947ea32defd08b29a8a25d75f6bd4987))
@@ -882,7 +878,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT     STATE       INIT  COMPANY       FULLNAME             FLAGS
-COMP( 1985, tvc64,    0,      0,     tvc,       tvc,      tvc_state,  0,    "Videoton",   "TVC 64",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, tvc64p,   tvc64,  0,     tvc,       tvc,      tvc_state,  0,    "Videoton",   "TVC 64+",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, tvc64pru, tvc64,  0,     tvc,       tvc64pru, tvc_state,  0,    "Videoton",   "TVC 64+ (Russian)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     CLASS      INIT        COMPANY       FULLNAME             FLAGS
+COMP( 1985, tvc64,    0,      0,      tvc,     tvc,      tvc_state, empty_init, "Videoton",   "TVC 64",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, tvc64p,   tvc64,  0,      tvc,     tvc,      tvc_state, empty_init, "Videoton",   "TVC 64+",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, tvc64pru, tvc64,  0,      tvc,     tvc64pru, tvc_state, empty_init, "Videoton",   "TVC 64+ (Russian)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

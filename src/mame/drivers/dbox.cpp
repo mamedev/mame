@@ -448,7 +448,7 @@ class dbox_state : public driver_device
 
 	virtual void machine_reset() override;
 	virtual void machine_start () override;
-	DECLARE_DRIVER_INIT(dbox);
+	void init_dbox();
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_LATCH8_WRITE_4(WRITELINE("display", sda5708_device, reset_w))
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(dbox_state, dbox)
+void dbox_state::init_dbox()
 {
 }
 
@@ -640,13 +640,13 @@ ROM_START( dbox )
 	ROM_DEFAULT_BIOS("b200uns")
 
 	ROM_SYSTEM_BIOS(0, "b200uns", "Nokia Bootloader B200uns")
-	ROMX_LOAD( "b200uns.bin",   0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f), ROM_BIOS(1) )
+	ROMX_LOAD( "b200uns.bin",   0x000000, 0x020000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "b210uns", "Nokia Bootloader B210uns")
-	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(2) )
+	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "nbc106.bin", "Nokia Bootloader CI v1.06")
-	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
+	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(2) )
 ROM_END
 
-COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

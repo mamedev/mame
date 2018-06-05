@@ -91,7 +91,6 @@ class address_map; // Forward declaration
 
 // common device interfaces
 #include "diexec.h"
-#include "diserial.h"
 #include "devcpu.h"
 
 // video-related

@@ -177,7 +177,7 @@ SAMPLES_START_CB_MEMBER(exidy_state::targ_audio_start)
 
 MACHINE_CONFIG_START(exidy_state::spectar_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
@@ -193,7 +193,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(exidy_state::targ_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)

@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("z80", INPUT_LINE_IRQ0))
 
 	/* fdc */
-	MCFG_FD1771_ADD("fdc", 4_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", FD1771, 4_MHz_XTAL / 2)
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, proteus_state, motor_w))
 	MCFG_WD_FDC_FORCE_READY
 
@@ -421,11 +421,11 @@ ROM_START(proteus)
 	ROM_REGION(0x1000, "bios", 0)
 	ROM_DEFAULT_BIOS("82")
 	ROM_SYSTEM_BIOS(0, "82", "030982")
-	ROMX_LOAD("proteusv30.u28", 0x0000, 0x1000, CRC(ad02dc36) SHA1(f73aff8b3d85448f603a2fe807e3a7e02550db27), ROM_BIOS(1))
+	ROMX_LOAD("proteusv30.u28", 0x0000, 0x1000, CRC(ad02dc36) SHA1(f73aff8b3d85448f603a2fe807e3a7e02550db27), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "86", "300986")
-	ROMX_LOAD("300986.u28", 0x0000, 0x1000, CRC(f607d396) SHA1(0b9d9d3178b5587e60da56885b9e8a83f7d5dd26), ROM_BIOS(2))
+	ROMX_LOAD("300986.u28", 0x0000, 0x1000, CRC(f607d396) SHA1(0b9d9d3178b5587e60da56885b9e8a83f7d5dd26), ROM_BIOS(1))
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY     FULLNAME                     FLAGS */
-COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, 0,    "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME                     FLAGS */
+COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, empty_init, "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )

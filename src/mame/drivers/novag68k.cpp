@@ -11,7 +11,6 @@
     such as Arena(in editmode).
 
     TODO:
-	- scorpio68 internal artwork
     - RS232 port
 
 ******************************************************************************
@@ -38,6 +37,7 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 
 // internal artwork
 #include "novag_diablo68k.lh" // clickable
+#include "novag_scorpio68k.lh" // clickable
 
 
 class novag68k_state : public novagbase_state
@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_DEFAULT_LAYOUT(layout_novag_diablo68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(novag68k_state::scorpio68k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(scorpio68k_map)
 
-	//MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
+	MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
 MACHINE_CONFIG_END
 
 
@@ -288,7 +288,7 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START( diablo68 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
 	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) )
 	ROM_LOAD16_BYTE("book.bin",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
@@ -296,7 +296,7 @@ ROM_END
 
 
 ROM_START( scorpio68 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("s_evn_904.u3", 0x00000, 0x8000, CRC(a8f63245) SHA1(0ffdc6eb8ecad730440b0bfb2620fb00820e1aea) )
 	ROM_LOAD16_BYTE("s_odd_c18.u2", 0x00001, 0x8000, CRC(4f033319) SHA1(fce228b1705b7156d4d01ef92b22a875d0f6f321) )
 	ROM_LOAD16_BYTE("502.u4",       0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
@@ -308,6 +308,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE     INPUT       STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1991, diablo68,  0,      0, diablo68k,  diablo68k,  novag68k_state, 0, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, scorpio68, 0,      0, scorpio68k, scorpio68k, novag68k_state, 0, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME       PARENT CMP MACHINE     INPUT       CLASS           INIT        COMPANY  FULLNAME         FLAGS
+CONS( 1991, diablo68,  0,      0, diablo68k,  diablo68k,  novag68k_state, empty_init, "Novag", "Diablo 68000",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, scorpio68, 0,      0, scorpio68k, scorpio68k, novag68k_state, empty_init, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

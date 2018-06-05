@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_DEVICE_ADD ("aciaremt", ACIA6850, 0)
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200))
+	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(WRITELINE (*this, force68k_state, write_f1_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (*this, force68k_state, write_f3_clock))
 	MCFG_MC14411_F5_CB(WRITELINE (*this, force68k_state, write_f5_clock))
@@ -638,16 +638,16 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (fccpu1)
-ROM_REGION (0x1000000, "maincpu", 0)
-ROM_DEFAULT_BIOS("forcemon-1.0l")
+	ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("forcemon-1.0l")
 
-ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
-ROMX_LOAD ("fccpu1v1.0l.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(1))
-ROMX_LOAD ("fccpu1v1.0l.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90dc44d9c25d28428233e6846da6edce2d69e440), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
+	ROMX_LOAD ("fccpu1v1.0l.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD ("fccpu1v1.0l.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90dc44d9c25d28428233e6846da6edce2d69e440), ROM_SKIP(1) | ROM_BIOS(0))
 
-ROM_SYSTEM_BIOS(1, "forcebug-1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
-ROMX_LOAD ("fccpu1v1.1.j8.bin", 0x080001, 0x4000, CRC (116dcbf0) SHA1 (6870b71606933f84afe27ad031c651d201b93f99), ROM_SKIP(1) | ROM_BIOS(2))
-ROMX_LOAD ("fccpu1v1.1.j9.bin", 0x080000, 0x4000, CRC (aefd5b0b) SHA1 (1e24530a6d5dc4fb77fde67acae08d371e59fc0f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "forcebug-1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
+	ROMX_LOAD ("fccpu1v1.1.j8.bin", 0x080001, 0x4000, CRC (116dcbf0) SHA1 (6870b71606933f84afe27ad031c651d201b93f99), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("fccpu1v1.1.j9.bin", 0x080000, 0x4000, CRC (aefd5b0b) SHA1 (1e24530a6d5dc4fb77fde67acae08d371e59fc0f), ROM_SKIP(1) | ROM_BIOS(1))
 
 /*
  * System ROM terminal commands
@@ -704,31 +704,31 @@ ROM_END
  */
 #if 0
 ROM_START (fccpu6)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6a)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6v)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6va)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6vb)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 #endif
 
 /* Driver */
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT     CLASS            INIT  COMPANY                  FULLNAME          FLAGS */
-COMP( 1983, fccpu1,   0,      0,      fccpu1,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
-//COMP( 1989, fccpu6,   0,      0,      fccpu6,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6va, 0,      0,      fccpu6va,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */
+COMP( 1983, fccpu1,   0,      0,      fccpu1,   force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
+//COMP( 1989, fccpu6,   0,      0,      fccpu6,   force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,  force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,  force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6va, 0,      0,      fccpu6va, force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb, force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )

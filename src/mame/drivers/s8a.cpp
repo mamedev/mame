@@ -67,7 +67,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8a);
-	DECLARE_DRIVER_INIT(s8a);
+	void init_s8a();
 	void s8a(machine_config &config);
 	void s8a_audio_map(address_map &map);
 	void s8a_main_map(address_map &map);
@@ -162,14 +162,14 @@ INPUT_CHANGED_MEMBER( s8a_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( s8a_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( s8a_state::sol3_w )
@@ -278,7 +278,7 @@ MACHINE_RESET_MEMBER( s8a_state, s8a )
 {
 }
 
-DRIVER_INIT_MEMBER( s8a_state, s8a )
+void s8a_state::init_s8a()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s8a_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -359,4 +359,4 @@ ROM_START(scrzy_l1)
 	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
 
-GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, s8a, ROT0, "Williams", "Still Crazy", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, init_s8a, ROT0, "Williams", "Still Crazy", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

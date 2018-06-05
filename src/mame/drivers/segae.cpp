@@ -315,12 +315,9 @@ GND  8A 8B GND
 
 class systeme_state : public driver_device
 {
-protected:
-	virtual void machine_start() override;
-
 public:
-	systeme_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	systeme_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp1(*this, "vdp1"),
 		m_vdp2(*this, "vdp2"),
@@ -328,7 +325,9 @@ public:
 		m_maincpu_region(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
-		m_bank1d(*this, "bank1d") { }
+		m_bank1d(*this, "bank1d"),
+		m_lamp(*this, "lamp0")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(bank_write);
 	DECLARE_WRITE8_MEMBER(coin_counters_write);
@@ -336,8 +335,8 @@ public:
 	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
 	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
 
-	DECLARE_DRIVER_INIT( opaopa );
-	DECLARE_DRIVER_INIT( fantzn2 );
+	void init_opaopa();
+	void init_fantzn2();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -353,6 +352,10 @@ public:
 	void systeme_map(address_map &map);
 	void vdp1_map(address_map &map);
 	void vdp2_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
@@ -364,6 +367,7 @@ private:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
+	output_finder<> m_lamp;
 
 	// Analog input related
 	uint8_t m_port_select;
@@ -447,12 +451,13 @@ WRITE8_MEMBER(systeme_state::coin_counters_write)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
-	machine().output().set_lamp_value(0, BIT(data, 2)); // used only by hangonjr?
+	m_lamp = BIT(data, 2); // used only by hangonjr?
 }
 
 
 void systeme_state::machine_start()
 {
+	m_lamp.resolve();
 	membank("vdp1_bank")->configure_entries(0, 2, m_vram[0], 0x4000);
 	membank("vdp2_bank")->configure_entries(0, 2, m_vram[1], 0x4000);
 	m_bank1->configure_entries(0, 16, m_maincpu_region->base() + 0x10000, 0x4000);
@@ -903,7 +908,7 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	MCFG_DEVICE_ADDRESS_MAP(0, vdp2_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -961,7 +966,7 @@ MACHINE_CONFIG_START(systeme_state::systemeb)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(systeme_state, opaopa)
+void systeme_state::init_opaopa()
 {
 	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), banked_decrypted_opcodes, m_maincpu_region->bytes());
@@ -971,7 +976,7 @@ DRIVER_INIT_MEMBER(systeme_state, opaopa)
 }
 
 
-DRIVER_INIT_MEMBER(systeme_state, fantzn2)
+void systeme_state::init_fantzn2()
 {
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }
@@ -1119,12 +1124,12 @@ ROM_END
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,           INPUT,    STATE          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr. (Rev. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
-GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ridleofp, 0,        ridleofp,          ridleofp, systeme_state, 0,        ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opaopa,   0,        systemeb,          opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opaopan,  opaopa,   systeme,           opaopa,   systeme_state, 0,        ROT0,   "Sega", "Opa Opa (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, fantzn2,  0,        systemex,          fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetrisse, 0,        systeme,           tetrisse, systeme_state, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, empty_init,    ROT0,   "Sega", "Hang-On Jr. (Rev. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, empty_init,    ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
+GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, empty_init,    ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, empty_init,    ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ridleofp, 0,        ridleofp,          ridleofp, systeme_state, empty_init,    ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opaopa,   0,        systemeb,          opaopa,   systeme_state, init_opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opaopan,  opaopa,   systeme,           opaopa,   systeme_state, empty_init,    ROT0,   "Sega", "Opa Opa (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, fantzn2,  0,        systemex,          fantzn2,  systeme_state, init_fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrisse, 0,        systeme,           tetrisse, systeme_state, empty_init,    ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )

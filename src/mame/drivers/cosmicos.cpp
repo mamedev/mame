@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -556,14 +556,14 @@ MACHINE_CONFIG_END
 ROM_START( cosmicos )
 	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "hex", "Hex Monitor" )
-	ROMX_LOAD( "hex.ic6",   0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(1) ) /* typed in from manual */
-	ROMX_LOAD( "hex.ic7",   0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(1) ) /* typed in from manual */
+	ROMX_LOAD( "hex.ic6",   0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(0) ) // typed in from manual
+	ROMX_LOAD( "hex.ic7",   0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(0) ) // typed in from manual
 	ROM_SYSTEM_BIOS( 1, "ascii", "ASCII Monitor" )
-	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(1) )
 ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME    FLAGS
-COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, cosmicos_state, 0,    "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME    FLAGS
+COMP( 1979, cosmicos, 0,      0,      cosmicos, cosmicos, cosmicos_state, empty_init, "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

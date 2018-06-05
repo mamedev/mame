@@ -71,7 +71,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK           XTAL(14'000'000)
+#define MAIN_CLOCK           14_MHz_XTAL
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 3.50 Mhz */
@@ -801,7 +801,7 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u75_cb2_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, AY_CLOCK)
 	// TODO : Add port I/O handler
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, squale_state, ay_porta_r))
@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
-	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) )
+	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")
@@ -846,12 +846,12 @@ ROM_START( squale )
 	ROM_DEFAULT_BIOS("v201")
 
 	ROM_SYSTEM_BIOS(0, "v201", "Version 2.1")
-	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(1) )
+	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(0) )
 
 	// place ROM v1.2 signature here.
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, 0,    "Apollo 7", "Squale", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, empty_init, "Apollo 7", "Squale", 0 )

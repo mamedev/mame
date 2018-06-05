@@ -317,7 +317,7 @@ static const gfx_layout spritelayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( mario )
+static GFXDECODE_START( gfx_mario )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mario_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mario)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mario)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
 
@@ -562,8 +562,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   mario,  mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariof,   mario,   mario,   mariof, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioe,   mario,   mario,   marioe, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioj,   mario,   mario,   marioj, mario_state, 0, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   mario,  mario_state, 0, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioe, mario, mario, marioe, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,  mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )

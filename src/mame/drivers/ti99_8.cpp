@@ -222,7 +222,8 @@ public:
 		m_ioport(*this, TI99_IOPORT_TAG),
 		m_mainboard(*this, TI998_MAINBOARD_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
-		m_cassette(*this, "cassette")
+		m_cassette(*this, "cassette"),
+		m_keyboard(*this, "COL%u", 0U)
 	{
 	}
 
@@ -286,6 +287,8 @@ private:
 	required_device<bus::ti99::internal::mainboard8_device>  m_mainboard;
 	required_device<bus::ti99::joyport::joyport_device> m_joyport;
 	required_device<cassette_image_device> m_cassette;
+
+	required_ioport_array<14> m_keyboard;
 };
 
 /*
@@ -448,11 +451,6 @@ WRITE8_MEMBER( ti99_8_state::cruwrite )
     keyboard column selection.)
 ***************************************************************************/
 
-static const char *const column[] = {
-	"COL0", "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7",
-	"COL8", "COL9", "COL10", "COL11", "COL12", "COL13"
-};
-
 READ8_MEMBER( ti99_8_state::read_by_9901 )
 {
 	int answer=0;
@@ -477,7 +475,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		answer = (answer << 6);
 		if (m_int1 == CLEAR_LINE) answer |= 0x02;
@@ -502,7 +500,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		answer = (answer >> 2) & 0x07;
 		break;
@@ -777,7 +775,7 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	SPEAKER(config, "sound_out").front_center();
 	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, sound_ready))
@@ -785,17 +783,16 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	// Speech hardware
 	// Note: SPEECHROM uses its tag for referencing the region
 	MCFG_DEVICE_ADD(TI998_SPEECHROM_REG, SPEECHROM, 0)
-	MCFG_SPEAKER_STANDARD_MONO("speech_out")
+	SPEAKER(config, "speech_out").front_center();
 	MCFG_DEVICE_ADD(TI998_SPEECHSYN_TAG, CD2501ECD, 640000L)
 	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, speech_ready))
 	MCFG_TMS52XX_SPEECHROM(TI998_SPEECHROM_REG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech_out", 0.50)
 
 	// Cassette drive
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	MCFG_GROM_ADD( TI998_SYSGROM0_TAG, 0, TI998_SYSGROM_REG, 0x0000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
@@ -924,6 +921,6 @@ ROM_END
 
 #define rom_ti99_8e rom_ti99_8
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT   STATE         INIT  COMPANY              FULLNAME                     FLAGS
-COMP( 1983, ti99_8,  0,      0,      ti99_8_60hz, ti99_8, ti99_8_state, 0,    "Texas Instruments", "TI-99/8 Computer (US)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, ti99_8e, ti99_8, 0,      ti99_8_50hz, ti99_8, ti99_8_state, 0,    "Texas Instruments", "TI-99/8 Computer (Europe)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT        COMPANY              FULLNAME                     FLAGS
+COMP( 1983, ti99_8,  0,      0,      ti99_8_60hz, ti99_8, ti99_8_state, empty_init, "Texas Instruments", "TI-99/8 Computer (US)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ti99_8e, ti99_8, 0,      ti99_8_50hz, ti99_8, ti99_8_state, empty_init, "Texas Instruments", "TI-99/8 Computer (Europe)", MACHINE_SUPPORTS_SAVE )

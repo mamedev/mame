@@ -528,7 +528,7 @@ static const gfx_layout tile_layout =
 	16*8
 };
 
-static GFXDECODE_START( grchamp )
+static GFXDECODE_START( gfx_grchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,  0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,       0, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,       0, 2 )
@@ -760,7 +760,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grchamp)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(grchamp_state, grchamp)
 
@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -789,8 +789,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(grchamp)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, grchamp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -954,6 +953,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
-GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
-GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
+GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

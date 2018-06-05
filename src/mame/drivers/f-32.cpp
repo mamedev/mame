@@ -188,13 +188,14 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/8, PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -266,13 +267,14 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 //  MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/8, PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -374,5 +376,5 @@ ROM_START( royalpk2 )
 ROM_END
 
 
-GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, 0,        ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, royalpk2, 0, royalpk2, royalpk2, mosaicf2_state, 0,        ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )
+GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, empty_init, ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, royalpk2, 0, royalpk2, royalpk2, mosaicf2_state, empty_init, ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )

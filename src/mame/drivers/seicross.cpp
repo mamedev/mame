@@ -97,7 +97,7 @@ WRITE8_MEMBER(seicross_state::portB_w)
 	if (((m_portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
@@ -381,7 +381,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( seicross )
+static GFXDECODE_START( gfx_seicross )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -420,12 +420,12 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seicross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicross)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seicross_state, portB_r))
@@ -629,7 +629,7 @@ ROM_START( sectrzon )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seicross_state,friskytb)
+void seicross_state::init_friskytb()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	// this code is in ROM 6.3h, maps to MCU at dxxx
@@ -640,10 +640,10 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 }
 
 
-GAME( 1981, friskyt,  0,        nvram,    friskyt,  seicross_state, 0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta, friskyt,  nvram,    friskyt,  seicross_state, 0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb, friskyt,  friskytb, friskyt,  seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
-GAME( 1982, radrad,   0,        no_nvram, radrad,   seicross_state, 0,        ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, radradj,  radrad,   no_nvram, radrad,   seicross_state, 0,        ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicross, 0,        no_nvram, seicross, seicross_state, 0,        ROT90, "Nichibutsu / Alice", "Seicross", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon, seicross, no_nvram, seicross, seicross_state, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,  0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta, friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb, friskyt,  friskytb, friskyt,  seicross_state, init_friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
+GAME( 1982, radrad,   0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,  radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicross, 0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

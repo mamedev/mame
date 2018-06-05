@@ -235,14 +235,14 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
+	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, b2m_state, b2m_fdc_drq))
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
@@ -277,6 +277,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE        INIT     COMPANY   FULLNAME                  FLAGS */
-COMP( 1989, b2m,    0,      0,      b2m,        b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M",           MACHINE_SUPPORTS_SAVE)
-COMP( 1989, b2mrom, b2m,    0,      b2mrom,     b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M ROM-disk",  MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                 FLAGS */
+COMP( 1989, b2m,    0,      0,      b2m,     b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M",          MACHINE_SUPPORTS_SAVE)
+COMP( 1989, b2mrom, b2m,    0,      b2mrom,  b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M ROM-disk", MACHINE_SUPPORTS_SAVE)

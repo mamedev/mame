@@ -870,7 +870,7 @@ void pce220_state::machine_start()
 
 	m_vram = (uint8_t*)memregion("lcd_vram")->base();
 
-	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
+	subdevice<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pcg850v_state::machine_start()
@@ -884,7 +884,7 @@ void pcg850v_state::machine_start()
 	membank("bank4")->configure_entries(0, 22, rom, 0x4000);
 
 	m_vram = (uint8_t*)memregion("lcd_vram")->base();
-	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
+	subdevice<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pce220_state::machine_reset()
@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -992,7 +992,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1028,7 +1028,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1049,17 +1049,17 @@ ROM_START( pce220 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "v 0.1")
 	ROM_SYSTEM_BIOS( 1, "v2", "v 0.2")
-	ROM_LOAD( "bank0.bin",      0x0000, 0x4000, CRC(1fa94d11) SHA1(24c54347dbb1423388360a359aa09db47d2057b7))
-	ROM_LOAD( "bank1.bin",      0x4000, 0x4000, CRC(0f9864b0) SHA1(6b7301c96f1a865e1931d82872a1ed5d1f80644e))
-	ROM_LOAD( "bank2.bin",      0x8000, 0x4000, CRC(1625e958) SHA1(090440600d461aa7efe4adbf6e975aa802aabeec))
-	ROM_LOAD( "bank3.bin",      0xc000, 0x4000, CRC(ed9a57f8) SHA1(58087dc64103786a40325c0a1e04bd88bfd6da57))
-	ROM_LOAD( "bank4.bin",     0x10000, 0x4000, CRC(e37665ae) SHA1(85f5c84f69f79e7ac83b30397b2a1d9629f9eafa))
-	ROMX_LOAD( "bank5.bin",     0x14000, 0x4000, CRC(6b116e7a) SHA1(b29f5a070e846541bddc88b5ee9862cc36b88eee),ROM_BIOS(2))
-	ROMX_LOAD( "bank5_0.1.bin", 0x14000, 0x4000, CRC(13c26eb4) SHA1(b9cd0efd6b195653b9610e20ad8aab541824a689),ROM_BIOS(1))
-	ROMX_LOAD( "bank6.bin",     0x18000, 0x4000, CRC(4fbfbd18) SHA1(e5aab1df172dcb94aa90e7d898eacfc61157ff15),ROM_BIOS(2))
-	ROMX_LOAD( "bank6_0.1.bin", 0x18000, 0x4000, CRC(e2cda7a6) SHA1(01b1796d9485fde6994cb5afbe97514b54cfbb3a),ROM_BIOS(1))
-	ROMX_LOAD( "bank7.bin",     0x1c000, 0x4000, CRC(5e98b5b6) SHA1(f22d74d6a24f5929efaf2983caabd33859232a94),ROM_BIOS(2))
-	ROMX_LOAD( "bank7_0.1.bin", 0x1c000, 0x4000, CRC(d8e821b2) SHA1(18245a75529d2f496cdbdc28cdf40def157b20c0),ROM_BIOS(1))
+	ROM_LOAD(  "bank0.bin",      0x0000, 0x4000, CRC(1fa94d11) SHA1(24c54347dbb1423388360a359aa09db47d2057b7))
+	ROM_LOAD(  "bank1.bin",      0x4000, 0x4000, CRC(0f9864b0) SHA1(6b7301c96f1a865e1931d82872a1ed5d1f80644e))
+	ROM_LOAD(  "bank2.bin",      0x8000, 0x4000, CRC(1625e958) SHA1(090440600d461aa7efe4adbf6e975aa802aabeec))
+	ROM_LOAD(  "bank3.bin",      0xc000, 0x4000, CRC(ed9a57f8) SHA1(58087dc64103786a40325c0a1e04bd88bfd6da57))
+	ROM_LOAD(  "bank4.bin",     0x10000, 0x4000, CRC(e37665ae) SHA1(85f5c84f69f79e7ac83b30397b2a1d9629f9eafa))
+	ROMX_LOAD( "bank5.bin",     0x14000, 0x4000, CRC(6b116e7a) SHA1(b29f5a070e846541bddc88b5ee9862cc36b88eee), ROM_BIOS(1))
+	ROMX_LOAD( "bank5_0.1.bin", 0x14000, 0x4000, CRC(13c26eb4) SHA1(b9cd0efd6b195653b9610e20ad8aab541824a689), ROM_BIOS(0))
+	ROMX_LOAD( "bank6.bin",     0x18000, 0x4000, CRC(4fbfbd18) SHA1(e5aab1df172dcb94aa90e7d898eacfc61157ff15), ROM_BIOS(1))
+	ROMX_LOAD( "bank6_0.1.bin", 0x18000, 0x4000, CRC(e2cda7a6) SHA1(01b1796d9485fde6994cb5afbe97514b54cfbb3a), ROM_BIOS(0))
+	ROMX_LOAD( "bank7.bin",     0x1c000, 0x4000, CRC(5e98b5b6) SHA1(f22d74d6a24f5929efaf2983caabd33859232a94), ROM_BIOS(1))
+	ROMX_LOAD( "bank7_0.1.bin", 0x1c000, 0x4000, CRC(d8e821b2) SHA1(18245a75529d2f496cdbdc28cdf40def157b20c0), ROM_BIOS(0))
 
 	ROM_REGION( 0x200, "lcd_vram", ROMREGION_ERASE00)   //HD61202 internal RAM (4096 bits)
 ROM_END
@@ -1114,7 +1114,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY    FULLNAME        FLAGS
-COMP( 1991, pce220,  0,      0,      pce220,   pce220,  pce220_state,  0,    "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
-COMP( 1992, pcg815,  0,      0,      pcg815,   pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
-COMP( 2001, pcg850v, 0,      0,      pcg850v,  pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
+COMP( 1991, pce220,  0,      0,      pce220,  pce220,  pce220_state,  empty_init, "Sharp", "PC-E220",  MACHINE_NOT_WORKING )
+COMP( 1992, pcg815,  0,      0,      pcg815,  pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G815",  MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,      0,      pcg850v, pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G850V", MACHINE_NOT_WORKING )

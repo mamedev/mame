@@ -61,6 +61,9 @@ public:
 		, m_p_vram(*this, "vram")
 	{ }
 
+	void unior(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
@@ -75,9 +78,9 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	void unior(machine_config &config);
 	void unior_io(address_map &map);
 	void unior_mem(address_map &map);
+
 private:
 	uint8_t m_4c;
 	uint8_t m_4e;
@@ -245,7 +248,7 @@ static const gfx_layout unior_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( unior )
+static GFXDECODE_START( gfx_unior )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -265,9 +268,6 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
-
-	if(linecount == 8)
-		gfx = 0;
 
 	if (vsp)
 		gfx = 0;
@@ -390,12 +390,12 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unior)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unior)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -451,5 +451,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY      FULLNAME  FLAGS */
-COMP( 19??, unior,  radio86,  0,       unior,     unior, unior_state,   0,    "<unknown>", "Unior",  MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS */
+COMP( 19??, unior, radio86, 0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_NOT_WORKING )

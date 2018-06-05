@@ -75,6 +75,6 @@ private:
 
 
 /*----------- defined in audio/canyon.c -----------*/
-DISCRETE_SOUND_EXTERN( canyon );
+DISCRETE_SOUND_EXTERN( canyon_discrete );
 
 #endif // MAME_INCLUDES_CANYON_H

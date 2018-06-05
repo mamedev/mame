@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(pes_state::pes)
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pes_state, data_to_i8031))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -271,14 +271,14 @@ ROM_START( pes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("kevbios")
 	ROM_SYSTEM_BIOS( 0, "orig", "PES box with original firmware v2.5")
-	ROMX_LOAD( "vpu_2-5.bin",   0x0000, 0x2000, CRC(b27cfdf7) SHA1(c52acf9c080823de5ef26ac55abe168ad53a7d38), ROM_BIOS(1)) // original firmware, rather buggy, 4800bps serial, buggy RTS/CTS flow control, no buffer
+	ROMX_LOAD( "vpu_2-5.bin",   0x0000, 0x2000, CRC(b27cfdf7) SHA1(c52acf9c080823de5ef26ac55abe168ad53a7d38), ROM_BIOS(0)) // original firmware, rather buggy, 4800bps serial, buggy RTS/CTS flow control, no buffer
 	ROM_SYSTEM_BIOS( 1, "kevbios", "PES box with kevtris' rewritten firmware")
-	ROMX_LOAD( "pes.bin",   0x0000, 0x2000, CRC(22c1c4ec) SHA1(042e139cd0cf6ffafcd88904f1636c6fa1b38f25), ROM_BIOS(2)) // rewritten firmware by kevtris, 4800bps serial, RTS/CTS plus XON/XOFF flow control, 64 byte buffer
+	ROMX_LOAD( "pes.bin",   0x0000, 0x2000, CRC(22c1c4ec) SHA1(042e139cd0cf6ffafcd88904f1636c6fa1b38f25), ROM_BIOS(1)) // rewritten firmware by kevtris, 4800bps serial, RTS/CTS plus XON/XOFF flow control, 64 byte buffer
 ROM_END
 
 /******************************************************************************
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                        FULLNAME             FLAGS
-COMP( 1987, pes,    0,      0,      pes,        pes,   pes_state,  0,    "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME             FLAGS
+COMP( 1987, pes,  0,      0,      pes,     pes,   pes_state, empty_init, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

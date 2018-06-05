@@ -29,9 +29,17 @@ DEFINE_DEVICE_TYPE(QL_EXPANSION_SLOT, ql_expansion_slot_device, "ql_expansion_sl
 
 device_ql_expansion_card_interface::device_ql_expansion_card_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
+	m_slot(dynamic_cast<ql_expansion_slot_device *>(device.owner())),
 	m_romoeh(0)
 {
-	m_slot = dynamic_cast<ql_expansion_slot_device *>(device.owner());
+}
+
+
+void device_ql_expansion_card_interface::interface_post_start()
+{
+	device_slot_card_interface::interface_post_start();
+
+	device().save_item(NAME(m_romoeh));
 }
 
 
@@ -59,15 +67,29 @@ ql_expansion_slot_device::ql_expansion_slot_device(const machine_config &mconfig
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ql_expansion_slot_device::device_start()
+void ql_expansion_slot_device::device_validity_check(validity_checker &valid) const
 {
-	m_card = dynamic_cast<device_ql_expansion_card_interface *>(get_card_device());
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_ql_expansion_card_interface *>(card))
+		osd_printf_error("Card device %s (%s) does not implement device_ql_expansion_card_interface\n", card->tag(), card->name());
+}
 
+void ql_expansion_slot_device::device_resolve_objects()
+{
 	// resolve callbacks
 	m_write_ipl0l.resolve_safe();
 	m_write_ipl1l.resolve_safe();
 	m_write_berrl.resolve_safe();
 	m_write_extintl.resolve_safe();
+
+	m_card = dynamic_cast<device_ql_expansion_card_interface *>(get_card_device());
+}
+
+void ql_expansion_slot_device::device_start()
+{
+	device_t *const card(get_card_device());
+	if (card && !m_card)
+		throw emu_fatalerror("ql_expansion_slot_device: card device %s (%s) does not implement device_ql_expansion_card_interface\n", card->tag(), card->name());
 }
 
 

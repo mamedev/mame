@@ -47,10 +47,11 @@ public:
 		m_vpos_ram(*this, "vpos_ram"),
 		m_hpos_ram(*this, "hpos_ram"),
 		m_orga_ram(*this, "orga_ram"),
-		m_code_ram(*this, "code_ram")
+		m_code_ram(*this, "code_ram"),
+		m_lamp(*this, "lamp0")
 	{ }
 
-	DECLARE_DRIVER_INIT(triplhnt);
+	void init_triplhnt();
 	void triplhnt(machine_config &config);
 
 protected:
@@ -75,6 +76,7 @@ protected:
 	void set_collision(int code);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
 	void triplhnt_map(address_map &map);
 
 private:
@@ -92,6 +94,7 @@ private:
 	required_shared_ptr<uint8_t> m_hpos_ram;
 	required_shared_ptr<uint8_t> m_orga_ram;
 	required_shared_ptr<uint8_t> m_code_ram;
+	output_finder<> m_lamp;
 
 	uint8_t m_cmos[16];
 	uint8_t m_da_latch;
@@ -105,7 +108,7 @@ private:
 };
 
 /*----------- defined in audio/triplhnt.cpp -----------*/
-DISCRETE_SOUND_EXTERN( triplhnt );
+DISCRETE_SOUND_EXTERN( triplhnt_discrete );
 extern const char *const triplhnt_sample_names[];
 
 #endif // MAME_INCLUDES_TRIPLHNT_H

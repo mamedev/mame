@@ -322,7 +322,8 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_GRADIUS3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -512,7 +513,7 @@ ROM_END
 
 
 
-GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )

@@ -106,8 +106,8 @@ enum
 #define     ROM_SHIFT_NIBBLE_LO     ROM_BITSHIFT(0)
 #define     ROM_SHIFT_NIBBLE_HI     ROM_BITSHIFT(4)
 
-#define ROM_BIOSFLAGSMASK           0xff000000          /* only loaded if value matches global bios value */
-#define     ROM_BIOS(n)             (((n) & 255) << 24)
+#define ROM_BIOSFLAGSMASK           0xff000000          /* only loaded if value matches device bios value */
+#define     ROM_BIOS(n)             ((((n) + 1) & 255) << 24)
 
 #define ROM_INHERITEDFLAGS          (ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK | ROM_BITWIDTHMASK | ROM_BITSHIFTMASK | ROM_BIOSFLAGSMASK)
 

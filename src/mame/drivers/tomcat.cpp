@@ -300,7 +300,7 @@ void tomcat_state::machine_start()
 	((uint16_t*)m_shared_ram)[0x0002] = 0xf600;
 	((uint16_t*)m_shared_ram)[0x0003] = 0x0000;
 
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, 0x800);
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, 0x800);
 
 	save_item(NAME(m_nvram));
 	save_item(NAME(m_dsp_BIO));
@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_M48T02_ADD( "m48t02" )
+	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -372,7 +372,8 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_DEVICE_ADD("avg", AVG_TOMCAT, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 
@@ -397,4 +398,4 @@ ROM_START( tomcat )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
 
-GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, 0, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, empty_init, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )

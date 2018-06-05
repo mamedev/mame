@@ -970,7 +970,7 @@ MACHINE_CONFIG_START(mlanding_state::mlanding)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1034,4 +1034,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )

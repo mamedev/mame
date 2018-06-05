@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassic_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassicsvr_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
@@ -379,5 +379,5 @@ ROM_START( giclassvr )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END
 
-GAME( 1998, giclasex,  0, giclassic, giclassic, giclassic_state,    0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
-GAME( 1998, giclassvr, 0, giclassvr, giclassvr, giclassicsvr_state, 0, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclasex, 0, giclassic, giclassic, giclassic_state,    empty_init, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclassvr,0, giclassvr, giclassvr, giclassicsvr_state, empty_init, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)

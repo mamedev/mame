@@ -244,7 +244,7 @@ static const discrete_op_amp_filt_info galaxian_bandpass_desc =
  *************************************/
 
 
-static DISCRETE_SOUND_START(galaxian)
+static DISCRETE_SOUND_START(galaxian_discrete)
 
 	/************************************************/
 	/* Input register mapping for galaxian          */
@@ -376,8 +376,8 @@ static DISCRETE_SOUND_START(galaxian)
 DISCRETE_SOUND_END
 
 
-static DISCRETE_SOUND_START(mooncrst)
-	DISCRETE_IMPORT(galaxian)
+static DISCRETE_SOUND_START(mooncrst_discrete)
+	DISCRETE_IMPORT(galaxian_discrete)
 
 	/************************************************/
 	/* Moon Cresta mixing stage                     */
@@ -393,6 +393,7 @@ galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, cons
 	: device_t(mconfig, GALAXIAN, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_lfo_val(0)
+	, m_discrete(*this, "^" GAL_AUDIO)
 {
 }
 
@@ -403,8 +404,6 @@ galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, cons
 void galaxian_sound_device::device_start()
 {
 	m_lfo_val = 0;
-
-	m_discrete = machine().device<discrete_device>(GAL_AUDIO);
 
 	save_item(NAME(m_lfo_val));
 }
@@ -501,8 +500,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxian_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(galaxian)
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -511,8 +509,7 @@ MACHINE_CONFIG_START(galaxold_state::mooncrst_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(mooncrst)
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -522,8 +519,7 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(galaxian)
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -532,8 +528,6 @@ MACHINE_CONFIG_START(galaxian_state::mooncrst_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(mooncrst)
-
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

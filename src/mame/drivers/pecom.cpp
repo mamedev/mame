@@ -206,15 +206,15 @@ ROM_END
 ROM_START( pecom64 )
 	ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver4", "version 4")
-	ROMX_LOAD( "rom_1_g_24.02.88_l.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(1) )
-	ROMX_LOAD( "rom_2_g_24.02.88_d.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(1) )
+	ROMX_LOAD( "rom_1_g_24.02.88_l.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(0) )
+	ROMX_LOAD( "rom_2_g_24.02.88_d.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ver1", "version 1")
-	ROMX_LOAD( "170887-rom1.bin", 0x8000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(2) )
-	ROMX_LOAD( "170887-rom2.bin", 0xc000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(2) )
+	ROMX_LOAD( "170887-rom1.bin", 0x8000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(1) )
+	ROMX_LOAD( "170887-rom2.bin", 0xc000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(1) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE     INPUT  STATE         INIT   COMPANY   FULLNAME     FLAGS */
-COMP( 1986, pecom32, 0,       0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 32",  0)
-COMP( 1987, pecom64, pecom32, 0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 64",  0)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME     FLAGS */
+COMP( 1986, pecom32, 0,       0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 32",  0)
+COMP( 1987, pecom64, pecom32, 0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 64",  0)

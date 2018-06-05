@@ -113,6 +113,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_aysnd(*this, "aysnd"),
+		m_tms(*this, "tms"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -120,7 +122,7 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
-	DECLARE_DRIVER_INIT(looping);
+	void init_looping();
 	void looping(machine_config &config);
 
 protected:
@@ -171,8 +173,10 @@ private:
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ay8910_device> m_aysnd;
+	required_device<tms5220_device> m_tms;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -360,9 +364,8 @@ void looping_state::machine_start()
 void looping_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 /*************************************
@@ -450,22 +453,14 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 
 WRITE_LINE_MEMBER(looping_state::ay_enable_w)
 {
-	device_t *device = machine().device("aysnd");
-	int output;
-
-	device_sound_interface *sound;
-	device->interface(sound);
-	for (output = 0; output < 3; output++)
-		sound->set_output_gain(output, state ? 1.0 : 0.0);
+	for (int output = 0; output < 3; output++)
+		m_aysnd->set_output_gain(output, state ? 1.0 : 0.0);
 }
 
 
 WRITE_LINE_MEMBER(looping_state::speech_enable_w)
 {
-	device_t *device = machine().device("tms");
-	device_sound_interface *sound;
-	device->interface(sound);
-	sound->set_output_gain(0, state ? 1.0 : 0.0);
+	m_tms->set_output_gain(0, state ? 1.0 : 0.0);
 }
 
 
@@ -613,7 +608,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( looping )
+static GFXDECODE_START( gfx_looping )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,    0, 8 )
 GFXDECODE_END
@@ -660,7 +655,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", looping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_looping)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
@@ -671,7 +666,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, looping_state, flip_screen_y_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -920,16 +915,15 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(looping_state,looping)
+void looping_state::init_looping()
 {
 	int length = memregion("maincpu")->bytes();
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
 
 	m_cop_port_l = 0;
 
 	/* bitswap the TMS9995 ROMs */
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
@@ -944,7 +938,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
  *
  *************************************/
 
-GAME( 1982, looping,   0,        looping, looping, looping_state, looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND /*| MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingv,  looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingva, looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */ )
-GAME( 1982, skybump,   0,        looping, skybump, looping_state, looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE  */)
+GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND /*| MACHINE_SUPPORTS_SAVE */)
+GAME( 1982, loopingv,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */)
+GAME( 1982, loopingva, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */ )
+GAME( 1982, skybump,   0,        looping, skybump, looping_state, init_looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE  */)

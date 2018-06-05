@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(pasopia);
+	void init_pasopia();
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
 	void pasopia(machine_config &config);
@@ -254,7 +254,7 @@ static const gfx_layout p7_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( pasopia )
+static GFXDECODE_START( gfx_pasopia )
 	GFXDECODE_ENTRY( "chargen", 0x0000, p7_chars_8x8, 0, 4 )
 GFXDECODE_END
 
@@ -268,7 +268,7 @@ static const z80_daisy_config pasopia_daisy[] =
 
 
 
-DRIVER_INIT_MEMBER(pasopia_state,pasopia)
+void pasopia_state::init_pasopia()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
@@ -343,5 +343,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY      FULLNAME   FLAGS
-COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia_state, pasopia, "Toshiba",   "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME   FLAGS
+COMP( 1986, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, init_pasopia, "Toshiba", "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

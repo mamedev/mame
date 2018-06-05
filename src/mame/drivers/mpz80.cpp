@@ -760,11 +760,11 @@ ROM_START( mpz80 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("447")
 	ROM_SYSTEM_BIOS( 0, "373", "3.73" )
-	ROMX_LOAD( "mpz80 mon3.73 fb34.17c", 0x0000, 0x1000, CRC(0bbffaec) SHA1(005ba726fc071f06cb1c969d170960438a3fc1a8), ROM_BIOS(1) )
+	ROMX_LOAD( "mpz80 mon3.73 fb34.17c", 0x0000, 0x1000, CRC(0bbffaec) SHA1(005ba726fc071f06cb1c969d170960438a3fc1a8), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "375", "3.75" )
-	ROMX_LOAD( "mpz80 mon3.75 0706.17c", 0x0000, 0x1000, CRC(1118a592) SHA1(d70f94c09602cd0bdc4fbaeb14989e8cc1540960), ROM_BIOS(2) )
+	ROMX_LOAD( "mpz80 mon3.75 0706.17c", 0x0000, 0x1000, CRC(1118a592) SHA1(d70f94c09602cd0bdc4fbaeb14989e8cc1540960), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "447", "4.47" )
-	ROMX_LOAD( "mon 4.47 f4f6.17c", 0x0000, 0x1000, CRC(b99c5d7f) SHA1(11181432ee524c7e5a68ead0671fc945256f5d1b), ROM_BIOS(3) )
+	ROMX_LOAD( "mon 4.47 f4f6.17c", 0x0000, 0x1000, CRC(b99c5d7f) SHA1(11181432ee524c7e5a68ead0671fc945256f5d1b), ROM_BIOS(2) )
 
 	ROM_REGION( 0x20, "s100rev2", 0 )
 	ROM_LOAD( "z80-2 15a.15a", 0x00, 0x20, CRC(8a84249d) SHA1(dfbc49c5944f110f48419fd893fa84f4f0e113b8) ) // 82S123 or 6331
@@ -781,5 +781,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY            FULLNAME    FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,   mpz80, mpz80_state,  0,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME    FLAGS
+COMP( 1980, mpz80, 0,      0,      mpz80,   mpz80, mpz80_state, empty_init, "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

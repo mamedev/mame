@@ -196,7 +196,7 @@ void tms7000_device::device_start()
 {
 	// init/zerofill
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 
 	set_icountptr(m_icount);
 
@@ -632,7 +632,7 @@ void tms7000_device::execute_run()
 	{
 		debugger_instruction_hook(m_pc);
 
-		m_op = m_direct->read_byte(m_pc++);
+		m_op = m_cache->read_byte(m_pc++);
 		execute_one(m_op);
 	} while (m_icount > 0);
 }

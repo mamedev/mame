@@ -3,9 +3,6 @@
 #include "emu.h"
 #include "k001005.h"
 
-#include "video/k001006.h"
-
-
 /*****************************************************************************/
 /* Konami K001005 Polygon Renderer (KS10071) */
 
@@ -1186,18 +1183,18 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 DEFINE_DEVICE_TYPE(K001005, k001005_device, "k001005", "K001005 Polygon Renderer")
 
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K001005, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_k001006(nullptr),
-		m_fifo(nullptr),
-		m_status(0),
-		m_ram_ptr(0),
-		m_fifo_read_ptr(0),
-		m_fifo_write_ptr(0),
-		m_reg_far_z(0)
+	: device_t(mconfig, K001005, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_k001006(*this, finder_base::DUMMY_TAG)
+	, m_fifo(nullptr)
+	, m_status(0)
+	, m_ram_ptr(0)
+	, m_fifo_read_ptr(0)
+	, m_fifo_write_ptr(0)
+	, m_reg_far_z(0)
 {
-		m_ram[0] = nullptr;
-		m_ram[1] = nullptr;
+	m_ram[0] = nullptr;
+	m_ram[1] = nullptr;
 }
 
 //-------------------------------------------------
@@ -1206,8 +1203,6 @@ k001005_device::k001005_device(const machine_config &mconfig, const char *tag, d
 
 void k001005_device::device_start()
 {
-	m_k001006 = machine().device(m_k001006_tag);
-
 	m_ram[0] = std::make_unique<uint16_t[]>(0x140000);
 	m_ram[1] = std::make_unique<uint16_t[]>(0x140000);
 

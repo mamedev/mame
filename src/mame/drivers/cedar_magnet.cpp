@@ -22,6 +22,11 @@
     * there seem to be 2 checks, one based on a weird sector on the discs, the other based on
       a port read
   - add additional hardware notes from ArcadeHacker
+  - layer enables on War Mission? (transitions from title screen etc.)
+
+ notes:
+  - 2 player mode can be enabled in service mode for War Mission, it is disabled by default
+    (settings are stored on the disk)
 
 */
 
@@ -49,7 +54,7 @@
   - Crazy Driver
   - Jungle Trophy
   - Quadrum
-  - War Mission **
+  - War Mission ** *
   - The Burning Cave
   - Scorpio
   - Paris Dakar **
@@ -104,7 +109,7 @@ I suspect the additional memory was an afterthought.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/bankdev.h"
 #include "machine/z80ctc.h"
@@ -134,9 +139,13 @@ public:
 		m_pal_r(*this, "pal_r"),
 		m_pal_g(*this, "pal_g"),
 		m_pal_b(*this, "pal_b"),
-
 		m_ic48_pio(*this, "z80pio_ic48"),
 		m_ic49_pio(*this, "z80pio_ic49"),
+		m_ic48_pio_pa_val(0xff),
+		m_ic48_pio_pb_val(0xff),
+		m_ic49_pio_pb_val(0xff),
+		m_address1hack(-1),
+		m_address2hack(-1),
 		m_palette(*this, "palette"),
 		m_maincpu(*this, "maincpu"),
 		m_cedsound(*this, "cedtop"),
@@ -144,12 +153,11 @@ public:
 		m_cedplane1(*this, "cedplane1"),
 		m_cedsprite(*this, "cedsprite")
 	{
-		m_ic48_pio_pa_val = 0xff;
-		m_ic48_pio_pb_val = 0xff;
-		m_ic49_pio_pb_val = 0xff;
-		m_prothack = nullptr;
 	}
 
+	void cedar_magnet(machine_config &config);
+
+private:
 	required_device<address_map_bank_device> m_bank0;
 	required_device<address_map_bank_device> m_sub_ram_bankdev;
 	required_device<address_map_bank_device> m_sub_pal_bankdev;
@@ -188,7 +196,6 @@ public:
 	DECLARE_READ8_MEMBER(port7c_r);
 
 	// other ports
-
 	DECLARE_READ8_MEMBER(other_cpu_r);
 	DECLARE_WRITE8_MEMBER(other_cpu_w);
 
@@ -206,11 +213,9 @@ public:
 
 	void handle_sub_board_cpu_lines(cedar_magnet_board_interface &dev, int old_data, int data);
 	INTERRUPT_GEN_MEMBER(irq);
-	typedef void (cedar_magnet_state::*prot_func)();
-	prot_func m_prothack;
-	void mag_time_protection_hack();
-	void mag_xain_protection_hack();
-	void mag_exzi_protection_hack();
+	void kludge_protection();
+	int m_address1hack;
+	int m_address2hack;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -224,10 +229,6 @@ public:
 	required_device<cedar_magnet_plane_device> m_cedplane1;
 	required_device<cedar_magnet_sprite_device> m_cedsprite;
 
-	DECLARE_DRIVER_INIT(mag_time);
-	DECLARE_DRIVER_INIT(mag_xain);
-	DECLARE_DRIVER_INIT(mag_exzi);
-	void cedar_magnet(machine_config &config);
 	void cedar_bank0(address_map &map);
 	void cedar_magnet_io(address_map &map);
 	void cedar_magnet_mainboard_sub_pal_map(address_map &map);
@@ -756,8 +757,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 {
-	if (m_prothack)
-		(this->*m_prothack)();
+	kludge_protection();
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_cedplane0->irq_hold();
@@ -864,6 +864,18 @@ ROM_START( mag_xain )
 	ROM_LOAD( "xain.img", 0x00000, 0xf0000, CRC(5647849f) SHA1(edd2f3f6359424583bf526bf4601476dc849e617) )
 ROM_END
 
+ROM_START( mag_war )
+	BIOS_ROM
+	/* Data after 0xd56b0 would not read consistently, however the game only appears to use the first 24 tracks (up to 0x48fff)
+	   as it loads once on startup, not during gameplay, and all tracks before that gave consistent reads.  There is data after this
+	   point but it is likely leftovers from another game / whatever was on the disk before, so for our purposes this should be fine.
+
+	   Some bullets do seem to spawn from locations where there are no enemies, but I think this is just annoying game design.
+	*/
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "war mission wm 4_6_87.img", 0x00000, 0xf0000, CRC(e6b35710) SHA1(e24f9adde09e4eacbfb58e359a2df263748fc7de) )
+ROM_END
+
 /*
     protection? (Time Scanner note)
 
@@ -879,45 +891,49 @@ ROM_END
 */
 
 
-void protection_hack(uint8_t* ram, int address1, int address2)
+void cedar_magnet_state::kludge_protection()
 {
-	if ((ram[address1] == 0x3e) && (ram[address1+1] == 0xff)) ram[address1] = 0xc9;
-	if ((ram[address2] == 0x3e) && (ram[address2+1] == 0xff)) ram[address2] = 0xc9;
+	const int max_addr = 0x3ffff;
+
+	if (m_address1hack == -1)
+	{
+		for (int i = 0; i < max_addr - 4; i++)
+		{
+			if ((m_ram0[i + 0] == 0x7f) && (m_ram0[i + 1] == 0xc8) && (m_ram0[i + 2] == 0x3e) && (m_ram0[i + 3] == 0xff))
+			{
+				m_address1hack = i + 2;
+				logerror("found patch at %06x\n", i + 2);
+				break;
+			}
+		}
+	}
+	else
+	{
+		if ((m_ram0[m_address1hack] == 0x3e) && (m_ram0[m_address1hack + 1] == 0xff)) m_ram0[m_address1hack] = 0xc9;
+	}
+
+	if (m_address2hack == -1)
+	{
+		for (int i = 0; i < max_addr - 4; i++)
+		{
+			if ((m_ram0[i + 0] == 0x10) && (m_ram0[i + 1] == 0xdd) && (m_ram0[i + 2] == 0x3e) && (m_ram0[i + 3] == 0xff))
+			{
+				m_address2hack = i + 2;
+				logerror("found patch at %06x\n", i + 2);
+				break;
+			}
+		}
+	}
+	else
+	{
+		if ((m_ram0[m_address2hack] == 0x3e) && (m_ram0[m_address2hack + 1] == 0xff)) m_ram0[m_address2hack] = 0xc9;
+	}
 }
 
-void cedar_magnet_state::mag_time_protection_hack()
-{
-	protection_hack(m_ram0, 0x8bc, 0x905);
-}
+GAME( 1987, cedmag,   0,      cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
 
-void cedar_magnet_state::mag_xain_protection_hack()
-{
-	protection_hack(m_ram0, 0x796, 0x7df);
-}
+GAME( 1987, mag_time, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
+GAME( 1987, mag_exzi, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
+GAME( 1987, mag_xain, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos
+GAME( 1987, mag_war,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 4/6/87)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-void cedar_magnet_state::mag_exzi_protection_hack()
-{
-	protection_hack(m_ram0, 0x8b6, 0x8ff);
-}
-
-
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_time)
-{
-	m_prothack = &cedar_magnet_state::mag_time_protection_hack;
-}
-
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_xain)
-{
-	m_prothack = &cedar_magnet_state::mag_xain_protection_hack;
-}
-
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
-{
-	m_prothack = &cedar_magnet_state::mag_exzi_protection_hack;
-}
-
-GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, cedar_magnet_state,  0,        ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
-
-GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
-GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
-GAME( 1987, mag_xain,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_xain, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos

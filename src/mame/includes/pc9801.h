@@ -84,6 +84,8 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_pic1(*this, "pic8259_master"),
 		m_pic2(*this, "pic8259_slave"),
+		m_ppi_sys(*this, "ppi8255_sys"),
+		m_ppi_prn(*this, "ppi8255_prn"),
 		m_fdc_2hd(*this, "upd765_2hd"),
 		m_fdc_2dd(*this, "upd765_2dd"),
 		m_rtc(*this, UPD1990A_TAG),
@@ -117,7 +119,7 @@ public:
 	void pc9821(machine_config &config);
 	void pc9801rs(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
-	DECLARE_DRIVER_INIT(pc9801_kanji);
+	void init_pc9801_kanji();
 
 protected:
 	virtual void video_start() override;
@@ -130,6 +132,8 @@ private:
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+	required_device<i8255_device> m_ppi_sys;
+	required_device<i8255_device> m_ppi_prn;
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<upd1990a_device> m_rtc;

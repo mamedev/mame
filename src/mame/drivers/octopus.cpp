@@ -621,7 +621,7 @@ WRITE8_MEMBER(octopus_state::vidcontrol_w)
 {
 	m_vidctrl = data;
 	m_fdc->dden_w(data & 0x04);
-	m_fdc->set_unscaled_clock((data & 0x08) ? XTAL(16'000'000) / 16 : XTAL(16'000'000) / 8);
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / ((data & 0x08) ? 16 : 8));
 }
 
 // Sound hardware
@@ -881,16 +881,16 @@ void octopus_centronics_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(octopus_state::octopus)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8088, XTAL(24'000'000) / 3)  // 8MHz
+	MCFG_DEVICE_ADD("maincpu",I8088, 24_MHz_XTAL / 3)  // 8MHz
 	MCFG_DEVICE_PROGRAM_MAP(octopus_mem)
 	MCFG_DEVICE_IO_MAP(octopus_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(octopus_state, x86_irq_cb)
 
-	MCFG_DEVICE_ADD("subcpu",Z80, XTAL(24'000'000) / 4) // 6MHz
+	MCFG_DEVICE_ADD("subcpu",Z80, 24_MHz_XTAL / 4) // 6MHz
 	MCFG_DEVICE_PROGRAM_MAP(octopus_sub_mem)
 	MCFG_DEVICE_IO_MAP(octopus_sub_io)
 
-	MCFG_DEVICE_ADD("dma1", AM9517A, XTAL(24'000'000) / 6)  // 4MHz
+	MCFG_DEVICE_ADD("dma1", AM9517A, 24_MHz_XTAL / 6)  // 4MHz
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, octopus_state,dma_read))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, octopus_state,dma_write))
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, octopus_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, octopus_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, octopus_state, dack3_w))
-	MCFG_DEVICE_ADD("dma2", AM9517A, XTAL(24'000'000) / 6)  // 4MHz
+	MCFG_DEVICE_ADD("dma2", AM9517A, 24_MHz_XTAL / 6)  // 4MHz
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, octopus_state, dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(*this, octopus_state,dma_read))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, octopus_state,dma_write))
@@ -940,7 +940,8 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, octopus_state,rtc_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, octopus_state,cntl_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, octopus_state,gpo_w))
-	MCFG_MC146818_ADD("rtc", XTAL(32'768))
+
+	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic_slave",pic8259_device, ir2_w)) MCFG_DEVCB_INVERT
 
 	// Keyboard UART
@@ -955,7 +956,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_DEVICE_ADD("keyboard_clock_tx", CLOCK, 1200 * 64)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("keyboard",i8251_device,write_txc))
 
-	MCFG_FD1793_ADD("fdc",XTAL(16'000'000) / 8)
+	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic_master",pic8259_device, ir5_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma2",am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -970,11 +971,11 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, octopus_state,spk_freq_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("serial", Z80SIO, XTAL(16'000'000) / 4) // clock rate not mentioned in tech manual
+	MCFG_DEVICE_ADD("serial", Z80SIO, 16_MHz_XTAL / 4) // clock rate not mentioned in tech manual
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic_master",pic8259_device, ir1_w))
 	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("serial_a",rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("serial_b",rs232_port_device, write_txd))
@@ -1036,5 +1037,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                 FULLNAME       FLAGS
-COMP( 1986, octopus,  0,      0,       octopus,   octopus, octopus_state, 0,    "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                 FULLNAME       FLAGS
+COMP( 1986, octopus, 0,      0,      octopus, octopus, octopus_state, empty_init, "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)

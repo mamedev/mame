@@ -23,6 +23,7 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "diserial.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -82,7 +83,7 @@ public:
 		m_centronics_busy(0), m_centronics_perror(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4 );
+	void init_px4();
 
 	DECLARE_PALETTE_INIT( px4 );
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -260,7 +261,7 @@ public:
 	m_ramdisk(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4p );
+	void init_px4p();
 
 	DECLARE_PALETTE_INIT( px4p );
 
@@ -1214,16 +1215,16 @@ uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitma
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( px4_state, px4 )
+void px4_state::init_px4()
 {
 	// map os rom and last half of memory
 	membank("bank1")->set_base(memregion("os")->base());
 	membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 }
 
-DRIVER_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::init_px4p()
 {
-	DRIVER_INIT_CALL(px4);
+	init_px4();
 
 	// reserve memory for external ram-disk
 	m_ramdisk = std::make_unique<uint8_t[]>(0x20000);
@@ -1500,7 +1501,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_PALETTE_INIT_OWNER(px4_state, px4)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1569,9 +1570,9 @@ MACHINE_CONFIG_END
 ROM_START( px4 )
 	ROM_REGION(0x8000, "os", 0)
 	ROM_SYSTEM_BIOS(0, "default",  "PX-4 OS ROM")
-	ROMX_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502), ROM_BIOS(1))
+	ROMX_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ramtest",  "PX-4/PX-8 DRAM Test Ver. 1.0")
-	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(2))
+	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
@@ -1580,9 +1581,9 @@ ROM_END
 ROM_START( px4p )
 	ROM_REGION(0x8000, "os", 0)
 	ROM_SYSTEM_BIOS(0, "default",  "PX-4+ OS ROM")
-	ROMX_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455), ROM_BIOS(1))
+	ROMX_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ramtest",  "PX-4/PX-8 DRAM Test Ver. 1.0")
-	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(2))
+	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
@@ -1593,6 +1594,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  px4,  "Epson", "PX-4",   0 )
-COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, px4p, "Epson", "PX-4+",  0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT       COMPANY  FULLNAME  FLAGS
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  init_px4,  "Epson", "PX-4",   0 )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, init_px4p, "Epson", "PX-4+",  0 )

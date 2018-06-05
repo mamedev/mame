@@ -338,4 +338,4 @@ ROM_START( ps2 )
 	ROM_LOAD( "scph_bios_v15_jap_220.bin", 0x000000, 0x400000, CRC(493c1e58) SHA1(d9a7537fa463fcdd3e270af14a93731736cafc4a) )
 ROM_END
 
-CONS(2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, 0, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )
+CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )

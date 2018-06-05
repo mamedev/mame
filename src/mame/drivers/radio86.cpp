@@ -345,7 +345,7 @@ static const gfx_layout radio86_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( radio86 )
+static GFXDECODE_START( gfx_radio86 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, radio86_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -372,16 +372,13 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(78*6, 30*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radio86)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radio86)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(radio86_state,radio86)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
@@ -510,9 +507,9 @@ ROM_END
 ROM_START( radiorom )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "32k", "32 KB rom disk")
-	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(1))
+	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "64k", "64 KB rom disk")
-	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(2))
+	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(1))
 	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
@@ -569,15 +566,15 @@ ROM_START( impuls03 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT    STATE          INIT      COMPANY        FULLNAME                       FLAGS
-COMP( 1986, radio86,  0,       0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK",                  0 )
-COMP( 1986, radio16,  radio86, 0,      radio16,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (16K RAM)",        0 )
-COMP( 1986, kr03,     radio86, 0,      radio86,   radio86, radio86_state, radio86,  "Elektronika", "KR-03",                       0 )
-COMP( 1986, radio4k,  radio86, 0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (4K ROM)",         0 )
-COMP( 1986, radiorom, radio86, 0,      radiorom,  radio86, radio86_state, radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       0 )
-COMP( 1986, radioram, radio86, 0,      radioram,  radio86, radio86_state, radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   0 )
-COMP( 1986, spektr01, radio86, 0,      radio86,   radio86, radio86_state, radio86,  "<unknown>",   "Spektr-001",                  0 )
-COMP( 1986, rk7007,   radio86, 0,      rk7007,    ms7007,  radio86_state, radio86,  "<unknown>",   "Radio-86RK (MS7007)",         0 )
-COMP( 1986, rk700716, radio86, 0,      rk700716,  ms7007,  radio86_state, radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", 0 )
-COMP( 1986, mikron2,  radio86, 0,      mikron2,   radio86, radio86_state, radio86,  "<unknown>",   "Mikron-2",                    0 )
-COMP( 1986, impuls03, radio86, 0,      impuls03,  radio86, radio86_state, radio86,  "<unknown>",   "Impuls-03",                   0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT           COMPANY        FULLNAME                       FLAGS
+COMP( 1986, radio86,  0,       0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK",                  0 )
+COMP( 1986, radio16,  radio86, 0,      radio16,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (16K RAM)",        0 )
+COMP( 1986, kr03,     radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "Elektronika", "KR-03",                       0 )
+COMP( 1986, radio4k,  radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (4K ROM)",         0 )
+COMP( 1986, radiorom, radio86, 0,      radiorom, radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       0 )
+COMP( 1986, radioram, radio86, 0,      radioram, radio86, radio86_state, init_radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   0 )
+COMP( 1986, spektr01, radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Spektr-001",                  0 )
+COMP( 1986, rk7007,   radio86, 0,      rk7007,   ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007)",         0 )
+COMP( 1986, rk700716, radio86, 0,      rk700716, ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", 0 )
+COMP( 1986, mikron2,  radio86, 0,      mikron2,  radio86, radio86_state, init_radio86,  "<unknown>",   "Mikron-2",                    0 )
+COMP( 1986, impuls03, radio86, 0,      impuls03, radio86, radio86_state, init_radio86,  "<unknown>",   "Impuls-03",                   0 )

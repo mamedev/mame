@@ -234,7 +234,7 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 	// 80/40 character mode
 	m_80_40_char_en = BIT(data, 4);
-	m_crtc->set_clock(m_80_40_char_en ? XTAL(12'480'000)/16 : XTAL(12'480'000)/8);
+	m_crtc->set_clock(12.48_MHz_XTAL / (m_80_40_char_en ? 16 : 8));
 
 	// RTC interrupt enable
 	m_enable_rtc_int = BIT(data, 5);
@@ -709,7 +709,7 @@ void trs80m2_state::machine_reset()
 
 MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8_MHz_XTAL / 2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
 	MCFG_DEVICE_IO_MAP(z80_io)
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(12'480'000)/8)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, 12.48_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
@@ -732,7 +732,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_FD1791_ADD(FD1791_TAG, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(Z80PIO_TAG, z80pio_device, pa_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
@@ -740,15 +740,15 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL(8'000'000)/2/2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 8_MHz_XTAL / 2)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, trs80m2_state, read))
@@ -756,14 +756,14 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, trs80m2_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, trs80m2_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
@@ -794,13 +794,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8_MHz_XTAL / 2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
 	MCFG_DEVICE_IO_MAP(m16_z80_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, am9519_device, iack_cb)
 
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(24'000'000)/4)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, 24_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(m68000_mem)
 	MCFG_DEVICE_DISABLE()
 
@@ -814,7 +814,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(12'480'000)/8)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, 12.48_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_FD1791_ADD(FD1791_TAG, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(Z80PIO_TAG, z80pio_device, pa_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
@@ -830,15 +830,15 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL(8'000'000)/2/2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 8_MHz_XTAL / 2)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, trs80m2_state, read))
@@ -846,14 +846,14 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, trs80m2_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, trs80m2_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(AM9519A_TAG, AM9519, 0)
@@ -927,17 +927,17 @@ ROM_START( trs80m2 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "9733" )
 	ROM_SYSTEM_BIOS( 0, "c8ff", "Version 1" )
-	ROMX_LOAD( "8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e), ROM_BIOS(1) )
+	ROMX_LOAD( "8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "2bff", "Version 2 (1981-07-29)" )
-	ROMX_LOAD( "8047316.u11", 0x0000, 0x0800, CRC(c6c71d8b) SHA1(7107e2cbbe769851a4460680c2deff8e76a101b5), ROM_BIOS(2) )
+	ROMX_LOAD( "8047316.u11", 0x0000, 0x0800, CRC(c6c71d8b) SHA1(7107e2cbbe769851a4460680c2deff8e76a101b5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "2119", "Version 3 (1982-05-07)" )
-	ROMX_LOAD( "cpu_2119.u11", 0x0000, 0x0800, CRC(7a663049) SHA1(f308439ce266df717bfe79adcdad6024b4faa141), ROM_BIOS(3) )
+	ROMX_LOAD( "cpu_2119.u11", 0x0000, 0x0800, CRC(7a663049) SHA1(f308439ce266df717bfe79adcdad6024b4faa141), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "1bbe", "Version 3 (1982-05-07, Alt)" )
-	ROMX_LOAD( "cpu_11be.u11", 0x0000, 0x0800, CRC(8edceea7) SHA1(3d797acedd8a71a82c695129ca764f85aa9022b2), ROM_BIOS(4) )
+	ROMX_LOAD( "cpu_11be.u11", 0x0000, 0x0800, CRC(8edceea7) SHA1(3d797acedd8a71a82c695129ca764f85aa9022b2), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "fc86", "Version 4 (1982-11-18)" )
-	ROMX_LOAD( "cpu_fc86.u11", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "cpu_fc86.u11", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "9733", "Version 5 (1983-07-29)" )
-	ROMX_LOAD( "u54.u11", 0x0000, 0x0800, CRC(823924b1) SHA1(aee0625bcbd8620b28ab705e15ad9bea804c8476), ROM_BIOS(6) )
+	ROMX_LOAD( "u54.u11", 0x0000, 0x0800, CRC(823924b1) SHA1(aee0625bcbd8620b28ab705e15ad9bea804c8476), ROM_BIOS(5) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
 	ROM_LOAD( "8043316.u9", 0x0000, 0x0800, CRC(04425b03) SHA1(32a29dc202b7fcf21838289cc3bffc51ef943dab) )
@@ -956,9 +956,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY              FULLNAME            FLAGS
-COMP( 1979, trs80m2,    0,       0,      trs80m2,    trs80m2, trs80m2_state,  0,    "Tandy Radio Shack", "TRS-80 Model II",  MACHINE_NO_SOUND_HW )
-COMP( 1982, trs80m16,   trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-//COMP( 1983, trs80m12, trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-//COMP( 1984, trs80m16b,trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-//COMP( 1985, tandy6k,  trs80m2, 0,      tandy6k,    trs80m2, tandy6k_state,  0,    "Tandy Radio Shack", "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY              FULLNAME            FLAGS
+COMP( 1979, trs80m2,    0,       0,      trs80m2,  trs80m2, trs80m2_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model II",  MACHINE_NO_SOUND_HW )
+COMP( 1982, trs80m16,   trs80m2, 0,      trs80m16, trs80m2, trs80m16_state, empty_init, "Tandy Radio Shack", "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1983, trs80m12, trs80m2, 0,      trs80m16, trs80m2, trs80m16_state, empty_init, "Tandy Radio Shack", "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1984, trs80m16b,trs80m2, 0,      trs80m16, trs80m2, trs80m16_state, empty_init, "Tandy Radio Shack", "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1985, tandy6k,  trs80m2, 0,      tandy6k,  trs80m2, tandy6k_state,  empty_init, "Tandy Radio Shack", "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

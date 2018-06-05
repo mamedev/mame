@@ -712,7 +712,7 @@ static const gfx_layout px8_charlayout =
     GFXDECODE( px8 )
 -------------------------------------------------*/
 
-static GFXDECODE_START( px8 )
+static GFXDECODE_START( gfx_px8 )
 	GFXDECODE_ENTRY( SED1320_TAG, 0x0000, px8_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -774,14 +774,13 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", px8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_px8)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
@@ -813,9 +812,9 @@ ROM_START( px8 )
 	ROM_REGION( 0x10000, UPD70008_TAG, 0 )
 	ROM_DEFAULT_BIOS("052884")
 	ROM_SYSTEM_BIOS( 0, "091383", "9/13/83" )
-	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(1) )
+	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "052884", "5/28/84" )
-	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(2) )
+	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(1) )
 
 	ROM_REGION( 0x0800, SED1320_TAG, 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(5b52edbd) SHA1(38197edf301bb2843bea040536af545f76b3d44f) )
@@ -835,5 +834,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,    0,      0,      px8,    px8,   px8_state, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_NOT_WORKING )

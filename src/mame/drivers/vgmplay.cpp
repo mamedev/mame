@@ -131,6 +131,12 @@ public:
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
 
+	void stop();
+	void pause();
+	bool paused() const { return m_paused; }
+	void play();
+	void toggle_loop() { m_loop = !m_loop; }
+
 private:
 	struct rom_block {
 		offs_t start_address;
@@ -146,7 +152,10 @@ private:
 	address_space_config m_file_config, m_io_config, m_io16_config;
 	address_space *m_file, *m_io, *m_io16;
 
-	int m_icount, m_state;
+	int m_icount;
+	int m_state;
+	bool m_paused;
+	bool m_loop;
 
 	uint32_t m_pc;
 
@@ -172,6 +181,15 @@ private:
 
 DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
 
+enum vgmplay_inputs : uint8_t
+{
+	VGMPLAY_STOP,
+	VGMPLAY_PAUSE,
+	VGMPLAY_PLAY,
+	VGMPLAY_RESTART,
+	VGMPLAY_LOOP,
+};
+
 class vgmplay_state : public driver_device
 {
 public:
@@ -181,6 +199,7 @@ public:
 
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_READ8_MEMBER(file_size_r);
+	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
@@ -209,6 +228,9 @@ public:
 private:
 	std::vector<uint8_t> m_file_data;
 	required_device<bitbanger_device> m_file;
+	required_device<vgmplay_device> m_vgmplay;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
 	required_device<ym2612_device>  m_ym2612;
 	required_device<ym2151_device>  m_ym2151;
 	required_device<ym2413_device>  m_ym2413;
@@ -268,9 +290,30 @@ void vgmplay_device::device_reset()
 {
 	m_pc = 0;
 	m_state = RESET;
+	m_paused = false;
+	m_loop = true;
 
 	m_ym2612_stream_offset = 0;
 	blocks_clear();
+}
+
+void vgmplay_device::stop()
+{
+	device_reset();
+	m_paused = true;
+}
+
+void vgmplay_device::pause()
+{
+	m_paused = !m_paused;
+}
+
+void vgmplay_device::play()
+{
+	if (m_paused && m_state != DONE)
+		m_paused = false;
+	else
+		device_reset();
 }
 
 uint32_t vgmplay_device::execute_min_cycles() const
@@ -355,6 +398,16 @@ void vgmplay_device::execute_run()
 			break;
 		}
 		case RUN: {
+			if (m_paused)
+			{
+				machine().sound().system_mute(1);
+				m_icount = 0;
+				return;
+			}
+			else
+			{
+				machine().sound().system_mute(0);
+			}
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 				debugger_instruction_hook(m_pc);
 			uint8_t code = m_file->read_byte(m_pc);
@@ -634,14 +687,23 @@ void vgmplay_device::execute_run()
 			}
 			break;
 		}
-		case DONE: {
+		case DONE:
+		{
 			static bool done = false;
-			if(!done) {
+			if(!done && !m_loop)
+			{
 				logerror("done\n");
 				done = true;
 			}
-			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debugger_instruction_hook(m_pc);
+			else if (m_loop)
+			{
+				device_reset();
+			}
+			else
+			{
+				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+					debugger_instruction_hook(m_pc);
+			}
 			m_icount = 0;
 			break;
 		}
@@ -1075,6 +1137,9 @@ READ8_MEMBER(vgmplay_device::c352_rom_r)
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
 	, m_file(*this, "file")
+	, m_vgmplay(*this, "vgmplay")
+	, m_lspeaker(*this, "lspeaker")
+	, m_rspeaker(*this, "rspeaker")
 	, m_ym2612(*this, "ym2612")
 	, m_ym2151(*this, "ym2151")
 	, m_ym2413(*this, "ym2413")
@@ -1315,13 +1380,13 @@ void vgmplay_state::machine_start()
 					m_okim6295_clock[0] &= ~0x80000000;
 					m_okim6295_pin7[0] = 1;
 				}
-				m_okim6295[0]->config_pin7(m_okim6295_pin7[0]);
+				m_okim6295[0]->config_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
 				m_okim6295[0]->set_unscaled_clock(m_okim6295_clock[0] & ~0xc0000000);
 				if (m_okim6295_clock[0] & 0x40000000) {
 					m_okim6295_clock[0] &= ~0x40000000;
 					m_okim6295_clock[1] = m_okim6295_clock[0];
 					m_okim6295_pin7[1] = m_okim6295_pin7[0];
-					m_okim6295[1]->config_pin7(m_okim6295_pin7[1]);
+					m_okim6295[1]->config_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
 					m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
 				}
 			}
@@ -1417,7 +1482,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
 	if ((data & mem_mask) != (m_okim6295_pin7[Chip] & mem_mask))
 	{
 		COMBINE_DATA(&m_okim6295_pin7[Chip]);
-		m_okim6295[Chip]->config_pin7(m_okim6295_pin7[Chip]);
+		m_okim6295[Chip]->set_pin7(m_okim6295_pin7[Chip]);
 	}
 }
 
@@ -1479,7 +1544,39 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 	}
 }
 
+INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
+{
+	if (!newval)
+		return;
+
+	int val = (uint8_t)(uintptr_t)param;
+	switch (val)
+	{
+		case VGMPLAY_STOP:
+			m_vgmplay->stop();
+			break;
+		case VGMPLAY_PAUSE:
+			m_vgmplay->pause();
+			break;
+		case VGMPLAY_PLAY:
+			m_vgmplay->play();
+			break;
+		case VGMPLAY_RESTART:
+			m_vgmplay->device_reset();
+			break;
+		case VGMPLAY_LOOP:
+			m_vgmplay->toggle_loop();
+			break;
+	}
+}
+
 static INPUT_PORTS_START( vgmplay )
+	PORT_START("CONTROLS")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)		PORT_NAME("Stop")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)		PORT_NAME("Pause")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)		PORT_NAME("Play")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)		PORT_NAME("Restart")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)		PORT_NAME("Loop")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)
@@ -1628,7 +1725,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
 	MCFG_BITBANGER_READONLY(true)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym2612", YM2612, 7670454)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
@@ -1722,17 +1820,17 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_C352_ADD("c352", 1000000, 288)
+	MCFG_DEVICE_ADD("c352", C352, 1000000, 288)
 	MCFG_DEVICE_ADDRESS_MAP(0, c352_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_OKIM6295_ADD("okim6295a", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295a", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295a_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("okim6295b", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295b", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295b_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
@@ -1777,4 +1875,4 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
 ROM_END
 
-CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )
+CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", 0 )

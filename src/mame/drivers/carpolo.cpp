@@ -220,7 +220,7 @@ static const gfx_layout alphalayout =
 	8*8
 };
 
-static GFXDECODE_START( carpolo )
+static GFXDECODE_START( gfx_carpolo )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,         12 )
 	GFXDECODE_ENTRY( "gfx2", 0, goallayout,   12*2,      2 )
 	GFXDECODE_ENTRY( "gfx3", 0, alphalayout,  12*2+2*16, 4 )
@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, carpolo_state, screen_vblank_carpolo))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carpolo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carpolo)
 	MCFG_PALETTE_ADD("palette", 12*2+2*16+4*2)
 	MCFG_PALETTE_INIT_OWNER(carpolo_state,carpolo)
 
@@ -346,17 +346,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(carpolo_state,carpolo)
+void carpolo_state::init_carpolo()
 {
-	size_t i, len;
-	uint8_t *ROM;
-
-
 	/* invert gfx PROM since the bits are active LO */
-	ROM = memregion("gfx2")->base();
-	len = memregion("gfx2")->bytes();
-	for (i = 0;i < len; i++)
+	uint8_t *ROM = memregion("gfx2")->base();
+	size_t len = memregion("gfx2")->bytes();
+	for (size_t i = 0; i < len; i++)
 		ROM[i] ^= 0x0f;
 }
 
-GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, init_carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

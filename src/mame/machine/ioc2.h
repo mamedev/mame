@@ -18,19 +18,10 @@
 #include "machine/pit8253.h"
 #include "machine/z80scc.h"
 
-#define MCFG_IOC2_GUINNESS_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, SGI_IOC2_GUINNESS, 0)
-
-#define MCFG_IOC2_FULL_HOUSE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SGI_IOC2_FULL_HOUSE, 0)
-
-#define MCFG_IOC2_CPU(cpu_tag) \
-	downcast<ioc2_device &>(*device).set_cpu_tag(cpu_tag);
-
 class ioc2_device : public device_t
 {
 public:
-	void set_cpu_tag(const char *tag) { m_maincpu.set_tag(tag); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -69,7 +60,7 @@ public:
 	};
 
 protected:
-	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id);
+	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -150,6 +141,7 @@ protected:
 	required_device<pit8254_device> m_pit;
 
 	virtual void handle_reset_reg_write(uint8_t data);
+	virtual uint8_t get_system_id() = 0;
 
 	uint8_t m_gen_ctrl_select_reg;
 	uint8_t m_gen_ctrl_reg;
@@ -192,21 +184,33 @@ protected:
 class ioc2_guinness_device : public ioc2_device
 {
 public:
+	template <typename T>
+	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: ioc2_guinness_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: ioc2_device(mconfig, type, tag, owner, clock, 0x01)
-	{ }
+	uint8_t get_system_id() override { return 0x01; }
 };
 
 class ioc2_full_house_device : public ioc2_device
 {
 public:
+	template <typename T>
+	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: ioc2_full_house_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: ioc2_device(mconfig, type, tag, owner, clock, 0x20)
-	{ }
+	uint8_t get_system_id() override { return 0x20; }
 };
 
 DECLARE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device)

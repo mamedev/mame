@@ -61,12 +61,12 @@ public:
 	DECLARE_READ16_MEMBER(karnov_control_r);
 	DECLARE_WRITE16_MEMBER(karnov_videoram_w);
 	DECLARE_WRITE16_MEMBER(karnov_playfield_swap_w);
-	DECLARE_DRIVER_INIT(wndrplnt);
-	DECLARE_DRIVER_INIT(karnov);
-	DECLARE_DRIVER_INIT(karnovj);
-	DECLARE_DRIVER_INIT(chelnovu);
-	DECLARE_DRIVER_INIT(chelnovj);
-	DECLARE_DRIVER_INIT(chelnov);
+	void init_wndrplnt();
+	void init_karnov();
+	void init_karnovj();
+	void init_chelnovu();
+	void init_chelnovj();
+	void init_chelnov();
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -10,6 +10,9 @@
 #include "machine/timer.h"
 #include "video/scn2674.h"
 
+#include "diserial.h"
+
+
 #define MCFG_PCX_VIDEO_TXD_HANDLER(_devcb) \
 	devcb = &downcast<pcx_video_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 

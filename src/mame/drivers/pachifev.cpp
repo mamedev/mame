@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(pachifev_state::pachifev)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pachifev_state, vblank_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 #if USE_MSM
 	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))  /* guess */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pachifev_state,pf_adpcm_int))    /* interrupt function */
@@ -388,4 +388,4 @@ ROM_START( pachifev )
 
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state, empty_init, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

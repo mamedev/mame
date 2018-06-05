@@ -705,7 +705,7 @@ static const gfx_layout osi_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( osi )
+static GFXDECODE_START( gfx_osi )
 	GFXDECODE_ENTRY( "chargen", 0x0000, osi_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -718,10 +718,10 @@ MACHINE_CONFIG_START(sb2m600_state::osi600)
 
 	/* video hardware */
 	osi600_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
 	MCFG_DISCRETE_INTF(osi600_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(uk101_state::uk101)
 
 	/* video hardware */
 	uk101_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* cassette ACIA */
 	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
@@ -774,10 +774,10 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 
 	/* video hardware */
 	osi630_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
 	MCFG_DISCRETE_INTF(osi600c_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -840,9 +840,9 @@ ROM_START( sb2m600b )
 	ROM_LOAD( "basus04.u12", 0xb800, 0x0800, CRC(8ee6030e) SHA1(71f210163e4268cba2dd78a97c4d8f5dcebf980e) )
 	ROM_LOAD( "monde01.u13", 0xf800, 0x0800, CRC(95a44d2e) SHA1(4a0241c4015b94c436d0f0f58b3dd9d5207cd847) ) // also known as syn600.rom
 	ROM_SYSTEM_BIOS(0, "original", "Original")
-	ROMX_LOAD("basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80), ROM_BIOS(1) )
+	ROMX_LOAD("basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "fixed", "Fixed")
-	ROMX_LOAD( "basic3.rom", 0xb000, 0x0800, CRC(ac37d575) SHA1(11407eb24d1ba7afb889b7677c987e8be1a61aab), ROM_BIOS(2) )
+	ROMX_LOAD( "basic3.rom", 0xb000, 0x0800, CRC(ac37d575) SHA1(11407eb24d1ba7afb889b7677c987e8be1a61aab), ROM_BIOS(1) )
 
 	ROM_REGION( 0x0800, "chargen",0)
 	ROM_LOAD( "chgsup2.u41", 0x0000, 0x0800, CRC(735f5e0a) SHA1(87c6271497c5b00a974d905766e91bb965180594) ) // see below, is this the same rom, but on a different pcb/form factor?
@@ -865,10 +865,10 @@ ROM_START( uk101 )
 	ROM_LOAD( "basuk04.ic12",  0xb800, 0x0800, CRC(667223e8) SHA1(dca78be4b98317413376d69119942d692e39575a) )
 	// This monitor came from another emulator and works well on the 64x16 screen
 	ROM_SYSTEM_BIOS(0, "final", "64x16 screen final? rom")
-	ROMX_LOAD( "monuk02.ic13",  0xf800, 0x0800, CRC(e5b7028d) SHA1(74f0934014fdf83d33c8d3579e562b53c0683270), ROM_BIOS(1) )
+	ROMX_LOAD( "monuk02.ic13",  0xf800, 0x0800, CRC(e5b7028d) SHA1(74f0934014fdf83d33c8d3579e562b53c0683270), ROM_BIOS(0) )
 	// This monitor is for a 32x32 screen, and could be the prototype referred to in Practical Electronics
 	ROM_SYSTEM_BIOS(1, "proto", "32x32 screen proto? rom")
-	ROMX_LOAD( "monuk02_alt.ic13",  0xf800, 0x0800, CRC(04ac5822) SHA1(2bbbcd0ca18103fd68afcf64a7483653b925d83e), ROM_BIOS(2) )
+	ROMX_LOAD( "monuk02_alt.ic13",  0xf800, 0x0800, CRC(04ac5822) SHA1(2bbbcd0ca18103fd68afcf64a7483653b925d83e), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "chguk101.ic41", 0x0000, 0x0800, CRC(fce2c84a) SHA1(baa66a7a48e4d62282671ef53abfaf450b888b70) )
@@ -889,7 +889,7 @@ void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-DRIVER_INIT_MEMBER(c1p_state,c1p)
+void c1p_state::init_c1p()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
@@ -897,9 +897,9 @@ DRIVER_INIT_MEMBER(c1p_state,c1p)
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   STATE          INIT  COMPANY            FULLNAME                            FLAGS
-COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600, c1p_state,     c1p,  "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
-COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600, c1pmf_state,   c1p,  "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101,  uk101_state,   0,    "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY            FULLNAME                            FLAGS
+COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
+COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
+COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
+COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

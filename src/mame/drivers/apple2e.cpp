@@ -3903,7 +3903,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_PALETTE_INIT_OWNER(apple2e_state, apple2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -4020,18 +4020,18 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2e_state, ay3600_repeat, attotime::from_hz(15))
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2e_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2e_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskiing")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_DEVICE_ADD(A2_AUXSLOT_TAG, A2EAUXSLOT, 0)
 	MCFG_A2EAUXSLOT_CPU("maincpu")
@@ -4090,13 +4090,13 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	// IIc and friends have no cassette port
 	MCFG_DEVICE_REMOVE(A2_CASSETTE_TAG)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl1")   // IIc has no slots, of course :)
-	MCFG_A2BUS_SLOT_REMOVE("sl2")
-	MCFG_A2BUS_SLOT_REMOVE("sl3")
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl5")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_SLOT_REMOVE("sl7")
+	MCFG_DEVICE_REMOVE("sl1")   // IIc has no slots, of course :)
+	MCFG_DEVICE_REMOVE("sl2")
+	MCFG_DEVICE_REMOVE("sl3")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl5")
+	MCFG_DEVICE_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl7")
 
 	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(14'318'181) / 8) // ~1.789 MHz
@@ -4119,8 +4119,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
 
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_MOCKINGBOARD, NOOP )   // Mockingboard 4C
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NOOP)
+	A2BUS_MOCKINGBOARD(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus); // Mockingboard 4C
+	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
 	MCFG_DEVICE_REMOVE(A2_AUXSLOT_TAG)
@@ -4149,8 +4149,8 @@ static const floppy_interface apple2cp_floppy35_floppy_interface =
 
 MACHINE_CONFIG_START(apple2e_state::apple2cp)
 	apple2c(config);
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl6")
 	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(apple2cp_floppy35_floppy_interface)
 MACHINE_CONFIG_END
@@ -4158,8 +4158,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
 	apple2c(config);
 
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
+	MCFG_DEVICE_REMOVE("sl6")
+	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
@@ -4167,8 +4167,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
 	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(apple2c_memexp_map)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
+	MCFG_DEVICE_REMOVE("sl6")
+	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -4200,16 +4200,16 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl6")
 
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
+	A2BUS_LASER128(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -4224,16 +4224,16 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl6")
 
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NOOP)
+	A2BUS_LASER128(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl5", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -4242,15 +4242,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::ceci)
 	apple2e(config);
-	MCFG_A2BUS_SLOT_REMOVE("sl1")
-	MCFG_A2BUS_SLOT_REMOVE("sl2")
-	MCFG_A2BUS_SLOT_REMOVE("sl3")
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl5")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_SLOT_REMOVE("sl7")
+	MCFG_DEVICE_REMOVE("sl1")
+	MCFG_DEVICE_REMOVE("sl2")
+	MCFG_DEVICE_REMOVE("sl3")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl5")
+	MCFG_DEVICE_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl7")
 
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NOOP)
+	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
@@ -4515,16 +4515,16 @@ ROM_START(ceci)
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "default", "ver 1.21")
-	ROMX_LOAD( "u7.alt", 0x000000, 0x008000, CRC(23c87b3b) SHA1(ff9673f628390e9b0fb60732acc72b580200b5ae), ROM_BIOS(1) )
-	ROMX_LOAD( "u35.alt", 0x008000, 0x008000, CRC(a4f40181) SHA1(db1ed69b2ed3280b1c90f76dbd637370d5bc11b0), ROM_BIOS(1) )
+	ROMX_LOAD( "u7.alt", 0x000000, 0x008000, CRC(23c87b3b) SHA1(ff9673f628390e9b0fb60732acc72b580200b5ae), ROM_BIOS(0) )
+	ROMX_LOAD( "u35.alt", 0x008000, 0x008000, CRC(a4f40181) SHA1(db1ed69b2ed3280b1c90f76dbd637370d5bc11b0), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "older", "ver 1.1")
-	ROMX_LOAD( "u7.tmm24256ap.bin", 0x000000, 0x008000, CRC(2e3f73b0) SHA1(a2967b3a9a040a1c47eb0fea9a632b833cd1c060), ROM_BIOS(2) )
-	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(2) )
+	ROMX_LOAD( "u7.tmm24256ap.bin", 0x000000, 0x008000, CRC(2e3f73b0) SHA1(a2967b3a9a040a1c47eb0fea9a632b833cd1c060), ROM_BIOS(1) )
+	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "diag", "self test")
-	ROMX_LOAD( "u7.selftest.bin", 0x000000, 0x008000, CRC(4b045a44) SHA1(d2c716d0eb9f1c70e108d16c6a88d44b894e39fd), ROM_BIOS(3) )
-	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(3) )
+	ROMX_LOAD( "u7.selftest.bin", 0x000000, 0x008000, CRC(4b045a44) SHA1(d2c716d0eb9f1c70e108d16c6a88d44b894e39fd), ROM_BIOS(2) )
+	ROMX_LOAD( "u35.tmm24256ap.bin", 0x008000, 0x008000, CRC(7f3ee968) SHA1(f4fd7ceda4c9ab9bc626d6abb76b7fd2b5faf2da), ROM_BIOS(2) )
 
 	ROM_REGION(0x40000,"cecexp",0)
 	ROM_LOAD16_BYTE( "u33.mx231024-0059.bin", 0x000000, 0x020000, CRC(a2a59f35) SHA1(01c787e150bf1378088a9333ec9338387aae0f50) )
@@ -4537,24 +4537,24 @@ ROM_START(ceci)
 	ROM_LOAD( "u40.m2822.bin", 0x000000, 0x000100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT      STATE           INIT  COMPANY              FULLNAME */
-COMP( 1983, apple2e,  0,        apple2,   apple2e,     apple2e,   apple2e_state,  0,    "Apple Computer",    "Apple //e", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, apple2euk,apple2e,  0,        apple2e,     apple2euk, apple2e_state,  0,    "Apple Computer",    "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, apple2ees,apple2e,  0,        apple2e,     apple2ees, apple2e_state,  0,    "Apple Computer",    "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, mprof3,   apple2e,  0,        mprof3,      apple2e,   apple2e_state,  0,    "Multitech",         "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2ee, apple2e,  0,        apple2ee,    apple2e,   apple2e_state,  0,    "Apple Computer",    "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2eeuk,apple2e, 0,        apple2ee,    apple2euk, apple2e_state,  0,    "Apple Computer",    "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2eefr,apple2e, 0,        apple2ee,    apple2efr, apple2e_state,  0,    "Apple Computer",    "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, apple2ep, apple2e,  0,        apple2ep,    apple2ep,  apple2e_state,  0,    "Apple Computer",    "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, apple2c,  0,        apple2,   apple2c,     apple2c,   apple2e_state,  0,    "Apple Computer",    "Apple //c" , MACHINE_SUPPORTS_SAVE )
-COMP( 1985?,spectred, apple2e,  0,        spectred,    apple2e,   apple2e_state,  0,    "Scopus/Spectrum",   "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
-COMP( 1986, tk3000,   apple2c,  0,        tk3000,      apple2e,   apple2e_state,  0,    "Microdigital",      "TK3000//e" , MACHINE_SUPPORTS_SAVE )
-COMP( 1989, prav8c,   apple2e,  0,        apple2e,     apple2e,   apple2e_state,  0,    "Pravetz",           "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, laser128, apple2c,  0,        laser128,    apple2e,   apple2e_state,  0,    "Video Technology",  "Laser 128 (version 4.2)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, las128ex, apple2c,  0,        laser128,    apple2e,   apple2e_state,  0,    "Video Technology",  "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, las128e2, apple2c,  0,        laser128ex2, apple2e,   apple2e_state,  0,    "Video Technology",  "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2c0, apple2c,  0,        apple2c_iwm, apple2c,   apple2e_state,  0,    "Apple Computer",    "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2c3, apple2c,  0,        apple2c_mem, apple2c,   apple2e_state,  0,    "Apple Computer",    "Apple //c (Original Memory Expansion)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2c4, apple2c,  0,        apple2c_mem, apple2c,   apple2e_state,  0,    "Apple Computer",    "Apple //c (rev 4)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, ceci,     0,        apple2,   ceci,        ceci,      apple2e_state,  0,    "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, apple2cp, apple2c,  0,        apple2cp,    apple2c,   apple2e_state,  0,    "Apple Computer",    "Apple //c Plus", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT   COMPAT  MACHINE      INPUT      CLASS          INIT        COMPANY             FULLNAME */
+COMP( 1983, apple2e,    0,       apple2, apple2e,     apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2euk,  apple2e, 0,      apple2e,     apple2euk, apple2e_state, empty_init, "Apple Computer",   "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2ees,  apple2e, 0,      apple2e,     apple2ees, apple2e_state, empty_init, "Apple Computer",   "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, mprof3,     apple2e, 0,      mprof3,      apple2e,   apple2e_state, empty_init, "Multitech",        "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,    apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eeuk, apple2e, 0,      apple2ee,    apple2euk, apple2e_state, empty_init, "Apple Computer",   "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eefr, apple2e, 0,      apple2ee,    apple2efr, apple2e_state, empty_init, "Apple Computer",   "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, apple2ep,   apple2e, 0,      apple2ep,    apple2ep,  apple2e_state, empty_init, "Apple Computer",   "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, apple2c,    0,       apple2, apple2c,     apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c" , MACHINE_SUPPORTS_SAVE )
+COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, empty_init, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tk3000,     apple2c, 0,      tk3000,      apple2e,   apple2e_state, empty_init, "Microdigital",     "TK3000//e" , MACHINE_SUPPORTS_SAVE )
+COMP( 1989, prav8c,     apple2e, 0,      apple2e,     apple2e,   apple2e_state, empty_init, "Pravetz",          "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, laser128,   apple2c, 0,      laser128,    apple2e,   apple2e_state, empty_init, "Video Technology", "Laser 128 (version 4.2)", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, las128ex,   apple2c, 0,      laser128,    apple2e,   apple2e_state, empty_init, "Video Technology", "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, las128e2,   apple2c, 0,      laser128ex2, apple2e,   apple2e_state, empty_init, "Video Technology", "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c3,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (Original Memory Expansion)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c4,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (rev 4)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, ceci,       0,       apple2, ceci,        ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

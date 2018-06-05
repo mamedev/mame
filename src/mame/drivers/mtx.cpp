@@ -25,7 +25,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -403,9 +403,9 @@ ROM_START( mtx512 )
 	ROM_DEFAULT_BIOS("us")
 	ROM_SYSTEM_BIOS( 0, "us", "U.S.A." )
 	ROM_SYSTEM_BIOS( 1, "dk", "Denmark" )
-	ROMX_LOAD( "danish.rom",  0xe000, 0x2000, CRC(9c1b3fae) SHA1(82bc021660d88eebcf0c4d3856558ee9acc1c348), ROM_BIOS(2) )
+	ROMX_LOAD( "danish.rom",  0xe000, 0x2000, CRC(9c1b3fae) SHA1(82bc021660d88eebcf0c4d3856558ee9acc1c348), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "fi", "Finland" )
-	ROMX_LOAD( "finnish.rom", 0xe000, 0x2000, CRC(9b96cf72) SHA1(b46d1a733e0e635ccdaf4752cc370d793c3b5c55), ROM_BIOS(3) )
+	ROMX_LOAD( "finnish.rom", 0xe000, 0x2000, CRC(9b96cf72) SHA1(b46d1a733e0e635ccdaf4752cc370d793c3b5c55), ROM_BIOS(2) )
 
 	ROM_REGION( 0x2000, "sdx", 0 )
 	ROM_LOAD( "sdx", 0x0000, 0x2000, NO_DUMP )
@@ -428,10 +428,10 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE        INIT    COMPANY         FULLNAME   FLAGS
-COMP( 1983, mtx512,   0,        0,      mtx512,   mtx512, mtx_state,   0,      "Memotech Ltd", "MTX 512", 0 )
-COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512, mtx_state,   0,      "Memotech Ltd", "MTX 500", 0 )
-COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512, mtx_state,   0,      "Memotech Ltd", "RS 128",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY         FULLNAME   FLAGS
+COMP( 1983, mtx512, 0,      0,      mtx512,  mtx512, mtx_state, empty_init, "Memotech Ltd", "MTX 512", 0 )
+COMP( 1983, mtx500, mtx512, 0,      mtx500,  mtx512, mtx_state, empty_init, "Memotech Ltd", "MTX 500", 0 )
+COMP( 1984, rs128,  mtx512, 0,      rs128,   mtx512, mtx_state, empty_init, "Memotech Ltd", "RS 128",  0 )
 
 
 /*

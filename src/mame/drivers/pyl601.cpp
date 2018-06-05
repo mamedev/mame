@@ -56,17 +56,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_fdc(*this, "upd765"),
+		m_floppy(*this, "upd765:%u", 0U),
 		m_ram(*this, RAM_TAG),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
-	uint8_t m_rom_page;
-	uint32_t m_vdisk_addr;
-	uint8_t m_key_code;
-	uint8_t m_keyboard_clk;
-	uint8_t m_video_mode;
-	uint8_t m_tick50_mark;
-	uint8_t m_floppy_ctrl;
+	void pyl601(machine_config &config);
+	void pyl601a(machine_config &config);
+	void init_pyl601();
+
+private:
 	DECLARE_READ8_MEMBER(rom_page_r);
 	DECLARE_WRITE8_MEMBER(rom_page_w);
 	DECLARE_WRITE8_MEMBER(vdisk_page_w);
@@ -86,19 +85,27 @@ public:
 	MC6845_UPDATE_ROW(pyl601_update_row);
 	MC6845_UPDATE_ROW(pyl601a_update_row);
 	uint8_t selectedline(uint16_t data);
-	required_device<speaker_sound_device> m_speaker;
-	required_device<upd765a_device> m_fdc;
-	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(pyl601);
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void pyl601_mem(address_map &map);
+
+	uint8_t m_rom_page;
+	uint32_t m_vdisk_addr;
+	uint8_t m_key_code;
+	uint8_t m_keyboard_clk;
+	uint8_t m_video_mode;
+	uint8_t m_tick50_mark;
+	uint8_t m_floppy_ctrl;
+
+	required_device<speaker_sound_device> m_speaker;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void pyl601(machine_config &config);
-	void pyl601a(machine_config &config);
-	void pyl601_mem(address_map &map);
 };
 
 
@@ -240,7 +247,7 @@ WRITE8_MEMBER(pyl601_state::floppy_w)
 		//reset
 		m_fdc->reset();
 
-	floppy_image_device *floppy = machine().device<floppy_connector>(BIT(data,2) ? "upd765:1" : "upd765:0")->get_device();
+	floppy_image_device *floppy = m_floppy[BIT(data, 2)]->get_device();
 	if(floppy)
 		floppy->mon_w(!BIT(data, 3));
 
@@ -479,7 +486,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 
 
 
-DRIVER_INIT_MEMBER(pyl601_state,pyl601)
+void pyl601_state::init_pyl601()
 {
 	memset(m_ram->pointer(), 0, 64 * 1024);
 }
@@ -526,11 +533,11 @@ static const gfx_layout pyl601a_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( pyl601 )
+static GFXDECODE_START( gfx_pyl601 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( pyl601a )
+static GFXDECODE_START( gfx_pyl601a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -547,11 +554,11 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pyl601)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pyl601)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -576,7 +583,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601a)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( XTAL(2'000'000))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pyl601a)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
 
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))
@@ -629,6 +636,6 @@ ROM_START( pyl601a )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY             FULLNAME       FLAGS */
-COMP( 1989, pyl601,  0,       0,       pyl601,    pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601",  0 )
-COMP( 1989, pyl601a, pyl601,  0,       pyl601a,   pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601A", 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY             FULLNAME       FLAGS */
+COMP( 1989, pyl601,  0,      0,      pyl601,  pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601",  0 )
+COMP( 1989, pyl601a, pyl601, 0,      pyl601a, pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601A", 0 )

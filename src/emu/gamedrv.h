@@ -144,12 +144,6 @@ public:
 //  MACROS
 //**************************************************************************
 
-// wrappers for the DRIVER_INIT callback
-#define DRIVER_INIT_NAME(name)          init_##name
-#define DECLARE_DRIVER_INIT(name)       void DRIVER_INIT_NAME(name)() ATTR_COLD
-#define DRIVER_INIT_MEMBER(cls, name)   void cls::DRIVER_INIT_NAME(name)()
-#define DRIVER_INIT_CALL(name)          DRIVER_INIT_NAME(name)()
-
 // wrappers for declaring and defining game drivers
 #define GAME_NAME(name)         driver_##name
 #define GAME_TRAITS_NAME(name)  driver_##name##traits
@@ -181,7 +175,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	COMPANY,                                                            \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
+	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	nullptr,                                                            \
@@ -200,7 +194,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	COMPANY,                                                            \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
+	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	&LAYOUT,                                                            \
@@ -220,7 +214,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	COMPANY,                                                            \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
+	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \
@@ -239,7 +233,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	COMPANY,                                                            \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
+	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \
@@ -258,7 +252,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	COMPANY,                                                            \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
+	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \

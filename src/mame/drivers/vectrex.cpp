@@ -110,7 +110,7 @@ MACHINE_CONFIG_START(vectrex_base_state::vectrex_base)
 	MCFG_SCREEN_UPDATE_DRIVER(vectrex_base_state, screen_update_vectrex)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic301 (also used for vector generation)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -147,15 +147,15 @@ MACHINE_CONFIG_END
 ROM_START(vectrex)
 	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "bios0", "exec rom")
-	ROMX_LOAD("exec_rom.bin", 0x0000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(1) )
+	ROMX_LOAD("exec_rom.bin", 0x0000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "bios1", "exec rom intl 284001-1")
-	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0x0000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(2) )
+	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0x0000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(1) )
 
 //  The following fastboots are listed here for reference and documentation
 //  ROM_SYSTEM_BIOS(2, "bios2", "us-fastboot hack")
-//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(3) )
+//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(2) )
 //  ROM_SYSTEM_BIOS(3, "bios3", "intl-fastboot hack")
-//  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(4) )
+//  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(3) )
 
 ROM_END
 
@@ -248,7 +248,7 @@ ROM_END
 
 ***************************************************************************/
 
-//   YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     STATE          INIT  MONITOR  COMPANY                         FULLNAME
-CONS(1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, 0,             "General Consumer Electronics", "Vectrex" , ROT270)
+//   YEAR  NAME       PARENT    COMPAT   MACHINE   INPUT     STATE          INIT        MONITOR  COMPANY                         FULLNAME
+CONS( 1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, empty_init,          "General Consumer Electronics", "Vectrex" , ROT270)
 
-GAME(1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, 0,    ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?
+GAME( 1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, empty_init, ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?

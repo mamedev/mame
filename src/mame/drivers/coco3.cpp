@@ -292,10 +292,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	// video hardware
 	MCFG_DEFAULT_LAYOUT(layout_coco3)
 
-	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363))
-	MCFG_GIME_MAINCPU(MAINCPU_TAG)
-	MCFG_GIME_RAM(RAM_TAG)
-	MCFG_GIME_EXT(CARTRIDGE_TAG)
+	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
 	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
 	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
 	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
@@ -343,10 +340,7 @@ MACHINE_CONFIG_START(coco3_state::coco3p)
 	MCFG_DEVICE_CLOCK(XTAL(28'475'000) / 32)
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
-	MCFG_DEVICE_REPLACE(GIME_TAG, GIME_PAL, XTAL(28'475'000))
-	MCFG_GIME_MAINCPU(MAINCPU_TAG)
-	MCFG_GIME_RAM(RAM_TAG)
-	MCFG_GIME_EXT(CARTRIDGE_TAG)
+	MCFG_DEVICE_REPLACE(GIME_TAG, GIME_PAL, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
 	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
 	MCFG_GIME_FSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, cb1_w))
 	MCFG_GIME_IRQ_CALLBACK(WRITELINE(*this, coco3_state, gime_irq_w))
@@ -390,7 +384,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
-COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
-COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
-COMP(  19??,    coco3dw1,   coco,   0,      coco3dw1,  coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )
+COMP( 1986, coco3,    coco, 0, coco3,    coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
+COMP( 1986, coco3p,   coco, 0, coco3p,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
+COMP( 19??, coco3h,   coco, 0, coco3h,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
+COMP( 19??, coco3dw1, coco, 0, coco3dw1, coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )

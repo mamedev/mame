@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(ibm5160_mb_device::device_add_mconfig)
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, ibm5160_mb_device, keyboard_data_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END

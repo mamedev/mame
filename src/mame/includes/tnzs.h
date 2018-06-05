@@ -182,7 +182,7 @@ public:
 	DECLARE_WRITE8_MEMBER(csport_w);
 
 	DECLARE_MACHINE_RESET(kageki);
-	DECLARE_DRIVER_INIT(kageki);
+	void init_kageki();
 
 	SAMPLES_START_CB_MEMBER(init_samples);
 

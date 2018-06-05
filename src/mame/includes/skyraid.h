@@ -62,6 +62,6 @@ private:
 };
 
 /*----------- defined in audio/skyraid.c -----------*/
-DISCRETE_SOUND_EXTERN( skyraid );
+DISCRETE_SOUND_EXTERN( skyraid_discrete );
 
 #endif // MAME_INCLUDES_SKYRAID_H

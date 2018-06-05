@@ -409,7 +409,6 @@ WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 
 WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
-	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -425,7 +424,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* reboot */
 		case 1:
 		{
-			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			popmessage("SYS: Reboot");
 		}
 		break;
@@ -495,14 +494,14 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* set fdc terminal count */
 		case 5:
 		{
-			fdc->tc_w(true);
+			m_fdc->tc_w(true);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			fdc->tc_w(false);
+			m_fdc->tc_w(false);
 		}
 		break;
 
@@ -522,10 +521,10 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		case 9:
 		{
 			floppy_image_device *floppy;
-			floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
+			floppy = m_floppy[0]->get_device();
 			if(floppy)
 				floppy->mon_w(0);
-			floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
+			floppy = m_floppy[1]->get_device();
 			if(floppy)
 				floppy->mon_w(0);
 		}
@@ -535,10 +534,10 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		case 10:
 		{
 			floppy_image_device *floppy;
-			floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
+			floppy = m_floppy[0]->get_device();
 			if(floppy)
 				floppy->mon_w(1);
-			floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
+			floppy = m_floppy[1]->get_device();
 			if(floppy)
 				floppy->mon_w(1);
 		}
@@ -641,20 +640,6 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 //      m_printer_headpos++;
 }
 
-WRITE8_MEMBER(pcw_state::pcw_printer_data_w)
-{
-	m_printer_data = data;
-	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,0,data);
-	logerror("PRN [0xFC]: Sent command %02x\n",data);
-}
-
-WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
-{
-	m_printer_command = data;
-	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,1,data);
-	logerror("PRN [0xFD]: Sent command %02x\n",data);
-}
-
 // print error type
 // should return 0xF8 if there are no errors
 // 0 = underrun
@@ -662,10 +647,6 @@ WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
 // 3 = bad command
 // 5 = print error
 // anything else = no printer
-READ8_MEMBER(pcw_state::pcw_printer_data_r)
-{
-	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,0);
-}
 
 // printer status
 // bit 7 - bail bar in
@@ -676,10 +657,6 @@ READ8_MEMBER(pcw_state::pcw_printer_data_r)
 // bit 2 - paper is present
 // bit 1 - busy
 // bit 0 - controller fault
-READ8_MEMBER(pcw_state::pcw_printer_status_r)
-{
-	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,1);
-}
 
 /* MCU handlers */
 /* I/O ports: (likely to be completely wrong...)
@@ -960,8 +937,7 @@ void pcw_state::pcw_io(address_map &map)
 	map(0x0f6, 0x0f6).w(this, FUNC(pcw_state::pcw_pointer_table_top_scan_w));
 	map(0x0f7, 0x0f7).w(this, FUNC(pcw_state::pcw_vdu_video_control_register_w));
 	map(0x0f8, 0x0f8).rw(this, FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
-	map(0x0fc, 0x0fc).rw(this, FUNC(pcw_state::pcw_printer_data_r), FUNC(pcw_state::pcw_printer_data_w));
-	map(0x0fd, 0x0fd).rw(this, FUNC(pcw_state::pcw_printer_status_r), FUNC(pcw_state::pcw_printer_command_w));
+	map(0x0fc, 0x0fd).rw("printer_mcu", FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 }
 
 
@@ -1020,15 +996,12 @@ void pcw_state::machine_reset()
 	/* and hack our way past the MCU side of the boot process */
 	code[0x01] = 0x40;
 
-	m_printer_status = 0xff;
-	m_printer_command = 0xff;
-	m_printer_data = 0x00;
 	m_printer_headpos = 0x00; // bring printer head to left margin
 	m_printer_shift = 0;
 	m_printer_shift_output = 0;
 }
 
-DRIVER_INIT_MEMBER(pcw_state,pcw)
+void pcw_state::init_pcw()
 {
 	m_maincpu->set_input_line_vector(0, 0x0ff);
 
@@ -1286,7 +1259,7 @@ MACHINE_CONFIG_START(pcw_state::pcw)
 	MCFG_PALETTE_INIT_OWNER(pcw_state, pcw)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1400,9 +1373,9 @@ ROM_END
 
 /* these are all variants on the pcw design */
 /* major difference is memory configuration and drive type */
-/*     YEAR NAME       PARENT   COMPAT  MACHINE   INPUT STATE        INIT  COMPANY        FULLNAME */
-COMP( 1985, pcw8256,   0,       0,      pcw8256,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
-COMP( 1985, pcw8512,   pcw8256, 0,      pcw8512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9256,   pcw8256, 0,      pcw8256,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9512,   pcw8256, 0,      pcw9512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
-COMP( 1993, pcw10,     pcw8256, 0,      pcw8512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT CLASS      INIT      COMPANY        FULLNAME */
+COMP( 1985, pcw8256, 0,       0,      pcw8256, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
+COMP( 1985, pcw8512, pcw8256, 0,      pcw8512, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
+COMP( 1987, pcw9256, pcw8256, 0,      pcw8256, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
+COMP( 1987, pcw9512, pcw8256, 0,      pcw9512, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
+COMP( 1993, pcw10,   pcw8256, 0,      pcw8512, pcw,  pcw_state, init_pcw, "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)

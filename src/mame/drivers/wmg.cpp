@@ -91,7 +91,7 @@ public:
 	{ }
 
 	DECLARE_MACHINE_RESET(wmg);
-	DECLARE_DRIVER_INIT(wmg);
+	void init_wmg();
 	DECLARE_READ8_MEMBER(wmg_nvram_r);
 	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
 	DECLARE_READ8_MEMBER(wmg_pia_0_r);
@@ -421,7 +421,6 @@ MACHINE_RESET_MEMBER( wmg_state, wmg )
 	m_wmg_port_select=0;
 	m_wmg_vram_bank=0;
 	wmg_c400_w( space1, 0, 0);
-	MACHINE_RESET_CALL_MEMBER(williams_common);
 	m_maincpu->reset();
 }
 
@@ -474,7 +473,7 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
  *  Driver Initialisation
  *
  *************************************/
-DRIVER_INIT_MEMBER( wmg_state, wmg )
+void wmg_state::init_wmg()
 {
 	uint8_t *cpu = memregion("maincpu")->base();
 	uint8_t *snd = memregion("soundcpu")->base();
@@ -503,8 +502,11 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_MACHINE_RESET_OVERRIDE(wmg_state, wmg)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 240
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -517,7 +519,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -577,4 +579,4 @@ ROM_END
  *
  *******************************************************/
 
-GAME( 2001, wmg, 0, wmg, wmg, wmg_state, wmg, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )
+GAME( 2001, wmg, 0, wmg, wmg, wmg_state, init_wmg, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )

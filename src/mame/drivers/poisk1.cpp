@@ -93,7 +93,7 @@ public:
 
 	required_ioport_array<8> m_kbdio;
 
-	DECLARE_DRIVER_INIT(poisk1);
+	void init_poisk1();
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
@@ -594,7 +594,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER(p1_state, poisk1)
+void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -692,7 +692,7 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -714,32 +714,32 @@ ROM_START( poisk1 )
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89r0", "1989r0")
-	ROMX_LOAD( "bios.rf6", 0xe000, 0x2000, CRC(c0f333e3) SHA1(a44f355b7deae3693e1462d57543a42944fd0969), ROM_BIOS(1))
+	ROMX_LOAD("bios.rf6", 0xe000, 0x2000, CRC(c0f333e3) SHA1(a44f355b7deae3693e1462d57543a42944fd0969), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v89", "1989")
-	ROMX_LOAD( "biosp1s.rf4", 0xe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988), ROM_BIOS(2))
+	ROMX_LOAD("biosp1s.rf4", 0xe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v91", "1991")
-	ROMX_LOAD( "poisk_1991.bin", 0xe000, 0x2000, CRC(d61c56fd) SHA1(de202e1f7422d585a1385a002a4fcf9d756236e5), ROM_BIOS(3))
+	ROMX_LOAD("poisk_1991.bin", 0xe000, 0x2000, CRC(d61c56fd) SHA1(de202e1f7422d585a1385a002a4fcf9d756236e5), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v91r2", "1991r2")
-	ROMX_LOAD( "p_bios_nm.bin", 0xe000, 0x2000, CRC(84430b4f) SHA1(3e477962be3cea09662cb2e3ad9966ad01c7455d), ROM_BIOS(4))
+	ROMX_LOAD("p_bios_nm.bin", 0xe000, 0x2000, CRC(84430b4f) SHA1(3e477962be3cea09662cb2e3ad9966ad01c7455d), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(4, "test1", "Test 1")
-	ROMX_LOAD( "test1.rf6", 0x00000, 0x2000, CRC(a5f05dff) SHA1(21dd0cea605bd7be22e94f8355d86b2478d9527e), ROM_BIOS(5))
+	ROMX_LOAD("test1.rf6", 0x00000, 0x2000, CRC(a5f05dff) SHA1(21dd0cea605bd7be22e94f8355d86b2478d9527e), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "test2", "Test 2")
-	ROMX_LOAD( "test2.rf6", 0x00000, 0x2000, CRC(eff730e4) SHA1(fcbc08de9b8592c974eaea837839f1a9caf36a75), ROM_BIOS(6))
+	ROMX_LOAD("test2.rf6", 0x00000, 0x2000, CRC(eff730e4) SHA1(fcbc08de9b8592c974eaea837839f1a9caf36a75), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(6, "test3", "Test 3")
-	ROMX_LOAD( "test3.rf6", 0x00000, 0x2000, CRC(23025dc9) SHA1(dca4cb580162bb28f6e49ff625b677001d40d573), ROM_BIOS(7))
+	ROMX_LOAD("test3.rf6", 0x00000, 0x2000, CRC(23025dc9) SHA1(dca4cb580162bb28f6e49ff625b677001d40d573), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS(7, "test4", "Test 4")
-	ROMX_LOAD( "test4.rf6", 0x00000, 0x2000, CRC(aac8fc5e) SHA1(622abb5ac66d38a474ee54fe016aff0ba0b5794f), ROM_BIOS(8))
+	ROMX_LOAD("test4.rf6", 0x00000, 0x2000, CRC(aac8fc5e) SHA1(622abb5ac66d38a474ee54fe016aff0ba0b5794f), ROM_BIOS(7))
 	ROM_SYSTEM_BIOS(8, "test5", "Test 5")
-	ROMX_LOAD( "test5.rf6", 0x00000, 0x2000, CRC(f308e679) SHA1(37bd35f62015d338b3347fd4e3ec455eab048b66), ROM_BIOS(9))
+	ROMX_LOAD("test5.rf6", 0x00000, 0x2000, CRC(f308e679) SHA1(37bd35f62015d338b3347fd4e3ec455eab048b66), ROM_BIOS(8))
 
 	// 0xc0000, sets 80x25 text and loops asking for 'Boot from hard disk (Y or N)?'
-	ROM_LOAD( "boot_net.rf4", 0x00000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BIOS
+	ROM_LOAD("boot_net.rf4", 0x00000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BIOS
 	// 0xc0000, accesses ports 0x90..0x97
-	ROM_LOAD( "pois_net.bin", 0x00000, 0x2000, CRC(cf9dd80a) SHA1(566bcb40c0cb2c8bfd5b485f0db689fdeaca3e86)) // ??? BIOS
+	ROM_LOAD("pois_net.bin", 0x00000, 0x2000, CRC(cf9dd80a) SHA1(566bcb40c0cb2c8bfd5b485f0db689fdeaca3e86)) // ??? BIOS
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_LOAD( "poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
+	ROM_LOAD("poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
 ROM_END
 
 /***************************************************************************
@@ -748,5 +748,5 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR     NAME       PARENT      COMPAT  MACHINE   INPUT    STATE     INIT    COMPANY          FULLNAME   FLAGS
-COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,   poisk1,  p1_state, poisk1, "Electronmash",  "Poisk-1", 0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS     INIT         COMPANY         FULLNAME   FLAGS
+COMP( 1989, poisk1, ibm5150, 0,      poisk1,  poisk1, p1_state, init_poisk1, "Electronmash", "Poisk-1", 0 )

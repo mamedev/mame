@@ -290,7 +290,7 @@ public:
 	DECLARE_MACHINE_START(cat);
 	DECLARE_MACHINE_RESET(cat);
 	DECLARE_VIDEO_START(cat);
-	DECLARE_DRIVER_INIT(cat);
+	void init_cat();
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -365,16 +365,15 @@ protected:
 
 // TODO: this init doesn't actually work yet! please fix me!
 /*
-DRIVER_INIT_MEMBER( cat_state,cat )
+void cat_state::init_cat()
 {
     uint8_t *svrom = memregion("svrom")->base();
-    int i;
     // fill svrom with the correct 2e80 pattern except where svrom1 sits
     // first half
-    for (i = 0; i < 0x20000; i+=2)
+    for (int i = 0; i < 0x20000; i+=2)
         svrom[i] = 0x2E;
     // second half
-    for (i = 0x20000; i < 0x40000; i+=2)
+    for (int i = 0x20000; i < 0x40000; i+=2)
     {
         svrom[i] = 0x2E;
         svrom[i+1] = 0x80;
@@ -932,7 +931,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	m_video_enable = 1;
 	m_video_invert = 0;
 	m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS);
-	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
+	subdevice<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
 MACHINE_RESET_MEMBER(cat_state,cat)
@@ -1089,7 +1088,7 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1109,10 +1108,10 @@ ROM_START( cat )
 	 * 4 rows populated on a "released" cat.
 	 */
 	ROM_SYSTEM_BIOS( 0, "r240", "Canon Cat V2.40 US Firmware")
-	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9d718c0a521fefe4f86ef328805b7921bade9d89), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0a85385527e2cc55790de9f9919eb44ac32d7f62), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boultl1.ic3", 0x20001, 0x10000, CRC(c61dafb0) SHA1(93216c26c2d5fc71412acc548c96046a996ea668), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(d177e1d3a39b005dd94a6bda186221d597129af4), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9d718c0a521fefe4f86ef328805b7921bade9d89), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0a85385527e2cc55790de9f9919eb44ac32d7f62), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "boultl1.ic3", 0x20001, 0x10000, CRC(c61dafb0) SHA1(93216c26c2d5fc71412acc548c96046a996ea668), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(d177e1d3a39b005dd94a6bda186221d597129af4), ROM_SKIP(1) | ROM_BIOS(0))
 	/* This 2.40 code was compiled by Dwight Elvey based on the v2.40 source
 	 * code disks recovered around 2004. It does NOT exactly match the above
 	 * set exactly but has a few small differences. One of the printer drivers
@@ -1121,20 +1120,20 @@ ROM_START( cat )
 	 * set above.
 	 */
 	ROM_SYSTEM_BIOS( 1, "r240r", "Canon Cat V2.40 US Firmware compiled from recovered source code")
-	ROMX_LOAD( "r240l0.ic2", 0x00001, 0x10000, CRC(1b89bdc4) SHA1(39c639587dc30f9d6636b46d0465f06272838432), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r240h0.ic4", 0x00000, 0x10000, CRC(94f89b8c) SHA1(6c336bc30636a02c625d31f3057ec86bf4d155fc), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r240l1.ic3", 0x20001, 0x10000, CRC(1a73be4f) SHA1(e2de2cb485f78963368fb8ceba8fb66ca56dba34), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r240h1.ic5", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r240l0.ic2", 0x00001, 0x10000, CRC(1b89bdc4) SHA1(39c639587dc30f9d6636b46d0465f06272838432), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "r240h0.ic4", 0x00000, 0x10000, CRC(94f89b8c) SHA1(6c336bc30636a02c625d31f3057ec86bf4d155fc), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "r240l1.ic3", 0x20001, 0x10000, CRC(1a73be4f) SHA1(e2de2cb485f78963368fb8ceba8fb66ca56dba34), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "r240h1.ic5", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075), ROM_SKIP(1) | ROM_BIOS(1))
 	/* This v1.74 code comes from (probably) the 'main us release' of first-run
 	 * Canon cats, and was dumped from machine serial number R12014979
 	 * Canon cat v1.74 roms are labeled as r74; they only added the major number
 	 * to the rom label after v2.0?
 	 */
 	ROM_SYSTEM_BIOS( 2, "r174", "Canon Cat V1.74 US Firmware")
-	ROMX_LOAD( "r74__0l__c18c.blue.ic2", 0x00001, 0x10000, CRC(b19aa0c8) SHA1(85b3e549cfb91bd3dd32335e02eaaf9350e80900), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "r74__0h__75a6.yellow.ic4", 0x00000, 0x10000, CRC(75281f77) SHA1(ed8b5e37713892ee83413d23c839d09e2fd2c1a9), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "r74__1l__c8a3.green.ic3", 0x20001, 0x10000, CRC(93275558) SHA1(f690077a87076fd51ae385ac5a455804cbc43c8f), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "r74__1h__3c37.white.ic5", 0x20000, 0x10000, CRC(5d7c3962) SHA1(8335993583fdd30b894c01c1a7a6aca61cd81bb4), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD( "r74__0l__c18c.blue.ic2", 0x00001, 0x10000, CRC(b19aa0c8) SHA1(85b3e549cfb91bd3dd32335e02eaaf9350e80900), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r74__0h__75a6.yellow.ic4", 0x00000, 0x10000, CRC(75281f77) SHA1(ed8b5e37713892ee83413d23c839d09e2fd2c1a9), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r74__1l__c8a3.green.ic3", 0x20001, 0x10000, CRC(93275558) SHA1(f690077a87076fd51ae385ac5a455804cbc43c8f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r74__1h__3c37.white.ic5", 0x20000, 0x10000, CRC(5d7c3962) SHA1(8335993583fdd30b894c01c1a7a6aca61cd81bb4), ROM_SKIP(1) | ROM_BIOS(2))
 	// According to Sandy Bumgarner, there should be a 2.42 version which fixes some bugs in the calc command vs 2.40
 	// According to the Cat Repair Manual page 4-20, there should be a version called B91U0x (maybe 1.91 or 0.91?) with sum16s of 9F1F, FF0A, 79BF and 03FF
 
@@ -1178,5 +1177,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1987, cat,  0,      0,       cat,       cat,     cat_state,     0,       "Canon",  "Cat",         MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1987, cat,  0,      0,      cat,     cat,   cat_state, empty_init, "Canon", "Cat",    MACHINE_NOT_WORKING)

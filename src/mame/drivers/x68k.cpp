@@ -1568,12 +1568,12 @@ void x68k_state::machine_start()
 	m_fdc.motor = 0;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68000)
+void x68k_state::init_x68000()
 {
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
 
-	machine().device<nvram_device>("nvram")->set_base(&m_nvram[0], m_nvram.size()*sizeof(m_nvram[0]));
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram[0], m_nvram.size()*sizeof(m_nvram[0]));
 
 #ifdef USE_PREDEFINED_SRAM
 	{
@@ -1606,16 +1606,16 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	save_item(NAME(m_spritereg));
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68kxvi)
+void x68k_state::init_x68kxvi()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68030)
+void x68k_state::init_x68030()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }
@@ -1682,7 +1682,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcgpalette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcgpalette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("gfxpalette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(2, x68k_state, GGGGGRRRRRBBBBBI)
@@ -1694,24 +1694,23 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_DEFAULT_LAYOUT( layout_x68000 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ym2151", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, x68k_state,x68k_fm_irq))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6258_ADD("okim6258", 4000000)
+	MCFG_DEVICE_ADD("okim6258", OKIM6258, 4000000)
 	MCFG_OKIM6258_DIVIDER(FOSC_DIV_BY_512)
 	MCFG_OKIM6258_ADPCM_TYPE(TYPE_4BITS)
 	MCFG_OKIM6258_OUT_BITS(OUTPUT_10BITS)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outl", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outr", 0.50)
 
-	MCFG_FILTER_VOLUME_ADD("adpcm_outl", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("adpcm_outr", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "adpcm_outl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "adpcm_outr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_UPD72065_ADD("upd72065", true, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, x68k_state, fdc_irq))
@@ -1779,16 +1778,16 @@ ROM_START( x68000 )
 	ROM_DEFAULT_BIOS("cz600ce")
 	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
-	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
+	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1 (91/01/11)")
-	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2 (91/10/24)")
-	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
+	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
-	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
-	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
-	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(4) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(4) | ROM_SKIP(1) )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
 	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
@@ -1800,16 +1799,16 @@ ROM_START( x68ksupr )
 	ROM_DEFAULT_BIOS("ipl11")
 	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
-	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
+	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1 (91/01/11)")
-	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2 (91/10/24)")
-	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
+	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
-	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
-	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
-	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(4) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(4) | ROM_SKIP(1) )
 	ROM_LOAD("scsiinsu.bin",0xfc0000, 0x002000, CRC(f65a3e24) SHA1(15a17798839a3f7f361119205aebc301c2df5967) )  // Dumped from an X68000 Super HD
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
@@ -1823,16 +1822,16 @@ ROM_START( x68kxvi )
 	ROM_DEFAULT_BIOS("ipl11")
 	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
-	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
+	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1 (91/01/11)")
-	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2 (91/10/24)")
-	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
+	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
-	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
-	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
-	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(4) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(4) | ROM_SKIP(1) )
 	ROM_LOAD("scsiinco.bin",0xfc0000, 0x002000, CRC(2485e14d) SHA1(101a9bba8ea4bb90965c144bcfd7182f889ab958) )  // Dumped from an X68000 XVI Compact
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
@@ -1846,16 +1845,16 @@ ROM_START( x68030 )
 	ROM_DEFAULT_BIOS("ipl13")
 	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
-	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
+	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1 (91/01/11)")
-	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2 (91/10/24)")
-	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
+	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
-	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "cz600ce",  "CZ-600CE IPL-ROM V1.0 (87/03/18)")
-	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(5) | ROM_SKIP(1) )
-	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0897cezz.ic12", 0xfe0000, 0x010000, CRC(cdc95995) SHA1(810cae207ffd29926e604cf1eb964ae8ea1fadb5), ROM_BIOS(4) | ROM_SKIP(1) )
+	ROMX_LOAD( "rh-ix0898cezz.ic11", 0xfe0001, 0x010000, CRC(e60e09a8) SHA1(f3d4a6506493ea3ac7b9c8e441d781fbdd61abd5), ROM_BIOS(4) | ROM_SKIP(1) )
 	ROM_LOAD("scsiinrom.dat",0xfc0000, 0x002000, CRC(1c6c889e) SHA1(3f063d4231cdf53da6adc4db96533725e260076a) BAD_DUMP )
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
@@ -1865,8 +1864,8 @@ ROM_START( x68030 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   STATE       INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1987, x68000,   0,      0,      x68000,   x68000, x68k_state, x68000, "Sharp",    "X68000",       MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, x68ksupr, x68000, 0,      x68ksupr, x68000, x68k_state, x68000, "Sharp",    "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1991, x68kxvi,  x68000, 0,      x68kxvi,  x68000, x68k_state, x68kxvi,"Sharp",    "X68000 XVI",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1993, x68030,   x68000, 0,      x68030,   x68000, x68k_state, x68030, "Sharp",    "X68030",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS       INIT         COMPANY  FULLNAME        FLAGS
+COMP( 1987, x68000,   0,      0,      x68000,   x68000, x68k_state, init_x68000, "Sharp", "X68000",       MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, x68ksupr, x68000, 0,      x68ksupr, x68000, x68k_state, init_x68000, "Sharp", "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1991, x68kxvi,  x68000, 0,      x68kxvi,  x68000, x68k_state, init_x68kxvi,"Sharp", "X68000 XVI",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1993, x68030,   x68000, 0,      x68030,   x68000, x68k_state, init_x68030, "Sharp", "X68030",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

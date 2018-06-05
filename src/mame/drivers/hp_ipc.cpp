@@ -737,7 +737,7 @@ static void hp_ipc_floppies(device_slot_interface &device)
  *  1   Real-time clock
  */
 MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(15'920'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 15.92_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_outer)
 
 	MCFG_HP1LL3_ADD("gpu")
@@ -746,22 +746,22 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 
 	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
 	// XXX when floppy code correctly handles 600 rpm drives.
-	MCFG_WD2797_ADD("fdc", XTAL(2'000'000))
+	MCFG_DEVICE_ADD("fdc", WD2797, 2_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_5))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","hp_ipc")
 
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_1))
 //  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_6))
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
+	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, 15.92_MHz_XTAL / 2)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_2))
 	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_7))
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
 
-	MCFG_DEVICE_ADD("hpib" , TMS9914 , XTAL(4000000))
+	MCFG_DEVICE_ADD("hpib", TMS9914, 4_MHz_XTAL)
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))
 	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , dio_w))
 	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
@@ -803,7 +803,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	// ver.period = 16.7ms (~60 hz)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 512, 278, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 512, 278, 0, 256)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -823,7 +823,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 640, 480, 0, 400)
+	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 640, 480, 0, 400)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -837,27 +837,27 @@ ROM_START(hp_ipc)
 	ROM_DEFAULT_BIOS("v50")
 
 	ROM_SYSTEM_BIOS(0, "v10", "HP-UX 1.0")
-	ROMX_LOAD("00095-60006.bin", 0x00000, 0x80000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("00095-60006.bin", 0x00000, 0x80000, NO_DUMP, ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v50", "HP-UX 5.0")
 	// Should be spread across 4 x 128K ROMs
-	ROMX_LOAD("hp ipc os 82991a.bin", 0x00000, 0x80000, BAD_DUMP CRC(df45a37b) SHA1(476af9923bca0d2d0f40aeb81be5145ca76fddf5), ROM_BIOS(2))
+	ROMX_LOAD("hp ipc os 82991a.bin", 0x00000, 0x80000, BAD_DUMP CRC(df45a37b) SHA1(476af9923bca0d2d0f40aeb81be5145ca76fddf5), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "diaga", "Diag ROM A")
-	ROMX_LOAD("boarda_u1.bin", 0x00001, 0x4000, CRC(f40e1434) SHA1(a4f633f3e0971ba3ff218c6d6f777b8253bade8c), ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("boarda_u2.bin", 0x00000, 0x4000, CRC(80f6eb08) SHA1(ea943f72d37b43b5ba06b8e6f11824601109497c), ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("boarda_u3.bin", 0x40001, 0x4000, CRC(0f2fd4d5) SHA1(9ed41fca947d58d7f4159336421601963e3cae17), ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("boarda_u4.bin", 0x40000, 0x4000, CRC(d6741772) SHA1(1574a52d6658f9a7beace6572bea11ee923fc1bf), ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("boarda_u1.bin", 0x00001, 0x4000, CRC(f40e1434) SHA1(a4f633f3e0971ba3ff218c6d6f777b8253bade8c), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("boarda_u2.bin", 0x00000, 0x4000, CRC(80f6eb08) SHA1(ea943f72d37b43b5ba06b8e6f11824601109497c), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("boarda_u3.bin", 0x40001, 0x4000, CRC(0f2fd4d5) SHA1(9ed41fca947d58d7f4159336421601963e3cae17), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("boarda_u4.bin", 0x40000, 0x4000, CRC(d6741772) SHA1(1574a52d6658f9a7beace6572bea11ee923fc1bf), ROM_BIOS(2) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(3, "diagb", "Diag ROM B")
-	ROMX_LOAD("boardb_u1.bin", 0x00001, 0x4000, CRC(597777d9) SHA1(24671499e4685f306b1b37a071adc0634f9f1e4e), ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("boardb_u2.bin", 0x00000, 0x4000, CRC(bc2ada19) SHA1(efebab335ca8a57e77b1076050e861a3a0eb09fc), ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("boardb_u3.bin", 0x40001, 0x2000, CRC(c227622a) SHA1(99747945dc6efaa45ce8d7d3c58830dbe46b651a), ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("boardb_u4.bin", 0x40000, 0x2000, CRC(d99efe90) SHA1(345437007f8d728ceafc5cd97414ef94ce38e363), ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("boardb_u1.bin", 0x00001, 0x4000, CRC(597777d9) SHA1(24671499e4685f306b1b37a071adc0634f9f1e4e), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("boardb_u2.bin", 0x00000, 0x4000, CRC(bc2ada19) SHA1(efebab335ca8a57e77b1076050e861a3a0eb09fc), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("boardb_u3.bin", 0x40001, 0x2000, CRC(c227622a) SHA1(99747945dc6efaa45ce8d7d3c58830dbe46b651a), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("boardb_u4.bin", 0x40000, 0x2000, CRC(d99efe90) SHA1(345437007f8d728ceafc5cd97414ef94ce38e363), ROM_BIOS(3) | ROM_SKIP(1))
 ROM_END
 
 #define rom_hp9808a rom_hp_ipc
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT           STATE          INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1985, hp_ipc,     0,       0,      hp_ipc,        hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, hp9808a,    0,       0,      hp9808a,       hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                            FLAGS
+COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, hp9808a, 0,      0,      hp9808a, hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)

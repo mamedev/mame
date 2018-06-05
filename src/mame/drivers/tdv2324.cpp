@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(TMS9937NL_TAG, TMS9927, XTAL(25'398'360) / 8)
+	MCFG_DEVICE_ADD(TMS9937NL_TAG, TMS9927, 25.39836_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	// devices
@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 
 	MCFG_DEVICE_ADD(MK3887N4_TAG, Z80SIO2, 8000000/2)
 
-	MCFG_FD1797_ADD(FD1797PL02_TAG, 8000000/4)
+	MCFG_DEVICE_ADD(FD1797PL02_TAG, FD1797, 8000000/4)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
@@ -355,5 +355,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY     FULLNAME    FLAGS
-COMP( 1983, tdv2324,  0,      0,      tdv2324,  tdv2324, tdv2324_state, 0,    "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
+COMP( 1983, tdv2324, 0,      0,      tdv2324, tdv2324, tdv2324_state, empty_init, "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

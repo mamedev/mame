@@ -123,37 +123,15 @@ class mazerbla_state : public driver_device
 {
 public:
 	mazerbla_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_vcu(*this,"vcu"),
-		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch")
-		{ }
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<mb_vcu_device> m_vcu;
-	required_device<screen_device> m_screen;
-	optional_device<generic_latch_8_device> m_soundlatch;
-
-	uint8_t m_port02_status;
-	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
-
-	double m_weights_r[2];
-	double m_weights_g[3];
-	double m_weights_b[3];
-
-	/* misc */
-	uint8_t m_ls670_0[4];
-	uint8_t m_ls670_1[4];
-
-	uint8_t m_zpu_int_vector;
-
-	uint8_t m_bcd_7445;
-
-	uint8_t m_vsb_ls273;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_vcu(*this,"vcu")
+		, m_screen(*this, "screen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
 	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
@@ -171,11 +149,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	DECLARE_DRIVER_INIT(mazerbla);
-	DECLARE_DRIVER_INIT(greatgun);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	void init_mazerbla();
+	void init_greatgun();
 	DECLARE_PALETTE_INIT(mazerbla);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -194,6 +169,37 @@ public:
 	void mazerbla_cpu3_map(address_map &map);
 	void mazerbla_io_map(address_map &map);
 	void mazerbla_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<mb_vcu_device> m_vcu;
+	required_device<screen_device> m_screen;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	output_finder<3> m_leds;
+	output_finder<2> m_lamps;
+
+	uint8_t m_port02_status;
+	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
+
+	double m_weights_r[2];
+	double m_weights_g[3];
+	double m_weights_b[3];
+
+	/* misc */
+	uint8_t m_ls670_0[4];
+	uint8_t m_ls670_1[4];
+
+	uint8_t m_zpu_int_vector;
+
+	uint8_t m_bcd_7445;
+
+	uint8_t m_vsb_ls273;
 };
 
 
@@ -396,7 +402,7 @@ WRITE8_MEMBER(mazerbla_state::zpu_led_w)
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	output().set_led_value(0, offset & 1);
+	m_leds[0] = BIT(offset, 0);
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
@@ -404,8 +410,8 @@ WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*output().set_led_value(0, (data & 0x10) >> 4);*/
-	/*output().set_led_value(1, (data & 0x20) >> 4);*/
+	/*m_lamps[0] = BIT(data, 4);*/
+	/*m_lamps[1] = BIT(data, 5);*/
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
@@ -417,13 +423,13 @@ WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
 WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 {
 	/* bit 7 - led on */
-	output().set_led_value(2, BIT(data, 7));
+	m_leds[2] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
 {
 	/* bit 0, bit 1 - led on */
-	output().set_led_value(1, BIT(data, 0));
+	m_leds[1] = BIT(data, 0);
 }
 
 
@@ -438,7 +444,7 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	m_vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	output().set_led_value(1, BIT(data, 5));
+	m_leds[1] = BIT(data, 5);
 }
 
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
@@ -921,6 +927,9 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
+	m_leds.resolve();
+	m_lamps.resolve();
+
 	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_port02_status));
@@ -1046,7 +1055,7 @@ MACHINE_CONFIG_START(mazerbla_state::greatgun)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK / 8)
 	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
@@ -1173,12 +1182,12 @@ ROM_START( greatgun )
 //  ROM20.10g, ROM21.10f, ROM22.10d and ROM23.10c are unpopulated.
 ROM_END
 
-DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
+void mazerbla_state::init_mazerbla()
 {
 //  m_game_id = MAZERBLA;
 }
 
-DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
+void mazerbla_state::init_greatgun()
 {
 	uint8_t *rom = memregion("sub2")->base();
 
@@ -1193,6 +1202,6 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 	rom[0x0380] = 0;
 }
 
-GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?
-GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?
+GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, init_greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

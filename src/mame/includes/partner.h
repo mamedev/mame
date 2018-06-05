@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(partner_floppy_w);
 	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
 	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
-	DECLARE_DRIVER_INIT(partner);
+	void init_partner();
 	DECLARE_MACHINE_START(partner);
 	DECLARE_MACHINE_RESET(partner);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);

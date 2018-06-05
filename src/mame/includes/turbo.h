@@ -41,6 +41,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_digits(*this, "digit%u", 0U)
+		, m_lamp(*this, "lamp")
 	{ }
 
 private:
@@ -67,9 +68,10 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	output_finder<32> m_digits;
+	output_finder<> m_lamp;
 
 	std::unique_ptr<uint8_t[]>     m_buckrog_bitmap_ram;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override { m_digits.resolve(); m_lamp.resolve(); }
 
 	/* machine states */
 	uint8_t       m_i8279_scanlines;
@@ -161,8 +163,8 @@ public:
 	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
 	DECLARE_READ8_MEMBER(spriteram_r);
 	DECLARE_WRITE8_MEMBER(spriteram_w);
-	DECLARE_DRIVER_INIT(turbo_enc);
-	DECLARE_DRIVER_INIT(turbo_noenc);
+	void init_turbo_enc();
+	void init_turbo_noenc();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(turbo);
 	DECLARE_PALETTE_INIT(turbo);

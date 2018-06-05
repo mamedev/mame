@@ -364,7 +364,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( spbactn )
+static GFXDECODE_START( gfx_spbactn )
 	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x0300, 16 + 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x0000, 0x1000 )
@@ -396,7 +396,7 @@ static const gfx_layout proto_spr_layout =
 };
 
 
-static GFXDECODE_START( spbactnp )
+static GFXDECODE_START( gfx_spbactnp )
 	GFXDECODE_ENTRY( "gfx1", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "gfx2", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
 	GFXDECODE_ENTRY( "gfx3", 0, proto_spr_layout,   0x0000, 16 + 384 )
@@ -431,7 +431,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spbactn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactn)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spbactnp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactnp)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware  - different? */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -606,6 +606,6 @@ ROM_START( spbactnp )
 	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 
-GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
+GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!

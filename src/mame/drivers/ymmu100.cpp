@@ -452,7 +452,8 @@ MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 899, 0, 240)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE("maincpu:sci0", h8_sci_device, rx_w))
@@ -463,7 +464,7 @@ MACHINE_CONFIG_START(mu100_state::mu100)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 ROM_START( mu100 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -502,5 +503,5 @@ ROM_START( mu100r )
 	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
+CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )

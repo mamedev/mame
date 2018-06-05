@@ -259,7 +259,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( carrera )
+static GFXDECODE_START( gfx_carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -333,12 +333,12 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carrera)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carrera)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)
 	/* these are set as input, but I have no idea which input port it uses is for the AY */
@@ -364,4 +364,4 @@ ROM_START( carrera )
 ROM_END
 
 
-GAME( 19??, carrera, 0, carrera, carrera, carrera_state, 0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )
+GAME( 19??, carrera, 0, carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )

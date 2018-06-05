@@ -167,7 +167,7 @@ static void swtpc09_floppies(device_slot_interface &device)
 /* MPU09, MPID, MPS2 DMF2 */
 MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", MC6809, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mp09_mem)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
@@ -196,11 +196,11 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, swtpc09_state, acia_interrupt))
 
-	MCFG_DEVICE_ADD("brg", MC14411, XTAL(1'843'200))
+	MCFG_DEVICE_ADD("brg", MC14411, 1.8432_MHz_XTAL)
 	MCFG_MC14411_F1_CB(WRITELINE("acia", acia6850_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
-	MCFG_FD1793_ADD("fdc", XTAL(1'000'000))
+	MCFG_DEVICE_ADD("fdc", FD1793, 1_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
@@ -242,7 +242,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(swtpc09_state::swtpc09d3)
 	swtpc09_base(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(8'000'000))
+	MCFG_DEVICE_CLOCK(8_MHz_XTAL)
 
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_DEVICE_CLOCK(2000000)
@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09d3)
 	MCFG_DEVICE_MODIFY("acia")
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("via", VIA6522, 4_MHz_XTAL / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, swtpc09_state, dmf3_via_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, swtpc09_state, dmf3_via_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, swtpc09_state, dmf3_via_write_porta))
@@ -287,8 +287,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT    STATE          INIT       COMPANY  FULLNAME                    FLAGS
-COMP( 1980, swtpc09,   0,        0,      swtpc09,   swtpc09, swtpc09_state, swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW )
-COMP( 1980, swtpc09i,  swtpc09,  0,      swtpc09i,  swtpc09, swtpc09_state, swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1980, swtpc09u,  swtpc09,  0,      swtpc09u,  swtpc09, swtpc09_state, swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMF2", MACHINE_NO_SOUND_HW )
-COMP( 1980, swtpc09d3, swtpc09,  0,      swtpc09d3, swtpc09, swtpc09_state, swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMF3", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    CLASS          INIT            COMPANY  FULLNAME                    FLAGS
+COMP( 1980, swtpc09,   0,       0,      swtpc09,   swtpc09, swtpc09_state, init_swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09i,  swtpc09, 0,      swtpc09i,  swtpc09, swtpc09_state, init_swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09u,  swtpc09, 0,      swtpc09u,  swtpc09, swtpc09_state, init_swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMF2", MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09d3, swtpc09, 0,      swtpc09d3, swtpc09, swtpc09_state, init_swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMF3", MACHINE_NO_SOUND_HW )

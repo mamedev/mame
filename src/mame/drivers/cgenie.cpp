@@ -52,8 +52,8 @@ public:
 		m_rs232_dcd(1)
 	{}
 
-	DECLARE_DRIVER_INIT(cgenie_eu);
-	DECLARE_DRIVER_INIT(cgenie_nz);
+	void init_cgenie_eu();
+	void init_cgenie_nz();
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -292,12 +292,12 @@ WRITE_LINE_MEMBER( cgenie_state::rs232_dcd_w )
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_eu )
+void cgenie_state::init_cgenie_eu()
 {
 	m_palette = &m_palette_eu[0];
 }
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_nz )
+void cgenie_state::init_cgenie_nz()
 {
 	m_palette = &m_palette_nz[0];
 }
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_MC6845_UPDATE_ROW_CB(cgenie_state, crtc_update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8("par", cg_parallel_slot_device, pa_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pa_w))
@@ -511,9 +511,9 @@ ROM_END
 ROM_START( cgenienz )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "old", "Old ROM")
-	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1))
+	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "new", "New ROM")
-	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2))
+	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(1))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
@@ -524,6 +524,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE INPUT   CLASS         INIT       COMPANY FULLNAME                             FLAGS
-COMP( 1982, cgenie,   0,        0,      cgenie, cgenie, cgenie_state, cgenie_eu, "EACA", "Colour Genie EG2000",               0)
-COMP( 1982, cgenienz, cgenie,   0,      cgenie, cgenie, cgenie_state, cgenie_nz, "EACA", "Colour Genie EG2000 (New Zealand)", 0)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE INPUT   CLASS         INIT            COMPANY FULLNAME                             FLAGS
+COMP( 1982, cgenie,   0,      0,      cgenie, cgenie, cgenie_state, init_cgenie_eu, "EACA", "Colour Genie EG2000",               0)
+COMP( 1982, cgenienz, cgenie, 0,      cgenie, cgenie, cgenie_state, init_cgenie_nz, "EACA", "Colour Genie EG2000 (New Zealand)", 0)

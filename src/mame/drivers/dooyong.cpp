@@ -777,7 +777,7 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc007).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc008, 0xc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc010, 0xc010).portr("SYSTEM");
@@ -797,7 +797,7 @@ void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 void dooyong_z80_ym2203_state::pollux_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
 	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
@@ -816,7 +816,7 @@ void dooyong_z80_ym2203_state::pollux_map(address_map &map)
 void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
 	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
@@ -836,7 +836,7 @@ void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 void dooyong_z80_state::bluehawk_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc000).portr("DSWA");
 	map(0xc000, 0xc000).w(this, FUNC(dooyong_z80_state::flip_screen_w));
 	map(0xc001, 0xc001).portr("DSWB");
@@ -857,7 +857,7 @@ void dooyong_z80_state::bluehawk_map(address_map &map)
 void dooyong_z80_state::flytiger_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram().share("spriteram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("P1");
@@ -877,7 +877,7 @@ void dooyong_z80_state::flytiger_map(address_map &map)
 void dooyong_z80_state::primella_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram(); /* what is this? looks like a palette? scratchpad RAM maybe? */
 	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
@@ -1352,11 +1352,9 @@ const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			16*32+0, 16*32+1, 16*32+2, 16*32+3, 16*32+16+0, 16*32+16+1, 16*32+16+2, 16*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,4) },
+	{ STEP4(0,1), STEP4(16,1), STEP4(4*8*16,1), STEP4(4*8*16+16,1) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
@@ -1365,29 +1363,27 @@ const gfx_layout rshark_spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
-GFXDECODE_START( lastday )
+GFXDECODE_START( gfx_lastday )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16+64 )
 GFXDECODE_END
 
-GFXDECODE_START( flytiger )
+GFXDECODE_START( gfx_flytiger )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 32+64 )
 GFXDECODE_END
 
-GFXDECODE_START( bluehawk )
+GFXDECODE_START( gfx_bluehawk )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16 )
@@ -1395,14 +1391,14 @@ GFXDECODE_START( bluehawk )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,           0, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( primella )
+GFXDECODE_START( gfx_primella )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	/* no sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         768, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( rshark )
+GFXDECODE_START( gfx_rshark )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
@@ -1411,7 +1407,7 @@ GFXDECODE_START( rshark )
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,      1024, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( popbingo )
+GFXDECODE_START( gfx_popbingo )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0,  1 )
@@ -1435,7 +1431,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1451,7 +1447,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1460,12 +1456,12 @@ MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1474,7 +1470,7 @@ MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 16_MHz_XTAL/16, PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -1491,7 +1487,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1499,10 +1495,10 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_lastday)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1516,7 +1512,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1544,7 +1540,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1552,10 +1548,10 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_gulfstrm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1582,7 +1578,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1590,10 +1586,10 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_pollux)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1620,7 +1616,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1628,10 +1624,10 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_bluehawk)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bluehawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bluehawk)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
@@ -1660,7 +1656,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1668,10 +1664,10 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_flytiger)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flytiger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flytiger)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
@@ -1707,7 +1703,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_primella)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", primella)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_primella)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 1, "gfx2", -0x4000)
@@ -1746,7 +1742,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1754,10 +1750,10 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rshark_state, screen_update_rshark)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rshark)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1798,7 +1794,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1806,10 +1802,10 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(popbingo_state, screen_update_popbingo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popbingo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2755,35 +2751,35 @@ ROM_END
 
 /* The differences between the two lastday sets are only in the sound program and graphics. The main program is the same. */
 
-GAME( 1990, lastday,  0,        lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lastdaya, lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddaydoo,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastday,   0,        lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastdaya,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddaydoo,   lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmk,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm,  0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmb, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmm, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmk, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pollux,   0,        pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
-GAME( 1991, polluxn,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pollux,    0,        pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa2,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
+GAME( 1991, polluxn,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, flytiger, 0,        flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, flytigera,flytiger, flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytiger,  0,        flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytigera, flytiger, flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawk,  0,        bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawkn, bluehawk, bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sadari,   0,        primella, sadari,   dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sadari,    0,        primella, sadari,   dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, gundl94,  0,        primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, primella, gundl94,  primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gundl94,   0,        primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, primella,  gundl94,  primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, superx,   0,        superx,   superx,   rshark_state,             0, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1994, superxm,  superx,   superx,   superx,   rshark_state,             0, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superx,    0,        superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superxm,   superx,   superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, rshark,   0,        rshark,   rshark,   rshark_state,             0, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rshark,    0,        rshark,   rshark,   rshark_state,             empty_init, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, popbingo, 0,        popbingo, popbingo, popbingo_state,           0, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )
+GAME( 1996, popbingo,  0,        popbingo, popbingo, popbingo_state,           empty_init, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )

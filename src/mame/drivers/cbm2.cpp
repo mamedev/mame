@@ -2315,7 +2315,7 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(14'318'181)/14)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_DEVICE_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -2333,7 +2333,7 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6567_TAG, mos6567_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)/14)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, p500_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, p500_state, sid_poty_r))
@@ -2431,7 +2431,7 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(17'734'472)/18)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_DEVICE_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -2449,7 +2449,7 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6569_TAG, mos6569_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, p500_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, p500_state, sid_poty_r))
@@ -2544,7 +2544,7 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(18'000'000)/9)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_DEVICE_PROGRAM_MAP(cbm2_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -2565,7 +2565,7 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	MCFG_MC6845_UPDATE_ROW_CB(cbm2_state, crtc_update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(18'000'000)/9)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, cbm2_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, cbm2_state, sid_poty_r))
@@ -2840,18 +2840,19 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( p500 )
-	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901236-01.u84", 0x0000, 0x2000, CRC(33eb6aa2) SHA1(7e3497ae2edbb38c753bd31ed1bf3ae798c9a976), ROM_BIOS(1) )
-	ROMX_LOAD( "901235-01.u83", 0x2000, 0x2000, CRC(18a27feb) SHA1(951b5370dd7db762b8504a141f9f26de345069bb), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901236-02.u84", 0x0000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca), ROM_BIOS(2) )
-	ROMX_LOAD( "901235-02.u83", 0x2000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841), ROM_BIOS(2) )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROMX_LOAD( "901236-01.u84", 0x0000, 0x2000, CRC(33eb6aa2) SHA1(7e3497ae2edbb38c753bd31ed1bf3ae798c9a976), ROM_BIOS(0) )
+	ROMX_LOAD( "901235-01.u83", 0x2000, 0x2000, CRC(18a27feb) SHA1(951b5370dd7db762b8504a141f9f26de345069bb), ROM_BIOS(0) )
+	ROMX_LOAD( "901236-02.u84", 0x0000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca), ROM_BIOS(1) )
+	ROMX_LOAD( "901235-02.u83", 0x2000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROMX_LOAD( "901234-01.u82", 0x0000, 0x2000, CRC(67962025) SHA1(24b41b65c85bf30ab4e2911f677ce9843845b3b1), ROM_BIOS(1) )
-	ROMX_LOAD( "901234-02.u82", 0x0000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523), ROM_BIOS(2) )
+	ROMX_LOAD( "901234-01.u82", 0x0000, 0x2000, CRC(67962025) SHA1(24b41b65c85bf30ab4e2911f677ce9843845b3b1), ROM_BIOS(0) )
+	ROMX_LOAD( "901234-02.u82", 0x0000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u76", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
@@ -2891,18 +2892,19 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( b128 )
-	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(1) )
-	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(2) )
-	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(2) )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(0) )
+	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(0) )
+	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
@@ -2927,9 +2929,9 @@ ROM_START( b256 )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
@@ -2963,18 +2965,19 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( b128hp )
-	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(1) )
-	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(2) )
-	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(2) )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(0) )
+	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(0) )
+	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
@@ -2998,9 +3001,9 @@ ROM_START( b256hp )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
@@ -3027,9 +3030,9 @@ ROM_START( bx256hp )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
@@ -3086,20 +3089,20 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT    COMPANY                         FULLNAME                    FLAGS
-COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,       p500_state,      0,      "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
-COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,       p500_state,      0,      "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b500,       0,      0,      b128,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b128,       b500,   0,      b128,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B128",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b256,       b500,   0,      b256,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B256",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm610,     b500,   0,      cbm610,     cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "CBM 610",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm620,     b500,   0,      cbm620,     cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "CBM 620",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm620_hu,  b500,   0,      cbm620,     cbm2_hu,    cbm2_state,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b128hp,     0,      0,      b128hp,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b256hp,     b128hp, 0,      b256hp,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
-COMP( 1983, bx256hp,    b128hp, 0,      bx256hp,    cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
-COMP( 1983, cbm710,     b128hp, 0,      cbm710,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720,     b128hp, 0,      cbm720,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720_de,  b128hp, 0,      cbm720,     cbm2_de,    cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720_se,  b128hp, 0,      cbm720,     cbm2_se,    cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm730,     b128hp, 0,      cbm730,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY                         FULLNAME                    FLAGS
+COMP( 1983, p500,      0,      0,      p500_ntsc, cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1983, p500p,     p500,   0,      p500_pal,  cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b500,      0,      0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128,      b500,   0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B128",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256,      b500,   0,      b256,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B256",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm610,    b500,   0,      cbm610,    cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 610",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620,    b500,   0,      cbm620,    cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 620",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620_hu, b500,   0,      cbm620,    cbm2_hu, cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128hp,    0,      0,      b128hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256hp,    b128hp, 0,      b256hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, bx256hp,   b128hp, 0,      bx256hp,   cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, cbm710,    b128hp, 0,      cbm710,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720,    b128hp, 0,      cbm720,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_de, b128hp, 0,      cbm720,    cbm2_de, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_se, b128hp, 0,      cbm720,    cbm2_se, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm730,    b128hp, 0,      cbm730,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing

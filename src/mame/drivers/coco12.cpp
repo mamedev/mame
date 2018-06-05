@@ -382,19 +382,18 @@ void t4426_cart(device_slot_interface &device)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(coco_state::coco_sound)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "sbs", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "sbs", -1.0, DAC_VREF_NEG_INPUT)
 
 	// Single-bit sound: R22 = 10K
-	MCFG_DEVICE_ADD("sbs", DAC_1BIT, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 
@@ -461,7 +460,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL(14'318'181), MAINCPU_TAG, AS_PROGRAM)
+	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, XTAL(14'318'181), MAINCPU_TAG)
 	MCFG_SAM6883_RES_CALLBACK(READ8(*this, coco12_state, sam_read))
 
 	// Becker Port device
@@ -655,15 +654,15 @@ ROM_END
 
 ROM_START(cd6809)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-		ROM_DEFAULT_BIOS("84")
+	ROM_DEFAULT_BIOS("84")
 
-		ROM_SYSTEM_BIOS( 0, "83", "1983" )
-	ROMX_LOAD("cd6809bas83.rom",    0x2000, 0x2000, CRC(f8e64142) SHA1(c0fd689119e2619ec226a2d67aeeb32070c14e38), ROM_BIOS(1))
-	ROMX_LOAD("cd6809extbas83.rom", 0x0000, 0x2000, CRC(e5d5aa15) SHA1(0cd4a3d9e4af1d0176964e35e3d15a9fa0e68ac4), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 0, "83", "1983" )
+	ROMX_LOAD("cd6809bas83.rom",    0x2000, 0x2000, CRC(f8e64142) SHA1(c0fd689119e2619ec226a2d67aeeb32070c14e38), ROM_BIOS(0))
+	ROMX_LOAD("cd6809extbas83.rom", 0x0000, 0x2000, CRC(e5d5aa15) SHA1(0cd4a3d9e4af1d0176964e35e3d15a9fa0e68ac4), ROM_BIOS(0))
 
-		ROM_SYSTEM_BIOS( 1, "84", "1984" )
-	ROMX_LOAD("cd6809bas84.rom",    0x2000, 0x2000, CRC(8a9971da) SHA1(5cb5f1ffc983a85ba92af68b1d571b270f6db559), ROM_BIOS(2))
-	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 1, "84", "1984" )
+	ROMX_LOAD("cd6809bas84.rom",    0x2000, 0x2000, CRC(8a9971da) SHA1(5cb5f1ffc983a85ba92af68b1d571b270f6db559), ROM_BIOS(1))
+	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(1))
 ROM_END
 
 #define rom_cocoh rom_coco
@@ -675,18 +674,18 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//     YEAR     NAME        PARENT  COMPAT  MACHINE  INPUT     STATE         INIT  COMPANY                         FULLNAME                               FLAGS
-COMP(  1980,    coco,       0,      0,      coco,    coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer",                      0 )
-COMP(  19??,    cocoh,      coco,   0,      cocoh,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
-COMP(  1981,    cocoe,      coco,   0,      cocoe,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
-COMP(  19??,    cocoeh,     coco,   0,      cocoeh,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_UNOFFICIAL )
-COMP(  1983,    coco2,      coco,   0,      coco2,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2",                    0 )
-COMP(  19??,    coco2h,     coco,   0,      coco2h,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_UNOFFICIAL )
-COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2B",                   0 )
-COMP(  19??,    coco2bh,    coco,   0,      coco2bh, coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_UNOFFICIAL )
-COMP(  1983,    cp400,      coco,   0,      cp400,   coco,     coco12_state, 0,    "Prológica",                    "CP400",                               0 )
-COMP(  1985,    cp400c2,    coco,   0,      cp400,   cp400c2,  coco12_state, 0,    "Prológica",                    "CP400 Color II",                      0 )
-COMP(  1983,    lzcolor64,  coco,   0,      coco,    coco,     coco12_state, 0,    "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
-COMP(  1983,    cd6809,     coco,   0,      cd6809,  coco,     coco12_state, 0,    "Codimex",                      "CD-6809",              0 )
-COMP(  1984,    mx1600,     coco,   0,      coco,    coco,     coco12_state, 0,    "Dynacom",                      "MX-1600",                             0 )
-COMP(  1986,    t4426,      coco,   0,      t4426,   coco,     coco12_state, 0,    "Terco AB",                     "Terco 4426 CNC Programming station",  0 )
+//    YEAR   NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                         FULLNAME                               FLAGS
+COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      0 )
+COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
+COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
+COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_UNOFFICIAL )
+COMP( 1983,  coco2,     coco,   0,      coco2,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2",                    0 )
+COMP( 19??,  coco2h,    coco,   0,      coco2h,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_UNOFFICIAL )
+COMP( 1985?, coco2b,    coco,   0,      coco2b,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   0 )
+COMP( 19??,  coco2bh,   coco,   0,      coco2bh, coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_UNOFFICIAL )
+COMP( 1983,  cp400,     coco,   0,      cp400,   coco,    coco12_state, empty_init, "Prológica",                    "CP400",                               0 )
+COMP( 1985,  cp400c2,   coco,   0,      cp400,   cp400c2, coco12_state, empty_init, "Prológica",                    "CP400 Color II",                      0 )
+COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
+COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",              0 )
+COMP( 1984,  mx1600,    coco,   0,      coco,    coco,    coco12_state, empty_init, "Dynacom",                      "MX-1600",                             0 )
+COMP( 1986,  t4426,     coco,   0,      t4426,   coco,    coco12_state, empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  0 )

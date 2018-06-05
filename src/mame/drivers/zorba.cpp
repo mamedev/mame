@@ -73,7 +73,7 @@ ToDo:
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x0000, 0x3fff).bankr(m_read_bank).bankw("bankw0");
 	map(0x4000, 0xffff).ram();
 }
 
@@ -128,7 +128,7 @@ const gfx_layout u5_charlayout =
 	8*16                    // every char takes 16 bytes
 };
 
-GFXDECODE_START( zorba )
+GFXDECODE_START( gfx_zorba )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u5_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -145,13 +145,12 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_zorba)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(m_palette)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD(m_beep, BEEP, 800) // should be horizontal frequency / 16, so depends on CRTC parameters
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq0")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<0>))
@@ -227,7 +226,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// Floppies
-	MCFG_FD1793_ADD(m_fdc, 24_MHz_XTAL / 24)
+	MCFG_DEVICE_ADD(m_fdc, FD1793, 24_MHz_XTAL / 24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("irq2", input_merger_device, in_w<0>))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("irq2", input_merger_device, in_w<1>))
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -274,8 +273,8 @@ void zorba_state::machine_start()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
-	membank("bankr0")->configure_entry(0, &main[0x0000]);
-	membank("bankr0")->configure_entry(1, &main[0x10000]);
+	m_read_bank->configure_entry(0, &main[0x0000]);
+	m_read_bank->configure_entry(1, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 
 	save_item(NAME(m_intmask));
@@ -305,7 +304,7 @@ void zorba_state::machine_reset()
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
 	m_read_bank->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	membank("bankw0")->set_entry(0); // always write to RAM
 
 	m_maincpu->reset();
 }
@@ -563,8 +562,8 @@ ROM_START( zorba )
 	ROM_LOAD( "74ls288.u77", 0x0040, 0x0020, CRC(946e03b0) SHA1(24240bdd7bdf507a5b51628fb36ad1266fc53a28) BAD_DUMP ) // looks like bad dump of address decode PROM
 ROM_END
 
-COMP( 1984?, zorba, 0, 0, zorba, zorba, zorba_state, 0, "Modular Micros", "Zorba (Modular Micros)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984?, zorba, 0, 0, zorba, zorba, zorba_state, empty_init, "Modular Micros", "Zorba (Modular Micros)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Undumped versions (see startup screen notes at top of file)
-// COMP( 1983, zorbat, zorba, 0, zorba, zorba, zorba_state, 0, "Telcon Industries",  "Zorba (Telcon Industries)",  MACHINE_NOT_WORKING )
-// COMP( 1984, zorbag, zorba, 0, zorba, zorba, zorba_state, 0, "Gemini Electronics", "Zorba (Gemini Electronics)", MACHINE_NOT_WORKING )
+// COMP( 1983, zorbat, zorba, 0, zorba, zorba, zorba_state, empty_init, "Telcon Industries",  "Zorba (Telcon Industries)",  MACHINE_NOT_WORKING )
+// COMP( 1984, zorbag, zorba, 0, zorba, zorba, zorba_state, empty_init, "Gemini Electronics", "Zorba (Gemini Electronics)", MACHINE_NOT_WORKING )

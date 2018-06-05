@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_last_nmi_state = state;
 }
@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(coleco_state::coleco)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
@@ -446,10 +446,10 @@ MACHINE_CONFIG_END
 ROM_START (coleco)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "original", "Original" )
-	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(1) )
+	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "thick", "Thick characters" )
 	// differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
-	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(2) )
+	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(1) )
 ROM_END
 
 /*  ONYX (Prototype)
@@ -495,10 +495,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco, coleco_state, 0,    "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, coleco_state, 0,    "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
-CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, coleco_state, 0,    "Coleco",           "ColecoVision (PAL)",               0 )
-CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  coleco_state, 0,    "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,     czz50,  coleco_state, 0,    "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  coleco_state, 0,    "Telegames",        "Personal Arcade",                  0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                            FLAGS
+CONS( 1982, coleco,   0,      0,      coleco,   coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco, 0,      coleco,   coleco, coleco_state, empty_init, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, colecop,  coleco, 0,      colecop,  coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )

@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(electron_state::electron)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 300 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -295,7 +295,7 @@ ROM_END
 #define rom_btm2105 rom_electron
 
 
-/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT  COMPANY                             FULLNAME                                 FLAGS */
-COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, 0,    "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
-COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, 0,    "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                             FULLNAME                                 FLAGS */
+COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, empty_init, "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, empty_init, "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
+COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, empty_init, "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

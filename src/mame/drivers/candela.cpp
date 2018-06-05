@@ -663,11 +663,11 @@ DEVICE_INPUT_DEFAULTS_END
 #endif
 
 /* Fake clock values until we TODO: figure out how the PTM generates the clocks */
-#define CAN09T_BAUDGEN_CLOCK XTAL(1'843'200)
+#define CAN09T_BAUDGEN_CLOCK 1.8432_MHz_XTAL
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
 MACHINE_CONFIG_START(can09t_state::can09t)
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'915'200)) // IPL crystal
+	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL) // IPL crystal
 	MCFG_DEVICE_PROGRAM_MAP(can09t_map)
 
 	/* --PIA inits----------------------- */
@@ -708,7 +708,7 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE (*this, can09t_state, write_acia_clock))
 MACHINE_CONFIG_END
 
-#define CAN09_X1_CLOCK XTAL(22'118'400)        /* UKI 22118.40 Khz */
+#define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
 MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
@@ -750,13 +750,13 @@ MACHINE_CONFIG_START(can09_state::can09)
 	/* screen - totally faked value for now */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 512, 0, 512, 576, 0, 576)
+	MCFG_SCREEN_RAW_PARAMS(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576)
 	MCFG_SCREEN_UPDATE_DRIVER(can09_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Floppy */
-	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) ) // TODO: Verify 8MHz UKI crystal assumed to be used
+	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL) // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")
@@ -799,6 +799,6 @@ ROM_START( can09 ) /* The bigger black computer CAN v1 */
 	ROM_LOAD( "ic14-vdu42.bin", 0x0000, 0x2000, CRC(67fc3c8c) SHA1(1474d6259646798377ef4ce7e43d3c8d73858344) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME            FLAGS
-COMP( 1984, can09,      0,          0,      can09,      can09,  can09_state,  0,          "Candela Data AB",  "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1984, can09t,     0,          0,      can09t,     can09t, can09t_state, 0,          "Candela Data AB",  "Candela CAN09",    MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME            FLAGS
+COMP( 1984, can09,  0,      0,      can09,   can09,  can09_state,  empty_init, "Candela Data AB", "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1984, can09t, 0,      0,      can09t,  can09t, can09t_state, empty_init, "Candela Data AB", "Candela CAN09",    MACHINE_NO_SOUND_HW )

@@ -382,11 +382,9 @@ MACHINE_CONFIG_START(zx_state::zx81_spk )
 	zx81(config);
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zx_state::ts1000)
@@ -431,23 +429,23 @@ MACHINE_CONFIG_END
 ROM_START(zx80)
 	ROM_REGION( 0x1000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "default", "BASIC")
-	ROMX_LOAD( "zx80.rom",   0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a), ROM_BIOS(1) )
+	ROMX_LOAD( "zx80.rom",   0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "aszmic", "ASZMIC")
-	ROMX_LOAD( "aszmic.rom", 0x0000, 0x1000, CRC(6c123536) SHA1(720867cbfafafc8c7438bbc325a77eaef571e5c0), ROM_BIOS(2) )
+	ROMX_LOAD( "aszmic.rom", 0x0000, 0x1000, CRC(6c123536) SHA1(720867cbfafafc8c7438bbc325a77eaef571e5c0), ROM_BIOS(1) )
 ROM_END
 
 ROM_START(zx81)
 	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "3rd", "3rd rev.")
-	ROMX_LOAD( "zx81b.rom",   0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(1) )
+	ROMX_LOAD( "zx81b.rom",   0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "1st", "1st rev.")
-	ROMX_LOAD( "zx81.rom",    0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102), ROM_BIOS(2) )
+	ROMX_LOAD( "zx81.rom",    0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "2nd", "2nd rev.")
-	ROMX_LOAD( "zx81a.rom",   0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc), ROM_BIOS(3) )
+	ROMX_LOAD( "zx81a.rom",   0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "hforth", "Forth by David Husband")
-	ROMX_LOAD( "h4th.rom",    0x0000, 0x2000, CRC(257d5a32) SHA1(03809a6b464609ff924f7e55a85eef875cd47ae8), ROM_BIOS(4) )
+	ROMX_LOAD( "h4th.rom",    0x0000, 0x2000, CRC(257d5a32) SHA1(03809a6b464609ff924f7e55a85eef875cd47ae8), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "tforth", "Forth by Tree Systems")
-	ROMX_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) SHA1(3ee15779e03482b10fc59eb4df2446376c56b00d), ROM_BIOS(5) )
+	ROMX_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) SHA1(3ee15779e03482b10fc59eb4df2446376c56b00d), ROM_BIOS(4) )
 ROM_END
 
 ROM_START(ts1000)
@@ -504,14 +502,14 @@ ROM_END
 
 /* Game Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS        INIT    COMPANY                     FULLNAME               FLAGS
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-80",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-81",               MACHINE_NO_SOUND_HW )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1000", MACHINE_NO_SOUND_HW )
-COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1500", MACHINE_NO_SOUND_HW )
-COMP( 1983, tk85,       zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Microdigital",             "TK85",                MACHINE_NO_SOUND_HW )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Ritas do Brasil Ltda",     "Ringo 470",           MACHINE_NO_SOUND_HW )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,  zx_state,    zx,     "Your Computer",            "PC8300",              MACHINE_NOT_WORKING )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Creon Enterprises",        "Power 3000",          MACHINE_NOT_WORKING )
-COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         MACHINE_NOT_WORKING )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    zx_state,    zx,     "Wilf Rigter",              "ZX97",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_UNOFFICIAL )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT    COMPANY                    FULLNAME               FLAGS
+COMP( 1980, zx80,     0,      0,      zx80,    zx80,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-80",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1981, zx81,     0,      0,      zx81,    zx81,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-81",               MACHINE_NO_SOUND_HW )
+COMP( 1982, ts1000,   zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1000", MACHINE_NO_SOUND_HW )
+COMP( 1983, ts1500,   zx81,   0,      ts1500,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1500", MACHINE_NO_SOUND_HW )
+COMP( 1983, tk85,     zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Microdigital",           "TK85",                MACHINE_NO_SOUND_HW )
+COMP( 1983, ringo470, zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Ritas do Brasil Ltda",   "Ringo 470",           MACHINE_NO_SOUND_HW )
+COMP( 1984, pc8300,   zx81,   0,      pc8300,  pc8300,  zx_state, init_zx, "Your Computer",          "PC8300",              MACHINE_NOT_WORKING )
+COMP( 1983, pow3000,  zx81,   0,      pow3000, pow3000, zx_state, init_zx, "Creon Enterprises",      "Power 3000",          MACHINE_NOT_WORKING )
+COMP( 1982, lambda,   zx81,   0,      pow3000, pow3000, zx_state, init_zx, "Lambda Electronics Ltd", "Lambda 8300",         MACHINE_NOT_WORKING )
+COMP( 1997, zx97,     zx81,   0,      zx81,    zx81,    zx_state, init_zx, "Wilf Rigter",            "ZX97",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_UNOFFICIAL )

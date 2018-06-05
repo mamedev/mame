@@ -316,7 +316,7 @@ static const gfx_layout vt100_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vt100 )
+static GFXDECODE_START( gfx_vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", vt100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_vt100)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
@@ -592,9 +592,9 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt100" )
 	ROM_SYSTEM_BIOS( 0, "vt100o", "VT100 older roms" )
-	ROMX_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1)) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
+	ROMX_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(0)) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
 	ROM_SYSTEM_BIOS( 1, "vt100", "VT100 newer roms" )
-	ROMX_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15), ROM_BIOS(2)) // version 2 1979 or 1980 'later rom', correct for later vt100s
+	ROMX_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15), ROM_BIOS(1)) // version 2 1979 or 1980 'later rom', correct for later vt100s
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
@@ -824,11 +824,11 @@ ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt102" )
 	ROM_SYSTEM_BIOS( 0, "vt102o", "VT102 older roms" )
-	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt131
-	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt131
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(0)) // shared with vt131
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(0)) // shared with vt131
 	ROM_SYSTEM_BIOS( 1, "vt102", "VT102 newer roms" )
-	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt131
-	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt131
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(1)) // shared with vt131
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(1)) // shared with vt131
 	//e67 socket is empty on vt102 but populated on vt131 below
 
 	ROM_REGION(0x1000, "chargen", 0)
@@ -843,11 +843,11 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt131" )
 	ROM_SYSTEM_BIOS( 0, "vt131o", "VT131 older roms" )
-	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt102
-	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt102
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(0)) // shared with vt102
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(0)) // shared with vt102
 	ROM_SYSTEM_BIOS( 1, "vt131", "VT131 newer roms" )
-	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt102
-	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt102
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(1)) // shared with vt102
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(1)) // shared with vt102
 	ROM_LOAD( "23-280e2-00.e67", 0xA000, 0x0800, CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; pins 20, 18 and 21 are /CE /CE2 and /CE3 on this mask rom
 
 	ROM_REGION(0x1000, "chargen", 0)
@@ -875,16 +875,16 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1979, vt100ac,  vt100,  0,       vt100ac,   vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1981, vt101,    vt102,  0,       vt101,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT110", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT125", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT131", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-//COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT132", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT180", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                          FULLNAME    FLAGS */
+COMP( 1978, vt100,   0,      0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt100wp, vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1979, vt100ac, vt100,  0,      vt100ac, vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt101,   vt102,  0,      vt101,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT101",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt102,   0,      0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT102",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt103,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT103",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1978, vt105,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT105",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt110,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT110",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1981, vt125,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT125",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt131,   vt102,  0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT131",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt132,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT132",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1983, vt180,   vt100,  0,      vt180,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT180",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

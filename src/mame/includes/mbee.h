@@ -12,7 +12,7 @@
 #include "bus/centronics/ctronics.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -45,7 +45,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
+		, m_wave(*this, "wave")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
@@ -92,15 +92,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_READ8_MEMBER(fdc_status_r);
 	DECLARE_WRITE8_MEMBER(fdc_motor_w);
-	DECLARE_DRIVER_INIT(mbeepc85);
-	DECLARE_DRIVER_INIT(mbee256);
-	DECLARE_DRIVER_INIT(mbee56);
-	DECLARE_DRIVER_INIT(mbeett);
-	DECLARE_DRIVER_INIT(mbeeppc);
-	DECLARE_DRIVER_INIT(mbee);
-	DECLARE_DRIVER_INIT(mbeepc);
-	DECLARE_DRIVER_INIT(mbeeic);
-	DECLARE_DRIVER_INIT(mbee128);
+	void init_mbeepc85();
+	void init_mbee256();
+	void init_mbee56();
+	void init_mbeett();
+	void init_mbeeppc();
+	void init_mbee();
+	void init_mbeepc();
+	void init_mbeeic();
+	void init_mbee128();
 	DECLARE_MACHINE_RESET(mbee);
 	DECLARE_VIDEO_START(mono);
 	DECLARE_VIDEO_START(standard);

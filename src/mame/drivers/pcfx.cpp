@@ -437,11 +437,11 @@ MACHINE_CONFIG_START(pcfx_state::pcfx)
 	MCFG_HUC6261_VDC2("huc6270_b")
 	MCFG_HUC6261_KING("huc6272")
 
-	MCFG_HUC6272_ADD( "huc6272", XTAL(21'477'272) )
+	MCFG_DEVICE_ADD( "huc6272", HUC6272, XTAL(21'477'272) )
 	MCFG_HUC6272_IRQ_CHANGED_CB(WRITELINE(*this, pcfx_state, irq13_w))
 	MCFG_HUC6272_RAINBOW("huc6271")
 
-	MCFG_HUC6271_ADD( "huc6271", XTAL(21'477'272) )
+	MCFG_DEVICE_ADD( "huc6271", HUC6271, XTAL(21'477'272) )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "pcfx")
 MACHINE_CONFIG_END
@@ -450,9 +450,9 @@ MACHINE_CONFIG_END
 ROM_START( pcfx )
 	ROM_REGION( 0x100000, "ipl", 0 )
 	ROM_SYSTEM_BIOS( 0, "v100", "BIOS v1.00 - 2 Sep 1994" )
-	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(1) )
+	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
-	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(2) )
+	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(1) )
 
 	ROM_REGION( 0x80000, "scsi_rom", 0 )
 	ROM_LOAD( "fx-scsi.rom", 0x00000, 0x80000, CRC(f3e60e5e) SHA1(65482a23ac5c10a6095aee1db5824cca54ead6e5) )
@@ -473,6 +473,6 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE            INIT    COMPANY  FULLNAME                  FLAGS
-CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx,  pcfx_state,      0,      "NEC",   "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 199?, pcfxga,     pcfx,   0,      pcfx,       pcfx,  pcfx_state,      0,      "NEC",   "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME                  FLAGS
+CONS( 1994, pcfx,   0,      0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC",   "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, pcfxga, pcfx,   0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC",   "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

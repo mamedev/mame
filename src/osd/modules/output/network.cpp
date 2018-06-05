@@ -43,9 +43,9 @@ public:
   {
 	m_machine = &machine;
 	m_clients->insert(shared_from_this());
-	// now send "hello = 1" to the newly connected client
-	std::strncpy(m_data, "hello = 1\1", max_length);
-	do_write(10);
+	// now send "mame_start = rom" to the newly connected client
+	std::snprintf(m_data, max_length, "mame_start = %s\r", machine.system().name);
+	do_write(std::strlen(m_data));
 	do_read();
   }
 
@@ -58,44 +58,45 @@ private:
 
   void handle_message(char *msg)
   {
-	char verb[1024];
-	int value;
+	const char *equals_delimiter = " = ";
+	char *msg_name = strtok(msg, equals_delimiter);
+	char *msg_value = strtok(NULL, equals_delimiter);
 
-	//printf("handle_message: got [%s]\n", msg);
+	//printf("handle_message: msg_name [%s] msg_value [%s]\n", msg_name, msg_value);
 
-	std::uint32_t ch = 0;
-	while (msg[ch] != ' ')
+	if (std::strcmp(msg_name, "mame_message") == 0)
 	{
-		ch++;
-	}
-	msg[ch] = '\0';
-	ch++;
-	std::strncpy(verb, msg, sizeof(verb)-1);
-	//printf("verb = [%s], ", verb);
+		const char *comma_delimiter = ",";
+		msg_name = strtok(msg_value, comma_delimiter);
+		msg_value = strtok(NULL, comma_delimiter);
+		int id = atoi(msg_name);
+		int value = atoi(msg_value);
 
-	while (msg[ch] != ' ')
-	{
-		ch++;
-	}
-
-	ch++;
-	value = atoi(&msg[ch]);
-	//printf("value = %d\n", value);
-
-	if (!std::strcmp(verb, "send_id"))
-	{
-		if (value == 0)
+		switch(id)
 		{
-			std::snprintf(m_data, max_length, "req_id = %s\1", machine().system().name);
+		case IM_MAME_PAUSE:
+			if (value == 1 && !machine().paused())
+			{
+				machine().pause();
+			}
+			else if (value == 0 && machine().paused())
+			{
+				machine().resume();
+			}
+			break;
+		case IM_MAME_SAVESTATE:
+			if (value == 0)
+			{
+				machine().schedule_load("auto");
+			}
+			else if (value == 1)
+			{
+				machine().schedule_save("auto");
+			}
+			break;
 		}
-		else
-		{
-			std::snprintf(m_data, max_length, "req_id = %s\1", machine().output().id_to_name(value));
-		}
-
-		do_write(std::strlen(m_data));
-	}
   }
+}
 
   void do_read()
   {
@@ -105,16 +106,16 @@ private:
 		{
 		  if (!ec)
 		  {
-			if (length > 0)
-			{
-				m_input_m_data[length] = '\0';
-				handle_message(m_input_m_data);
-			}
-			do_read();
+				if (length > 0)
+				{
+					m_input_m_data[length] = '\0';
+					handle_message(m_input_m_data);
+				}
+				do_read();
 		  }
 		  else
 		  {
-			m_clients->erase(shared_from_this());
+				m_clients->erase(shared_from_this());
 		  }
 		});
   }
@@ -204,7 +205,7 @@ public:
 	virtual void exit() override
 	{
 		// tell clients MAME is shutting down
-		notify("mamerun", 0);
+		notify("mame_stop", 1);
 		m_io_context->stop();
 		m_working_thread.join();
 		delete m_server;
@@ -216,7 +217,7 @@ public:
 	virtual void notify(const char *outname, int32_t value) override
 	{
 		static char buf[256];
-		sprintf(buf, "%s = %d\1", ((outname==nullptr) ? "none" : outname), value);
+		sprintf(buf, "%s = %d\r", ((outname==nullptr) ? "none" : outname), value);
 		m_server->deliver_to_all(buf);
 	}
 

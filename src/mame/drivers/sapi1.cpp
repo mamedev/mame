@@ -74,9 +74,9 @@ public:
 	DECLARE_READ8_MEMBER(uart_ready_r);
 	DECLARE_WRITE8_MEMBER(uart_mode_w);
 	DECLARE_WRITE8_MEMBER(uart_reset_w);
-	DECLARE_DRIVER_INIT(sapizps3);
-	DECLARE_DRIVER_INIT(sapizps3a);
-	DECLARE_DRIVER_INIT(sapizps3b);
+	void init_sapizps3();
+	void init_sapizps3a();
+	void init_sapizps3b();
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -595,20 +595,20 @@ MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
 	m_bank1->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::init_sapizps3()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
+void sapi1_state::init_sapizps3a()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 	m_uart->write_swe(0);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
+void sapi1_state::init_sapizps3b()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -721,55 +721,56 @@ MACHINE_CONFIG_END
 ROM_START( sapi1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "mb1", "MB1" )
-	ROMX_LOAD( "sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(1))
+	ROMX_LOAD("sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mb2", "MB2 (ANK-1)" )
-	ROMX_LOAD( "mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(2))
+	ROMX_LOAD("mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(1))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "sapi1.chr",  0x0000, 0x1000, CRC(9edafa2c) SHA1(a903db0e8923cca91646274d010dc19b6b377e3e) )
+	ROM_LOAD("sapi1.chr",  0x0000, 0x1000, CRC(9edafa2c) SHA1(a903db0e8923cca91646274d010dc19b6b377e3e))
 ROM_END
 
 ROM_START( sapizps2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v4", "MIKOS 4" )
-	ROMX_LOAD( "36.bin", 0x0000, 0x0800, CRC(a27f340a) SHA1(d07d208fcbe428897336c17197d3e8fb52181f38), ROM_BIOS(1))
-	ROMX_LOAD( "37.bin", 0x0800, 0x0800, CRC(30daa708) SHA1(66e990c40788ee25cf6cabd4842a78daf4fcdddd), ROM_BIOS(1))
+	ROMX_LOAD("36.bin", 0x0000, 0x0800, CRC(a27f340a) SHA1(d07d208fcbe428897336c17197d3e8fb52181f38), ROM_BIOS(0))
+	ROMX_LOAD("37.bin", 0x0800, 0x0800, CRC(30daa708) SHA1(66e990c40788ee25cf6cabd4842a78daf4fcdddd), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v5", "MIKOS 5" )
-	ROMX_LOAD( "mikos5_1.bin", 0x0000, 0x0800, CRC(c2a83ca3) SHA1(a3678253d7690c89945e791ea0f8e15b081c9126), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_2.bin", 0x0800, 0x0800, CRC(c4458a04) SHA1(0cc909323f0e6507d95e57ea39e1deb8bd57bf89), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_3.bin", 0x1000, 0x0800, CRC(efb499f3) SHA1(78f0ca3ff10d7af4ae94ab820723296beb035f8f), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_4.bin", 0x1800, 0x0800, CRC(4d90e9be) SHA1(8ec554198697550a49432e8210d43700ef1d6a32), ROM_BIOS(2))
+	ROMX_LOAD("mikos5_1.bin", 0x0000, 0x0800, CRC(c2a83ca3) SHA1(a3678253d7690c89945e791ea0f8e15b081c9126), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_2.bin", 0x0800, 0x0800, CRC(c4458a04) SHA1(0cc909323f0e6507d95e57ea39e1deb8bd57bf89), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_3.bin", 0x1000, 0x0800, CRC(efb499f3) SHA1(78f0ca3ff10d7af4ae94ab820723296beb035f8f), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_4.bin", 0x1800, 0x0800, CRC(4d90e9be) SHA1(8ec554198697550a49432e8210d43700ef1d6a32), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "mb3", "MB3 (Consul)" )
-	ROMX_LOAD( "mb3_1.bin", 0x0000, 0x1000, CRC(be895f88) SHA1(7fc2a92f41d978a9f0ccd0e235ea3c6146adfb6f), ROM_BIOS(3))
+	ROMX_LOAD("mb3_1.bin", 0x0000, 0x1000, CRC(be895f88) SHA1(7fc2a92f41d978a9f0ccd0e235ea3c6146adfb6f), ROM_BIOS(2))
 ROM_END
 
 ROM_START( sapizps3 )
 	ROM_REGION( 0x10800, "maincpu", 0 )
 	// These 2 bioses use videoram at F800
 	ROM_SYSTEM_BIOS( 0, "per", "Perina" )
-	ROMX_LOAD( "perina_1988.bin",0x10000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(1))
+	ROMX_LOAD("perina_1988.bin",0x10000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "1zmod", "JPR-1Zmod" )
-	ROMX_LOAD( "jpr1zmod.bin",   0x10000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(2))
+	ROMX_LOAD("jpr1zmod.bin",   0x10000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(1))
 ROM_END
 
 ROM_START( sapizps3a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// This bios uses a terminal
-	ROM_LOAD( "jpr1a.bin",      0xf800, 0x0800, CRC(3ed89786) SHA1(dcc8657b4884bfe58d114c539b733b73d038ee30))
+	ROM_LOAD("jpr1a.bin",      0xf800, 0x0800, CRC(3ed89786) SHA1(dcc8657b4884bfe58d114c539b733b73d038ee30))
 ROM_END
 
 ROM_START( sapizps3b )
 	ROM_REGION( 0x10800, "maincpu", 0 )
-	// This bios uses a 6845
-	ROM_LOAD( "pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
+	// This BIOS uses a 6845
+	ROM_LOAD("pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
 ROM_END
 
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  CLASS        INIT       COMPANY  FULLNAME                   FLAGS
-COMP( 1985, sapi1,     0,       0,      sapi1,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps2,  sapi1,   0,      sapi2,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3,  sapi1,   0,      sapi3,      sapi1, sapi1_state, sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3a, sapi1,   0,      sapi3a,     sapi1, sapi1_state, sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3b, sapi1,   0,      sapi3b,     sapi1, sapi1_state, sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT            COMPANY  FULLNAME                   FLAGS
+COMP( 1985, sapi1,     0,      0,      sapi1,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi1_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi1_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi1_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+

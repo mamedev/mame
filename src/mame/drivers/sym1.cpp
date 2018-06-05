@@ -64,7 +64,7 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	DECLARE_DRIVER_INIT(sym1);
+	void init_sym1();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
@@ -277,7 +277,7 @@ WRITE8_MEMBER( sym1_state::via3_a_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( sym1_state, sym1 )
+void sym1_state::init_sym1()
 {
 	// wipe expansion memory banks that are not installed
 	if (m_ram->size() < 4*1024)
@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(sym1_state::sym1)
 	MCFG_DEFAULT_LAYOUT(layout_sym1)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -383,9 +383,9 @@ MACHINE_CONFIG_END
 ROM_START( sym1 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "ver10",  "Version 1.0")
-	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(1))
+	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ver11",  "Version 1.1")
-	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(2))
+	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(1))
 	ROM_LOAD("rae_b000", 0xb000, 0x1000, CRC(f6429326) SHA1(6f2f10649b54f54217bb35c8c453b5d05434bd86) )
 	ROM_LOAD("bas_c000", 0xc000, 0x1000, CRC(c168fe70) SHA1(7447a5e229140cbbde4cf90886966a5d93aa24e1) )
 	ROM_LOAD("bas_d000", 0xd000, 0x1000, CRC(8375a978) SHA1(240301bf8bb8ddb99b65a585f17895e1ad872631) )
@@ -397,5 +397,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY                   FULLNAME          FLAGS
-COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                   FULLNAME          FLAGS
+COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, init_sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )

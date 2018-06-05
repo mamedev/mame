@@ -160,7 +160,8 @@ protected:
 	int m_icount;
 	endianness_t m_endian;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u32 (offs_t)> m_pr32;
+	std::function<const void * (offs_t)> m_prptr;
 
 	/* Coprocessor Registers */
 	uint32_t m_control;

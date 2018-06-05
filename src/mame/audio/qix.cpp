@@ -59,7 +59,7 @@ static const discrete_comp_adder_table qix_attn_table =
 	{RES_K(22)+250, RES_K(10)+250, RES_K(5.6)+250, RES_K(3.3)+250}
 };
 
-static DISCRETE_SOUND_START(qix)
+static DISCRETE_SOUND_START(qix_discrete)
 	/*                    NODE                      */
 	DISCRETE_INPUTX_DATA(QIX_DAC_DATA, 128, -128*128, 128)
 	DISCRETE_INPUT_DATA (QIX_VOL_DATA)
@@ -196,10 +196,10 @@ MACHINE_CONFIG_START(qix_state::qix_audio)
 	MCFG_PIA_CA2_HANDLER(WRITE8(*this, qix_state, sndpia_2_warning_w))
 	MCFG_PIA_CB2_HANDLER(WRITE8(*this, qix_state, sndpia_2_warning_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(qix)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, qix_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(qix_state::slither_audio)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, qix_state, qix_pia_dint))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, qix_state, qix_pia_dint))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, SLITHER_CLOCK_OSC/4/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

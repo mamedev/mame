@@ -25,37 +25,40 @@ class segas18_state : public sega_16bit_common_base
 public:
 	// construction/destruction
 	segas18_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_mapper(*this, "mapper"),
-			m_maincpu(*this, "maincpu"),
-			m_maincpu_region(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_mcu(*this, "mcu"),
-			m_vdp(*this, "gen_vdp"),
-			m_io(*this, "io"),
-			m_nvram(*this, "nvram"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_upd4701(*this, {"upd1", "upd2", "upd3"}),
-			m_workram(*this, "workram"),
-			m_romboard(ROM_BOARD_INVALID),
-			m_grayscale_enable(false),
-			m_vdp_enable(false),
-			m_vdp_mixing(0),
-			m_lghost_value(0),
-			m_lghost_select(0)
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_mapper(*this, "mapper")
+		, m_maincpu(*this, "maincpu")
+		, m_maincpu_region(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_mcu(*this, "mcu")
+		, m_vdp(*this, "gen_vdp")
+		, m_io(*this, "io")
+		, m_nvram(*this, "nvram")
+		, m_sprites(*this, "sprites")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_upd4701(*this, {"upd1", "upd2", "upd3"})
+		, m_workram(*this, "workram")
+		, m_sprites_region(*this, "sprites")
+		, m_soundbank(*this, "soundbank")
+		, m_gun_recoil(*this, "P%u_Gun_Recoil", 1U)
+		, m_romboard(ROM_BOARD_INVALID)
+		, m_grayscale_enable(false)
+		, m_vdp_enable(false)
+		, m_vdp_mixing(0)
+		, m_lghost_value(0)
+		, m_lghost_select(0)
 	{
 	}
 
 	// driver init
-	DECLARE_DRIVER_INIT(ddcrew);
-	DECLARE_DRIVER_INIT(lghost);
-	DECLARE_DRIVER_INIT(generic_shad);
-	DECLARE_DRIVER_INIT(generic_5874);
-	DECLARE_DRIVER_INIT(wwally);
-	DECLARE_DRIVER_INIT(generic_5987);
-	DECLARE_DRIVER_INIT(hamaway);
+	void init_ddcrew();
+	void init_lghost();
+	void init_generic_shad();
+	void init_generic_5874();
+	void init_wwally();
+	void init_generic_5987();
+	void init_hamaway();
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
@@ -102,6 +105,7 @@ public:
 	void system18_i8751(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void mcu_io_map(address_map &map);
+	void pcm_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 	void system18_map(address_map &map);
@@ -149,6 +153,11 @@ protected:
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;
+
+	required_memory_region m_sprites_region;
+	optional_memory_bank m_soundbank;
+
+	output_finder<3> m_gun_recoil;
 
 	// configuration
 	segas18_rom_board   m_romboard;

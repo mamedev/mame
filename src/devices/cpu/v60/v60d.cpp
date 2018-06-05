@@ -455,13 +455,13 @@ u32 v60_disassembler::decode_F3(const char *opnm, int opsize1, int opsize2, unsi
 
 u32 v60_disassembler::decode_F4a(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc+opcodes.r8(pc));
+	util::stream_format(stream, "%-8s%X", opnm, ipc + static_cast<int8_t>(opcodes.r8(pc)));
 	return 2;
 }
 
 u32 v60_disassembler::decode_F4b(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc+opcodes.r16(pc));
+	util::stream_format(stream, "%-8s%X", opnm, ipc + static_cast<int16_t>(opcodes.r16(pc)));
 	return 3;
 }
 

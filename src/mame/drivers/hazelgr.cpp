@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -114,4 +114,4 @@ ROM_START( hg_frd )
 ROM_END
 
 
-GAME( 198?,  hg_frd,  0,  haze,  haze, haze_state,  0,  ROT0,  "Hazel Grove",    "Fruit Deuce (Hazel Grove)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?, hg_frd, 0, haze, haze, haze_state, empty_init, ROT0, "Hazel Grove", "Fruit Deuce (Hazel Grove)", MACHINE_IS_SKELETON_MECHANICAL)

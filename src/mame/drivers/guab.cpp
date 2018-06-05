@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", 5))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* TODO: Verify clock */
 	MCFG_DEVICE_ADD("snsnd", SN76489, 2000000)
@@ -542,7 +542,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
 
 	// floppy
-	MCFG_WD1773_ADD("fdc", 8000000)
+	MCFG_DEVICE_ADD("fdc", WD1773, 8000000)
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", 6))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
@@ -585,7 +585,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS       INIT  ROTATION  COMPANY  FULLNAME                FLAGS
-GAME( 1986, guab,     0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Give us a Break",      0 )
-GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
-GAME( 1988, tenup,    0,      guab,    tenup, guab_state, 0,    ROT0,     "JPM",   "Ten Up",               0 )
+//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS       INIT        ROTATION  COMPANY  FULLNAME                FLAGS
+GAME( 1986, guab,     0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Give us a Break",      0 )
+GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
+GAME( 1988, tenup,    0,      guab,    tenup, guab_state, empty_init, ROT0,     "JPM",   "Ten Up",               0 )

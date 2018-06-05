@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	m_control_regs[BDMA_CONTROL_REG] |= ((param >> 14) & 0xff) << 8;
 
 	if (m_control_regs[BDMA_CONTROL_REG] & 8)
-		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	else
 		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum_time());
 
@@ -504,7 +504,8 @@ MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_GENERIC_LATCH_16_ADD("data_in")
 	MCFG_GENERIC_LATCH_16_ADD("data_out")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dacl", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

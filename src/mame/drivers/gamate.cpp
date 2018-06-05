@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_cart);
 	DECLARE_READ8_MEMBER(read_cart);
 
-	DECLARE_DRIVER_INIT(gamate);
+	void init_gamate();
 
 	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -144,7 +144,7 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(gamate_state,gamate)
+void gamate_state::init_gamate()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer2),this));
@@ -185,7 +185,8 @@ MACHINE_CONFIG_START(gamate_state::gamate)
 	MCFG_GAMATE_VIDEO_ADD("video")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // Stereo headphone output
+	SPEAKER(config, "lspeaker").front_left(); // Stereo headphone output
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ay8910", AY8910, 4433000 / 4) // AY compatible, no actual AY chip present
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
@@ -221,11 +222,11 @@ as well as the PCB.
 ROM_START(gamate)
 	ROM_REGION(0x1000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "default", "DEFAULT")
-	ROMX_LOAD("gamate_bios_umc.bin", 0x0000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(1) )
+	ROMX_LOAD("gamate_bios_umc.bin", 0x0000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "newer", "NEWER")
-	ROMX_LOAD("gamate_bios_bit.bin", 0x0000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
+	ROMX_LOAD("gamate_bios_bit.bin", 0x0000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(1))
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT    COMPANY     FULLNAME  FLAGS
-CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME  FLAGS
+CONS( 1990, gamate, 0,      0,      gamate,  gamate, gamate_state, init_gamate, "Bit Corp", "Gamate", 0 )

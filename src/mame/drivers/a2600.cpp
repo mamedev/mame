@@ -506,11 +506,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a2600_state::a2600)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
-	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_M6502_DISABLE_CACHE()
 	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback))
@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_NTSC/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
@@ -554,10 +554,10 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
-	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback_pal))
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
@@ -604,6 +604,6 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,  a2600, a2600_state, 0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
-CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, a2600_state, 0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME */
+CONS( 1977, a2600,  0,      0,      a2600,   a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )

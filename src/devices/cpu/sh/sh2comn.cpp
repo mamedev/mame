@@ -722,15 +722,8 @@ READ32_MEMBER( sh2_device::sh7604_r )
 	return m_m[offset];
 }
 
-void sh2_device::sh2_set_frt_input(int state)
+void sh2_device::set_frt_input(int state)
 {
-	if(state == PULSE_LINE)
-	{
-		sh2_set_frt_input(ASSERT_LINE);
-		sh2_set_frt_input(CLEAR_LINE);
-		return;
-	}
-
 	if(m_frt_input == state) {
 		return;
 	}

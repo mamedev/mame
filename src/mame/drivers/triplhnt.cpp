@@ -16,9 +16,9 @@ Atari Triple Hunt Driver
 
 
 
-DRIVER_INIT_MEMBER(triplhnt_state,triplhnt)
+void triplhnt_state::init_triplhnt()
 {
-	machine().device<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
+	subdevice<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }
 
 
@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
 
 WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
 {
-	output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -111,6 +111,12 @@ READ8_MEMBER(triplhnt_state::da_latch_r)
 	/* the following is a slight simplification */
 
 	return (offset & 1) ? cross_x : cross_y;
+}
+
+
+void triplhnt_state::machine_start()
+{
+	m_lamp.resolve();
 }
 
 
@@ -270,7 +276,7 @@ static const gfx_layout triplhnt_tile_layout =
 };
 
 
-static GFXDECODE_START( triplhnt )
+static GFXDECODE_START( gfx_triplhnt )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_small_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_large_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, triplhnt_tile_layout, 4, 2 )
@@ -321,20 +327,19 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triplhnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)  /* 2 channels */
 	MCFG_SAMPLES_NAMES(triplhnt_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(triplhnt)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, triplhnt_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -360,4 +365,4 @@ ROM_START( triplhnt )
 ROM_END
 
 
-GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, init_triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

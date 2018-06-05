@@ -93,4 +93,4 @@ ROM_START( vp60 )
 	ROM_LOAD( "195.kbd",    0x0000, 0x0400, CRC(14885da3) SHA1(3b06f658af1a62b28e62d8b3a557b74169917a12) )
 ROM_END
 
-COMP( 1982, vp60, 0, 0, vp60, vp60, vp60_state, 0, "ADDS", "Viewpoint 60", MACHINE_IS_SKELETON )
+COMP( 1982, vp60, 0, 0, vp60, vp60, vp60_state, empty_init, "ADDS", "Viewpoint 60", MACHINE_IS_SKELETON )

@@ -1004,8 +1004,8 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000) / 16, PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1081,7 +1081,7 @@ Copyright notice in rom states: Creative Electronics & Software Written by Keith
 ***************************************************************************/
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
 
 #define GALGAMES_BIOS_ROMS \
 	ROM_SYSTEM_BIOS( 0, "1.90",   "v1.90 12/01/98" ) \
@@ -1226,7 +1226,7 @@ ROM_START( galgame4 )
 ROM_END
 
 
-GAME( 1998, galgbios, 0,        galgbios, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 1998, galgame2, galgbios, galgame2, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
-GAME( 1998, galgame3, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
-GAME( 1998, galgame4, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 1998, galgame2, galgbios, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
+GAME( 1998, galgame3, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
+GAME( 1998, galgame4, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )

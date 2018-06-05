@@ -161,7 +161,7 @@ INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
 	m_discrete->write(space, SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);  // NAM - Noise Amplitude
 
 	if (m_nmion)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -334,7 +334,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( skydiver )
+static GFXDECODE_START( gfx_skydiver )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 4 )
 GFXDECODE_END
@@ -391,16 +391,15 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skydiver)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skydiver)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
 	MCFG_PALETTE_INIT_OWNER(skydiver_state, skydiver)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(skydiver)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, skydiver_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -435,4 +434,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL(1978, skydiver, 0, skydiver, skydiver, skydiver_state, 0, ROT0, "Atari", "Sky Diver", MACHINE_SUPPORTS_SAVE, layout_skydiver )
+GAMEL(1978, skydiver, 0, skydiver, skydiver, skydiver_state, empty_init, ROT0, "Atari", "Sky Diver", MACHINE_SUPPORTS_SAVE, layout_skydiver )

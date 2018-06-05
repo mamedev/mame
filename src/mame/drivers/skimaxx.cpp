@@ -47,14 +47,15 @@
 class skimaxx_state : public driver_device
 {
 public:
-	skimaxx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	skimaxx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_tms(*this, "tms"),
 		m_blitter_regs(*this, "blitter_regs"),
 		m_fpga_ctrl(*this, "fpga_ctrl"),
-		m_fg_buffer(*this, "fg_buffer") { }
+		m_fg_buffer(*this, "fg_buffer")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -412,7 +413,7 @@ static const gfx_layout texlayout =
 	texlayout_yoffset
 };
 
-static GFXDECODE_START( skimaxx )
+static GFXDECODE_START( gfx_skimaxx )
 	GFXDECODE_ENTRY( "blitter", 0, texlayout, 0, 1 )
 GFXDECODE_END
 
@@ -528,23 +529,24 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", skimaxx )
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skimaxx)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(4'000'000), PIN7_LOW)     // ?
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(4'000'000), okim6295_device::PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(4'000'000)/2, PIN7_HIGH)  // ?
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki3", XTAL(4'000'000), PIN7_LOW)     // ?
+	MCFG_DEVICE_ADD("oki3", OKIM6295, XTAL(4'000'000), okim6295_device::PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki4", XTAL(4'000'000)/2, PIN7_HIGH)  // ?
+	MCFG_DEVICE_ADD("oki4", OKIM6295, XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -604,4 +606,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, skimaxx, 0, skimaxx, skimaxx, skimaxx_state, 0, ROT0, "Kyle Hodgetts / ICE", "Skimaxx", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, skimaxx, 0, skimaxx, skimaxx, skimaxx_state, empty_init, ROT0, "Kyle Hodgetts / ICE", "Skimaxx", MACHINE_IMPERFECT_GRAPHICS )

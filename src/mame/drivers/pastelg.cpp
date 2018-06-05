@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(pastelg_state::pastelg)
 	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(pastelg_state::threeds)
 	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
@@ -565,6 +565,6 @@ ROM_END
 
 
 
-GAME( 1985, pastelg, 0,       pastelg, pastelg, pastelg_state, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, threeds, 0,       threeds, threeds, pastelg_state, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galds,   threeds, threeds, galds,   pastelg_state, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pastelg, 0,       pastelg, pastelg, pastelg_state, empty_init, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, threeds, 0,       threeds, threeds, pastelg_state, empty_init, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galds,   threeds, threeds, galds,   pastelg_state, empty_init, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

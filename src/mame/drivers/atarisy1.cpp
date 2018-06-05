@@ -695,7 +695,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarisy1 )
+static GFXDECODE_START( gfx_atarisy1 )
 	GFXDECODE_ENTRY( "alpha", 0x00000, anlayout,       0, 64 )
 GFXDECODE_END
 
@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
@@ -774,7 +774,8 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
@@ -878,10 +879,10 @@ MACHINE_CONFIG_END
 */
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1) | ROM_SKIP(1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios) | ROM_SKIP(1))
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define MOTHERBOARD_BIOS                                                                                                       \
 	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )                                                                     \
@@ -1912,7 +1913,11 @@ ROM_START( roadblstgu )
 	ROM_LOAD( "136048-1174.a7", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )//
 	ROM_LOAD( "136048-1173.a5", 0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )//
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 
@@ -2403,7 +2408,11 @@ ROM_START( roadblstcg )
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 
@@ -2486,7 +2495,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarisy1_state,marble)
+void atarisy1_state::init_marble()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2494,7 +2503,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
+void atarisy1_state::init_peterpak()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2502,7 +2511,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
+void atarisy1_state::init_indytemp()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2510,7 +2519,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
+void atarisy1_state::init_roadrunn()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2518,7 +2527,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,roadblst)
+void atarisy1_state::init_roadblst()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2533,35 +2542,35 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadblst)
  *
  *************************************/
 
-GAME( 1984, atarisy1,   0,        peterpak, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Atari System 1 BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1984, atarisy1,   0,        peterpak, peterpak, atarisy1_state, init_peterpak, ROT0, "Atari Games", "Atari System 1 BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1984, marble,     atarisy1, marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 1)", 0 )
-GAME( 1984, marble2,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 2)", 0 )
-GAME( 1984, marble3,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 3)", 0 )
-GAME( 1984, marble4,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 4)", 0 )
-GAME( 1984, marble5,    marble,   marble,   marble,   atarisy1_state, marble,   ROT0, "Atari Games", "Marble Madness (set 5 - LSI Cartridge)", 0 )
+GAME( 1984, marble,     atarisy1, marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 1)", 0 )
+GAME( 1984, marble2,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 2)", 0 )
+GAME( 1984, marble3,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 3)", 0 )
+GAME( 1984, marble4,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 4)", 0 )
+GAME( 1984, marble5,    marble,   marble,   marble,   atarisy1_state, init_marble,   ROT0, "Atari Games", "Marble Madness (set 5 - LSI Cartridge)", 0 )
 
-GAME( 1984, peterpak,   atarisy1, peterpak, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Peter Pack Rat", 0 )
+GAME( 1984, peterpak,   atarisy1, peterpak, peterpak, atarisy1_state, init_peterpak, ROT0, "Atari Games", "Peter Pack Rat", 0 )
 
-GAME( 1985, indytemp,   atarisy1, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 )
-GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
-GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
-GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
-GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
-GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, indytemp,   atarisy1, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 )
+GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
+GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
+GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
+GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
+GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
-GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
-GAME( 1985, roadrunn1,  roadrunn, roadrunn, roadrunn, atarisy1_state, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
+GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
+GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
+GAME( 1985, roadrunn1,  roadrunn, roadrunn, roadrunn, atarisy1_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
 
-GAME( 1987, roadblst,   atarisy1, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 4)", 0 )
-GAME( 1987, roadblstg,  roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 3)", 0 )
-GAME( 1987, roadblst3,  roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 3)", 0 )
-GAME( 1987, roadblstg2, roadblst, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 2)", 0 )
-GAME( 1987, roadblst2,  roadblst, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 2)", 0 )
-GAME( 1987, roadblstg1, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 1)", 0 )
-GAME( 1987, roadblst1,  roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 1)", 0 )
-GAME( 1987, roadblstc,  roadblst, roadb110, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
-GAME( 1987, roadblstcg, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1_state, roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
+GAME( 1987, roadblst,   atarisy1, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 4)", 0 )
+GAME( 1987, roadblstg,  roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 3)", 0 )
+GAME( 1987, roadblst3,  roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 3)", 0 )
+GAME( 1987, roadblstg2, roadblst, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 2)", 0 )
+GAME( 1987, roadblst2,  roadblst, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 2)", 0 )
+GAME( 1987, roadblstg1, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev 1)", 0 )
+GAME( 1987, roadblst1,  roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, rev 1)", 0 )
+GAME( 1987, roadblstc,  roadblst, roadb110, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
+GAME( 1987, roadblstcg, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )

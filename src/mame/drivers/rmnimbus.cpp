@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(4'433'619)*2,650,0,640,260,0,250)
+	MCFG_SCREEN_RAW_PARAMS(4.433619_MHz_XTAL * 2,650,0,640,260,0,250)
 	MCFG_SCREEN_UPDATE_DRIVER(rmnimbus_state, screen_update_nimbus)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
@@ -132,7 +132,7 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Backing storage */
-	MCFG_WD2793_ADD(FDC_TAG, 1000000)
+	MCFG_DEVICE_ADD(FDC_TAG, WD2793, 1000000)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, rmnimbus_state,nimbus_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, rmnimbus_state,nimbus_fdc_drq_w))
@@ -194,7 +194,7 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
+	SPEAKER(config, MONO_TAG).front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, rmnimbus_state, nimbus_sound_ay8910_porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, rmnimbus_state, nimbus_sound_ay8910_portb_w))
@@ -214,16 +214,16 @@ ROM_START( nimbus )
 	ROM_REGION( 0x100000, MAINCPU_TAG, 0 )
 
 	ROM_SYSTEM_BIOS(0, "v131a", "Nimbus BIOS v1.31a (1986-06-18)")
-	ROMX_LOAD("sys1-1.31a-16128-1986-06-18.rom", 0xf0001, 0x8000, CRC(6416eb05) SHA1(1b640163a7efbc24381c7b24976a8609c066959b),ROM_SKIP(1) | ROM_BIOS(1)  )
-	ROMX_LOAD("sys2-1.31a-16129-1986-06-18.rom", 0xf0000, 0x8000, CRC(b224359d) SHA1(456bbe37afcd4429cca76ba2d6bd534dfda3fc9c),ROM_SKIP(1) | ROM_BIOS(1)  )
+	ROMX_LOAD("sys1-1.31a-16128-1986-06-18.rom", 0xf0001, 0x8000, CRC(6416eb05) SHA1(1b640163a7efbc24381c7b24976a8609c066959b), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("sys2-1.31a-16129-1986-06-18.rom", 0xf0000, 0x8000, CRC(b224359d) SHA1(456bbe37afcd4429cca76ba2d6bd534dfda3fc9c), ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v132f", "Nimbus BIOS v1.32f (1989-10-20)")
-	ROMX_LOAD("sys-1-1.32f-22779-1989-10-20.rom", 0xf0001, 0x8000, CRC(786c31e8) SHA1(da7f828f7f96087518bea1a3d89fee59b283b4ba),ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD("sys-2-1.32f-22779-1989-10-20.rom", 0xf0000, 0x8000, CRC(0be3db64) SHA1(af806405ec6fbc20385705f90d5059a47de17b08),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD("sys-1-1.32f-22779-1989-10-20.rom", 0xf0001, 0x8000, CRC(786c31e8) SHA1(da7f828f7f96087518bea1a3d89fee59b283b4ba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("sys-2-1.32f-22779-1989-10-20.rom", 0xf0000, 0x8000, CRC(0be3db64) SHA1(af806405ec6fbc20385705f90d5059a47de17b08), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "v140d", "Nimbus BIOS v1.40d (1990-xx-xx)")
-	ROMX_LOAD("sys-1-1.40d.rom", 0xf0001, 0x8000, CRC(b8d3dc0b) SHA1(82e0dcdc6c7a83339af68d6cb61211fcb14bed88),ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD("sys-2-1.40d.rom", 0xf0000, 0x8000, CRC(b0826b0b) SHA1(3baa369a0e7ef138ca29aae0ee8a89ab670a02b9),ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD("sys-1-1.40d.rom", 0xf0001, 0x8000, CRC(b8d3dc0b) SHA1(82e0dcdc6c7a83339af68d6cb61211fcb14bed88), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("sys-2-1.40d.rom", 0xf0000, 0x8000, CRC(b0826b0b) SHA1(3baa369a0e7ef138ca29aae0ee8a89ab670a02b9), ROM_SKIP(1) | ROM_BIOS(2))
 
 	ROM_REGION( 0x4000, IOCPU_TAG, 0 )
 	ROM_LOAD("hexec-v1.02u-13488-1985-10-29.rom", 0x0000, 0x1000, CRC(75c6adfd) SHA1(0f11e0b7386c6368d20e1fc7a6196d670f924825))
@@ -232,5 +232,5 @@ ROM_START( nimbus )
 	ROM_LOAD("er59256", 0x00, 0x20, CRC(1a39de76) SHA1(0b6607f008dd92d6ab9af62b0b042fc3f5f4461c))
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY              FULLNAME  FLAGS
-COMP( 1986, nimbus,     0,      0,      nimbus,  nimbus, rmnimbus_state, 0,    "Research Machines", "Nimbus", 0)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS           INIT        COMPANY              FULLNAME  FLAGS
+COMP( 1986, nimbus, 0,      0,      nimbus,  nimbus, rmnimbus_state, empty_init, "Research Machines", "Nimbus", 0)

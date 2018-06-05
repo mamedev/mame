@@ -90,7 +90,7 @@ void skeetsht_state::video_start()
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(skeetsht_state::scanline_update)
 {
-	const rgb_t *const pens = m_tlc34076->get_pens();
+	const pen_t *const pens = m_tlc34076->pens();
 	uint16_t *vram = &m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
 	int coladdr = params->coladdr;
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -302,5 +302,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
-GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )
+GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, empty_init, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
+GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, empty_init, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )

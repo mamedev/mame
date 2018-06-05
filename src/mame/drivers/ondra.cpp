@@ -141,9 +141,8 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -185,6 +184,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE        INIT  COMPANY   FULLNAME       FLAGS
-COMP( 1989, ondrat, 0,      0,      ondra,      ondra, ondra_state, 0,    "Tesla",  "Ondra",       0 )
-COMP( 1989, ondrav, ondrat, 0,      ondra,      ondra, ondra_state, 0,    "ViLi",   "Ondra ViLi",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME      FLAGS
+COMP( 1989, ondrat, 0,      0,      ondra,   ondra, ondra_state, empty_init, "Tesla", "Ondra",      0 )
+COMP( 1989, ondrav, ondrat, 0,      ondra,   ondra, ondra_state, empty_init, "ViLi",  "Ondra ViLi", 0 )

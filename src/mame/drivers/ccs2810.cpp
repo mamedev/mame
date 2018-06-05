@@ -93,8 +93,8 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_DRIVER_INIT(ccs2810);
-	DECLARE_DRIVER_INIT(ccs2422);
+	void init_ccs2810();
+	void init_ccs2422();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(port04_r);
@@ -882,11 +882,11 @@ void ccs_state::machine_reset()
 	m_power_on_status = m_jump_en->read() | 8;
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
+void ccs_state::init_ccs2810()
 {
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
+void ccs_state::init_ccs2422()
 {
 }
 
@@ -905,7 +905,7 @@ static void ccs_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(ccs_state::ccs2810)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2810_io)
 
@@ -913,7 +913,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2810)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
+	MCFG_DEVICE_ADD("ins8250", INS8250, 1.8432_MHz_XTAL)
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -929,7 +929,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ccs_state::ccs2422)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2422_io)
 
@@ -937,7 +937,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
+	MCFG_DEVICE_ADD("ins8250", INS8250, 1.8432_MHz_XTAL)
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -950,7 +950,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("ins8250", ins8250_device, dsr_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_device, cts_w))
 
-	MCFG_MB8877_ADD("fdc", XTAL(16'000'000) / 8) // UB1793 or MB8877
+	MCFG_DEVICE_ADD("fdc", MB8877, 16_MHz_XTAL / 8) // UB1793 or MB8877
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
@@ -976,6 +976,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    CLASS       INIT       COMPANY                        FULLNAME                    FLAGS */
-COMP( 1980, ccs2810,  0,       0,       ccs2810,   ccs2810, ccs_state,  ccs2810,   "California Computer Systems", "CCS Model 2810 CPU card",  MACHINE_NO_SOUND_HW)
-COMP( 1980, ccs2422,  ccs2810, 0,       ccs2422,   ccs2810, ccs_state,  ccs2422,   "California Computer Systems", "CCS Model 2422B FDC card", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT    CLASS      INIT          COMPANY                        FULLNAME                    FLAGS */
+COMP( 1980, ccs2810, 0,       0,      ccs2810,  ccs2810, ccs_state, init_ccs2810, "California Computer Systems", "CCS Model 2810 CPU card",  MACHINE_NO_SOUND_HW)
+COMP( 1980, ccs2422, ccs2810, 0,      ccs2422,  ccs2810, ccs_state, init_ccs2422, "California Computer Systems", "CCS Model 2422B FDC card", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

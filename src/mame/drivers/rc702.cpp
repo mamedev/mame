@@ -22,7 +22,7 @@ Issues:
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/7474.h"
 #include "machine/am9517a.h"
 #include "machine/clock.h"
@@ -57,7 +57,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(rc702);
+	void init_rc702();
 	DECLARE_MACHINE_RESET(rc702);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
@@ -243,7 +243,7 @@ static const rgb_t our_palette[3] = {
 	rgb_t(0xff, 0xb4, 0x00), // on
 };
 
-DRIVER_INIT_MEMBER( rc702_state, rc702 )
+void rc702_state::init_rc702()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -403,11 +403,11 @@ MACHINE_CONFIG_END
 ROM_START( rc702 )
 	ROM_REGION( 0x10800, "maincpu", 0 )
 		ROM_SYSTEM_BIOS(0, "rc700", "RC700")
-		ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(1))
+		ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(0))
 		ROM_SYSTEM_BIOS(1, "rc702", "RC702")
-		ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(2))
+		ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(1))
 		ROM_SYSTEM_BIOS(2, "rc703", "RC703")
-		ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(3))
+		ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(2))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 		ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
@@ -416,5 +416,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT     CLASS            INIT    COMPANY            FULLNAME         FLAGS
-COMP( 1979, rc702,     0,       0,      rc702,      rc702,    rc702_state,     rc702,  "Regnecentralen",  "RC702 Piccolo", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME         FLAGS
+COMP( 1979, rc702, 0,      0,      rc702,   rc702, rc702_state, init_rc702, "Regnecentralen", "RC702 Piccolo", MACHINE_NOT_WORKING )

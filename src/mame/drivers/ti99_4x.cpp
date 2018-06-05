@@ -86,7 +86,11 @@ public:
 		m_datamux(*this, TI99_DATAMUX_TAG),
 		m_video(*this, TI_VDP_TAG),
 		m_cassette1(*this, "cassette"),
-		m_cassette2(*this, "cassette2")
+		m_cassette2(*this, "cassette2"),
+		m_keyboard(*this, "COL%u", 0U),
+		m_alpha(*this, "ALPHA"),
+		m_alpha1(*this, "ALPHA1"),
+		m_alphabug(*this, "ALPHABUG")
 	{ }
 
 	// Machine management
@@ -183,6 +187,11 @@ private:
 	optional_device<tms9928a_device>    m_video;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+
+	optional_ioport_array<6> m_keyboard;
+	optional_ioport m_alpha;
+	optional_ioport m_alpha1;
+	optional_ioport m_alphabug;
 
 	// Timer for EVPC (provided by the TMS9929A, but EVPC replaces that VDP)
 	emu_timer   *m_gromclk_timer;
@@ -458,8 +467,6 @@ WRITE8_MEMBER( ti99_4x_state::external_operation )
 ***************************************************************************/
 
 
-static const char *const column[] = { "COL0", "COL1", "COL2", "COL3", "COL4", "COL5" };
-
 READ8_MEMBER( ti99_4x_state::read_by_9901 )
 {
 	int answer=0;
@@ -486,15 +493,15 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 			// the line enough to make the TMS9901 sense the low level.
 			// A reported, feasible fix was to cut the line and insert a diode
 			// below the Alphalock key.
-			if ((m_model!=MODEL_4) && (ioport("ALPHABUG")->read()!=0) ) answer |= (ioport("ALPHA")->read() | ioport("ALPHA1")->read());
+			if ((m_model!=MODEL_4) && (m_alphabug->read()!=0) ) answer |= (m_alpha->read() | m_alpha1->read());
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		if (m_check_alphalock)  // never true for TI-99/4
 		{
-			answer &= ~(ioport("ALPHA")->read() | ioport("ALPHA1")->read());
+			answer &= ~(m_alpha->read() | m_alpha1->read());
 		}
 		answer = (answer << 3);
 		if (m_int1 == CLEAR_LINE) answer |= 0x02;
@@ -505,7 +512,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 	case tms9901_device::INT8_INT15:
 		// |1|1|1|INT12|0|K|K|K|
 		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
-		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
+		else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
 		answer |= 0xe0;
 		if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
 		break;
@@ -890,18 +897,17 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	SPEAKER(config, "sound_out").front_center();
 	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_sound) )
 
 	// Cassette drives
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM devices
 	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
@@ -1009,18 +1015,17 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	SPEAKER(config, "sound_out").front_center();
 	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_sound) )
 
 	// Cassette drives
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM devices
 	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
@@ -1172,12 +1177,11 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Cassette drives
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM devices
 	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
@@ -1260,10 +1264,10 @@ ROM_START(ti99_4ev)
 	ROM_LOAD("994a_grom2.u502", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE        INPUT    CLASS          INIT  COMPANY             FULLNAME                            FLAGS
-COMP( 1979, ti99_4,   0,        0,     ti99_4_60hz,   ti99_4,  ti99_4x_state, 0,   "Texas Instruments", "TI-99/4 Home Computer (US)",       MACHINE_SUPPORTS_SAVE)
-COMP( 1980, ti99_4e,  ti99_4,   0,     ti99_4_50hz,   ti99_4,  ti99_4x_state, 0,   "Texas Instruments", "TI-99/4 Home Computer (Europe)",   MACHINE_SUPPORTS_SAVE)
-COMP( 1981, ti99_4a,  0,        0,     ti99_4a_60hz,  ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer (US)",      MACHINE_SUPPORTS_SAVE)
-COMP( 1981, ti99_4ae, ti99_4a,  0,     ti99_4a_50hz,  ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer (Europe)",  MACHINE_SUPPORTS_SAVE)
-COMP( 1983, ti99_4qi, ti99_4a,  0,     ti99_4qi_60hz, ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4QI Home Computer (US)",     MACHINE_SUPPORTS_SAVE)
-COMP( 1994, ti99_4ev, ti99_4a,  0,     ti99_4ev_60hz, ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer with EVPC", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME      PARENT   COMPAT  MACHINE        INPUT    CLASS          INIT        COMPANY              FULLNAME                            FLAGS
+COMP( 1979, ti99_4,   0,       0,      ti99_4_60hz,   ti99_4,  ti99_4x_state, empty_init, "Texas Instruments", "TI-99/4 Home Computer (US)",       MACHINE_SUPPORTS_SAVE)
+COMP( 1980, ti99_4e,  ti99_4,  0,      ti99_4_50hz,   ti99_4,  ti99_4x_state, empty_init, "Texas Instruments", "TI-99/4 Home Computer (Europe)",   MACHINE_SUPPORTS_SAVE)
+COMP( 1981, ti99_4a,  0,       0,      ti99_4a_60hz,  ti99_4a, ti99_4x_state, empty_init, "Texas Instruments", "TI-99/4A Home Computer (US)",      MACHINE_SUPPORTS_SAVE)
+COMP( 1981, ti99_4ae, ti99_4a, 0,      ti99_4a_50hz,  ti99_4a, ti99_4x_state, empty_init, "Texas Instruments", "TI-99/4A Home Computer (Europe)",  MACHINE_SUPPORTS_SAVE)
+COMP( 1983, ti99_4qi, ti99_4a, 0,      ti99_4qi_60hz, ti99_4a, ti99_4x_state, empty_init, "Texas Instruments", "TI-99/4QI Home Computer (US)",     MACHINE_SUPPORTS_SAVE)
+COMP( 1994, ti99_4ev, ti99_4a, 0,      ti99_4ev_60hz, ti99_4a, ti99_4x_state, empty_init, "Texas Instruments", "TI-99/4A Home Computer with EVPC", MACHINE_SUPPORTS_SAVE)

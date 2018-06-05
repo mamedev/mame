@@ -108,7 +108,7 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		output().set_led_value(0, data & 0x08);
+		m_led = BIT(data, 3);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
@@ -300,6 +300,7 @@ INPUT_PORTS_END
 
 void overdriv_state::machine_start()
 {
+	m_led.resolve();
 	m_objdma_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
 
 	save_item(NAME(m_cpuB_ctrl));
@@ -380,7 +381,8 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	MCFG_K053252_OFFSETS(13*8, 2*8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
@@ -519,6 +521,6 @@ ROM_START( overdrivb )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
 
-GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
-GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
-GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
+GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?

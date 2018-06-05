@@ -302,7 +302,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( warpspeed )
+static GFXDECODE_START( gfx_warpspeed )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1  )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 1  )
 GFXDECODE_END
@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(warpspeed_state::warpspeed)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warpspeed)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warpspeed)
 	MCFG_PALETTE_ADD("palette", 2+8)
 	MCFG_PALETTE_INIT_OWNER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_END
@@ -378,4 +378,4 @@ ROM_START( warpsped )
 ROM_END
 
 
-GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, 0, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.
+GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, empty_init, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.

@@ -172,7 +172,7 @@ void magtouch_state::machine_start()
 {
 	m_rombank->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	m_rombank->set_entry(0);
-	machine().device<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
 }
 
 static void magtouch_isa8_cards(device_slot_interface &device)
@@ -252,4 +252,4 @@ ROM_START(magtouch)
 	ROM_FILL(0x511ba, 1, 0xeb) // skip csum
 ROM_END
 
-GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, 0, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, magtouch, 0, magtouch, magtouch, magtouch_state, empty_init, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )

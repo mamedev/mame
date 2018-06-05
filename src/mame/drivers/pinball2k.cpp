@@ -40,6 +40,7 @@ public:
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
+		m_ramdac(*this, "ramdac"),
 		m_palette(*this, "palette") { }
 
 	required_shared_ptr<uint32_t> m_main_ram;
@@ -48,6 +49,7 @@ public:
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	required_device<ramdac_device> m_ramdac;
 	required_device<palette_device> m_palette;
 	uint8_t m_pal[768];
 
@@ -88,7 +90,7 @@ public:
 	DECLARE_WRITE32_MEMBER(port400_w);
 	DECLARE_READ32_MEMBER(port800_r);
 	DECLARE_WRITE32_MEMBER(port800_w);
-	DECLARE_DRIVER_INIT(pinball2k);
+	void init_pinball2k();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -342,8 +344,6 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
-		ramdac_device *ramdac = machine().device<ramdac_device>("ramdac");
-
 		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
 			// guess: crtc params?
@@ -352,7 +352,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			m_pal_index = data;
-			ramdac->index_w( space, 0, data );
+			m_ramdac->index_w( space, 0, data );
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
@@ -362,7 +362,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 			{
 				m_pal_index = 0;
 			}
-			ramdac->pal_w( space, 0, data );
+			m_ramdac->pal_w( space, 0, data );
 		}
 	}
 	else
@@ -516,12 +516,12 @@ static const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA )
-/* Support up to four CGA fonts */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout, 0, 256 )   /* Font 0 */
-	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout, 0, 256 )   /* Font 1 */
-	GFXDECODE_ENTRY( "gfx1", 0x1000, CGA_charlayout, 0, 256 )   /* Font 2 */
-	GFXDECODE_ENTRY( "gfx1", 0x1800, CGA_charlayout, 0, 256 )   /* Font 3*/
+static GFXDECODE_START( gfx_cga )
+	// Support up to four CGA fonts
+	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout, 0, 256 )   // Font 0
+	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout, 0, 256 )   // Font 1
+	GFXDECODE_ENTRY( "gfx1", 0x1000, CGA_charlayout, 0, 256 )   // Font 2
+	GFXDECODE_ENTRY( "gfx1", 0x1800, CGA_charlayout, 0, 256 )   // Font 3
 GFXDECODE_END
 
 static INPUT_PORTS_START(mediagx)
@@ -622,11 +622,12 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pinball2k_state, screen_update_mediagx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 
@@ -635,7 +636,7 @@ void pinball2k_state::init_mediagx()
 	m_frame_width = m_frame_height = 1;
 }
 
-DRIVER_INIT_MEMBER(pinball2k_state, pinball2k)
+void pinball2k_state::init_pinball2k()
 {
 	init_mediagx();
 }
@@ -702,6 +703,6 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
-GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
-GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )

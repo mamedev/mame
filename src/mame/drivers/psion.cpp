@@ -32,7 +32,7 @@
 TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {
 	if (m_enable_nmi)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 uint8_t psion_state::kb_read()
@@ -565,7 +565,7 @@ static const gfx_layout psion_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( psion )
+static GFXDECODE_START( gfx_psion )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, psion_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -586,13 +586,13 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -687,118 +687,118 @@ MACHINE_CONFIG_END
 ROM_START( psion1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "Organiser I")
-	ROMX_LOAD( "psion1.rom",  0xf000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(1))
+	ROMX_LOAD( "psion1.rom",  0xf000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(0))
 ROM_END
 
 ROM_START( psioncm )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v24", "CM v2.4")
-	ROMX_LOAD( "24-cm.dat",    0x8000, 0x8000,  CRC(f6798394) SHA1(736997f0db9a9ee50d6785636bdc3f8ff1c33c66), ROM_BIOS(1))
+	ROMX_LOAD("24-cm.dat",    0x8000, 0x8000,  CRC(f6798394) SHA1(736997f0db9a9ee50d6785636bdc3f8ff1c33c66), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v26", "CM v2.6")
-	ROMX_LOAD( "26-cm.rom",    0x8000, 0x8000,  CRC(21b7c94c) SHA1(e0a3168c96a3f0b37b8698e86574e40597fe3c62), ROM_BIOS(2))
+	ROMX_LOAD("26-cm.rom",    0x8000, 0x8000,  CRC(21b7c94c) SHA1(e0a3168c96a3f0b37b8698e86574e40597fe3c62), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v33", "CM v3.3")
-	ROMX_LOAD( "33-cm.rom",    0x8000, 0x8000,  CRC(5c10b167) SHA1(6deea00fe648bddae1d61a22858023bc80277ea0), ROM_BIOS(3))
+	ROMX_LOAD("33-cm.rom",    0x8000, 0x8000,  CRC(5c10b167) SHA1(6deea00fe648bddae1d61a22858023bc80277ea0), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v33f","CM v3.3 French")
-	ROMX_LOAD( "33-cmf.rom",   0x8000, 0x8000,  CRC(4d626ce2) SHA1(82b96f11a0abfc1931b6022b84733d975ad7ab2b), ROM_BIOS(4))
+	ROMX_LOAD("33-cmf.rom",   0x8000, 0x8000,  CRC(4d626ce2) SHA1(82b96f11a0abfc1931b6022b84733d975ad7ab2b), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "v36f","CM v3.6 French")
-	ROMX_LOAD( "36-cmf.rom",   0x8000, 0x8000,  CRC(beabe0f5) SHA1(a5ef3bb92190a257cb0e94d58b2c23935436edeb), ROM_BIOS(5))
+	ROMX_LOAD("36-cmf.rom",   0x8000, 0x8000,  CRC(beabe0f5) SHA1(a5ef3bb92190a257cb0e94d58b2c23935436edeb), ROM_BIOS(4))
 ROM_END
 
 ROM_START( psionxp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v26", "XP v2.6")
-	ROMX_LOAD( "26-xp.rom",    0x8000, 0x8000,  CRC(a81db40f) SHA1(af72d94ccee1fa1dade8776bdbd39920665a68b7), ROM_BIOS(1) )
+	ROMX_LOAD( "26-xp.rom",    0x8000, 0x8000,  CRC(a81db40f) SHA1(af72d94ccee1fa1dade8776bdbd39920665a68b7), ROM_BIOS(0) )
 ROM_END
 
 ROM_START( psionla )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v33", "LA v3.3")
-	ROMX_LOAD( "33-la.dat",    0x8000, 0x8000,  CRC(02668ed4) SHA1(e5d4ee6b1cde310a2970ffcc6f29a0ce09b08c46), ROM_BIOS(1))
+	ROMX_LOAD("33-la.dat",    0x8000, 0x8000,  CRC(02668ed4) SHA1(e5d4ee6b1cde310a2970ffcc6f29a0ce09b08c46), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v34g", "LA v3.4 German")
-	ROMX_LOAD( "34-lag.rom",   0x8000, 0x8000,  CRC(13a92c4b) SHA1(dab8bd6a41a5fd509c5ad4b0b0ab80d14f2c421a), ROM_BIOS(2))
+	ROMX_LOAD("34-lag.rom",   0x8000, 0x8000,  CRC(13a92c4b) SHA1(dab8bd6a41a5fd509c5ad4b0b0ab80d14f2c421a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v36", "LA v3.6")
-	ROMX_LOAD( "36-la.rom",    0x8000, 0x8000,  CRC(7442c7f6) SHA1(94f15bd06bd750be70fa4a4ab588237c5a703f65), ROM_BIOS(3))
+	ROMX_LOAD("36-la.rom",    0x8000, 0x8000,  CRC(7442c7f6) SHA1(94f15bd06bd750be70fa4a4ab588237c5a703f65), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v30", "LA v3.0")
-	ROMX_LOAD( "30-lahp.rom",    0x8000, 0x8000,  CRC(50192528) SHA1(c556d53f70bf5ecae756b2ebfc6d954912316bbe), ROM_BIOS(4))
+	ROMX_LOAD("30-lahp.rom",    0x8000, 0x8000,  CRC(50192528) SHA1(c556d53f70bf5ecae756b2ebfc6d954912316bbe), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "v36f", "LA v3.6 French")
-	ROMX_LOAD( "36-laf.rom",    0x8000, 0x8000, CRC(036ef00e) SHA1(98f303273e570e94a1e25a58cf1ffcec0db32165), ROM_BIOS(5))
+	ROMX_LOAD("36-laf.rom",    0x8000, 0x8000, CRC(036ef00e) SHA1(98f303273e570e94a1e25a58cf1ffcec0db32165), ROM_BIOS(4))
 ROM_END
 
 ROM_START( psionp200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v33", "POS200a v3.3")
-	ROMX_LOAD( "33-p200a.rom", 0x8000, 0x8000, CRC(91e94998) SHA1(e9e8106eb9283d20452697859894aa407cc07bd1), ROM_BIOS(1))
+	ROMX_LOAD("33-p200a.rom", 0x8000, 0x8000, CRC(91e94998) SHA1(e9e8106eb9283d20452697859894aa407cc07bd1), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v36", "POS200 v3.6")
-	ROMX_LOAD( "36-p200.rom",  0x8000, 0x8000, CRC(4569ef5b) SHA1(8c275474cc6e3f50156f0b6e32121cadd14ea8be), ROM_BIOS(2))
+	ROMX_LOAD("36-p200.rom",  0x8000, 0x8000, CRC(4569ef5b) SHA1(8c275474cc6e3f50156f0b6e32121cadd14ea8be), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v36a", "POS200a v3.6")
-	ROMX_LOAD( "36-p200a.rom", 0x8000, 0x8000, CRC(36cceeb7) SHA1(57069812c5a16babfff91dc7d7e0842e5dc68652), ROM_BIOS(3))
+	ROMX_LOAD("36-p200a.rom", 0x8000, 0x8000, CRC(36cceeb7) SHA1(57069812c5a16babfff91dc7d7e0842e5dc68652), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v36b", "POS250 v3.6")
-	ROMX_LOAD( "36-p250.rom",  0x8000, 0x8000, CRC(235cc76a) SHA1(3229cdff4b049a1fbf9a758ce3abf3fdc9b547c9), ROM_BIOS(4))
+	ROMX_LOAD("36-p250.rom",  0x8000, 0x8000, CRC(235cc76a) SHA1(3229cdff4b049a1fbf9a758ce3abf3fdc9b547c9), ROM_BIOS(3))
 ROM_END
 
 ROM_START( psionp350 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v36", "POS350 v3.6")
-	ROMX_LOAD( "36-p350.dat",  0x8000, 0x8000,  CRC(3a371a74) SHA1(9167210b2c0c3bd196afc08ca44ab23e4e62635e), ROM_BIOS(1))
+	ROMX_LOAD("36-p350.dat",  0x8000, 0x8000,  CRC(3a371a74) SHA1(9167210b2c0c3bd196afc08ca44ab23e4e62635e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v38", "POS350 v3.8")
-	ROMX_LOAD( "38-p350.dat",  0x8000, 0x8000,  CRC(1b8b082f) SHA1(a3e875a59860e344f304a831148a7980f28eaa4a), ROM_BIOS(2))
+	ROMX_LOAD("38-p350.dat",  0x8000, 0x8000,  CRC(1b8b082f) SHA1(a3e875a59860e344f304a831148a7980f28eaa4a), ROM_BIOS(1))
 ROM_END
 
 ROM_START( psionlam )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v37", "LA v3.7")
-	ROMX_LOAD( "37-lam.dat",   0x8000, 0x10000, CRC(7ee3a1bc) SHA1(c7fbd6c8e47c9b7d5f636e9f56e911b363d6796b), ROM_BIOS(1))
+	ROMX_LOAD("37-lam.dat",   0x8000, 0x10000, CRC(7ee3a1bc) SHA1(c7fbd6c8e47c9b7d5f636e9f56e911b363d6796b), ROM_BIOS(0))
 ROM_END
 
 ROM_START( psionlz64 )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v44", "LZ64 v4.4")
-	ROMX_LOAD( "44-lz64.dat",  0x8000, 0x10000, CRC(aa487913) SHA1(5a44390f63fc8c1bc94299ab2eb291bc3a5b989a), ROM_BIOS(1))
+	ROMX_LOAD("44-lz64.dat",  0x8000, 0x10000, CRC(aa487913) SHA1(5a44390f63fc8c1bc94299ab2eb291bc3a5b989a), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v46si", "LZ64 v4.6 Spanish / Italian")
-	ROMX_LOAD( "46-lz64i.rom", 0x8000, 0x10000, CRC(c96c7e65) SHA1(1b4af43657bbd3ecd92f370762bde166047b85e2), ROM_BIOS(2))
+	ROMX_LOAD("46-lz64i.rom", 0x8000, 0x10000, CRC(c96c7e65) SHA1(1b4af43657bbd3ecd92f370762bde166047b85e2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v43", "LZ64 v4.3")
-	ROMX_LOAD( "43-lz64.rom",  0x8000, 0x10000, CRC(57e7a372) SHA1(46c2da1cfe991c0c1f2486e4aa28388767937ddd), ROM_BIOS(3))
+	ROMX_LOAD("43-lz64.rom",  0x8000, 0x10000, CRC(57e7a372) SHA1(46c2da1cfe991c0c1f2486e4aa28388767937ddd), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v46a", "LZ64 v4.6a")
-	ROMX_LOAD( "46a-lz64.rom", 0x8000, 0x10000, CRC(9b0d5a7a) SHA1(f1cdd6ef43cd65ef18e148deca0500f0c1ad2f80), ROM_BIOS(4))
+	ROMX_LOAD("46a-lz64.rom", 0x8000, 0x10000, CRC(9b0d5a7a) SHA1(f1cdd6ef43cd65ef18e148deca0500f0c1ad2f80), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "v46b", "LZ64 v4.6b")
-	ROMX_LOAD( "46b-lz64.rom", 0x8000, 0x10000, CRC(8d1101e2) SHA1(eddd0c3a2881667a1485b0d66f82f8c7792995c2), ROM_BIOS(5))
+	ROMX_LOAD("46b-lz64.rom", 0x8000, 0x10000, CRC(8d1101e2) SHA1(eddd0c3a2881667a1485b0d66f82f8c7792995c2), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "v45", "LZ64 v4.5")
-	ROMX_LOAD( "45-lz64.rom",  0x8000, 0x10000, CRC(4fbd5d88) SHA1(43f97549d2060840aa6313d526000530f384a08f), ROM_BIOS(6))
+	ROMX_LOAD("45-lz64.rom",  0x8000, 0x10000, CRC(4fbd5d88) SHA1(43f97549d2060840aa6313d526000530f384a08f), ROM_BIOS(5))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
-	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
+	ROM_LOAD("psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
 ROM_END
 
 ROM_START( psionlz64s )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v46", "LZ64 v4.6")
-	ROMX_LOAD( "46-lz64s.dat", 0x8000, 0x10000, CRC(328d9772) SHA1(7f9e2d591d59ecfb0822d7067c2fe59542ea16dd), ROM_BIOS(1))
+	ROMX_LOAD("46-lz64s.dat", 0x8000, 0x10000, CRC(328d9772) SHA1(7f9e2d591d59ecfb0822d7067c2fe59542ea16dd), ROM_BIOS(0))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
-	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
+	ROM_LOAD("psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
 ROM_END
 
 ROM_START( psionlz )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v46", "LZ v4.6")
-	ROMX_LOAD( "46-lz.dat",    0x8000, 0x10000, CRC(22715f48) SHA1(cf460c81cadb53eddb7afd8dadecbe8c38ea3fc2), ROM_BIOS(1))
+	ROMX_LOAD("46-lz.dat",    0x8000, 0x10000, CRC(22715f48) SHA1(cf460c81cadb53eddb7afd8dadecbe8c38ea3fc2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v42", "LZ v4.2")
-	ROMX_LOAD( "42-lz.rom",    0x8000, 0x10000, CRC(f2d6ad47) SHA1(ee8315ae872463068d805c6e0b71f62ae8eb65be), ROM_BIOS(2))
+	ROMX_LOAD("42-lz.rom",    0x8000, 0x10000, CRC(f2d6ad47) SHA1(ee8315ae872463068d805c6e0b71f62ae8eb65be), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v44", "LZ v4.4")
-	ROMX_LOAD( "44-lz.rom",    0x8000, 0x10000, CRC(4a0a990b) SHA1(dde0ba69a4a7f02b610ad6bd69a8b8552b060223), ROM_BIOS(3))
+	ROMX_LOAD("44-lz.rom",    0x8000, 0x10000, CRC(4a0a990b) SHA1(dde0ba69a4a7f02b610ad6bd69a8b8552b060223), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v45", "LZ v4.5")
-	ROMX_LOAD( "45-lz.rom",    0x8000, 0x10000, CRC(f95d8f39) SHA1(cb64152c2418bf730c89999d1b13c1d1ada1f082), ROM_BIOS(4))
+	ROMX_LOAD("45-lz.rom",    0x8000, 0x10000, CRC(f95d8f39) SHA1(cb64152c2418bf730c89999d1b13c1d1ada1f082), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "v45s", "LZ v4.5S")
-	ROMX_LOAD( "45-lzs.rom",   0x8000, 0x10000, CRC(2d082d7f) SHA1(fcd00864a0cc617e61997240945ea70a8e9fa211), ROM_BIOS(5))
+	ROMX_LOAD("45-lzs.rom",   0x8000, 0x10000, CRC(2d082d7f) SHA1(fcd00864a0cc617e61997240945ea70a8e9fa211), ROM_BIOS(4))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
-	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
+	ROM_LOAD("psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
 ROM_END
 
 ROM_START( psionp464 )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v46", "POS464 v4.6")
-	ROMX_LOAD( "46-p464.dat",  0x8000, 0x10000, CRC(672a0945) SHA1(d2a6e3fe1019d1bd7ae4725e33a0b9973f8cd7d8), ROM_BIOS(1))
+	ROMX_LOAD( "46-p464.dat",  0x8000, 0x10000, CRC(672a0945) SHA1(d2a6e3fe1019d1bd7ae4725e33a0b9973f8cd7d8), ROM_BIOS(0))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
 	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
@@ -806,15 +806,15 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE    INPUT   STATE          INIT  COMPANY   FULLNAME               FLAGS
-COMP( 1984, psion1,     0,       0,      psion1,    psion1, psion1_state,  0,    "Psion",  "Organiser I",         MACHINE_NOT_WORKING )
-COMP( 1986, psioncm,    0,       0,      psioncm,   psion,  psion_state,   0,    "Psion",  "Organiser II CM",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionla,    psioncm, 0,      psionla,   psion,  psion_state,   0,    "Psion",  "Organiser II LA",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionxp,    psioncm, 0,      psionla,   psion,  psion_state,   0,    "Psion",  "Organiser II XP",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionp200,  psioncm, 0,      psionp350, psion,  psion_state,   0,    "Psion",  "Organiser II P200",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionp350,  psioncm, 0,      psionp350, psion,  psion_state,   0,    "Psion",  "Organiser II P350",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, psionlam,   psioncm, 0,      psionlam,  psion,  psion_state,   0,    "Psion",  "Organiser II LAM",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionlz,    0,       0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II LZ",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionlz64,  psionlz, 0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II LZ64",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionlz64s, psionlz, 0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II LZ64S",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, psionp464,  psionlz, 0,      psionlz,   psion,  psion_state,   0,    "Psion",  "Organiser II P464",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE    INPUT   CLASS         INIT        COMPANY  FULLNAME              FLAGS
+COMP( 1984, psion1,     0,       0,      psion1,    psion1, psion1_state, empty_init, "Psion", "Organiser I",        MACHINE_NOT_WORKING )
+COMP( 1986, psioncm,    0,       0,      psioncm,   psion,  psion_state,  empty_init, "Psion", "Organiser II CM",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionla,    psioncm, 0,      psionla,   psion,  psion_state,  empty_init, "Psion", "Organiser II LA",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionxp,    psioncm, 0,      psionla,   psion,  psion_state,  empty_init, "Psion", "Organiser II XP",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionp200,  psioncm, 0,      psionp350, psion,  psion_state,  empty_init, "Psion", "Organiser II P200",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionp350,  psioncm, 0,      psionp350, psion,  psion_state,  empty_init, "Psion", "Organiser II P350",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, psionlam,   psioncm, 0,      psionlam,  psion,  psion_state,  empty_init, "Psion", "Organiser II LAM",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionlz,    0,       0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II LZ",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionlz64,  psionlz, 0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II LZ64",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionlz64s, psionlz, 0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II LZ64S", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1989, psionp464,  psionlz, 0,      psionlz,   psion,  psion_state,  empty_init, "Psion", "Organiser II P464",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

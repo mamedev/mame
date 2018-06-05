@@ -45,7 +45,7 @@ WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
 		m_blank = 0;
 		m_frameswap = false;
 		m_status = 0;
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	m_ctrl = data;
 }
@@ -185,7 +185,7 @@ void decodmd_type1_device::set_busy(uint8_t input, uint8_t val)
 
 TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
 {
-	m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void decodmd_type1_device::decodmd1_map(address_map &map)

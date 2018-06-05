@@ -901,13 +901,13 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(MOS7501_TAG, M7501, 0)
 	MCFG_DEVICE_PROGRAM_MAP(plus4_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M7501_PORT_CALLBACKS(READ8(*this, plus4_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
 
 	// video and sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, 0, ted_videoram_map, WRITELINE(*this, plus4_state, ted_irq_w), READ8(*this, plus4_state, ted_k_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1159,11 +1159,11 @@ ROM_START( plus4 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
-	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
+	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
+	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(2) ) // first half contains R5 kernal
 
 	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1186,11 +1186,11 @@ ROM_START( plus4p )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u24", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u24", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u24", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u24", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u24", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u24", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0x8000, "function", 0 )
 	ROM_LOAD( "317053-01.u25", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
@@ -1209,11 +1209,11 @@ ROM_START( c16 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
-	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
+	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
+	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(2) ) // first half contains R5 kernal
 
 	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1232,11 +1232,11 @@ ROM_START( c16p )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1253,9 +1253,9 @@ ROM_START( c16_hu )
 
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(2) )
+	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(1) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1272,11 +1272,11 @@ ROM_START( c116 )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u101", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1288,13 +1288,13 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE       INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1984, c264,   0,      0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 264 (Prototype)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c232,   c264,   0,      c232,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 232 (Prototype)",    MACHINE_SUPPORTS_SAVE )
-COMP( 1984, v364,   c264,   0,      v364,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore V364 (Prototype)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4,  c264,   0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (NTSC)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4p, c264,   0,      plus4p, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (PAL)",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16,    c264,   0,      c16n,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (NTSC)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16p,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (PAL)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16_hu, c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (Hungary)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c116,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 116",                MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME                      FLAGS
+COMP( 1984, c264,   0,      0,      plus4n,  plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore 264 (Prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c232,   c264,   0,      c232,    plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore 232 (Prototype)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, v364,   c264,   0,      v364,    plus4, c16_state, empty_init, "Commodore Business Machines", "Commodore V364 (Prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4,  c264,   0,      plus4n,  plus4, c16_state, empty_init, "Commodore Business Machines", "Plus/4 (NTSC)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4p, c264,   0,      plus4p,  plus4, c16_state, empty_init, "Commodore Business Machines", "Plus/4 (PAL)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16,    c264,   0,      c16n,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (NTSC)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16p,   c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (PAL)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16_hu, c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 16 (Hungary)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c116,   c264,   0,      c16p,    c16,   c16_state, empty_init, "Commodore Business Machines", "Commodore 116",              MACHINE_SUPPORTS_SAVE )

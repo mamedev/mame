@@ -44,61 +44,34 @@ class dmv_state : public driver_device
 {
 public:
 	dmv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_screen(*this, "screen"),
-			m_hgdc(*this, "upd7220"),
-			m_dmac(*this, "dma8237"),
-			m_pit(*this, "pit8253"),
-			m_fdc(*this, "i8272"),
-			m_floppy0(*this, "i8272:0"),
-			m_floppy1(*this, "i8272:1"),
-			m_keyboard(*this, "keyboard"),
-			m_speaker(*this, "speaker"),
-			m_video_ram(*this, "video_ram"),
-			m_palette(*this, "palette"),
-			m_ram(*this, "ram"),
-			m_bootrom(*this, "boot"),
-			m_chargen(*this, "chargen"),
-			m_slot1(*this, "slot1"),
-			m_slot2(*this, "slot2"),
-			m_slot2a(*this, "slot2a"),
-			m_slot3(*this, "slot3"),
-			m_slot4(*this, "slot4"),
-			m_slot5(*this, "slot5"),
-			m_slot6(*this, "slot6"),
-			m_slot7(*this, "slot7"),
-			m_slot7a(*this, "slot7a")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_hgdc(*this, "upd7220")
+		, m_dmac(*this, "dma8237")
+		, m_pit(*this, "pit8253")
+		, m_fdc(*this, "i8272")
+		, m_floppy0(*this, "i8272:0")
+		, m_floppy1(*this, "i8272:1")
+		, m_keyboard(*this, "keyboard")
+		, m_speaker(*this, "speaker")
+		, m_video_ram(*this, "video_ram")
+		, m_palette(*this, "palette")
+		, m_ram(*this, "ram")
+		, m_bootrom(*this, "boot")
+		, m_chargen(*this, "chargen")
+		, m_slot1(*this, "slot1")
+		, m_slot2(*this, "slot2")
+		, m_slot2a(*this, "slot2a")
+		, m_slot3(*this, "slot3")
+		, m_slot4(*this, "slot4")
+		, m_slot5(*this, "slot5")
+		, m_slot6(*this, "slot6")
+		, m_slot7(*this, "slot7")
+		, m_slot7a(*this, "slot7a")
+		, m_leds(*this, "led%u", 1U)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<upd7220_device> m_hgdc;
-	required_device<am9517a_device> m_dmac;
-	required_device<pit8253_device> m_pit;
-	required_device<i8272a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<dmv_keyboard_device> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<uint16_t> m_video_ram;
-	required_device<palette_device> m_palette;
-	required_memory_region m_ram;
-	required_memory_region m_bootrom;
-	required_memory_region m_chargen;
-
-	required_device<dmvcart_slot_device> m_slot1;
-	required_device<dmvcart_slot_device> m_slot2;
-	required_device<dmvcart_slot_device> m_slot2a;
-	required_device<dmvcart_slot_device> m_slot3;
-	required_device<dmvcart_slot_device> m_slot4;
-	required_device<dmvcart_slot_device> m_slot5;
-	required_device<dmvcart_slot_device> m_slot6;
-	required_device<dmvcart_slot_device> m_slot7;
-	required_device<dmvcart_slot_device> m_slot7a;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void update_halt_line();
 
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -168,6 +141,43 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void dmv(machine_config &config);
+	void dmv_io(address_map &map);
+	void dmv_mem(address_map &map);
+	void upd7220_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<upd7220_device> m_hgdc;
+	required_device<am9517a_device> m_dmac;
+	required_device<pit8253_device> m_pit;
+	required_device<i8272a_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<dmv_keyboard_device> m_keyboard;
+	required_device<speaker_sound_device> m_speaker;
+	required_shared_ptr<uint16_t> m_video_ram;
+	required_device<palette_device> m_palette;
+	required_memory_region m_ram;
+	required_memory_region m_bootrom;
+	required_memory_region m_chargen;
+
+	required_device<dmvcart_slot_device> m_slot1;
+	required_device<dmvcart_slot_device> m_slot2;
+	required_device<dmvcart_slot_device> m_slot2a;
+	required_device<dmvcart_slot_device> m_slot3;
+	required_device<dmvcart_slot_device> m_slot4;
+	required_device<dmvcart_slot_device> m_slot5;
+	required_device<dmvcart_slot_device> m_slot6;
+	required_device<dmvcart_slot_device> m_slot7;
+	required_device<dmvcart_slot_device> m_slot7a;
+	output_finder<8> m_leds;
+
 	bool        m_ramoutdis;
 	int         m_switch16;
 	int         m_thold7;
@@ -180,10 +190,6 @@ public:
 	int         m_floppy_motor;
 	int         m_busint[8];
 	int         m_irqs[8];
-	void dmv(machine_config &config);
-	void dmv_io(address_map &map);
-	void dmv_mem(address_map &map);
-	void upd7220_map(address_map &map);
 };
 
 WRITE8_MEMBER(dmv_state::tc_set_w)
@@ -214,7 +220,7 @@ WRITE8_MEMBER(dmv_state::leds_w)
 	*/
 
 	for(int i=0; i<8; i++)
-		output().set_led_value(8-i, BIT(data, i));
+		m_leds[7-i] = BIT(data, i);
 }
 
 READ8_MEMBER(dmv_state::ramsel_r)
@@ -618,6 +624,7 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
+	m_leds.resolve();
 }
 
 void dmv_state::machine_reset()
@@ -663,7 +670,7 @@ static const gfx_layout dmv_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dmv )
+static GFXDECODE_START( gfx_dmv )
 	GFXDECODE_ENTRY("chargen", 0x0000, dmv_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -788,7 +795,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmv)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
@@ -826,7 +833,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, dmv_state, timint_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -885,18 +892,18 @@ ROM_START( dmv )
 	ROM_SYSTEM_BIOS(3, "m06", "M.06.00")    // Mono machine
 	ROM_SYSTEM_BIOS(4, "m05", "M.05.00")    // Mono machine, marked "updated"
 
-	ROMX_LOAD( "dmv_mb_rom_33610.bin", 0x00000,    0x02000,    CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964), ROM_BIOS(1) )
-	ROMX_LOAD( "dmv_mb_rom_32838.bin", 0x00000,    0x02000,    CRC(d5ceb559) SHA1(e3a05e43aa1b09f0a857b8d54b00bcd321215bf6), ROM_BIOS(2) )
-	ROMX_LOAD( "dmv_mb_rom_33609.bin", 0x00000,    0x02000,    CRC(120951b6) SHA1(57bef9cc6379dea5730bc1477e8896508e00a349), ROM_BIOS(3) )
-	ROMX_LOAD( "dmv_mb_rom_32676.bin", 0x00000,    0x02000,    CRC(7796519e) SHA1(8d5dd9c1e66c96fcca271b6f673d6a0e784acb33), ROM_BIOS(4) )
-	ROMX_LOAD( "dmv_mb_rom_32664.bin", 0x00000,    0x02000,    CRC(6624610e) SHA1(e9226be897d2c5f875784ab77dad8807f14c7714), ROM_BIOS(5) )
+	ROMX_LOAD( "dmv_mb_rom_33610.bin", 0x00000,    0x02000,    CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964), ROM_BIOS(0) )
+	ROMX_LOAD( "dmv_mb_rom_32838.bin", 0x00000,    0x02000,    CRC(d5ceb559) SHA1(e3a05e43aa1b09f0a857b8d54b00bcd321215bf6), ROM_BIOS(1) )
+	ROMX_LOAD( "dmv_mb_rom_33609.bin", 0x00000,    0x02000,    CRC(120951b6) SHA1(57bef9cc6379dea5730bc1477e8896508e00a349), ROM_BIOS(2) )
+	ROMX_LOAD( "dmv_mb_rom_32676.bin", 0x00000,    0x02000,    CRC(7796519e) SHA1(8d5dd9c1e66c96fcca271b6f673d6a0e784acb33), ROM_BIOS(3) )
+	ROMX_LOAD( "dmv_mb_rom_32664.bin", 0x00000,    0x02000,    CRC(6624610e) SHA1(e9226be897d2c5f875784ab77dad8807f14c7714), ROM_BIOS(4) )
 
 	ROM_REGION(0x400, "kb_ctrl_mcu", 0)
+	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(0) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(1) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(2) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(3) )
-	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(4) )
-	ROMX_LOAD( "dmv_mb_8741_32121.bin",    0x00000,    0x00400,    CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775), ROM_BIOS(5) )
+	ROMX_LOAD( "dmv_mb_8741_32121.bin",    0x00000,    0x00400,    CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775), ROM_BIOS(4) )
 
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD( "76161.bin",    0x00000,    0x00800,  CRC(6e4df4f9) SHA1(20ff4fc48e55eaf5131f6573fff93e7f97d2f45d)) // same for both color and monochrome board
@@ -906,5 +913,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  STATE      INIT   COMPANY  FULLNAME             FLAGS
-COMP( 1984, dmv,    0,      0,       dmv,     dmv,   dmv_state, 0,     "NCR",   "Decision Mate V",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME           FLAGS
+COMP( 1984, dmv,  0,      0,      dmv,     dmv,   dmv_state, empty_init, "NCR",   "Decision Mate V", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -819,7 +819,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -845,5 +845,5 @@ ROM_START( clcd )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                        FULLNAME           FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd,  clcd_state,  0,     "Commodore Business Machines", "LCD (Prototype)", 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                        FULLNAME           FLAGS */
+COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (Prototype)", 0 )

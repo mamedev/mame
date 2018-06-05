@@ -80,7 +80,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s11);
-	DECLARE_DRIVER_INIT(s11);
+	void init_s11();
 	void s11(machine_config &config);
 	void s11_audio_map(address_map &map);
 	void s11_bg_map(address_map &map);

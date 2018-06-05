@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(wico_state::wico)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -474,4 +474,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

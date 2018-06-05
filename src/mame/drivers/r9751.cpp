@@ -111,7 +111,7 @@ public:
 	DECLARE_READ8_MEMBER(pdc_dma_r);
 	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 
-	DECLARE_DRIVER_INIT(r9751);
+	void init_r9751();
 
 	void r9751(machine_config &config);
 	void r9751_mem(address_map &map);
@@ -227,7 +227,7 @@ WRITE8_MEMBER(r9751_state::pdc_dma_w)
 	if(TRACE_DMA) logerror("DMA WRITE: %08X DATA: %08X\n", address,data);
 }
 
-DRIVER_INIT_MEMBER(r9751_state,r9751)
+void r9751_state::init_r9751()
 {
 	reg_ff050004 = 0;
 	reg_fff80040 = 0;
@@ -675,10 +675,10 @@ MACHINE_CONFIG_END
 ROM_START(r9751)
 	ROM_REGION32_BE(0x00010000, "prom", 0)
 	ROM_SYSTEM_BIOS(0, "prom34",  "PROM Version 3.4")
-	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__=49fe7a=__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27512 @Unknown
+	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__=49fe7a=__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(0) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27512 @Unknown
 
 	ROM_SYSTEM_BIOS(1, "prom42", "PROM Version 4.2")
-	ROMX_LOAD( "98d5731__zebra_v4.2__4cd79d.u5", 0x0000, 0x10000, CRC(e640f8df) SHA1(a9e4fa271d7f2f3a134e2120932ec088d5b8b007), ROM_GROUPWORD | ROM_BIOS(2) ) // Label: 98D5731 // ZEBRA V4.2 // 4CD79D 27512 @Unknown
+	ROMX_LOAD( "98d5731__zebra_v4.2__4cd79d.u5", 0x0000, 0x10000, CRC(e640f8df) SHA1(a9e4fa271d7f2f3a134e2120932ec088d5b8b007), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: 98D5731 // ZEBRA V4.2 // 4CD79D 27512 @Unknown
 ROM_END
 
 
@@ -687,5 +687,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT      COMPAT  MACHINE  INPUT  STATE        INIT      COMPANY                 FULLNAME              FLAGS
-COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,    "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY               FULLNAME              FLAGS
+COMP( 1988, r9751, 0,      0,      r9751,   r9751, r9751_state, init_r9751, "ROLM Systems, Inc.", "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

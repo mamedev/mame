@@ -359,7 +359,7 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 
 	MCFG_DEFAULT_LAYOUT(layout_rz1)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("upd934g_c", UPD934G, 1333000)
 	MCFG_UPD934G_DATA_CB(READ8(*this, rz1_state, upd934g_c_data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -392,5 +392,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME  FLAGS
-CONS( 1986, rz1,  0,      0,       rz1,     rz1,   rz1_state, 0,   "Casio",  "RZ-1",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS
+CONS( 1986, rz1,  0,      0,      rz1,     rz1,   rz1_state, empty_init, "Casio", "RZ-1",   MACHINE_SUPPORTS_SAVE )

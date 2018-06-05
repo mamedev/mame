@@ -195,7 +195,7 @@ static const gfx_layout motionlayout =
 };
 
 
-static GFXDECODE_START( bsktball )
+static GFXDECODE_START( gfx_bsktball )
 	GFXDECODE_ENTRY( "gfx1", 0x0600, charlayout,   0x00, 0x02 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, motionlayout, 0x08, 0x40 )
 GFXDECODE_END
@@ -264,16 +264,15 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bsktball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bsktball)
 	MCFG_PALETTE_ADD("palette", 2*4 + 4*4*4*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(bsktball)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bsktball_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -305,4 +304,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, 0, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, empty_init, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )

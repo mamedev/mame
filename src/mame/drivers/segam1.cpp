@@ -375,9 +375,9 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 	MCFG_MB8421_INTL_HANDLER(INPUTLINE("m1comm", 0))
 
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
-	MCFG_S24MIXER_DEVICE_ADD("mixer")
+	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD("mixer", S24MIXER, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	MCFG_PALETTE_ADD("palette", 8192*2)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -438,5 +438,5 @@ ROM_START( unkm1 ) // 1992.01.31 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
-GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state,    0, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, bingpty,    0,        segam1,    segam1, segam1_state, empty_init, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING )
+GAME( 1992, unkm1,      0,        unkm1,     segam1, segam1_state, empty_init, ROT0,  "Sega", "unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

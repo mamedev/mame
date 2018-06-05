@@ -15,8 +15,8 @@
 
 #define g65816_read_8(addr)             m_data_space->read_byte(addr)
 #define g65816_write_8(addr,data)       m_data_space->write_byte(addr,data)
-#define g65816_read_8_immediate(A)      m_program_direct->read_byte(A)
-#define g65816_read_8_opcode(A)         m_opcode_direct->read_byte(A)
+#define g65816_read_8_immediate(A)      m_program_cache->read_byte(A)
+#define g65816_read_8_opcode(A)         m_opcode_cache->read_byte(A)
 #define g65816_jumping(A)
 #define g65816_branching(A)
 

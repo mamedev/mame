@@ -464,7 +464,7 @@ READ_LINE_MEMBER( vip_state::ef1_r )
 
 READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	output().set_led_value(LED_TAPE, m_cassette->input() > 0);
+	m_leds[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
@@ -485,7 +485,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	m_beeper->write(machine().dummy_space(), NODE_01, state);
 
 	// Q led
-	output().set_led_value(LED_Q, state);
+	m_leds[LED_Q] = state ? 1 : 0;
 
 	// tape output
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -556,7 +556,7 @@ static const discrete_555_desc vip_ca555_a =
 	DEFAULT_555_VALUES
 };
 
-static DISCRETE_SOUND_START( vip )
+static DISCRETE_SOUND_START( vip_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, (int) RES_M(1), (int) CAP_P(470), NODE_01, &vip_ca555_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
@@ -621,8 +621,10 @@ void vip_state::machine_start()
 		ram[addr] = machine().rand() & 0xff;
 	}
 
+	m_leds.resolve();
+
 	// turn on power LED
-	output().set_led_value(LED_POWER, 1);
+	m_leds[LED_POWER] = 1;
 
 	// reset sound
 	m_beeper->write(machine().dummy_space(), NODE_01, 0);
@@ -737,10 +739,9 @@ MACHINE_CONFIG_START(vip_state::vip)
 	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(vip)
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vip_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, nullptr, WRITELINE(*this, vip_state, byteio_inst_w))
@@ -811,6 +812,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                FLAGS
-COMP( 1977, vip,    0,      0,      vip,     vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
-COMP( 1977, vp111,  vip,    0,      vp111,   vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                FLAGS
+COMP( 1977, vip,   0,      0,      vip,     vip,   vip_state, empty_init, "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+COMP( 1977, vp111, vip,    0,      vp111,   vip,   vip_state, empty_init, "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )

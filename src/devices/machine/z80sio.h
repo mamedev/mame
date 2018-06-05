@@ -57,7 +57,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS

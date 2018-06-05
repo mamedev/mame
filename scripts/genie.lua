@@ -1031,7 +1031,7 @@ end
 				buildoptions {
 					"-Wno-format-overflow", -- try machine/bfm_sc45_helper.cpp in GCC 8.0.1, among others
 					"-Wno-stringop-truncation", -- ImGui again
-					"-Wno-stringop-overflow",	-- formats/victor9k_dsk.cpp bugs the compiler
+					"-Wno-stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
 				}
 				buildoptions_cpp {
 					"-Wno-class-memaccess", -- many instances in ImGui and BGFX

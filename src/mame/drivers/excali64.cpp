@@ -447,7 +447,7 @@ static const gfx_layout excali64_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( excali64 )
+static GFXDECODE_START( gfx_excali64 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, excali64_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -551,7 +551,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 
 MACHINE_CONFIG_START(excali64_state::excali64)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
@@ -562,24 +562,22 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000) / 16) /* Timer 0: tone gen for speaker */
+	MCFG_PIT8253_CLK0(16_MHz_XTAL / 16) /* Timer 0: tone gen for speaker */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
-	//MCFG_PIT8253_CLK1(XTAL(16'000'000) / 16) /* Timer 1: baud rate gen for 8251 */
+	//MCFG_PIT8253_CLK1(16_MHz_XTAL / 16) /* Timer 1: baud rate gen for 8251 */
 	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, excali64_state, write_uart_clock))
-	//MCFG_PIT8253_CLK2(XTAL(16'000'000) / 16) /* Timer 2: not used */
+	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 16) /* Timer 2: not used */
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write)) // parallel port
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, excali64_state, ppib_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, excali64_state, ppic_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, excali64_state, ppic_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -590,8 +588,8 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 40)
 	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excali64)
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(16'000'000) / 16) // 1MHz for lowres; 2MHz for highres
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excali64)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 16_MHz_XTAL / 16) // 1MHz for lowres; 2MHz for highres
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(excali64_state, update_row)
@@ -601,14 +599,14 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("dma", Z80DMA, 16_MHz_XTAL / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, excali64_state, busreq_w))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, excali64_state, memory_read_byte))
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, excali64_state, memory_write_byte))
@@ -652,5 +650,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS           INIT  COMPANY          FULLNAME        FLAGS
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, excali64_state, 0,    "BGR Computers", "Excalibur 64", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME        FLAGS
+COMP( 1984, excali64, 0,      0,      excali64, excali64, excali64_state, empty_init, "BGR Computers", "Excalibur 64", 0 )

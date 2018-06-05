@@ -116,8 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	int m_rom_pagesize;
-	DECLARE_DRIVER_INIT(touryuu);
-	DECLARE_DRIVER_INIT(bballoon);
+	void init_touryuu();
+	void init_bballoon();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
@@ -269,7 +269,6 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	#endif
@@ -294,7 +293,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	#endif
@@ -329,7 +327,6 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 {
 	struct nand_t &nand = m_nand;
-//  device_t *nand = machine().device( "nand");
 	uint8_t data = 0;
 	switch (nand.mode)
 	{
@@ -375,7 +372,6 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 
 WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
 {
-//  device_t *nand = machine().device( "nand");
 	#if NAND_LOG
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 	#endif
@@ -637,7 +633,8 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 //  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, nullptr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
@@ -755,16 +752,16 @@ ROM_START( touryuu )
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
 
-DRIVER_INIT_MEMBER(ghosteo_state,bballoon)
+void ghosteo_state::init_bballoon()
 {
 	m_rom_pagesize = 0x200; // extra data is missing from the FLASH dumps and needs to be simulated
 }
 
-DRIVER_INIT_MEMBER(ghosteo_state,touryuu)
+void ghosteo_state::init_touryuu()
 {
 	m_rom_pagesize = 0x210;
 }
 
-GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
-GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )
-GAME( 2005, touryuu,  0, touryuu,  touryuu,  ghosteo_state, touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom
+GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, touryuu,  0, touryuu,  touryuu,  ghosteo_state, init_touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom

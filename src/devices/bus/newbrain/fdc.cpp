@@ -49,9 +49,9 @@ ROM_START( newbrain_fdc )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("issue2")
 	ROM_SYSTEM_BIOS( 0, "issue1", "Issue 1" )
-	ROMX_LOAD( "d417-1.rom", 0x0000, 0x2000, CRC(40fad31c) SHA1(5137be4cc026972c0ffd4fa6990e8583bdfce163), ROM_BIOS(1) )
+	ROMX_LOAD( "d417-1.rom", 0x0000, 0x2000, CRC(40fad31c) SHA1(5137be4cc026972c0ffd4fa6990e8583bdfce163), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "issue2", "Issue 2" )
-	ROMX_LOAD( "d417-2.rom", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c), ROM_BIOS(2) )
+	ROMX_LOAD( "d417-2.rom", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c), ROM_BIOS(1) )
 ROM_END
 
 

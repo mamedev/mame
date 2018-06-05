@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(starshp1_state::mux_w)
 
 WRITE_LINE_MEMBER(starshp1_state::led_w)
 {
-	output().set_led_value(0, !state);
+	m_led = state ? 0 : 1;
 }
 
 
@@ -175,6 +175,12 @@ void starshp1_state::starshp1_map(address_map &map)
 	map(0xde00, 0xde07).mirror(0x0008).w("audiolatch", FUNC(f9334_device::write_d0));
 	map(0xdf00, 0xdf0f).w(this, FUNC(starshp1_state::starshp1_analog_out_w));
 	map(0xf000, 0xffff).rom();
+}
+
+
+void starshp1_state::machine_start()
+{
+	m_led.resolve();
 }
 
 
@@ -281,7 +287,7 @@ static const gfx_layout shiplayout =
 };
 
 
-static GFXDECODE_START( starshp1 )
+static GFXDECODE_START( gfx_starshp1 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 2, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0, shiplayout,   6, 2 )
@@ -315,16 +321,15 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, starshp1_state, screen_vblank_starshp1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starshp1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starshp1)
 	MCFG_PALETTE_ADD("palette", 19)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(starshp1_state, starshp1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(starshp1)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, starshp1_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("audiolatch", F9334, 0) // D9
@@ -407,5 +412,5 @@ ROM_START( starshpp )
 ROM_END
 
 
-GAME( 1977, starshp1, 0,        starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
-GAME( 1977, starshpp, starshp1, starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshp1, 0,        starshp1, starshp1, starshp1_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshpp, starshp1, starshp1, starshp1, starshp1_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )

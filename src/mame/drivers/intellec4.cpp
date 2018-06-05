@@ -846,19 +846,19 @@ MACHINE_CONFIG_START(intellec4_state::intellec4)
 	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE(m_cpu, mcs40_cpu_device_base::AS_RAM_PORTS)
 	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(*this, intellec4_state, bus_reset_4002))
 	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(*this, intellec4_state, bus_user_reset))
-	MCFG_DEVICE_ADD("j7",  INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm4_90")
-	MCFG_DEVICE_ADD("j8",  INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm6_26")
-	MCFG_DEVICE_ADD("j9",  INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j10", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j11", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j12", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j13", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j14", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j15", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j16", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j17", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j18", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j19", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
+	INTELLEC4_UNIV_SLOT(config, "j7",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm4_90");
+	INTELLEC4_UNIV_SLOT(config, "j8",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm6_26");
+	INTELLEC4_UNIV_SLOT(config, "j9",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j10", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j11", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j12", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j13", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j14", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j15", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j16", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j17", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j18", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j19", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
 MACHINE_CONFIG_END
 
 
@@ -1434,25 +1434,25 @@ ROM_START(intlc44)
 	ROM_REGION(0x0400, "monitor", 0) // 4 * 1702A
 	ROM_DEFAULT_BIOS("v2.1")
 	ROM_SYSTEM_BIOS(0, "v2.1", "MON 4 V2.1")
-	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(1))
+	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(0))
 ROM_END
 
 ROM_START(intlc440)
 	ROM_REGION(0x0400, "monitor", 0) // 4 * 1702A
 	ROM_DEFAULT_BIOS("v2.1")
 	ROM_SYSTEM_BIOS(0, "v2.1", "MON 4 V2.1")
-	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(1))
-	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(1))
+	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-100-v_2.1.a2",      0x0100, 0x0100, CRC(66562a4f) SHA1(040749c45e95dfc39b3397d0c31c8b4c11f0a5fc), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-200-v_2.1.a3",      0x0200, 0x0100, CRC(fe039c68) SHA1(1801cfcc7514412865c0fdc7d1800fcf583a2d2a), ROM_BIOS(0))
+	ROMX_LOAD("mon_4-300-v_2.1.a4",      0x0300, 0x0100, CRC(3724d5af) SHA1(b764b3bb3541fbda875f7a7655f46aa54b332631), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2.1_1200", "MON 4 V2.1 1200 Baud hack")
-	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(2))
-	ROMX_LOAD("i40_mon-1.a2",            0x0100, 0x0100, CRC(cd9fecd6) SHA1(9c4fb85118c881687fd4b324e5089df05d1e63d1), ROM_BIOS(2))
-	ROMX_LOAD("i40_mon-2.a3",            0x0200, 0x0100, CRC(037de128) SHA1(3694636e1f4e23688b36ea9ee755a0c5888f4328), ROM_BIOS(2))
-	ROMX_LOAD("1200_baud-i40_mon-f3.a4", 0x0300, 0x0100, CRC(f3198d79) SHA1(b7903073b69f487b6f78842c08694f12225d85f0), ROM_BIOS(2))
+	ROMX_LOAD("mon_4-000-v_2.1.a1",      0x0000, 0x0100, CRC(8d1f56ff) SHA1(96bc19be9be4e92195fad82d7a3cadb763ab6e3f), ROM_BIOS(1))
+	ROMX_LOAD("i40_mon-1.a2",            0x0100, 0x0100, CRC(cd9fecd6) SHA1(9c4fb85118c881687fd4b324e5089df05d1e63d1), ROM_BIOS(1))
+	ROMX_LOAD("i40_mon-2.a3",            0x0200, 0x0100, CRC(037de128) SHA1(3694636e1f4e23688b36ea9ee755a0c5888f4328), ROM_BIOS(1))
+	ROMX_LOAD("1200_baud-i40_mon-f3.a4", 0x0300, 0x0100, CRC(f3198d79) SHA1(b7903073b69f487b6f78842c08694f12225d85f0), ROM_BIOS(1))
 ROM_END
 
 } // anonymous namespace
@@ -1462,6 +1462,6 @@ ROM_END
     Machine definitions
 ***********************************************************************/
 
-//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT  STATE        INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1973?, intlc44,  0,      0,      mod4,     mod4,  mod4_state,  0,    "Intel", "INTELLEC 4/MOD 4",  MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
-COMP( 1974?, intlc440, 0,      0,      mod40,    mod40, mod40_state, 0,    "Intel", "INTELLEC 4/MOD 40", MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1973?, intlc44,  0,      0,      mod4,    mod4,  mod4_state,  empty_init, "Intel", "INTELLEC 4/MOD 4",  MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
+COMP( 1974?, intlc440, 0,      0,      mod40,   mod40, mod40_state, empty_init, "Intel", "INTELLEC 4/MOD 40", MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )

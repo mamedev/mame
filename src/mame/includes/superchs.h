@@ -33,7 +33,7 @@ public:
 
 	void superchs(machine_config &config);
 	void chase3(machine_config &config);
-	DECLARE_DRIVER_INIT(superchs);
+	void init_superchs();
 
 protected:
 	virtual void video_start() override;

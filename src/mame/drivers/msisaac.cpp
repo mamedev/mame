@@ -29,7 +29,7 @@ TO DO:
 TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_pending_nmi = 1;
 }
@@ -50,7 +50,7 @@ WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_pending_nmi = 0;
 	}
 }
@@ -399,7 +399,7 @@ static const gfx_layout tile_layout =
 	32*8
 };
 
-static GFXDECODE_START( msisaac )
+static GFXDECODE_START( gfx_msisaac )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 64 )
@@ -473,13 +473,13 @@ MACHINE_CONFIG_START(msisaac_state::msisaac)
 	MCFG_SCREEN_UPDATE_DRIVER(msisaac_state, screen_update_msisaac)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msisaac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msisaac)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_TA7630_ADD("ta7630")
@@ -544,4 +544,4 @@ ROM_START( msisaac )
 ROM_END
 
 
-GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

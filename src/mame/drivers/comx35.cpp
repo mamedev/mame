@@ -704,9 +704,9 @@ ROM_START( comx35p )
 	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic100" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
-	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(1) )
+	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic101", "COMX BASIC V1.01" )
-	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(2) )
+	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(1) )
 ROM_END
 
 
@@ -722,6 +722,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1983, comx35p,    0,      0,      pal,        comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (PAL)",    MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (NTSC)",   MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME          FLAGS
+COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_IMPERFECT_SOUND )

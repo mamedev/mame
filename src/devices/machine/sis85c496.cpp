@@ -88,7 +88,7 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, sis85c496_host_device, pc_dack7_w))
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, sis85c496_host_device, cpu_int_w))
 	MCFG_PIC8259_IN_SP_CB(VCC)
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, sis85c496_host_device, get_slave_ack))
 
@@ -97,8 +97,8 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
+	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE(*this, sis85c496_host_device, cpu_reset_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE(*this, sis85c496_host_device, cpu_a20_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("pic8259_master", pic8259_device, ir1_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
 	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
@@ -112,7 +112,7 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -120,7 +120,7 @@ MACHINE_CONFIG_END
 
 sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, SIS85C496, tag, owner, clock),
-	m_maincpu(*this, ":maincpu"),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_pic8259_master(*this, "pic8259_master"),
 	m_pic8259_slave(*this, "pic8259_slave"),
 	m_dma8237_1(*this, "dma8237_1"),
@@ -134,9 +134,9 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 {
 }
 
-void sis85c496_host_device::set_cpu_tag(const char *_cpu_tag)
+void sis85c496_host_device::set_cpu_tag(const char *cpu_tag)
 {
-	cpu_tag = _cpu_tag;
+	m_maincpu.set_tag(cpu_tag);
 }
 
 void sis85c496_host_device::set_ram_size(int _ram_size)
@@ -148,9 +148,8 @@ void sis85c496_host_device::device_start()
 {
 	pci_host_device::device_start();
 
-	cpu = machine().device<cpu_device>(cpu_tag);
-	memory_space = &cpu->space(AS_PROGRAM);
-	io_space = &cpu->space(AS_IO);
+	memory_space = &m_maincpu->space(AS_PROGRAM);
+	io_space = &m_maincpu->space(AS_IO);
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;
@@ -581,6 +580,21 @@ WRITE8_MEMBER( sis85c496_host_device::write_rtc )
 	else {
 		m_ds12885->write(space,offset,data);
 	}
+}
+
+WRITE_LINE_MEMBER(sis85c496_host_device::cpu_int_w)
+{
+	m_maincpu->set_input_line(0, state);
+}
+
+WRITE_LINE_MEMBER(sis85c496_host_device::cpu_a20_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_A20, state);
+}
+
+WRITE_LINE_MEMBER(sis85c496_host_device::cpu_reset_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
 /*

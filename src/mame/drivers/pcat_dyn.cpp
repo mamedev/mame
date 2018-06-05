@@ -69,7 +69,7 @@ void pcat_dyn_state::machine_start()
 {
 	m_prgbank->configure_entries(0, 256, memregion("game_prg")->base(), 0x1000);
 	m_nvram_bank->configure_entries(0, 2, &m_nvram_mem[0], 0x1000);
-	machine().device<nvram_device>("nvram")->set_base(&m_nvram_mem[0], 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram_mem[0], 0x2000);
 }
 
 void pcat_dyn_state::nvram_init(nvram_device &nvram, void *base, size_t size)
@@ -274,5 +274,5 @@ ROM_START(toursol1)
 ROM_END
 
 
-GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn_state, 0, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, toursol1, toursol, pcat_dyn, pcat_dyn, pcat_dyn_state, 0, ROT0, "Dynamo", "Tournament Solitaire (V1.04, 06/22/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn_state, empty_init, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, toursol1, toursol, pcat_dyn, pcat_dyn, pcat_dyn_state, empty_init, ROT0, "Dynamo", "Tournament Solitaire (V1.04, 06/22/95)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

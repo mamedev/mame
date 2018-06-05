@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(mjsister_state::mjsister)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MCLK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -567,4 +567,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, mjsister, 0, mjsister, mjsister, mjsister_state, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mjsister, 0, mjsister, mjsister, mjsister_state, empty_init, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )

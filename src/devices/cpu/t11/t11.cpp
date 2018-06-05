@@ -78,7 +78,7 @@ device_memory_interface::space_config_vector t11_device::memory_space_config() c
 int t11_device::ROPCODE()
 {
 	PC &= 0xfffe;
-	int val = m_direct->read_word(PC);
+	int val = m_cache->read_word(PC);
 	PC += 2;
 	return val;
 }
@@ -261,7 +261,7 @@ void t11_device::device_start()
 
 	m_initial_pc = initial_pc[c_initial_mode >> 13];
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	m_out_reset_func.resolve_safe();
 
 	save_item(NAME(m_ppc.w.l));

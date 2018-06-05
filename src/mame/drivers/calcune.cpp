@@ -4,8 +4,8 @@
 
     Calcune (Japan, prototype)
 
-    CPUs are HD68HC000CP8 and TMP84C00AU-6 QFP types. Other ICs include two
-    Sega 315-5560-02 VDPs and a YMZ280B-F for sound.
+    CPUs are HD68HC000CP8 and TMPZ84C00AU-6 QFP types. Other ICs include
+    two Sega 315-5660-02 VDPs and a YMZ280B-F for sound.
 
     Oscillators: 53.693MHz (OSC1), 16.9444 (XL1), 14.318 (XL3).
 
@@ -46,7 +46,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	DECLARE_DRIVER_INIT(calcune);
+	void init_calcune();
 
 	DECLARE_READ16_MEMBER(cal_700000_r);
 	DECLARE_WRITE16_MEMBER(cal_770000_w);
@@ -293,7 +293,8 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -305,7 +306,7 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(calcune_state,calcune)
+void calcune_state::init_calcune()
 {
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(false);
@@ -334,4 +335,4 @@ ROM_END
 
 
 
-GAME( 1996, calcune,  0,        calcune,   calcune,     calcune_state, calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )
+GAME( 1996, calcune, 0, calcune, calcune, calcune_state, init_calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )

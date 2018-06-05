@@ -81,10 +81,10 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(tvboy_mem)
-	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tvboy_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tvboy_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, tvboy_state, a2600_tia_vsync_callback_pal))
@@ -95,7 +95,7 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
@@ -154,6 +154,6 @@ ROM_START( stvboy )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE        INIT  COMPANY    FULLNAME
-CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
-CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY    FULLNAME
+CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )

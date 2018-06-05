@@ -396,7 +396,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( nsmpoker )
+static GFXDECODE_START( gfx_nsmpoker )
 	GFXDECODE_ENTRY( "maincpu", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "maincpu", 0, tilelayout, 0, 16 )
 GFXDECODE_END
@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nsmpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nsmpoker)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(nsmpoker_state, nsmpoker)
@@ -464,5 +464,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY   FULLNAME               FLAGS
-GAME( 198?, nsmpoker, 0,      nsmpoker, nsmpoker, nsmpoker_state, 0,    ROT0, "NSM",    "NSM Poker (TMS9995)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME               FLAGS
+GAME( 198?, nsmpoker, 0,      nsmpoker, nsmpoker, nsmpoker_state, empty_init, ROT0, "NSM",    "NSM Poker (TMS9995)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

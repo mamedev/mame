@@ -55,7 +55,7 @@ public:
 
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	DECLARE_DRIVER_INIT(gizmondo);
+	void init_gizmondo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
@@ -181,7 +181,7 @@ void gizmondo_state::gizmondo_map(address_map &map)
     MACHINE DRIVERS
 *******************************************************************************/
 
-DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
+void gizmondo_state::init_gizmondo()
 {
 	// do nothing
 }
@@ -248,7 +248,7 @@ INPUT_PORTS_END
 ROM_START( gizmondo )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "fboot", "fboot" )
-	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(1) )
+	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(0) )
 ROM_END
 
-CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, init_gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -30,12 +30,12 @@ private:
 	required_device<dac_word_interface> m_rdac;
 	required_device<dac_word_interface> m_ldac;
 	uint16_t m_count;
+	uint16_t m_curcount;
 	uint16_t m_sample[2];
 	uint8_t m_index[2]; // unknown indexed registers, volume?
 	uint8_t m_data[2][16];
 	uint8_t m_mode;
-	uint8_t m_stat;
-	uint8_t m_dmalen;
+	uint8_t m_ctrl;
 	unsigned int m_sample_byte;
 	unsigned int m_samples;
 	emu_timer *m_pcm;
@@ -63,29 +63,26 @@ void vis_audio_device::device_start()
 
 void vis_audio_device::device_reset()
 {
-	m_count = 0xffff;
+	m_count = 0;
+	m_curcount = 0;
 	m_sample_byte = 0;
 	m_samples = 0;
 	m_mode = 0;
 	m_index[0] = m_index[1] = 0;
-	m_stat = 0;
 }
 
 void vis_audio_device::dack16_w(int line, uint16_t data)
 {
 	m_sample[m_samples++] = data;
-	if(m_samples >= ((m_dmalen & 2) ? 1 : 2))
+	m_curcount++;
+	if(m_samples >= 2)
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
 void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(m_count == 0xffff)
-	{
-		m_isa->drq7_w(ASSERT_LINE);
-		m_samples = 0;
+	if(m_samples < 2)
 		return;
-	}
 	switch(m_mode & 0x88)
 	{
 		case 0x80: // 8bit mono
@@ -113,32 +110,31 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			break;
 	}
 
-	if(m_sample_byte >= ((m_dmalen & 2) ? 2 : 4))
+	if(m_sample_byte >= 4)
 	{
 		m_sample_byte = 0;
 		m_samples = 0;
-		if(m_count)
-			m_isa->drq7_w(ASSERT_LINE);
-		else
+		m_isa->drq7_w(ASSERT_LINE);
+		if(m_curcount >= m_count)
 		{
-			m_ldac->write(0x8000);
-			m_rdac->write(0x8000);
-			m_stat = 4;
-			m_isa->irq7_w(ASSERT_LINE);
+			m_curcount = 0;
+			m_ctrl |= 4;
+			if(BIT(m_ctrl, 1))
+				m_isa->irq7_w(ASSERT_LINE);
 		}
-		m_count--;
 	}
 }
 
 MACHINE_CONFIG_START(vis_audio_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // sanyo lc7883k
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // sanyo lc7883k
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
@@ -149,14 +145,20 @@ READ8_MEMBER(vis_audio_device::pcm_r)
 	switch(offset)
 	{
 		case 0x00:
+			m_isa->irq7_w(CLEAR_LINE);
+			m_ctrl &= ~4;
 			return m_mode;
 		case 0x02:
 			return m_data[0][m_index[0]];
 		case 0x04:
 			return m_data[1][m_index[1]];
 		case 0x09:
+		{
+			u8 ret = m_ctrl;
 			m_isa->irq7_w(CLEAR_LINE);
-			return m_stat;
+			m_ctrl &= ~4;
+			return ret;
+		}
 		case 0x0c:
 			return m_count & 0xff;
 		case 0x0e:
@@ -173,6 +175,7 @@ READ8_MEMBER(vis_audio_device::pcm_r)
 
 WRITE8_MEMBER(vis_audio_device::pcm_w)
 {
+	u8 oldmode = m_mode;
 	switch(offset)
 	{
 		case 0x00:
@@ -191,7 +194,7 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 			m_index[1] = data;
 			return;
 		case 0x09:
-			m_dmalen = data;
+			m_ctrl = data;
 			return;
 		case 0x0c:
 			m_count = (m_count & 0xff00) | data;
@@ -206,14 +209,12 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 			logerror("unknown pcm write %04x %02x\n", offset, data);
 			return;
 	}
-	if((m_mode & 0x10) && (m_count != 0xffff))
+	if((m_mode & 0x10) && (m_mode ^ oldmode))
 	{
-		const int rates[] = {44100, 22050, 11025, 5512};
 		m_samples = 0;
 		m_sample_byte = 0;
-		m_stat = 0;
 		m_isa->drq7_w(ASSERT_LINE);
-		attotime rate = attotime::from_hz(rates[(m_mode >> 5) & 3]);
+		attotime rate = attotime::from_ticks((double)(1 << ((m_mode >> 5) & 3)), 44100.0); // TODO : Unknown clock
 		m_pcm->adjust(rate, 0, rate);
 	}
 	else if(!(m_mode & 0x10))
@@ -823,7 +824,7 @@ READ8_MEMBER(vis_state::sysctl_r)
 WRITE8_MEMBER(vis_state::sysctl_w)
 {
 	if(BIT(data, 0) && !BIT(m_sysctl, 0))
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	//m_maincpu->set_input_line(INPUT_LINE_A20, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 	m_sysctl = data;
 }
@@ -915,4 +916,4 @@ ROM_START(vis)
 	ROM_LOAD( "p513bk1b.bin", 0x80000, 0x80000, CRC(e18239c4) SHA1(a0262109e10a07a11eca43371be9978fff060bc5))
 ROM_END
 
-COMP ( 1992, vis,  0, 0, vis, vis, vis_state, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, vis, 0, 0, vis, vis, vis_state, empty_init, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

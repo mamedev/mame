@@ -53,7 +53,7 @@ public:
 		m_es5503_rom(*this, "es5503")
 	{ }
 
-	DECLARE_DRIVER_INIT(mquake);
+	void init_mquake();
 
 	DECLARE_READ8_MEMBER( es5503_sample_r );
 	DECLARE_WRITE16_MEMBER( output_w );
@@ -335,7 +335,8 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	MCFG_VIDEO_START_OVERRIDE(mquake_state,amiga)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -414,7 +415,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER( mquake_state, mquake )
+void mquake_state::init_mquake()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
@@ -429,4 +430,4 @@ DRIVER_INIT_MEMBER( mquake_state, mquake )
  *
  *************************************/
 
-GAME( 1987, mquake, 0, mquake, mquake, mquake_state, mquake, 0, "Sente", "Moonquake", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, mquake, 0, mquake, mquake, mquake_state, init_mquake, 0, "Sente", "Moonquake", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

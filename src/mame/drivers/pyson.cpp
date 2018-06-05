@@ -254,6 +254,6 @@ ROM_START( wswe2k3 )
 ROM_END
 
 
-GAME(2002, pyson,          0,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2002, wswe,       pyson,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
-GAME(2003, wswe2k3,    pyson,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
+GAME(2002, pyson,          0,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2002, wswe,       pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
+GAME(2003, wswe2k3,    pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)

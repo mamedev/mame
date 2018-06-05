@@ -301,6 +301,7 @@ protected:
 	optional_device<screen_device> m_screen;
 	optional_device<mc68681_device> m_duartn68681;
 	required_device<adc0808_device> m_adc8;
+	output_finder<2> m_lamps;
 
 	uint8_t                   m_hd34010_host_access;
 

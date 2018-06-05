@@ -206,7 +206,7 @@ static const gfx_layout cd2650_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( cd2650 )
+static GFXDECODE_START( gfx_cd2650 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -308,18 +308,16 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cd2650)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cd2650)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -350,5 +348,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "2650 Computer System", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME                FLAGS
+COMP( 1977, cd2650, 0,      0,      cd2650,  cd2650, cd2650_state, empty_init, "Central Data", "2650 Computer System", 0 )

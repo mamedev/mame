@@ -968,7 +968,7 @@ static const gfx_layout charlayout =
 //  GFXDECODE( portfolio )
 //-------------------------------------------------
 
-static GFXDECODE_START( portfolio )
+static GFXDECODE_START( gfx_portfolio )
 	GFXDECODE_ENTRY( HD61830_TAG, 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portfolio)
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)
@@ -1044,7 +1044,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(PCD3311T_TAG, PCD3311, XTAL(3'578'640))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1085,8 +1085,8 @@ MACHINE_CONFIG_END
 ROM_START( pofo )
 	ROM_REGION( 0x40000, M80C88A_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "dip1072", "DIP DOS 1.072" )
-	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(1) ) // dumped with debug.com
-	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(1) ) // dumped with debug.com
+	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(0) ) // dumped with debug.com
+	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(0) ) // dumped with debug.com
 
 	ROM_REGION( 0x8000, HD61830_TAG, 0 )
 	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual
@@ -1098,5 +1098,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT      STATE            INIT  COMPANY   FULLNAME      FLAGS
-COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, portfolio_state, 0,    "Atari",  "Portfolio",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME     FLAGS
+COMP( 1989, pofo, 0,      0,      portfolio, portfolio, portfolio_state, empty_init, "Atari", "Portfolio", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

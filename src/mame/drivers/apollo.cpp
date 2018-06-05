@@ -971,7 +971,7 @@ void apollo_state::machine_start(){
  Driver Init
  ***************************************************************************/
 
-DRIVER_INIT_MEMBER(apollo_state,dn3500)
+void apollo_state::init_dn3500()
 {
 //  MLOG1(("driver_init_dn3500"));
 
@@ -984,19 +984,19 @@ DRIVER_INIT_MEMBER(apollo_state,dn3500)
 	node_type=  NODE_TYPE_DN3500;
 	ram_config_byte= DN3500_RAM_CONFIG_BYTE;
 
-	DRIVER_INIT_CALL(apollo);
+	init_apollo();
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dsp3500)
+void apollo_state::init_dsp3500()
 {
-	DRIVER_INIT_CALL( dn3500 );
+	init_dn3500();
 //  MLOG1(("driver_init_dsp3500"));
 	node_type = NODE_TYPE_DSP3500;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dn3000)
+void apollo_state::init_dn3000()
 {
-	DRIVER_INIT_CALL( dn3500 );
+	init_dn3500();
 //  MLOG1(("driver_init_dn3000"));
 
 	ram_base_address = DN3000_RAM_BASE;
@@ -1006,16 +1006,16 @@ DRIVER_INIT_MEMBER(apollo_state,dn3000)
 	ram_config_byte= DN3000_RAM_CONFIG_8MB;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dsp3000)
+void apollo_state::init_dsp3000()
 {
-	DRIVER_INIT_CALL( dn3000 );
+	init_dn3000();
 //  MLOG1(("driver_init_dsp3000"));
 	node_type = NODE_TYPE_DSP3000;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dn5500)
+void apollo_state::init_dn5500()
 {
-	DRIVER_INIT_CALL( dn3500 );
+	init_dn3500();
 //  MLOG1(("driver_init_dn5500"));
 
 	ram_base_address = DN5500_RAM_BASE;
@@ -1025,9 +1025,9 @@ DRIVER_INIT_MEMBER(apollo_state,dn5500)
 	ram_config_byte= DN5500_RAM_CONFIG_BYTE;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dsp5500)
+void apollo_state::init_dsp5500()
 {
-	DRIVER_INIT_CALL( dn5500 );
+	init_dn5500();
 //  MLOG1(("driver_init_dsp5500"));
 	node_type = NODE_TYPE_DSP5500;
 }
@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(apollo_state::dn3500)
 	apollo(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1088,7 +1088,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3500)
 	apollo_terminal(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1139,7 +1139,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3000)
 	apollo_terminal(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1188,7 +1188,7 @@ MACHINE_CONFIG_START(apollo_state::dsp5500)
 	apollo_terminal(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1226,7 +1226,7 @@ ROM_START( dn3500 )
 	// Note: file name must be converted to lower case (i.e. 3500_boot_12191_7.bin)
 	// Note: this duplicates boot rom md7c-rev-8.00-1989-08-16-17-23-52.bin
 	ROM_SYSTEM_BIOS( 0, "md7c-rev-8.00", "MD7C REV 8.00, 1989/08/16.17:23:52" )
-	ROMX_LOAD( "3500_boot_12191_7.bin", 0x00000, 0x10000, CRC(3132067d) SHA1(36f3c83d9f2df42f2537b09ca2f051a8c9dfbfc2) , ROM_BIOS(1) )
+	ROMX_LOAD( "3500_boot_12191_7.bin", 0x00000, 0x10000, CRC(3132067d) SHA1(36f3c83d9f2df42f2537b09ca2f051a8c9dfbfc2) , ROM_BIOS(0) )
 ROM_END
 
 ROM_START( dn5500 )
@@ -1234,14 +1234,14 @@ ROM_START( dn5500 )
 	ROM_REGION( 0x0100000, MAINCPU, 0 ) /* 68000 code */
 
 	ROM_SYSTEM_BIOS( 0, "md7c-rev-8.00", "MD7C REV 8.00, 1989/08/16.17:23:52" )
-	ROMX_LOAD( "5500_boot_a1631-80046_1-30-92.bin", 0x00000, 0x10000, CRC(7b9ed610) SHA1(7315a884ec4551c44433c6079cc06509223cb02b) , ROM_BIOS(1) )
+	ROMX_LOAD( "5500_boot_a1631-80046_1-30-92.bin", 0x00000, 0x10000, CRC(7b9ed610) SHA1(7315a884ec4551c44433c6079cc06509223cb02b) , ROM_BIOS(0) )
 ROM_END
 
 ROM_START( dn3000)
 	ROM_REGION( 0x0090000, MAINCPU, 0 ) /* 68000 code */
 
 	ROM_SYSTEM_BIOS( 0, "md8-rev-7.0", "MD8 REV 7.0, 1988/08/16.15:14:39" )
-	ROMX_LOAD( "3000_boot_8475_7.bin",  0x00000, 0x08000, CRC(0fe2d471) SHA1(6c383d2266719a3d069b7bf015f6945179395e7a), ROM_BIOS(1) )
+	ROMX_LOAD( "3000_boot_8475_7.bin",  0x00000, 0x08000, CRC(0fe2d471) SHA1(6c383d2266719a3d069b7bf015f6945179395e7a), ROM_BIOS(0) )
 ROM_END
 
 #define rom_dsp3500    rom_dn3500
@@ -1263,15 +1263,15 @@ ROM_END
 #define DSP_FLAGS 0
 //#define DSP_FLAGS MACHINE_NO_SOUND
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE         INIT     COMPANY     FULLNAME                         FLAGS */
-COMP( 1989, dn3500,          0, 0,      dn3500_15i, dn3500,  apollo_state, dn3500,  "Apollo",   "Apollo DN3500",                 DN_FLAGS )
-COMP( 1989, dsp3500,    dn3500, 0,      dsp3500,    dsp3500, apollo_state, dsp3500, "Apollo",   "Apollo DSP3500",                DSP_FLAGS )
-COMP( 1989, dn3500_19i, dn3500, 0,      dn3500_19i, dn3500,  apollo_state, dn3500,  "Apollo",   "Apollo DN3500 19\" Monochrome", DN_FLAGS )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS         INIT          COMPANY   FULLNAME                         FLAGS */
+COMP( 1989, dn3500,     0,      0,      dn3500_15i, dn3500,  apollo_state, init_dn3500,  "Apollo", "Apollo DN3500",                 DN_FLAGS )
+COMP( 1989, dsp3500,    dn3500, 0,      dsp3500,    dsp3500, apollo_state, init_dsp3500, "Apollo", "Apollo DSP3500",                DSP_FLAGS )
+COMP( 1989, dn3500_19i, dn3500, 0,      dn3500_19i, dn3500,  apollo_state, init_dn3500,  "Apollo", "Apollo DN3500 19\" Monochrome", DN_FLAGS )
 
-COMP( 1988, dn3000,     dn3500, 0,      dn3000_15i, dn3500,  apollo_state, dn3000,  "Apollo",   "Apollo DN3000",                 DN_FLAGS )
-COMP( 1988, dsp3000,    dn3500, 0,      dsp3000,    dsp3500, apollo_state, dsp3000, "Apollo",   "Apollo DSP3000",                DSP_FLAGS )
-COMP( 1988, dn3000_19i, dn3500, 0,      dn3000_19i, dn3500,  apollo_state, dn3000,  "Apollo",   "Apollo DN3000 19\" Monochrome", DN_FLAGS )
+COMP( 1988, dn3000,     dn3500, 0,      dn3000_15i, dn3500,  apollo_state, init_dn3000,  "Apollo", "Apollo DN3000",                 DN_FLAGS )
+COMP( 1988, dsp3000,    dn3500, 0,      dsp3000,    dsp3500, apollo_state, init_dsp3000, "Apollo", "Apollo DSP3000",                DSP_FLAGS )
+COMP( 1988, dn3000_19i, dn3500, 0,      dn3000_19i, dn3500,  apollo_state, init_dn3000,  "Apollo", "Apollo DN3000 19\" Monochrome", DN_FLAGS )
 
-COMP( 1991, dn5500,     dn3500, 0,      dn5500_15i, dn3500,  apollo_state, dn5500,  "Apollo",   "Apollo DN5500",                 MACHINE_NOT_WORKING )
-COMP( 1991, dsp5500,    dn3500, 0,      dsp5500,    dsp3500, apollo_state, dsp5500, "Apollo",   "Apollo DSP5500",                MACHINE_NOT_WORKING )
-COMP( 1991, dn5500_19i, dn3500, 0,      dn5500_19i, dn3500,  apollo_state, dn5500,  "Apollo",   "Apollo DN5500 19\" Monochrome", MACHINE_NOT_WORKING )
+COMP( 1991, dn5500,     dn3500, 0,      dn5500_15i, dn3500,  apollo_state, init_dn5500,  "Apollo", "Apollo DN5500",                 MACHINE_NOT_WORKING )
+COMP( 1991, dsp5500,    dn3500, 0,      dsp5500,    dsp3500, apollo_state, init_dsp5500, "Apollo", "Apollo DSP5500",                MACHINE_NOT_WORKING )
+COMP( 1991, dn5500_19i, dn3500, 0,      dn5500_19i, dn3500,  apollo_state, init_dn5500,  "Apollo", "Apollo DN5500 19\" Monochrome", MACHINE_NOT_WORKING )

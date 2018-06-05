@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
@@ -423,7 +423,8 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, tourvision_state, tourvision_i8155_c_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, tourvision_state, tourvision_timer_out))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -442,21 +443,21 @@ MACHINE_CONFIG_END
 #define TOURVISION_BIOS \
 	ROM_REGION( 0x8000, "subcpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "60", "V4-60" ) \
-	ROMX_LOAD( "v4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
+	ROMX_LOAD( "v4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "55", "V4-55" ) \
-	ROMX_LOAD( "v4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
+	ROMX_LOAD( "v4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 2, "53", "V4-53" ) \
-	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(3) ) \
+	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 3, "52", "V4-52" ) \
-	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(4) ) \
+	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) ) \
 	ROM_SYSTEM_BIOS( 4, "43", "V4-43" ) \
-	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
+	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(4) ) \
 	ROM_SYSTEM_BIOS( 5, "40", "V4-40" ) \
-	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(6) ) \
+	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(5) ) \
 	ROM_SYSTEM_BIOS( 6, "20", "VT-20" ) \
-	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(7) ) \
+	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(6) ) \
 	ROM_SYSTEM_BIOS( 7, "11", "VT-11" ) \
-	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(8) )
+	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(7) )
 
 
 ROM_START(tourvis)
@@ -466,4 +467,4 @@ ROM_START(tourvis)
 ROM_END
 
 
-GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, init_pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

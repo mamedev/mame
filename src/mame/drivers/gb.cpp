@@ -478,8 +478,6 @@ void megaduck_state::megaduck_map(address_map &map)
 	map(0xffff, 0xffff).rw(this, FUNC(megaduck_state::gb_ie_r), FUNC(megaduck_state::gb_ie_w));                                  /* interrupt enable register */
 }
 
-static GFXDECODE_START( gb )
-GFXDECODE_END
 
 static INPUT_PORTS_START( gameboy )
 	PORT_START("INPUTS")
@@ -630,14 +628,15 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -671,14 +670,15 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("apu", DMG_APU, 4295454)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(gb_state::gbpocket)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_MGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", MGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gb_state::gbcolor)
@@ -749,15 +749,16 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
-	MCFG_CGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", CGB_PPU, "maincpu")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("apu", CGB04_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -795,15 +796,16 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -822,9 +824,9 @@ MACHINE_CONFIG_END
 ROM_START(gameboy)
 	ROM_REGION(0x0100, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "dmg", "DMG vX")
-	ROMX_LOAD("dmg_boot.bin", 0x0000, 0x0100, CRC(59c8598e) SHA1(4ed31ec6b0b175bb109c0eb5fd3d193da823339f), ROM_BIOS(1))
+	ROMX_LOAD("dmg_boot.bin", 0x0000, 0x0100, CRC(59c8598e) SHA1(4ed31ec6b0b175bb109c0eb5fd3d193da823339f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "dmg_v0", "DMG v0")
-	ROMX_LOAD("dmg_v0.rom", 0x0000, 0x0100, CRC(c2f5cc97) SHA1(8bd501e31921e9601788316dbd3ce9833a97bcbc), ROM_BIOS(2))
+	ROMX_LOAD("dmg_v0.rom", 0x0000, 0x0100, CRC(c2f5cc97) SHA1(8bd501e31921e9601788316dbd3ce9833a97bcbc), ROM_BIOS(1))
 ROM_END
 
 ROM_START(supergb)
@@ -858,15 +860,15 @@ ROM_START(gamefgtr)
 	ROM_LOAD("gamefgtr.bin", 0x0000, 0x0100, CRC(908ba8de) SHA1(a4a36f71bf1b3b587df620d48ae940af93a982a5))
 ROM_END
 
-/*   YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT    STATE           INIT  COMPANY     FULLNAME */
-CONS(1990, gameboy,   0,       0,       gameboy,  gameboy, gb_state,       0,    "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1994, supergb,   gameboy, 0,       supergb,  gameboy, gb_state,       0,    "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, supergb2,  gameboy, 0,       supergb2, gameboy, gb_state,       0,    "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1996, gbpocket,  gameboy, 0,       gbpocket, gameboy, gb_state,       0,    "Nintendo", "Game Boy Pocket", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, gbcolor,   0,       0,       gbcolor,  gameboy, gb_state,       0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+/*   YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    STATE           INIT        COMPANY     FULLNAME */
+CONS(1990, gameboy,  0,       0,       gameboy,  gameboy, gb_state,       empty_init, "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy, gb_state,       empty_init, "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, supergb2, gameboy, 0,       supergb2, gameboy, gb_state,       empty_init, "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy, gb_state,       empty_init, "Nintendo", "Game Boy Pocket", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy, gb_state,       empty_init, "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
-CONS(1993, megaduck,  0,       0,       megaduck, gameboy, megaduck_state, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS(1993, megaduck, 0,       0,       megaduck, gameboy, megaduck_state, empty_init, "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // http://blog.gg8.se/wordpress/2012/11/11/gameboy-clone-game-fighter-teardown/
-CONS(1993, gamefgtr,  gameboy, 0,       gameboy,  gameboy, gb_state,       0,    "bootleg", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1993, gamefgtr, gameboy, 0,       gameboy,  gameboy, gb_state,       empty_init, "bootleg", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

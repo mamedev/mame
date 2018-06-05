@@ -112,8 +112,8 @@ public:
 	DECLARE_VIDEO_START(spinlbrk);
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
-	DECLARE_DRIVER_INIT(banked_oki);
-	DECLARE_DRIVER_INIT(kickball);
+	void init_banked_oki();
+	void init_kickball();
 	uint32_t screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

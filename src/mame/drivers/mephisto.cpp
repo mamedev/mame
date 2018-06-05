@@ -96,7 +96,7 @@ public:
 	//uint8_t *m_p_ram;
 	uint8_t m_led7;
 	uint8_t m_allowNMI;
-	DECLARE_DRIVER_INIT(mephisto);
+	void init_mephisto();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(mm2);
@@ -239,14 +239,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
 	if (m_allowNMI)
 	{
 		m_allowNMI = 0;
-		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	m_beep->set_state(m_outlatch->q6_r() ? 1 : 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_beep->set_state(m_outlatch->q6_r() ? 1 : 0);
 }
 
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mephisto_state, write_led7))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -365,7 +365,7 @@ ROM_START(mm4)
 	ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" )
-	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2))
+	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm4tk)
@@ -373,7 +373,7 @@ ROM_START(mm4tk)
 	ROM_LOAD("mm4tk.rom", 0x8000, 0x8000, CRC(51cb36a4) SHA1(9e184b4e85bb721e794b88d8657ae8d2ff5a24af))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" )
-	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(0))
+	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm5tk)
@@ -381,7 +381,7 @@ ROM_START(mm5tk)
 	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, BAD_DUMP CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
-	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(0))
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm5)
@@ -389,7 +389,7 @@ ROM_START(mm5)
 	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
-	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2))
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm50)
@@ -397,11 +397,11 @@ ROM_START(mm50)
 	ROM_LOAD("mm50.rom", 0x8000, 0x8000, CRC(fcfa7e6e) SHA1(afeac3a8c957ba58cefaa27b11df974f6f2066da))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
-	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2))
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614), ROM_BIOS(1))
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mephisto_state,mephisto)
+void mephisto_state::init_mephisto()
 {
 	m_lcd_shift_counter = 3;
 }
@@ -412,12 +412,11 @@ DRIVER_INIT_MEMBER(mephisto_state,mephisto)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY             FULLNAME                            FLAGS */
-
-CONS( 1984, mm2,        mm4,    0,      mm2,        mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, rebel5,     mm4,    0,      rebel5,     mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto Rebell 5,0 Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4,        0,      0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer",       MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer Turbo Kit + HG440",       MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5,        mm4,    0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm50,       mm4,    0,      mephisto,   mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer Turbo Kit + HG550",       MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY             FULLNAME                              FLAGS */
+CONS( 1984, mm2,    mm4,    0,      mm2,      mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto MM2 Schachcomputer",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, rebel5, mm4,    0,      rebel5,   mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto Rebell 5,0 Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4,    0,      0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 4 Schachcomputer",          MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 4 Schachcomputer Turbo Kit + HG440", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm5,    mm4,    0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 5.1 Schachcomputer",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm50,   mm4,    0,      mephisto, mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 5.0 Schachcomputer",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm5tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, init_mephisto, "Hegener & Glaser", "Mephisto 5.1 Schachcomputer Turbo Kit + HG550", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

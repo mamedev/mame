@@ -363,7 +363,7 @@ static const gfx_layout z1013_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( z1013 )
+static GFXDECODE_START( gfx_z1013 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, z1013_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -383,13 +383,12 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	MCFG_SCREEN_UPDATE_DRIVER(z1013_state, screen_update_z1013)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z1013)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z1013)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
@@ -413,10 +412,10 @@ MACHINE_CONFIG_END
 ROM_START( z1013 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "202", "Original" )
-	ROMX_LOAD( "mon_202.bin", 0xf000, 0x0800, CRC(5884edab) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709), ROM_BIOS(1))
+	ROMX_LOAD( "mon_202.bin", 0xf000, 0x0800, CRC(5884edab) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "jm", "Jens Muller version" )
-	ROMX_LOAD( "mon_jm_1992.bin", 0xf000, 0x0800, CRC(186d2888) SHA1(b52ccb557c41c96bace7db4c4f5031a0cd736168), ROM_BIOS(2))
+	ROMX_LOAD( "mon_jm_1992.bin", 0xf000, 0x0800, CRC(186d2888) SHA1(b52ccb557c41c96bace7db4c4f5031a0cd736168), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
@@ -447,10 +446,10 @@ ROM_END
 ROM_START( z1013s60 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD( "mon_rb_s6009.bin", 0xf000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(1))
+	ROMX_LOAD( "mon_rb_s6009.bin", 0xf000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD( "4k-moni-k7652.bin", 0xf000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(2))
+	ROMX_LOAD( "4k-moni-k7652.bin", 0xf000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
@@ -467,9 +466,9 @@ ROM_START( z1013k69 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT      STATE        INIT  COMPANY                           FULLNAME               FLAGS
-COMP( 1985, z1013,     0,      0,      z1013,       z1013_8x4, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  0 )
-COMP( 1985, z1013a2,   z1013,  0,      z1013,       z1013_8x8, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)",  0 )
-COMP( 1985, z1013k76,  z1013,  0,      z1013k76,    z1013,     z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7659)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, z1013s60,  z1013,  0,      z1013k76,    z1013_8x8, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, z1013k69,  z1013,  0,      z1013k76,    z1013,     z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7669)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS        INIT        COMPANY                           FULLNAME               FLAGS
+COMP( 1985, z1013,    0,      0,      z1013,    z1013_8x4, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  0 )
+COMP( 1985, z1013a2,  z1013,  0,      z1013,    z1013_8x8, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)",  0 )
+COMP( 1985, z1013k76, z1013,  0,      z1013k76, z1013,     z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7659)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, z1013s60, z1013,  0,      z1013k76, z1013_8x8, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, z1013k69, z1013,  0,      z1013k76, z1013,     z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7669)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

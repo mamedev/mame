@@ -77,7 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_01_r);
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
-	DECLARE_DRIVER_INIT(nascom);
+	void init_nascom();
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
@@ -121,8 +121,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
-	DECLARE_DRIVER_INIT(nascom2);
-	DECLARE_DRIVER_INIT(nascom2c);
+	void init_nascom2();
+	void init_nascom2c();
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
@@ -346,7 +346,7 @@ void nascom_state::machine_reset()
 	m_hd6402->write_cs(1);
 }
 
-DRIVER_INIT_MEMBER( nascom_state, nascom )
+void nascom_state::init_nascom()
 {
 	// install extra memory
 	if (m_ram->size() > 0)
@@ -364,9 +364,9 @@ void nascom2_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascom2 )
+void nascom2_state::init_nascom2()
 {
-	DRIVER_INIT_CALL(nascom);
+	init_nascom();
 
 	// setup nasbus
 	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
@@ -384,7 +384,7 @@ WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascom2c )
+void nascom2_state::init_nascom2c()
 {
 	// install memory
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
@@ -420,7 +420,7 @@ static const gfx_layout nascom1_charlayout =
 	8 * 16
 };
 
-static GFXDECODE_START( nascom1 )
+static GFXDECODE_START( gfx_nascom1 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom1_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -442,7 +442,7 @@ static const gfx_layout nascom2_charlayout =
 	8 * 16
 };
 
-static GFXDECODE_START( nascom2 )
+static GFXDECODE_START( gfx_nascom2 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom2_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nascom1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nascom1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// uart
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom2_state, screen_update_nascom)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", nascom2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nascom2)
 
 	// generic sockets for ram/rom (todo: support ram here)
 	MCFG_GENERIC_SOCKET_ADD("socket1", generic_plain_slot, "nascom_socket")
@@ -757,11 +757,11 @@ ROM_START( nascom1 )
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_DEFAULT_BIOS("t4")
 	ROM_SYSTEM_BIOS(0, "t1", "NasBug T1")
-	ROMX_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c), ROM_BIOS(1))
+	ROMX_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "t2", "NasBug T2")
-	ROMX_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(2))
+	ROMX_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "t4", "NasBug T4")
-	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(3))
+	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(2))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("nascom1.chr",   0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
@@ -771,9 +771,9 @@ ROM_START( nascom2 )
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ns3")
 	ROM_SYSTEM_BIOS(0, "ns1", "NasSys 1")
-	ROMX_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(1))
+	ROMX_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ns3", "NasSys 3")
-	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(2))
+	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(1))
 
 	ROM_REGION(0x2000, "basic", 0)
 	ROM_LOAD("basic.rom", 0x0000, 0x2000, CRC(5cb5197b) SHA1(c41669c2b6d6dea808741a2738426d97bccc9b07))
@@ -797,7 +797,7 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT      COMPANY                  FULLNAME           FLAGS
-COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom1_state, nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
-COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
-COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT           COMPANY                  FULLNAME           FLAGS
+COMP( 1977, nascom1,  0,       0,      nascom1,  nascom1,  nascom1_state, init_nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
+COMP( 1980, nascom2c, nascom2, 0,      nascom2c, nascom2c, nascom2_state, init_nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )

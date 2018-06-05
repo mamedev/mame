@@ -14,7 +14,7 @@
 #include "8x300dasm.h"
 #include "debugger.h"
 
-#define FETCHOP(a)         (m_direct->read_word(a))
+#define FETCHOP(a)         (m_cache->read_word(a))
 #define CYCLES(x)          do { m_icount -= (x); } while (0)
 #define READPORT(a)        (m_io->read_byte(a))
 #define WRITEPORT(a,v)     (m_io->write_byte((a), (v)))
@@ -97,7 +97,7 @@ uint8_t n8x300_cpu_device::get_reg(uint8_t reg)
 void n8x300_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_PC));
