@@ -97,6 +97,7 @@ public:
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY"),
+		m_nvram(*this, "sysram.%u", 1U),
 		m_lamps(*this, "lamp%u", 0U)
 	{
 		m_sysram[0] = nullptr;
@@ -137,8 +138,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
-
-	nvram_device *m_nvram[2];
+	required_device_array<nvram_device, 2> m_nvram;
 
 	memory_region *m_cart_rom;
 
@@ -558,8 +558,6 @@ void cc40_state::machine_start()
 	else
 		membank("cartbank")->set_base(memregion("maincpu")->base() + 0x5000);
 
-	m_nvram[0] = machine().device<nvram_device>("sysram.1");
-	m_nvram[1] = machine().device<nvram_device>("sysram.2");
 	init_sysram(0, 0x800); // default to 6KB
 	init_sysram(1, 0x800); // "
 
