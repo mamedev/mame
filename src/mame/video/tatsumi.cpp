@@ -1251,10 +1251,11 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	#ifdef UNUSED_FUNCTION
-	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100]
-													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300]
-														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100]
-														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300]);
+	popmessage("%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)"
+                                                        ,m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100],m_cyclwarr_videoram[1][0x1ff]
+													    ,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300],m_cyclwarr_videoram[1][0x3ff]
+														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100],m_cyclwarr_videoram[0][0x1ff]
+														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300],m_cyclwarr_videoram[0][0x3ff]);
 	#endif													
 
 	screen.priority().fill(0, cliprect);
