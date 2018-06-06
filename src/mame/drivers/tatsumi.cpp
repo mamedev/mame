@@ -16,8 +16,8 @@
     - Round Up 5: Finish road layer.
 	  Tunnel sections are borderline unplayable, plus slopes are ugly to watch.
     - Apache 3: road layer, has twelve rotation registers!
-    - Cycle Warriors: transparent road layer on sidelines, wrong mask_data?
-    - Missing BG layer (Round Up 5) - banked VRAM data from somewhere!?
+    - (fixed) Cycle Warriors: transparent road layer on sidelines, wrong mask_data?
+    - (fixed) Missing BG layer (Round Up 5) - banked VRAM data from somewhere!?
     - Round Up 5: always boots with a coin inserted 
 	  $5152 is the coin counter, gets an explicit 1 at boot.
 	  There are other two buffers read from 68k before that, written to $5156 and $515a
@@ -25,10 +25,10 @@
     - (fixed) Round Up 5 doesn't survive a reset 
     - (fixed?) Cycle Warriors: test mode text does not appear as it needs a -256 Y 
 	  scroll offset from somewhere. 
-	- Cycle Warriors: sometimes it draws garbage on character select or even hangs
+	- (fixed) Cycle Warriors: sometimes it draws garbage on character select or even hangs
 	  depending on where player coins up, most likely caused by miscommunication with sub CPU?
-	- Cycle Warriors: ranking screen is completely wrong;
-    - Cycle Warriors: ugly orange color on character select and briefing screens, layer disable?
+	- (fixed) Cycle Warriors: ranking screen is completely wrong;
+    - (fixed) Cycle Warriors: ugly orange color on character select and briefing screens, layer disable?
     - Combine Big Fight & CycleWarriors video routines - currently each
       game uses different sized tilemaps - these are probably software
       controlled rather than hardwired, but I don't think either game
@@ -190,11 +190,6 @@ WRITE16_MEMBER(cyclwarr_state::cyclwarr_sprite_w)
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-WRITE16_MEMBER(cyclwarr_state::bigfight_a20000_w)
-{
-	COMBINE_DATA(&m_bigfight_a20000[offset]);
-}
-
 WRITE16_MEMBER(cyclwarr_state::bigfight_a40000_w)
 {
 	COMBINE_DATA(&m_bigfight_a40000[offset]);
@@ -203,6 +198,7 @@ WRITE16_MEMBER(cyclwarr_state::bigfight_a40000_w)
 WRITE16_MEMBER(cyclwarr_state::bigfight_a60000_w)
 {
 	COMBINE_DATA(&m_bigfight_a60000[offset]);
+//	popmessage("%04x",m_bigfight_a60000[offset]);
 }
 
 template<int Bank>
@@ -343,7 +339,7 @@ void cyclwarr_state::common_map(address_map &map)
 	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<1>), FUNC(cyclwarr_state::cyclwarr_videoram_w<1>)).share("cw_videoram1");
 	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram_r<0>), FUNC(cyclwarr_state::cyclwarr_videoram_w<0>)).share("cw_videoram0");
 
-	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
+	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::video_config_w));
 	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
 	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
 	map(0x0ac000, 0x0ac003).w(this, FUNC(tatsumi_state::hd6445_crt_w)).umask16(0x00ff);
