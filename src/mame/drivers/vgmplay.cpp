@@ -41,6 +41,11 @@
 
 #include <zlib.h>
 
+#include <list>
+#include <memory>
+#include <utility>
+#include <vector>
+
 #define AS_IO16             1
 #define MCFG_CPU_IO16_MAP   MCFG_DEVICE_DATA_MAP
 
@@ -98,9 +103,6 @@ public:
 
 	vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 	virtual uint32_t execute_min_cycles() const override;
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
@@ -138,7 +140,57 @@ public:
 	void play();
 	void toggle_loop() { m_loop = !m_loop; }
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
+	enum { ACT_LED_PERSIST_MS = 100 };
+
+	enum act_led {
+		LED_AY8910 = 0,
+
+		LED_SN76496,
+
+		LED_OKIM6295,
+
+		LED_YM2151,
+		LED_YM2203,
+		LED_YM2413,
+		LED_YM2608,
+		LED_YM2612,
+		LED_YM3526,
+		LED_YM3812,
+		LED_YMF271,
+		LED_YMZ280B,
+
+		LED_MULTIPCM,
+		LED_SEGAPCM,
+
+		LED_QSOUND,
+
+		LED_POKEY,
+
+		LED_NESAPU,
+		LED_GAMEBOY,
+
+		LED_C352,
+
+		LED_C6280,
+
+		LED_K051649,
+		LED_K053260,
+		LED_K054539,
+
+		LED_COUNT
+	};
+
+	enum { RESET, RUN, DONE };
+
+	using led_expiry = std::pair<act_led, attotime>;
+	using led_expiry_list = std::list<led_expiry>;
+	using led_expiry_iterator = led_expiry_list::iterator;
+
 	struct rom_block {
 		offs_t start_address;
 		offs_t end_address;
@@ -148,24 +200,35 @@ private:
 		rom_block(offs_t start, offs_t end, std::unique_ptr<uint8_t[]> &&d) : start_address(start), end_address(end), data(std::move(d)) {}
 	};
 
-	enum { RESET, RUN, DONE };
+	void pulse_act_led(act_led led);
+	TIMER_CALLBACK_MEMBER(act_led_expired);
+
+	uint8_t rom_r(int chip, uint8_t type, offs_t offset);
+	uint32_t handle_data_block(uint32_t address);
+	void blocks_clear();
+
+	output_finder<LED_COUNT> m_act_leds;
+	led_expiry_list m_act_led_expiries;
+	std::unique_ptr<led_expiry_iterator []> m_act_led_index;
+	led_expiry_iterator m_act_led_off;
+	emu_timer *m_act_led_timer = nullptr;
 
 	address_space_config m_file_config, m_io_config, m_io16_config;
-	address_space *m_file, *m_io, *m_io16;
+	address_space *m_file = nullptr, *m_io = nullptr, *m_io16 = nullptr;
 
-	int m_icount;
-	int m_state;
-	bool m_paused;
-	bool m_loop;
+	int m_icount = 0;
+	int m_state = RESET;
+	bool m_paused = false;
+	bool m_loop = false;
 
-	uint32_t m_pc;
+	uint32_t m_pc = 0U;
 
 	std::list<rom_block> m_rom_blocks[2][0x40];
 
 	std::vector<uint8_t> m_data_streams[0x40];
 	std::vector<uint32_t> m_data_stream_starts[0x40];
 
-	uint32_t m_ym2612_stream_offset;
+	uint32_t m_ym2612_stream_offset = 0U;
 
 	uint32_t m_multipcm_bank_l[2];
 	uint32_t m_multipcm_bank_r[2];
@@ -174,10 +237,6 @@ private:
 	uint32_t m_okim6295_nmk112_enable[2];
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
-
-	uint8_t rom_r(int chip, uint8_t type, offs_t offset);
-	uint32_t handle_data_block(uint32_t address);
-	void blocks_clear();
 };
 
 DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
@@ -268,6 +327,7 @@ private:
 
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, VGMPLAY, tag, owner, clock),
+	m_act_leds(*this, "led_act_%u", 0U),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 32),
 	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 32)
@@ -280,6 +340,13 @@ void vgmplay_device::device_start()
 	m_file = &space(AS_PROGRAM);
 	m_io   = &space(AS_IO);
 	m_io16  = &space(AS_IO16);
+
+	m_act_leds.resolve();
+	m_act_led_index = std::make_unique<led_expiry_iterator []>(LED_COUNT);
+	for (act_led led = act_led(0); LED_COUNT != led; led = act_led(led + 1))
+		m_act_led_index[led] = m_act_led_expiries.emplace(m_act_led_expiries.end(), led, attotime::never);
+	m_act_led_off = m_act_led_expiries.begin();
+	m_act_led_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_device::act_led_expired), this));
 
 	save_item(NAME(m_pc));
 
@@ -296,6 +363,45 @@ void vgmplay_device::device_reset()
 
 	m_ym2612_stream_offset = 0;
 	blocks_clear();
+}
+
+void vgmplay_device::pulse_act_led(act_led led)
+{
+	m_act_leds[led] = 1;
+
+	bool const was_first(m_act_led_expiries.begin() == m_act_led_index[led]);
+	bool const all_off(m_act_led_expiries.begin() == m_act_led_off);
+	attotime const now(machine().time());
+
+	m_act_led_index[led]->second = now + attotime::from_msec(ACT_LED_PERSIST_MS);
+	if (m_act_led_off != m_act_led_index[led])
+		m_act_led_expiries.splice(m_act_led_off, m_act_led_expiries, m_act_led_index[led]);
+	else
+		++m_act_led_off;
+	if (all_off)
+		m_act_led_timer->adjust(attotime::from_msec(ACT_LED_PERSIST_MS));
+	else if (was_first)
+		m_act_led_timer->adjust(m_act_led_expiries.begin()->second - now);
+}
+
+TIMER_CALLBACK_MEMBER(vgmplay_device::act_led_expired)
+{
+	attotime const now(machine().time());
+
+	while ((now + attotime::from_msec(1)) >= m_act_led_expiries.begin()->second)
+	{
+		led_expiry_iterator const expired(m_act_led_expiries.begin());
+		m_act_leds[expired->first] = 0;
+		expired->second = attotime::never;
+		if (expired != m_act_led_off)
+		{
+			m_act_led_expiries.splice(m_act_led_off, m_act_led_expiries, expired);
+			m_act_led_off = expired;
+		}
+	}
+
+	if (m_act_led_expiries.begin() != m_act_led_off)
+		m_act_led_timer->adjust(m_act_led_expiries.begin()->second - now);
 }
 
 void vgmplay_device::stop()
@@ -359,23 +465,21 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 	} else if(type < 0x7f)
 		logerror("ignored compressed stream size %x type %02x\n", size, type);
 
-	else if(type < 0x80)
+	else if (type < 0x80)
 		logerror("ignored compression table size %x\n", size);
 
-	else if(type < 0xc0) {
+	else if (type < 0xc0) {
 		//uint32_t rs = m_file->read_dword(m_pc+7);
 		uint32_t start = m_file->read_dword(m_pc+11);
 		std::unique_ptr<uint8_t[]> block = std::make_unique<uint8_t[]>(size - 8);
 		for(uint32_t i=0; i<size-8; i++)
 			block[i] = m_file->read_byte(m_pc+15+i);
 		m_rom_blocks[second][type - 0x80].emplace_front(start, start+size-9, std::move(block));
-	} else if (type == 0xc2) {
+	} else if(type == 0xc2) {
 		uint16_t start = m_file->read_word(m_pc+7);
 		uint32_t data_size = size - 2;
 		for (int i = 0; i < data_size; i++)
-		{
 			m_io->write_byte(A_NESRAM + start + i, m_file->read_byte(m_pc + 9 + i));
-		}
 	} else {
 		logerror("ignored ram block size %x type %02x\n", size, type);
 	}
@@ -414,40 +518,47 @@ void vgmplay_device::execute_run()
 			uint8_t code = m_file->read_byte(m_pc);
 			switch(code) {
 			case 0x4f:
+				pulse_act_led(LED_SN76496);
 				m_io->write_byte(A_SN76496+0, m_file->read_byte(m_pc+1));
 				m_pc += 2;
 				break;
 
 			case 0x50:
+				pulse_act_led(LED_SN76496);
 				m_io->write_byte(A_SN76496+1, m_file->read_byte(m_pc+1));
 				m_pc += 2;
 				break;
 
 			case 0x51:
+				pulse_act_led(LED_YM2413);
 				m_io->write_byte(A_YM2413+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2413+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0x52:
+				pulse_act_led(LED_YM2612);
 				m_io->write_byte(A_YM2612+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2612+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0x53:
+				pulse_act_led(LED_YM2612);
 				m_io->write_byte(A_YM2612+2, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2612+3, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0x54:
+				pulse_act_led(LED_YM2151);
 				m_io->write_byte(A_YM2151+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2151+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0x55:
+				pulse_act_led(LED_YM2203);
 				m_io->write_byte(A_YM2203A+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2203A+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
@@ -455,30 +566,35 @@ void vgmplay_device::execute_run()
 
 			case 0x56:
 			case 0x57:
+				pulse_act_led(LED_YM2608);
 				m_io->write_byte(A_YM2608+0+((code & 1) << 1), m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2608+1+((code & 1) << 1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0xA5:
+				pulse_act_led(LED_YM2203);
 				m_io->write_byte(A_YM2203B+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2203B+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0x5a:
+				pulse_act_led(LED_YM3812);
 				m_io->write_byte(A_YM3812+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM3812+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0x5b:
+				pulse_act_led(LED_YM3526);
 				m_io->write_byte(A_YM3526+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM3526+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0x5d:
+				pulse_act_led(LED_YMZ280B);
 				m_io->write_byte(A_YMZ280B+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YMZ280B+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
@@ -526,6 +642,7 @@ void vgmplay_device::execute_run()
 
 			case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 			case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
+				pulse_act_led(LED_YM2612);
 				if(!m_data_streams[0].empty()) {
 					if(m_ym2612_stream_offset >= int(m_data_streams[0].size()))
 						m_ym2612_stream_offset = 0;
@@ -538,16 +655,13 @@ void vgmplay_device::execute_run()
 				m_icount -= code & 0xf;
 				break;
 
-			case 0xa0:
-			{
+			case 0xa0: {
+				pulse_act_led(LED_AY8910);
 				uint8_t reg = m_file->read_byte(m_pc+1);
-				if (reg & 0x80)
-				{
+				if(reg & 0x80) {
 					m_io->write_byte(A_AY8910A+1, reg & 0x7f);
 					m_io->write_byte(A_AY8910A+0, m_file->read_byte(m_pc+2));
-				}
-				else
-				{
+				} else {
 					m_io->write_byte(A_AY8910B+1, reg & 0x7f);
 					m_io->write_byte(A_AY8910B+0, m_file->read_byte(m_pc+2));
 				}
@@ -556,19 +670,21 @@ void vgmplay_device::execute_run()
 			}
 
 			case 0xb3:
+				pulse_act_led(LED_GAMEBOY);
 				m_io->write_byte(A_GAMEBOY + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0xb4:
+				pulse_act_led(LED_NESAPU);
 				m_io->write_byte(A_NESAPU + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
-			case 0xb5:
-			{
+			case 0xb5: {
+				pulse_act_led(LED_MULTIPCM);
 				uint8_t offset = m_file->read_byte(m_pc+1);
-				if (offset & 0x80)
+				if(offset & 0x80)
 					m_io->write_byte(A_MULTIPCMB + (offset & 0x7f), m_file->read_byte(m_pc+2));
 				else
 					m_io->write_byte(A_MULTIPCMA + (offset & 0x7f), m_file->read_byte(m_pc+2));
@@ -576,10 +692,10 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
-			case 0xb8:
-			{
+			case 0xb8: {
+				pulse_act_led(LED_OKIM6295);
 				uint8_t offset = m_file->read_byte(m_pc+1);
-				if (offset & 0x80)
+				if(offset & 0x80)
 					m_io->write_byte(A_OKIM6295B + (offset & 0x7f), m_file->read_byte(m_pc+2));
 				else
 					m_io->write_byte(A_OKIM6295A + (offset & 0x7f), m_file->read_byte(m_pc+2));
@@ -588,17 +704,19 @@ void vgmplay_device::execute_run()
 			}
 
 			case 0xb9:
+				pulse_act_led(LED_C6280);
 				m_io->write_byte(A_C6280 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
 			case 0xba:
+				pulse_act_led(LED_K053260);
 				m_io->write_byte(A_K053260 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
-			case 0xbb:
-			{
+			case 0xbb: {
+				pulse_act_led(LED_POKEY);
 				uint8_t offset = m_file->read_byte(m_pc+1);
 				if (offset & 0x80)
 					m_io->write_byte(A_POKEYA + (offset & 0x7f), m_file->read_byte(m_pc+2));
@@ -609,20 +727,18 @@ void vgmplay_device::execute_run()
 			}
 
 			case 0xc0:
+				pulse_act_led(LED_SEGAPCM);
 				m_io->write_byte(A_SEGAPCM + (m_file->read_word(m_pc+1) & 0x7ff), m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
 
-			case 0xc3:
-			{
+			case 0xc3: {
+				pulse_act_led(LED_MULTIPCM);
 				uint8_t offset = m_file->read_byte(m_pc+1);
-				if (offset & 0x80)
-				{
+				if (offset & 0x80) {
 					m_io->write_byte(A_MULTIPCMB + 4 + (offset & 0x7f), m_file->read_byte(m_pc+3));
 					m_io->write_byte(A_MULTIPCMB + 8 + (offset & 0x7f), m_file->read_byte(m_pc+2));
-				}
-				else
-				{
+				} else {
 					m_io->write_byte(A_MULTIPCMA + 4 + (offset & 0x7f), m_file->read_byte(m_pc+3));
 					m_io->write_byte(A_MULTIPCMA + 8 + (offset & 0x7f), m_file->read_byte(m_pc+2));
 				}
@@ -631,14 +747,15 @@ void vgmplay_device::execute_run()
 			}
 
 			case 0xc4:
+				pulse_act_led(LED_QSOUND);
 				m_io->write_byte(A_QSOUND + 0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_QSOUND + 1, m_file->read_byte(m_pc+2));
 				m_io->write_byte(A_QSOUND + 2, m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
 
-			case 0xd1:
-			{
+			case 0xd1: {
+				pulse_act_led(LED_YMF271);
 				uint8_t offset = m_file->read_byte(m_pc+1);
 				m_io->write_byte(A_YMF271 + (offset & 7) * 2, m_file->read_byte(m_pc+2));
 				m_io->write_byte(A_YMF271 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc+3));
@@ -646,8 +763,8 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
-			case 0xd2:
-			{
+			case 0xd2: {
+				pulse_act_led(LED_K051649);
 				uint32_t offset = m_file->read_byte(m_pc+1) << 1;
 				m_io->write_byte(A_K051649 + (offset | 0), m_file->read_byte(m_pc+2));
 				m_io->write_byte(A_K051649 + (offset | 1), m_file->read_byte(m_pc+3));
@@ -655,8 +772,8 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
-			case 0xd3:
-			{
+			case 0xd3: {
+				pulse_act_led(LED_K054539);
 				uint16_t offset = m_file->read_byte(m_pc+1) << 16 | m_file->read_byte(m_pc+2);
 				if (offset & 0x8000)
 					m_io->write_byte(A_K054539B + (offset & 0x3ff), m_file->read_byte(m_pc+3));
@@ -667,12 +784,13 @@ void vgmplay_device::execute_run()
 			}
 
 			case 0xe0:
+				pulse_act_led(LED_YM2612);
 				m_ym2612_stream_offset = m_file->read_dword(m_pc+1);
 				m_pc += 5;
 				break;
 
-			case 0xe1:
-			{
+			case 0xe1: {
+				pulse_act_led(LED_C352);
 				uint32_t addr = (m_file->read_byte(m_pc+1) << 8) | m_file->read_byte(m_pc+2);
 				uint16_t data = (m_file->read_byte(m_pc+3) << 8) | m_file->read_byte(m_pc+4);
 				m_io16->write_word(A_C352 + (addr << 1), data);
@@ -1563,7 +1681,7 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 			m_vgmplay->play();
 			break;
 		case VGMPLAY_RESTART:
-			m_vgmplay->device_reset();
+			m_vgmplay->reset();
 			break;
 		case VGMPLAY_LOOP:
 			m_vgmplay->toggle_loop();
