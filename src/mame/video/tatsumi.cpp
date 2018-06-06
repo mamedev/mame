@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Angelo Salese
 #include "emu.h"
 #include "includes/tatsumi.h"
 #include "screen.h"
@@ -56,15 +56,18 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
 }
 
 // apply shadowing to underlying layers
-// TODO: it might mix up with the lower palette bank instead 
-void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap)
+// TODO: it might mix up with the lower palette bank instead (color bank 0x1400?)
+void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output)
 {
 	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
 	{
 		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
 		{
 			uint8_t shadow = shadow_bitmap.pix8(y, x);
-			if(shadow)
+			// xor_output is enabled during Chen boss fight (where shadows have more brightness than everything else)
+			// TODO: transition before fighting him should also black out all the background tilemaps too!? 
+			//       (more evidence that we need to mix with color bank 0x1400 instead of doing true RGB mixing).
+			if(shadow ^ xor_output)
 			{
 				rgb_t shadow_pen = bitmap.pix32(y, x);
 				bitmap.pix32(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
@@ -702,7 +705,7 @@ uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb3
 	screen.priority().fill(0, cliprect);
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
 //  draw_ground(bitmap, cliprect);
 	draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1038,7 +1041,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	draw_landscape(bitmap,cliprect,0);
 	draw_landscape(bitmap,cliprect,1);
 	draw_road(bitmap,cliprect);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -1078,7 +1081,16 @@ WRITE16_MEMBER(cyclwarr_state::video_config_w)
 {
 	COMBINE_DATA(&m_video_config[offset]);
 }
- 
+
+// mixing control (seems to be available only for Big Fight and Cycle Warriors)
+// --x- ---- enabled in Big Fight, disabled in Cycle Warriors (unknown purpose)
+// ---- -x-- enable shadow mixing
+// ---- ---x if 1 invert shadows, i.e. shadows are drawn with original pen while non shadows are halved (Chen stage in Big Fight)
+WRITE16_MEMBER(cyclwarr_state::mixing_control_w)
+{
+	COMBINE_DATA(&m_mixing_control);
+}
+
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 {
@@ -1309,7 +1321,7 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 	screen.priority().fill(0, cliprect);
 	draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_bg_layers(screen, bitmap, cliprect, 0);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority());
+	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), m_mixing_control & 1);
 	draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
 	draw_bg_layers(screen, bitmap, cliprect, 1);
 	return 0;

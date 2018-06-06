@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Angelo Salese
 /***************************************************************************
 
     Apache 3                                            ATF-011
@@ -195,12 +195,6 @@ WRITE16_MEMBER(cyclwarr_state::bigfight_a40000_w)
 	COMBINE_DATA(&m_bigfight_a40000[offset]);
 }
 
-WRITE16_MEMBER(cyclwarr_state::bigfight_a60000_w)
-{
-	COMBINE_DATA(&m_bigfight_a60000[offset]);
-//	popmessage("%04x",m_bigfight_a60000[offset]);
-}
-
 template<int Bank>
 READ16_MEMBER(cyclwarr_state::cyclwarr_videoram_r)
 {
@@ -341,7 +335,7 @@ void cyclwarr_state::common_map(address_map &map)
 
 	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::video_config_w));
 	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
-	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
+	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::mixing_control_w));
 	map(0x0ac000, 0x0ac003).w(this, FUNC(tatsumi_state::hd6445_crt_w)).umask16(0x00ff);
 
 	map(0x0b8000, 0x0b8001).w(this, FUNC(cyclwarr_state::cyclwarr_sound_w)).umask16(0xff00);
