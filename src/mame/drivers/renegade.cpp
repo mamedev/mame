@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	{
 		m_msm->reset_w(1);
 		m_adpcm_playing = false;
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 	{
