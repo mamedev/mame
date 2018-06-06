@@ -894,8 +894,12 @@ WRITE8_MEMBER( am9517a_device::write )
 
 		case REGISTER_MASTER_CLEAR:
 			LOG("AM9517A Master Clear\n");
-
-			device_reset();
+			{
+				// Even the master reset should not clear the state of the input lines.
+				int stored_status = m_status;
+				device_reset();
+				m_status = stored_status & 0xF0;
+			}
 			break;
 
 		case REGISTER_CLEAR_MASK:
