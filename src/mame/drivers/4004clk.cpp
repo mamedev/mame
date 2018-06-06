@@ -138,12 +138,12 @@ void nixieclock_state::machine_start()
 MACHINE_CONFIG_START(nixieclock_state::_4004clk)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I4004, 5_MHz_XTAL / 8);
-	MCFG_I4004_ROM_MAP(_4004clk_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(_4004clk_mem)
-	MCFG_I4004_ROM_PORTS_MAP(_4004clk_rp)
-	MCFG_I4004_RAM_STATUS_MAP(_4004clk_stat)
-	MCFG_I4004_RAM_PORTS_MAP(_4004clk_mp)
+	i4004_cpu_device &cpu(I4004(config, "maincpu", 5_MHz_XTAL / 8));
+	cpu.set_rom_map(&nixieclock_state::_4004clk_rom);
+	cpu.set_ram_memory_map(&nixieclock_state::_4004clk_mem);
+	cpu.set_rom_ports_map(&nixieclock_state::_4004clk_rp);
+	cpu.set_ram_status_map(&nixieclock_state::_4004clk_stat);
+	cpu.set_ram_ports_map(&nixieclock_state::_4004clk_mp);
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_4004clk)

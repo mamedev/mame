@@ -226,12 +226,12 @@ void busicom_state::machine_reset()
 
 MACHINE_CONFIG_START(busicom_state::busicom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I4004, 750000)
-	MCFG_I4004_ROM_MAP(busicom_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(busicom_mem)
-	MCFG_I4004_ROM_PORTS_MAP(busicom_rp)
-	MCFG_I4004_RAM_STATUS_MAP(busicom_stat)
-	MCFG_I4004_RAM_PORTS_MAP(busicom_mp)
+	I4004(config, m_maincpu, 750000);
+	m_maincpu->set_rom_map(&busicom_state::busicom_rom);
+	m_maincpu->set_ram_memory_map(&busicom_state::busicom_mem);
+	m_maincpu->set_rom_ports_map(&busicom_state::busicom_rp);
+	m_maincpu->set_ram_status_map(&busicom_state::busicom_stat);
+	m_maincpu->set_ram_ports_map(&busicom_state::busicom_mp);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

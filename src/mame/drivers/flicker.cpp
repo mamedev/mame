@@ -398,12 +398,12 @@ void flicker_state::driver_start()
 
 MACHINE_CONFIG_START(flicker_state::flicker)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I4004, 5_MHz_XTAL / 8)
-	MCFG_I4004_ROM_MAP(flicker_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(flicker_memory)
-	MCFG_I4004_ROM_PORTS_MAP(flicker_rom_ports)
-	MCFG_I4004_RAM_STATUS_MAP(flicker_status)
-	MCFG_I4004_RAM_PORTS_MAP(flicker_ram_ports)
+	MCFG_DEVICE_ADD(m_maincpu, I4004, 5_MHz_XTAL / 8)
+	m_maincpu->set_rom_map(&flicker_state::flicker_rom);
+	m_maincpu->set_ram_memory_map(&flicker_state::flicker_memory);
+	m_maincpu->set_rom_ports_map(&flicker_state::flicker_rom_ports);
+	m_maincpu->set_ram_status_map(&flicker_state::flicker_status);
+	m_maincpu->set_ram_ports_map(&flicker_state::flicker_ram_ports);
 	MCFG_I4004_CM_RAM1_CB(WRITELINE(*this, flicker_state, cm_ram1_w))
 	MCFG_I4004_CM_RAM2_CB(WRITELINE(*this, flicker_state, cm_ram2_w))
 
