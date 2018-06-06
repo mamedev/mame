@@ -141,14 +141,14 @@ TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 {
 	if((m_dac_counter&0x7ff) == 0x7ff) /* reload top address bits */
 	{
-		m_sample_rom_offset_1=(( m_data740000 >> m_offset_shift ) & 0xff )<<11;
-		m_sample_rom_offset_2=(( m_data760000 >> m_offset_shift ) & 0xff )<<11;
+		m_sample_rom_offset[0]=(( m_data740000 >> m_offset_shift ) & 0xff )<<11;
+		m_sample_rom_offset[1]=(( m_data760000 >> m_offset_shift ) & 0xff )<<11;
 		m_offset_shift^=8; /* switch between MSB and LSB */
 	}
 	++m_dac_counter; /* update low address bits */
 
-	m_dac1->write(m_samples_1[m_sample_rom_offset_1 + (m_dac_counter & 0x7ff)]);
-	m_dac2->write(m_samples_2[m_sample_rom_offset_2 + (m_dac_counter & 0x7ff)]);
+	m_dac[0]->write(m_samples[0][m_sample_rom_offset[0] + (m_dac_counter & 0x7ff)]);
+	m_dac[1]->write(m_samples[1][m_sample_rom_offset[1] + (m_dac_counter & 0x7ff)]);
 	m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
@@ -161,16 +161,12 @@ INTERRUPT_GEN_MEMBER(rltennis_state::interrupt)
 
 void rltennis_state::machine_start()
 {
-	m_samples_1 = memregion("samples1")->base();
-	m_samples_2 = memregion("samples2")->base();
-	m_gfx =  memregion("gfx1")->base();
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rltennis_state::sample_player),this));
 
 	save_item(NAME(m_data760000));
 	save_item(NAME(m_data740000));
 	save_item(NAME(m_dac_counter));
-	save_item(NAME(m_sample_rom_offset_1));
-	save_item(NAME(m_sample_rom_offset_2));
+	save_item(NAME(m_sample_rom_offset));
 	save_item(NAME(m_offset_shift));
 	save_item(NAME(m_unk_counter));
 }
@@ -219,7 +215,7 @@ ROM_START( rltennis )
 	ROM_LOAD16_BYTE( "tennis_1.u12", 0x00001, 0x80000, CRC(2ded10d7) SHA1(cca1e858c9c759ef5c0aca6ee50d23d5d532534c) )
 	ROM_LOAD16_BYTE( "tennis_2.u19", 0x00000, 0x80000, CRC(a0dbd2ed) SHA1(8db7dbb6a36fd0fb382a4938d7eba1f7662aa672) )
 
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00  )
+	ROM_REGION( 0x1000000, "gfx", ROMREGION_ERASE00  )
 	ROM_LOAD( "tennis_5.u33", 0x000000, 0x80000, CRC(067a2e4b) SHA1(ab5a227de2b0c51b17aeca68c8af1bf224904ac8) )
 	ROM_LOAD( "tennis_6.u34", 0x080000, 0x80000, CRC(901df2c1) SHA1(7e57d7c7e281ddc02a3e34178d3e471bd8e1d572) )
 	ROM_LOAD( "tennis_7.u35", 0x100000, 0x80000, CRC(8d70fb37) SHA1(250c4c3d32e5a7e17413ee41e1abccb0492b63fd) )
