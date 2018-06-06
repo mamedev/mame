@@ -35,6 +35,7 @@
 #include "sound/ymz280b.h"
 #include "sound/2608intf.h"
 
+#include "vgmplay.lh"
 #include "debugger.h"
 #include "speaker.h"
 
@@ -1724,6 +1725,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
 	MCFG_BITBANGER_READONLY(true)
+	MCFG_DEFAULT_LAYOUT(layout_vgmplay)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

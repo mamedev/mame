@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black2"><rect><color red="0.2" green="0.21" blue="0.23" /></rect></element>
+	
+	<element name="hl1" defstate="0">
+		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+	<element name="text_l1">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25A0;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l2">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25EB;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l3">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25B6;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l4">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25C4;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l5">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25CE;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="45" top="0" bottom="55" />
+
+		<bezel element="static_black2"><bounds x="0"  y="4" width="8" height="5" /></bezel>
+		<bezel element="static_black2"><bounds x="9"  y="4" width="8" height="5" /></bezel>
+		<bezel element="static_black2"><bounds x="18" y="4" width="8" height="5" /></bezel>
+		<bezel element="static_black2"><bounds x="27" y="4" width="8" height="5" /></bezel>
+		<bezel element="static_black2"><bounds x="36" y="4" width="8" height="5" /></bezel>
+
+		<bezel element="text_l1"><bounds x="0"  y="5" width="8" height="3.5" /></bezel>
+		<bezel element="text_l2"><bounds x="9"  y="5" width="8" height="3.5" /></bezel>
+		<bezel element="text_l3"><bounds x="18" y="5" width="8" height="3.5" /></bezel>
+		<bezel element="text_l4"><bounds x="27" y="5" width="8" height="3.5" /></bezel>
+		<bezel element="text_l5"><bounds x="36" y="5" width="8" height="3.5" /></bezel>
+
+		<bezel element="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0" y="4" width="8" height="5" /><color alpha="0.15" /></bezel>
+		<bezel element="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="9"  y="4" width="8" height="5" /><color alpha="0.15" /></bezel>
+		<bezel element="hl1" inputtag="CONTROLS" inputmask="0x0004"><bounds x="18" y="4" width="8" height="5" /><color alpha="0.15" /></bezel>
+		<bezel element="hl1" inputtag="CONTROLS" inputmask="0x0008"><bounds x="27" y="4" width="8" height="5" /><color alpha="0.15" /></bezel>
+		<bezel element="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="36" y="4" width="8" height="5" /><color alpha="0.15" /></bezel>
+	</view>
+</mamelayout>
