@@ -133,8 +133,8 @@ const tiny_rom_entry *k573dio_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(k573dio_device::device_add_mconfig)
-	MCFG_MAS3507D_ADD( "mpeg" )
-	MCFG_DS2401_ADD( "digital_id" )
+	MCFG_MAS3507D_ADD( "mpeg" );
+	DS2401( config, "digital_id" );
 MACHINE_CONFIG_END
 
 void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

@@ -8662,7 +8662,7 @@ MACHINE_CONFIG_START(wingco_state::flam7_w4)
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
-	MCFG_DS2401_ADD("fl7w4_id")
+	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::flaming7)
@@ -8677,7 +8677,7 @@ MACHINE_CONFIG_START(wingco_state::flaming7)
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
-	MCFG_DS2401_ADD("fl7w4_id")
+	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::flam7_tw)
@@ -8692,7 +8692,7 @@ MACHINE_CONFIG_START(wingco_state::flam7_tw)
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
-	MCFG_DS2401_ADD("fl7w4_id")
+	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::mbstar)

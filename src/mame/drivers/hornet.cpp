@@ -1186,7 +1186,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hornet_state::sscope2)
 	hornet_2board_v2(config);
 
-	MCFG_DS2401_ADD("lan_serial_id")
+	MCFG_DEVICE_ADD("lan_serial_id", DS2401)
 	MCFG_EEPROM_SERIAL_93C46_ADD("lan_eeprom")
 MACHINE_CONFIG_END
 
