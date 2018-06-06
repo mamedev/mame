@@ -113,6 +113,16 @@ void smioc_device::smioc_mem(address_map &map)
 	map(0xF8000, 0xFFFFF).rom().region("rom", 0);
 }
 
+static DEVICE_INPUT_DEFAULTS_START(terminal)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_EVEN)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
+
 MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* CPU - Intel 80C188 */
 	MCFG_DEVICE_ADD(I188_TAG, I80188, XTAL(20'000'000) / 2) // Clock division unknown
@@ -125,6 +135,7 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* RS232 */	
 	/* Port 1: Console */
 	MCFG_DEVICE_ADD("rs232_p1", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
 		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
 
@@ -133,21 +144,30 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* SCC2698B */
 	MCFG_DEVICE_ADD("scc2698b", SCC2698B, XTAL(3'686'400))
 	MCFG_SCC2698B_TX_CALLBACK(a, WRITELINE("rs232_p1", rs232_port_device, write_txd))
-	MCFG_SCC2698B_MPP1_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq1_w)) // MPP1 output is TxRDY, DREQ1 is UART 0 TX request
-	MCFG_SCC2698B_MPP2_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq0_w)) // MPP2 output is RxRDY, DREQ0 is UART 0 RX request
+	MCFG_SCC2698B_MPP1_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq1_w)) MCFG_DEVCB_INVERT // MPP1 output is TxRDY (Active High), DREQ1 is UART 0 TX request (Active Low)
+	MCFG_SCC2698B_MPP2_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT // MPP2 output is RxRDY (Active High), DREQ0 is UART 0 RX request (Active Low)
 	MCFG_SCC2698B_TX_CALLBACK(b, WRITELINE("rs232_p2", rs232_port_device, write_txd))
-	MCFG_SCC2698B_MPP1_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq3_w)) 
-	MCFG_SCC2698B_MPP2_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq2_w)) 
+	MCFG_SCC2698B_MPP1_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq3_w)) MCFG_DEVCB_INVERT
+	MCFG_SCC2698B_MPP2_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
 
+	/* The first dma8237 is set up in cascade mode, and each of its four channels provides HREQ/HACK to the other 4 DMA controllers*/
+	MCFG_DEVICE_MODIFY("dma8237_1")
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE("dma8237_2", am9517a_device, hack_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE("dma8237_3", am9517a_device, hack_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE("dma8237_4", am9517a_device, hack_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE("dma8237_5", am9517a_device, hack_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_1", am9517a_device, hack_w))
+	/* Connect base DMA controller's Hold Request to its own Hold ACK
+		The CPU doesn't support hold request / hold ack pins, so we will pretend that the DMA controller immediately gets what it wants every time it asks.
+		This will keep things moving forward, but the CPU will continue going through DMA requests rather than halting for a few cycles each time.
+		It shouldn't cause a problem though.
+		*/
 
 	MCFG_DEVICE_MODIFY("dma8237_2")
 	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, smioc_device, dma8237_2_dmaread))
 	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, smioc_device, dma8237_2_dmawrite))
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, smioc_device, dma8237_2_hreq_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, smioc_device, dma8237_dack_2_3_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
+
 
 	MCFG_DEVICE_MODIFY("rs232_p1")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("scc2698b", scc2698b_device, port_a_rx_w))
@@ -204,9 +224,6 @@ void smioc_device::device_reset()
 	m_m68k_r_cb.resolve_safe(0);
 	m_m68k_w_cb.resolve_safe();
 
-	// Attempt to get DMA working by just holding DREQ high for the first dma chip
-	//m_dma8237_2->dreq1_w(1);
-	//m_dma8237_2->dreq3_w(1);
 }
 
 void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
@@ -321,7 +338,14 @@ READ8_MEMBER(smioc_device::dma68k_r)
 
 	m_dma_timer->adjust(attotime::from_usec(10));
 
-	data = m_m68k_r_cb(offset);
+	// This behavior is not currently well understood - but it seems like the address might be off by one.
+	// When the SMIOC starts a DMA read from the 68k memory transfer space, the first word it reads (at the right address), it throws away
+	// And it deliberately reads the DMA at address+1.
+	// One possibility is that issuing the read is more like a doorbell for the hardware on the board to fetch a data stream starting at that address
+	// but it's not currently clear how it works, so implementing read for the time being as reading address-1 (address - 2 bytes)
+	// Another (and maybe more likely) possibility is that the hardware is doing a slow fetch of the value, and the N+1 read returns data from the Nth read's address
+
+	data = m_m68k_r_cb(offset-1);
 	logerror("dma68k[%04X] => %02X\n", offset, data);
 	return data;
 }
@@ -396,35 +420,13 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 
 
 
-// The logic on the SMIOC board somehow proxies the UART's information about what channels are ready into the DMA DREQ lines.
-// It's not 100% clear how this works, but a rough guess is it's providing !(RDYN) & (!DACK).
-// For now pretend the UART is always ready.
-WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_0_w)
-{
-	//m_dma8237_2->dreq0_w(1); // Disable channel 0 (UART 0 RX)
-}
-WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_1_w)
-{
-	//m_dma8237_2->dreq1_w(!state); // Uart 0 TX
-}
-WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_2_w)
-{
-	//m_dma8237_2->dreq2_w(1); // Disable channel 2 (UART 1 RX)
-}
-WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_3_w)
-{
-	//m_dma8237_2->dreq3_w(!state);
-}
-
-WRITE_LINE_MEMBER(smioc_device::dma8237_2_hreq_w)
-{
-	//m_dma8237_2->hack_w(state);
-}
 
 READ8_MEMBER(smioc_device::dma8237_2_dmaread)
 {
-	logerror("dma2read\n");
-	return 0;
+	int data = m_smioccpu->space(AS_PROGRAM).read_byte(offset);
+	logerror("dma2read [0x%x] => 0x%x\n", offset, data);
+	m_scc2698b->write_reg(0x03, data);
+	return data;
 }
 WRITE8_MEMBER(smioc_device::dma8237_2_dmawrite)
 {

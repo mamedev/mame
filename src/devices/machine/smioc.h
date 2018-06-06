@@ -48,12 +48,6 @@ public:
 	DECLARE_READ8_MEMBER(boardlogic_mmio_r);
 	DECLARE_WRITE8_MEMBER(boardlogic_mmio_w);
 
-	DECLARE_WRITE_LINE_MEMBER(dma8237_2_hreq_w);
-
-	DECLARE_WRITE_LINE_MEMBER(dma8237_dack_2_0_w);
-	DECLARE_WRITE_LINE_MEMBER(dma8237_dack_2_1_w);
-	DECLARE_WRITE_LINE_MEMBER(dma8237_dack_2_2_w);
-	DECLARE_WRITE_LINE_MEMBER(dma8237_dack_2_3_w);
 
 	u16 m_status;
 	u16 m_status2;

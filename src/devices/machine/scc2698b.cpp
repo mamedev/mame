@@ -178,6 +178,8 @@ int scc2698b_channel::read_RXH()
 
 void scc2698b_channel::reset_all()
 {
+	mpp1_value = -1; // Force pin update
+	mpp2_value = -1;
 	reset_tx();
 	reset_rx();
 }
@@ -305,7 +307,7 @@ int scc2698b_channel::read_SR()
 void scc2698b_channel::set_mpp_output(bool output)
 {
 	mpp_is_output = output;
-	recompute_pin_output();
+	recompute_pin_output(true);
 }
 
 void scc2698b_channel::recompute_pin_output(bool force)
@@ -321,14 +323,17 @@ void scc2698b_channel::recompute_pin_output(bool force)
 
 		if (new_mpp1 != mpp1_value || force)
 		{
+			logerror("Channel %d MPP1 => %d\n", channel_port, new_mpp1);
 			parent->write_line_mpp1(channel_port, new_mpp1);
 			mpp1_value = new_mpp1;
 		}
 		if (new_mpp2 != mpp2_value || force)
 		{
+			logerror("Channel %d MPP2 => %d\n", channel_port, new_mpp1);
 			parent->write_line_mpp2(channel_port, new_mpp2);
 			mpp2_value = new_mpp2;
 		}
+		logerror("Channel %d Debug MPP1 => %d, MPP2 => %d\n", channel_port, new_mpp1, new_mpp2);
 	}
 }
 
@@ -682,7 +687,7 @@ void scc2698b_device::write_MR(int port, int value)
 		// Write MR2
 		channel->MR2 = value;
 	}
-	channel->moderegister_ptr = !channel->moderegister_ptr;
+	channel->moderegister_ptr = 1;
 
 	channel->update_serial_configuration();
 }
@@ -732,7 +737,7 @@ void scc2698b_device::write_CR(int port, int value)
 		channel->SR &= 0x0F;
 		break;
 	default:
-		logerror("Unimplemented Command Register write");
+		logerror("Unimplemented Command Register write\n");
 
 	}
 }
@@ -757,7 +762,7 @@ int scc2698b_device::read_MR(int port)
 		data = channel->MR2;
 	}
 
-	channel->moderegister_ptr = !channel->moderegister_ptr;
+	channel->moderegister_ptr = 1;
 	return data;
 }
 int scc2698b_device::read_SR(int port)
