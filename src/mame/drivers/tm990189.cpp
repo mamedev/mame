@@ -181,7 +181,7 @@ private:
 	emu_timer *m_joy2x_timer;
 	emu_timer *m_joy2y_timer;
 	device_image_interface *m_rs232_fp;
-	uint8_t m_rs232_rts;
+	//uint8_t m_rs232_rts;
 	uint8_t m_bogus_read_save;
 };
 
