@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __ADDRMAP_H__
-#define __ADDRMAP_H__
+#ifndef MAME_EMU_ADDRMAP_H
+#define MAME_EMU_ADDRMAP_H
 
 
 
@@ -47,16 +47,12 @@ enum map_handler_type
 class map_handler_data
 {
 public:
-	map_handler_data()
-		: m_type(AMH_NONE),
-			m_bits(0),
-			m_name(nullptr),
-			m_tag(nullptr) { }
+	map_handler_data() { }
 
-	map_handler_type    m_type;             // type of the handler
-	u8                  m_bits;             // width of the handler in bits, or 0 for default
-	const char *        m_name;             // name of the handler
-	const char *        m_tag;              // tag for I/O ports and banks
+	map_handler_type    m_type = AMH_NONE;  // type of the handler
+	u8                  m_bits = 0;         // width of the handler in bits, or 0 for default
+	const char *        m_name = nullptr;   // name of the handler
+	const char *        m_tag = nullptr;    // tag for I/O ports and banks
 };
 
 
@@ -485,4 +481,4 @@ public:
 	void map_validity_check(validity_checker &valid, int spacenum) const;
 };
 
-#endif  /* __ADDRMAP_H__ */
+#endif // MAME_EMU_ADDRMAP_H

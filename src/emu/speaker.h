@@ -6,6 +6,18 @@
 
     Speaker output sound device.
 
+    Speakers have (x, y, z) coordinates in 3D space:
+    * Observer is at position (0, 0, 0)
+    * Positive x is to the right of the observer
+    * Negative x is to the left of the observer
+    * Positive y is above the observer
+    * Negative y is below the observer
+    * Positive z is in front of the observer
+    * Negative z is behind the observer
+
+    Currently, MAME only considers the sign of the x coordinate (not its
+    magnitude), and completely ignores the y and z coordinates.
+
 ***************************************************************************/
 #ifndef MAME_EMU_SPEAKER_H
 #define MAME_EMU_SPEAKER_H

@@ -2144,14 +2144,14 @@ MACHINE_CONFIG_END
 // Variants with additional digital sound board
 MACHINE_CONFIG_START(ksys573_state::k573d)
 	konami573(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::konami573d_map, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573d_map);
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD( "k573dio", XTAL(19'660'800) )
 MACHINE_CONFIG_END
 
 // Variants with additional analogue i/o board
 MACHINE_CONFIG_START(ksys573_state::k573a)
 	konami573(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::konami573a_map, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573a_map);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::pccard1_16mb)
@@ -2409,7 +2409,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::fbaitbc)
 	konami573(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::fbaitbc_map, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::fbaitbc_map);
 
 	MCFG_DEVICE_ADD(m_upd4701, UPD4701A, 0)
 	MCFG_UPD4701_PORTY("uPD4701_y")
@@ -2449,7 +2449,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::pnchmn)
 	konami573(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::konami573a_map, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573a_map);
 
 	cassxi(config);
 	pccard1_32mb(config);
@@ -2465,7 +2465,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::gunmania)
 	konami573(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::gunmania_map, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::gunmania_map);
 
 	DS2401( config, "gunmania_id" );
 	pccard2_32mb(config);

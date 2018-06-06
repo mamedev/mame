@@ -137,9 +137,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(zorba_state::zorba)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, Z80, 24_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(zorba_mem)
-	MCFG_DEVICE_IO_MAP(zorba_io)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zorba_state::zorba_mem);
+	m_maincpu->set_addrmap(AS_IO, &zorba_state::zorba_io);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
