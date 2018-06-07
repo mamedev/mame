@@ -235,7 +235,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(carpolo_state::carpolo)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000)/12)       /* 940.75 kHz */
+	MCFG_DEVICE_ADD(m_maincpu, M6502, XTAL(11'289'000)/12)       /* 940.75 kHz */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", carpolo_state,  carpolo_timer_interrupt)   /* this not strictly VBLANK,
 	                                                   but it's supposed to happen 60
@@ -254,31 +254,31 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, carpolo_state, coin3_interrupt_clear_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, carpolo_state, coin4_interrupt_clear_w))
 
-	MCFG_DEVICE_ADD("7474_2s_1", TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_2s_1, TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, carpolo_state, carpolo_7474_2s_1_q_cb))
 
-	MCFG_DEVICE_ADD("7474_2s_2", TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_2s_2, TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, carpolo_state, carpolo_7474_2s_2_q_cb))
 
-	MCFG_DEVICE_ADD("7474_2u_1", TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_2u_1, TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, carpolo_state, carpolo_7474_2u_1_q_cb))
 
-	MCFG_DEVICE_ADD("7474_2u_2", TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_2u_2, TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, carpolo_state, carpolo_7474_2u_2_q_cb))
 
-	MCFG_DEVICE_ADD("7474_1f_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1f_2", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1d_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1d_2", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1c_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1c_2", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1a_1", TTL7474, 0)
-	MCFG_DEVICE_ADD("7474_1a_2", TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1f_1, TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1f_2, TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1d_1, TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1d_2, TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1c_1, TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1c_2, TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1a_1, TTL7474, 0)
+	MCFG_DEVICE_ADD(m_ttl7474_1a_2, TTL7474, 0)
 
-	MCFG_DEVICE_ADD("74148_3s", TTL74148, 0)
+	MCFG_DEVICE_ADD(m_ttl74148_3s, TTL74148, 0)
 	MCFG_74148_OUTPUT_CB(carpolo_state, ttl74148_3s_cb)
 
-	MCFG_DEVICE_ADD("74153_1k", TTL153)
+	MCFG_DEVICE_ADD(m_ttl74153_1k, TTL153)
 	MCFG_TTL153_ZA_CB(WRITELINE(*this, carpolo_state, ls153_za_w)) // pia1 pb5
 	MCFG_TTL153_ZB_CB(WRITELINE(*this, carpolo_state, ls153_zb_w)) // pia1 pb4
 
