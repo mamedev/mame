@@ -945,6 +945,29 @@ static INPUT_PORTS_START( gradius4 )
 	PORT_DIPSETTING( 0x00, "15KHz" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
+	PORT_INCLUDE(gradius4)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x02, 0x02, "Cabinet Type") PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(0x02, "2 Player")
+	PORT_DIPSETTING(0x00, "4 Player")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(terabrst) //Uses a ccd camera and sensor for gun inputs much similar to thunderh. Need to hook that up as well as the gun board.
+	PORT_INCLUDE(hornet)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 Trigger")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P1 Bomb")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( sscope )
 	PORT_INCLUDE( hornet )
 
@@ -1629,10 +1652,10 @@ ROM_END
 /*************************************************************************/
 
 GAME(  1998, gradius4,  0,        hornet,        gradius4,hornet_state, init_gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,        gradius4,hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,        hornet,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrst,  0,        terabrst,      hornet,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrsta, terabrst, terabrst,      hornet,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,        nbapbp,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,   nbapbp,   hornet,        nbapbp,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrst,  0,        terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrsta, terabrst, terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
 // version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
