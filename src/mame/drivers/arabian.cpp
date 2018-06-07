@@ -214,11 +214,11 @@ WRITE8_MEMBER(arabian_state::mcu_port_p_w)
 void arabian_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).w(this, FUNC(arabian_state::arabian_videoram_w));
+	map(0x8000, 0xbfff).w(FUNC(arabian_state::arabian_videoram_w));
 	map(0xc000, 0xc000).mirror(0x01ff).portr("IN0");
 	map(0xc200, 0xc200).mirror(0x01ff).portr("DSW1");
 	map(0xd000, 0xd7ff).mirror(0x0800).ram().share("custom_cpu_ram");
-	map(0xe000, 0xe007).mirror(0x0ff8).w(this, FUNC(arabian_state::arabian_blitter_w)).share("blitter");
+	map(0xe000, 0xe007).mirror(0x0ff8).w(FUNC(arabian_state::arabian_blitter_w)).share("blitter");
 }
 
 

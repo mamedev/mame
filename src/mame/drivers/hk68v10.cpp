@@ -225,8 +225,8 @@ required_device<scc8530_device> m_sccterm;
 void hk68v10_state::hk68v10_mem(address_map &map)
 {
 map.unmap_value_high();
-map(0x000000, 0x000007).ram().w(this, FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
-map(0x000000, 0x000007).rom().r(this, FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
+map(0x000000, 0x000007).ram().w(FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
+map(0x000000, 0x000007).rom().r(FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
 map(0x000008, 0x1fffff).ram(); /* 2 Mb RAM */
 map(0xFC0000, 0xFC3fff).rom(); /* System EPROM Area 16Kb HBUG */
 map(0xFC4000, 0xFDffff).rom(); /* System EPROM Area an additional 112Kb for System ROM */

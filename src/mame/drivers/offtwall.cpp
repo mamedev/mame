@@ -211,7 +211,7 @@ READ16_MEMBER(offtwall_state::unknown_verify_r)
 void offtwall_state::main_map(address_map &map)
 {
 	map(0x000000, 0x037fff).rom();
-	map(0x038000, 0x03ffff).r(this, FUNC(offtwall_state::bankrom_r)).region("maincpu", 0x38000).share("bankrom_base");
+	map(0x038000, 0x03ffff).r(FUNC(offtwall_state::bankrom_r)).region("maincpu", 0x38000).share("bankrom_base");
 	map(0x120000, 0x120fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x260000, 0x260001).portr("260000");
 	map(0x260002, 0x260003).portr("260002");
@@ -222,7 +222,7 @@ void offtwall_state::main_map(address_map &map)
 	map(0x260024, 0x260025).portr("260024");
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
 	map(0x260041, 0x260041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
-	map(0x260050, 0x260051).w(this, FUNC(offtwall_state::io_latch_w));
+	map(0x260050, 0x260051).w(FUNC(offtwall_state::io_latch_w));
 	map(0x260060, 0x260061).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x2a0000, 0x2a0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");

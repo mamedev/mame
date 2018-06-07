@@ -53,7 +53,7 @@ void dual68_state::dual68_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000ffff).ram().share("ram");
 	map(0x00080000, 0x00081fff).rom().region("user1", 0);
-	map(0x007f0000, 0x007f0001).w(this, FUNC(dual68_state::terminal_w));
+	map(0x007f0000, 0x007f0001).w(FUNC(dual68_state::terminal_w));
 	map(0x00800000, 0x00801fff).rom().region("user1", 0);
 }
 

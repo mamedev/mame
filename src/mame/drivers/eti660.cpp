@@ -92,8 +92,8 @@ void eti660_state::mem_map(address_map &map)
 void eti660_state::io_map(address_map &map)
 {
 	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x02, 0x02).rw(this, FUNC(eti660_state::pia_r), FUNC(eti660_state::pia_w));
-	map(0x03, 0x03).w(this, FUNC(eti660_state::colorram_w));
+	map(0x02, 0x02).rw(FUNC(eti660_state::pia_r), FUNC(eti660_state::pia_w));
+	map(0x03, 0x03).w(FUNC(eti660_state::colorram_w));
 	map(0x04, 0x04).rw(m_cti, FUNC(cdp1864_device::dispoff_r), FUNC(cdp1864_device::tone_latch_w));
 }
 

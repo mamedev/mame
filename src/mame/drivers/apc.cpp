@@ -484,16 +484,16 @@ void apc_state::apc_map(address_map &map)
 void apc_state::apc_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0x00, 0x1f).rw(this, FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
+	map(0x00, 0x1f).rw(FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
 	map(0x20, 0x23).rw(m_i8259_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
-	map(0x28, 0x2f).rw(this, FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
+	map(0x28, 0x2f).rw(FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
 //  0x30, 0x37 serial port 0/1 (i8251) (even/odd)
-	map(0x38, 0x3f).w(this, FUNC(apc_state::apc_dma_segments_w)).umask16(0x00ff);
-	map(0x40, 0x43).rw(this, FUNC(apc_state::apc_gdc_r), FUNC(apc_state::apc_gdc_w));
-	map(0x46, 0x46).w(this, FUNC(apc_state::apc_irq_ack_w));
-	map(0x48, 0x4f).rw(this, FUNC(apc_state::apc_kbd_r), FUNC(apc_state::apc_kbd_w)).umask16(0x00ff);
+	map(0x38, 0x3f).w(FUNC(apc_state::apc_dma_segments_w)).umask16(0x00ff);
+	map(0x40, 0x43).rw(FUNC(apc_state::apc_gdc_r), FUNC(apc_state::apc_gdc_w));
+	map(0x46, 0x46).w(FUNC(apc_state::apc_irq_ack_w));
+	map(0x48, 0x4f).rw(FUNC(apc_state::apc_kbd_r), FUNC(apc_state::apc_kbd_w)).umask16(0x00ff);
 	map(0x50, 0x53).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // upd765
-	map(0x58, 0x58).rw(this, FUNC(apc_state::apc_rtc_r), FUNC(apc_state::apc_rtc_w));
+	map(0x58, 0x58).rw(FUNC(apc_state::apc_rtc_r), FUNC(apc_state::apc_rtc_w));
 //  0x59 CMOS enable
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5b, Power Off

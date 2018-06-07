@@ -33,8 +33,8 @@ void mikro80_state::mikro80_mem(address_map &map)
 void mikro80_state::mikro80_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x07).rw(this, FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
+	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x07).rw(FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
 }
 
 void mikro80_state::kristall_io(address_map &map)
@@ -46,11 +46,11 @@ void mikro80_state::kristall_io(address_map &map)
 void mikro80_state::radio99_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x04).w(this, FUNC(mikro80_state::radio99_sound_w));
-	map(0x05, 0x05).rw(this, FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
-	map(0x06, 0x06).r(this, FUNC(mikro80_state::mikro80_8255_portb_r));
-	map(0x07, 0x07).w(this, FUNC(mikro80_state::mikro80_8255_porta_w));
+	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x04).w(FUNC(mikro80_state::radio99_sound_w));
+	map(0x05, 0x05).rw(FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
+	map(0x06, 0x06).r(FUNC(mikro80_state::mikro80_8255_portb_r));
+	map(0x07, 0x07).w(FUNC(mikro80_state::mikro80_8255_porta_w));
 }
 
 /* Input ports */

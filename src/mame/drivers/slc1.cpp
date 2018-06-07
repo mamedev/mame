@@ -205,7 +205,7 @@ void slc1_state::mem_map(address_map &map)
 void slc1_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
 }
 
 

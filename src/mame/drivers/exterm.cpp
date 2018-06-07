@@ -243,12 +243,12 @@ void exterm_state::master_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).mirror(0xfc700000).ram().share("master_videoram");
 	map(0x00800000, 0x00bfffff).mirror(0xfc400000).ram();
-	map(0x01000000, 0x013fffff).mirror(0xfc000000).rw(this, FUNC(exterm_state::host_data_r), FUNC(exterm_state::host_data_w));
-	map(0x01400000, 0x0143ffff).mirror(0xfc000000).r(this, FUNC(exterm_state::trackball_port_r<0>));
-	map(0x01440000, 0x0147ffff).mirror(0xfc000000).r(this, FUNC(exterm_state::trackball_port_r<1>));
+	map(0x01000000, 0x013fffff).mirror(0xfc000000).rw(FUNC(exterm_state::host_data_r), FUNC(exterm_state::host_data_w));
+	map(0x01400000, 0x0143ffff).mirror(0xfc000000).r(FUNC(exterm_state::trackball_port_r<0>));
+	map(0x01440000, 0x0147ffff).mirror(0xfc000000).r(FUNC(exterm_state::trackball_port_r<1>));
 	map(0x01480000, 0x014bffff).mirror(0xfc000000).portr("DSW");
-	map(0x01500000, 0x0153ffff).mirror(0xfc000000).w(this, FUNC(exterm_state::output_port_0_w));
-	map(0x01580000, 0x015bffff).mirror(0xfc000000).w(this, FUNC(exterm_state::sound_latch_w)).umask16(0x00ff);
+	map(0x01500000, 0x0153ffff).mirror(0xfc000000).w(FUNC(exterm_state::output_port_0_w));
+	map(0x01580000, 0x015bffff).mirror(0xfc000000).w(FUNC(exterm_state::sound_latch_w)).umask16(0x00ff);
 	map(0x015c0000, 0x015fffff).mirror(0xfc000000).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x01800000, 0x01807fff).mirror(0xfc7f8000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x02800000, 0x02807fff).mirror(0xfc7f8000).ram().share("nvram");
@@ -275,13 +275,13 @@ void exterm_state::slave_map(address_map &map)
 void exterm_state::sound_master_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x4000, 0x5fff).w(this, FUNC(exterm_state::ym2151_data_latch_w));
-	map(0x6000, 0x67ff).w(this, FUNC(exterm_state::sound_nmi_rate_w));
+	map(0x4000, 0x5fff).w(FUNC(exterm_state::ym2151_data_latch_w));
+	map(0x6000, 0x67ff).w(FUNC(exterm_state::sound_nmi_rate_w));
 	map(0x6800, 0x6fff).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
-	map(0x7000, 0x77ff).r(this, FUNC(exterm_state::sound_nmi_to_slave_r));
+	map(0x7000, 0x77ff).r(FUNC(exterm_state::sound_nmi_to_slave_r));
 /*  AM_RANGE(0x7800, 0x7fff) unknown - to S4-13 */
 	map(0x8000, 0xffff).rom();
-	map(0xa000, 0xbfff).w(this, FUNC(exterm_state::sound_control_w));
+	map(0xa000, 0xbfff).w(FUNC(exterm_state::sound_control_w));
 }
 
 
@@ -290,8 +290,8 @@ void exterm_state::sound_slave_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
 	map(0x4000, 0x5fff).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::write));
-	map(0x8001, 0x8001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::write));
+	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::data_w));
+	map(0x8001, 0x8001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 

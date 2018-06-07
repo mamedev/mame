@@ -400,14 +400,14 @@ WRITE8_MEMBER( nakajies_state::bank7_w ) { bank_w( 7, offset, data ); }
 
 void nakajies_state::nakajies_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).bankr("bank0").w(this, FUNC(nakajies_state::bank0_w));
-	map(0x20000, 0x3ffff).bankr("bank1").w(this, FUNC(nakajies_state::bank1_w));
-	map(0x40000, 0x5ffff).bankr("bank2").w(this, FUNC(nakajies_state::bank2_w));
-	map(0x60000, 0x7ffff).bankr("bank3").w(this, FUNC(nakajies_state::bank3_w));
-	map(0x80000, 0x9ffff).bankr("bank4").w(this, FUNC(nakajies_state::bank4_w));
-	map(0xa0000, 0xbffff).bankr("bank5").w(this, FUNC(nakajies_state::bank5_w));
-	map(0xc0000, 0xdffff).bankr("bank6").w(this, FUNC(nakajies_state::bank6_w));
-	map(0xe0000, 0xfffff).bankr("bank7").w(this, FUNC(nakajies_state::bank7_w));
+	map(0x00000, 0x1ffff).bankr("bank0").w(FUNC(nakajies_state::bank0_w));
+	map(0x20000, 0x3ffff).bankr("bank1").w(FUNC(nakajies_state::bank1_w));
+	map(0x40000, 0x5ffff).bankr("bank2").w(FUNC(nakajies_state::bank2_w));
+	map(0x60000, 0x7ffff).bankr("bank3").w(FUNC(nakajies_state::bank3_w));
+	map(0x80000, 0x9ffff).bankr("bank4").w(FUNC(nakajies_state::bank4_w));
+	map(0xa0000, 0xbffff).bankr("bank5").w(FUNC(nakajies_state::bank5_w));
+	map(0xc0000, 0xdffff).bankr("bank6").w(FUNC(nakajies_state::bank6_w));
+	map(0xe0000, 0xfffff).bankr("bank7").w(FUNC(nakajies_state::bank7_w));
 }
 
 
@@ -504,12 +504,12 @@ READ8_MEMBER( nakajies_state::keyboard_r )
 
 void nakajies_state::nakajies_io_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(nakajies_state::lcd_memory_start_w));
-	map(0x0010, 0x0017).w(this, FUNC(nakajies_state::banking_w));
-	map(0x0060, 0x0060).rw(this, FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
-	map(0x0090, 0x0090).rw(this, FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
-	map(0x00a0, 0x00a0).r(this, FUNC(nakajies_state::unk_a0_r));
-	map(0x00b0, 0x00b0).r(this, FUNC(nakajies_state::keyboard_r));
+	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
+	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
+	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
+	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
+	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::unk_a0_r));
+	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
 	map(0x00d0, 0x00df).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 }
 

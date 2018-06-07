@@ -125,14 +125,14 @@ void chinsan_state::chinsan_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x20, 0x20).w(this, FUNC(chinsan_state::adpcm_w));
-	map(0x30, 0x30).w(this, FUNC(chinsan_state::ctrl_w));
+	map(0x20, 0x20).w(FUNC(chinsan_state::adpcm_w));
+	map(0x30, 0x30).w(FUNC(chinsan_state::ctrl_w));
 }
 
 void chinsan_state::mayumi_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x30, 0x30).portr("extra").w(this, FUNC(chinsan_state::ctrl_w));
+	map(0x30, 0x30).portr("extra").w(FUNC(chinsan_state::ctrl_w));
 	map(0xc0, 0xc3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd0, 0xd1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }

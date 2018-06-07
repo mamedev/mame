@@ -124,12 +124,12 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS3 */
 		case 1:
-			m_sn_1->write(space, 0, m_sn_latch);
+			m_sn_1->write(m_sn_latch);
 			break;
 
 		/* CS4 */
 		case 2:
-			m_sn_2->write(space, 0, m_sn_latch);
+			m_sn_2->write(m_sn_latch);
 			break;
 
 		/* CS5 */
@@ -158,7 +158,7 @@ void circusc_state::circusc_map(address_map &map)
 	map(0x0000, 0x0007).mirror(0x03f8).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x0400, 0x0400).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* WDOG */
 	map(0x0800, 0x0800).mirror(0x03ff).w("soundlatch", FUNC(generic_latch_8_device::write));              /* SOUND DATA */
-	map(0x0c00, 0x0c00).mirror(0x03ff).w(this, FUNC(circusc_state::circusc_sh_irqtrigger_w));    /* SOUND-ON causes interrupt on audio CPU */
+	map(0x0c00, 0x0c00).mirror(0x03ff).w(FUNC(circusc_state::circusc_sh_irqtrigger_w));    /* SOUND-ON causes interrupt on audio CPU */
 	map(0x1000, 0x1000).mirror(0x03fc).portr("SYSTEM");
 	map(0x1001, 0x1001).mirror(0x03fc).portr("P1");
 	map(0x1002, 0x1002).mirror(0x03fc).portr("P2");
@@ -167,8 +167,8 @@ void circusc_state::circusc_map(address_map &map)
 	map(0x1800, 0x1800).mirror(0x03ff).portr("DSW2");
 	map(0x1c00, 0x1c00).mirror(0x03ff).writeonly().share("scroll"); /* VGAP */
 	map(0x2000, 0x2fff).ram();
-	map(0x3000, 0x33ff).ram().w(this, FUNC(circusc_state::circusc_colorram_w)).share("colorram"); /* colorram */
-	map(0x3400, 0x37ff).ram().w(this, FUNC(circusc_state::circusc_videoram_w)).share("videoram"); /* videoram */
+	map(0x3000, 0x33ff).ram().w(FUNC(circusc_state::circusc_colorram_w)).share("colorram"); /* colorram */
+	map(0x3400, 0x37ff).ram().w(FUNC(circusc_state::circusc_videoram_w)).share("videoram"); /* videoram */
 	map(0x3800, 0x38ff).ram().share("spriteram_2"); /* spriteram2 */
 	map(0x3900, 0x39ff).ram().share("spriteram"); /* spriteram */
 	map(0x3a00, 0x3fff).ram();
@@ -180,8 +180,8 @@ void circusc_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));       /* CS0 */
-	map(0x8000, 0x8000).mirror(0x1fff).r(this, FUNC(circusc_state::circusc_sh_timer_r));  /* CS1 */
-	map(0xa000, 0xa07f).mirror(0x1f80).w(this, FUNC(circusc_state::circusc_sound_w));    /* CS2 - CS6 */
+	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(circusc_state::circusc_sh_timer_r));  /* CS1 */
+	map(0xa000, 0xa07f).mirror(0x1f80).w(FUNC(circusc_state::circusc_sound_w));    /* CS2 - CS6 */
 }
 
 

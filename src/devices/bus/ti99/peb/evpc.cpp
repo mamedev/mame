@@ -296,7 +296,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 
 	if (m_sound_accessed)
 	{
-		m_sound->write(space, 0, data);
+		m_sound->write(data);
 	}
 }
 

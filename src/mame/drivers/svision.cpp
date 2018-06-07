@@ -250,7 +250,7 @@ WRITE8_MEMBER(svision_state::tvlink_w)
 void svision_state::svision_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).rw(this, FUNC(svision_state::svision_r), FUNC(svision_state::svision_w)).share(m_reg);
+	map(0x2000, 0x3fff).rw(FUNC(svision_state::svision_r), FUNC(svision_state::svision_w)).share(m_reg);
 	map(0x4000, 0x5fff).ram().share(m_videoram);
 	map(0x6000, 0x7fff).noprw();
 	map(0x8000, 0xbfff).bankr(m_bank1);
@@ -260,7 +260,7 @@ void svision_state::svision_mem(address_map &map)
 void svision_state::tvlink_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).rw(this, FUNC(svision_state::tvlink_r), FUNC(svision_state::tvlink_w)).share(m_reg);
+	map(0x2000, 0x3fff).rw(FUNC(svision_state::tvlink_r), FUNC(svision_state::tvlink_w)).share(m_reg);
 	map(0x4000, 0x5fff).ram().share(m_videoram);
 	map(0x6000, 0x7fff).noprw();
 	map(0x8000, 0xbfff).bankr(m_bank1);

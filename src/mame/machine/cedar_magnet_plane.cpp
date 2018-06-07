@@ -29,10 +29,10 @@ void cedar_magnet_plane_device::cedar_magnet_plane_io(address_map &map)
 	map(0xc0, 0xc3).rw("z80pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xc4, 0xc7).rw("z80pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 
-	map(0xcc, 0xcc).w(this, FUNC(cedar_magnet_plane_device::plane_portcc_w));
-	map(0xcd, 0xcd).w(this, FUNC(cedar_magnet_plane_device::plane_portcd_w));
-	map(0xce, 0xce).w(this, FUNC(cedar_magnet_plane_device::plane_portce_w));
-	map(0xcf, 0xcf).w(this, FUNC(cedar_magnet_plane_device::plane_portcf_w));
+	map(0xcc, 0xcc).w(FUNC(cedar_magnet_plane_device::plane_portcc_w));
+	map(0xcd, 0xcd).w(FUNC(cedar_magnet_plane_device::plane_portcd_w));
+	map(0xce, 0xce).w(FUNC(cedar_magnet_plane_device::plane_portce_w));
+	map(0xcf, 0xcf).w(FUNC(cedar_magnet_plane_device::plane_portcf_w));
 
 }
 

@@ -174,10 +174,10 @@ void miragemj_state::mirage_map(address_map &map)
 	map(0x160000, 0x160001).nopw();
 	map(0x168000, 0x16800f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
 	map(0x16a000, 0x16a001).nopw();
-	map(0x16c000, 0x16c001).w(this, FUNC(miragemj_state::okim1_rombank_w));
-	map(0x16c002, 0x16c003).w(this, FUNC(miragemj_state::okim0_rombank_w));
-	map(0x16c004, 0x16c005).w(this, FUNC(miragemj_state::mjmux_w));
-	map(0x16c006, 0x16c007).r(this, FUNC(miragemj_state::mjmux_r));
+	map(0x16c000, 0x16c001).w(FUNC(miragemj_state::okim1_rombank_w));
+	map(0x16c002, 0x16c003).w(FUNC(miragemj_state::okim0_rombank_w));
+	map(0x16c004, 0x16c005).w(FUNC(miragemj_state::mjmux_w));
+	map(0x16c006, 0x16c007).r(FUNC(miragemj_state::mjmux_r));
 	map(0x16e000, 0x16e001).nopw();
 	map(0x16e002, 0x16e003).portr("SYSTEM_IN");
 	map(0x170000, 0x173fff).ram();

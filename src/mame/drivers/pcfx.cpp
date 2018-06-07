@@ -188,7 +188,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 
 void pcfx_state::pcfx_io(address_map &map)
 {
-	map(0x00000000, 0x000000FF).rw(this, FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
+	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
 	map(0x00000100, 0x000001FF).noprw();   /* HuC6230 */
 	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::regs)).umask32(0x0000ffff);   /* HuC6271 */
 	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
@@ -196,7 +196,7 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x000006FF).rw("huc6272", FUNC(huc6272_device::read), FUNC(huc6272_device::write));    /* HuC6272 */
 	map(0x00000C80, 0x00000C83).noprw();
-	map(0x00000E00, 0x00000EFF).rw(this, FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
+	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
 	map(0x00000F00, 0x00000FFF).noprw();
 //  AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
 	map(0x00780000, 0x007FFFFF).rom().region("scsi_rom", 0);

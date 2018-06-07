@@ -80,11 +80,11 @@ void cz101_state::maincpu_map(address_map &map)
 	map(0x0000, 0x7fff).rom().region("program", 0);
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x97ff).noprw(); // rampack
-	map(0x9800, 0x9fff).w(this, FUNC(cz101_state::led_4_w));
-	map(0xa000, 0xa7ff).w(this, FUNC(cz101_state::led_3_w));
-	map(0xa800, 0xafff).w(this, FUNC(cz101_state::led_2_w));
-	map(0xb000, 0xb7ff).w(this, FUNC(cz101_state::led_1_w));
-	map(0xb800, 0xbfff).r(this, FUNC(cz101_state::keys_r));
+	map(0x9800, 0x9fff).w(FUNC(cz101_state::led_4_w));
+	map(0xa000, 0xa7ff).w(FUNC(cz101_state::led_3_w));
+	map(0xa800, 0xafff).w(FUNC(cz101_state::led_2_w));
+	map(0xb000, 0xb7ff).w(FUNC(cz101_state::led_1_w));
+	map(0xb800, 0xbfff).r(FUNC(cz101_state::keys_r));
 }
 
 

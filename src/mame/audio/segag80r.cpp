@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(monsterb_sound_device::device_add_mconfig)
 	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, monsterb_sound_device, n7751_command_r))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, monsterb_sound_device, n7751_rom_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monsterb_sound_device, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 

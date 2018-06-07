@@ -245,9 +245,9 @@ void vidbrain_state::vidbrain_mem(address_map &map)
 
 void vidbrain_state::vidbrain_io(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(vidbrain_state::keyboard_w));
-	map(0x01, 0x01).rw(this, FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
-	map(0x0c, 0x0f).w(this, FUNC(vidbrain_state::f3853_w));
+	map(0x00, 0x00).w(FUNC(vidbrain_state::keyboard_w));
+	map(0x01, 0x01).rw(FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
+	map(0x0c, 0x0f).w(FUNC(vidbrain_state::f3853_w));
 //  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_device, read, write)
 }
 

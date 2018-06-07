@@ -112,7 +112,7 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 
 void m68340_cpu_device::m68340_internal_map(address_map &map)
 {
-	map(0x0003ff00, 0x0003ff03).rw(this, FUNC(m68340_cpu_device::m68340_internal_base_r), FUNC(m68340_cpu_device::m68340_internal_base_w));
+	map(0x0003ff00, 0x0003ff03).rw(FUNC(m68340_cpu_device::m68340_internal_base_r), FUNC(m68340_cpu_device::m68340_internal_base_w));
 }
 
 

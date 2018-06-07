@@ -427,7 +427,7 @@ void ghosteo_state::bballoon_map(address_map &map)
 
 void ghosteo_state::touryuu_map(address_map &map)
 {
-	map(0x10000000, 0x10000003).r(this, FUNC(ghosteo_state::touryuu_port_10000000_r));
+	map(0x10000000, 0x10000003).r(FUNC(ghosteo_state::touryuu_port_10000000_r));
 	map(0x10100000, 0x10100003).portr("10100000");
 	map(0x10200000, 0x10200003).portr("10200000");
 	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);

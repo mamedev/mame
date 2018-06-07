@@ -1001,9 +1001,9 @@ void pacman_state::pacman_map(address_map &map)
 {
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	map(0x0000, 0x3fff).mirror(0x8000).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(this, FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(addressable_latch_device::write_d0));
@@ -1022,8 +1022,8 @@ void pacman_state::pacman_map(address_map &map)
 void pacman_state::birdiy_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x8000).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 //  AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
@@ -1046,9 +1046,9 @@ void pacman_state::mspacman_map(address_map &map)
 	map(0x0000, 0xffff).bankr("bank1");
 	map(0x4000, 0x7fff).mirror(0x8000).unmaprw();
 
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(this, FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -1063,23 +1063,23 @@ void pacman_state::mspacman_map(address_map &map)
 	map(0x50c0, 0x50c0).mirror(0xaf3f).portr("DSW2");
 
 	/* overlay decode enable/disable on top */
-	map(0x0038, 0x003f).rw(this, FUNC(pacman_state::mspacman_disable_decode_r_0x0038), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x03b0, 0x03b7).rw(this, FUNC(pacman_state::mspacman_disable_decode_r_0x03b0), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x1600, 0x1607).rw(this, FUNC(pacman_state::mspacman_disable_decode_r_0x1600), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x2120, 0x2127).rw(this, FUNC(pacman_state::mspacman_disable_decode_r_0x2120), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x3ff0, 0x3ff7).rw(this, FUNC(pacman_state::mspacman_disable_decode_r_0x3ff0), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x3ff8, 0x3fff).rw(this, FUNC(pacman_state::mspacman_enable_decode_r_0x3ff8), FUNC(pacman_state::mspacman_enable_decode_w));
-	map(0x8000, 0x8007).rw(this, FUNC(pacman_state::mspacman_disable_decode_r_0x8000), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x97f0, 0x97f7).rw(this, FUNC(pacman_state::mspacman_disable_decode_r_0x97f0), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x0038, 0x003f).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x0038), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x03b0, 0x03b7).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x03b0), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x1600, 0x1607).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x1600), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x2120, 0x2127).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x2120), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x3ff0, 0x3ff7).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x3ff0), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x3ff8, 0x3fff).rw(FUNC(pacman_state::mspacman_enable_decode_r_0x3ff8), FUNC(pacman_state::mspacman_enable_decode_w));
+	map(0x8000, 0x8007).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x8000), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x97f0, 0x97f7).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x97f0), FUNC(pacman_state::mspacman_disable_decode_w));
 }
 
 
 void pacman_state::woodpek_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(this, FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -1105,8 +1105,8 @@ void pacman_state::numcrash_map(address_map &map)
 	/* 0x3800 - 0x3fff unmapped? */
 	map(0x8000, 0x9fff).rom();
 
-	map(0x4000, 0x43ff).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 
 	map(0x4c00, 0x4fef).ram();
 	map(0x4ff0, 0x4fff).ram().share("spriteram");
@@ -1126,15 +1126,15 @@ void pacman_state::numcrash_map(address_map &map)
 void pacman_state::alibaba_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(this, FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4eef).mirror(0xa000).ram();
 	map(0x4ef0, 0x4eff).mirror(0xa000).ram().share("spriteram");
 	map(0x4f00, 0x4fff).mirror(0xa000).ram();
 	map(0x5000, 0x5007).mirror(0xaf38).w("latch1", FUNC(ls259_device::write_d0));
 	map(0x5000, 0x5000).mirror(0xaf38).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x5040, 0x506f).mirror(0xaf00).w(this, FUNC(pacman_state::alibaba_sound_w)); /* the sound region is not contiguous */
+	map(0x5040, 0x506f).mirror(0xaf00).w(FUNC(pacman_state::alibaba_sound_w)); /* the sound region is not contiguous */
 	map(0x5050, 0x505f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1142,9 +1142,9 @@ void pacman_state::alibaba_map(address_map &map)
 	map(0x5000, 0x5000).mirror(0xaf3f).portr("IN0");
 	map(0x5040, 0x5040).mirror(0xaf3f).portr("IN1");
 	map(0x5080, 0x5080).mirror(0xaf3f).portr("DSW1");
-	map(0x50c0, 0x50c0).mirror(0xaf00).r(this, FUNC(pacman_state::alibaba_mystery_1_r));
-	map(0x50c1, 0x50c1).mirror(0xaf00).r(this, FUNC(pacman_state::alibaba_mystery_2_r));
-	map(0x50c2, 0x50ff).mirror(0xaf00).r(this, FUNC(pacman_state::pacman_read_nop));
+	map(0x50c0, 0x50c0).mirror(0xaf00).r(FUNC(pacman_state::alibaba_mystery_1_r));
+	map(0x50c1, 0x50c1).mirror(0xaf00).r(FUNC(pacman_state::alibaba_mystery_2_r));
+	map(0x50c2, 0x50ff).mirror(0xaf00).r(FUNC(pacman_state::pacman_read_nop));
 	map(0x8000, 0x8fff).rom();
 	map(0x9000, 0x93ff).mirror(0x0c00).ram();
 	map(0xa000, 0xa7ff).mirror(0x1800).rom();
@@ -1154,8 +1154,8 @@ void pacman_state::alibaba_map(address_map &map)
 void pacman_state::dremshpr_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4800, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -1179,9 +1179,9 @@ void pacman_state::dremshpr_map(address_map &map)
 void pacman_state::epos_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x8000).bankr("bank1");
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(this, FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -1200,11 +1200,11 @@ void pacman_state::epos_map(address_map &map)
 void pacman_state::s2650games_map(address_map &map)
 {
 	map(0x0000, 0x0fff).bankr("bank1");
-	map(0x1000, 0x13ff).mirror(0x6000).w(this, FUNC(pacman_state::s2650games_colorram_w)).share("colorram");
-	map(0x1400, 0x141f).mirror(0x6000).w(this, FUNC(pacman_state::s2650games_scroll_w));
+	map(0x1000, 0x13ff).mirror(0x6000).w(FUNC(pacman_state::s2650games_colorram_w)).share("colorram");
+	map(0x1400, 0x141f).mirror(0x6000).w(FUNC(pacman_state::s2650games_scroll_w));
 	map(0x1420, 0x148f).mirror(0x6000).writeonly();
 	map(0x1490, 0x149f).mirror(0x6000).writeonly().share("s2650_spriteram");
-	map(0x14a0, 0x14bf).mirror(0x6000).w(this, FUNC(pacman_state::s2650games_tilesbank_w)).share("s2650_tileram");
+	map(0x14a0, 0x14bf).mirror(0x6000).w(FUNC(pacman_state::s2650games_tilesbank_w)).share("s2650_tileram");
 	map(0x14c0, 0x14ff).mirror(0x6000).writeonly();
 	map(0x1500, 0x1507).mirror(0x6000).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x1508, 0x155f).mirror(0x6000).writeonly();
@@ -1212,11 +1212,11 @@ void pacman_state::s2650games_map(address_map &map)
 	map(0x1570, 0x157f).mirror(0x6000).writeonly();
 	map(0x1586, 0x1587).mirror(0x6000).nopw();
 	map(0x15c0, 0x15c0).mirror(0x6000).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x15c7, 0x15c7).mirror(0x6000).w(this, FUNC(pacman_state::porky_banking_w));
+	map(0x15c7, 0x15c7).mirror(0x6000).w(FUNC(pacman_state::porky_banking_w));
 	map(0x1500, 0x1500).mirror(0x6000).portr("IN0");
 	map(0x1540, 0x1540).mirror(0x6000).portr("IN1");
 	map(0x1580, 0x1580).mirror(0x6000).portr("DSW0");
-	map(0x1800, 0x1bff).mirror(0x6000).w(this, FUNC(pacman_state::s2650games_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(pacman_state::s2650games_videoram_w)).share("videoram");
 	map(0x1c00, 0x1fef).mirror(0x6000).ram();
 	map(0x1ff0, 0x1fff).mirror(0x6000).writeonly().share("spriteram");
 	map(0x2000, 0x2fff).bankr("bank2");
@@ -1228,33 +1228,33 @@ void pacman_state::s2650games_map(address_map &map)
 void pacman_state::rocktrv2_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram();
 	map(0x5000, 0x5007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x5fe0, 0x5fe3).w(this, FUNC(pacman_state::rocktrv2_prot_data_w)).share("rocktrv2_prot");
-	map(0x5ff0, 0x5ff0).w(this, FUNC(pacman_state::rocktrv2_question_bank_w));
+	map(0x5fe0, 0x5fe3).w(FUNC(pacman_state::rocktrv2_prot_data_w)).share("rocktrv2_prot");
+	map(0x5ff0, 0x5ff0).w(FUNC(pacman_state::rocktrv2_question_bank_w));
 	map(0x5000, 0x5000).portr("IN0");
 	map(0x5040, 0x507f).portr("IN1");
 	map(0x5080, 0x5080).portr("DSW1");
 	map(0x50c0, 0x50c0).portr("DSW2");
-	map(0x5fe0, 0x5fe0).r(this, FUNC(pacman_state::rocktrv2_prot1_data_r));
-	map(0x5fe4, 0x5fe4).r(this, FUNC(pacman_state::rocktrv2_prot2_data_r));
-	map(0x5fe8, 0x5fe8).r(this, FUNC(pacman_state::rocktrv2_prot3_data_r));
-	map(0x5fec, 0x5fec).r(this, FUNC(pacman_state::rocktrv2_prot4_data_r));
+	map(0x5fe0, 0x5fe0).r(FUNC(pacman_state::rocktrv2_prot1_data_r));
+	map(0x5fe4, 0x5fe4).r(FUNC(pacman_state::rocktrv2_prot2_data_r));
+	map(0x5fe8, 0x5fe8).r(FUNC(pacman_state::rocktrv2_prot3_data_r));
+	map(0x5fec, 0x5fec).r(FUNC(pacman_state::rocktrv2_prot4_data_r));
 	map(0x5fff, 0x5fff).portr("DSW2");       /* DSW2 mirrored */
 	map(0x6000, 0x7fff).rom();
-	map(0x8000, 0xffff).r(this, FUNC(pacman_state::rocktrv2_question_r));
+	map(0x8000, 0xffff).r(FUNC(pacman_state::rocktrv2_question_r));
 }
 
 
 void pacman_state::bigbucks_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram();
 	map(0x5000, 0x5007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
@@ -1264,7 +1264,7 @@ void pacman_state::bigbucks_map(address_map &map)
 	map(0x5080, 0x50bf).portr("DSW1");
 	map(0x50c0, 0x50ff).portr("DSW2");
 	map(0x5100, 0x5100).nopw(); /*?*/
-	map(0x6000, 0x6000).w(this, FUNC(pacman_state::bigbucks_bank_w));
+	map(0x6000, 0x6000).w(FUNC(pacman_state::bigbucks_bank_w));
 	map(0x8000, 0x9fff).rom();
 }
 
@@ -1272,9 +1272,9 @@ void pacman_state::bigbucks_map(address_map &map)
 void pacman_state::mschamp_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bank1");
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(this, FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -1294,12 +1294,12 @@ void pacman_state::mschamp_map(address_map &map)
 void pacman_state::superabc_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bank1");
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4800, 0x4fef).mirror(0xa000).ram().share("28c16.u17"); // nvram
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x5002, 0x5002).mirror(0xaf3c).w(this, FUNC(pacman_state::superabc_bank_w));
+	map(0x5002, 0x5002).mirror(0xaf3c).w(FUNC(pacman_state::superabc_bank_w));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1317,9 +1317,9 @@ void pacman_state::superabc_map(address_map &map)
 void pacman_state::crushs_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x8000).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-	map(0x4800, 0x4bff).mirror(0xa000).r(this, FUNC(pacman_state::pacman_read_nop)).nopw();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -1340,8 +1340,8 @@ void pacman_state::pengojpm_map(address_map &map)
 //  AM_RANGE(0x1000, 0x1fff) // header check for 0x55aa at POST, diagnostic ROM?
 	map(0x4000, 0x7fff).rom();
 
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pacman_state::pacman_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pacman_state::pacman_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 
 	map(0x8800, 0x8bff).ram();
 //  AM_RANGE(0x8800, 0x8bff) AM_READ(pacman_read_nop) AM_WRITENOP
@@ -1371,14 +1371,14 @@ void pacman_state::pengojpm_map(address_map &map)
 void pacman_state::writeport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(pacman_state::pacman_interrupt_vector_w));    /* Pac-Man only */
+	map(0x00, 0x00).w(FUNC(pacman_state::pacman_interrupt_vector_w));    /* Pac-Man only */
 }
 
 void pacman_state::vanvan_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w("sn1", FUNC(sn76496_device::write));
-	map(0x02, 0x02).w("sn2", FUNC(sn76496_device::write));
+	map(0x01, 0x01).w("sn1", FUNC(sn76496_device::command_w));
+	map(0x02, 0x02).w("sn2", FUNC(sn76496_device::command_w));
 }
 
 void pacman_state::dremshpr_portmap(address_map &map)
@@ -1390,53 +1390,53 @@ void pacman_state::dremshpr_portmap(address_map &map)
 void pacman_state::piranha_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(pacman_state::piranha_interrupt_vector_w));
+	map(0x00, 0x00).w(FUNC(pacman_state::piranha_interrupt_vector_w));
 }
 
 void pacman_state::nmouse_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(pacman_state::nmouse_interrupt_vector_w));
+	map(0x00, 0x00).w(FUNC(pacman_state::nmouse_interrupt_vector_w));
 }
 
 void pacman_state::epos_portmap(address_map &map)
 {
 	writeport(map);
-	map(0x00, 0xff).r(this, FUNC(pacman_state::epos_decryption_w));   /* Switch protection logic */
+	map(0x00, 0xff).r(FUNC(pacman_state::epos_decryption_w));   /* Switch protection logic */
 }
 
 void pacman_state::mschamp_portmap(address_map &map)
 {
 	writeport(map);
-	map(0x00, 0x00).r(this, FUNC(pacman_state::mschamp_kludge_r));
+	map(0x00, 0x00).r(FUNC(pacman_state::mschamp_kludge_r));
 }
 
 void pacman_state::bigbucks_portmap(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(pacman_state::bigbucks_question_r));
+	map(0x0000, 0xffff).r(FUNC(pacman_state::bigbucks_question_r));
 }
 
 void pacman_state::s2650games_dataport(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).w("sn1", FUNC(sn76496_device::write));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).w("sn1", FUNC(sn76496_device::command_w));
 }
 
 void pacman_state::drivfrcp_portmap(address_map &map)
 {
 	map(0x00, 0x00).nopr();
-	map(0x01, 0x01).r(this, FUNC(pacman_state::drivfrcp_port1_r));
+	map(0x01, 0x01).r(FUNC(pacman_state::drivfrcp_port1_r));
 }
 
 void pacman_state::_8bpm_portmap(address_map &map)
 {
 	map(0x00, 0x00).nopr();
-	map(0x01, 0x01).r(this, FUNC(pacman_state::_8bpm_port1_r));
+	map(0x01, 0x01).r(FUNC(pacman_state::_8bpm_port1_r));
 	map(0xe0, 0xe0).nopr();
 }
 
 void pacman_state::porky_portmap(address_map &map)
 {
-	map(0x01, 0x01).r(this, FUNC(pacman_state::porky_port1_r));
+	map(0x01, 0x01).r(FUNC(pacman_state::porky_port1_r));
 }
 
 void pacman_state::crushs_portmap(address_map &map)
@@ -4209,6 +4209,27 @@ ROM_START( mspacmanbgd )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "10.e5",    0x0000, 0x0800, CRC(f2c5da43) SHA1(6a6de2ecc313a11ad12d8d1712c05f923984f668) )
+	ROM_CONTINUE(0x1000,0x800)
+	ROM_CONTINUE(0x0800,0x800)
+	ROM_CONTINUE(0x1800,0x800)
+	ROM_IGNORE(0x6000) // this also contains regular pacman gfx, ignore them for now at least
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) ) // slightly different to original (verified)
+	ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // == 82s126.4a
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // == 82s126.1m
+	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */ // == 82s126.3m
+ROM_END
+
+ROM_START( mspacmanbco )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cs.11",  0x0000, 0x4000, CRC(1ba81f43) SHA1(db1407231f760a0c213d29d1126dd22dd4fcc5b9) )
+	ROM_CONTINUE(0x8000,0x4000) // blocks 5+6 are repeated twice in here
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "c13.13",    0x0000, 0x0800, CRC(f2c5da43) SHA1(6a6de2ecc313a11ad12d8d1712c05f923984f668) )
 	ROM_CONTINUE(0x1000,0x800)
 	ROM_CONTINUE(0x0800,0x800)
 	ROM_CONTINUE(0x1800,0x800)
@@ -7352,6 +7373,7 @@ GAME( 1992, mspacmanbgd,mspacman,woodpek, mspacman, pacman_state,  empty_init,  
 GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Triunvi)",  "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Triunvi bootleg)", MACHINE_SUPPORTS_SAVE ) //
 GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
 GAME( 1991, mspacmanbhe,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
+GAME( 1992, mspacmanbco,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Cocamatic)","Come-Cocos (Ms. Pac-Man) (Cocamatic bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // this PCB have swapped Blue and Green color lines (Ms.Pac-Man sprite should be pink), no "MADE IN GREECE" text at PCB
 GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  empty_init,    ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
 

@@ -70,7 +70,7 @@ void dynamoah_state::i8031_mem(address_map &map)
 
 void dynamoah_state::i8031_ext_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(dynamoah_state::ext_r), FUNC(dynamoah_state::ext_w));
+	map(0x0000, 0xffff).rw(FUNC(dynamoah_state::ext_r), FUNC(dynamoah_state::ext_w));
 }
 
 MACHINE_CONFIG_START(dynamoah_state::dynamoah)

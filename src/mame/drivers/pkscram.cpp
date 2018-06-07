@@ -125,14 +125,14 @@ void pkscram_state::pkscramble_map(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x0400ff).ram().share("nvram");
 	map(0x041000, 0x043fff).ram(); // main ram
-	map(0x044000, 0x044fff).ram().w(this, FUNC(pkscram_state::pkscramble_fgtilemap_w)).share("fgtilemap_ram"); // fg tilemap
-	map(0x045000, 0x045fff).ram().w(this, FUNC(pkscram_state::pkscramble_mdtilemap_w)).share("mdtilemap_ram"); // md tilemap (just a copy of fg?)
-	map(0x046000, 0x046fff).ram().w(this, FUNC(pkscram_state::pkscramble_bgtilemap_w)).share("bgtilemap_ram"); // bg tilemap
+	map(0x044000, 0x044fff).ram().w(FUNC(pkscram_state::pkscramble_fgtilemap_w)).share("fgtilemap_ram"); // fg tilemap
+	map(0x045000, 0x045fff).ram().w(FUNC(pkscram_state::pkscramble_mdtilemap_w)).share("mdtilemap_ram"); // md tilemap (just a copy of fg?)
+	map(0x046000, 0x046fff).ram().w(FUNC(pkscram_state::pkscramble_bgtilemap_w)).share("bgtilemap_ram"); // bg tilemap
 	map(0x047000, 0x047fff).ram(); // unused
 	map(0x048000, 0x048fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x049000, 0x049001).portr("DSW");
 	map(0x049004, 0x049005).portr("INPUTS");
-	map(0x049008, 0x049009).w(this, FUNC(pkscram_state::pkscramble_output_w));
+	map(0x049008, 0x049009).w(FUNC(pkscram_state::pkscramble_output_w));
 	map(0x049010, 0x049011).nopw();
 	map(0x049014, 0x049015).nopw();
 	map(0x049018, 0x049019).nopw();

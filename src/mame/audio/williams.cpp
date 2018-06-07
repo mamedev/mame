@@ -164,9 +164,9 @@ void williams_cvsd_sound_device::williams_cvsd_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x2001).mirror(0x1ffe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x6000).mirror(0x07ff).w(this, FUNC(williams_cvsd_sound_device::cvsd_digit_clock_clear_w));
-	map(0x6800, 0x6800).mirror(0x07ff).w(this, FUNC(williams_cvsd_sound_device::cvsd_clock_set_w));
-	map(0x7800, 0x7800).mirror(0x07ff).w(this, FUNC(williams_cvsd_sound_device::bank_select_w));
+	map(0x6000, 0x6000).mirror(0x07ff).w(FUNC(williams_cvsd_sound_device::cvsd_digit_clock_clear_w));
+	map(0x6800, 0x6800).mirror(0x07ff).w(FUNC(williams_cvsd_sound_device::cvsd_clock_set_w));
+	map(0x7800, 0x7800).mirror(0x07ff).w(FUNC(williams_cvsd_sound_device::bank_select_w));
 	map(0x8000, 0xffff).bankr("rombank");
 }
 
@@ -180,7 +180,7 @@ MACHINE_CONFIG_START(williams_cvsd_sound_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(williams_cvsd_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_cvsd_sound_device, talkback_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("cpu", M6809_FIRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("cpu", INPUT_LINE_NMI))
@@ -460,12 +460,12 @@ void williams_narc_sound_device::williams_narc_master_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).mirror(0x03fe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2800).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::master_talkback_w));
-	map(0x2c00, 0x2c00).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::command2_w));
-	map(0x3000, 0x3000).mirror(0x03ff).w("dac1", FUNC(dac_byte_interface::write));
-	map(0x3400, 0x3400).mirror(0x03ff).r(this, FUNC(williams_narc_sound_device::command_r));
-	map(0x3800, 0x3800).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::master_bank_select_w));
-	map(0x3c00, 0x3c00).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::master_sync_w));
+	map(0x2800, 0x2800).mirror(0x03ff).w(FUNC(williams_narc_sound_device::master_talkback_w));
+	map(0x2c00, 0x2c00).mirror(0x03ff).w(FUNC(williams_narc_sound_device::command2_w));
+	map(0x3000, 0x3000).mirror(0x03ff).w("dac1", FUNC(dac_byte_interface::data_w));
+	map(0x3400, 0x3400).mirror(0x03ff).r(FUNC(williams_narc_sound_device::command_r));
+	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(williams_narc_sound_device::master_bank_select_w));
+	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(williams_narc_sound_device::master_sync_w));
 	map(0x4000, 0xbfff).bankr("masterbank");
 	map(0xc000, 0xffff).bankr("masterupper");
 }
@@ -478,13 +478,13 @@ void williams_narc_sound_device::williams_narc_master_map(address_map &map)
 void williams_narc_sound_device::williams_narc_slave_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::cvsd_clock_set_w));
-	map(0x2400, 0x2400).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::cvsd_digit_clock_clear_w));
-	map(0x2800, 0x2800).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::slave_talkback_w));
-	map(0x3000, 0x3000).mirror(0x03ff).w("dac2", FUNC(dac_byte_interface::write));
-	map(0x3400, 0x3400).mirror(0x03ff).r(this, FUNC(williams_narc_sound_device::command2_r));
-	map(0x3800, 0x3800).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::slave_bank_select_w));
-	map(0x3c00, 0x3c00).mirror(0x03ff).w(this, FUNC(williams_narc_sound_device::slave_sync_w));
+	map(0x2000, 0x2000).mirror(0x03ff).w(FUNC(williams_narc_sound_device::cvsd_clock_set_w));
+	map(0x2400, 0x2400).mirror(0x03ff).w(FUNC(williams_narc_sound_device::cvsd_digit_clock_clear_w));
+	map(0x2800, 0x2800).mirror(0x03ff).w(FUNC(williams_narc_sound_device::slave_talkback_w));
+	map(0x3000, 0x3000).mirror(0x03ff).w("dac2", FUNC(dac_byte_interface::data_w));
+	map(0x3400, 0x3400).mirror(0x03ff).r(FUNC(williams_narc_sound_device::command2_r));
+	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(williams_narc_sound_device::slave_bank_select_w));
+	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(williams_narc_sound_device::slave_sync_w));
 	map(0x4000, 0xbfff).bankr("slavebank");
 	map(0xc000, 0xffff).bankr("slaveupper");
 }
@@ -723,13 +723,13 @@ WRITE8_MEMBER(williams_adpcm_sound_device::talkback_w)
 void williams_adpcm_sound_device::williams_adpcm_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).mirror(0x03ff).w(this, FUNC(williams_adpcm_sound_device::bank_select_w));
+	map(0x2000, 0x2000).mirror(0x03ff).w(FUNC(williams_adpcm_sound_device::bank_select_w));
 	map(0x2400, 0x2401).mirror(0x03fe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2800).mirror(0x03ff).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2800, 0x2800).mirror(0x03ff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2c00, 0x2c00).mirror(0x03ff).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x3000, 0x3000).mirror(0x03ff).r(this, FUNC(williams_adpcm_sound_device::command_r));
-	map(0x3400, 0x3400).mirror(0x03ff).w(this, FUNC(williams_adpcm_sound_device::oki6295_bank_select_w));
-	map(0x3c00, 0x3c00).mirror(0x03ff).w(this, FUNC(williams_adpcm_sound_device::talkback_w));
+	map(0x3000, 0x3000).mirror(0x03ff).r(FUNC(williams_adpcm_sound_device::command_r));
+	map(0x3400, 0x3400).mirror(0x03ff).w(FUNC(williams_adpcm_sound_device::oki6295_bank_select_w));
+	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(williams_adpcm_sound_device::talkback_w));
 	map(0x4000, 0xbfff).bankr("rombank");
 	map(0xc000, 0xffff).bankr("romupper");
 }

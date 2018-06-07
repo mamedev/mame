@@ -146,15 +146,15 @@ void lastduel_state::lastduel_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0xfc0000, 0xfc0003).nopw(); /* Written rarely */
 	map(0xfc0800, 0xfc0fff).ram().share("spriteram");
-	map(0xfc4000, 0xfc4001).portr("P1_P2").w(this, FUNC(lastduel_state::lastduel_flip_w));
-	map(0xfc4002, 0xfc4003).portr("SYSTEM").w(this, FUNC(lastduel_state::lastduel_sound_w));
+	map(0xfc4000, 0xfc4001).portr("P1_P2").w(FUNC(lastduel_state::lastduel_flip_w));
+	map(0xfc4002, 0xfc4003).portr("SYSTEM").w(FUNC(lastduel_state::lastduel_sound_w));
 	map(0xfc4004, 0xfc4005).portr("DSW1");
 	map(0xfc4006, 0xfc4007).portr("DSW2");
-	map(0xfc8000, 0xfc800f).w(this, FUNC(lastduel_state::lastduel_scroll_w));
-	map(0xfcc000, 0xfcdfff).ram().w(this, FUNC(lastduel_state::lastduel_vram_w)).share("vram");
-	map(0xfd0000, 0xfd3fff).ram().w(this, FUNC(lastduel_state::lastduel_scroll1_w)).share("scroll1");
-	map(0xfd4000, 0xfd7fff).ram().w(this, FUNC(lastduel_state::lastduel_scroll2_w)).share("scroll2");
-	map(0xfd8000, 0xfd87ff).ram().w(this, FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
+	map(0xfc8000, 0xfc800f).w(FUNC(lastduel_state::lastduel_scroll_w));
+	map(0xfcc000, 0xfcdfff).ram().w(FUNC(lastduel_state::lastduel_vram_w)).share("vram");
+	map(0xfd0000, 0xfd3fff).ram().w(FUNC(lastduel_state::lastduel_scroll1_w)).share("scroll1");
+	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::lastduel_scroll2_w)).share("scroll2");
+	map(0xfd8000, 0xfd87ff).ram().w(FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
 	map(0xfe0000, 0xffffff).ram();
 }
 
@@ -162,15 +162,15 @@ void lastduel_state::madgear_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0xfc1800, 0xfc1fff).ram().share("spriteram");
-	map(0xfc4000, 0xfc4001).portr("DSW1").w(this, FUNC(lastduel_state::lastduel_flip_w));
-	map(0xfc4002, 0xfc4003).portr("DSW2").w(this, FUNC(lastduel_state::lastduel_sound_w));
+	map(0xfc4000, 0xfc4001).portr("DSW1").w(FUNC(lastduel_state::lastduel_flip_w));
+	map(0xfc4002, 0xfc4003).portr("DSW2").w(FUNC(lastduel_state::lastduel_sound_w));
 	map(0xfc4004, 0xfc4005).portr("P1_P2");
 	map(0xfc4006, 0xfc4007).portr("SYSTEM");
-	map(0xfc8000, 0xfc9fff).ram().w(this, FUNC(lastduel_state::lastduel_vram_w)).share("vram");
-	map(0xfcc000, 0xfcc7ff).ram().w(this, FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
-	map(0xfd0000, 0xfd000f).w(this, FUNC(lastduel_state::lastduel_scroll_w));
-	map(0xfd4000, 0xfd7fff).ram().w(this, FUNC(lastduel_state::madgear_scroll1_w)).share("scroll1");
-	map(0xfd8000, 0xfdffff).ram().w(this, FUNC(lastduel_state::madgear_scroll2_w)).share("scroll2");
+	map(0xfc8000, 0xfc9fff).ram().w(FUNC(lastduel_state::lastduel_vram_w)).share("vram");
+	map(0xfcc000, 0xfcc7ff).ram().w(FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
+	map(0xfd0000, 0xfd000f).w(FUNC(lastduel_state::lastduel_scroll_w));
+	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::madgear_scroll1_w)).share("scroll1");
+	map(0xfd8000, 0xfdffff).ram().w(FUNC(lastduel_state::madgear_scroll2_w)).share("scroll2");
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -199,7 +199,7 @@ void lastduel_state::madgear_sound_map(address_map &map)
 	map(0xf002, 0xf003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf004, 0xf004).w("oki", FUNC(okim6295_device::write));
 	map(0xf006, 0xf006).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf00a, 0xf00a).w(this, FUNC(lastduel_state::mg_bankswitch_w));
+	map(0xf00a, 0xf00a).w(FUNC(lastduel_state::mg_bankswitch_w));
 }
 
 /******************************************************************************/

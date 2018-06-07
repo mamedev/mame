@@ -298,10 +298,10 @@ void fireball_state::fireball_map(address_map &map)
 void fireball_state::fireball_io_map(address_map &map)
 {
 
-	map(0x00, 0x01).rw(this, FUNC(fireball_state::io_00_r), FUNC(fireball_state::io_00_w));
-	map(0x02, 0x03).rw(this, FUNC(fireball_state::io_02_r), FUNC(fireball_state::io_02_w));
-	map(0x04, 0x05).rw(this, FUNC(fireball_state::io_04_r), FUNC(fireball_state::io_04_w));
-	map(0x06, 0x07).rw(this, FUNC(fireball_state::io_06_r), FUNC(fireball_state::io_06_w));
+	map(0x00, 0x01).rw(FUNC(fireball_state::io_00_r), FUNC(fireball_state::io_00_w));
+	map(0x02, 0x03).rw(FUNC(fireball_state::io_02_r), FUNC(fireball_state::io_02_w));
+	map(0x04, 0x05).rw(FUNC(fireball_state::io_04_r), FUNC(fireball_state::io_04_w));
+	map(0x06, 0x07).rw(FUNC(fireball_state::io_06_r), FUNC(fireball_state::io_06_w));
 
 }
 

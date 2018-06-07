@@ -126,7 +126,7 @@ void mk1_state::mk1_mem(address_map &map)
 
 void mk1_state::mk1_io(address_map &map)
 {
-	map(0x0, 0x1).rw(this, FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
+	map(0x0, 0x1).rw(FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 

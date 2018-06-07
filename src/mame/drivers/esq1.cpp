@@ -509,7 +509,7 @@ void esq1_state::esq1_map(address_map &map)
 	map(0x4000, 0x5fff).ram();                 // SEQRAM
 	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
 	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0x6800, 0x68ff).w(this, FUNC(esq1_state::analog_w));
+	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
 	map(0x7000, 0x7fff).bankr("osbank");
 	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
 }
@@ -521,9 +521,9 @@ void esq1_state::sq80_map(address_map &map)
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
 	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
 	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0x6800, 0x68ff).w(this, FUNC(esq1_state::analog_w));
-	map(0x6c00, 0x6dff).w(this, FUNC(esq1_state::mapper_w));
-	map(0x6e00, 0x6fff).rw(this, FUNC(esq1_state::wd1772_r), FUNC(esq1_state::wd1772_w));
+	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
+	map(0x6c00, 0x6dff).w(FUNC(esq1_state::mapper_w));
+	map(0x6e00, 0x6fff).rw(FUNC(esq1_state::wd1772_r), FUNC(esq1_state::wd1772_w));
 	map(0x7000, 0x7fff).bankr("osbank");
 	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
 }

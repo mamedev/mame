@@ -617,7 +617,7 @@ void mario_state::mario_sound_map(address_map &map)
 
 void mario_state::mario_sound_io_map(address_map &map)
 {
-	map(0x00, 0xff).r(this, FUNC(mario_state::mario_sh_tune_r)).w(this, FUNC(mario_state::mario_sh_sound_w));
+	map(0x00, 0xff).r(FUNC(mario_state::mario_sh_tune_r)).w(FUNC(mario_state::mario_sh_sound_w));
 }
 
 void mario_state::masao_sound_map(address_map &map)

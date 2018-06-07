@@ -85,52 +85,52 @@ void bking_state::bking_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram();
-	map(0x9000, 0x97ff).ram().w(this, FUNC(bking_state::bking_playfield_w)).share("playfield_ram");
+	map(0x9000, 0x97ff).ram().w(FUNC(bking_state::bking_playfield_w)).share("playfield_ram");
 }
 
 void bking_state::bking_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(bking_state::bking_xld1_w));
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(bking_state::bking_yld1_w));
-	map(0x02, 0x02).portr("DSWA").w(this, FUNC(bking_state::bking_xld2_w));
-	map(0x03, 0x03).portr("DSWB").w(this, FUNC(bking_state::bking_yld2_w));
-	map(0x04, 0x04).portr("DSWC").w(this, FUNC(bking_state::bking_xld3_w));
-	map(0x05, 0x05).rw(this, FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
-	map(0x06, 0x06).rw(this, FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(bking_state::bking_xld1_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(bking_state::bking_yld1_w));
+	map(0x02, 0x02).portr("DSWA").w(FUNC(bking_state::bking_xld2_w));
+	map(0x03, 0x03).portr("DSWB").w(FUNC(bking_state::bking_yld2_w));
+	map(0x04, 0x04).portr("DSWC").w(FUNC(bking_state::bking_xld3_w));
+	map(0x05, 0x05).rw(FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
+	map(0x06, 0x06).rw(FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
 	map(0x07, 0x07).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x08, 0x08).w(this, FUNC(bking_state::bking_cont1_w));
-	map(0x09, 0x09).w(this, FUNC(bking_state::bking_cont2_w));
-	map(0x0a, 0x0a).w(this, FUNC(bking_state::bking_cont3_w));
-	map(0x0b, 0x0b).w(this, FUNC(bking_state::bking_soundlatch_w));
+	map(0x08, 0x08).w(FUNC(bking_state::bking_cont1_w));
+	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
+	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
+	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
-	map(0x0d, 0x0d).w(this, FUNC(bking_state::bking_hitclr_w));
-	map(0x07, 0x1f).r(this, FUNC(bking_state::bking_pos_r));
+	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
+	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
 }
 
 void bking_state::bking3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(bking_state::bking_xld1_w));
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(bking_state::bking_yld1_w));
-	map(0x02, 0x02).portr("DSWA").w(this, FUNC(bking_state::bking_xld2_w));
-	map(0x03, 0x03).portr("DSWB").w(this, FUNC(bking_state::bking_yld2_w));
-	map(0x04, 0x04).portr("DSWC").w(this, FUNC(bking_state::bking_xld3_w));
-	map(0x05, 0x05).rw(this, FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
-	map(0x06, 0x06).rw(this, FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(bking_state::bking_xld1_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(bking_state::bking_yld1_w));
+	map(0x02, 0x02).portr("DSWA").w(FUNC(bking_state::bking_xld2_w));
+	map(0x03, 0x03).portr("DSWB").w(FUNC(bking_state::bking_yld2_w));
+	map(0x04, 0x04).portr("DSWC").w(FUNC(bking_state::bking_xld3_w));
+	map(0x05, 0x05).rw(FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
+	map(0x06, 0x06).rw(FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
 	map(0x07, 0x07).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x08, 0x08).w(this, FUNC(bking_state::bking_cont1_w));
-	map(0x09, 0x09).w(this, FUNC(bking_state::bking_cont2_w));
-	map(0x0a, 0x0a).w(this, FUNC(bking_state::bking_cont3_w));
-	map(0x0b, 0x0b).w(this, FUNC(bking_state::bking_soundlatch_w));
+	map(0x08, 0x08).w(FUNC(bking_state::bking_cont1_w));
+	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
+	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
+	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
-	map(0x0d, 0x0d).w(this, FUNC(bking_state::bking_hitclr_w));
-	map(0x07, 0x1f).r(this, FUNC(bking_state::bking_pos_r));
+	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
+	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
 	map(0x2f, 0x2f).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x4f, 0x4f).rw(this, FUNC(bking_state::bking3_mcu_status_r), FUNC(bking_state::unk_w));
-	map(0x60, 0x60).r(this, FUNC(bking_state::bking3_extrarom_r));
-	map(0x6f, 0x6f).rw(this, FUNC(bking_state::bking3_ext_check_r), FUNC(bking_state::bking3_addr_h_w));
-	map(0x8f, 0x8f).w(this, FUNC(bking_state::bking3_addr_l_w));
+	map(0x4f, 0x4f).rw(FUNC(bking_state::bking3_mcu_status_r), FUNC(bking_state::unk_w));
+	map(0x60, 0x60).r(FUNC(bking_state::bking3_extrarom_r));
+	map(0x6f, 0x6f).rw(FUNC(bking_state::bking3_ext_check_r), FUNC(bking_state::bking3_addr_h_w));
+	map(0x8f, 0x8f).w(FUNC(bking_state::bking3_addr_l_w));
 }
 
 void bking_state::bking_audio_map(address_map &map)
@@ -143,7 +143,7 @@ void bking_state::bking_audio_map(address_map &map)
 	map(0x4402, 0x4403).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x4403, 0x4403).r("ay2", FUNC(ay8910_device::data_r));
 	map(0x4800, 0x4800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x4802, 0x4802).rw(this, FUNC(bking_state::bking_sndnmi_disable_r), FUNC(bking_state::bking_sndnmi_enable_w));
+	map(0x4802, 0x4802).rw(FUNC(bking_state::bking_sndnmi_disable_r), FUNC(bking_state::bking_sndnmi_enable_w));
 	map(0xe000, 0xefff).rom();   /* Space for diagnostic ROM */
 }
 
@@ -434,7 +434,7 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bking_state, port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 

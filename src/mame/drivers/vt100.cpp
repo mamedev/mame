@@ -163,8 +163,8 @@ READ8_MEMBER(vt100_state::flags_r)
 
 WRITE8_MEMBER(vt100_state::baud_rate_w)
 {
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
+	m_dbrg->write_str(data & 0x0f);
+	m_dbrg->write_stt(data >> 4);
 }
 
 READ8_MEMBER(vt100_state::modem_r)
@@ -201,15 +201,15 @@ void vt100_state::vt100_io(address_map &map)
 	map(0x00, 0x00).rw("pusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x01, 0x01).rw("pusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x02 Baud rate generator
-	map(0x02, 0x02).w(this, FUNC(vt100_state::baud_rate_w));
+	map(0x02, 0x02).w(FUNC(vt100_state::baud_rate_w));
 	// 0x22 Modem buffer
-	map(0x22, 0x22).r(this, FUNC(vt100_state::modem_r));
+	map(0x22, 0x22).r(FUNC(vt100_state::modem_r));
 	// 0x42 Flags buffer
-	map(0x42, 0x42).r(this, FUNC(vt100_state::flags_r));
+	map(0x42, 0x42).r(FUNC(vt100_state::flags_r));
 	// 0x42 Brightness D/A latch
 	map(0x42, 0x42).w(m_crtc, FUNC(vt100_video_device::brightness_w));
 	// 0x62 NVR latch
-	map(0x62, 0x62).w(this, FUNC(vt100_state::nvr_latch_w));
+	map(0x62, 0x62).w(FUNC(vt100_state::nvr_latch_w));
 	// 0x82 Keyboard UART data
 	map(0x82, 0x82).rw("kbduart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	// 0xA2 Video processor DC012
@@ -233,8 +233,8 @@ WRITE8_MEMBER(vt100_state::printer_w)
 void vt100_state::vt102_io(address_map &map)
 {
 	vt100_io(map);
-	map(0x03, 0x03).select(0x1c).r(this, FUNC(vt100_state::printer_r));
-	map(0x23, 0x23).select(0x1c).w (this, FUNC(vt100_state::printer_w));
+	map(0x03, 0x03).select(0x1c).r(FUNC(vt100_state::printer_r));
+	map(0x23, 0x23).select(0x1c).w(FUNC(vt100_state::printer_w));
 }
 
 /* Input ports */

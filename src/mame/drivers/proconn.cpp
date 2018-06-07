@@ -163,54 +163,54 @@ void proconn_state::proconn_portmap(address_map &map)
 //  ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
 	// sio (vfd should be connected to it?)
-	map(0x00ff, 0x00ff).rw(this, FUNC(proconn_state::sio_r<0>), FUNC(proconn_state::sio_w<0>));
-	map(0x01ff, 0x01ff).rw(this, FUNC(proconn_state::sio_r<2>), FUNC(proconn_state::sio_w<2>));
-	map(0x02ff, 0x02ff).rw(this, FUNC(proconn_state::sio_r<1>), FUNC(proconn_state::sio_w<1>));
-	map(0x03ff, 0x03ff).rw(this, FUNC(proconn_state::sio_r<3>), FUNC(proconn_state::sio_w<3>));
+	map(0x00ff, 0x00ff).rw(FUNC(proconn_state::sio_r<0>), FUNC(proconn_state::sio_w<0>));
+	map(0x01ff, 0x01ff).rw(FUNC(proconn_state::sio_r<2>), FUNC(proconn_state::sio_w<2>));
+	map(0x02ff, 0x02ff).rw(FUNC(proconn_state::sio_r<1>), FUNC(proconn_state::sio_w<1>));
+	map(0x03ff, 0x03ff).rw(FUNC(proconn_state::sio_r<3>), FUNC(proconn_state::sio_w<3>));
 
 	// ctc
-	map(0x00fe, 0x00fe).rw(this, FUNC(proconn_state::ctc_r<0>), FUNC(proconn_state::ctc_w<0>));
-	map(0x01fe, 0x01fe).rw(this, FUNC(proconn_state::ctc_r<2>), FUNC(proconn_state::ctc_w<2>));
-	map(0x02fe, 0x02fe).rw(this, FUNC(proconn_state::ctc_r<1>), FUNC(proconn_state::ctc_w<1>));
-	map(0x03fe, 0x03fe).rw(this, FUNC(proconn_state::ctc_r<3>), FUNC(proconn_state::ctc_w<3>));
+	map(0x00fe, 0x00fe).rw(FUNC(proconn_state::ctc_r<0>), FUNC(proconn_state::ctc_w<0>));
+	map(0x01fe, 0x01fe).rw(FUNC(proconn_state::ctc_r<2>), FUNC(proconn_state::ctc_w<2>));
+	map(0x02fe, 0x02fe).rw(FUNC(proconn_state::ctc_r<1>), FUNC(proconn_state::ctc_w<1>));
+	map(0x03fe, 0x03fe).rw(FUNC(proconn_state::ctc_r<3>), FUNC(proconn_state::ctc_w<3>));
 
 	// ay (meters connected to it?)
-	map(0x00fd, 0x00fd).rw(this, FUNC(proconn_state::ay_r<0>), FUNC(proconn_state::ay_w<0>));
-	map(0x00fc, 0x00fc).w(this, FUNC(proconn_state::ay_w<1>));
+	map(0x00fd, 0x00fd).rw(FUNC(proconn_state::ay_r<0>), FUNC(proconn_state::ay_w<0>));
+	map(0x00fc, 0x00fc).w(FUNC(proconn_state::ay_w<1>));
 
 	// ??
 	map(0xfbf9, 0xfbf9).nopw();
 	map(0xfff9, 0xfff9).nopw();
 
 	// pio5 (lamps?)
-	map(0x00f0, 0x00f0).rw(this, FUNC(proconn_state::pio5_r<0>), FUNC(proconn_state::pio5_w<0>));
-	map(0x01f0, 0x01f0).rw(this, FUNC(proconn_state::pio5_r<1>), FUNC(proconn_state::pio5_w<1>));
-	map(0x02f0, 0x02f0).rw(this, FUNC(proconn_state::pio5_r<2>), FUNC(proconn_state::pio5_w<2>));
-	map(0x03f0, 0x03f0).rw(this, FUNC(proconn_state::pio5_r<3>), FUNC(proconn_state::pio5_w<3>));
+	map(0x00f0, 0x00f0).rw(FUNC(proconn_state::pio5_r<0>), FUNC(proconn_state::pio5_w<0>));
+	map(0x01f0, 0x01f0).rw(FUNC(proconn_state::pio5_r<1>), FUNC(proconn_state::pio5_w<1>));
+	map(0x02f0, 0x02f0).rw(FUNC(proconn_state::pio5_r<2>), FUNC(proconn_state::pio5_w<2>));
+	map(0x03f0, 0x03f0).rw(FUNC(proconn_state::pio5_r<3>), FUNC(proconn_state::pio5_w<3>));
 
 	// pio4 (triacs + 7segs)
-	map(0x00e8, 0x00e8).rw(this, FUNC(proconn_state::pio4_r<0>), FUNC(proconn_state::pio4_w<0>));
-	map(0x01e8, 0x01e8).rw(this, FUNC(proconn_state::pio4_r<1>), FUNC(proconn_state::pio4_w<1>));
-	map(0x02e8, 0x02e8).rw(this, FUNC(proconn_state::pio4_r<2>), FUNC(proconn_state::pio4_w<2>));
-	map(0x03e8, 0x03e8).rw(this, FUNC(proconn_state::pio4_r<3>), FUNC(proconn_state::pio4_w<3>));
+	map(0x00e8, 0x00e8).rw(FUNC(proconn_state::pio4_r<0>), FUNC(proconn_state::pio4_w<0>));
+	map(0x01e8, 0x01e8).rw(FUNC(proconn_state::pio4_r<1>), FUNC(proconn_state::pio4_w<1>));
+	map(0x02e8, 0x02e8).rw(FUNC(proconn_state::pio4_r<2>), FUNC(proconn_state::pio4_w<2>));
+	map(0x03e8, 0x03e8).rw(FUNC(proconn_state::pio4_r<3>), FUNC(proconn_state::pio4_w<3>));
 
 	// pio3 (lamps? + opto in?)
-	map(0x00d8, 0x00d8).rw(this, FUNC(proconn_state::pio3_r<0>), FUNC(proconn_state::pio3_w<0>));
-	map(0x01d8, 0x01d8).rw(this, FUNC(proconn_state::pio3_r<1>), FUNC(proconn_state::pio3_w<1>));
-	map(0x02d8, 0x02d8).rw(this, FUNC(proconn_state::pio3_r<2>), FUNC(proconn_state::pio3_w<2>));
-	map(0x03d8, 0x03d8).rw(this, FUNC(proconn_state::pio3_r<3>), FUNC(proconn_state::pio3_w<3>));
+	map(0x00d8, 0x00d8).rw(FUNC(proconn_state::pio3_r<0>), FUNC(proconn_state::pio3_w<0>));
+	map(0x01d8, 0x01d8).rw(FUNC(proconn_state::pio3_r<1>), FUNC(proconn_state::pio3_w<1>));
+	map(0x02d8, 0x02d8).rw(FUNC(proconn_state::pio3_r<2>), FUNC(proconn_state::pio3_w<2>));
+	map(0x03d8, 0x03d8).rw(FUNC(proconn_state::pio3_r<3>), FUNC(proconn_state::pio3_w<3>));
 
 	// pio2 (reels?)
-	map(0x00b8, 0x00b8).rw(this, FUNC(proconn_state::pio2_r<0>), FUNC(proconn_state::pio2_w<0>));
-	map(0x01b8, 0x01b8).rw(this, FUNC(proconn_state::pio2_r<1>), FUNC(proconn_state::pio2_w<1>));
-	map(0x02b8, 0x02b8).rw(this, FUNC(proconn_state::pio2_r<2>), FUNC(proconn_state::pio2_w<2>));
-	map(0x03b8, 0x03b8).rw(this, FUNC(proconn_state::pio2_r<3>), FUNC(proconn_state::pio2_w<3>));
+	map(0x00b8, 0x00b8).rw(FUNC(proconn_state::pio2_r<0>), FUNC(proconn_state::pio2_w<0>));
+	map(0x01b8, 0x01b8).rw(FUNC(proconn_state::pio2_r<1>), FUNC(proconn_state::pio2_w<1>));
+	map(0x02b8, 0x02b8).rw(FUNC(proconn_state::pio2_r<2>), FUNC(proconn_state::pio2_w<2>));
+	map(0x03b8, 0x03b8).rw(FUNC(proconn_state::pio2_r<3>), FUNC(proconn_state::pio2_w<3>));
 
 	// pio1 (reels? + inputs?)
-	map(0x0078, 0x0078).rw(this, FUNC(proconn_state::pio1_r<0>), FUNC(proconn_state::pio1_w<0>));
-	map(0x0178, 0x0178).rw(this, FUNC(proconn_state::pio1_r<1>), FUNC(proconn_state::pio1_w<1>));
-	map(0x0278, 0x0278).rw(this, FUNC(proconn_state::pio1_r<2>), FUNC(proconn_state::pio1_w<2>));
-	map(0x0378, 0x0378).rw(this, FUNC(proconn_state::pio1_r<3>), FUNC(proconn_state::pio1_w<3>));
+	map(0x0078, 0x0078).rw(FUNC(proconn_state::pio1_r<0>), FUNC(proconn_state::pio1_w<0>));
+	map(0x0178, 0x0178).rw(FUNC(proconn_state::pio1_r<1>), FUNC(proconn_state::pio1_w<1>));
+	map(0x0278, 0x0278).rw(FUNC(proconn_state::pio1_r<2>), FUNC(proconn_state::pio1_w<2>));
+	map(0x0378, 0x0378).rw(FUNC(proconn_state::pio1_r<3>), FUNC(proconn_state::pio1_w<3>));
 }
 
 

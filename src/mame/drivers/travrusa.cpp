@@ -61,12 +61,12 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 void travrusa_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(travrusa_state::travrusa_videoram_w)).share("videoram");
-	map(0x9000, 0x9000).w(this, FUNC(travrusa_state::travrusa_scroll_x_low_w));
-	map(0xa000, 0xa000).w(this, FUNC(travrusa_state::travrusa_scroll_x_high_w));
+	map(0x8000, 0x8fff).ram().w(FUNC(travrusa_state::travrusa_videoram_w)).share("videoram");
+	map(0x9000, 0x9000).w(FUNC(travrusa_state::travrusa_scroll_x_low_w));
+	map(0xa000, 0xa000).w(FUNC(travrusa_state::travrusa_scroll_x_high_w));
 	map(0xc800, 0xc9ff).writeonly().share("spriteram");
 	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).w(this, FUNC(travrusa_state::travrusa_flipscreen_w));    /* + coin counters - not written by shtrider */
+	map(0xd001, 0xd001).w(FUNC(travrusa_state::travrusa_flipscreen_w));    /* + coin counters - not written by shtrider */
 	map(0xd000, 0xd000).portr("SYSTEM");     /* IN0 */
 	map(0xd001, 0xd001).portr("P1");         /* IN1 */
 	map(0xd002, 0xd002).portr("P2");         /* IN2 */

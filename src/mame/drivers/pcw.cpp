@@ -930,13 +930,13 @@ void pcw_state::pcw_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x000, 0x001).mirror(0x7e).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x080, 0x0ef).rw(this, FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
-	map(0x0f0, 0x0f3).w(this, FUNC(pcw_state::pcw_bank_select_w));
-	map(0x0f4, 0x0f4).rw(this, FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
-	map(0x0f5, 0x0f5).w(this, FUNC(pcw_state::pcw_roller_ram_addr_w));
-	map(0x0f6, 0x0f6).w(this, FUNC(pcw_state::pcw_pointer_table_top_scan_w));
-	map(0x0f7, 0x0f7).w(this, FUNC(pcw_state::pcw_vdu_video_control_register_w));
-	map(0x0f8, 0x0f8).rw(this, FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
+	map(0x080, 0x0ef).rw(FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
+	map(0x0f0, 0x0f3).w(FUNC(pcw_state::pcw_bank_select_w));
+	map(0x0f4, 0x0f4).rw(FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
+	map(0x0f5, 0x0f5).w(FUNC(pcw_state::pcw_roller_ram_addr_w));
+	map(0x0f6, 0x0f6).w(FUNC(pcw_state::pcw_pointer_table_top_scan_w));
+	map(0x0f7, 0x0f7).w(FUNC(pcw_state::pcw_vdu_video_control_register_w));
+	map(0x0f8, 0x0f8).rw(FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
 	map(0x0fc, 0x0fd).rw("printer_mcu", FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 }
 
@@ -946,14 +946,14 @@ void pcw_state::pcw9512_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x000, 0x001).mirror(0x7e).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x080, 0x0ef).rw(this, FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
-	map(0x0f0, 0x0f3).w(this, FUNC(pcw_state::pcw_bank_select_w));
-	map(0x0f4, 0x0f4).rw(this, FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
-	map(0x0f5, 0x0f5).w(this, FUNC(pcw_state::pcw_roller_ram_addr_w));
-	map(0x0f6, 0x0f6).w(this, FUNC(pcw_state::pcw_pointer_table_top_scan_w));
-	map(0x0f7, 0x0f7).w(this, FUNC(pcw_state::pcw_vdu_video_control_register_w));
-	map(0x0f8, 0x0f8).rw(this, FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
-	map(0x0fc, 0x0fd).rw(this, FUNC(pcw_state::pcw9512_parallel_r), FUNC(pcw_state::pcw9512_parallel_w));
+	map(0x080, 0x0ef).rw(FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
+	map(0x0f0, 0x0f3).w(FUNC(pcw_state::pcw_bank_select_w));
+	map(0x0f4, 0x0f4).rw(FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
+	map(0x0f5, 0x0f5).w(FUNC(pcw_state::pcw_roller_ram_addr_w));
+	map(0x0f6, 0x0f6).w(FUNC(pcw_state::pcw_pointer_table_top_scan_w));
+	map(0x0f7, 0x0f7).w(FUNC(pcw_state::pcw_vdu_video_control_register_w));
+	map(0x0f8, 0x0f8).rw(FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
+	map(0x0fc, 0x0fd).rw(FUNC(pcw_state::pcw9512_parallel_r), FUNC(pcw_state::pcw9512_parallel_w));
 }
 
 

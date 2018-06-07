@@ -246,9 +246,9 @@ void cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map(address_map &map)
 {
 // these are 3x MOTOROLA MM2114N SRAM 4096 bit RAM (twice the size because we map bytes, but only 4 bits are used)
 // these are on the master board memory sub-board
-	map(0x2400, 0x27ff).ram().w(this, FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
-	map(0x2800, 0x2bff).ram().w(this, FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
-	map(0x3000, 0x33ff).ram().w(this, FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
+	map(0x2400, 0x27ff).ram().w(FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
+	map(0x2800, 0x2bff).ram().w(FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
+	map(0x3000, 0x33ff).ram().w(FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
 }
 
 void cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map(address_map &map)
@@ -267,10 +267,10 @@ void cedar_magnet_state::cedar_magnet_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x18, 0x18).rw(this, FUNC(cedar_magnet_state::port18_r), FUNC(cedar_magnet_state::port18_w));
-	map(0x19, 0x19).rw(this, FUNC(cedar_magnet_state::port19_r), FUNC(cedar_magnet_state::port19_w));
-	map(0x1a, 0x1a).r(this, FUNC(cedar_magnet_state::port1a_r));
-	map(0x1b, 0x1b).w(this, FUNC(cedar_magnet_state::port1b_w));
+	map(0x18, 0x18).rw(FUNC(cedar_magnet_state::port18_r), FUNC(cedar_magnet_state::port18_w));
+	map(0x19, 0x19).rw(FUNC(cedar_magnet_state::port19_r), FUNC(cedar_magnet_state::port19_w));
+	map(0x1a, 0x1a).r(FUNC(cedar_magnet_state::port1a_r));
+	map(0x1b, 0x1b).w(FUNC(cedar_magnet_state::port1b_w));
 
 	map(0x20, 0x23).rw(m_ic48_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x40, 0x43).rw(m_ic49_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -282,10 +282,10 @@ void cedar_magnet_state::cedar_magnet_io(address_map &map)
 	map(0x6c, 0x6c).portr("TEST");
 
 	// banking / access controls to the sub-board memory
-	map(0x70, 0x70).w(this, FUNC(cedar_magnet_state::rambank_palbank_w));
-	map(0x74, 0x74).w(this, FUNC(cedar_magnet_state::palupload_w));
-	map(0x78, 0x78).rw(this, FUNC(cedar_magnet_state::watchdog_r), FUNC(cedar_magnet_state::paladdr_w));
-	map(0x7c, 0x7c).r(this, FUNC(cedar_magnet_state::port7c_r)); // protection??
+	map(0x70, 0x70).w(FUNC(cedar_magnet_state::rambank_palbank_w));
+	map(0x74, 0x74).w(FUNC(cedar_magnet_state::palupload_w));
+	map(0x78, 0x78).rw(FUNC(cedar_magnet_state::watchdog_r), FUNC(cedar_magnet_state::paladdr_w));
+	map(0x7c, 0x7c).r(FUNC(cedar_magnet_state::port7c_r)); // protection??
 
 	map(0xff, 0xff).w(m_cedsound, FUNC(cedar_magnet_sound_device::sound_command_w));
 }
@@ -301,7 +301,7 @@ void cedar_magnet_state::cedar_bank0(address_map &map)
 
 	/* memory configuration  2*/
 	map(0x20000, 0x2bfff).m(m_sub_ram_bankdev, FUNC(address_map_bank_device::amap8));
-	map(0x2c000, 0x2ffff).rw(this, FUNC(cedar_magnet_state::other_cpu_r), FUNC(cedar_magnet_state::other_cpu_w));
+	map(0x2c000, 0x2ffff).rw(FUNC(cedar_magnet_state::other_cpu_r), FUNC(cedar_magnet_state::other_cpu_w));
 
 	/* memory configuration 3*/
 	map(0x30000, 0x31fff).rom().region("maincpu", 0x0000).mirror(0x0e000);

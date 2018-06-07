@@ -83,7 +83,7 @@ uint8_t a2bus_echoii_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			return 0x1f | m_tms->status_r();
+			return 0x1f | m_tms->read_status();
 	}
 
 	return 0;
@@ -96,13 +96,9 @@ void a2bus_echoii_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0:
 			m_latch = data;
 			if (!m_ready)
-			{
-				m_tms->data_w(m_latch);
-			}
+				m_tms->write_data(m_latch);
 			else
-			{
 				m_byte_in_latch = true;
-			}
 			break;
 	}
 }
@@ -114,7 +110,7 @@ bool a2bus_echoii_device::take_c800()
 
 void a2bus_echoii_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_tms->data_w(m_latch);
+	m_tms->write_data(m_latch);
 	m_byte_in_latch = false;
 	m_timer->adjust(attotime::never);
 }

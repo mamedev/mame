@@ -119,8 +119,8 @@ void zapcomp_state::zapcomp_mem(address_map &map)
 void zapcomp_state::zapcomp_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(zapcomp_state::keyboard_r));
-	map(0x05, 0x07).w(this, FUNC(zapcomp_state::display_7seg_w));
+	map(0x00, 0x00).r(FUNC(zapcomp_state::keyboard_r));
+	map(0x05, 0x07).w(FUNC(zapcomp_state::display_7seg_w));
 }
 
 static INPUT_PORTS_START( zapcomp )

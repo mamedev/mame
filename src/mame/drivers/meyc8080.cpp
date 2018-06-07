@@ -325,13 +325,13 @@ void meyc8080_state::meyc8080_map(address_map &map)
 	map(0x8000, 0x9fff).ram().share("vram2");
 //  AM_RANGE(0xa000, 0xa0ff) AM_RAM     // unknown... filled with 00's at boot time or when entering the service mode.
 	map(0xcd00, 0xcdff).ram().share("nvram");
-	map(0xf000, 0xf000).portr("BSW").w(this, FUNC(meyc8080_state::meyc8080_dac_1_w));
-	map(0xf004, 0xf004).portr("IN1").w(this, FUNC(meyc8080_state::lights_1_w));
-	map(0xf006, 0xf006).portr("IN2").w(this, FUNC(meyc8080_state::lights_2_w));
-	map(0xf008, 0xf008).w(this, FUNC(meyc8080_state::counters_w));
-	map(0xf00f, 0xf00f).w(this, FUNC(meyc8080_state::meyc8080_dac_2_w));
-	map(0xf0f0, 0xf0f0).w(this, FUNC(meyc8080_state::meyc8080_dac_3_w));
-	map(0xf0ff, 0xf0ff).w(this, FUNC(meyc8080_state::meyc8080_dac_4_w));
+	map(0xf000, 0xf000).portr("BSW").w(FUNC(meyc8080_state::meyc8080_dac_1_w));
+	map(0xf004, 0xf004).portr("IN1").w(FUNC(meyc8080_state::lights_1_w));
+	map(0xf006, 0xf006).portr("IN2").w(FUNC(meyc8080_state::lights_2_w));
+	map(0xf008, 0xf008).w(FUNC(meyc8080_state::counters_w));
+	map(0xf00f, 0xf00f).w(FUNC(meyc8080_state::meyc8080_dac_2_w));
+	map(0xf0f0, 0xf0f0).w(FUNC(meyc8080_state::meyc8080_dac_3_w));
+	map(0xf0ff, 0xf0ff).w(FUNC(meyc8080_state::meyc8080_dac_4_w));
 }
 
 

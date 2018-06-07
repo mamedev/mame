@@ -351,7 +351,7 @@ void pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program(address_map &map)
 
 void pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pc_kbd_keytronic_pc3270_device::internal_data_read), FUNC(pc_kbd_keytronic_pc3270_device::internal_data_write));
+	map(0x0000, 0xffff).rw(FUNC(pc_kbd_keytronic_pc3270_device::internal_data_read), FUNC(pc_kbd_keytronic_pc3270_device::internal_data_write));
 }
 
 

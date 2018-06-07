@@ -457,9 +457,9 @@ void tempest_state::main_map(address_map &map)
 	map(0x0e00, 0x0e00).portr("DSW2");
 	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x3fff).rom();
-	map(0x4000, 0x4000).w(this, FUNC(tempest_state::tempest_coin_w));
+	map(0x4000, 0x4000).w(FUNC(tempest_state::tempest_coin_w));
 	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
-	map(0x5000, 0x5000).w(this, FUNC(tempest_state::wdclr_w));
+	map(0x5000, 0x5000).w(FUNC(tempest_state::wdclr_w));
 	map(0x5800, 0x5800).w(m_avg, FUNC(avg_tempest_device::reset_w));
 	map(0x6000, 0x603f).w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
@@ -469,9 +469,9 @@ void tempest_state::main_map(address_map &map)
 	map(0x6080, 0x609f).w(m_mathbox, FUNC(mathbox_device::go_w));
 	map(0x60c0, 0x60cf).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x60d0, 0x60df).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x60e0, 0x60e0).w(this, FUNC(tempest_state::tempest_led_w));
+	map(0x60e0, 0x60e0).w(FUNC(tempest_state::tempest_led_w));
 	map(0x9000, 0xdfff).rom();
-	map(0xae1f, 0xae1f).r(this, FUNC(tempest_state::rom_ae1f_r));
+	map(0xae1f, 0xae1f).r(FUNC(tempest_state::rom_ae1f_r));
 	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 

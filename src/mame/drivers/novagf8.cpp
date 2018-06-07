@@ -128,8 +128,8 @@ void novagf8_state::delta1_map(address_map &map)
 
 void novagf8_state::delta1_io(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
-	map(0x1, 0x1).rw(this, FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
+	map(0x0, 0x0).rw(FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
+	map(0x1, 0x1).rw(FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 

@@ -589,9 +589,9 @@ READ8_MEMBER( tm990189_state::video_vdp_r )
 	it. */
 
 	if (offset & 2)
-		reply = m_tms9918->register_read(space, 0);
+		reply = m_tms9918->register_read();
 	else
-		reply = m_tms9918->vram_read(space, 0);
+		reply = m_tms9918->vram_read();
 
 	if (!(offset & 1))
 		m_bogus_read_save = reply;
@@ -606,9 +606,9 @@ WRITE8_MEMBER( tm990189_state::video_vdp_w )
 	if (offset & 1)
 	{
 		if (offset & 2)
-			m_tms9918->register_write(space, 0, data);
+			m_tms9918->register_write(data);
 		else
-			m_tms9918->vram_write(space, 0, data);
+			m_tms9918->vram_write(data);
 	}
 }
 
@@ -749,9 +749,9 @@ void tm990189_state::tm990_189_v_memmap(address_map &map)
 	map(0x0800, 0x0fff).rom();                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 
 	map(0x1000, 0x17ff).rom().nopw();     /* video board ROM 1 */
-	map(0x1800, 0x1fff).rom().w(this, FUNC(tm990189_state::video_joy_w));   /* video board ROM 2 and joystick write port*/
-	map(0x2000, 0x27ff).r(this, FUNC(tm990189_state::video_vdp_r)).nopw();   /* video board tms9918 read ports (bogus) */
-	map(0x2800, 0x2fff).rw(this, FUNC(tm990189_state::video_joy_r), FUNC(tm990189_state::video_vdp_w)); /* video board joystick read port and tms9918 write ports */
+	map(0x1800, 0x1fff).rom().w(FUNC(tm990189_state::video_joy_w));   /* video board ROM 2 and joystick write port*/
+	map(0x2000, 0x27ff).r(FUNC(tm990189_state::video_vdp_r)).nopw();   /* video board tms9918 read ports (bogus) */
+	map(0x2800, 0x2fff).rw(FUNC(tm990189_state::video_joy_r), FUNC(tm990189_state::video_vdp_w)); /* video board joystick read port and tms9918 write ports */
 
 	map(0x3000, 0x3fff).rom();                                 /* main ROM - unibug or university basic */
 }

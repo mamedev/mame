@@ -38,7 +38,7 @@ public:
 	template <unsigned Bit, class Object> devcb_base &set_bit_handler(Object &&cb) { return m_bit_handlers[Bit].set_callback(std::forward<Object>(cb)); }
 
 	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER(write) { write(data); }
+	DECLARE_WRITE8_MEMBER(bus_w) { write(data); }
 
 protected:
 	virtual void device_resolve_objects() override;

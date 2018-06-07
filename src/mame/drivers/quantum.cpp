@@ -169,11 +169,11 @@ void quantum_state::main_map(address_map &map)
 	map(0x840000, 0x84001f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x840020, 0x84003f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x900000, 0x9001ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
-	map(0x940000, 0x940001).r(this, FUNC(quantum_state::trackball_r)); /* trackball */
+	map(0x940000, 0x940001).r(FUNC(quantum_state::trackball_r)); /* trackball */
 	map(0x948000, 0x948001).portr("SYSTEM");
 	map(0x950000, 0x95001f).writeonly().share("colorram");
-	map(0x958000, 0x958001).w(this, FUNC(quantum_state::led_w));
-	map(0x960000, 0x960001).w(this, FUNC(quantum_state::nvram_recall_w));
+	map(0x958000, 0x958001).w(FUNC(quantum_state::led_w));
+	map(0x960000, 0x960001).w(FUNC(quantum_state::nvram_recall_w));
 	map(0x968000, 0x968001).w(m_avg, FUNC(avg_quantum_device::reset_word_w));
 	map(0x970000, 0x970001).w(m_avg, FUNC(avg_quantum_device::go_word_w));
 	map(0x978000, 0x978001).nopr().w("watchdog", FUNC(watchdog_timer_device::reset16_w));

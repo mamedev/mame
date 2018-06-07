@@ -96,14 +96,14 @@ void pulsar_state::pulsar_io(address_map &map)
 	map(0xc0, 0xc3).mirror(0x0c).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0xd0, 0xd3).mirror(0x0c).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0xe0, 0xe3).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf0, 0xff).w(this, FUNC(pulsar_state::baud_w));
+	map(0xf0, 0xff).w(FUNC(pulsar_state::baud_w));
 }
 
 
 WRITE8_MEMBER( pulsar_state::baud_w )
 {
-	m_brg->str_w(data & 0x0f);
-	m_brg->stt_w(data >> 4);
+	m_brg->write_str(data & 0x0f);
+	m_brg->write_stt(data >> 4);
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */

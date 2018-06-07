@@ -154,7 +154,7 @@ void murogmbl_state::murogmbl_map(address_map &map)
 	map(0x6000, 0x6000).portr("IN0");
 	map(0x6800, 0x6800).portr("DSW");
 	map(0x7000, 0x7000).portr("IN1");
-	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::write)); /* read is always discarded */
+	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* read is always discarded */
 }
 
 void slotunbl_state::slotunbl_map(address_map &map)
@@ -167,7 +167,7 @@ void slotunbl_state::slotunbl_map(address_map &map)
 	map(0x6000, 0x6000).portr("IN0");
 	map(0x6800, 0x6800).portr("DSW");
 	map(0x7000, 0x7000).portr("IN1");
-	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::write)); /* read is always discarded */
+	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* read is always discarded */
 }
 
 void murogmbl_state::video_start()

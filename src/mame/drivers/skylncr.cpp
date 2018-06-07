@@ -466,55 +466,55 @@ void skylncr_state::mem_map_skylncr(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
 
-	map(0x8800, 0x8fff).ram().w(this, FUNC(skylncr_state::skylncr_videoram_w)).share("videoram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(skylncr_state::skylncr_colorram_w)).share("colorram");
+	map(0x8800, 0x8fff).ram().w(FUNC(skylncr_state::skylncr_videoram_w)).share("videoram");
+	map(0x9000, 0x97ff).ram().w(FUNC(skylncr_state::skylncr_colorram_w)).share("colorram");
 
-	map(0x9800, 0x99ff).ram().w(this, FUNC(skylncr_state::reeltiles_1_w)).share("reeltiles_1_ram");
-	map(0x9a00, 0x9bff).ram().w(this, FUNC(skylncr_state::reeltiles_2_w)).share("reeltiles_2_ram");
-	map(0x9c00, 0x9dff).ram().w(this, FUNC(skylncr_state::reeltiles_3_w)).share("reeltiles_3_ram");
-	map(0x9e00, 0x9fff).ram().w(this, FUNC(skylncr_state::reeltiles_4_w)).share("reeltiles_4_ram");
-	map(0xa000, 0xa1ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_1_w)).share("rthigh_1_ram");
-	map(0xa200, 0xa3ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_2_w)).share("rthigh_2_ram");
-	map(0xa400, 0xa5ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_3_w)).share("rthigh_3_ram");
-	map(0xa600, 0xa7ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_4_w)).share("rthigh_4_ram");
+	map(0x9800, 0x99ff).ram().w(FUNC(skylncr_state::reeltiles_1_w)).share("reeltiles_1_ram");
+	map(0x9a00, 0x9bff).ram().w(FUNC(skylncr_state::reeltiles_2_w)).share("reeltiles_2_ram");
+	map(0x9c00, 0x9dff).ram().w(FUNC(skylncr_state::reeltiles_3_w)).share("reeltiles_3_ram");
+	map(0x9e00, 0x9fff).ram().w(FUNC(skylncr_state::reeltiles_4_w)).share("reeltiles_4_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(skylncr_state::reeltileshigh_1_w)).share("rthigh_1_ram");
+	map(0xa200, 0xa3ff).ram().w(FUNC(skylncr_state::reeltileshigh_2_w)).share("rthigh_2_ram");
+	map(0xa400, 0xa5ff).ram().w(FUNC(skylncr_state::reeltileshigh_3_w)).share("rthigh_3_ram");
+	map(0xa600, 0xa7ff).ram().w(FUNC(skylncr_state::reeltileshigh_4_w)).share("rthigh_4_ram");
 
-	map(0xaa55, 0xaa55).r(this, FUNC(skylncr_state::ret_ff));
+	map(0xaa55, 0xaa55).r(FUNC(skylncr_state::ret_ff));
 
-	map(0xb000, 0xb03f).ram().w(this, FUNC(skylncr_state::reelscroll1_w)).share("reelscroll1");
-	map(0xb040, 0xb07f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb080, 0xb0bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb0c0, 0xb0ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb100, 0xb13f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb140, 0xb17f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb180, 0xb1bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
-	map(0xb1c0, 0xb1ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb000, 0xb03f).ram().w(FUNC(skylncr_state::reelscroll1_w)).share("reelscroll1");
+	map(0xb040, 0xb07f).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb080, 0xb0bf).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb0c0, 0xb0ff).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb100, 0xb13f).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb140, 0xb17f).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb180, 0xb1bf).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb1c0, 0xb1ff).ram().w(FUNC(skylncr_state::reelscroll1_w));
 
-	map(0xb200, 0xb23f).ram().w(this, FUNC(skylncr_state::reelscroll2_w)).share("reelscroll2");
-	map(0xb240, 0xb27f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb280, 0xb2bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb2c0, 0xb2ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb300, 0xb33f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb340, 0xb37f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb380, 0xb3bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
-	map(0xb3c0, 0xb3ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb200, 0xb23f).ram().w(FUNC(skylncr_state::reelscroll2_w)).share("reelscroll2");
+	map(0xb240, 0xb27f).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb280, 0xb2bf).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb2c0, 0xb2ff).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb300, 0xb33f).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb340, 0xb37f).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb380, 0xb3bf).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb3c0, 0xb3ff).ram().w(FUNC(skylncr_state::reelscroll2_w));
 
-	map(0xb400, 0xb43f).ram().w(this, FUNC(skylncr_state::reelscroll3_w)).share("reelscroll3");
-	map(0xb440, 0xb47f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb480, 0xb4bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb4c0, 0xb4ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb500, 0xb53f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb540, 0xb57f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb580, 0xb5bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
-	map(0xb5c0, 0xb5ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb400, 0xb43f).ram().w(FUNC(skylncr_state::reelscroll3_w)).share("reelscroll3");
+	map(0xb440, 0xb47f).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb480, 0xb4bf).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb4c0, 0xb4ff).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb500, 0xb53f).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb540, 0xb57f).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb580, 0xb5bf).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb5c0, 0xb5ff).ram().w(FUNC(skylncr_state::reelscroll3_w));
 
-	map(0xb600, 0xb63f).ram().w(this, FUNC(skylncr_state::reelscroll4_w)).share("reelscroll4");
-	map(0xb640, 0xb67f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb680, 0xb6bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb6c0, 0xb6ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb700, 0xb73f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb740, 0xb77f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb780, 0xb7bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
-	map(0xb7c0, 0xb7ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb600, 0xb63f).ram().w(FUNC(skylncr_state::reelscroll4_w)).share("reelscroll4");
+	map(0xb640, 0xb67f).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb680, 0xb6bf).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb6c0, 0xb6ff).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb700, 0xb73f).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb740, 0xb77f).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb780, 0xb7bf).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb7c0, 0xb7ff).ram().w(FUNC(skylncr_state::reelscroll4_w));
 
 	map(0xc000, 0xffff).rom();
 }
@@ -527,7 +527,7 @@ void skylncr_state::io_map_skylncr(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 
-	map(0x20, 0x20).w(this, FUNC(skylncr_state::skylncr_coin_w));
+	map(0x20, 0x20).w(FUNC(skylncr_state::skylncr_coin_w));
 
 	map(0x30, 0x31).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x31, 0x31).r("aysnd", FUNC(ay8910_device::data_r));
@@ -540,7 +540,7 @@ void skylncr_state::io_map_skylncr(address_map &map)
 	map(0x51, 0x51).w("ramdac2", FUNC(ramdac_device::pal_w));
 	map(0x52, 0x52).w("ramdac2", FUNC(ramdac_device::mask_w));
 
-	map(0x70, 0x70).w(this, FUNC(skylncr_state::skylncr_nmi_enable_w));
+	map(0x70, 0x70).w(FUNC(skylncr_state::skylncr_nmi_enable_w));
 }
 
 
@@ -548,13 +548,13 @@ void skylncr_state::io_map_mbutrfly(address_map &map)
 {
 	map.global_mask(0xff);
 	io_map_skylncr(map);
-	map(0x60, 0x60).w(this, FUNC(skylncr_state::mbutrfly_prot_w));
+	map(0x60, 0x60).w(FUNC(skylncr_state::mbutrfly_prot_w));
 }
 
 
 void skylncr_state::bdream97_opcode_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(skylncr_state::bdream97_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(skylncr_state::bdream97_opcode_r));
 }
 
 

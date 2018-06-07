@@ -318,14 +318,14 @@ WRITE16_MEMBER(isbc_215g_device::mem_w)
 
 void isbc_215g_device::isbc_215g_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(isbc_215g_device::mem_r), FUNC(isbc_215g_device::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(isbc_215g_device::mem_r), FUNC(isbc_215g_device::mem_w));
 }
 
 void isbc_215g_device::isbc_215g_io(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("i8089", 0);
 	map(0x4000, 0x47ff).mirror(0x3800).ram();
-	map(0x8000, 0x8039).mirror(0x3fc0).rw(this, FUNC(isbc_215g_device::io_r), FUNC(isbc_215g_device::io_w));
+	map(0x8000, 0x8039).mirror(0x3fc0).rw(FUNC(isbc_215g_device::io_r), FUNC(isbc_215g_device::io_w));
 	map(0xc070, 0xc08f).rw("sbx1", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
 	map(0xc0b0, 0xc0bf).rw("sbx1", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
 	map(0xc0d0, 0xc0df).rw("sbx2", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);

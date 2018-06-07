@@ -182,7 +182,7 @@ void mephisto_polgar_state::polgar_mem(address_map &map)
 	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_modul_device::io_w));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(this, FUNC(mephisto_polgar_state::polgar_keys_r));
+	map(0x2c00, 0x2c07).r(FUNC(mephisto_polgar_state::polgar_keys_r));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));
 	map(0x4000, 0xffff).rom();
@@ -238,13 +238,13 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_modul_device::latch_w));
 	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_modul_device::io_w));
-	map(0x2c00, 0x2c07).r(this, FUNC(mephisto_risc_state::polgar_keys_r));
+	map(0x2c00, 0x2c07).r(FUNC(mephisto_risc_state::polgar_keys_r));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));
-	map(0x3800, 0x3800).w(this, FUNC(mephisto_risc_state::latch1_w));
-	map(0x3c00, 0x3c00).r(this, FUNC(mephisto_risc_state::latch0_r));
+	map(0x3800, 0x3800).w(FUNC(mephisto_risc_state::latch1_w));
+	map(0x3c00, 0x3c00).r(FUNC(mephisto_risc_state::latch0_r));
 	map(0x4000, 0x7fff).rom();
 	map(0x8000, 0xffff).bankr("rombank");
 }
@@ -253,8 +253,8 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 void mephisto_risc_state::mrisc_arm_mem(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram();
-	map(0x00400000, 0x007fffff).rw(this, FUNC(mephisto_risc_state::latch1_r), FUNC(mephisto_risc_state::latch0_w)).umask32(0x000000ff);
-	map(0x01800000, 0x01800003).r(this, FUNC(mephisto_risc_state::disable_boot_rom_r));
+	map(0x00400000, 0x007fffff).rw(FUNC(mephisto_risc_state::latch1_r), FUNC(mephisto_risc_state::latch0_w)).umask32(0x000000ff);
+	map(0x01800000, 0x01800003).r(FUNC(mephisto_risc_state::disable_boot_rom_r));
 }
 
 
@@ -291,11 +291,11 @@ void mephisto_milano_state::milano_mem(address_map &map)
 	map(0x0000, 0x1fbf).ram().share("nvram");
 
 	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display_modul_device::latch_w));
-	map(0x1fd0, 0x1fd0).w(this, FUNC(mephisto_milano_state::milano_led_w));
-	map(0x1fe0, 0x1fe0).r(this, FUNC(mephisto_milano_state::milano_input_r));
+	map(0x1fd0, 0x1fd0).w(FUNC(mephisto_milano_state::milano_led_w));
+	map(0x1fe0, 0x1fe0).r(FUNC(mephisto_milano_state::milano_input_r));
 	map(0x1fe8, 0x1fef).w("outlatch", FUNC(hc259_device::write_d7));
-	map(0x1fd8, 0x1fdf).r(this, FUNC(mephisto_milano_state::polgar_keys_r));
-	map(0x1ff0, 0x1ff0).w(this, FUNC(mephisto_milano_state::milano_io_w));
+	map(0x1fd8, 0x1fdf).r(FUNC(mephisto_milano_state::polgar_keys_r));
+	map(0x1ff0, 0x1ff0).w(FUNC(mephisto_milano_state::milano_io_w));
 
 	map(0x2000, 0xffff).rom();
 }
@@ -342,10 +342,10 @@ WRITE8_MEMBER(mephisto_modena_state::modena_digits_w)
 void mephisto_modena_state::modena_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x4000, 0x4000).w(this, FUNC(mephisto_modena_state::modena_digits_w));
-	map(0x5000, 0x5000).w(this, FUNC(mephisto_modena_state::modena_led_w));
-	map(0x6000, 0x6000).w(this, FUNC(mephisto_modena_state::modena_io_w));
-	map(0x7000, 0x7fff).r(this, FUNC(mephisto_modena_state::modena_input_r));
+	map(0x4000, 0x4000).w(FUNC(mephisto_modena_state::modena_digits_w));
+	map(0x5000, 0x5000).w(FUNC(mephisto_modena_state::modena_led_w));
+	map(0x6000, 0x6000).w(FUNC(mephisto_modena_state::modena_io_w));
+	map(0x7000, 0x7fff).r(FUNC(mephisto_modena_state::modena_input_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -385,11 +385,11 @@ READ8_MEMBER(mephisto_academy_state::academy_input_r)
 void mephisto_academy_state::academy_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2400, 0x2400).r(this, FUNC(mephisto_academy_state::academy_input_r));
+	map(0x2400, 0x2400).r(FUNC(mephisto_academy_state::academy_input_r));
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c00).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0x3000, 0x3007).w("outlatch", FUNC(hc259_device::write_d7));
-	map(0x3400, 0x3400).w(this, FUNC(mephisto_academy_state::academy_led_w));
+	map(0x3400, 0x3400).w(FUNC(mephisto_academy_state::academy_led_w));
 	map(0x3800, 0x3801).rw("display:hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x4000, 0xffff).rom();
 }

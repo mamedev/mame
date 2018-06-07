@@ -95,7 +95,7 @@ void buster_state::mainmap(address_map &map)
 	map(0x7c8a, 0x7c8a).portr("IN5");
 	map(0x7c8c, 0x7c8c).portr("IN6");
 	map(0x7c8e, 0x7c8e).portr("IN7");
-	map(0x7cb0, 0x7cb7).w(this, FUNC(buster_state::coin_output_w));
+	map(0x7cb0, 0x7cb7).w(FUNC(buster_state::coin_output_w));
 	map(0x8800, 0x8fff).ram().share("wram"); // ???
 	map(0xa000, 0xa0ff).ram(); // nvram?
 }

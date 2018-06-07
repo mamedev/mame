@@ -73,10 +73,10 @@ void chaos_state::mem_map(address_map &map)
 void chaos_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x1e, 0x1e).r(this, FUNC(chaos_state::port1e_r));
-	map(0x1f, 0x1f).rw(this, FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
-	map(0x90, 0x90).r(this, FUNC(chaos_state::port90_r));
-	map(0x91, 0x91).r(this, FUNC(chaos_state::port91_r));
+	map(0x1e, 0x1e).r(FUNC(chaos_state::port1e_r));
+	map(0x1f, 0x1f).rw(FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
+	map(0x90, 0x90).r(FUNC(chaos_state::port90_r));
+	map(0x91, 0x91).r(FUNC(chaos_state::port91_r));
 	map(0x92, 0x92).w(m_terminal, FUNC(generic_terminal_device::write));
 }
 

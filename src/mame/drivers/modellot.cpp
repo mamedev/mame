@@ -82,8 +82,8 @@ void modellot_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x77, 0x77).r(this, FUNC(modellot_state::port77_r));
-	map(0xff, 0xff).r(this, FUNC(modellot_state::portff_r));
+	map(0x77, 0x77).r(FUNC(modellot_state::port77_r));
+	map(0xff, 0xff).r(FUNC(modellot_state::portff_r));
 }
 
 

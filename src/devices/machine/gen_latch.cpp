@@ -121,12 +121,12 @@ WRITE8_MEMBER( generic_latch_8_device::clear_w )
 	m_latched_value = 0x00;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::preset_w )
+WRITE_LINE_MEMBER( generic_latch_8_device::preset )
 {
 	m_latched_value = 0xff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
+WRITE_LINE_MEMBER( generic_latch_8_device::clear )
 {
 	m_latched_value = 0x00;
 }
@@ -204,12 +204,12 @@ WRITE16_MEMBER( generic_latch_16_device::clear_w )
 	m_latched_value = 0x0000;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::preset_w )
+WRITE_LINE_MEMBER( generic_latch_16_device::preset )
 {
 	m_latched_value = 0xffff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::clear_w )
+WRITE_LINE_MEMBER( generic_latch_16_device::clear )
 {
 	m_latched_value = 0x0000;
 }

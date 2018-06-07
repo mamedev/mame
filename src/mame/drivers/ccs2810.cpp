@@ -180,21 +180,21 @@ WRITE8_MEMBER(ccs_state::io_write)
 
 void ccs_state::ccs2810_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::memory_read), FUNC(ccs_state::memory_write));
+	map(0x0000, 0xffff).rw(FUNC(ccs_state::memory_read), FUNC(ccs_state::memory_write));
 }
 
 void ccs_state::ccs2810_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
+	map(0x0000, 0xffff).rw(FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
 }
 
 void ccs_state::ccs2422_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
-	map(0x04, 0x04).mirror(0xff00).rw(this, FUNC(ccs_state::port04_r), FUNC(ccs_state::port04_w));
+	map(0x0000, 0xffff).rw(FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
+	map(0x04, 0x04).mirror(0xff00).rw(FUNC(ccs_state::port04_r), FUNC(ccs_state::port04_w));
 	map(0x30, 0x33).mirror(0xff00).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
-	map(0x34, 0x34).mirror(0xff00).rw(this, FUNC(ccs_state::port34_r), FUNC(ccs_state::port34_w));
-	map(0x40, 0x40).mirror(0xff00).w(this, FUNC(ccs_state::port40_w));
+	map(0x34, 0x34).mirror(0xff00).rw(FUNC(ccs_state::port34_r), FUNC(ccs_state::port34_w));
+	map(0x40, 0x40).mirror(0xff00).w(FUNC(ccs_state::port40_w));
 }
 
 /* Input ports */

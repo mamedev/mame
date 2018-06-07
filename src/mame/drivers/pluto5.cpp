@@ -241,7 +241,7 @@ WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 
 void pluto5_state::pluto5_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(pluto5_state::pluto5_mem_r), FUNC(pluto5_state::pluto5_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(pluto5_state::pluto5_mem_r), FUNC(pluto5_state::pluto5_mem_w));
 }
 
 static INPUT_PORTS_START(  pluto5 )

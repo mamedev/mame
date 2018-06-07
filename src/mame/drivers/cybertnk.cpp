@@ -586,26 +586,26 @@ void cybertnk_state::master_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x087fff).ram(); /*Work RAM*/
 	map(0x0a0000, 0x0a0fff).ram().share("spr_ram"); // non-tile based sprite ram
-	map(0x0c0000, 0x0c1fff).ram().w(this, FUNC(cybertnk_state::vram_w<0>)).share("tilemap0_vram");
-	map(0x0c4000, 0x0c5fff).ram().w(this, FUNC(cybertnk_state::vram_w<1>)).share("tilemap1_vram");
-	map(0x0c8000, 0x0c9fff).ram().w(this, FUNC(cybertnk_state::vram_w<2>)).share("tilemap2_vram");
+	map(0x0c0000, 0x0c1fff).ram().w(FUNC(cybertnk_state::vram_w<0>)).share("tilemap0_vram");
+	map(0x0c4000, 0x0c5fff).ram().w(FUNC(cybertnk_state::vram_w<1>)).share("tilemap1_vram");
+	map(0x0c8000, 0x0c9fff).ram().w(FUNC(cybertnk_state::vram_w<2>)).share("tilemap2_vram");
 	map(0x0e0000, 0x0e0fff).ram().share("sharedram");
 	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* 2x palettes, one for each screen */
 
-	map(0x110000, 0x110001).w(this, FUNC(cybertnk_state::sound_cmd_w));
+	map(0x110000, 0x110001).w(FUNC(cybertnk_state::sound_cmd_w));
 	map(0x110002, 0x110003).portr("DSW1").nopw();// watchdog?
-	map(0x110004, 0x110004).r(this, FUNC(cybertnk_state::io_rdy_r));
+	map(0x110004, 0x110004).r(FUNC(cybertnk_state::io_rdy_r));
 	map(0x110006, 0x110007).portr("IN0");
-	map(0x110006, 0x110007).w(this, FUNC(cybertnk_state::mux_w));
-	map(0x110008, 0x110009).portr("IN1").w(this, FUNC(cybertnk_state::cnt_w));
+	map(0x110006, 0x110007).w(FUNC(cybertnk_state::mux_w));
+	map(0x110008, 0x110009).portr("IN1").w(FUNC(cybertnk_state::cnt_w));
 	map(0x11000a, 0x11000b).portr("DSW2");
-	map(0x11000c, 0x11000d).w(this, FUNC(cybertnk_state::irq_ack_w));
+	map(0x11000c, 0x11000d).w(FUNC(cybertnk_state::irq_ack_w));
 
 	map(0x110040, 0x110045).ram().share("tilemap0_scroll");
 	map(0x110048, 0x11004d).ram().share("tilemap1_scroll");
 	map(0x110080, 0x110085).ram().share("tilemap2_scroll");
 
-	map(0x1100d5, 0x1100d5).r(this, FUNC(cybertnk_state::mux_r));
+	map(0x1100d5, 0x1100d5).r(FUNC(cybertnk_state::mux_r));
 }
 
 void cybertnk_state::slave_mem(address_map &map)

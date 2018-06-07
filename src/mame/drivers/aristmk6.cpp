@@ -309,15 +309,15 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x11000000, 0x1107ffff).ram(); // SRAM1 512KB
 	map(0x11800000, 0x1187ffff).ram(); // SRAM2 512KB
 // 12000xxx main control registers area
-	map(0x12000010, 0x12000017).w(this, FUNC(aristmk6_state::eeprom_w));
+	map(0x12000010, 0x12000017).w(FUNC(aristmk6_state::eeprom_w));
 	map(0x12000078, 0x1200007f).nopw(); // watchdog ??
 	map(0x12000080, 0x12000087).nopw(); // 0-1-2 written here repeatedly, diag LED or smth ?
-	map(0x120000E0, 0x120000E7).r(this, FUNC(aristmk6_state::hwver_r));
-	map(0x120000E8, 0x12000107).r(this, FUNC(aristmk6_state::irqpend_r));
-	map(0x12000108, 0x12000127).w(this, FUNC(aristmk6_state::irqen_w));
+	map(0x120000E0, 0x120000E7).r(FUNC(aristmk6_state::hwver_r));
+	map(0x120000E8, 0x12000107).r(FUNC(aristmk6_state::irqpend_r));
+	map(0x12000108, 0x12000127).w(FUNC(aristmk6_state::irqen_w));
 	map(0x12400010, 0x12400017).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x12400018, 0x1240001f).rw(m_uart0, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x13800000, 0x13800007).r(this, FUNC(aristmk6_state::test_r));
+	map(0x13800000, 0x13800007).r(FUNC(aristmk6_state::test_r));
 }
 
 void aristmk6_state::aristmk6_port(address_map &map)

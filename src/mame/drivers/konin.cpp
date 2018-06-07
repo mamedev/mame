@@ -102,7 +102,7 @@ void konin_state::konin_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x24, 0x24).w(this, FUNC(konin_state::picu_b_w));
+	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
 	map(0x80, 0x83).lrw8("ioppi_rw",
 						 [this](address_space &space, offs_t offset, u8 mem_mask) {
 							 return m_ioppi->read(space, offset^3, mem_mask);

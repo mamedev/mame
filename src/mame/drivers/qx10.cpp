@@ -556,17 +556,17 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x0c, 0x0d).rw(m_pic_s, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x10, 0x13).rw(m_scc, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x14, 0x17).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x18, 0x1b).portr("DSW").w(this, FUNC(qx10_state::qx10_18_w));
-	map(0x1c, 0x1f).w(this, FUNC(qx10_state::prom_sel_w));
-	map(0x20, 0x23).w(this, FUNC(qx10_state::cmos_sel_w));
+	map(0x18, 0x1b).portr("DSW").w(FUNC(qx10_state::qx10_18_w));
+	map(0x1c, 0x1f).w(FUNC(qx10_state::prom_sel_w));
+	map(0x20, 0x23).w(FUNC(qx10_state::cmos_sel_w));
 	map(0x2c, 0x2c).portr("CONFIG");
-	map(0x2d, 0x2d).rw(this, FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
-	map(0x30, 0x33).rw(this, FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
+	map(0x2d, 0x2d).rw(FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
+	map(0x30, 0x33).rw(FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
 	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 //  map(0x3a, 0x3a) GDC zoom
 //  map(0x3b, 0x3b) GDC light pen req
-	map(0x3c, 0x3d).rw(this, FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
+	map(0x3c, 0x3d).rw(FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 //  map(0xfc, 0xfd) Multi-Font comms
@@ -711,7 +711,7 @@ WRITE16_MEMBER( qx10_state::vram_w )
 
 void qx10_state::upd7220_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw(this, FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
+	map(0x00000, 0x3ffff).rw(FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
 }
 
 static void keyboard(device_slot_interface &device)

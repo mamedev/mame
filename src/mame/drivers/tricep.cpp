@@ -63,8 +63,8 @@ void tricep_state::tricep_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("p_ram");
 	map(0x00fd0000, 0x00fd1fff).rom().region("user1", 0);
-	map(0x00ff0028, 0x00ff002b).rw(this, FUNC(tricep_state::pci_r), FUNC(tricep_state::pci_w)).umask16(0xffff);
-	map(0x00ff002f, 0x00ff002f).w(this, FUNC(tricep_state::pci_mux_w));
+	map(0x00ff0028, 0x00ff002b).rw(FUNC(tricep_state::pci_r), FUNC(tricep_state::pci_w)).umask16(0xffff);
+	map(0x00ff002f, 0x00ff002f).w(FUNC(tricep_state::pci_mux_w));
 }
 
 /* Input ports */

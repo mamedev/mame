@@ -68,8 +68,8 @@ void zac_2_state::zac_2_io(address_map &map)
 
 void zac_2_state::zac_2_data(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_2_state::ctrl_r), FUNC(zac_2_state::ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(zac_2_state::data_r), FUNC(zac_2_state::data_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_2_state::ctrl_r), FUNC(zac_2_state::ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(zac_2_state::data_r), FUNC(zac_2_state::data_w));
 }
 
 static INPUT_PORTS_START( zac_2 )

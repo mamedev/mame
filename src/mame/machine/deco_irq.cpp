@@ -132,10 +132,10 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 
 void deco_irq_device::map(address_map &map)
 {
-	map(0x0, 0x0).w(this, FUNC(deco_irq_device::control_w));
-	map(0x1, 0x1).rw(this, FUNC(deco_irq_device::scanline_r), FUNC(deco_irq_device::scanline_w));
-	map(0x2, 0x2).rw(this, FUNC(deco_irq_device::raster_irq_ack_r), FUNC(deco_irq_device::vblank_irq_ack_w));
-	map(0x3, 0x3).r(this, FUNC(deco_irq_device::status_r));
+	map(0x0, 0x0).w(FUNC(deco_irq_device::control_w));
+	map(0x1, 0x1).rw(FUNC(deco_irq_device::scanline_r), FUNC(deco_irq_device::scanline_w));
+	map(0x2, 0x2).rw(FUNC(deco_irq_device::raster_irq_ack_r), FUNC(deco_irq_device::vblank_irq_ack_w));
+	map(0x3, 0x3).r(FUNC(deco_irq_device::status_r));
 }
 
 WRITE8_MEMBER( deco_irq_device::control_w )

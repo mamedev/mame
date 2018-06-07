@@ -200,11 +200,11 @@ void magmax_state::magmax_map(address_map &map)
 	map(0x030002, 0x030003).portr("P2");
 	map(0x030004, 0x030005).portr("SYSTEM");
 	map(0x030006, 0x030007).portr("DSW");
-	map(0x030010, 0x030011).w(this, FUNC(magmax_state::magmax_vreg_w)).share("vreg");
+	map(0x030010, 0x030011).w(FUNC(magmax_state::magmax_vreg_w)).share("vreg");
 	map(0x030012, 0x030013).writeonly().share("scroll_x");
 	map(0x030014, 0x030015).writeonly().share("scroll_y");
 	map(0x03001d, 0x03001d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x03001e, 0x03001f).w(this, FUNC(magmax_state::cpu_irq_ack_w));
+	map(0x03001e, 0x03001f).w(FUNC(magmax_state::cpu_irq_ack_w));
 }
 
 void magmax_state::magmax_sound_map(address_map &map)
@@ -221,7 +221,7 @@ void magmax_state::magmax_sound_io_map(address_map &map)
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x06, 0x06).r(this, FUNC(magmax_state::magmax_sound_r));
+	map(0x06, 0x06).r(FUNC(magmax_state::magmax_sound_r));
 }
 
 

@@ -90,7 +90,7 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 	map(0x4800, 0x4800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::sector_r));
 	map(0x5800, 0x5800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::sector_w));
 	map(0x6800, 0x6800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::data_r));
-	map(0x6c00, 0x6fff).r(this, FUNC(adam_fdc_device::data_r));
+	map(0x6c00, 0x6fff).r(FUNC(adam_fdc_device::data_r));
 	map(0x7800, 0x7800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::data_w));
 	map(0x8000, 0x8fff).mirror(0x7000).rom().region(M6801_TAG, 0);
 }
@@ -102,8 +102,8 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 
 void adam_fdc_device::adam_fdc_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(adam_fdc_device::p1_r), FUNC(adam_fdc_device::p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_fdc_device::p2_r), FUNC(adam_fdc_device::p2_w));
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(adam_fdc_device::p1_r), FUNC(adam_fdc_device::p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_fdc_device::p2_r), FUNC(adam_fdc_device::p2_w));
 	map(M6801_PORT3, M6801_PORT3);
 	map(M6801_PORT4, M6801_PORT4);
 }
@@ -210,7 +210,7 @@ void adam_fdc_device::adamnet_reset_w(int state)
 
 READ8_MEMBER( adam_fdc_device::data_r )
 {
-	uint8_t data = m_fdc->data_r();
+	uint8_t data = m_fdc->read_data();
 
 	m_ram[offset & 0x3ff] = data;
 

@@ -53,8 +53,8 @@ void m20_8086_device::i86_prog(address_map &map)
 
 void m20_8086_device::i86_io(address_map &map)
 {
-	map(0x4000, 0x4fff).rw(this, FUNC(m20_8086_device::z8000_io_r), FUNC(m20_8086_device::z8000_io_w));
-	map(0x7ffa, 0x7ffd).w(this, FUNC(m20_8086_device::handshake_w));
+	map(0x4000, 0x4fff).rw(FUNC(m20_8086_device::z8000_io_r), FUNC(m20_8086_device::z8000_io_w));
+	map(0x7ffa, 0x7ffd).w(FUNC(m20_8086_device::handshake_w));
 }
 
 MACHINE_CONFIG_START(m20_8086_device::device_add_mconfig)

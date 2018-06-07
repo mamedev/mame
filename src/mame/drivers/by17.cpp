@@ -133,7 +133,7 @@ void by17_state::by17_map(address_map &map)
 	map(0x0000, 0x007f).ram();
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0200, 0x02ff).ram().rw(this, FUNC(by17_state::nibble_nvram_r), FUNC(by17_state::nibble_nvram_w)).share("nvram");
+	map(0x0200, 0x02ff).ram().rw(FUNC(by17_state::nibble_nvram_r), FUNC(by17_state::nibble_nvram_w)).share("nvram");
 	map(0x1000, 0x1fff).rom().region("roms", 0);
 }
 

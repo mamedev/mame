@@ -25,7 +25,7 @@ void lynx_state::lynx_mem(address_map &map)
 	map(0xfd00, 0xfdff).ram().share("mem_fd00");
 	map(0xfe00, 0xfff7).bankr("bank3").writeonly().share("mem_fe00");
 	map(0xfff8, 0xfff8).ram();
-	map(0xfff9, 0xfff9).rw(this, FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
+	map(0xfff9, 0xfff9).rw(FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
 	map(0xfffa, 0xffff).bankr("bank4").writeonly().share("mem_fffa");
 }
 

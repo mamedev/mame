@@ -58,7 +58,7 @@ void amerihok_state::amerihok_map(address_map &map)
 
 void amerihok_state::amerihok_data_map(address_map &map)
 {
-	map(0x2000, 0x2000).w(this, FUNC(amerihok_state::control_w));
+	map(0x2000, 0x2000).w(FUNC(amerihok_state::control_w));
 	map(0x4000, 0x4000).w(m_oki, FUNC(okim6376_device::write));
 }
 

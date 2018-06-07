@@ -41,11 +41,11 @@ void higemaru_state::higemaru_map(address_map &map)
 	map(0xc002, 0xc002).portr("SYSTEM");
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
-	map(0xc800, 0xc800).w(this, FUNC(higemaru_state::higemaru_c800_w));
+	map(0xc800, 0xc800).w(FUNC(higemaru_state::higemaru_c800_w));
 	map(0xc801, 0xc802).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc803, 0xc804).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(higemaru_state::higemaru_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(higemaru_state::higemaru_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(higemaru_state::higemaru_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(higemaru_state::higemaru_colorram_w)).share("colorram");
 	map(0xd880, 0xd9ff).ram().share("spriteram");
 	map(0xe000, 0xefff).ram();
 }

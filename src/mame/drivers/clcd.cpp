@@ -607,20 +607,20 @@ void clcd_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 void clcd_state::clcd_banked_mem(address_map &map)
 {
 	/* KERN/APPL/RAM */
-	map(0x00000, 0x1ffff).mirror(0x40000).rw(this, FUNC(clcd_state::ram_r), FUNC(clcd_state::ram_w));
+	map(0x00000, 0x1ffff).mirror(0x40000).rw(FUNC(clcd_state::ram_r), FUNC(clcd_state::ram_w));
 	map(0x20000, 0x3ffff).mirror(0x40000).rom().region("maincpu", 0);
 
 	/* TEST */
-	map(0x81000, 0x83fff).r(this, FUNC(clcd_state::mmu_offset1_r));
-	map(0x84000, 0x87fff).r(this, FUNC(clcd_state::mmu_offset2_r));
-	map(0x88000, 0x8bfff).r(this, FUNC(clcd_state::mmu_offset3_r));
-	map(0x8c000, 0x8dfff).r(this, FUNC(clcd_state::mmu_offset4_r));
-	map(0x8e000, 0x8f7ff).r(this, FUNC(clcd_state::mmu_offset5_r));
+	map(0x81000, 0x83fff).r(FUNC(clcd_state::mmu_offset1_r));
+	map(0x84000, 0x87fff).r(FUNC(clcd_state::mmu_offset2_r));
+	map(0x88000, 0x8bfff).r(FUNC(clcd_state::mmu_offset3_r));
+	map(0x8c000, 0x8dfff).r(FUNC(clcd_state::mmu_offset4_r));
+	map(0x8e000, 0x8f7ff).r(FUNC(clcd_state::mmu_offset5_r));
 }
 
 void clcd_state::clcd_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rw(this, FUNC(clcd_state::ram_r), FUNC(clcd_state::ram_w));
+	map(0x0000, 0x0fff).rw(FUNC(clcd_state::ram_r), FUNC(clcd_state::ram_w));
 	map(0x1000, 0x3fff).rw(m_bank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0x4000, 0x7fff).rw(m_bank2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0x8000, 0xbfff).rw(m_bank3, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
@@ -629,21 +629,21 @@ void clcd_state::clcd_mem(address_map &map)
 	map(0xf880, 0xf88f).mirror(0x70).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xf980, 0xf983).mirror(0x7c).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xfa00, 0xffff).rom().region("maincpu", 0x1fa00);
-	map(0xfa00, 0xfa00).mirror(0x7f).w(this, FUNC(clcd_state::mmu_mode_kern_w));
-	map(0xfa80, 0xfa80).mirror(0x7f).w(this, FUNC(clcd_state::mmu_mode_appl_w));
-	map(0xfb00, 0xfb00).mirror(0x7f).w(this, FUNC(clcd_state::mmu_mode_ram_w));
-	map(0xfb80, 0xfb80).mirror(0x7f).w(this, FUNC(clcd_state::mmu_mode_recall_w));
-	map(0xfc00, 0xfc00).mirror(0x7f).w(this, FUNC(clcd_state::mmu_mode_save_w));
-	map(0xfc80, 0xfc80).mirror(0x7f).w(this, FUNC(clcd_state::mmu_mode_test_w));
-	map(0xfd00, 0xfd00).mirror(0x7f).w(this, FUNC(clcd_state::mmu_offset1_w));
-	map(0xfd80, 0xfd80).mirror(0x7f).w(this, FUNC(clcd_state::mmu_offset2_w));
-	map(0xfe00, 0xfe00).mirror(0x7f).w(this, FUNC(clcd_state::mmu_offset3_w));
-	map(0xfe80, 0xfe80).mirror(0x7f).w(this, FUNC(clcd_state::mmu_offset4_w));
-	map(0xff00, 0xff00).mirror(0x7f).w(this, FUNC(clcd_state::mmu_offset5_w));
-	map(0xff80, 0xff80).mirror(0x7c).w(this, FUNC(clcd_state::lcd_scrollx_w));
-	map(0xff81, 0xff81).mirror(0x7c).w(this, FUNC(clcd_state::lcd_scrolly_w));
-	map(0xff82, 0xff82).mirror(0x7c).w(this, FUNC(clcd_state::lcd_mode_w));
-	map(0xff83, 0xff83).mirror(0x7c).w(this, FUNC(clcd_state::lcd_size_w));
+	map(0xfa00, 0xfa00).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_kern_w));
+	map(0xfa80, 0xfa80).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_appl_w));
+	map(0xfb00, 0xfb00).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_ram_w));
+	map(0xfb80, 0xfb80).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_recall_w));
+	map(0xfc00, 0xfc00).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_save_w));
+	map(0xfc80, 0xfc80).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_test_w));
+	map(0xfd00, 0xfd00).mirror(0x7f).w(FUNC(clcd_state::mmu_offset1_w));
+	map(0xfd80, 0xfd80).mirror(0x7f).w(FUNC(clcd_state::mmu_offset2_w));
+	map(0xfe00, 0xfe00).mirror(0x7f).w(FUNC(clcd_state::mmu_offset3_w));
+	map(0xfe80, 0xfe80).mirror(0x7f).w(FUNC(clcd_state::mmu_offset4_w));
+	map(0xff00, 0xff00).mirror(0x7f).w(FUNC(clcd_state::mmu_offset5_w));
+	map(0xff80, 0xff80).mirror(0x7c).w(FUNC(clcd_state::lcd_scrollx_w));
+	map(0xff81, 0xff81).mirror(0x7c).w(FUNC(clcd_state::lcd_scrolly_w));
+	map(0xff82, 0xff82).mirror(0x7c).w(FUNC(clcd_state::lcd_mode_w));
+	map(0xff83, 0xff83).mirror(0x7c).w(FUNC(clcd_state::lcd_size_w));
 }
 
 /* Input ports */

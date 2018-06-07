@@ -1709,7 +1709,7 @@ void chihiro_state::chihiro_map(address_map &map)
 void chihiro_state::chihiro_map_io(address_map &map)
 {
 	xbox_base_map_io(map);
-	map(0x4000, 0x40ff).rw(this, FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
+	map(0x4000, 0x40ff).rw(FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
 }
 
 static INPUT_PORTS_START(chihiro)

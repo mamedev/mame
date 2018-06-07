@@ -190,13 +190,13 @@ void _1942_state::_1942_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
 	map(0xc800, 0xc800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xc802, 0xc803).w(this, FUNC(_1942_state::_1942_scroll_w));
-	map(0xc804, 0xc804).w(this, FUNC(_1942_state::_1942_c804_w));
-	map(0xc805, 0xc805).w(this, FUNC(_1942_state::_1942_palette_bank_w));
-	map(0xc806, 0xc806).w(this, FUNC(_1942_state::_1942_bankswitch_w));
+	map(0xc802, 0xc803).w(FUNC(_1942_state::_1942_scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
+	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
+	map(0xc806, 0xc806).w(FUNC(_1942_state::_1942_bankswitch_w));
 	map(0xcc00, 0xcc7f).ram().share("spriteram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -221,22 +221,22 @@ void _1942p_state::_1942p_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
 
 	map(0xe000, 0xefff).ram();
 
 	map(0xce00, 0xcfff).ram().share("spriteram");
 
-	map(0xdc02, 0xdc03).w(this, FUNC(_1942_state::_1942_scroll_w));
-	map(0xc804, 0xc804).w(this, FUNC(_1942_state::_1942_c804_w));
-	map(0xc805, 0xc805).w(this, FUNC(_1942_state::_1942_palette_bank_w));
+	map(0xdc02, 0xdc03).w(FUNC(_1942_state::_1942_scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
+	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
 
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(_1942p_state::_1942p_palette_w)).share("protopal");
+	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::_1942p_palette_w)).share("protopal");
 
-	map(0xf400, 0xf400).w(this, FUNC(_1942_state::_1942_bankswitch_w));
+	map(0xf400, 0xf400).w(FUNC(_1942_state::_1942_bankswitch_w));
 	map(0xf500, 0xf500).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf600, 0xf600).w(this, FUNC(_1942p_state::_1942p_f600_w));
+	map(0xf600, 0xf600).w(FUNC(_1942p_state::_1942p_f600_w));
 
 	map(0xf700, 0xf700).portr("DSWA");
 	map(0xf701, 0xf701).portr("SYSTEM");

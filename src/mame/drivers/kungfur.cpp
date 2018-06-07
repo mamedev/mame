@@ -231,8 +231,8 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 void kungfur_state::kungfur_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x4000, 0x4000).w(this, FUNC(kungfur_state::kungfur_adpcm1_w));
-	map(0x4004, 0x4004).w(this, FUNC(kungfur_state::kungfur_adpcm2_w));
+	map(0x4000, 0x4000).w(FUNC(kungfur_state::kungfur_adpcm1_w));
+	map(0x4004, 0x4004).w(FUNC(kungfur_state::kungfur_adpcm2_w));
 	map(0x4008, 0x400b).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x400c, 0x400f).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc000, 0xffff).rom();

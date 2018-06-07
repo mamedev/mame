@@ -72,11 +72,11 @@ void volfied_state::main_map(address_map &map)
 	map(0x080000, 0x0fffff).rom();     /* tiles   */
 	map(0x100000, 0x103fff).ram();     /* main    */
 	map(0x200000, 0x203fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));
-	map(0x400000, 0x47ffff).rw(this, FUNC(volfied_state::video_ram_r), FUNC(volfied_state::video_ram_w));
+	map(0x400000, 0x47ffff).rw(FUNC(volfied_state::video_ram_r), FUNC(volfied_state::video_ram_w));
 	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x600000, 0x600001).w(this, FUNC(volfied_state::video_mask_w));
-	map(0x700000, 0x700001).w(this, FUNC(volfied_state::sprite_ctrl_w));
-	map(0xd00000, 0xd00001).rw(this, FUNC(volfied_state::video_ctrl_r), FUNC(volfied_state::video_ctrl_w));
+	map(0x600000, 0x600001).w(FUNC(volfied_state::video_mask_w));
+	map(0x700000, 0x700001).w(FUNC(volfied_state::sprite_ctrl_w));
+	map(0xd00000, 0xd00001).rw(FUNC(volfied_state::video_ctrl_r), FUNC(volfied_state::video_ctrl_w));
 	map(0xe00001, 0xe00001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0xe00003, 0xe00003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0xf00000, 0xf007ff).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);

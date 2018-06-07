@@ -87,8 +87,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( preset_w );
 	DECLARE_WRITE8_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( preset_w );
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
+	DECLARE_WRITE_LINE_MEMBER( preset );
+	DECLARE_WRITE_LINE_MEMBER( clear );
 
 	DECLARE_READ8_MEMBER( acknowledge_r );
 	DECLARE_WRITE8_MEMBER( acknowledge_w );
@@ -118,8 +118,8 @@ public:
 
 	DECLARE_WRITE16_MEMBER( preset_w );
 	DECLARE_WRITE16_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( preset_w );
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
+	DECLARE_WRITE_LINE_MEMBER( preset );
+	DECLARE_WRITE_LINE_MEMBER( clear );
 
 	void preset_w(u16 value) { m_latched_value = value; }
 

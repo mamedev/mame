@@ -194,8 +194,8 @@ void fastfred_state::fastfred_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd3ff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd000, 0xd3ff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd840, 0xd85f).ram().share("spriteram");
 	map(0xd860, 0xdbff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share("bgcolor");
@@ -210,10 +210,10 @@ void fastfred_state::jumpcoas_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd03f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd000, 0xd03f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd040, 0xd05f).ram().share("spriteram");
 	map(0xd060, 0xd3ff).ram();
-	map(0xd800, 0xdbff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xdbff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
 	map(0xe000, 0xe000).writeonly().share("bgcolor");
 	map(0xe800, 0xe800).portr("DSW1");
 	map(0xe801, 0xe801).portr("DSW2");
@@ -228,14 +228,14 @@ void fastfred_state::jumpcoas_map(address_map &map)
 void fastfred_state::imago_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x1fff).r(this, FUNC(fastfred_state::imago_sprites_offset_r));
+	map(0x1000, 0x1fff).r(FUNC(fastfred_state::imago_sprites_offset_r));
 	map(0x2000, 0x6fff).rom();
 	map(0xb000, 0xb3ff).ram(); // same fg videoram (which one of the 2 is really used?)
-	map(0xb800, 0xbfff).ram().w(this, FUNC(fastfred_state::imago_sprites_dma_w));
+	map(0xb800, 0xbfff).ram().w(FUNC(fastfred_state::imago_sprites_dma_w));
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcbff).ram().w(this, FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xc800, 0xcbff).ram().w(FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd840, 0xd85f).ram().share("spriteram");
 	map(0xd860, 0xd8ff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS");
@@ -243,7 +243,7 @@ void fastfred_state::imago_map(address_map &map)
 	map(0xf000, 0xf000).portr("DSW");
 	map(0xf000, 0xf007).mirror(0x03f8).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xf400, 0xf400).nopw(); // writes 0 or 2
-	map(0xf401, 0xf401).w(this, FUNC(fastfred_state::imago_sprites_bank_w));
+	map(0xf401, 0xf401).w(FUNC(fastfred_state::imago_sprites_bank_w));
 	map(0xf800, 0xf800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -251,7 +251,7 @@ void fastfred_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(fastfred_state::sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(fastfred_state::sound_nmi_mask_w));
 	map(0x4000, 0x4000).writeonly();  // Reset PSG's
 	map(0x5000, 0x5001).w("ay8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay8910.2", FUNC(ay8910_device::address_data_w));

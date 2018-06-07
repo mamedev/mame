@@ -294,14 +294,14 @@ void aces1_state::aces1_map(address_map &map)
 	map(0xafb0, 0xafb3).rw("ic24", FUNC(i8255_device::read), FUNC(i8255_device::write)); // IC24 - lamps, 7segs
 	map(0xafd0, 0xafd3).rw("ic25", FUNC(i8255_device::read), FUNC(i8255_device::write)); // IC25 - lamps, meters, reel comms (writes)
 	map(0xafe0, 0xafe3).rw("ic37", FUNC(i8255_device::read), FUNC(i8255_device::write));//  IC37 - doors, coins, reel optics (reads)
-	map(0xc000, 0xc000).r(this, FUNC(aces1_state::aces1_unk_r)); // illegal or reset irq?
-	map(0xe000, 0xe000).rw(this, FUNC(aces1_state::aces1_nmi_counter_reset_r), FUNC(aces1_state::aces1_nmi_counter_reset_w));
+	map(0xc000, 0xc000).r(FUNC(aces1_state::aces1_unk_r)); // illegal or reset irq?
+	map(0xe000, 0xe000).rw(FUNC(aces1_state::aces1_nmi_counter_reset_r), FUNC(aces1_state::aces1_nmi_counter_reset_w));
 }
 
 
 void aces1_state::aces1_portmap(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(aces1_state::aces1_unk_port00_r)); // read before enabling interrupts?
+	map(0x00, 0x00).r(FUNC(aces1_state::aces1_unk_port00_r)); // read before enabling interrupts?
 }
 
 

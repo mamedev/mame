@@ -76,8 +76,8 @@ WRITE8_MEMBER(stellafr_state::ay8910_portb_w)
 void stellafr_state::stellafr_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x8000c1, 0x8000c1).w(this, FUNC(stellafr_state::write_8000c1));
-	map(0x800101, 0x800101).rw(this, FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101));
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::write_8000c1));
+	map(0x800101, 0x800101).rw(FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101));
 	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
