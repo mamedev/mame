@@ -103,7 +103,7 @@ WRITE8_MEMBER(atarigt_state::cage_irq_callback)
 
 READ32_MEMBER(atarigt_state::special_port2_r)
 {
-	int temp = ioport("SERVICE")->read();
+	int temp = m_service_io->read();
 	temp ^= 0x0001;     /* /A2DRDY always high for now */
 	return (temp << 16) | temp;
 }
@@ -111,7 +111,7 @@ READ32_MEMBER(atarigt_state::special_port2_r)
 
 READ32_MEMBER(atarigt_state::special_port3_r)
 {
-	int temp = ioport("COIN")->read();
+	int temp = m_coin_io->read();
 	if (m_video_int_state) temp ^= 0x0001;
 	if (m_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
@@ -121,7 +121,7 @@ READ32_MEMBER(atarigt_state::special_port3_r)
 inline void atarigt_state::compute_fake_pots(int *pots)
 {
 #if (HACK_TMEK_CONTROLS)
-	int fake = ioport("FAKE")->read();
+	int fake = m_fake_io->read();
 
 	pots[0] = pots[1] = pots[2] = pots[3] = 0x80;
 
@@ -412,12 +412,12 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 	primrage_update_mode(offset);
 
 	/* check for certain read sequences */
-	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(m_protdata) * 2)
-		m_protdata[(offset - 0xdc7800) / 2] = data;
+	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(m_protdata.get()) * 2)
+		m_protdata[(offset - 0xdc7800) >> 1] = data;
 
 	if (m_protmode == 2)
 	{
-		int temp = (offset - 0xdc7800) / 2;
+		int temp = (offset - 0xdc7800) >> 1;
 		if (LOG_PROTECTION) logerror("prot:mode 2 param = %04X\n", temp);
 		m_protresult = temp * 0x6915 + 0x6915;
 	}
@@ -730,7 +730,7 @@ static const gfx_layout pflayout =
 	5,
 	{ 0, 0, 1, 2, 3 },
 	{ RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+4, 0, 4, RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+12, 8, 12 },
-	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
+	{ STEP8(0,16) },
 	16*8
 };
 
@@ -742,7 +742,7 @@ static const gfx_layout pftoplayout =
 	6,
 	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+4, 0, 0, 0, 0 },
 	{ 3, 2, 1, 0, 11, 10, 9, 8 },
-	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
+	{ STEP8(0,16) },
 	16*8
 };
 
@@ -752,9 +752,9 @@ static const gfx_layout anlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
-	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_ADD("palette", MRAM_ENTRIES)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD("alpha", "gfxdecode", 2, atarigt_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64, 32)
@@ -1326,6 +1326,9 @@ void atarigt_state::init_primrage()
 	/* install protection */
 	m_protection_r = &atarigt_state::primrage_protection_r;
 	m_protection_w = &atarigt_state::primrage_protection_w;
+
+	m_protdata = make_unique_clear<uint8_t[]>(0x800);
+	save_pointer(NAME(m_protdata.get()), 0x800);
 }
 
 /*************************************
