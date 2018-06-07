@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
 
 	// logical width is 65536(4096*16) but we load only 1024 pixel each
 	// for reduce RAM usage
-	tile_index = (((m_vrom_offset << 9) + tile_index) & 0x1ffff) <<= 1;
+	tile_index = (((m_vrom_offset << 9) + tile_index) & 0x1ffff) << 1;
 	int vrom_offset = (tile_index >> 3);
 	tile_index = (m_vrom[0][vrom_offset & ~1] << 4) | ((m_vrom[0][vrom_offset | 1] & 0x7) << 12) | (tile_index & 0xf);
 
