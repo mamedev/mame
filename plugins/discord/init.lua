@@ -42,10 +42,9 @@ function discord.startplugin()
 		end
 	end
 
-	local function update(stop)
-		local activity
+	local function update(status)
 		local running = emu.romname() ~= "___empty"
-		local state = not running and "In menu" or manager:machine().paused and "Paused" or "Playing"
+		local state = not running and "In menu" or status
 		local details = running and manager:machine():system().description or nil
 		if emu.softname() ~= "" then
 			for name, dev in pairs(manager:machine().images) do
@@ -55,18 +54,17 @@ function discord.startplugin()
 				end
 			end
 		end
-		activity = {
-			state = state,
-			details = details,
-			timestamps = {
-				start = starttime
-			}
-		}
 		local status = {
 			cmd = "SET_ACTIVITY",
 			args = {
 				pid = emu.pid(),
-				activity = activity,
+				activity = {
+					state = state,
+					details = details,
+					timestamps = {
+						start = starttime
+					}
+				}
 			},
 			nonce = nonce
 		}
@@ -80,7 +78,7 @@ function discord.startplugin()
 			local res = pipe:read(100)
 			data = data .. res
 		until #res == 0 and #data > 0 or time + 1 < os.time()
-		print(data)
+		--print(data)
 	end
 		
 	do
@@ -93,19 +91,15 @@ function discord.startplugin()
 
 	emu.register_start(function()
 		starttime = os.time()
-		update()
-	end)
-
-	emu.register_stop(function()
-		update()
+		update("Playing")
 	end)
 
 	emu.register_pause(function()
-		update()
+		update("Paused")
 	end)
 
 	emu.register_resume(function()
-		update()
+		update("Playing")
 	end)
 end
 
