@@ -73,6 +73,7 @@ public:
 	SAMPLES_START_CB_MEMBER(ninjakd2_init_samples);
 	DECLARE_READ8_MEMBER(omegaf_io_protection_r);
 	DECLARE_READ8_MEMBER(robokid_motion_error_verbose_r);
+	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(omegaf_io_protection_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_fgvideoram_w);

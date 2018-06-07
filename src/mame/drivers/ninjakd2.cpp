@@ -364,6 +364,14 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 	// other bits unused
 }
 
+// omega fighter compares port $c1e7 with and $e0
+// returning 0 and no small enemies shoot any bullet.
+// returning 0xff seems enough
+// TODO: find a better reference and verify if there are more gameplay quirks, this might really be anything!
+READ8_MEMBER(ninjakd2_state::unk_r)
+{
+	return 0xff;
+}
 
 
 /*************************************
@@ -452,7 +460,7 @@ void ninjakd2_state::omegaf_main_cpu(address_map &map)
 	map(0xc004, 0xc006).w(FUNC(ninjakd2_state::omegaf_io_protection_w));
 	map(0xc100, 0xc104).w(FUNC(ninjakd2_state::robokid_bg0_ctrl_w));
 	map(0xc105, 0xc105).w(FUNC(ninjakd2_state::robokid_bg0_bank_w));
-	map(0xc1e7, 0xc1e7).nopr(); // see notes
+	map(0xc1e7, 0xc1e7).r(FUNC(ninjakd2_state::unk_r)); // see notes
 	map(0xc200, 0xc204).w(FUNC(ninjakd2_state::robokid_bg1_ctrl_w));
 	map(0xc205, 0xc205).w(FUNC(ninjakd2_state::robokid_bg1_bank_w));
 	map(0xc300, 0xc304).w(FUNC(ninjakd2_state::robokid_bg2_ctrl_w));
