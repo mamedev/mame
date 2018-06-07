@@ -582,8 +582,11 @@ WRITE8_MEMBER( mc146818_device::write )
 
 		case REG_A:
 			// top bit of A is read only
-			m_data[REG_A] = data & ~REG_A_UIP;
-			update_timer();
+			if ((data ^ m_data[REG_A]) & ~REG_A_UIP)
+			{
+				m_data[REG_A] = data & ~REG_A_UIP;
+				update_timer();
+			}
 			break;
 
 		case REG_B:
