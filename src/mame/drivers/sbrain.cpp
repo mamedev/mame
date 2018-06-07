@@ -138,11 +138,11 @@ void sbrain_state::sbrain_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x40).mirror(6).rw(m_u0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x48, 0x4f).r(this, FUNC(sbrain_state::port48_r)); //chr_int_latch
-	map(0x50, 0x57).r(this, FUNC(sbrain_state::port50_r));
+	map(0x48, 0x4f).r(FUNC(sbrain_state::port48_r)); //chr_int_latch
+	map(0x50, 0x57).r(FUNC(sbrain_state::port50_r));
 	map(0x58, 0x58).mirror(6).rw(m_u1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x59, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x60, 0x67).w(this, FUNC(sbrain_state::baud_w));
+	map(0x60, 0x67).w(FUNC(sbrain_state::baud_w));
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -156,7 +156,7 @@ void sbrain_state::sbrain_subio(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x08, 0x0b).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
-	map(0x10, 0x10).rw(this, FUNC(sbrain_state::port10_r), FUNC(sbrain_state::port10_w));
+	map(0x10, 0x10).rw(FUNC(sbrain_state::port10_r), FUNC(sbrain_state::port10_w));
 }
 
 
@@ -204,8 +204,8 @@ WRITE8_MEMBER( sbrain_state::port10_w )
 
 WRITE8_MEMBER( sbrain_state::baud_w )
 {
-	m_brg->str_w(data & 0x0f);
-	m_brg->stt_w(data >> 4);
+	m_brg->write_str(data & 0x0f);
+	m_brg->write_stt(data >> 4);
 }
 
 READ8_MEMBER( sbrain_state::ppi_pa_r )

@@ -57,7 +57,7 @@ READ8_MEMBER( vt520_state::vt520_some_r )
 void vt520_state::vt520_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x7ffb, 0x7ffb).r(this, FUNC(vt520_state::vt520_some_r));
+	map(0x7ffb, 0x7ffb).r(FUNC(vt520_state::vt520_some_r));
 }
 
 /* Input ports */

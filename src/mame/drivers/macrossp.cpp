@@ -343,32 +343,32 @@ void macrossp_state::macrossp_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x802fff).ram().share("spriteram");
 	/* SCR A Layer */
-	map(0x900000, 0x903fff).ram().w(this, FUNC(macrossp_state::macrossp_scra_videoram_w)).share("scra_videoram");
+	map(0x900000, 0x903fff).ram().w(FUNC(macrossp_state::macrossp_scra_videoram_w)).share("scra_videoram");
 	map(0x904200, 0x9043ff).ram().share("scra_linezoom"); /* W/O? */
 	map(0x905000, 0x90500b).ram().share("scra_videoregs"); /* W/O? */
 	/* SCR B Layer */
-	map(0x908000, 0x90bfff).ram().w(this, FUNC(macrossp_state::macrossp_scrb_videoram_w)).share("scrb_videoram");
+	map(0x908000, 0x90bfff).ram().w(FUNC(macrossp_state::macrossp_scrb_videoram_w)).share("scrb_videoram");
 	map(0x90c200, 0x90c3ff).ram().share("scrb_linezoom"); /* W/O? */
 	map(0x90d000, 0x90d00b).ram().share("scrb_videoregs"); /* W/O? */
 	/* SCR C Layer */
-	map(0x910000, 0x913fff).ram().w(this, FUNC(macrossp_state::macrossp_scrc_videoram_w)).share("scrc_videoram");
+	map(0x910000, 0x913fff).ram().w(FUNC(macrossp_state::macrossp_scrc_videoram_w)).share("scrc_videoram");
 	map(0x914200, 0x9143ff).ram().share("scrc_linezoom");/* W/O? */
 	map(0x915000, 0x91500b).ram().share("scrc_videoregs"); /* W/O? */
 	/* Text Layer */
-	map(0x918000, 0x91bfff).ram().w(this, FUNC(macrossp_state::macrossp_text_videoram_w)).share("text_videoram");
+	map(0x918000, 0x91bfff).ram().w(FUNC(macrossp_state::macrossp_text_videoram_w)).share("text_videoram");
 	map(0x91c200, 0x91c3ff).ram().share("text_linezoom"); /* W/O? */
 	map(0x91d000, 0x91d00b).ram().share("text_videoregs"); /* W/O? */
 
 	map(0xa00000, 0xa03fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
 	map(0xb00000, 0xb00003).portr("INPUTS");
-	map(0xb00004, 0xb00007).r(this, FUNC(macrossp_state::macrossp_soundstatus_r)).nopw(); // irq related?
+	map(0xb00004, 0xb00007).r(FUNC(macrossp_state::macrossp_soundstatus_r)).nopw(); // irq related?
 	map(0xb00008, 0xb0000b).nopw();    // irq related?
 	map(0xb0000c, 0xb0000f).portr("DSW").nopw();
-	map(0xb00012, 0xb00013).w(this, FUNC(macrossp_state::palette_fade_w));
+	map(0xb00012, 0xb00013).w(FUNC(macrossp_state::palette_fade_w));
 	map(0xb00020, 0xb00023).nopw();
 
-	map(0xc00000, 0xc00003).w(this, FUNC(macrossp_state::macrossp_soundcmd_w));
+	map(0xc00000, 0xc00003).w(FUNC(macrossp_state::macrossp_soundcmd_w));
 
 	map(0xf00000, 0xf1ffff).ram().share("mainram"); /* Main Ram */
 //  map(0xfe0000, 0xfe0003).noprw();
@@ -379,7 +379,7 @@ void macrossp_state::macrossp_sound_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x207fff).ram();
 	map(0x400000, 0x40007f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);
-	map(0x600000, 0x600001).r(this, FUNC(macrossp_state::macrossp_soundcmd_r));
+	map(0x600000, 0x600001).r(FUNC(macrossp_state::macrossp_soundcmd_r));
 }
 
 /*** INPUT PORTS *************************************************************/

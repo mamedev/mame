@@ -1715,9 +1715,9 @@ WRITE32_MEMBER(zaurus_state::pxa255_rtc_w)
 void zaurus_state::zaurus_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().region("firmware", 0);
-	map(0x40900000, 0x4090000f).rw(this, FUNC(zaurus_state::pxa255_rtc_r), FUNC(zaurus_state::pxa255_rtc_w));
-	map(0x40a00000, 0x40a0001f).rw(this, FUNC(zaurus_state::pxa255_ostimer_r), FUNC(zaurus_state::pxa255_ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(this, FUNC(zaurus_state::pxa255_intc_r), FUNC(zaurus_state::pxa255_intc_w));
+	map(0x40900000, 0x4090000f).rw(FUNC(zaurus_state::pxa255_rtc_r), FUNC(zaurus_state::pxa255_rtc_w));
+	map(0x40a00000, 0x40a0001f).rw(FUNC(zaurus_state::pxa255_ostimer_r), FUNC(zaurus_state::pxa255_ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(FUNC(zaurus_state::pxa255_intc_r), FUNC(zaurus_state::pxa255_intc_w));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 

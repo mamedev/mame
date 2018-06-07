@@ -128,9 +128,7 @@ public:
 
 	void base(machine_config &config);
 	void mtrap(machine_config &config);
-	void mtrap_cvsd_audio(machine_config &config);
 	void venture(machine_config &config);
-	void venture_audio(machine_config &config);
 	void fax(machine_config &config);
 	void teetert(machine_config &config);
 	void sidetrac(machine_config &config);
@@ -148,9 +146,6 @@ public:
 	void spectar_map(address_map &map);
 	void targ_map(address_map &map);
 	void venture_map(address_map &map);
-	void venture_audio_map(address_map &map);
-	void cvsd_iomap(address_map &map);
-	void cvsd_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

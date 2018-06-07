@@ -296,10 +296,10 @@ void junofrst_state::main_map(address_map &map)
 	map(0x8028, 0x8028).portr("P2");
 	map(0x802c, 0x802c).portr("DSW1");
 	map(0x8030, 0x8037).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x8040, 0x8040).w(this, FUNC(junofrst_state::sh_irqtrigger_w));
+	map(0x8040, 0x8040).w(FUNC(junofrst_state::sh_irqtrigger_w));
 	map(0x8050, 0x8050).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x8060, 0x8060).w(this, FUNC(junofrst_state::bankselect_w));
-	map(0x8070, 0x8073).w(this, FUNC(junofrst_state::blitter_w));
+	map(0x8060, 0x8060).w(FUNC(junofrst_state::bankselect_w));
+	map(0x8070, 0x8073).w(FUNC(junofrst_state::blitter_w));
 	map(0x8100, 0x8fff).ram();
 	map(0x9000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xffff).rom();
@@ -315,7 +315,7 @@ void junofrst_state::audio_map(address_map &map)
 	map(0x4001, 0x4001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x4002, 0x4002).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x5000, 0x5000).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x6000, 0x6000).w(this, FUNC(junofrst_state::i8039_irq_w));
+	map(0x6000, 0x6000).w(FUNC(junofrst_state::i8039_irq_w));
 }
 
 
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	MCFG_DEVICE_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
 	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, junofrst_state, i8039_irqen_and_status_w))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3

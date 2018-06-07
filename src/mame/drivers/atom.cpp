@@ -271,9 +271,9 @@ void atom_state::atom_mem(address_map &map)
 void atomeb_state::atomeb_mem(address_map &map)
 {
 	atom_mem(map);
-	map(0xa000, 0xafff).r(this, FUNC(atomeb_state::ext_r));
-	map(0xbfff, 0xbfff).rw(this, FUNC(atomeb_state::eprom_r), FUNC(atomeb_state::eprom_w));
-	map(0xe000, 0xefff).r(this, FUNC(atomeb_state::dos_r));
+	map(0xa000, 0xafff).r(FUNC(atomeb_state::ext_r));
+	map(0xbfff, 0xbfff).rw(FUNC(atomeb_state::eprom_r), FUNC(atomeb_state::eprom_w));
+	map(0xe000, 0xefff).r(FUNC(atomeb_state::dos_r));
 }
 
 /*-------------------------------------------------
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 

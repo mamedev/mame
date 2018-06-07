@@ -229,8 +229,8 @@ DEFINE_DEVICE_TYPE(VME_FCCPU21YB, vme_fccpu21yb_card_device, "fccpu21yb", "Force
 void vme_fccpu20_device::cpu20_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x00000007).ram().w(this, FUNC(vme_fccpu20_device::bootvect_w));   /* After first write we act as RAM */
-	map(0x00000000, 0x00000007).rom().r(this, FUNC(vme_fccpu20_device::bootvect_r));   /* ROM mirror just during reset */
+	map(0x00000000, 0x00000007).ram().w(FUNC(vme_fccpu20_device::bootvect_w));   /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(FUNC(vme_fccpu20_device::bootvect_r));   /* ROM mirror just during reset */
 	map(0x00000008, 0x0007ffff).ram(); /* Local SRAM */
 	map(0x00080000, 0x000fffff).ram(); /* SRAM-22 installed */
 	map(0xff040000, 0xff04ffff).ram();

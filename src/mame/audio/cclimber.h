@@ -24,7 +24,7 @@ public:
 	// construction/destruction
 	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(sample_trigger_w);
+	DECLARE_WRITE_LINE_MEMBER(sample_trigger);
 	DECLARE_WRITE8_MEMBER(sample_trigger_w);
 	DECLARE_WRITE8_MEMBER(sample_rate_w);
 	DECLARE_WRITE8_MEMBER(sample_volume_w);

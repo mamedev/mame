@@ -177,26 +177,26 @@ WRITE8_MEMBER( molecula_state::sio_w)
 
 void molecula_state::molecula_file_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::file_r), FUNC(molecula_state::file_w));
+	map(0x0000, 0xffff).rw(FUNC(molecula_state::file_r), FUNC(molecula_state::file_w));
 }
 
 void molecula_state::molecula_file_io(address_map &map)
 {
 	map.global_mask(0xff);
 //  AM_RANGE(0x40, 0x43) AM_READWRITE(sio_r,sio_w)
-	map(0x72, 0x73).w(this, FUNC(molecula_state::file_output_w)); // unknown
+	map(0x72, 0x73).w(FUNC(molecula_state::file_output_w)); // unknown
 }
 
 void molecula_state::molecula_app_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::app_r), FUNC(molecula_state::app_w));
+	map(0x0000, 0xffff).rw(FUNC(molecula_state::app_r), FUNC(molecula_state::app_w));
 }
 
 void molecula_state::molecula_app_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w(this, FUNC(molecula_state::app_output_w));
-	map(0x60, 0x63).rw(this, FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
+	map(0x10, 0x10).w(FUNC(molecula_state::app_output_w));
+	map(0x60, 0x63).rw(FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
 }
 
 static INPUT_PORTS_START( molecula )

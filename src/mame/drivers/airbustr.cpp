@@ -333,19 +333,19 @@ void airbustr_state::master_map(address_map &map)
 void airbustr_state::master_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(airbustr_state::master_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(airbustr_state::master_bankswitch_w));
 	map(0x01, 0x01).nopw(); // ???
-	map(0x02, 0x02).w(this, FUNC(airbustr_state::master_nmi_trigger_w));
+	map(0x02, 0x02).w(FUNC(airbustr_state::master_nmi_trigger_w));
 }
 
 void airbustr_state::slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("slavebank");
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(airbustr_state::videoram_w<1>)).share("videoram2");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(airbustr_state::colorram_w<1>)).share("colorram2");
-	map(0xc800, 0xcbff).ram().w(this, FUNC(airbustr_state::videoram_w<0>)).share("videoram1");
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(airbustr_state::colorram_w<0>)).share("colorram1");
+	map(0xc000, 0xc3ff).ram().w(FUNC(airbustr_state::videoram_w<1>)).share("videoram2");
+	map(0xc400, 0xc7ff).ram().w(FUNC(airbustr_state::colorram_w<1>)).share("colorram2");
+	map(0xc800, 0xcbff).ram().w(FUNC(airbustr_state::videoram_w<0>)).share("videoram1");
+	map(0xcc00, 0xcfff).ram().w(FUNC(airbustr_state::colorram_w<0>)).share("colorram1");
 	map(0xd000, 0xd5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd600, 0xdfff).ram();
 	map(0xe000, 0xefff).ram();
@@ -355,14 +355,14 @@ void airbustr_state::slave_map(address_map &map)
 void airbustr_state::slave_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(airbustr_state::slave_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(airbustr_state::slave_bankswitch_w));
 	map(0x02, 0x02).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
-	map(0x04, 0x0c).w(this, FUNC(airbustr_state::scrollregs_w));
-	map(0x0e, 0x0e).r(this, FUNC(airbustr_state::soundcommand_status_r));
+	map(0x04, 0x0c).w(FUNC(airbustr_state::scrollregs_w));
+	map(0x0e, 0x0e).r(FUNC(airbustr_state::soundcommand_status_r));
 	map(0x20, 0x20).portr("P1");
 	map(0x22, 0x22).portr("P2");
 	map(0x24, 0x24).portr("SYSTEM");
-	map(0x28, 0x28).w(this, FUNC(airbustr_state::coin_counter_w));
+	map(0x28, 0x28).w(FUNC(airbustr_state::coin_counter_w));
 	map(0x38, 0x38).nopw(); // irq ack / irq mask
 }
 
@@ -376,7 +376,7 @@ void airbustr_state::sound_map(address_map &map)
 void airbustr_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(airbustr_state::sound_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(airbustr_state::sound_bankswitch_w));
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x04, 0x04).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x06, 0x06).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));

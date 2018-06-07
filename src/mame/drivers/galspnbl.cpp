@@ -75,7 +75,7 @@ void galspnbl_state::main_map(address_map &map)
 	map(0xa01000, 0xa017ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa01800, 0xa027ff).nopw();    /* more palette ? */
 	map(0xa80000, 0xa80001).portr("IN0");
-	map(0xa80010, 0xa80011).portr("IN1").w(this, FUNC(galspnbl_state::soundcommand_w));
+	map(0xa80010, 0xa80011).portr("IN1").w(FUNC(galspnbl_state::soundcommand_w));
 	map(0xa80020, 0xa80021).portr("SYSTEM").nopw();     /* w - could be watchdog, but causes resets when picture is shown */
 	map(0xa80030, 0xa80031).portr("DSW1").nopw();       /* w - irq ack? */
 	map(0xa80040, 0xa80041).portr("DSW2");

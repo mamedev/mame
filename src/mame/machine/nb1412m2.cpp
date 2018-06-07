@@ -93,24 +93,24 @@ DEFINE_DEVICE_TYPE(NB1412M2, nb1412m2_device, "nb1412m2", "NB1412M2 Mahjong Cust
 void nb1412m2_device::nb1412m2_map(address_map &map)
 {
 	// data decrypter
-	map(0x32, 0x32).w(this, FUNC(nb1412m2_device::rom_op_w));
-	map(0x33, 0x34).w(this, FUNC(nb1412m2_device::rom_address_w));
-	map(0x35, 0x36).w(this, FUNC(nb1412m2_device::rom_adjust_w));
-	map(0x37, 0x37).r(this, FUNC(nb1412m2_device::rom_decrypt_r));
+	map(0x32, 0x32).w(FUNC(nb1412m2_device::rom_op_w));
+	map(0x33, 0x34).w(FUNC(nb1412m2_device::rom_address_w));
+	map(0x35, 0x36).w(FUNC(nb1412m2_device::rom_adjust_w));
+	map(0x37, 0x37).r(FUNC(nb1412m2_device::rom_decrypt_r));
 
 	// timer
-	map(0x40, 0x40).w(this, FUNC(nb1412m2_device::timer_w));
-	map(0x41, 0x41).rw(this, FUNC(nb1412m2_device::timer_r), FUNC(nb1412m2_device::timer_ack_w));
+	map(0x40, 0x40).w(FUNC(nb1412m2_device::timer_w));
+	map(0x41, 0x41).rw(FUNC(nb1412m2_device::timer_r), FUNC(nb1412m2_device::timer_ack_w));
 	map(0x42, 0x43).nopw(); // always 0x03
 
 	// DAC control
 	map(0x11, 0x11).nopw(); // - unknown (volume/channel control?)
-	map(0x18, 0x18).w(this, FUNC(nb1412m2_device::dac_timer_w)); // timer frequency
+	map(0x18, 0x18).w(FUNC(nb1412m2_device::dac_timer_w)); // timer frequency
 	map(0x19, 0x19).nopw(); // 2 written at POST
-	map(0x51, 0x52).w(this, FUNC(nb1412m2_device::dac_address_w)); //  start address
+	map(0x51, 0x52).w(FUNC(nb1412m2_device::dac_address_w)); //  start address
 
 	// latches?
-	map(0x90, 0x90).rw(this, FUNC(nb1412m2_device::const90_r),FUNC(nb1412m2_device::const90_w)); //ram();
+	map(0x90, 0x90).rw(FUNC(nb1412m2_device::const90_r),FUNC(nb1412m2_device::const90_w)); //ram();
 	map(0x92, 0x92).ram();
 	map(0x94, 0x94).ram(); //rw(this,FUNC(nb1412m2_device::xor_r),FUNC(nb1412m2_device::xor_w));
 

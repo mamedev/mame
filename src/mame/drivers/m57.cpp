@@ -72,11 +72,11 @@
 void m57_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(m57_state::m57_videoram_w)).share("videoram");
+	map(0x8000, 0x87ff).ram().w(FUNC(m57_state::m57_videoram_w)).share("videoram");
 	map(0x9000, 0x91ff).ram().share("scrollram");
 	map(0xc820, 0xc8ff).writeonly().share("spriteram");
 	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).w(this, FUNC(m57_state::m57_flipscreen_w)); /* + coin counters */
+	map(0xd001, 0xd001).w(FUNC(m57_state::m57_flipscreen_w)); /* + coin counters */
 	map(0xd000, 0xd000).portr("IN0");
 	map(0xd001, 0xd001).portr("IN1");
 	map(0xd002, 0xd002).portr("IN2");

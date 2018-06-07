@@ -96,7 +96,7 @@ void pb1000_state::pb2000c_mem(address_map &map)
 	map(0x00000, 0x0ffff).bankr("bank1");
 	map(0x00000, 0x00bff).rom();
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
-	map(0x00c10, 0x00c11).w(this, FUNC(pb1000_state::gatearray_w));
+	map(0x00c10, 0x00c11).w(FUNC(pb1000_state::gatearray_w));
 	map(0x10000, 0x1ffff).ram().share("nvram1");
 	map(0x20000, 0x27fff).r(m_card1, FUNC(generic_slot_device::read16_rom));
 	map(0x28000, 0x2ffff).ram().share("nvram2");

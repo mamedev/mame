@@ -92,9 +92,9 @@ void ax20_state::ax20_map(address_map &map)
 void ax20_state::ax20_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xffc0, 0xffc0).w(this, FUNC(ax20_state::tc_w));
-	map(0xffd0, 0xffd0).w(this, FUNC(ax20_state::ctl_w));
-	map(0xffe0, 0xffe0).r(this, FUNC(ax20_state::unk_r));
+	map(0xffc0, 0xffc0).w(FUNC(ax20_state::tc_w));
+	map(0xffd0, 0xffd0).w(FUNC(ax20_state::ctl_w));
+	map(0xffe0, 0xffe0).r(FUNC(ax20_state::unk_r));
 	map(0xff80, 0xff81).m(m_fdc, FUNC(i8272a_device::map));
 }
 

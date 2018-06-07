@@ -244,7 +244,7 @@ WRITE8_MEMBER(jongkyo_state::unknown_w)
 
 void jongkyo_state::jongkyo_memmap(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().w(this, FUNC(jongkyo_state::videoram2_w)); // wrong, this doesn't seem to be video ram on write..
+	map(0x0000, 0x3fff).rom().w(FUNC(jongkyo_state::videoram2_w)); // wrong, this doesn't seem to be video ram on write..
 	map(0x4000, 0x6bff).rom(); // fixed rom
 	map(0x6c00, 0x6fff).bankr("bank1");    // banked (8 banks)
 	map(0x7000, 0x77ff).ram();
@@ -265,12 +265,12 @@ void jongkyo_state::jongkyo_portmap(address_map &map)
 	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	map(0x10, 0x10).portr("DSW").w(this, FUNC(jongkyo_state::jongkyo_coin_counter_w));
-	map(0x11, 0x11).portr("IN0").w(this, FUNC(jongkyo_state::mux_w));
+	map(0x10, 0x10).portr("DSW").w(FUNC(jongkyo_state::jongkyo_coin_counter_w));
+	map(0x11, 0x11).portr("IN0").w(FUNC(jongkyo_state::mux_w));
 	// W 11 select keyboard row (fe fd fb f7)
 	map(0x40, 0x40).nopr(); // unknown, if (A & 0xf) == 0x0a then a bit 0 write to 0x7520 doesn't occur
-	map(0x40, 0x45).w(this, FUNC(jongkyo_state::bank_select_w));
-	map(0x46, 0x4f).w(this, FUNC(jongkyo_state::unknown_w));
+	map(0x40, 0x45).w(FUNC(jongkyo_state::bank_select_w));
+	map(0x46, 0x4f).w(FUNC(jongkyo_state::unknown_w));
 }
 
 /*************************************

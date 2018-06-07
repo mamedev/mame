@@ -919,12 +919,12 @@ void model1_state::model1_mem(address_map &map)
 	map(0x100000, 0x1fffff).bankr("bank1");
 	map(0x200000, 0x2fffff).rom();
 
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(model1_state::mr2_w)).share("mr2");
-	map(0x500000, 0x53ffff).ram().w(this, FUNC(model1_state::mr_w)).share("mr");
+	map(0x400000, 0x40ffff).ram().w(FUNC(model1_state::mr2_w)).share("mr2");
+	map(0x500000, 0x53ffff).ram().w(FUNC(model1_state::mr_w)).share("mr");
 
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(model1_state::md0_w)).share("display_list0");
-	map(0x610000, 0x61ffff).ram().w(this, FUNC(model1_state::md1_w)).share("display_list1");
-	map(0x680000, 0x680003).rw(this, FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
+	map(0x600000, 0x60ffff).ram().w(FUNC(model1_state::md0_w)).share("display_list0");
+	map(0x610000, 0x61ffff).ram().w(FUNC(model1_state::md1_w)).share("display_list1");
+	map(0x680000, 0x680003).rw(FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
 
 	map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
 	map(0x720000, 0x720001).nopw();        // Unknown, always 0
@@ -933,21 +933,21 @@ void model1_state::model1_mem(address_map &map)
 	map(0x770000, 0x770001).nopw();        // Video synchronization switch
 	map(0x780000, 0x7fffff).rw(m_tiles, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
 
-	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
+	map(0x900000, 0x903fff).ram().w(FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc00fff).r(this, FUNC(model1_state::dpram_r)).w(m_dpram, FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
+	map(0xc00000, 0xc00fff).r(FUNC(model1_state::dpram_r)).w(m_dpram, FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
 
 	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	map(0xd00000, 0xd00001).rw(this, FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w));
-	map(0xd20000, 0xd20003).w(this, FUNC(model1_state::v60_copro_ram_w));
-	map(0xd80000, 0xd80003).w(this, FUNC(model1_state::v60_copro_fifo_w)).mirror(0x10);
-	map(0xdc0000, 0xdc0003).r(this, FUNC(model1_state::fifoin_status_r));
+	map(0xd00000, 0xd00001).rw(FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w));
+	map(0xd20000, 0xd20003).w(FUNC(model1_state::v60_copro_ram_w));
+	map(0xd80000, 0xd80003).w(FUNC(model1_state::v60_copro_fifo_w)).mirror(0x10);
+	map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r));
 
-	map(0xe00000, 0xe00000).w(this, FUNC(model1_state::irq_control_w));
-	map(0xe00004, 0xe00005).w(this, FUNC(model1_state::bank_w));
+	map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
+	map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
 	map(0xe0000c, 0xe0000f).nopw();
 
 	map(0xf80000, 0xffffff).rom();
@@ -955,8 +955,8 @@ void model1_state::model1_mem(address_map &map)
 
 void model1_state::model1_io(address_map &map)
 {
-	map(0xd20000, 0xd20003).r(this, FUNC(model1_state::v60_copro_ram_r));
-	map(0xd80000, 0xd80003).r(this, FUNC(model1_state::v60_copro_fifo_r));
+	map(0xd20000, 0xd20003).r(FUNC(model1_state::v60_copro_ram_r));
+	map(0xd80000, 0xd80003).r(FUNC(model1_state::v60_copro_fifo_r));
 }
 
 void model1_state::model1_comm_mem(address_map &map)
@@ -1696,8 +1696,8 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
-	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_PALETTE("palette")
+	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )

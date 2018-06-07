@@ -115,18 +115,18 @@ void oneshot_state::oneshot_map(address_map &map)
 	map(0x080000, 0x087fff).ram();
 	map(0x0c0000, 0x0c07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x120000, 0x120fff).ram().share("sprites");
-	map(0x180000, 0x180fff).ram().w(this, FUNC(oneshot_state::oneshot_mid_videoram_w)).share("mid_videoram"); // some people , girl etc.
-	map(0x181000, 0x181fff).ram().w(this, FUNC(oneshot_state::oneshot_fg_videoram_w)).share("fg_videoram"); // credits etc.
-	map(0x182000, 0x182fff).ram().w(this, FUNC(oneshot_state::oneshot_bg_videoram_w)).share("bg_videoram"); // credits etc.
+	map(0x180000, 0x180fff).ram().w(FUNC(oneshot_state::oneshot_mid_videoram_w)).share("mid_videoram"); // some people , girl etc.
+	map(0x181000, 0x181fff).ram().w(FUNC(oneshot_state::oneshot_fg_videoram_w)).share("fg_videoram"); // credits etc.
+	map(0x182000, 0x182fff).ram().w(FUNC(oneshot_state::oneshot_bg_videoram_w)).share("bg_videoram"); // credits etc.
 	map(0x188000, 0x18800f).writeonly().share("scroll");    // scroll registers
 	map(0x190003, 0x190003).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x190011, 0x190011).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x190018, 0x190019).w(this, FUNC(oneshot_state::soundbank_w));
-	map(0x190026, 0x190027).r(this, FUNC(oneshot_state::oneshot_gun_x_p1_r));
-	map(0x19002e, 0x19002f).r(this, FUNC(oneshot_state::oneshot_gun_x_p2_r));
-	map(0x190036, 0x190037).r(this, FUNC(oneshot_state::oneshot_gun_y_p1_r));
-	map(0x19003e, 0x19003f).r(this, FUNC(oneshot_state::oneshot_gun_y_p2_r));
-	map(0x19c020, 0x19c021).r(this, FUNC(oneshot_state::oneshot_in0_word_r));
+	map(0x190018, 0x190019).w(FUNC(oneshot_state::soundbank_w));
+	map(0x190026, 0x190027).r(FUNC(oneshot_state::oneshot_gun_x_p1_r));
+	map(0x19002e, 0x19002f).r(FUNC(oneshot_state::oneshot_gun_x_p2_r));
+	map(0x190036, 0x190037).r(FUNC(oneshot_state::oneshot_gun_y_p1_r));
+	map(0x19003e, 0x19003f).r(FUNC(oneshot_state::oneshot_gun_y_p2_r));
+	map(0x19c020, 0x19c021).r(FUNC(oneshot_state::oneshot_in0_word_r));
 	map(0x19c024, 0x19c025).portr("DSW2");
 	map(0x19c02c, 0x19c02d).portr("CREDITS");
 	map(0x19c030, 0x19c031).portr("P1");

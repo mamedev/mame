@@ -143,7 +143,7 @@ void pasopia_state::pasopia_io(address_map &map)
 	map(0x28, 0x2b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x33).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 //  0x38 printer
-	map(0x3c, 0x3c).w(this, FUNC(pasopia_state::pasopia_ctrl_w));
+	map(0x3c, 0x3c).w(FUNC(pasopia_state::pasopia_ctrl_w));
 }
 
 /* Input ports */

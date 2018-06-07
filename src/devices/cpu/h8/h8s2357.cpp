@@ -117,7 +117,7 @@ void h8s2357_device::map(address_map &map)
 	map(0xffff2d, 0xffff2d).rw("intc", FUNC(h8s_intc_device::iscrl_r), FUNC(h8s_intc_device::iscrl_w));
 	map(0xffff2e, 0xffff2e).rw("intc", FUNC(h8s_intc_device::ier_r), FUNC(h8s_intc_device::ier_w));
 	map(0xffff2f, 0xffff2f).rw("intc", FUNC(h8s_intc_device::isr_r), FUNC(h8s_intc_device::isr_w));
-	map(0xffff39, 0xffff39).rw(this, FUNC(h8s2357_device::syscr_r), FUNC(h8s2357_device::syscr_w));
+	map(0xffff39, 0xffff39).rw(FUNC(h8s2357_device::syscr_r), FUNC(h8s2357_device::syscr_w));
 	map(0xffff50, 0xffff50).r("port1", FUNC(h8_port_device::port_r));
 	map(0xffff51, 0xffff51).r("port2", FUNC(h8_port_device::port_r));
 	map(0xffff52, 0xffff52).r("port3", FUNC(h8_port_device::port_r));

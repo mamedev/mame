@@ -67,7 +67,7 @@ void supstarf_state::main_map(address_map &map)
 void supstarf_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).w(this, FUNC(supstarf_state::driver_clk_w));
+	map(0x00, 0xff).w(FUNC(supstarf_state::driver_clk_w));
 }
 
 void supstarf_state::sound_map(address_map &map)
@@ -77,7 +77,7 @@ void supstarf_state::sound_map(address_map &map)
 
 void supstarf_state::sound_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(supstarf_state::psg_latch_r), FUNC(supstarf_state::psg_latch_w));
+	map(0x00, 0xff).rw(FUNC(supstarf_state::psg_latch_r), FUNC(supstarf_state::psg_latch_w));
 }
 
 READ8_MEMBER(supstarf_state::psg_latch_r)

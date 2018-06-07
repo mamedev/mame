@@ -95,9 +95,9 @@ void zms8085_state::mem_map(address_map &map)
 
 void zms8085_state::io_map(address_map &map)
 {
-	map(0x61, 0x61).r(this, FUNC(zms8085_state::special_r)).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x61, 0x61).r(FUNC(zms8085_state::special_r)).w(m_uart, FUNC(ay51013_device::transmit));
 	map(0x62, 0x62).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x63, 0x63).r(this, FUNC(zms8085_state::uart_status_r));
+	map(0x63, 0x63).r(FUNC(zms8085_state::uart_status_r));
 	map(0x68, 0x68).nopw();
 }
 

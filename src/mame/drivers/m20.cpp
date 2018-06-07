@@ -707,7 +707,7 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x00, 0x07).rw(m_fd1797, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff);
 
-	map(0x20, 0x21).rw(this, FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
+	map(0x20, 0x21).rw(FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
 
 	map(0x61, 0x61).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x62, 0x62).w("crtc", FUNC(mc6845_device::address_w)); // FIXME
@@ -724,7 +724,7 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	map(0x140, 0x143).rw(this, FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
+	map(0x140, 0x143).rw(FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
 
 	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
 }

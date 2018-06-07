@@ -475,8 +475,8 @@ void indigo_state::indigo_map(address_map &map)
 	map(0x0c000000, 0x0c7fffff).ram().share("share8");
 	map(0x10000000, 0x107fffff).ram().share("share9");
 	map(0x18000000, 0x187fffff).ram().share("share1");
-	map(0x1fb80000, 0x1fb8ffff).rw(this, FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
-	map(0x1fbd9000, 0x1fbd903f).rw(this, FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
+	map(0x1fb80000, 0x1fb8ffff).rw(FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
+	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
 }
 
 void indigo_state::indigo3k_map(address_map &map)

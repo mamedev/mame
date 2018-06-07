@@ -7,25 +7,25 @@ DEFINE_DEVICE_TYPE(SMBUS, smbus_device, "smbus", "SMBus interface")
 
 void smbus_device::map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(smbus_device::hst_sts_r), FUNC(smbus_device::hst_sts_w));
-	map(0x02, 0x02).rw(this, FUNC(smbus_device::hst_cnt_r), FUNC(smbus_device::hst_cnt_w));
-	map(0x03, 0x03).rw(this, FUNC(smbus_device::hst_cmd_r), FUNC(smbus_device::hst_cmd_w));
-	map(0x04, 0x04).rw(this, FUNC(smbus_device::xmit_slva_r), FUNC(smbus_device::xmit_slva_w));
-	map(0x05, 0x05).rw(this, FUNC(smbus_device::hst_d0_r), FUNC(smbus_device::hst_d0_w));
-	map(0x06, 0x06).rw(this, FUNC(smbus_device::hst_d1_r), FUNC(smbus_device::hst_d1_w));
-	map(0x07, 0x07).rw(this, FUNC(smbus_device::host_block_db_r), FUNC(smbus_device::host_block_db_w));
-	map(0x08, 0x08).rw(this, FUNC(smbus_device::pec_r), FUNC(smbus_device::pec_w));
-	map(0x09, 0x09).rw(this, FUNC(smbus_device::rcv_slva_r), FUNC(smbus_device::rcv_slva_w));
-	map(0x0a, 0x0b).rw(this, FUNC(smbus_device::slv_data_r), FUNC(smbus_device::slv_data_w));
-	map(0x0c, 0x0c).rw(this, FUNC(smbus_device::aux_sts_r), FUNC(smbus_device::aux_sts_w));
-	map(0x0d, 0x0d).rw(this, FUNC(smbus_device::aux_ctl_r), FUNC(smbus_device::aux_ctl_w));
-	map(0x0e, 0x0e).rw(this, FUNC(smbus_device::smlink_pin_ctl_r), FUNC(smbus_device::smlink_pin_ctl_w));
-	map(0x0f, 0x0f).rw(this, FUNC(smbus_device::smbus_pin_ctl_r), FUNC(smbus_device::smbus_pin_ctl_w));
-	map(0x10, 0x10).rw(this, FUNC(smbus_device::slv_sts_r), FUNC(smbus_device::slv_sts_w));
-	map(0x11, 0x11).rw(this, FUNC(smbus_device::slv_cmd_r), FUNC(smbus_device::slv_cmd_w));
-	map(0x14, 0x14).r(this, FUNC(smbus_device::notify_daddr_r));
-	map(0x16, 0x16).r(this, FUNC(smbus_device::notify_dlow_r));
-	map(0x17, 0x17).r(this, FUNC(smbus_device::notify_dhigh_r));
+	map(0x00, 0x00).rw(FUNC(smbus_device::hst_sts_r), FUNC(smbus_device::hst_sts_w));
+	map(0x02, 0x02).rw(FUNC(smbus_device::hst_cnt_r), FUNC(smbus_device::hst_cnt_w));
+	map(0x03, 0x03).rw(FUNC(smbus_device::hst_cmd_r), FUNC(smbus_device::hst_cmd_w));
+	map(0x04, 0x04).rw(FUNC(smbus_device::xmit_slva_r), FUNC(smbus_device::xmit_slva_w));
+	map(0x05, 0x05).rw(FUNC(smbus_device::hst_d0_r), FUNC(smbus_device::hst_d0_w));
+	map(0x06, 0x06).rw(FUNC(smbus_device::hst_d1_r), FUNC(smbus_device::hst_d1_w));
+	map(0x07, 0x07).rw(FUNC(smbus_device::host_block_db_r), FUNC(smbus_device::host_block_db_w));
+	map(0x08, 0x08).rw(FUNC(smbus_device::pec_r), FUNC(smbus_device::pec_w));
+	map(0x09, 0x09).rw(FUNC(smbus_device::rcv_slva_r), FUNC(smbus_device::rcv_slva_w));
+	map(0x0a, 0x0b).rw(FUNC(smbus_device::slv_data_r), FUNC(smbus_device::slv_data_w));
+	map(0x0c, 0x0c).rw(FUNC(smbus_device::aux_sts_r), FUNC(smbus_device::aux_sts_w));
+	map(0x0d, 0x0d).rw(FUNC(smbus_device::aux_ctl_r), FUNC(smbus_device::aux_ctl_w));
+	map(0x0e, 0x0e).rw(FUNC(smbus_device::smlink_pin_ctl_r), FUNC(smbus_device::smlink_pin_ctl_w));
+	map(0x0f, 0x0f).rw(FUNC(smbus_device::smbus_pin_ctl_r), FUNC(smbus_device::smbus_pin_ctl_w));
+	map(0x10, 0x10).rw(FUNC(smbus_device::slv_sts_r), FUNC(smbus_device::slv_sts_w));
+	map(0x11, 0x11).rw(FUNC(smbus_device::slv_cmd_r), FUNC(smbus_device::slv_cmd_w));
+	map(0x14, 0x14).r(FUNC(smbus_device::notify_daddr_r));
+	map(0x16, 0x16).r(FUNC(smbus_device::notify_dlow_r));
+	map(0x17, 0x17).r(FUNC(smbus_device::notify_dhigh_r));
 }
 
 smbus_device::smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

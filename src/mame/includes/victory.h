@@ -63,10 +63,8 @@ protected:
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
-	void victory_audio(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
-	void victory_audio_map(address_map &map);
 
 private:
 	/* microcode state */

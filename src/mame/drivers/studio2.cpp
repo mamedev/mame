@@ -344,8 +344,8 @@ void studio2_state::studio2_map(address_map &map)
 void studio2_state::studio2_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).r(this, FUNC(studio2_state::dispon_r));
-	map(0x02, 0x02).w(this, FUNC(studio2_state::keylatch_w));
+	map(0x01, 0x01).r(FUNC(studio2_state::dispon_r));
+	map(0x02, 0x02).w(FUNC(studio2_state::keylatch_w));
 }
 
 void visicom_state::visicom_map(address_map &map)
@@ -359,8 +359,8 @@ void visicom_state::visicom_map(address_map &map)
 
 void visicom_state::visicom_io_map(address_map &map)
 {
-	map(0x01, 0x01).w(this, FUNC(visicom_state::dispon_w));
-	map(0x02, 0x02).w(this, FUNC(visicom_state::keylatch_w));
+	map(0x01, 0x01).w(FUNC(visicom_state::dispon_w));
+	map(0x02, 0x02).w(FUNC(visicom_state::keylatch_w));
 }
 
 void mpt02_state::mpt02_map(address_map &map)
@@ -374,7 +374,7 @@ void mpt02_state::mpt02_map(address_map &map)
 void mpt02_state::mpt02_io_map(address_map &map)
 {
 	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x02, 0x02).w(this, FUNC(mpt02_state::keylatch_w));
+	map(0x02, 0x02).w(FUNC(mpt02_state::keylatch_w));
 	map(0x04, 0x04).rw(m_cti, FUNC(cdp1864_device::dispoff_r), FUNC(cdp1864_device::tone_latch_w));
 }
 

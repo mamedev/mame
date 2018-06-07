@@ -484,7 +484,7 @@ READ8_MEMBER( plus4_state::ted_videoram_r )
 
 void plus4_state::plus4_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(plus4_state::read), FUNC(plus4_state::write));
+	map(0x0000, 0xffff).rw(FUNC(plus4_state::read), FUNC(plus4_state::write));
 }
 
 
@@ -494,7 +494,7 @@ void plus4_state::plus4_mem(address_map &map)
 
 void plus4_state::ted_videoram_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(plus4_state::ted_videoram_r));
+	map(0x0000, 0xffff).r(FUNC(plus4_state::ted_videoram_r));
 }
 
 

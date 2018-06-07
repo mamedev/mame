@@ -31,12 +31,12 @@ DEFINE_DEVICE_TYPE(A2BUS_APPLICARD, a2bus_applicard_device, "a2aplcrd", "PCPI Ap
 
 void a2bus_applicard_device::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(a2bus_applicard_device::dma_r), FUNC(a2bus_applicard_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(a2bus_applicard_device::dma_r), FUNC(a2bus_applicard_device::dma_w));
 }
 
 void a2bus_applicard_device::z80_io(address_map &map)
 {
-	map(0x00, 0x60).mirror(0xff00).rw(this, FUNC(a2bus_applicard_device::z80_io_r), FUNC(a2bus_applicard_device::z80_io_w));
+	map(0x00, 0x60).mirror(0xff00).rw(FUNC(a2bus_applicard_device::z80_io_r), FUNC(a2bus_applicard_device::z80_io_w));
 }
 
 ROM_START( a2applicard )

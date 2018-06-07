@@ -445,7 +445,7 @@ void pc_state::ibm5550_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x00a0, 0x00a0).r(this, FUNC(pc_state::unk_r));
+	map(0x00a0, 0x00a0).r(FUNC(pc_state::unk_r));
 }
 
 void pc_state::epc_io(address_map &map)

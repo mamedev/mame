@@ -115,12 +115,12 @@ void czk80_state::czk80_mem(address_map &map)
 void czk80_state::czk80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).w(this, FUNC(czk80_state::port40_w));
+	map(0x40, 0x40).w(FUNC(czk80_state::port40_w));
 	map(0x4c, 0x4f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x50, 0x53).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x54, 0x57).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x80, 0x80).r(this, FUNC(czk80_state::port80_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x81, 0x81).r(this, FUNC(czk80_state::port81_r));
+	map(0x80, 0x80).r(FUNC(czk80_state::port80_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x81, 0x81).r(FUNC(czk80_state::port81_r));
 	/* Select one of the below */
 	//AM_RANGE(0xc0, 0xc0) AM_READ(portc0_r)
 	map(0xc0, 0xc1).m(m_fdc, FUNC(upd765a_device::map));

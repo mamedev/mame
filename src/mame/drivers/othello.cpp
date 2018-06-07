@@ -222,12 +222,12 @@ void othello_state::main_portmap(address_map &map)
 	map(0x80, 0x80).portr("INP");
 	map(0x81, 0x81).portr("SYSTEM");
 	map(0x83, 0x83).portr("DSW");
-	map(0x86, 0x86).w(this, FUNC(othello_state::tilebank_w));
-	map(0x87, 0x87).r(this, FUNC(othello_state::unk_87_r));
-	map(0x8a, 0x8a).w(this, FUNC(othello_state::unk_8a_w));
-	map(0x8c, 0x8c).rw(this, FUNC(othello_state::unk_8c_r), FUNC(othello_state::unk_8c_w));
-	map(0x8d, 0x8d).r(this, FUNC(othello_state::sound_ack_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x8f, 0x8f).w(this, FUNC(othello_state::unk_8f_w));
+	map(0x86, 0x86).w(FUNC(othello_state::tilebank_w));
+	map(0x87, 0x87).r(FUNC(othello_state::unk_87_r));
+	map(0x8a, 0x8a).w(FUNC(othello_state::unk_8a_w));
+	map(0x8c, 0x8c).rw(FUNC(othello_state::unk_8c_r), FUNC(othello_state::unk_8c_w));
+	map(0x8d, 0x8d).r(FUNC(othello_state::sound_ack_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x8f, 0x8f).w(FUNC(othello_state::unk_8f_w));
 }
 
 READ8_MEMBER(othello_state::latch_r)
@@ -268,11 +268,11 @@ void othello_state::audio_map(address_map &map)
 void othello_state::audio_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(othello_state::latch_r));
-	map(0x01, 0x01).w(this, FUNC(othello_state::ay_data_w));
-	map(0x03, 0x03).w(this, FUNC(othello_state::ay_address_w));
-	map(0x04, 0x04).w(this, FUNC(othello_state::ack_w));
-	map(0x08, 0x08).w(this, FUNC(othello_state::ay_select_w));
+	map(0x00, 0x00).r(FUNC(othello_state::latch_r));
+	map(0x01, 0x01).w(FUNC(othello_state::ay_data_w));
+	map(0x03, 0x03).w(FUNC(othello_state::ay_address_w));
+	map(0x04, 0x04).w(FUNC(othello_state::ack_w));
+	map(0x08, 0x08).w(FUNC(othello_state::ay_select_w));
 }
 
 WRITE8_MEMBER(othello_state::n7751_rom_control_w)
@@ -414,7 +414,7 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, othello_state, n7751_command_r))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, othello_state, n7751_rom_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, othello_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
 

@@ -108,8 +108,8 @@ void a6809_state::a6809_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().share("videoram");
-	map(0x0800, 0x0800).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(a6809_state::a6809_address_w));
-	map(0x0801, 0x0801).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(a6809_state::a6809_register_w));
+	map(0x0800, 0x0800).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(a6809_state::a6809_address_w));
+	map(0x0801, 0x0801).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(a6809_state::a6809_register_w));
 	map(0x0900, 0x090f).mirror(0xf0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xf000, 0xf7ff); // optional ROM
 	map(0xf800, 0xffff).rom().region("maincpu", 0);

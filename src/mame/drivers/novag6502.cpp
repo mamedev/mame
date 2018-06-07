@@ -516,16 +516,16 @@ void novag6502_state::supercon_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x1c00, 0x1c00).nopw(); // printer/clock?
 	map(0x1d00, 0x1d00).nopw(); // printer/clock?
-	map(0x1e00, 0x1e00).rw(this, FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::supercon_mux_w));
-	map(0x1f00, 0x1f00).rw(this, FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::supercon_control_w));
+	map(0x1e00, 0x1e00).rw(FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::supercon_mux_w));
+	map(0x1f00, 0x1f00).rw(FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::supercon_control_w));
 	map(0x2000, 0xffff).rom();
 }
 
 void novag6502_state::cforte_map(address_map &map)
 {
 	supercon_map(map);
-	map(0x1e00, 0x1e00).rw(this, FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::cforte_mux_w));
-	map(0x1f00, 0x1f00).rw(this, FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::cforte_control_w));
+	map(0x1e00, 0x1e00).rw(FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::cforte_mux_w));
+	map(0x1f00, 0x1f00).rw(FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::cforte_control_w));
 }
 
 
@@ -534,12 +534,12 @@ void novag6502_state::cforte_map(address_map &map)
 void novag6502_state::sforte_map(address_map &map)
 {
 	map(0x0000, 0x1fef).ram().share("nvram"); // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
-	map(0x1ff0, 0x1ff0).r(this, FUNC(novag6502_state::sexpert_input1_r));
-	map(0x1ff1, 0x1ff1).r(this, FUNC(novag6502_state::sexpert_input2_r));
+	map(0x1ff0, 0x1ff0).r(FUNC(novag6502_state::sexpert_input1_r));
+	map(0x1ff1, 0x1ff1).r(FUNC(novag6502_state::sexpert_input2_r));
 	map(0x1ff2, 0x1ff2).nopw(); // printer
 	map(0x1ff3, 0x1ff3).nopw(); // printer
-	map(0x1ff6, 0x1ff6).w(this, FUNC(novag6502_state::sforte_lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(this, FUNC(novag6502_state::sforte_lcd_data_w));
+	map(0x1ff6, 0x1ff6).w(FUNC(novag6502_state::sforte_lcd_control_w));
+	map(0x1ff7, 0x1ff7).w(FUNC(novag6502_state::sforte_lcd_data_w));
 	map(0x1ffc, 0x1fff).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x2000, 0x7fff).rom();
 	map(0x8000, 0xffff).bankr("rombank");
@@ -548,10 +548,10 @@ void novag6502_state::sforte_map(address_map &map)
 void novag6502_state::sexpert_map(address_map &map)
 {
 	sforte_map(map);
-	map(0x1ff4, 0x1ff4).w(this, FUNC(novag6502_state::sexpert_leds_w));
-	map(0x1ff5, 0x1ff5).w(this, FUNC(novag6502_state::sexpert_mux_w));
-	map(0x1ff6, 0x1ff6).w(this, FUNC(novag6502_state::sexpert_lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(this, FUNC(novag6502_state::sexpert_lcd_data_w));
+	map(0x1ff4, 0x1ff4).w(FUNC(novag6502_state::sexpert_leds_w));
+	map(0x1ff5, 0x1ff5).w(FUNC(novag6502_state::sexpert_mux_w));
+	map(0x1ff6, 0x1ff6).w(FUNC(novag6502_state::sexpert_lcd_control_w));
+	map(0x1ff7, 0x1ff7).w(FUNC(novag6502_state::sexpert_lcd_data_w));
 }
 
 

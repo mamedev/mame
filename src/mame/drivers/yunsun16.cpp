@@ -125,12 +125,12 @@ void yunsun16_state::main_map(address_map &map)
 	map(0x80010c, 0x80010f).ram().share("scrollram_1"); // Scrolling
 	map(0x800114, 0x800117).ram().share("scrollram_0"); // Scrolling
 	map(0x800154, 0x800155).ram().share("priorityram"); // Priority
-	map(0x800181, 0x800181).w(this, FUNC(yunsun16_state::sound_bank_w));    // Sound
+	map(0x800181, 0x800181).w(FUNC(yunsun16_state::sound_bank_w));    // Sound
 	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0x8001fe, 0x8001ff).nopw();    // ? 0 (during int)
 	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x908000, 0x90bfff).ram().w(this, FUNC(yunsun16_state::vram_1_w)).share("vram_1"); // Layer 1
-	map(0x90c000, 0x90ffff).ram().w(this, FUNC(yunsun16_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0x908000, 0x90bfff).ram().w(FUNC(yunsun16_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0x90c000, 0x90ffff).ram().w(FUNC(yunsun16_state::vram_0_w)).share("vram_0"); // Layer 0
 	map(0x910000, 0x910fff).ram().share("spriteram");   // Sprites
 	map(0xff0000, 0xffffff).ram();
 }

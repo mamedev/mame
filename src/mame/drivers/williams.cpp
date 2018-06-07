@@ -525,7 +525,7 @@ void williams_state::defender_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share("videoram");
 	map(0xc000, 0xcfff).m(m_bankc000, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xdfff).w(this, FUNC(williams_state::defender_bank_select_w));
+	map(0xd000, 0xdfff).w(FUNC(williams_state::defender_bank_select_w));
 	map(0xd000, 0xffff).rom();
 }
 
@@ -533,10 +533,10 @@ void williams_state::defender_map(address_map &map)
 void williams_state::defender_bankc000_map(address_map &map)
 {
 	map(0x0000, 0x000f).mirror(0x03e0).writeonly().share("paletteram");
-	map(0x03ff, 0x03ff).w(this, FUNC(williams_state::williams_watchdog_reset_w));
-	map(0x0010, 0x001f).mirror(0x03e0).w(this, FUNC(williams_state::defender_video_control_w));
-	map(0x0400, 0x04ff).mirror(0x0300).ram().w(this, FUNC(williams_state::williams_cmos_w)).share("nvram");
-	map(0x0800, 0x0bff).r(this, FUNC(williams_state::williams_video_counter_r));
+	map(0x03ff, 0x03ff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(williams_state::defender_video_control_w));
+	map(0x0400, 0x04ff).mirror(0x0300).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0x0800, 0x0bff).r(FUNC(williams_state::williams_video_counter_r));
 	map(0x0c00, 0x0c03).mirror(0x03e0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0c04, 0x0c07).mirror(0x03e0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x9fff).rom().region("maincpu", 0x10000);
@@ -558,11 +558,11 @@ void williams_state::williams_map(address_map &map)
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc900, 0xc9ff).w(this, FUNC(williams_state::williams_vram_select_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(this, FUNC(williams_state::williams_blitter_w));
-	map(0xcb00, 0xcbff).r(this, FUNC(williams_state::williams_video_counter_r));
-	map(0xcbff, 0xcbff).w(this, FUNC(williams_state::williams_watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0xc900, 0xc9ff).w(FUNC(williams_state::williams_vram_select_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
 	map(0xd000, 0xffff).rom();
 }
 
@@ -581,11 +581,11 @@ void williams_state::sinistar_map(address_map &map)
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc900, 0xc9ff).w(this, FUNC(williams_state::sinistar_vram_select_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(this, FUNC(williams_state::williams_blitter_w));
-	map(0xcb00, 0xcbff).r(this, FUNC(williams_state::williams_video_counter_r));
-	map(0xcbff, 0xcbff).w(this, FUNC(williams_state::williams_watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(williams_state::williams_cmos_w)).share("nvram");
+	map(0xc900, 0xc9ff).w(FUNC(williams_state::sinistar_vram_select_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::williams_cmos_w)).share("nvram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
 }
@@ -609,14 +609,14 @@ void blaster_state::blaster_map(address_map &map)
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc900, 0xc93f).w(this, FUNC(blaster_state::blaster_vram_select_w));
-	map(0xc940, 0xc97f).w(this, FUNC(blaster_state::blaster_remap_select_w));
-	map(0xc980, 0xc9bf).w(this, FUNC(blaster_state::blaster_bank_select_w));
-	map(0xc9c0, 0xc9ff).w(this, FUNC(blaster_state::blaster_video_control_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(this, FUNC(blaster_state::williams_blitter_w));
-	map(0xcb00, 0xcbff).r(this, FUNC(blaster_state::williams_video_counter_r));
-	map(0xcbff, 0xcbff).w(this, FUNC(blaster_state::williams_watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(blaster_state::williams_cmos_w)).share("nvram");
+	map(0xc900, 0xc93f).w(FUNC(blaster_state::blaster_vram_select_w));
+	map(0xc940, 0xc97f).w(FUNC(blaster_state::blaster_remap_select_w));
+	map(0xc980, 0xc9bf).w(FUNC(blaster_state::blaster_bank_select_w));
+	map(0xc9c0, 0xc9ff).w(FUNC(blaster_state::blaster_video_control_w));
+	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(blaster_state::williams_blitter_w));
+	map(0xcb00, 0xcbff).r(FUNC(blaster_state::williams_video_counter_r));
+	map(0xcbff, 0xcbff).w(FUNC(blaster_state::williams_watchdog_reset_w));
+	map(0xcc00, 0xcfff).ram().w(FUNC(blaster_state::williams_cmos_w)).share("nvram");
 	map(0xd000, 0xffff).rom();
 }
 
@@ -633,27 +633,27 @@ void williams2_state::williams2_common_map(address_map &map)
 	map(0x0000, 0xbfff).ram().share("videoram");
 	map(0x0000, 0x7fff).bankr("bank1");
 	map(0x8000, 0x87ff).m(m_bank8000, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(williams2_state::williams2_tileram_w)).share("williams2_tile");
-	map(0xc800, 0xc87f).w(this, FUNC(williams2_state::williams2_bank_select_w));
-	map(0xc880, 0xc887).mirror(0x0078).w(this, FUNC(williams2_state::williams_blitter_w));
-	map(0xc900, 0xc97f).w(this, FUNC(williams2_state::williams2_watchdog_reset_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(williams2_state::williams2_tileram_w)).share("williams2_tile");
+	map(0xc800, 0xc87f).w(FUNC(williams2_state::williams2_bank_select_w));
+	map(0xc880, 0xc887).mirror(0x0078).w(FUNC(williams2_state::williams_blitter_w));
+	map(0xc900, 0xc97f).w(FUNC(williams2_state::williams2_watchdog_reset_w));
 	map(0xc980, 0xc983).mirror(0x0070).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc984, 0xc987).mirror(0x0070).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc98c, 0xc98f).mirror(0x0070).w(this, FUNC(williams2_state::williams2_7segment_w));
-	map(0xcb00, 0xcb1f).w(this, FUNC(williams2_state::williams2_fg_select_w));
-	map(0xcb20, 0xcb3f).w(this, FUNC(williams2_state::williams2_bg_select_w));
-	map(0xcb40, 0xcb5f).w(this, FUNC(williams2_state::williams2_xscroll_low_w));
-	map(0xcb60, 0xcb7f).w(this, FUNC(williams2_state::williams2_xscroll_high_w));
-	map(0xcb80, 0xcb9f).w(this, FUNC(williams2_state::defender_video_control_w));
-	map(0xcba0, 0xcbbf).w(this, FUNC(williams2_state::williams2_blit_window_enable_w));
-	map(0xcbe0, 0xcbef).r(this, FUNC(williams2_state::williams_video_counter_r));
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(williams2_state::williams_cmos_w)).share("nvram");
+	map(0xc98c, 0xc98f).mirror(0x0070).w(FUNC(williams2_state::williams2_7segment_w));
+	map(0xcb00, 0xcb1f).w(FUNC(williams2_state::williams2_fg_select_w));
+	map(0xcb20, 0xcb3f).w(FUNC(williams2_state::williams2_bg_select_w));
+	map(0xcb40, 0xcb5f).w(FUNC(williams2_state::williams2_xscroll_low_w));
+	map(0xcb60, 0xcb7f).w(FUNC(williams2_state::williams2_xscroll_high_w));
+	map(0xcb80, 0xcb9f).w(FUNC(williams2_state::defender_video_control_w));
+	map(0xcba0, 0xcbbf).w(FUNC(williams2_state::williams2_blit_window_enable_w));
+	map(0xcbe0, 0xcbef).r(FUNC(williams2_state::williams_video_counter_r));
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams2_state::williams_cmos_w)).share("nvram");
 }
 
 void williams2_state::williams2_bank8000_map(address_map &map)
 {
 	map(0x0000, 0x07ff).bankrw("vram8000");
-	map(0x0800, 0x0fff).ram().w(this, FUNC(williams2_state::williams2_paletteram_w)).share("paletteram");
+	map(0x0800, 0x0fff).ram().w(FUNC(williams2_state::williams2_paletteram_w)).share("paletteram");
 }
 
 
@@ -1508,7 +1508,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
@@ -1696,10 +1696,10 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, blaster_state, blaster_snd_cmd_w))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("ldac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("ldac", dac_byte_interface, data_w))
 
 	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("rdac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("rdac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, blaster_state,williams_snd_irq_b))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, blaster_state,williams_snd_irq_b))
 
@@ -1777,7 +1777,7 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE("pia_1", pia6821_device, cb1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))

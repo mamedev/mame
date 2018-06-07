@@ -26,12 +26,12 @@ DEFINE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device, "flower_sound", "Flower C
 // TODO: AM_SELECT unsupported by DEVICE_ADDRESS_MAP, so we need a trampoline here
 void flower_sound_device::regs_map(address_map &map)
 {
-	map(0x00, 0x03).select(0x38).w(this, FUNC(flower_sound_device::frequency_w));
-	map(0x04, 0x04).select(0x38).w(this, FUNC(flower_sound_device::repeat_w));
-	map(0x05, 0x05).select(0x38).w(this, FUNC(flower_sound_device::unk_w));
-	map(0x07, 0x07).select(0x38).w(this, FUNC(flower_sound_device::volume_w));
-	map(0x40, 0x45).select(0x38).w(this, FUNC(flower_sound_device::start_address_w));
-	map(0x47, 0x47).select(0x38).w(this, FUNC(flower_sound_device::sample_trigger_w));
+	map(0x00, 0x03).select(0x38).w(FUNC(flower_sound_device::frequency_w));
+	map(0x04, 0x04).select(0x38).w(FUNC(flower_sound_device::repeat_w));
+	map(0x05, 0x05).select(0x38).w(FUNC(flower_sound_device::unk_w));
+	map(0x07, 0x07).select(0x38).w(FUNC(flower_sound_device::volume_w));
+	map(0x40, 0x45).select(0x38).w(FUNC(flower_sound_device::start_address_w));
+	map(0x47, 0x47).select(0x38).w(FUNC(flower_sound_device::sample_trigger_w));
 }
 
 //**************************************************************************

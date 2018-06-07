@@ -271,10 +271,10 @@ void alphatp_12_state::alphatp2_io(address_map &map)
 	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
-	map(0x12, 0x12).w(this, FUNC(alphatp_12_state::beep_w));
-	map(0x50, 0x53).rw(this, FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
-	map(0x54, 0x54).rw(this, FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
-	map(0x78, 0x78).w(this, FUNC(alphatp_12_state::bank_w));
+	map(0x12, 0x12).w(FUNC(alphatp_12_state::beep_w));
+	map(0x50, 0x53).rw(FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
+	map(0x54, 0x54).rw(FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
+	map(0x78, 0x78).w(FUNC(alphatp_12_state::bank_w));
 }
 
 
@@ -310,33 +310,33 @@ void alphatp_34_state::alphatp3_io(address_map &map)
 	//AM_RANGE(0x00, 0x00) AM_READ // unknown
 	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x08, 0x09).rw(this, FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
+	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
-	map(0x12, 0x12).w(this, FUNC(alphatp_34_state::beep_w));
-	map(0x40, 0x41).r(this, FUNC(alphatp_34_state::start88_r));
+	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
+	map(0x40, 0x41).r(FUNC(alphatp_34_state::start88_r));
 	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
-	map(0x50, 0x53).rw(this, FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
-	map(0x54, 0x54).rw(this, FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
-	map(0x78, 0x78).w(this, FUNC(alphatp_34_state::bank_w));
+	map(0x50, 0x53).rw(FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
+	map(0x54, 0x54).rw(FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
+	map(0x78, 0x78).w(FUNC(alphatp_34_state::bank_w));
 }
 
 void alphatp_34_state::alphatp30_8088_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
-	map(0xe0000, 0xeffff).rw(this, FUNC(alphatp_34_state::gfxext_r), FUNC(alphatp_34_state::gfxext_w));
+	map(0xe0000, 0xeffff).rw(FUNC(alphatp_34_state::gfxext_r), FUNC(alphatp_34_state::gfxext_w));
 	map(0xfe000, 0xfffff).rom().region("16bit", 0);
 }
 
 void alphatp_34_state::alphatp30_8088_io(address_map &map)
 {
 	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
-	map(0xf800, 0xf800).w(this, FUNC(alphatp_34_state::gfxext1_w));
-	map(0xf900, 0xf900).w(this, FUNC(alphatp_34_state::gfxext2_w));
-	map(0xfa00, 0xfa01).w(this, FUNC(alphatp_34_state::gfxext3_w));
+	map(0xf800, 0xf800).w(FUNC(alphatp_34_state::gfxext1_w));
+	map(0xf900, 0xf900).w(FUNC(alphatp_34_state::gfxext2_w));
+	map(0xfa00, 0xfa01).w(FUNC(alphatp_34_state::gfxext3_w));
 	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
 	map(0xffe0, 0xffe1).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xffe4, 0xffe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xffe9, 0xffea).rw(this, FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
+	map(0xffe9, 0xffea).rw(FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
 }
 
 READ8_MEMBER(alphatp_34_state::start88_r)

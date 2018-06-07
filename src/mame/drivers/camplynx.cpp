@@ -469,7 +469,7 @@ void camplynx_state::lynx48k_mem(address_map &map)
 	map(0xa000, 0xbfff).bankr("bankr6");
 	map(0xc000, 0xdfff).bankr("bankr7");
 	map(0xe000, 0xffff).bankr("bankr8");
-	map(0x0000, 0xffff).w(this, FUNC(camplynx_state::bank6_w));
+	map(0x0000, 0xffff).w(FUNC(camplynx_state::bank6_w));
 }
 
 void camplynx_state::lynx128k_mem(address_map &map)
@@ -483,15 +483,15 @@ void camplynx_state::lynx128k_mem(address_map &map)
 	map(0xa000, 0xbfff).bankr("bankr6");
 	map(0xc000, 0xdfff).bankr("bankr7");
 	map(0xe000, 0xffff).bankr("bankr8");
-	map(0x0000, 0xffff).w(this, FUNC(camplynx_state::bank1_w));
+	map(0x0000, 0xffff).w(FUNC(camplynx_state::bank1_w));
 }
 
 void camplynx_state::lynx48k_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x007f, 0x007f).mirror(0xff80).w(this, FUNC(camplynx_state::port7f_w));
-	map(0x0080, 0x0080).mirror(0xff00).w(this, FUNC(camplynx_state::port80_w));
-	map(0x0080, 0x0080).mirror(0xf000).r(this, FUNC(camplynx_state::port80_r));
+	map(0x007f, 0x007f).mirror(0xff80).w(FUNC(camplynx_state::port7f_w));
+	map(0x0080, 0x0080).mirror(0xff00).w(FUNC(camplynx_state::port80_w));
+	map(0x0080, 0x0080).mirror(0xf000).r(FUNC(camplynx_state::port80_r));
 	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
 	map(0x0280, 0x0280).mirror(0xf000).portr("LINE2");
 	map(0x0380, 0x0380).mirror(0xf000).portr("LINE3");
@@ -501,7 +501,7 @@ void camplynx_state::lynx48k_io(address_map &map)
 	map(0x0780, 0x0780).mirror(0xf000).portr("LINE7");
 	map(0x0880, 0x0880).mirror(0xf000).portr("LINE8");
 	map(0x0980, 0x0980).mirror(0xf000).portr("LINE9");
-	map(0x0084, 0x0084).mirror(0xff00).w(this, FUNC(camplynx_state::port84_w));
+	map(0x0084, 0x0084).mirror(0xff00).w(FUNC(camplynx_state::port84_w));
 	map(0x0086, 0x0086).mirror(0xff00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0087, 0x0087).mirror(0xff00).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -511,7 +511,7 @@ void camplynx_state::lynx96k_io(address_map &map)
 	lynx48k_io(map);
 	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
 	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
-	map(0x0058, 0x0058).mirror(0xff80).w(this, FUNC(camplynx_state::port58_w));
+	map(0x0058, 0x0058).mirror(0xff80).w(FUNC(camplynx_state::port58_w));
 }
 
 void camplynx_state::lynx128k_io(address_map &map)
@@ -519,12 +519,12 @@ void camplynx_state::lynx128k_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
 	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
-	map(0x0058, 0x0058).mirror(0xff80).w(this, FUNC(camplynx_state::port58_w));
+	map(0x0058, 0x0058).mirror(0xff80).w(FUNC(camplynx_state::port58_w));
 //  AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
 //  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
 //  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
 //  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
-	map(0x0080, 0x0080).mirror(0xff00).w(this, FUNC(camplynx_state::port80_w));
+	map(0x0080, 0x0080).mirror(0xff00).w(FUNC(camplynx_state::port80_w));
 	map(0x0080, 0x0080).mirror(0xf000).portr("LINE0");
 	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
 	map(0x0280, 0x0280).mirror(0xf000).portr("LINE2");
@@ -535,8 +535,8 @@ void camplynx_state::lynx128k_io(address_map &map)
 	map(0x0780, 0x0780).mirror(0xf000).portr("LINE7");
 	map(0x0880, 0x0880).mirror(0xf000).portr("LINE8");
 	map(0x0980, 0x0980).mirror(0xf000).portr("LINE9");
-	map(0x0082, 0x0082).mirror(0xff00).rw(this, FUNC(camplynx_state::port82_r), FUNC(camplynx_state::port82_w)); // read=serial buffer
-	map(0x0084, 0x0084).mirror(0xff00).w(this, FUNC(camplynx_state::port84_w));
+	map(0x0082, 0x0082).mirror(0xff00).rw(FUNC(camplynx_state::port82_r), FUNC(camplynx_state::port82_w)); // read=serial buffer
+	map(0x0084, 0x0084).mirror(0xff00).w(FUNC(camplynx_state::port84_w));
 	map(0x0086, 0x0086).mirror(0xff00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0087, 0x0087).mirror(0xff00).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }

@@ -11679,6 +11679,7 @@ dynadice                        // ?
 
 @source:dynamoah.cpp
 dynamoah                        //
+dynamoaha                       //
 
 @source:dynax.cpp
 7jigen                          // "37" 7jigen no Youseitachi 1990 Dynax
@@ -12230,6 +12231,9 @@ ec_unk5__a                      //
 ec_unk5__b                      //
 ec_unk5__c                      //
 ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
+
+@source:efdt.cpp
+efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
 
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
@@ -30528,6 +30532,7 @@ mspacmab                        // bootleg
 mspacmab2                       // bootleg
 mspacman                        // (c) 1981 Midway  // made by General Computer
 mspacmanbcc                     // bootleg
+mspacmanbco                     // bootleg
 mspacmanbg                      // bootleg
 mspacmanbgd                     // bootleg
 mspacmanblt                     // bootleg
@@ -36322,6 +36327,7 @@ arkretrnj                       // 1997.03 E36 (c) 1997 Taito Corporation (Japan
 arkretrnu                       // 1997.03 E36 (c) 1997 Taito Corporation (US)
 bubblem                         // 1996.?? E21 (c) 1995 Taito Corporation Japan (World)
 bubblemj                        // 1996.04 E21 (c) 1995 Taito Corporation (Japan)
+bubblemu                        // 1996.04 E21 (c) 1995 Taito America Corporation (US)
 bublbob2                        // 1994.?? D90 (c) 1994 Taito Corporation Japan (World)
 bublbob2o                       // 1994.?? D90 (c) 1994 Taito Corporation Japan (World)
 bublbob2p                       // prototype
@@ -37439,13 +37445,16 @@ avalns13                        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic S
 avalon20                        // 2004.11.02 The Key Of Avalon 2.0 - Eutaxy Commandment (client) (Rev B)
 avalonc                         // 2003.11 The Key Of Avalon: The Wizard Master (client) (Rev G)
 avalonce                        // 2003.08 The Key Of Avalon: The Wizard Master (client) (Rev E)
+avaloncc                        // 2003.07 The Key Of Avalon: The Wizard Master (client) (Rev C)
 avaloncf                        // 2003.09 The Key Of Avalon: The Wizard Master (client) (Rev F)
 avalons                         // 2003.11 The Key Of Avalon: The Wizard Master (server) (Rev G)
 avalonsc                        // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
 avalonse                        // 2003.08 The Key Of Avalon: The Wizard Master (server) (Rev E)
 avalonsf                        // 2003.09 The Key Of Avalon: The Wizard Master (server) (Rev F)
 avalns25                        // 2005.08 The Key Of Avalon 2.5 - War of the Key (server) (Rev B)
+avalns25a                       // 2005.05 The Key Of Avalon 2.5 - War of the Key (server) (Rev A)
 avalnc25                        // 2005.08 The Key Of Avalon 2.5 - War of the Key (client) (Rev B)
+avalnc25a                       // 2005.05 The Key Of Avalon 2.5 - War of the Key (client) (Rev A)
 fzeroax                         // 2003.12 F-Zero AX (Rev E)
 fzeroaxc                        // 2003.06.11 F-Zero AX (Rev C)
 gekpurya                        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C)

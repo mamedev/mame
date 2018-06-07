@@ -121,13 +121,13 @@ void odyssey2_state::odyssey2_mem(address_map &map)
 
 void odyssey2_state::odyssey2_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
+	map(0x00, 0xff).rw(FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
 }
 
 
 void g7400_state::g7400_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
+	map(0x00, 0xff).rw(FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
 }
 
 

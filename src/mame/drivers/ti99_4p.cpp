@@ -291,15 +291,15 @@ enum
 
 void ti99_4p_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(this, FUNC(ti99_4p_state::setoffset));
+	map(0x0000, 0xffff).rw(FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(FUNC(ti99_4p_state::setoffset));
 }
 
 void ti99_4p_state::cru_map(address_map &map)
 {
-	map(0x0000, 0x01ff).r(this, FUNC(ti99_4p_state::cruread));
+	map(0x0000, 0x01ff).r(FUNC(ti99_4p_state::cruread));
 	map(0x0000, 0x003f).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x0fff).w(this, FUNC(ti99_4p_state::cruwrite));
+	map(0x0000, 0x0fff).w(FUNC(ti99_4p_state::cruwrite));
 	map(0x0000, 0x01ff).w(m_tms9901, FUNC(tms9901_device::write));
 }
 

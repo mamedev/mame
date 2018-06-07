@@ -416,8 +416,8 @@ WRITE_LINE_MEMBER(v53_base_device::hack_w)
 
 void v53_base_device::v53_internal_port_map(address_map &map)
 {
-	map(0xffe0, 0xffe0).w(this, FUNC(v53_base_device::BSEL_w)); // 0xffe0 // uPD71037 DMA mode bank selection register
-	map(0xffe1, 0xffe1).w(this, FUNC(v53_base_device::BADR_w)); // 0xffe1 // uPD71037 DMA mode bank register peripheral mapping (also uses OPHA)
+	map(0xffe0, 0xffe0).w(FUNC(v53_base_device::BSEL_w)); // 0xffe0 // uPD71037 DMA mode bank selection register
+	map(0xffe1, 0xffe1).w(FUNC(v53_base_device::BADR_w)); // 0xffe1 // uPD71037 DMA mode bank register peripheral mapping (also uses OPHA)
 //  AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0x00ff) // 0xffe2
 //  AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0xff00) // 0xffe3
 //  AM_RANGE(0xffe4, 0xffe5) // (reserved     ,  0x00ff) // 0xffe4
@@ -425,28 +425,28 @@ void v53_base_device::v53_internal_port_map(address_map &map)
 //  AM_RANGE(0xffe6, 0xffe7) // (reserved     ,  0x00ff) // 0xffe6
 //  AM_RANGE(0xffe6, 0xffe7) // (reserved     ,  0xff00) // 0xffe7
 //  AM_RANGE(0xffe8, 0xffe9) // (reserved     ,  0x00ff) // 0xffe8
-	map(0xffe9, 0xffe9).w(this, FUNC(v53_base_device::BRC_w)); // 0xffe9 // baud rate counter (used for serial peripheral)
-	map(0xffea, 0xffea).w(this, FUNC(v53_base_device::WMB0_w)); // 0xffea // waitstate control
-	map(0xffeb, 0xffeb).w(this, FUNC(v53_base_device::WCY1_w)); // 0xffeb // waitstate control
-	map(0xffec, 0xffec).w(this, FUNC(v53_base_device::WCY0_w)); // 0xffec // waitstate control
-	map(0xffed, 0xffed).w(this, FUNC(v53_base_device::WAC_w)); // 0xffed // waitstate control
+	map(0xffe9, 0xffe9).w(FUNC(v53_base_device::BRC_w)); // 0xffe9 // baud rate counter (used for serial peripheral)
+	map(0xffea, 0xffea).w(FUNC(v53_base_device::WMB0_w)); // 0xffea // waitstate control
+	map(0xffeb, 0xffeb).w(FUNC(v53_base_device::WCY1_w)); // 0xffeb // waitstate control
+	map(0xffec, 0xffec).w(FUNC(v53_base_device::WCY0_w)); // 0xffec // waitstate control
+	map(0xffed, 0xffed).w(FUNC(v53_base_device::WAC_w)); // 0xffed // waitstate control
 //  AM_RANGE(0xffee, 0xffef) // (reserved     ,  0x00ff) // 0xffee
 //  AM_RANGE(0xffee, 0xffef) // (reserved     ,  0xff00) // 0xffef
-	map(0xfff0, 0xfff0).w(this, FUNC(v53_base_device::TCKS_w)); // 0xfff0 // timer clocks
-	map(0xfff1, 0xfff1).w(this, FUNC(v53_base_device::SBCR_w)); // 0xfff1 // internal clock divider, halt behavior etc.
-	map(0xfff2, 0xfff2).w(this, FUNC(v53_base_device::REFC_w)); // 0xfff2 // ram refresh control
-	map(0xfff3, 0xfff3).w(this, FUNC(v53_base_device::WMB1_w)); // 0xfff3 // waitstate control
-	map(0xfff4, 0xfff4).w(this, FUNC(v53_base_device::WCY2_w)); // 0xfff4 // waitstate control
-	map(0xfff5, 0xfff5).w(this, FUNC(v53_base_device::WCY3_w)); // 0xfff5 // waitstate control
-	map(0xfff6, 0xfff6).w(this, FUNC(v53_base_device::WCY4_w)); // 0xfff6 // waitstate control
+	map(0xfff0, 0xfff0).w(FUNC(v53_base_device::TCKS_w)); // 0xfff0 // timer clocks
+	map(0xfff1, 0xfff1).w(FUNC(v53_base_device::SBCR_w)); // 0xfff1 // internal clock divider, halt behavior etc.
+	map(0xfff2, 0xfff2).w(FUNC(v53_base_device::REFC_w)); // 0xfff2 // ram refresh control
+	map(0xfff3, 0xfff3).w(FUNC(v53_base_device::WMB1_w)); // 0xfff3 // waitstate control
+	map(0xfff4, 0xfff4).w(FUNC(v53_base_device::WCY2_w)); // 0xfff4 // waitstate control
+	map(0xfff5, 0xfff5).w(FUNC(v53_base_device::WCY3_w)); // 0xfff5 // waitstate control
+	map(0xfff6, 0xfff6).w(FUNC(v53_base_device::WCY4_w)); // 0xfff6 // waitstate control
 //  AM_RANGE(0xfff6, 0xfff7) // (reserved     ,  0xff00) // 0xfff7
-	map(0xfff8, 0xfff8).w(this, FUNC(v53_base_device::SULA_w)); // 0xfff8 // peripheral mapping
-	map(0xfff9, 0xfff9).w(this, FUNC(v53_base_device::TULA_w)); // 0xfff9 // peripheral mapping
-	map(0xfffa, 0xfffa).w(this, FUNC(v53_base_device::IULA_w)); // 0xfffa // peripheral mapping
-	map(0xfffb, 0xfffb).w(this, FUNC(v53_base_device::DULA_w)); // 0xfffb // peripheral mapping
-	map(0xfffc, 0xfffc).w(this, FUNC(v53_base_device::OPHA_w)); // 0xfffc // peripheral mapping (upper bits, common)
-	map(0xfffd, 0xfffd).w(this, FUNC(v53_base_device::OPSEL_w)); // 0xfffd // peripheral enabling
-	map(0xfffe, 0xfffe).w(this, FUNC(v53_base_device::SCTL_w)); // 0xfffe // peripheral configuration (& byte / word mapping)
+	map(0xfff8, 0xfff8).w(FUNC(v53_base_device::SULA_w)); // 0xfff8 // peripheral mapping
+	map(0xfff9, 0xfff9).w(FUNC(v53_base_device::TULA_w)); // 0xfff9 // peripheral mapping
+	map(0xfffa, 0xfffa).w(FUNC(v53_base_device::IULA_w)); // 0xfffa // peripheral mapping
+	map(0xfffb, 0xfffb).w(FUNC(v53_base_device::DULA_w)); // 0xfffb // peripheral mapping
+	map(0xfffc, 0xfffc).w(FUNC(v53_base_device::OPHA_w)); // 0xfffc // peripheral mapping (upper bits, common)
+	map(0xfffd, 0xfffd).w(FUNC(v53_base_device::OPSEL_w)); // 0xfffd // peripheral enabling
+	map(0xfffe, 0xfffe).w(FUNC(v53_base_device::SCTL_w)); // 0xfffe // peripheral configuration (& byte / word mapping)
 //  AM_RANGE(0xfffe, 0xffff) // (reserved     ,  0xff00) // 0xffff
 }
 

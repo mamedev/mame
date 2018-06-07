@@ -120,16 +120,16 @@ Interrupts:
 void primo_state::primoa_port(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).rw(this, FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
-	map(0xfd, 0xfd).w(this, FUNC(primo_state::primo_FD_w));
+	map(0x00, 0x3f).rw(FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
+	map(0xfd, 0xfd).w(FUNC(primo_state::primo_FD_w));
 }
 
 void primo_state::primob_port(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).rw(this, FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
-	map(0x40, 0x7f).rw(this, FUNC(primo_state::primo_be_2_r), FUNC(primo_state::primo_ki_2_w));
-	map(0xfd, 0xfd).w(this, FUNC(primo_state::primo_FD_w));
+	map(0x00, 0x3f).rw(FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
+	map(0x40, 0x7f).rw(FUNC(primo_state::primo_be_2_r), FUNC(primo_state::primo_ki_2_w));
+	map(0xfd, 0xfd).w(FUNC(primo_state::primo_FD_w));
 }
 
 void primo_state::primo32_mem(address_map &map)

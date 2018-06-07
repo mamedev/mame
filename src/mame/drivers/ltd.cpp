@@ -98,8 +98,8 @@ private:
 void ltd_state::ltd3_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().share("nvram"); // internal to the cpu
-	map(0x0080, 0x0087).mirror(0x78).r(this, FUNC(ltd_state::io_r));
-	map(0x0800, 0x2fff).w(this, FUNC(ltd_state::io_w));
+	map(0x0080, 0x0087).mirror(0x78).r(FUNC(ltd_state::io_r));
+	map(0x0800, 0x2fff).w(FUNC(ltd_state::io_w));
 	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
 }
 
@@ -108,7 +108,7 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x0000, 0x001f).ram(); // internal to the cpu
 	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("nvram");
-	map(0x0800, 0x0800).w(this, FUNC(ltd_state::count_reset_w));
+	map(0x0800, 0x0800).w(FUNC(ltd_state::count_reset_w));
 	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
@@ -121,8 +121,8 @@ void ltd_state::ltd4_map(address_map &map)
 
 void ltd_state::ltd4_io(address_map &map)
 {
-	map(0x0100, 0x0100).rw(this, FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
-	map(0x0101, 0x0101).rw(this, FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
+	map(0x0100, 0x0100).rw(FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
+	map(0x0101, 0x0101).rw(FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
 }
 
 // bits 6,7 not connected to data bus

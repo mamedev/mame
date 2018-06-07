@@ -104,7 +104,7 @@ void z1013_state::z1013_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x08, 0x08).w(this, FUNC(z1013_state::z1013_keyboard_w));
+	map(0x08, 0x08).w(FUNC(z1013_state::z1013_keyboard_w));
 }
 
 /* Input ports */

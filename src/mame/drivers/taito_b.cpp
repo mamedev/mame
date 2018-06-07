@@ -355,7 +355,7 @@ void taitob_state::tc0180vcu_memrw(address_map &map, u32 addr)
 	map(addr+0x11980, addr+0x137ff).ram();
 	map(addr+0x13800, addr+0x13fff).rw(m_tc0180vcu, FUNC(tc0180vcu_device::scroll_r), FUNC(tc0180vcu_device::scroll_w));
 	map(addr+0x18000, addr+0x1801f).rw(m_tc0180vcu, FUNC(tc0180vcu_device::ctrl_r), FUNC(tc0180vcu_device::ctrl_w));
-	map(addr+0x40000, addr+0x7ffff).rw(this, FUNC(taitob_state::tc0180vcu_framebuffer_word_r), FUNC(taitob_state::tc0180vcu_framebuffer_word_w));
+	map(addr+0x40000, addr+0x7ffff).rw(FUNC(taitob_state::tc0180vcu_framebuffer_word_r), FUNC(taitob_state::tc0180vcu_framebuffer_word_w));
 }
 
 void taitob_state::rastsag2_map(address_map &map)
@@ -420,8 +420,8 @@ void taitob_state::hitice_map(address_map &map)
 	map(0x700002, 0x700002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb00000, 0xb7ffff).ram().w(this, FUNC(taitob_state::hitice_pixelram_w)).share("pixelram");
-	map(0xbffff0, 0xbffff5).w(this, FUNC(taitob_state::hitice_pixel_scroll_w));
+	map(0xb00000, 0xb7ffff).ram().w(FUNC(taitob_state::hitice_pixelram_w)).share("pixelram");
+	map(0xbffff0, 0xbffff5).w(FUNC(taitob_state::hitice_pixel_scroll_w));
 //  { 0xbffffa, 0xbffffb, ???
 }
 
@@ -434,14 +434,14 @@ void taitob_state::rambo3_map(address_map &map)
 	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	tc0180vcu_memrw(map, 0x400000);
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
-	map(0x600010, 0x600011).r(this, FUNC(taitob_state::tracky1_lo_r)); /*player 1*/
-	map(0x600012, 0x600013).r(this, FUNC(taitob_state::tracky1_hi_r));
-	map(0x600014, 0x600015).r(this, FUNC(taitob_state::trackx1_lo_r));
-	map(0x600016, 0x600017).r(this, FUNC(taitob_state::trackx1_hi_r));
-	map(0x600018, 0x600019).r(this, FUNC(taitob_state::tracky2_lo_r)); /*player 2*/
-	map(0x60001a, 0x60001b).r(this, FUNC(taitob_state::tracky2_hi_r));
-	map(0x60001c, 0x60001d).r(this, FUNC(taitob_state::trackx2_lo_r));
-	map(0x60001e, 0x60001f).r(this, FUNC(taitob_state::trackx2_hi_r));
+	map(0x600010, 0x600011).r(FUNC(taitob_state::tracky1_lo_r)); /*player 1*/
+	map(0x600012, 0x600013).r(FUNC(taitob_state::tracky1_hi_r));
+	map(0x600014, 0x600015).r(FUNC(taitob_state::trackx1_lo_r));
+	map(0x600016, 0x600017).r(FUNC(taitob_state::trackx1_hi_r));
+	map(0x600018, 0x600019).r(FUNC(taitob_state::tracky2_lo_r)); /*player 2*/
+	map(0x60001a, 0x60001b).r(FUNC(taitob_state::tracky2_hi_r));
+	map(0x60001c, 0x60001d).r(FUNC(taitob_state::trackx2_lo_r));
+	map(0x60001e, 0x60001f).r(FUNC(taitob_state::trackx2_hi_r));
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
@@ -453,10 +453,10 @@ void taitob_state::pbobble_map(address_map &map)
 	tc0180vcu_memrw(map, 0x400000);
 	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0x500024, 0x500025).portr("P3_P4_A");        /* shown in service mode, game omits to read it */
-	map(0x500026, 0x500027).rw(this, FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
-	map(0x500028, 0x500029).w(this, FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
+	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
+	map(0x500028, 0x500029).w(FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
 	map(0x50002e, 0x50002f).portr("P3_P4_B");        /* shown in service mode, game omits to read it */
-	map(0x600000, 0x600003).w(this, FUNC(taitob_state::gain_control_w));
+	map(0x600000, 0x600003).w(FUNC(taitob_state::gain_control_w));
 	map(0x700000, 0x700001).nopr();
 	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -471,10 +471,10 @@ void taitob_state::spacedx_map(address_map &map)
 	tc0180vcu_memrw(map, 0x400000);
 	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0x500024, 0x500025).portr("P3_P4_A");
-	map(0x500026, 0x500027).rw(this, FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
-	map(0x500028, 0x500029).w(this, FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
+	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
+	map(0x500028, 0x500029).w(FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
 	map(0x50002e, 0x50002f).portr("P3_P4_B");
-	map(0x600000, 0x600003).w(this, FUNC(taitob_state::gain_control_w));
+	map(0x600000, 0x600003).w(FUNC(taitob_state::gain_control_w));
 	map(0x700000, 0x700001).nopr();
 	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -489,7 +489,7 @@ void taitob_state::spacedxo_map(address_map &map)
 	map(0x100000, 0x100000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x100002, 0x100002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x200000, 0x20000f).r(m_tc0220ioc, FUNC(tc0220ioc_device::read)).umask16(0x00ff);
-	map(0x200000, 0x20000f).w(this, FUNC(taitob_state::spacedxo_tc0220ioc_w));
+	map(0x200000, 0x20000f).w(FUNC(taitob_state::spacedxo_tc0220ioc_w));
 	map(0x210000, 0x210001).portr("IN3");
 	map(0x220000, 0x220001).portr("IN4");
 	map(0x230000, 0x230001).portr("IN5");
@@ -505,14 +505,14 @@ void taitob_state::qzshowby_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0x200024, 0x200025).portr("P3_P4_A");    /* player 3,4 start */
-	map(0x200026, 0x200027).w(this, FUNC(taitob_state::eeprom_w));
-	map(0x200028, 0x200029).rw(this, FUNC(taitob_state::player_34_coin_ctrl_r), FUNC(taitob_state::player_34_coin_ctrl_w));
+	map(0x200026, 0x200027).w(FUNC(taitob_state::eeprom_w));
+	map(0x200028, 0x200029).rw(FUNC(taitob_state::player_34_coin_ctrl_r), FUNC(taitob_state::player_34_coin_ctrl_w));
 	map(0x20002e, 0x20002f).portr("P3_P4_B");    /* player 3,4 buttons */
 	tc0180vcu_memrw(map, 0x400000);
 	map(0x600000, 0x600001).nopr();
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x700000, 0x700003).w(this, FUNC(taitob_state::gain_control_w));
+	map(0x700000, 0x700003).w(FUNC(taitob_state::gain_control_w));
 	map(0x800000, 0x801fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90ffff).ram(); /* Main RAM */
 }
@@ -597,12 +597,12 @@ void taitob_state::realpunc_map(address_map &map)
 	map(0x110000, 0x12ffff).ram();
 	map(0x130000, 0x13ffff).ram(); // Check me
 	map(0x180000, 0x18000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
-	map(0x184000, 0x184001).w(this, FUNC(taitob_state::realpunc_video_ctrl_w));
+	map(0x184000, 0x184001).w(FUNC(taitob_state::realpunc_video_ctrl_w));
 	map(0x188000, 0x188001).nopr();
 	map(0x188000, 0x188000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x188002, 0x188003).nopr();
 	map(0x188002, 0x188002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
-	map(0x18c000, 0x18c001).w(this, FUNC(taitob_state::realpunc_output_w));
+	map(0x18c000, 0x18c001).w(FUNC(taitob_state::realpunc_output_w));
 	tc0180vcu_memrw(map, 0x200000);
 	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x300001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
@@ -640,7 +640,7 @@ void taitob_state::sound_map(address_map &map)
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(taitob_state::bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(taitob_state::bankswitch_w));
 }
 
 void taitob_state::viofight_sound_map(address_map &map)

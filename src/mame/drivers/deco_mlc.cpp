@@ -298,22 +298,22 @@ void deco_mlc_state::avengrgs_map(address_map &map)
 {
 	map(0x0000000, 0x00fffff).rom().mirror(0xff000000);
 	map(0x0100000, 0x011ffff).ram().share("mainram").mirror(0xff000000);
-	map(0x0200000, 0x0200003).r(this, FUNC(deco_mlc_state::mlc_200000_r)).mirror(0xff000000);
-	map(0x0200004, 0x0200007).r(this, FUNC(deco_mlc_state::mlc_200004_r)).mirror(0xff000000);
-	map(0x0200070, 0x0200073).r(this, FUNC(deco_mlc_state::mlc_200070_r)).mirror(0xff000000);
-	map(0x0200074, 0x0200077).r(this, FUNC(deco_mlc_state::mlc_scanline_r)).mirror(0xff000000);
-	map(0x020007c, 0x020007f).r(this, FUNC(deco_mlc_state::mlc_20007c_r)).mirror(0xff000000);
-	map(0x0200000, 0x020007f).w(this, FUNC(deco_mlc_state::irq_ram_w)).share("irq_ram").mirror(0xff000000);
+	map(0x0200000, 0x0200003).r(FUNC(deco_mlc_state::mlc_200000_r)).mirror(0xff000000);
+	map(0x0200004, 0x0200007).r(FUNC(deco_mlc_state::mlc_200004_r)).mirror(0xff000000);
+	map(0x0200070, 0x0200073).r(FUNC(deco_mlc_state::mlc_200070_r)).mirror(0xff000000);
+	map(0x0200074, 0x0200077).r(FUNC(deco_mlc_state::mlc_scanline_r)).mirror(0xff000000);
+	map(0x020007c, 0x020007f).r(FUNC(deco_mlc_state::mlc_20007c_r)).mirror(0xff000000);
+	map(0x0200000, 0x020007f).w(FUNC(deco_mlc_state::irq_ram_w)).share("irq_ram").mirror(0xff000000);
 	map(0x0200080, 0x02000ff).ram().share("clip_ram").mirror(0xff000000);
-	map(0x0204000, 0x0206fff).rw(this, FUNC(deco_mlc_state::spriteram_r), FUNC(deco_mlc_state::spriteram_w)).mirror(0xff000000);
+	map(0x0204000, 0x0206fff).rw(FUNC(deco_mlc_state::spriteram_r), FUNC(deco_mlc_state::spriteram_w)).mirror(0xff000000);
 	map(0x0280000, 0x029ffff).ram().share("vram").mirror(0xff000000);
 	map(0x0300000, 0x0307fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).cswidth(32).share("palette").mirror(0xff000000);
 	map(0x0400000, 0x0400003).portr("INPUTS").mirror(0xff000000);
 	map(0x0440000, 0x0440003).portr("INPUTS2").mirror(0xff000000);
 	map(0x0440004, 0x0440007).portr("INPUTS3").mirror(0xff000000);
-	map(0x0440008, 0x044000b).r(this, FUNC(deco_mlc_state::mlc_440008_r)).mirror(0xff000000);
-	map(0x044001c, 0x044001f).rw(this, FUNC(deco_mlc_state::mlc_44001c_r), FUNC(deco_mlc_state::mlc_44001c_w)).mirror(0xff000000);
-	map(0x0500000, 0x0500003).w(this, FUNC(deco_mlc_state::eeprom_w)).mirror(0xff000000);
+	map(0x0440008, 0x044000b).r(FUNC(deco_mlc_state::mlc_440008_r)).mirror(0xff000000);
+	map(0x044001c, 0x044001f).rw(FUNC(deco_mlc_state::mlc_44001c_r), FUNC(deco_mlc_state::mlc_44001c_w)).mirror(0xff000000);
+	map(0x0500000, 0x0500003).w(FUNC(deco_mlc_state::eeprom_w)).mirror(0xff000000);
 	map(0x0600000, 0x0600007).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0xff000000).mirror(0xff000000);
 }
 
@@ -321,24 +321,24 @@ void deco_mlc_state::decomlc_map(address_map &map)
 {
 	map(0x0000000, 0x00fffff).rom();
 	map(0x0100000, 0x011ffff).ram().share("mainram");
-	map(0x0200000, 0x0200003).r(this, FUNC(deco_mlc_state::mlc_200000_r));
-	map(0x0200004, 0x0200007).r(this, FUNC(deco_mlc_state::mlc_200004_r));
-	map(0x0200070, 0x0200073).r(this, FUNC(deco_mlc_state::mlc_200070_r));
-	map(0x0200074, 0x0200077).r(this, FUNC(deco_mlc_state::mlc_scanline_r));
-	map(0x020007c, 0x020007f).r(this, FUNC(deco_mlc_state::mlc_20007c_r));
-	map(0x0200000, 0x020007f).w(this, FUNC(deco_mlc_state::irq_ram_w)).share("irq_ram");
+	map(0x0200000, 0x0200003).r(FUNC(deco_mlc_state::mlc_200000_r));
+	map(0x0200004, 0x0200007).r(FUNC(deco_mlc_state::mlc_200004_r));
+	map(0x0200070, 0x0200073).r(FUNC(deco_mlc_state::mlc_200070_r));
+	map(0x0200074, 0x0200077).r(FUNC(deco_mlc_state::mlc_scanline_r));
+	map(0x020007c, 0x020007f).r(FUNC(deco_mlc_state::mlc_20007c_r));
+	map(0x0200000, 0x020007f).w(FUNC(deco_mlc_state::irq_ram_w)).share("irq_ram");
 	map(0x0200080, 0x02000ff).ram().share("clip_ram");
-	map(0x0204000, 0x0206fff).rw(this, FUNC(deco_mlc_state::spriteram_r), FUNC(deco_mlc_state::spriteram_w));
+	map(0x0204000, 0x0206fff).rw(FUNC(deco_mlc_state::spriteram_r), FUNC(deco_mlc_state::spriteram_w));
 	map(0x0280000, 0x029ffff).ram().share("vram");
 	map(0x0300000, 0x0307fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).cswidth(32).share("palette");
 	map(0x0400000, 0x0400003).portr("INPUTS");
 	map(0x0440000, 0x0440003).portr("INPUTS2");
 	map(0x0440004, 0x0440007).portr("INPUTS3");
-	map(0x0440008, 0x044000b).r(this, FUNC(deco_mlc_state::mlc_440008_r));
-	map(0x044001c, 0x044001f).rw(this, FUNC(deco_mlc_state::mlc_44001c_r), FUNC(deco_mlc_state::mlc_44001c_w));
-	map(0x0500000, 0x0500003).w(this, FUNC(deco_mlc_state::eeprom_w));
+	map(0x0440008, 0x044000b).r(FUNC(deco_mlc_state::mlc_440008_r));
+	map(0x044001c, 0x044001f).rw(FUNC(deco_mlc_state::mlc_44001c_r), FUNC(deco_mlc_state::mlc_44001c_w));
+	map(0x0500000, 0x0500003).w(FUNC(deco_mlc_state::eeprom_w));
 	map(0x0600000, 0x0600007).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0xff000000);
-	map(0x070f000, 0x070ffff).rw(this, FUNC(deco_mlc_state::sh96_protection_region_0_146_r), FUNC(deco_mlc_state::sh96_protection_region_0_146_w)).umask32(0xffff0000);
+	map(0x070f000, 0x070ffff).rw(FUNC(deco_mlc_state::sh96_protection_region_0_146_r), FUNC(deco_mlc_state::sh96_protection_region_0_146_w)).umask32(0xffff0000);
 }
 
 /******************************************************************************/

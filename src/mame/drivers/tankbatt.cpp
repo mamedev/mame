@@ -162,11 +162,11 @@ void tankbatt_state::main_map(address_map &map)
 	map(0x0000, 0x000f).ram().share("bulletsram");
 	map(0x0010, 0x01ff).ram();
 	map(0x0200, 0x07ff).ram();
-	map(0x0800, 0x0bff).ram().w(this, FUNC(tankbatt_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0c07).r(this, FUNC(tankbatt_state::in0_r)).w("outlatch", FUNC(cd4099_device::write_d0));
-	map(0x0c08, 0x0c0f).r(this, FUNC(tankbatt_state::in1_r)).w("mainlatch", FUNC(cd4099_device::write_d0));
-	map(0x0c10, 0x0c10).w(this, FUNC(tankbatt_state::irq_ack_w));
-	map(0x0c18, 0x0c1f).r(this, FUNC(tankbatt_state::dsw_r));
+	map(0x0800, 0x0bff).ram().w(FUNC(tankbatt_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0c07).r(FUNC(tankbatt_state::in0_r)).w("outlatch", FUNC(cd4099_device::write_d0));
+	map(0x0c08, 0x0c0f).r(FUNC(tankbatt_state::in1_r)).w("mainlatch", FUNC(cd4099_device::write_d0));
+	map(0x0c10, 0x0c10).w(FUNC(tankbatt_state::irq_ack_w));
+	map(0x0c18, 0x0c1f).r(FUNC(tankbatt_state::dsw_r));
 	map(0x0c18, 0x0c18).nopw();    /* watchdog ?? */
 	map(0x6000, 0x7fff).rom().region("maincpu", 0);
 	map(0xe000, 0xffff).rom().region("maincpu", 0); //mirror for the reset/irq vectors

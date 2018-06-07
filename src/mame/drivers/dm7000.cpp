@@ -233,14 +233,14 @@ void dm7000_state::dm7000_mem(address_map &map)
 	map(0x00000000, 0x01ffffff).ram();                                     // RAM page 0 - 32MB
 	map(0x20000000, 0x21ffffff).ram();                                     // RAM page 1 - 32MB
 
-	map(0x40030000, 0x4003000f).rw(this, FUNC(dm7000_state::dm7000_iic0_r), FUNC(dm7000_state::dm7000_iic0_w));
-	map(0x40040000, 0x40040007).rw(this, FUNC(dm7000_state::dm7000_scc0_r), FUNC(dm7000_state::dm7000_scc0_w));
-	map(0x40060000, 0x40060047).rw(this, FUNC(dm7000_state::dm7000_gpio0_r), FUNC(dm7000_state::dm7000_gpio0_w));
-	map(0x400b0000, 0x400b000f).rw(this, FUNC(dm7000_state::dm7000_iic1_r), FUNC(dm7000_state::dm7000_iic1_w));
-	map(0x400c0000, 0x400c0007).rw(this, FUNC(dm7000_state::dm7000_scp0_r), FUNC(dm7000_state::dm7000_scp0_w));
+	map(0x40030000, 0x4003000f).rw(FUNC(dm7000_state::dm7000_iic0_r), FUNC(dm7000_state::dm7000_iic0_w));
+	map(0x40040000, 0x40040007).rw(FUNC(dm7000_state::dm7000_scc0_r), FUNC(dm7000_state::dm7000_scc0_w));
+	map(0x40060000, 0x40060047).rw(FUNC(dm7000_state::dm7000_gpio0_r), FUNC(dm7000_state::dm7000_gpio0_w));
+	map(0x400b0000, 0x400b000f).rw(FUNC(dm7000_state::dm7000_iic1_r), FUNC(dm7000_state::dm7000_iic1_w));
+	map(0x400c0000, 0x400c0007).rw(FUNC(dm7000_state::dm7000_scp0_r), FUNC(dm7000_state::dm7000_scp0_w));
 
 	/* ENET - ASIX AX88796 */
-	map(0x72000300, 0x720003ff).rw(this, FUNC(dm7000_state::dm7000_enet_r), FUNC(dm7000_state::dm7000_enet_w));
+	map(0x72000300, 0x720003ff).rw(FUNC(dm7000_state::dm7000_enet_r), FUNC(dm7000_state::dm7000_enet_w));
 
 	map(0x7f800000, 0x7ffdffff).rom().region("user2", 0);
 	map(0x7ffe0000, 0x7fffffff).rom().region("user1", 0);

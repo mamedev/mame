@@ -290,10 +290,10 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 {
 	if (!(data & 4))
 	{
-		m_ay1->reset_w();
+		m_ay1->reset_w(space, 0, 0);
 		if (m_isPhasor && m_PhasorNative)
 		{
-			m_ay2->reset_w();
+			m_ay2->reset_w(space, 0, 0);
 		}
 	}
 	else
@@ -306,15 +306,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 					break;
 
 				case 1: // BDIR=0, BC1=1 (read PSG)
-					m_porta1 = m_ay1->data_r();
+					m_porta1 = m_ay1->read_data();
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
-					m_ay1->data_w(m_porta1);
+					m_ay1->write_data(m_porta1);
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
-					m_ay1->address_w(m_porta1);
+					m_ay1->write_address(m_porta1);
 					break;
 			}
 		}
@@ -340,33 +340,33 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 				case 1: // BDIR=0, BC1=1 (read PSG)
 					if (chipSel & 1)
 					{
-						m_porta1 = m_ay1->data_r();
+						m_porta1 = m_ay1->read_data();
 					}
 					if (chipSel & 2)
 					{
-						m_porta1 = m_ay2->data_r();
+						m_porta1 = m_ay2->read_data();
 					}
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
 					if (chipSel & 1)
 					{
-						m_ay1->data_w(m_porta1);
+						m_ay1->write_data(m_porta1);
 					}
 					if (chipSel & 2)
 					{
-						m_ay2->data_w(m_porta1);
+						m_ay2->write_data(m_porta1);
 					}
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
 					if (chipSel & 1)
 					{
-						m_ay1->address_w(m_porta1);
+						m_ay1->write_address(m_porta1);
 					}
 					if (chipSel & 2)
 					{
-						m_ay2->address_w(m_porta1);
+						m_ay2->write_address(m_porta1);
 					}
 					break;
 			}
@@ -385,12 +385,12 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 	{
 		if (m_isPhasor && m_PhasorNative)
 		{
-			m_ay3->reset_w();
-			m_ay4->reset_w();
+			m_ay3->reset_w(space, 0, 0);
+			m_ay4->reset_w(space, 0, 0);
 		}
 		else
 		{
-			m_ay2->reset_w();
+			m_ay2->reset_w(space, 0, 0);
 		}
 	}
 	else
@@ -403,15 +403,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 					break;
 
 				case 1: // BDIR=0, BC1=1 (read PSG)
-					m_porta2 = m_ay2->data_r();
+					m_porta2 = m_ay2->read_data();
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
-					m_ay2->data_w(m_porta2);
+					m_ay2->write_data(m_porta2);
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
-					m_ay2->address_w(m_porta2);
+					m_ay2->write_data(m_porta2);
 					break;
 			}
 		}
@@ -437,33 +437,33 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 				case 1: // BDIR=0, BC1=1 (read PSG)
 					if (chipSel & 1)
 					{
-						m_porta2 = m_ay3->data_r();
+						m_porta2 = m_ay3->read_data();
 					}
 					if (chipSel & 2)
 					{
-						m_porta2 = m_ay4->data_r();
+						m_porta2 = m_ay4->read_data();
 					}
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
 					if (chipSel & 1)
 					{
-						m_ay3->data_w(m_porta2);
+						m_ay3->write_data(m_porta2);
 					}
 					if (chipSel & 2)
 					{
-						m_ay4->data_w(m_porta2);
+						m_ay4->write_data(m_porta2);
 					}
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
 					if (chipSel & 1)
 					{
-						m_ay3->address_w(m_porta2);
+						m_ay3->write_address(m_porta2);
 					}
 					if (chipSel & 2)
 					{
-						m_ay4->address_w(m_porta2);
+						m_ay4->write_address(m_porta2);
 					}
 					break;
 			}
@@ -494,7 +494,7 @@ uint8_t a2bus_echoplus_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			return 0x1f | m_tms->status_r();
+			return 0x1f | m_tms->read_status();
 	}
 
 	return 0;
@@ -505,7 +505,7 @@ void a2bus_echoplus_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-			m_tms->data_w(data);
+			m_tms->write_data(data);
 			break;
 	}
 }

@@ -180,7 +180,7 @@ WRITE8_MEMBER( abc80_state::csg_w )
 void abc80_state::abc80_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(abc80_state::read), FUNC(abc80_state::write));
+	map(0x0000, 0xffff).rw(FUNC(abc80_state::read), FUNC(abc80_state::write));
 }
 
 
@@ -198,7 +198,7 @@ void abc80_state::abc80_io(address_map &map)
 	map(0x03, 0x03).w(m_bus, FUNC(abcbus_slot_device::c2_w));
 	map(0x04, 0x04).w(m_bus, FUNC(abcbus_slot_device::c3_w));
 	map(0x05, 0x05).w(m_bus, FUNC(abcbus_slot_device::c4_w));
-	map(0x06, 0x06).w(this, FUNC(abc80_state::csg_w));
+	map(0x06, 0x06).w(FUNC(abc80_state::csg_w));
 	map(0x07, 0x07).r(m_bus, FUNC(abcbus_slot_device::rst_r));
 	map(0x10, 0x13).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }

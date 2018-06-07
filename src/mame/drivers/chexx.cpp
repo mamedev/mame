@@ -185,7 +185,7 @@ void chexx_state::chexx83_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // 6810 - 128 x 8 static RAM
 	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
+	map(0x8000, 0x8000).r(FUNC(chexx_state::input_r));
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -223,9 +223,9 @@ void chexx_state::faceoffh_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // M58725P - 2KB
 	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
-	map(0xa000, 0xa001).w(this, FUNC(chexx_state::ay_w));
-	map(0xc000, 0xc000).w(this, FUNC(chexx_state::lamp_w));
+	map(0x8000, 0x8000).r(FUNC(chexx_state::input_r));
+	map(0xa000, 0xa001).w(FUNC(chexx_state::ay_w));
+	map(0xc000, 0xc000).w(FUNC(chexx_state::lamp_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 

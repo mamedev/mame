@@ -94,7 +94,7 @@ void go2000_state::go2000_map(address_map &map)
 	map(0x800000, 0x800fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa00001).portr("INPUTS");
 	map(0xa00002, 0xa00003).portr("DSW");
-	map(0x620002, 0x620003).w(this, FUNC(go2000_state::sound_cmd_w));
+	map(0x620002, 0x620003).w(FUNC(go2000_state::sound_cmd_w));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP
 //  AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP
 //  AM_RANGE(0xe00020, 0xe00021) AM_WRITENOP
@@ -115,8 +115,8 @@ void go2000_state::go2000_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w(this, FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
+	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w(FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
 }
 
 

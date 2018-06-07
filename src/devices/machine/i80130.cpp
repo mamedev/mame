@@ -26,7 +26,7 @@ void i80130_device::rom_map(address_map &map)
 
 void i80130_device::io_map(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(i80130_device::io_r), FUNC(i80130_device::io_w));
+	map(0x00, 0x0f).rw(FUNC(i80130_device::io_r), FUNC(i80130_device::io_w));
 	//AM_RANGE(0x00, 0x01) AM_MIRROR(0x2) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
 	//AM_RANGE(0x08, 0x0f) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 }

@@ -76,13 +76,13 @@ WRITE16_MEMBER(deniam_state::deniam_irq_ack_w)
 void deniam_state::deniam16b_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(deniam_state::deniam_videoram_w)).share("videoram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(deniam_state::deniam_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
+	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
 	map(0x440000, 0x4407ff).writeonly().share("spriteram");
-	map(0x840000, 0x840fff).w(this, FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
 	map(0xc40000, 0xc40000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xc40002, 0xc40003).rw(this, FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
-	map(0xc40004, 0xc40005).w(this, FUNC(deniam_state::deniam_irq_ack_w));
+	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
+	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
 	map(0xc44000, 0xc44001).portr("SYSTEM");
 	map(0xc44002, 0xc44003).portr("P1");
 	map(0xc44004, 0xc44005).portr("P2").nopw();
@@ -103,21 +103,21 @@ void deniam_state::sound_io_map(address_map &map)
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x03).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x05, 0x05).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x07, 0x07).w(this, FUNC(deniam_state::deniam16b_oki_rom_bank_w));
+	map(0x07, 0x07).w(FUNC(deniam_state::deniam16b_oki_rom_bank_w));
 }
 
 /* identical to 16b, but handles sound directly */
 void deniam_state::deniam16c_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(deniam_state::deniam_videoram_w)).share("videoram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(deniam_state::deniam_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
+	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
 	map(0x440000, 0x4407ff).writeonly().share("spriteram");
-	map(0x840000, 0x840fff).w(this, FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
 	map(0xc40001, 0xc40001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc40002, 0xc40003).rw(this, FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
-	map(0xc40004, 0xc40005).w(this, FUNC(deniam_state::deniam_irq_ack_w));
-	map(0xc40006, 0xc40007).w(this, FUNC(deniam_state::deniam16c_oki_rom_bank_w));
+	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
+	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
+	map(0xc40006, 0xc40007).w(FUNC(deniam_state::deniam16c_oki_rom_bank_w));
 	map(0xc44000, 0xc44001).portr("SYSTEM");
 	map(0xc44002, 0xc44003).portr("P1");
 	map(0xc44004, 0xc44005).portr("P2");

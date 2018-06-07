@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Angelo Salese
 
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
@@ -68,7 +68,7 @@ public:
 	
 protected:
 	uint8_t m_hd6445_reg[64];
-	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap);
+	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output);
 private:
 	uint8_t m_hd6445_address;
 };
@@ -195,9 +195,9 @@ public:
 
 	DECLARE_READ16_MEMBER(cyclwarr_sprite_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sprite_w);
-	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);
+	DECLARE_WRITE16_MEMBER(video_config_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
-	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
+	DECLARE_WRITE16_MEMBER(mixing_control_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
 	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
 	DECLARE_WRITE16_MEMBER(output_w);
@@ -234,16 +234,18 @@ private:
 	std::vector<uint8_t> m_mask;
 	tilemap_t *m_layer[4];
 
-	uint16_t m_bigfight_a20000[8];
-	uint16_t m_bigfight_a60000[2];
+	uint16_t m_video_config[4];
+	uint16_t m_mixing_control;
 	uint16_t m_bigfight_a40000[2];
 	uint16_t m_bigfight_bank;
 	uint16_t m_bigfight_last_bank;
 	uint16_t m_road_color_bank, m_prev_road_bank;
+	uint16_t m_layer_page_size[4];
 	bool m_layer1_can_be_road;
 	
 	void tile_expand();
-	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, bool is_road, int hi_priority);
+	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority);
 	void draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority);
+	void apply_highlight_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &highlight_bitmap);
 };
 

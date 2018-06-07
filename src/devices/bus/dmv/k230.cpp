@@ -35,29 +35,29 @@ ROM_END
 void dmv_k230_device::k230_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x7ffff).rw(this, FUNC(dmv_k230_device::program_r), FUNC(dmv_k230_device::program_w));
-	map(0x80000, 0xfffff).r(this, FUNC(dmv_k230_device::rom_r));
+	map(0x00000, 0x7ffff).rw(FUNC(dmv_k230_device::program_r), FUNC(dmv_k230_device::program_w));
+	map(0x80000, 0xfffff).r(FUNC(dmv_k230_device::rom_r));
 }
 
 void dmv_k230_device::k230_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
+	map(0x00, 0xff).rw(FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
 }
 
 void dmv_k230_device::k234_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x7ffff).rw(this, FUNC(dmv_k230_device::program_r), FUNC(dmv_k230_device::program_w));
-	map(0xfff00, 0xfffff).rw(this, FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
+	map(0x00000, 0x7ffff).rw(FUNC(dmv_k230_device::program_r), FUNC(dmv_k230_device::program_w));
+	map(0xfff00, 0xfffff).rw(FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
 }
 
 void dmv_k230_device::k235_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
+	map(0x00, 0xff).rw(FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
 	map(0x90, 0x91).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
 

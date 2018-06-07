@@ -195,7 +195,7 @@ void metlfrzr_state::metlfrzr_map(address_map &map)
 	map(0xd604, 0xd604).portr("DSW2");
 	map(0xd600, 0xd61f).writeonly().share("vregs");
 
-	map(0xd700, 0xd700).w(this, FUNC(metlfrzr_state::output_w));
+	map(0xd700, 0xd700).w(FUNC(metlfrzr_state::output_w));
 	map(0xd710, 0xd710).w("t5182", FUNC(t5182_device::sound_irq_w));
 	map(0xd711, 0xd711).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	// following two do swapped access compared to darkmist

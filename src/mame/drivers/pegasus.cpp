@@ -200,8 +200,8 @@ void pegasus_state::pegasus_mem(address_map &map)
 	map(0xb000, 0xbdff).ram();
 	map(0xbe00, 0xbfff).ram().share("videoram");
 	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslots 4-5
-	map(0xe000, 0xe1ff).r(this, FUNC(pegasus_state::pegasus_protection_r));
-	map(0xe200, 0xe3ff).rw(this, FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
+	map(0xe000, 0xe1ff).r(FUNC(pegasus_state::pegasus_protection_r));
+	map(0xe200, 0xe3ff).rw(FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
 	map(0xe400, 0xe403).mirror(0x1fc).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe600, 0xe603).mirror(0x1fc).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf000, 0xffff).rom();

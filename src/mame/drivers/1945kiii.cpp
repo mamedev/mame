@@ -205,10 +205,10 @@ void k3_state::k3_base_map(address_map &map)
 	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x240000, 0x240fff).ram().share("spritera1");
 	map(0x280000, 0x280fff).ram().share("spritera2");
-	map(0x2c0000, 0x2c07ff).ram().w(this, FUNC(k3_state::k3_bgram_w)).share("bgram");
+	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::k3_bgram_w)).share("bgram");
 	map(0x2c0800, 0x2c0fff).ram(); // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
-	map(0x340000, 0x340001).w(this, FUNC(k3_state::k3_scrollx_w));
-	map(0x380000, 0x380001).w(this, FUNC(k3_state::k3_scrolly_w));
+	map(0x340000, 0x340001).w(FUNC(k3_state::k3_scrollx_w));
+	map(0x380000, 0x380001).w(FUNC(k3_state::k3_scrolly_w));
 	map(0x400000, 0x400001).portr("INPUTS");
 	map(0x440000, 0x440001).portr("SYSTEM");
 	map(0x480000, 0x480001).portr("DSW");
@@ -218,7 +218,7 @@ void k3_state::k3_map(address_map &map)
 {
 	k3_base_map(map);
 
-	map(0x3c0000, 0x3c0001).w(this, FUNC(k3_state::k3_soundbanks_w));
+	map(0x3c0000, 0x3c0001).w(FUNC(k3_state::k3_soundbanks_w));
 
 	map(0x4c0001, 0x4c0001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
 	map(0x500001, 0x500001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).cswidth(16);
@@ -230,7 +230,7 @@ void k3_state::flagrall_map(address_map &map)
 {
 	k3_base_map(map);
 
-	map(0x3c0000, 0x3c0001).w(this, FUNC(k3_state::flagrall_soundbanks_w));
+	map(0x3c0000, 0x3c0001).w(FUNC(k3_state::flagrall_soundbanks_w));
 	map(0x4c0001, 0x4c0001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 

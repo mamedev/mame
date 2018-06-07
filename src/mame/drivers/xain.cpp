@@ -304,23 +304,23 @@ template <unsigned N> WRITE8_MEMBER(xain_state::scrolly_w)
 void xain_state::bootleg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x27ff).ram().w(this, FUNC(xain_state::charram_w)).share(m_charram);
-	map(0x2800, 0x2fff).ram().w(this, FUNC(xain_state::bgram_w<1>)).share(m_bgram[1]);
-	map(0x3000, 0x37ff).ram().w(this, FUNC(xain_state::bgram_w<0>)).share(m_bgram[0]);
+	map(0x2000, 0x27ff).ram().w(FUNC(xain_state::charram_w)).share(m_charram);
+	map(0x2800, 0x2fff).ram().w(FUNC(xain_state::bgram_w<1>)).share(m_bgram[1]);
+	map(0x3000, 0x37ff).ram().w(FUNC(xain_state::bgram_w<0>)).share(m_bgram[0]);
 	map(0x3800, 0x397f).ram().share(m_spriteram);
 	map(0x3a00, 0x3a00).portr("P1");
-	map(0x3a00, 0x3a01).w(this, FUNC(xain_state::scrollx_w<1>));
+	map(0x3a00, 0x3a01).w(FUNC(xain_state::scrollx_w<1>));
 	map(0x3a01, 0x3a01).portr("P2");
 	map(0x3a02, 0x3a02).portr("DSW0");
-	map(0x3a02, 0x3a03).w(this, FUNC(xain_state::scrolly_w<1>));
+	map(0x3a02, 0x3a03).w(FUNC(xain_state::scrolly_w<1>));
 	map(0x3a03, 0x3a03).portr("DSW1");
-	map(0x3a04, 0x3a05).w(this, FUNC(xain_state::scrollx_w<0>));
+	map(0x3a04, 0x3a05).w(FUNC(xain_state::scrollx_w<0>));
 	map(0x3a05, 0x3a05).portr("VBLANK");
-	map(0x3a06, 0x3a07).w(this, FUNC(xain_state::scrolly_w<0>));
+	map(0x3a06, 0x3a07).w(FUNC(xain_state::scrolly_w<0>));
 	map(0x3a08, 0x3a08).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x3a09, 0x3a0c).w(this, FUNC(xain_state::main_irq_w));
-	map(0x3a0d, 0x3a0d).w(this, FUNC(xain_state::flipscreen_w));
-	map(0x3a0f, 0x3a0f).w(this, FUNC(xain_state::cpuA_bankswitch_w));
+	map(0x3a09, 0x3a0c).w(FUNC(xain_state::main_irq_w));
+	map(0x3a0d, 0x3a0d).w(FUNC(xain_state::flipscreen_w));
+	map(0x3a0f, 0x3a0f).w(FUNC(xain_state::cpuA_bankswitch_w));
 	map(0x3c00, 0x3dff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3e00, 0x3fff).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x4000, 0x7fff).bankr(m_rom_banks[0]);
@@ -331,16 +331,16 @@ void xain_state::main_map(address_map &map)
 {
 	bootleg_map(map);
 	map(0x3a04, 0x3a04).r(m_mcu, FUNC(taito68705_mcu_device::data_r));
-	map(0x3a06, 0x3a06).r(this, FUNC(xain_state::mcu_comm_reset_r));
+	map(0x3a06, 0x3a06).r(FUNC(xain_state::mcu_comm_reset_r));
 	map(0x3a0e, 0x3a0e).w(m_mcu, FUNC(taito68705_mcu_device::data_w));
 }
 
 void xain_state::cpu_map_B(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x2000).w(this, FUNC(xain_state::irqA_assert_w));
-	map(0x2800, 0x2800).w(this, FUNC(xain_state::irqB_clear_w));
-	map(0x3000, 0x3000).w(this, FUNC(xain_state::cpuB_bankswitch_w));
+	map(0x2000, 0x2000).w(FUNC(xain_state::irqA_assert_w));
+	map(0x2800, 0x2800).w(FUNC(xain_state::irqB_clear_w));
+	map(0x3000, 0x3000).w(FUNC(xain_state::cpuB_bankswitch_w));
 	map(0x4000, 0x7fff).bankr(m_rom_banks[1]);
 	map(0x8000, 0xffff).rom();
 }

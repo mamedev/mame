@@ -47,7 +47,7 @@ void mb_vcu_device::mb_vcu_pal_ram(address_map &map)
 	map(0x0000, 0x00ff).ram();
 	map(0x0200, 0x02ff).ram();
 	map(0x0400, 0x04ff).ram();
-	map(0x0600, 0x06ff).rw(this, FUNC(mb_vcu_device::mb_vcu_paletteram_r), FUNC(mb_vcu_device::mb_vcu_paletteram_w));
+	map(0x0600, 0x06ff).rw(FUNC(mb_vcu_device::mb_vcu_paletteram_r), FUNC(mb_vcu_device::mb_vcu_paletteram_w));
 }
 
 READ8_MEMBER( mb_vcu_device::mb_vcu_paletteram_r )

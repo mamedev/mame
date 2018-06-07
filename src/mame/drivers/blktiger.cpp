@@ -78,8 +78,8 @@ void blktiger_state::blktiger_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).rw(this, FUNC(blktiger_state::blktiger_bgvideoram_r), FUNC(blktiger_state::blktiger_bgvideoram_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(blktiger_state::blktiger_txvideoram_w)).share("txvideoram");
+	map(0xc000, 0xcfff).rw(FUNC(blktiger_state::blktiger_bgvideoram_r), FUNC(blktiger_state::blktiger_bgvideoram_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(blktiger_state::blktiger_txvideoram_w)).share("txvideoram");
 	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xdc00, 0xdfff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xe000, 0xfdff).ram();
@@ -90,36 +90,36 @@ void blktiger_state::blktiger_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(blktiger_state::blktiger_bankswitch_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(blktiger_state::blktiger_bankswitch_w));
 	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).portr("DSW0").w(this, FUNC(blktiger_state::blktiger_coinlockout_w));
-	map(0x04, 0x04).portr("DSW1").w(this, FUNC(blktiger_state::blktiger_video_control_w));
+	map(0x03, 0x03).portr("DSW0").w(FUNC(blktiger_state::blktiger_coinlockout_w));
+	map(0x04, 0x04).portr("DSW1").w(FUNC(blktiger_state::blktiger_video_control_w));
 	map(0x05, 0x05).portr("FREEZE");
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).rw(this, FUNC(blktiger_state::blktiger_from_mcu_r), FUNC(blktiger_state::blktiger_to_mcu_w));     /* Software protection (7) */
-	map(0x08, 0x09).w(this, FUNC(blktiger_state::blktiger_scrollx_w));
-	map(0x0a, 0x0b).w(this, FUNC(blktiger_state::blktiger_scrolly_w));
-	map(0x0c, 0x0c).w(this, FUNC(blktiger_state::blktiger_video_enable_w));
-	map(0x0d, 0x0d).w(this, FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
-	map(0x0e, 0x0e).w(this, FUNC(blktiger_state::blktiger_screen_layout_w));
+	map(0x07, 0x07).rw(FUNC(blktiger_state::blktiger_from_mcu_r), FUNC(blktiger_state::blktiger_to_mcu_w));     /* Software protection (7) */
+	map(0x08, 0x09).w(FUNC(blktiger_state::blktiger_scrollx_w));
+	map(0x0a, 0x0b).w(FUNC(blktiger_state::blktiger_scrolly_w));
+	map(0x0c, 0x0c).w(FUNC(blktiger_state::blktiger_video_enable_w));
+	map(0x0d, 0x0d).w(FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
+	map(0x0e, 0x0e).w(FUNC(blktiger_state::blktiger_screen_layout_w));
 }
 
 void blktiger_state::blktigerbl_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(blktiger_state::blktiger_bankswitch_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(blktiger_state::blktiger_bankswitch_w));
 	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).portr("DSW0").w(this, FUNC(blktiger_state::blktiger_coinlockout_w));
-	map(0x04, 0x04).portr("DSW1").w(this, FUNC(blktiger_state::blktiger_video_control_w));
+	map(0x03, 0x03).portr("DSW0").w(FUNC(blktiger_state::blktiger_coinlockout_w));
+	map(0x04, 0x04).portr("DSW1").w(FUNC(blktiger_state::blktiger_video_control_w));
 	map(0x05, 0x05).portr("FREEZE");
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).noprw();  /* Software protection (7) */
-	map(0x08, 0x09).w(this, FUNC(blktiger_state::blktiger_scrollx_w));
-	map(0x0a, 0x0b).w(this, FUNC(blktiger_state::blktiger_scrolly_w));
-	map(0x0c, 0x0c).w(this, FUNC(blktiger_state::blktiger_video_enable_w));
-	map(0x0d, 0x0d).w(this, FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
-	map(0x0e, 0x0e).w(this, FUNC(blktiger_state::blktiger_screen_layout_w));
+	map(0x08, 0x09).w(FUNC(blktiger_state::blktiger_scrollx_w));
+	map(0x0a, 0x0b).w(FUNC(blktiger_state::blktiger_scrolly_w));
+	map(0x0c, 0x0c).w(FUNC(blktiger_state::blktiger_video_enable_w));
+	map(0x0d, 0x0d).w(FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
+	map(0x0e, 0x0e).w(FUNC(blktiger_state::blktiger_screen_layout_w));
 }
 
 void blktiger_state::blktiger_sound_map(address_map &map)

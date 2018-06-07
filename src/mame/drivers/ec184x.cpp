@@ -211,7 +211,7 @@ void ec184x_state::ec1841_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ec1841_mb_device::map));
-	map(0x02b0, 0x02b3).rw(this, FUNC(ec184x_state::memboard_r), FUNC(ec184x_state::memboard_w));
+	map(0x02b0, 0x02b3).rw(FUNC(ec184x_state::memboard_r), FUNC(ec184x_state::memboard_w));
 }
 
 void ec184x_state::ec1847_io(address_map &map)

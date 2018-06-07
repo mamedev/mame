@@ -18,32 +18,32 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 void ide_pci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x09, 0x09).w(this, FUNC(ide_pci_device::prog_if_w));
-	map(0x10, 0x1f).rw(this, FUNC(ide_pci_device::address_base_r), FUNC(ide_pci_device::address_base_w));
-	map(0x2c, 0x2f).w(this, FUNC(ide_pci_device::subsystem_id_w));
-	map(0x40, 0x5f).rw(this, FUNC(ide_pci_device::pcictrl_r), FUNC(ide_pci_device::pcictrl_w));
+	map(0x09, 0x09).w(FUNC(ide_pci_device::prog_if_w));
+	map(0x10, 0x1f).rw(FUNC(ide_pci_device::address_base_r), FUNC(ide_pci_device::address_base_w));
+	map(0x2c, 0x2f).w(FUNC(ide_pci_device::subsystem_id_w));
+	map(0x40, 0x5f).rw(FUNC(ide_pci_device::pcictrl_r), FUNC(ide_pci_device::pcictrl_w));
 	map(0x70, 0x77).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w)); // PCI646
 	map(0x78, 0x7f).rw("ide2", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w)); // PCI646
 }
 
 void ide_pci_device::chan1_data_command_map(address_map &map)
 {
-	map(0x0, 0x7).rw("ide", FUNC(bus_master_ide_controller_device::read_cs0), FUNC(bus_master_ide_controller_device::write_cs0));
+	map(0x0, 0x7).rw("ide", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
 }
 
 void ide_pci_device::chan1_control_map(address_map &map)
 {
-	map(0x0, 0x3).rw(this, FUNC(ide_pci_device::ide_read_cs1), FUNC(ide_pci_device::ide_write_cs1));
+	map(0x0, 0x3).rw(FUNC(ide_pci_device::ide_read_cs1), FUNC(ide_pci_device::ide_write_cs1));
 }
 
 void ide_pci_device::chan2_data_command_map(address_map &map)
 {
-	map(0x0, 0x7).rw("ide2", FUNC(bus_master_ide_controller_device::read_cs0), FUNC(bus_master_ide_controller_device::write_cs0));
+	map(0x0, 0x7).rw("ide2", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
 }
 
 void ide_pci_device::chan2_control_map(address_map &map)
 {
-	map(0x0, 0x3).rw(this, FUNC(ide_pci_device::ide2_read_cs1), FUNC(ide_pci_device::ide2_write_cs1));
+	map(0x0, 0x3).rw(FUNC(ide_pci_device::ide2_read_cs1), FUNC(ide_pci_device::ide2_write_cs1));
 }
 
 void ide_pci_device::bus_master_map(address_map &map)

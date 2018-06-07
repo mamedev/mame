@@ -307,7 +307,7 @@ void pgm_state::pgm_z80_mem(address_map &map)
 void pgm_state::pgm_z80_io(address_map &map)
 {
 	map(0x8000, 0x8003).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write));
-	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(this, FUNC(pgm_state::z80_l3_w));
+	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::z80_l3_w));
 	map(0x8200, 0x82ff).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x84ff).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 }
@@ -320,24 +320,24 @@ void pgm_state::pgm_base_mem(address_map &map)
 
 	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share("sram"); /* Main Ram */
 
-	map(0x900000, 0x907fff).mirror(0x0f8000).rw(this, FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
+	map(0x900000, 0x907fff).mirror(0x0f8000).rw(FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
 	map(0xa00000, 0xa011ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xb00000, 0xb0ffff).ram().share("videoregs"); /* Video Regs inc. Zoom Table */
 
 	map(0xc00003, 0xc00003).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc00002, 0xc00003).w(this, FUNC(pgm_state::m68k_l1_w));
+	map(0xc00002, 0xc00003).w(FUNC(pgm_state::m68k_l1_w));
 	map(0xc00005, 0xc00005).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 	map(0xc00007, 0xc00007).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
-	map(0xc00008, 0xc00009).w(this, FUNC(pgm_state::z80_reset_w));
-	map(0xc0000a, 0xc0000b).w(this, FUNC(pgm_state::z80_ctrl_w));
+	map(0xc00008, 0xc00009).w(FUNC(pgm_state::z80_reset_w));
+	map(0xc0000a, 0xc0000b).w(FUNC(pgm_state::z80_ctrl_w));
 	map(0xc0000d, 0xc0000d).rw(m_soundlatch3, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 
 	map(0xc08000, 0xc08001).portr("P1P2");
 	map(0xc08002, 0xc08003).portr("P3P4");
 	map(0xc08004, 0xc08005).portr("Service");
-	map(0xc08006, 0xc08007).portr("DSW").w(this, FUNC(pgm_state::pgm_coin_counter_w));
+	map(0xc08006, 0xc08007).portr("DSW").w(FUNC(pgm_state::pgm_coin_counter_w));
 
-	map(0xc10000, 0xc1ffff).rw(this, FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
+	map(0xc10000, 0xc1ffff).rw(FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
 }
 
 void pgm_state::pgm_mem(address_map &map)

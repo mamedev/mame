@@ -670,14 +670,14 @@ void gaelco3d_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(gaelco3d_state::gaelco3d_paletteram_w)).share("paletteram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_w)).share("paletteram");
 	map(0x51000c, 0x51000d).portr("IN0");
 	map(0x51001c, 0x51001d).portr("IN1");
 	map(0x51002c, 0x51002d).portr("IN2");
 	map(0x51003c, 0x51003d).portr("IN3");
 	map(0x510041, 0x510041).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x510042, 0x510043).r(this, FUNC(gaelco3d_state::sound_status_r));
-	map(0x510100, 0x510101).rw(this, FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
+	map(0x510042, 0x510043).r(FUNC(gaelco3d_state::sound_status_r));
+	map(0x510100, 0x510101).rw(FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
 	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
 	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w",
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
@@ -689,21 +689,21 @@ void gaelco3d_state::main_map(address_map &map)
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
-	map(0xfe7f80, 0xfe7fff).w(this, FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
+	map(0xfe7f80, 0xfe7fff).w(FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
 }
 
 
 void gaelco3d_state::main020_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(gaelco3d_state::gaelco3d_paletteram_020_w)).share("paletteram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_020_w)).share("paletteram");
 	map(0x51000c, 0x51000f).portr("IN0");
 	map(0x51001c, 0x51001f).portr("IN1");
 	map(0x51002c, 0x51002f).portr("IN2");
 	map(0x51003c, 0x51003f).portr("IN3");
 	map(0x510041, 0x510041).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x510042, 0x510043).r(this, FUNC(gaelco3d_state::sound_status_r));
-	map(0x510100, 0x510101).rw(this, FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
+	map(0x510042, 0x510043).r(FUNC(gaelco3d_state::sound_status_r));
+	map(0x510100, 0x510101).rw(FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
 	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
 	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w",
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
@@ -715,14 +715,14 @@ void gaelco3d_state::main020_map(address_map &map)
 													 m_outlatch->write_d0(space, offset >> 2, data, mem_mask);
 												 });
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
-	map(0xfe7f80, 0xfe7fff).w(this, FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
+	map(0xfe7f80, 0xfe7fff).w(FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
 }
 
 void gaelco3d_state::tms_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rw(this, FUNC(gaelco3d_state::tms_m68k_ram_r), FUNC(gaelco3d_state::tms_m68k_ram_w));
+	map(0x000000, 0x007fff).rw(FUNC(gaelco3d_state::tms_m68k_ram_r), FUNC(gaelco3d_state::tms_m68k_ram_w));
 	map(0x400000, 0x7fffff).rom().region("user2", 0);
-	map(0xc00000, 0xc00007).w(this, FUNC(gaelco3d_state::gaelco3d_render_w));
+	map(0xc00000, 0xc00007).w(FUNC(gaelco3d_state::gaelco3d_render_w));
 }
 
 
@@ -734,12 +734,12 @@ void gaelco3d_state::adsp_program_map(address_map &map)
 
 void gaelco3d_state::adsp_data_map(address_map &map)
 {
-	map(0x0000, 0x0001).w(this, FUNC(gaelco3d_state::adsp_rombank_w));
+	map(0x0000, 0x0001).w(FUNC(gaelco3d_state::adsp_rombank_w));
 	map(0x0000, 0x1fff).bankr("adspbank");
 	map(0x2000, 0x2000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).umask16(0x00ff);
-	map(0x2000, 0x2000).w(this, FUNC(gaelco3d_state::sound_status_w));
+	map(0x2000, 0x2000).w(FUNC(gaelco3d_state::sound_status_w));
 	map(0x3800, 0x39ff).ram().share("adsp_fastram");    /* 512 words internal RAM */
-	map(0x3fe0, 0x3fff).w(this, FUNC(gaelco3d_state::adsp_control_w)).share("adsp_regs");
+	map(0x3fe0, 0x3fff).w(FUNC(gaelco3d_state::adsp_control_w)).share("adsp_regs");
 }
 
 

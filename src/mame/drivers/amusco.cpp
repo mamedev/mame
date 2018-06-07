@@ -365,13 +365,13 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 
 void amusco_state::amusco_io_map(address_map &map)
 {
-	map(0x0000, 0x0001).rw(this, FUNC(amusco_state::mc6845_r), FUNC(amusco_state::mc6845_w));
+	map(0x0000, 0x0001).rw(FUNC(amusco_state::mc6845_r), FUNC(amusco_state::mc6845_w));
 	map(0x0010, 0x0011).w(m_pic, FUNC(pic8259_device::write));
 	map(0x0020, 0x0023).w(m_pit, FUNC(pit8253_device::write));
 	map(0x0030, 0x0033).rw("ppi_outputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0040, 0x0043).rw("ppi_inputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::write));
-	map(0x0070, 0x0071).w(this, FUNC(amusco_state::vram_w));
+	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::command_w));
+	map(0x0070, 0x0071).w(FUNC(amusco_state::vram_w));
 	map(0x0280, 0x0283).rw("lpt_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x0380, 0x0383).rw("rtc_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }

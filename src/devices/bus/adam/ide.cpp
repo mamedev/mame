@@ -178,7 +178,7 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, uint8_
 			break;
 
 		case 0x40:
-			m_cent_data_out->write(space, 0, data);
+			m_cent_data_out->write(data);
 			break;
 
 		case 0x42: // Bank Number

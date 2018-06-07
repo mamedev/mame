@@ -739,8 +739,8 @@ void bingor_state::vip2000_io(address_map &map)
 {
 	map(0x0000, 0x0001).nopr(); // watchdog
 	map(0x0080, 0x009f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x0100, 0x0100).rw(this, FUNC(bingor_state::fromslave_r), FUNC(bingor_state::toslave_w));
-	map(0x0280, 0x0281).w(this, FUNC(bingor_state::vip2000_outputs_w));
+	map(0x0100, 0x0100).rw(FUNC(bingor_state::fromslave_r), FUNC(bingor_state::toslave_w));
+	map(0x0280, 0x0281).w(FUNC(bingor_state::vip2000_outputs_w));
 }
 
 WRITE8_MEMBER(bingor_state::toslave_w)
@@ -775,7 +775,7 @@ void bingor_state::slave_map(address_map &map)
 
 void bingor_state::slave_io(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(bingor_state::toslave_r), FUNC(bingor_state::fromslave_w));
+	map(0x0000, 0x0000).rw(FUNC(bingor_state::toslave_r), FUNC(bingor_state::fromslave_w));
 	map(0xc000, 0xcfff).ram();
 }
 

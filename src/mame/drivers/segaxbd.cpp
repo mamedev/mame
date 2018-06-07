@@ -929,11 +929,11 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x0e8000, 0x0e801f).mirror(0x003fe0).rw("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
 	map(0x100000, 0x100fff).mirror(0x00f000).ram().share("sprites");
 	map(0x110000, 0x11ffff).w("sprites", FUNC(sega_xboard_sprite_device::draw_write));
-	map(0x120000, 0x123fff).mirror(0x00c000).ram().w(this, FUNC(segaxbd_state::paletteram_w)).share("paletteram");
-	map(0x130000, 0x13ffff).rw(this, FUNC(segaxbd_state::adc_r), FUNC(segaxbd_state::adc_w));
+	map(0x120000, 0x123fff).mirror(0x00c000).ram().w(FUNC(segaxbd_state::paletteram_w)).share("paletteram");
+	map(0x130000, 0x13ffff).rw(FUNC(segaxbd_state::adc_r), FUNC(segaxbd_state::adc_w));
 	map(0x140000, 0x14000f).mirror(0x00fff0).rw("iochip_0", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
 	map(0x150000, 0x15000f).mirror(0x00fff0).rw("iochip_1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
-	map(0x160000, 0x16ffff).w(this, FUNC(segaxbd_state::iocontrol_w));
+	map(0x160000, 0x16ffff).w(FUNC(segaxbd_state::iocontrol_w));
 	map(0x200000, 0x27ffff).rom().region("subcpu", 0x00000);
 	map(0x280000, 0x283fff).mirror(0x01c000).ram().share("subram0");
 	map(0x2a0000, 0x2a3fff).mirror(0x01c000).ram().share("subram1");
@@ -1709,12 +1709,11 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SCREEN_UPDATE_DRIVER(segaxbd_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_XBOARD_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_XBOARD_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
+	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

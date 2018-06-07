@@ -183,10 +183,10 @@ MACHINE_START_MEMBER(nova2001_state,ninjakun)
 void nova2001_state::nova2001_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa7ff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
-	map(0xa800, 0xafff).ram().w(this, FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
+	map(0xa000, 0xa7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xa800, 0xafff).ram().w(FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
 	map(0xb000, 0xb7ff).ram().share("spriteram");
-	map(0xb800, 0xbfff).w(this, FUNC(nova2001_state::nova2001_flipscreen_w));
+	map(0xb800, 0xbfff).w(FUNC(nova2001_state::nova2001_flipscreen_w));
 	map(0xc000, 0xc000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xc001, 0xc001).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xc002, 0xc002).w("ay1", FUNC(ay8910_device::address_w));
@@ -209,12 +209,12 @@ void nova2001_state::ninjakun_cpu1_map(address_map &map)
 	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1");
-	map(0xa002, 0xa002).portr("IN2").w(this, FUNC(nova2001_state::ninjakun_cpu1_io_A002_w));
-	map(0xa003, 0xa003).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
-	map(0xc800, 0xcfff).rw(this, FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xa002, 0xa002).portr("IN2").w(FUNC(nova2001_state::ninjakun_cpu1_io_A002_w));
+	map(0xa003, 0xa003).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
 	map(0xe000, 0xe3ff).ram().share("share1");
 	map(0xe400, 0xe7ff).ram().share("share2");
 }
@@ -229,12 +229,12 @@ void nova2001_state::ninjakun_cpu2_map(address_map &map)
 	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1");
-	map(0xa002, 0xa002).portr("IN2").w(this, FUNC(nova2001_state::ninjakun_cpu2_io_A002_w));
-	map(0xa003, 0xa003).w(this, FUNC(nova2001_state::nova2001_flipscreen_w));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
-	map(0xc800, 0xcfff).rw(this, FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xa002, 0xa002).portr("IN2").w(FUNC(nova2001_state::ninjakun_cpu2_io_A002_w));
+	map(0xa003, 0xa003).w(FUNC(nova2001_state::nova2001_flipscreen_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
 	map(0xe000, 0xe3ff).ram().share("share2"); /* swapped wrt CPU1 */
 	map(0xe400, 0xe7ff).ram().share("share1"); /* swapped wrt CPU1 */
 }
@@ -244,7 +244,7 @@ void nova2001_state::pkunwar_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("spriteram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
 	map(0xa000, 0xa001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xa001, 0xa001).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xa002, 0xa003).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -256,7 +256,7 @@ void nova2001_state::pkunwar_map(address_map &map)
 void nova2001_state::pkunwar_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0x00, 0x00).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
 }
 
 
@@ -264,16 +264,16 @@ void nova2001_state::raiders5_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("spriteram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
-	map(0x9000, 0x97ff).rw(this, FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
-	map(0xa000, 0xa000).w(this, FUNC(nova2001_state::nova2001_scroll_x_w));
-	map(0xa001, 0xa001).w(this, FUNC(nova2001_state::nova2001_scroll_y_w));
-	map(0xa002, 0xa002).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0x8800, 0x8fff).ram().w(FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0x9000, 0x97ff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xa000, 0xa000).w(FUNC(nova2001_state::nova2001_scroll_x_w));
+	map(0xa001, 0xa001).w(FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xa002, 0xa002).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
 	map(0xc000, 0xc001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc001, 0xc001).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xc002, 0xc003).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xc003, 0xc003).r("ay2", FUNC(ay8910_device::data_r));
-	map(0xd000, 0xd1ff).ram().w(this, FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xd000, 0xd1ff).ram().w(FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
 	map(0xe000, 0xe7ff).ram().share("share1");
 }
 
@@ -289,9 +289,9 @@ void nova2001_state::raiders5_cpu2_map(address_map &map)
 	map(0xc000, 0xc000).nopr(); /* unknown */
 	map(0xc800, 0xc800).nopr(); /* unknown */
 	map(0xd000, 0xd000).nopr(); /* unknown */
-	map(0xe000, 0xe000).w(this, FUNC(nova2001_state::nova2001_scroll_x_w));
-	map(0xe001, 0xe001).w(this, FUNC(nova2001_state::nova2001_scroll_y_w));
-	map(0xe002, 0xe002).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0xe000, 0xe000).w(FUNC(nova2001_state::nova2001_scroll_x_w));
+	map(0xe001, 0xe001).w(FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xe002, 0xe002).w(FUNC(nova2001_state::pkunwar_flipscreen_w));
 }
 
 void nova2001_state::raiders5_io(address_map &map)

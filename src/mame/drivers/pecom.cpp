@@ -29,9 +29,9 @@ void pecom_state::pecom64_mem(address_map &map)
 
 void pecom_state::pecom64_io(address_map &map)
 {
-	map(0x01, 0x01).w(this, FUNC(pecom_state::pecom_bank_w));
-	map(0x03, 0x03).r(this, FUNC(pecom_state::pecom_keyboard_r));
-	map(0x03, 0x07).w(this, FUNC(pecom_state::pecom_cdp1869_w));
+	map(0x01, 0x01).w(FUNC(pecom_state::pecom_bank_w));
+	map(0x03, 0x03).r(FUNC(pecom_state::pecom_keyboard_r));
+	map(0x03, 0x07).w(FUNC(pecom_state::pecom_cdp1869_w));
 }
 
 /* Input ports */

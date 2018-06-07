@@ -42,7 +42,7 @@ const tiny_rom_entry *m24_z8000_device::device_rom_region() const
 
 void m24_z8000_device::z8000_prog(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
+	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
 
 	map(0x40000, 0x43fff).rom().region("z8000", 0);
 	map(0x50000, 0x53fff).rom().region("z8000", 0);
@@ -51,7 +51,7 @@ void m24_z8000_device::z8000_prog(address_map &map)
 
 void m24_z8000_device::z8000_data(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
+	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
 
 	map(0x40000, 0x43fff).rom().region("z8000", 0);
 	map(0x70000, 0x73fff).rom().region("z8000", 0);
@@ -59,13 +59,13 @@ void m24_z8000_device::z8000_data(address_map &map)
 
 void m24_z8000_device::z8000_io(address_map &map)
 {
-	map(0x0081, 0x0081).w(this, FUNC(m24_z8000_device::irqctl_w));
-	map(0x00a1, 0x00a1).w(this, FUNC(m24_z8000_device::serctl_w));
+	map(0x0081, 0x0081).w(FUNC(m24_z8000_device::irqctl_w));
+	map(0x00a1, 0x00a1).w(FUNC(m24_z8000_device::serctl_w));
 	map(0x00c1, 0x00c1).rw("i8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x00c3, 0x00c3).rw("i8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x0120, 0x0127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x8000, 0x83ff).rw(this, FUNC(m24_z8000_device::i86_io_r), FUNC(m24_z8000_device::i86_io_w));
-	map(0x80c1, 0x80c1).rw(this, FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
+	map(0x8000, 0x83ff).rw(FUNC(m24_z8000_device::i86_io_r), FUNC(m24_z8000_device::i86_io_w));
+	map(0x80c1, 0x80c1).rw(FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
 }
 
 MACHINE_CONFIG_START(m24_z8000_device::device_add_mconfig)

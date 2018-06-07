@@ -97,7 +97,7 @@ void h83002_device::map(address_map &map)
 
 	map(0xffffa8, 0xffffa9).rw("watchdog", FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
 	map(0xffffaa, 0xffffab).rw("watchdog", FUNC(h8_watchdog_device::rst_r), FUNC(h8_watchdog_device::rst_w));
-	map(0xffffad, 0xffffad).rw(this, FUNC(h83002_device::rtmcsr_r), FUNC(h83002_device::rtmcsr_w));
+	map(0xffffad, 0xffffad).rw(FUNC(h83002_device::rtmcsr_r), FUNC(h83002_device::rtmcsr_w));
 
 	map(0xffffb0, 0xffffb0).rw("sci0", FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
 	map(0xffffb1, 0xffffb1).rw("sci0", FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
@@ -130,7 +130,7 @@ void h83002_device::map(address_map &map)
 	map(0xffffe8, 0xffffe8).rw("adc", FUNC(h8_adc_device::adcsr_r), FUNC(h8_adc_device::adcsr_w));
 	map(0xffffe9, 0xffffe9).rw("adc", FUNC(h8_adc_device::adcr_r), FUNC(h8_adc_device::adcr_w));
 
-	map(0xfffff2, 0xfffff2).rw(this, FUNC(h83002_device::syscr_r), FUNC(h83002_device::syscr_w));
+	map(0xfffff2, 0xfffff2).rw(FUNC(h83002_device::syscr_r), FUNC(h83002_device::syscr_w));
 	map(0xfffff4, 0xfffff4).rw("intc", FUNC(h8h_intc_device::iscr_r), FUNC(h8h_intc_device::iscr_w));
 	map(0xfffff5, 0xfffff5).rw("intc", FUNC(h8h_intc_device::ier_r), FUNC(h8h_intc_device::ier_w));
 	map(0xfffff6, 0xfffff6).rw("intc", FUNC(h8h_intc_device::isr_r), FUNC(h8h_intc_device::isr_w));

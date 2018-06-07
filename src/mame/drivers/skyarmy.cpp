@@ -214,8 +214,8 @@ void skyarmy_state::skyarmy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8fff).ram().w(this, FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
-	map(0x9000, 0x93ff).ram().w(this, FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
+	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
+	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
 	map(0x9800, 0x983f).ram().share("spriteram"); /* Sprites */
 	map(0x9840, 0x985f).ram().share("scrollram");  /* Scroll RAM */
 	map(0xa000, 0xa000).portr("DSW");

@@ -128,21 +128,21 @@ void bankp_state::bankp_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(bankp_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(this, FUNC(bankp_state::colorram_w)).share("colorram");
-	map(0xf800, 0xfbff).ram().w(this, FUNC(bankp_state::videoram2_w)).share("videoram2");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(bankp_state::colorram2_w)).share("colorram2");
+	map(0xf000, 0xf3ff).ram().w(FUNC(bankp_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(FUNC(bankp_state::colorram_w)).share("colorram");
+	map(0xf800, 0xfbff).ram().w(FUNC(bankp_state::videoram2_w)).share("videoram2");
+	map(0xfc00, 0xffff).ram().w(FUNC(bankp_state::colorram2_w)).share("colorram2");
 }
 
 void bankp_state::bankp_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("IN1").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489_device::write));
+	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("IN1").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489_device::command_w));
 	map(0x04, 0x04).portr("DSW1");
-	map(0x05, 0x05).w(this, FUNC(bankp_state::scroll_w));
-	map(0x07, 0x07).w(this, FUNC(bankp_state::out_w));
+	map(0x05, 0x05).w(FUNC(bankp_state::scroll_w));
+	map(0x07, 0x07).w(FUNC(bankp_state::out_w));
 }
 
 

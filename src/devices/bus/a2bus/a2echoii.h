@@ -36,11 +36,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
+
+	DECLARE_WRITE_LINE_MEMBER( ready_w );
+
+private:
+	uint8_t m_latch;
+	int m_ready;
+	emu_timer *m_timer;
+	bool m_byte_in_latch;
 };
 
 // device type definition

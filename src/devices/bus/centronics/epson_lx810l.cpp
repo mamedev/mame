@@ -99,7 +99,7 @@ void epson_lx810l_device::lx810l_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* 32k firmware */
 	map(0x8000, 0x9fff).ram(); /* 8k external RAM */
-	map(0xa000, 0xbfff).rw(this, FUNC(epson_lx810l_device::fakemem_r), FUNC(epson_lx810l_device::fakemem_w)); /* fake memory, write one, set all */
+	map(0xa000, 0xbfff).rw(FUNC(epson_lx810l_device::fakemem_r), FUNC(epson_lx810l_device::fakemem_w)); /* fake memory, write one, set all */
 	map(0xc000, 0xc00f).mirror(0x1ff0).rw("e05a30", FUNC(e05a30_device::read), FUNC(e05a30_device::write));
 	map(0xe000, 0xfeff).noprw(); /* not used */
 }

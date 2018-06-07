@@ -25,10 +25,10 @@
 void kc85_4_state::kc85_4_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(kc85_4_state::expansion_io_read), FUNC(kc85_4_state::expansion_io_write));
+	map(0x0000, 0xffff).rw(FUNC(kc85_4_state::expansion_io_read), FUNC(kc85_4_state::expansion_io_write));
 
-	map(0x0084, 0x0085).mirror(0xff00).rw(this, FUNC(kc85_4_state::kc85_4_84_r), FUNC(kc85_4_state::kc85_4_84_w));
-	map(0x0086, 0x0087).mirror(0xff00).rw(this, FUNC(kc85_4_state::kc85_4_86_r), FUNC(kc85_4_state::kc85_4_86_w));
+	map(0x0084, 0x0085).mirror(0xff00).rw(FUNC(kc85_4_state::kc85_4_84_r), FUNC(kc85_4_state::kc85_4_84_w));
+	map(0x0086, 0x0087).mirror(0xff00).rw(FUNC(kc85_4_state::kc85_4_86_r), FUNC(kc85_4_state::kc85_4_86_w));
 	map(0x0088, 0x008b).mirror(0xff00).rw(m_z80pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x008c, 0x008f).mirror(0xff00).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
@@ -57,7 +57,7 @@ void kc_state::kc85_3_mem(address_map &map)
 void kc_state::kc85_3_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(kc_state::expansion_io_read), FUNC(kc_state::expansion_io_write));
+	map(0x0000, 0xffff).rw(FUNC(kc_state::expansion_io_read), FUNC(kc_state::expansion_io_write));
 
 	map(0x0088, 0x008b).mirror(0xff00).rw(m_z80pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x008c, 0x008f).mirror(0xff00).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));

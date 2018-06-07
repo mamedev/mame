@@ -177,13 +177,13 @@ void dcheese_state::main_cpu_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x200001).portr("200000").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x220000, 0x220001).portr("220000").w(this, FUNC(dcheese_state::madmax_blitter_color_w));
-	map(0x240000, 0x240001).portr("240000").w(this, FUNC(dcheese_state::eeprom_control_w));
-	map(0x260000, 0x26001f).w(this, FUNC(dcheese_state::madmax_blitter_xparam_w));
-	map(0x280000, 0x28001f).w(this, FUNC(dcheese_state::madmax_blitter_yparam_w));
-	map(0x2a0000, 0x2a003f).rw(this, FUNC(dcheese_state::madmax_blitter_vidparam_r), FUNC(dcheese_state::madmax_blitter_vidparam_w));
+	map(0x220000, 0x220001).portr("220000").w(FUNC(dcheese_state::madmax_blitter_color_w));
+	map(0x240000, 0x240001).portr("240000").w(FUNC(dcheese_state::eeprom_control_w));
+	map(0x260000, 0x26001f).w(FUNC(dcheese_state::madmax_blitter_xparam_w));
+	map(0x280000, 0x28001f).w(FUNC(dcheese_state::madmax_blitter_yparam_w));
+	map(0x2a0000, 0x2a003f).rw(FUNC(dcheese_state::madmax_blitter_vidparam_r), FUNC(dcheese_state::madmax_blitter_vidparam_w));
 	map(0x2e0001, 0x2e0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x300000, 0x300001).w(this, FUNC(dcheese_state::madmax_blitter_unknown_w));
+	map(0x300000, 0x300001).w(FUNC(dcheese_state::madmax_blitter_unknown_w));
 }
 
 
@@ -197,9 +197,9 @@ void dcheese_state::main_cpu_map(address_map &map)
 void dcheese_state::sound_cpu_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).rw(this, FUNC(dcheese_state::sound_status_r), FUNC(dcheese_state::sound_control_w));
+	map(0x0000, 0x07ff).rw(FUNC(dcheese_state::sound_status_r), FUNC(dcheese_state::sound_control_w));
 	map(0x0800, 0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1000, 0x10ff).mirror(0x0700).w(this, FUNC(dcheese_state::bsmt_data_w));
+	map(0x1000, 0x10ff).mirror(0x0700).w(FUNC(dcheese_state::bsmt_data_w));
 	map(0x1800, 0x1fff).ram();
 	map(0x2000, 0xffff).rom();
 }

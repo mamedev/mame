@@ -29,13 +29,13 @@ void orion_state::orion128_mem(address_map &map)
 {
 	map(0x0000, 0xefff).bankrw("bank1");
 	map(0xf000, 0xf3ff).bankrw("bank2");
-	map(0xf400, 0xf4ff).rw(this, FUNC(orion_state::orion128_system_r), FUNC(orion_state::orion128_system_w));  // Keyboard and cassette
-	map(0xf500, 0xf5ff).rw(this, FUNC(orion_state::orion128_romdisk_r), FUNC(orion_state::orion128_romdisk_w));
-	map(0xf700, 0xf7ff).rw(this, FUNC(orion_state::orion128_floppy_r), FUNC(orion_state::orion128_floppy_w));
+	map(0xf400, 0xf4ff).rw(FUNC(orion_state::orion128_system_r), FUNC(orion_state::orion128_system_w));  // Keyboard and cassette
+	map(0xf500, 0xf5ff).rw(FUNC(orion_state::orion128_romdisk_r), FUNC(orion_state::orion128_romdisk_w));
+	map(0xf700, 0xf7ff).rw(FUNC(orion_state::orion128_floppy_r), FUNC(orion_state::orion128_floppy_w));
 	map(0xf800, 0xffff).rom();
-	map(0xf800, 0xf8ff).w(this, FUNC(orion_state::orion128_video_mode_w));
-	map(0xf900, 0xf9ff).w(this, FUNC(orion_state::orion128_memory_page_w));
-	map(0xfa00, 0xfaff).w(this, FUNC(orion_state::orion128_video_page_w));
+	map(0xf800, 0xf8ff).w(FUNC(orion_state::orion128_video_mode_w));
+	map(0xf900, 0xf9ff).w(FUNC(orion_state::orion128_memory_page_w));
+	map(0xfa00, 0xfaff).w(FUNC(orion_state::orion128_video_page_w));
 }
 
 /* Orion Z80 Card II */
@@ -43,9 +43,9 @@ void orion_state::orion128_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xf8, 0xf8).w(this, FUNC(orion_state::orion128_video_mode_w));
-	map(0xf9, 0xf9).w(this, FUNC(orion_state::orion128_memory_page_w));
-	map(0xfa, 0xfa).w(this, FUNC(orion_state::orion128_video_page_w));
+	map(0xf8, 0xf8).w(FUNC(orion_state::orion128_video_mode_w));
+	map(0xf9, 0xf9).w(FUNC(orion_state::orion128_memory_page_w));
+	map(0xfa, 0xfa).w(FUNC(orion_state::orion128_video_page_w));
 }
 
 void orion_state::orionz80_mem(address_map &map)
@@ -61,7 +61,7 @@ void orion_state::orionz80_mem(address_map &map)
 /* Orion Pro */
 void orion_state::orionz80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(orion_state::orionz80_io_r), FUNC(orion_state::orionz80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(orion_state::orionz80_io_r), FUNC(orion_state::orionz80_io_w));
 }
 
 void orion_state::orionpro_mem(address_map &map)
@@ -79,7 +79,7 @@ void orion_state::orionpro_mem(address_map &map)
 
 void orion_state::orionpro_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(orion_state::orionpro_io_r), FUNC(orion_state::orionpro_io_w));
+	map(0x0000, 0xffff).rw(FUNC(orion_state::orionpro_io_r), FUNC(orion_state::orionpro_io_w));
 }
 
 FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )

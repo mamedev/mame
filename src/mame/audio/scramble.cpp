@@ -256,7 +256,7 @@ void scramble_state::ad2083_sound_map(address_map &map)
 void scramble_state::ad2083_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w(this, FUNC(scramble_state::ad2083_tms5110_ctrl_w));
+	map(0x01, 0x01).w(FUNC(scramble_state::ad2083_tms5110_ctrl_w));
 	map(0x10, 0x10).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x20, 0x20).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x40, 0x40).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));

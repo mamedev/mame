@@ -62,7 +62,7 @@ public:
 	void bankswitch();
 	void floppy_motor_off();
 	void set_floppy_motor_off_timer();
-	void ls259_w(int address, int data);
+	void write_ls259(int address, int data);
 
 	DECLARE_READ8_MEMBER( ls259_r );
 	DECLARE_WRITE8_MEMBER( ls259_w );

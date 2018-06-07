@@ -291,9 +291,9 @@ WRITE8_MEMBER(vicdual_state::depthch_io_w)
 void vicdual_state::depthch_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -303,7 +303,7 @@ void vicdual_state::depthch_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::depthch_io_r), FUNC(vicdual_state::depthch_io_w));
+	map(0x00, 0x0f).rw(FUNC(vicdual_state::depthch_io_r), FUNC(vicdual_state::depthch_io_w));
 }
 
 
@@ -377,9 +377,9 @@ void vicdual_state::safari_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).noprw(); /* unused */
 	map(0x8000, 0x8fff).mirror(0x3000).ram();
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -389,7 +389,7 @@ void vicdual_state::safari_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::safari_io_r), FUNC(vicdual_state::safari_io_w));
+	map(0x00, 0x0f).rw(FUNC(vicdual_state::safari_io_r), FUNC(vicdual_state::safari_io_w));
 }
 
 
@@ -461,9 +461,9 @@ WRITE8_MEMBER(vicdual_state::frogs_io_w)
 void vicdual_state::frogs_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -473,7 +473,7 @@ void vicdual_state::frogs_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::frogs_io_r), FUNC(vicdual_state::frogs_io_w));
+	map(0x00, 0x0f).rw(FUNC(vicdual_state::frogs_io_r), FUNC(vicdual_state::frogs_io_w));
 }
 
 
@@ -589,9 +589,9 @@ void vicdual_state::headon_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x6000).rom();
 	map(0x8000, 0xbfff).noprw(); /* unused */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -601,7 +601,7 @@ void vicdual_state::headon_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::headon_io_r), FUNC(vicdual_state::headon_io_w));
+	map(0x00, 0x0f).rw(FUNC(vicdual_state::headon_io_r), FUNC(vicdual_state::headon_io_w));
 }
 
 
@@ -611,7 +611,7 @@ void vicdual_state::sspaceat_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::sspaceat_io_r), FUNC(vicdual_state::headon_io_w));
+	map(0x00, 0x0f).rw(FUNC(vicdual_state::sspaceat_io_r), FUNC(vicdual_state::headon_io_w));
 }
 
 
@@ -861,16 +861,16 @@ void vicdual_state::headon2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x6000).rom();
 	/* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
 void vicdual_state::headon2_io_map(address_map &map)
 {
 	map.global_mask(0x1f);
-	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
+	map(0x00, 0x1f).rw(FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
 }
 
 
@@ -880,7 +880,7 @@ void vicdual_state::digger_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::digger_io_w));
+	map(0x00, 0x1f).rw(FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::digger_io_w));
 }
 
 
@@ -1173,17 +1173,17 @@ WRITE8_MEMBER(vicdual_state::headonn_io_w)
 void vicdual_state::vicdual_dualgame_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 void vicdual_state::carhntds_dualgame_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // also has part of a rom mapped at 0x4000
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 void vicdual_state::invho2_io_map(address_map &map)
@@ -1197,7 +1197,7 @@ void vicdual_state::invho2_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invho2_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::invho2_io_w));
 }
 
 
@@ -1212,7 +1212,7 @@ void vicdual_state::invds_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invds_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::invds_io_w));
 }
 
 void vicdual_state::carhntds_io_map(address_map &map)
@@ -1226,7 +1226,7 @@ void vicdual_state::carhntds_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carhntds_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::carhntds_io_w));
 }
 
 void vicdual_state::sspacaho_io_map(address_map &map)
@@ -1240,7 +1240,7 @@ void vicdual_state::sspacaho_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::sspacaho_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::sspacaho_io_w));
 }
 
 
@@ -1255,7 +1255,7 @@ void vicdual_state::tranqgun_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(this, FUNC(vicdual_state::tranqgun_io_w));
+	map(0x00, 0x0f).w(FUNC(vicdual_state::tranqgun_io_w));
 }
 
 
@@ -1270,7 +1270,7 @@ void vicdual_state::spacetrk_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::spacetrk_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::spacetrk_io_w));
 }
 
 
@@ -1285,7 +1285,7 @@ void vicdual_state::carnival_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carnival_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::carnival_io_w));
 }
 
 
@@ -1300,7 +1300,7 @@ void vicdual_state::brdrline_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(this, FUNC(vicdual_state::brdrline_io_w));
+	map(0x00, 0x0f).w(FUNC(vicdual_state::brdrline_io_w));
 }
 
 
@@ -1315,7 +1315,7 @@ void vicdual_state::pulsar_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::pulsar_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::pulsar_io_w));
 }
 
 
@@ -1330,7 +1330,7 @@ void vicdual_state::heiankyo_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(this, FUNC(vicdual_state::heiankyo_io_w));
+	map(0x00, 0x0f).w(FUNC(vicdual_state::heiankyo_io_w));
 }
 
 
@@ -1345,7 +1345,7 @@ void vicdual_state::alphaho_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::alphaho_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::alphaho_io_w));
 }
 
 
@@ -1360,7 +1360,7 @@ void vicdual_state::headonn_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::headonn_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::headonn_io_w));
 }
 
 
@@ -2275,10 +2275,10 @@ WRITE8_MEMBER(vicdual_state::samurai_io_w)
 /* dual game hardware */
 void vicdual_state::samurai_map(address_map &map)
 {
-	map(0x0000, 0x3fff).mirror(0x4000).rom().w(this, FUNC(vicdual_state::samurai_protection_w));
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x0000, 0x3fff).mirror(0x4000).rom().w(FUNC(vicdual_state::samurai_protection_w));
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -2293,7 +2293,7 @@ void vicdual_state::samurai_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(this, FUNC(vicdual_state::samurai_io_w));
+	map(0x00, 0x7f).w(FUNC(vicdual_state::samurai_io_w));
 }
 
 
@@ -2409,9 +2409,9 @@ void nsub_state::nsub_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
 	map(0x8000, 0xbfff).noprw(); /* unused */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(nsub_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(nsub_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(nsub_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(nsub_state::characterram_w)).share("characterram");
 }
 
 
@@ -2421,7 +2421,7 @@ void nsub_state::nsub_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(this, FUNC(nsub_state::nsub_io_r), FUNC(nsub_state::nsub_io_w));
+	map(0x00, 0x0f).rw(FUNC(nsub_state::nsub_io_r), FUNC(nsub_state::nsub_io_w));
 }
 
 
@@ -2557,7 +2557,8 @@ MACHINE_CONFIG_START(nsub_state::nsub)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(nsub_state, screen_update_color)
-	MCFG_S97269PB_ADD("s97269pb")
+
+	MCFG_DEVICE_ADD("s97269pb", S97269PB, 0)
 
 	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsub)
 	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
@@ -2598,9 +2599,9 @@ void vicdual_state::invinco_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
 	map(0x8000, 0xbfff).noprw(); /* unused */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -2610,7 +2611,7 @@ void vicdual_state::invinco_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::invinco_io_r), FUNC(vicdual_state::invinco_io_w));
+	map(0x00, 0x0f).rw(FUNC(vicdual_state::invinco_io_r), FUNC(vicdual_state::invinco_io_w));
 }
 
 

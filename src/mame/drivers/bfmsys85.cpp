@@ -364,17 +364,17 @@ void bfmsys85_state::memmap(address_map &map)
 {
 
 	map(0x0000, 0x1fff).ram().share("nvram"); //8k RAM
-	map(0x2000, 0x21FF).w(this, FUNC(bfmsys85_state::reel34_w));         // reel 3+4 latch
-	map(0x2200, 0x23FF).w(this, FUNC(bfmsys85_state::reel12_w));         // reel 1+2 latch
-	map(0x2400, 0x25FF).w(this, FUNC(bfmsys85_state::vfd_w));            // vfd latch
+	map(0x2000, 0x21FF).w(FUNC(bfmsys85_state::reel34_w));         // reel 3+4 latch
+	map(0x2200, 0x23FF).w(FUNC(bfmsys85_state::reel12_w));         // reel 1+2 latch
+	map(0x2400, 0x25FF).w(FUNC(bfmsys85_state::vfd_w));            // vfd latch
 
-	map(0x2600, 0x27FF).rw(this, FUNC(bfmsys85_state::mmtr_r), FUNC(bfmsys85_state::mmtr_w));// mechanical meter latch
-	map(0x2800, 0x2800).r(this, FUNC(bfmsys85_state::triac_r));           // payslide triacs
-	map(0x2800, 0x29FF).w(this, FUNC(bfmsys85_state::triac_w));          // triacs
+	map(0x2600, 0x27FF).rw(FUNC(bfmsys85_state::mmtr_r), FUNC(bfmsys85_state::mmtr_w));// mechanical meter latch
+	map(0x2800, 0x2800).r(FUNC(bfmsys85_state::triac_r));           // payslide triacs
+	map(0x2800, 0x29FF).w(FUNC(bfmsys85_state::triac_w));          // triacs
 
-	map(0x2A00, 0x2A00).rw(this, FUNC(bfmsys85_state::mux_data_r), FUNC(bfmsys85_state::mux_data_w));// mux
-	map(0x2A01, 0x2A01).rw(this, FUNC(bfmsys85_state::mux_ctrl_r), FUNC(bfmsys85_state::mux_ctrl_w));// mux status register
-	map(0x2E00, 0x2E00).r(this, FUNC(bfmsys85_state::irqlatch_r));        // irq latch ( MC6850 / timer )
+	map(0x2A00, 0x2A00).rw(FUNC(bfmsys85_state::mux_data_r), FUNC(bfmsys85_state::mux_data_w));// mux
+	map(0x2A01, 0x2A01).rw(FUNC(bfmsys85_state::mux_ctrl_r), FUNC(bfmsys85_state::mux_ctrl_w));// mux status register
+	map(0x2E00, 0x2E00).r(FUNC(bfmsys85_state::irqlatch_r));        // irq latch ( MC6850 / timer )
 
 	map(0x3000, 0x3000).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3001, 0x3001).nopr(); //sound latch
@@ -383,10 +383,10 @@ void bfmsys85_state::memmap(address_map &map)
 	map(0x3402, 0x3403).w(m_acia6850_0, FUNC(acia6850_device::write));
 	map(0x3406, 0x3407).r(m_acia6850_0, FUNC(acia6850_device::read));
 
-	map(0x3600, 0x3600).w(this, FUNC(bfmsys85_state::mux_enable_w));     // mux enable
+	map(0x3600, 0x3600).w(FUNC(bfmsys85_state::mux_enable_w));     // mux enable
 
 	map(0x4000, 0xffff).rom();                     // 48K ROM
-	map(0x8000, 0xFFFF).w(this, FUNC(bfmsys85_state::watchdog_w));       // kick watchdog
+	map(0x8000, 0xFFFF).w(FUNC(bfmsys85_state::watchdog_w));       // kick watchdog
 
 }
 

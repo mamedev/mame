@@ -263,13 +263,13 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 
 void wackygtr_state::program_map(address_map &map)
 {
-	map(0x0200, 0x0200).nopr().w(this, FUNC(wackygtr_state::irq_ack_w));
-	map(0x0400, 0x0400).nopr().w(this, FUNC(wackygtr_state::firq_ack_w));
-	map(0x0600, 0x0600).w(this, FUNC(wackygtr_state::disp_w<0>));
-	map(0x0800, 0x0800).w(this, FUNC(wackygtr_state::disp_w<1>));
-	map(0x0a00, 0x0a00).w(this, FUNC(wackygtr_state::disp_w<2>));
-	map(0x0c00, 0x0c00).w(this, FUNC(wackygtr_state::disp_w<3>));
-	map(0x0e00, 0x0e00).w(this, FUNC(wackygtr_state::sample_ctrl_w));
+	map(0x0200, 0x0200).nopr().w(FUNC(wackygtr_state::irq_ack_w));
+	map(0x0400, 0x0400).nopr().w(FUNC(wackygtr_state::firq_ack_w));
+	map(0x0600, 0x0600).w(FUNC(wackygtr_state::disp_w<0>));
+	map(0x0800, 0x0800).w(FUNC(wackygtr_state::disp_w<1>));
+	map(0x0a00, 0x0a00).w(FUNC(wackygtr_state::disp_w<2>));
+	map(0x0c00, 0x0c00).w(FUNC(wackygtr_state::disp_w<3>));
+	map(0x0e00, 0x0e00).w(FUNC(wackygtr_state::sample_ctrl_w));
 
 	map(0x1000, 0x1001).w("ymsnd", FUNC(ym2413_device::write));
 

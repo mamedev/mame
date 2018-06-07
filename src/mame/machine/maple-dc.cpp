@@ -9,12 +9,12 @@ DEFINE_DEVICE_TYPE(MAPLE_DC, maple_dc_device, "maple_dc", "Dreamcast Maple Bus")
 
 void maple_dc_device::amap(address_map &map)
 {
-	map(0x04, 0x07).rw(this, FUNC(maple_dc_device::sb_mdstar_r), FUNC(maple_dc_device::sb_mdstar_w));
-	map(0x10, 0x13).rw(this, FUNC(maple_dc_device::sb_mdtsel_r), FUNC(maple_dc_device::sb_mdtsel_w));
-	map(0x14, 0x17).rw(this, FUNC(maple_dc_device::sb_mden_r), FUNC(maple_dc_device::sb_mden_w));
-	map(0x18, 0x1b).rw(this, FUNC(maple_dc_device::sb_mdst_r), FUNC(maple_dc_device::sb_mdst_w));
-	map(0x80, 0x83).rw(this, FUNC(maple_dc_device::sb_msys_r), FUNC(maple_dc_device::sb_msys_w));
-	map(0x8c, 0x8f).w(this, FUNC(maple_dc_device::sb_mdapro_w));
+	map(0x04, 0x07).rw(FUNC(maple_dc_device::sb_mdstar_r), FUNC(maple_dc_device::sb_mdstar_w));
+	map(0x10, 0x13).rw(FUNC(maple_dc_device::sb_mdtsel_r), FUNC(maple_dc_device::sb_mdtsel_w));
+	map(0x14, 0x17).rw(FUNC(maple_dc_device::sb_mden_r), FUNC(maple_dc_device::sb_mden_w));
+	map(0x18, 0x1b).rw(FUNC(maple_dc_device::sb_mdst_r), FUNC(maple_dc_device::sb_mdst_w));
+	map(0x80, 0x83).rw(FUNC(maple_dc_device::sb_msys_r), FUNC(maple_dc_device::sb_msys_w));
+	map(0x8c, 0x8f).w(FUNC(maple_dc_device::sb_mdapro_w));
 }
 
 maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

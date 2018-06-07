@@ -396,7 +396,7 @@ void vega_state::vega_map(address_map &map)
 
 void vega_state::vega_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
+	map(0x00, 0xff).rw(FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
 }
 
 

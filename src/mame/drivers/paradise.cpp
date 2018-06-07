@@ -132,9 +132,9 @@ void paradise_state::base_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0xbfff).bankr("prgbank");    /* ROM (banked) */
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
+	map(0xc000, 0xc7ff).ram().w(FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
+	map(0xc800, 0xcfff).ram().w(FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
+	map(0xd000, 0xd7ff).ram().w(FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
 }
 
 void paradise_state::paradise_map(address_map &map)
@@ -162,24 +162,24 @@ void paradise_state::torus_map(address_map &map)
 
 void paradise_state::torus_io_map(address_map &map)
 {
-	map(0x0000, 0x17ff).ram().w(this, FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
-	map(0x1800, 0x1800).w(this, FUNC(paradise_state::priority_w));  // Layers priority
-	map(0x2001, 0x2001).w(this, FUNC(paradise_state::flipscreen_w));    // Flip Screen
-	map(0x2004, 0x2004).w(this, FUNC(paradise_state::palbank_w));   // Layers palette bank
-	map(0x2006, 0x2006).w(this, FUNC(paradise_state::rombank_w));   // ROM bank
+	map(0x0000, 0x17ff).ram().w(FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
+	map(0x1800, 0x1800).w(FUNC(paradise_state::priority_w));  // Layers priority
+	map(0x2001, 0x2001).w(FUNC(paradise_state::flipscreen_w));    // Flip Screen
+	map(0x2004, 0x2004).w(FUNC(paradise_state::palbank_w));   // Layers palette bank
+	map(0x2006, 0x2006).w(FUNC(paradise_state::rombank_w));   // ROM bank
 	map(0x2010, 0x2010).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 0
 	map(0x2020, 0x2020).portr("DSW1");
 	map(0x2021, 0x2021).portr("DSW2");
 	map(0x2022, 0x2022).portr("P1");
 	map(0x2023, 0x2023).portr("P2");
 	map(0x2024, 0x2024).portr("SYSTEM");
-	map(0x8000, 0xffff).ram().w(this, FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
+	map(0x8000, 0xffff).ram().w(FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
 }
 
 void paradise_state::paradise_io_map(address_map &map)
 {
 	torus_io_map(map);
-	map(0x2007, 0x2007).w(this, FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
+	map(0x2007, 0x2007).w(FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
 	map(0x2030, 0x2030).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 1
 }
 

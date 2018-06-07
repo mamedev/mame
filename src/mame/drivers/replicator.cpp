@@ -544,7 +544,7 @@ void replicator_state::replicator_data_map(address_map &map)
 
 void replicator_state::replicator_io_map(address_map &map)
 {
-	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(this, FUNC(replicator_state::port_r), FUNC(replicator_state::port_w));
+	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(FUNC(replicator_state::port_r), FUNC(replicator_state::port_w));
 }
 
 /****************************************************\

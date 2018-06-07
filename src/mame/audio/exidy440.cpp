@@ -52,12 +52,12 @@ static const int channel_bits[4] =
 void exidy440_sound_device::exidy440_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).noprw();
-	map(0x8000, 0x801f).mirror(0x03e0).rw(this, FUNC(exidy440_sound_device::m6844_r), FUNC(exidy440_sound_device::m6844_w));
-	map(0x8400, 0x840f).mirror(0x03f0).rw(this, FUNC(exidy440_sound_device::sound_volume_r), FUNC(exidy440_sound_device::sound_volume_w));
-	map(0x8800, 0x8800).mirror(0x03ff).r(this, FUNC(exidy440_sound_device::sound_command_r)).nopw();
+	map(0x8000, 0x801f).mirror(0x03e0).rw(FUNC(exidy440_sound_device::m6844_r), FUNC(exidy440_sound_device::m6844_w));
+	map(0x8400, 0x840f).mirror(0x03f0).rw(FUNC(exidy440_sound_device::sound_volume_r), FUNC(exidy440_sound_device::sound_volume_w));
+	map(0x8800, 0x8800).mirror(0x03ff).r(FUNC(exidy440_sound_device::sound_command_r)).nopw();
 	map(0x8c00, 0x93ff).noprw();
-	map(0x9400, 0x9403).mirror(0x03fc).nopr().w(this, FUNC(exidy440_sound_device::sound_banks_w));
-	map(0x9800, 0x9800).mirror(0x03ff).nopr().w(this, FUNC(exidy440_sound_device::sound_interrupt_clear_w));
+	map(0x9400, 0x9403).mirror(0x03fc).nopr().w(FUNC(exidy440_sound_device::sound_banks_w));
+	map(0x9800, 0x9800).mirror(0x03ff).nopr().w(FUNC(exidy440_sound_device::sound_interrupt_clear_w));
 	map(0x9c00, 0x9fff).noprw();
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).noprw();

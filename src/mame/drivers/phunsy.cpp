@@ -107,8 +107,8 @@ void phunsy_state::phunsy_io(address_map &map)
 void phunsy_state::phunsy_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(phunsy_state::phunsy_ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(phunsy_state::phunsy_ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
 }
 
 

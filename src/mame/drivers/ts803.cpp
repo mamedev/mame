@@ -137,15 +137,15 @@ void ts803_state::ts803_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0x0f).portr("DSW");
-	map(0x10, 0x1f).rw(this, FUNC(ts803_state::port10_r), FUNC(ts803_state::port10_w));
+	map(0x10, 0x1f).rw(FUNC(ts803_state::port10_r), FUNC(ts803_state::port10_w));
 	map(0x20, 0x2f).rw("sti", FUNC(z80sti_device::read), FUNC(z80sti_device::write));
 	map(0x30, 0x33).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x80, 0x83).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x90, 0x9f).rw(this, FUNC(ts803_state::disk_0_control_r), FUNC(ts803_state::disk_0_control_w));
-	map(0xa0, 0xbf).rw(this, FUNC(ts803_state::porta0_r), FUNC(ts803_state::porta0_w));
+	map(0x90, 0x9f).rw(FUNC(ts803_state::disk_0_control_r), FUNC(ts803_state::disk_0_control_w));
+	map(0xa0, 0xbf).rw(FUNC(ts803_state::porta0_r), FUNC(ts803_state::porta0_w));
 	map(0xc0, 0xc0).rw("crtc", FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w));
 	map(0xc2, 0xc2).rw("crtc", FUNC(sy6545_1_device::register_r), FUNC(sy6545_1_device::register_w));
-	map(0xc4, 0xc4).w(this, FUNC(ts803_state::crtc_controlreg_w));
+	map(0xc4, 0xc4).w(FUNC(ts803_state::crtc_controlreg_w));
 }
 
 /* Input ports */

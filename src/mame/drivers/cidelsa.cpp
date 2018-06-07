@@ -159,9 +159,9 @@ void cidelsa_state::destryera_map(address_map &map)
 
 void cidelsa_state::destryer_io_map(address_map &map)
 {
-	map(0x01, 0x01).portr("IN0").w(this, FUNC(cidelsa_state::destryer_out1_w));
+	map(0x01, 0x01).portr("IN0").w(FUNC(cidelsa_state::destryer_out1_w));
 	map(0x02, 0x02).portr("IN1");
-	map(0x03, 0x07).w(this, FUNC(cidelsa_state::cdp1869_w));
+	map(0x03, 0x07).w(FUNC(cidelsa_state::cdp1869_w));
 }
 
 // Altair
@@ -179,7 +179,7 @@ void cidelsa_state::altair_io_map(address_map &map)
 	map(0x01, 0x01).r("ic23", FUNC(cdp1852_device::read)).w("ic26", FUNC(cdp1852_device::write));
 	map(0x02, 0x02).r("ic24", FUNC(cdp1852_device::read));
 	map(0x04, 0x04).r("ic25", FUNC(cdp1852_device::read));
-	map(0x03, 0x07).w(this, FUNC(cidelsa_state::cdp1869_w));
+	map(0x03, 0x07).w(FUNC(cidelsa_state::cdp1869_w));
 }
 
 // Draco
@@ -197,7 +197,7 @@ void draco_state::draco_io_map(address_map &map)
 	map(0x01, 0x01).r("ic29", FUNC(cdp1852_device::read)).w("ic32", FUNC(cdp1852_device::write));
 	map(0x02, 0x02).r("ic30", FUNC(cdp1852_device::read));
 	map(0x04, 0x04).r("ic31", FUNC(cdp1852_device::read));
-	map(0x03, 0x07).w(this, FUNC(draco_state::cdp1869_w));
+	map(0x03, 0x07).w(FUNC(draco_state::cdp1869_w));
 }
 
 void draco_state::draco_sound_map(address_map &map)

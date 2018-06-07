@@ -841,21 +841,21 @@ void battles_state::machine_reset()
 void bosco_state::bosco_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
-	map(0x6800, 0x6807).r(this, FUNC(bosco_state::bosco_dsw_r));
+	map(0x6800, 0x6807).r(FUNC(bosco_state::bosco_dsw_r));
 	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx_0", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
 	map(0x7100, 0x7100).rw("06xx_0", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
 	map(0x7800, 0x7fff).ram().share("share1");
-	map(0x8000, 0x8fff).ram().w(this, FUNC(bosco_state::bosco_videoram_w)).share("videoram");/* + sprite registers */
+	map(0x8000, 0x8fff).ram().w(FUNC(bosco_state::bosco_videoram_w)).share("videoram");/* + sprite registers */
 	map(0x9000, 0x90ff).rw("06xx_1", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
 	map(0x9100, 0x9100).rw("06xx_1", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
 	map(0x9800, 0x980f).writeonly().share("bosco_radarattr");
-	map(0x9810, 0x9810).w(this, FUNC(bosco_state::bosco_scrollx_w));
-	map(0x9820, 0x9820).w(this, FUNC(bosco_state::bosco_scrolly_w));
+	map(0x9810, 0x9810).w(FUNC(bosco_state::bosco_scrollx_w));
+	map(0x9820, 0x9820).w(FUNC(bosco_state::bosco_scrolly_w));
 	map(0x9830, 0x9830).writeonly().share("starcontrol");
-	map(0x9840, 0x9840).w(this, FUNC(bosco_state::bosco_starclr_w));
+	map(0x9840, 0x9840).w(FUNC(bosco_state::bosco_starclr_w));
 	map(0x9870, 0x9877).w(m_videolatch, FUNC(ls259_device::write_d0));
 }
 
@@ -863,13 +863,13 @@ void bosco_state::bosco_map(address_map &map)
 void galaga_state::galaga_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
-	map(0x6800, 0x6807).r(this, FUNC(galaga_state::bosco_dsw_r));
+	map(0x6800, 0x6807).r(FUNC(galaga_state::bosco_dsw_r));
 	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
 	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
-	map(0x8000, 0x87ff).ram().w(this, FUNC(galaga_state::galaga_videoram_w)).share("videoram");
+	map(0x8000, 0x87ff).ram().w(FUNC(galaga_state::galaga_videoram_w)).share("videoram");
 	map(0x8800, 0x8bff).ram().share("galaga_ram1");
 	map(0x9000, 0x93ff).ram().share("galaga_ram2");
 	map(0x9800, 0x9bff).ram().share("galaga_ram3");
@@ -886,7 +886,7 @@ void galaga_state::gatsbee_main_map(address_map &map)
 void xevious_state::xevious_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
-	map(0x6800, 0x6807).r(this, FUNC(xevious_state::bosco_dsw_r));
+	map(0x6800, 0x6807).r(FUNC(xevious_state::bosco_dsw_r));
 	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -896,12 +896,12 @@ void xevious_state::xevious_map(address_map &map)
 	map(0x8000, 0x87ff).ram().share("xevious_sr1"); /* work RAM + sprite registers */
 	map(0x9000, 0x97ff).ram().share("xevious_sr2"); /* work RAM + sprite registers */
 	map(0xa000, 0xa7ff).ram().share("xevious_sr3"); /* work RAM + sprite registers */
-	map(0xb000, 0xb7ff).ram().w(this, FUNC(xevious_state::xevious_fg_colorram_w)).share("fg_colorram");
-	map(0xb800, 0xbfff).ram().w(this, FUNC(xevious_state::xevious_bg_colorram_w)).share("bg_colorram");
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(xevious_state::xevious_fg_videoram_w)).share("fg_videoram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(xevious_state::xevious_bg_videoram_w)).share("bg_videoram");
-	map(0xd000, 0xd07f).w(this, FUNC(xevious_state::xevious_vh_latch_w));
-	map(0xf000, 0xffff).rw(this, FUNC(xevious_state::xevious_bb_r), FUNC(xevious_state::xevious_bs_w));
+	map(0xb000, 0xb7ff).ram().w(FUNC(xevious_state::xevious_fg_colorram_w)).share("fg_colorram");
+	map(0xb800, 0xbfff).ram().w(FUNC(xevious_state::xevious_bg_colorram_w)).share("bg_colorram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(xevious_state::xevious_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(xevious_state::xevious_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xd07f).w(FUNC(xevious_state::xevious_vh_latch_w));
+	map(0xf000, 0xffff).rw(FUNC(xevious_state::xevious_bb_r), FUNC(xevious_state::xevious_bs_w));
 }
 
 
@@ -913,7 +913,7 @@ void digdug_state::digdug_map(address_map &map)
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
 	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
-	map(0x8000, 0x83ff).ram().w(this, FUNC(digdug_state::digdug_videoram_w)).share("videoram"); /* tilemap RAM (bottom half of RAM 0 */
+	map(0x8000, 0x83ff).ram().w(FUNC(digdug_state::digdug_videoram_w)).share("videoram"); /* tilemap RAM (bottom half of RAM 0 */
 	map(0x8400, 0x87ff).ram().share("share1");                          /* work RAM (top half for RAM 0 */
 	map(0x8800, 0x8bff).ram().share("digdug_objram");   /* work RAM + sprite registers */
 	map(0x9000, 0x93ff).ram().share("digdug_posram");   /* work RAM + sprite registers */
@@ -935,11 +935,11 @@ void galaga_state::galaga_mem4(address_map &map)
 void battles_state::battles_mem4(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x4000, 0x4003).r(this, FUNC(battles_state::input_port_r));
-	map(0x4001, 0x4001).w(this, FUNC(battles_state::cpu4_coin_w));
-	map(0x5000, 0x5000).w(this, FUNC(battles_state::noise_sound_w));
-	map(0x6000, 0x6000).rw(this, FUNC(battles_state::customio3_r), FUNC(battles_state::customio3_w));
-	map(0x7000, 0x7000).rw(this, FUNC(battles_state::customio_data3_r), FUNC(battles_state::customio_data3_w));
+	map(0x4000, 0x4003).r(FUNC(battles_state::input_port_r));
+	map(0x4001, 0x4001).w(FUNC(battles_state::cpu4_coin_w));
+	map(0x5000, 0x5000).w(FUNC(battles_state::noise_sound_w));
+	map(0x6000, 0x6000).rw(FUNC(battles_state::customio3_r), FUNC(battles_state::customio3_w));
+	map(0x7000, 0x7000).rw(FUNC(battles_state::customio_data3_r), FUNC(battles_state::customio_data3_w));
 	map(0x8000, 0x80ff).ram();
 }
 

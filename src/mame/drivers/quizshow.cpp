@@ -239,18 +239,18 @@ void quizshow_state::mem_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0bff).rom();
-	map(0x1802, 0x1802).w(this, FUNC(quizshow_state::audio_w));
-	map(0x1804, 0x1804).w(this, FUNC(quizshow_state::lamps1_w));
-	map(0x1808, 0x1808).w(this, FUNC(quizshow_state::lamps2_w));
-	map(0x1810, 0x1810).w(this, FUNC(quizshow_state::lamps3_w));
-	map(0x1820, 0x1820).w(this, FUNC(quizshow_state::tape_control_w));
-	map(0x1840, 0x1840).w(this, FUNC(quizshow_state::video_disable_w));
+	map(0x1802, 0x1802).w(FUNC(quizshow_state::audio_w));
+	map(0x1804, 0x1804).w(FUNC(quizshow_state::lamps1_w));
+	map(0x1808, 0x1808).w(FUNC(quizshow_state::lamps2_w));
+	map(0x1810, 0x1810).w(FUNC(quizshow_state::lamps3_w));
+	map(0x1820, 0x1820).w(FUNC(quizshow_state::tape_control_w));
+	map(0x1840, 0x1840).w(FUNC(quizshow_state::video_disable_w));
 	map(0x1881, 0x1881).portr("IN0");
 	map(0x1882, 0x1882).portr("IN1");
 	map(0x1884, 0x1884).portr("IN2");
 	map(0x1888, 0x1888).portr("IN3");
-	map(0x1900, 0x1900).r(this, FUNC(quizshow_state::timing_r));
-	map(0x1e00, 0x1fff).ram().w(this, FUNC(quizshow_state::main_ram_w)).share("main_ram");
+	map(0x1900, 0x1900).r(FUNC(quizshow_state::timing_r));
+	map(0x1e00, 0x1fff).ram().w(FUNC(quizshow_state::main_ram_w)).share("main_ram");
 }
 
 

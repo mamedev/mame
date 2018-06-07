@@ -103,12 +103,12 @@ void funkybee_state::funkybee_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xbfff).ram().w(this, FUNC(funkybee_state::funkybee_videoram_w)).share("videoram");
-	map(0xc000, 0xdfff).ram().w(this, FUNC(funkybee_state::funkybee_colorram_w)).share("colorram");
-	map(0xe000, 0xe000).w(this, FUNC(funkybee_state::funkybee_scroll_w));
+	map(0xa000, 0xbfff).ram().w(FUNC(funkybee_state::funkybee_videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).ram().w(FUNC(funkybee_state::funkybee_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).w(FUNC(funkybee_state::funkybee_scroll_w));
 	map(0xe800, 0xe807).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).nopr(); /* IRQ Ack */
-	map(0xf800, 0xf800).r(this, FUNC(funkybee_state::funkybee_input_port_0_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0xf800, 0xf800).r(FUNC(funkybee_state::funkybee_input_port_0_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0xf801, 0xf801).portr("IN1");
 	map(0xf802, 0xf802).portr("IN2");
 }

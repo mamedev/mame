@@ -80,8 +80,8 @@ WRITE_LINE_MEMBER(sbasketb_state::irq_mask_w)
 void sbasketb_state::sbasketb_map(address_map &map)
 {
 	map(0x2000, 0x2fff).ram();
-	map(0x3000, 0x33ff).ram().w(this, FUNC(sbasketb_state::sbasketb_colorram_w)).share(m_colorram);
-	map(0x3400, 0x37ff).ram().w(this, FUNC(sbasketb_state::sbasketb_videoram_w)).share(m_videoram);
+	map(0x3000, 0x33ff).ram().w(FUNC(sbasketb_state::sbasketb_colorram_w)).share(m_colorram);
+	map(0x3400, 0x37ff).ram().w(FUNC(sbasketb_state::sbasketb_videoram_w)).share(m_videoram);
 	map(0x3800, 0x39ff).ram().share(m_spriteram);
 	map(0x3a00, 0x3bff).ram();           /* Probably unused, but initialized */
 	map(0x3c00, 0x3c00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -89,7 +89,7 @@ void sbasketb_state::sbasketb_map(address_map &map)
 	map(0x3c20, 0x3c20).writeonly().share(m_palettebank);
 	map(0x3c80, 0x3c87).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x3d00, 0x3d00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x3d80, 0x3d80).w(this, FUNC(sbasketb_state::sbasketb_sh_irqtrigger_w));
+	map(0x3d80, 0x3d80).w(FUNC(sbasketb_state::sbasketb_sh_irqtrigger_w));
 	map(0x3e00, 0x3e00).portr("SYSTEM");
 	map(0x3e01, 0x3e01).portr("P1");
 	map(0x3e02, 0x3e02).portr("P2");
@@ -108,9 +108,9 @@ void sbasketb_state::sbasketb_sound_map(address_map &map)
 	map(0x8000, 0x8000).r(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
 	map(0xa000, 0xa000).w(m_vlm, FUNC(vlm5030_device::data_w)); /* speech data */
 	map(0xc000, 0xdfff).w(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sound_w));     /* speech and output control */
-	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::write));
-	map(0xe001, 0xe001).w(this, FUNC(sbasketb_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
-	map(0xe002, 0xe002).w(this, FUNC(sbasketb_state::konami_SN76496_w));      /* This address triggers the SN chip to read the data port. */
+	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0xe001, 0xe001).w(FUNC(sbasketb_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
+	map(0xe002, 0xe002).w(FUNC(sbasketb_state::konami_SN76496_w));      /* This address triggers the SN chip to read the data port. */
 }
 
 

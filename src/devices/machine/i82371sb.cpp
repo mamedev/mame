@@ -13,21 +13,21 @@ DEFINE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device, "i82371sb_isa", "Intel 823
 void i82371sb_isa_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x4c, 0x4c).rw(this, FUNC(i82371sb_isa_device::iort_r), FUNC(i82371sb_isa_device::iort_w));
-	map(0x4e, 0x4f).rw(this, FUNC(i82371sb_isa_device::xbcs_r), FUNC(i82371sb_isa_device::xbcs_w));
-	map(0x60, 0x63).rw(this, FUNC(i82371sb_isa_device::pirqrc_r), FUNC(i82371sb_isa_device::pirqrc_w));
-	map(0x68, 0x68).rw(this, FUNC(i82371sb_isa_device::tom_r), FUNC(i82371sb_isa_device::tom_w));
-	map(0x6a, 0x6b).rw(this, FUNC(i82371sb_isa_device::mstat_r), FUNC(i82371sb_isa_device::mstat_w));
-	map(0x70, 0x70).rw(this, FUNC(i82371sb_isa_device::mbirq0_r), FUNC(i82371sb_isa_device::mbirq0_w));
-	map(0x76, 0x77).rw(this, FUNC(i82371sb_isa_device::mbdma_r), FUNC(i82371sb_isa_device::mbdma_w));
-	map(0x82, 0x82).rw(this, FUNC(i82371sb_isa_device::dlc_r), FUNC(i82371sb_isa_device::dlc_w));
-	map(0xa0, 0xa0).rw(this, FUNC(i82371sb_isa_device::smicntl_r), FUNC(i82371sb_isa_device::smicntl_w));
-	map(0xa2, 0xa3).rw(this, FUNC(i82371sb_isa_device::smien_r), FUNC(i82371sb_isa_device::smien_w));
-	map(0xa4, 0xa7).rw(this, FUNC(i82371sb_isa_device::see_r), FUNC(i82371sb_isa_device::see_w));
-	map(0xa8, 0xa8).rw(this, FUNC(i82371sb_isa_device::ftmr_r), FUNC(i82371sb_isa_device::ftmr_w));
-	map(0xaa, 0xab).rw(this, FUNC(i82371sb_isa_device::smireq_r), FUNC(i82371sb_isa_device::smireq_w));
-	map(0xac, 0xac).rw(this, FUNC(i82371sb_isa_device::ctltmr_r), FUNC(i82371sb_isa_device::ctltmr_w));
-	map(0xae, 0xae).rw(this, FUNC(i82371sb_isa_device::cthtmr_r), FUNC(i82371sb_isa_device::cthtmr_w));
+	map(0x4c, 0x4c).rw(FUNC(i82371sb_isa_device::iort_r), FUNC(i82371sb_isa_device::iort_w));
+	map(0x4e, 0x4f).rw(FUNC(i82371sb_isa_device::xbcs_r), FUNC(i82371sb_isa_device::xbcs_w));
+	map(0x60, 0x63).rw(FUNC(i82371sb_isa_device::pirqrc_r), FUNC(i82371sb_isa_device::pirqrc_w));
+	map(0x68, 0x68).rw(FUNC(i82371sb_isa_device::tom_r), FUNC(i82371sb_isa_device::tom_w));
+	map(0x6a, 0x6b).rw(FUNC(i82371sb_isa_device::mstat_r), FUNC(i82371sb_isa_device::mstat_w));
+	map(0x70, 0x70).rw(FUNC(i82371sb_isa_device::mbirq0_r), FUNC(i82371sb_isa_device::mbirq0_w));
+	map(0x76, 0x77).rw(FUNC(i82371sb_isa_device::mbdma_r), FUNC(i82371sb_isa_device::mbdma_w));
+	map(0x82, 0x82).rw(FUNC(i82371sb_isa_device::dlc_r), FUNC(i82371sb_isa_device::dlc_w));
+	map(0xa0, 0xa0).rw(FUNC(i82371sb_isa_device::smicntl_r), FUNC(i82371sb_isa_device::smicntl_w));
+	map(0xa2, 0xa3).rw(FUNC(i82371sb_isa_device::smien_r), FUNC(i82371sb_isa_device::smien_w));
+	map(0xa4, 0xa7).rw(FUNC(i82371sb_isa_device::see_r), FUNC(i82371sb_isa_device::see_w));
+	map(0xa8, 0xa8).rw(FUNC(i82371sb_isa_device::ftmr_r), FUNC(i82371sb_isa_device::ftmr_w));
+	map(0xaa, 0xab).rw(FUNC(i82371sb_isa_device::smireq_r), FUNC(i82371sb_isa_device::smireq_w));
+	map(0xac, 0xac).rw(FUNC(i82371sb_isa_device::ctltmr_r), FUNC(i82371sb_isa_device::ctltmr_w));
+	map(0xae, 0xae).rw(FUNC(i82371sb_isa_device::cthtmr_r), FUNC(i82371sb_isa_device::cthtmr_w));
 }
 
 void i82371sb_isa_device::internal_io_map(address_map &map)
@@ -35,11 +35,11 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x0061, 0x0061).rw(this, FUNC(i82371sb_isa_device::at_portb_r), FUNC(i82371sb_isa_device::at_portb_w));
-	map(0x0080, 0x009f).rw(this, FUNC(i82371sb_isa_device::at_page8_r), FUNC(i82371sb_isa_device::at_page8_w));
+	map(0x0061, 0x0061).rw(FUNC(i82371sb_isa_device::at_portb_r), FUNC(i82371sb_isa_device::at_portb_w));
+	map(0x0080, 0x009f).rw(FUNC(i82371sb_isa_device::at_page8_r), FUNC(i82371sb_isa_device::at_page8_w));
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x00b2, 0x00b3).rw(this, FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));
-	map(0x00c0, 0x00df).rw(this, FUNC(i82371sb_isa_device::at_dma8237_2_r), FUNC(i82371sb_isa_device::at_dma8237_2_w));
+	map(0x00b2, 0x00b3).rw(FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));
+	map(0x00c0, 0x00df).rw(FUNC(i82371sb_isa_device::at_dma8237_2_r), FUNC(i82371sb_isa_device::at_dma8237_2_w));
 	map(0x00e0, 0x00ef).noprw();
 }
 

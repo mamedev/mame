@@ -302,8 +302,8 @@ void octopus_state::octopus_io(address_map &map)
 	map(0x00, 0x0f).rw(m_dma1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x10, 0x1f).rw(m_dma2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x20, 0x20).portr("DSWA");
-	map(0x21, 0x2f).rw(this, FUNC(octopus_state::system_r), FUNC(octopus_state::system_w));
-	map(0x31, 0x33).rw(this, FUNC(octopus_state::bank_sel_r), FUNC(octopus_state::bank_sel_w));
+	map(0x21, 0x2f).rw(FUNC(octopus_state::system_r), FUNC(octopus_state::system_w));
+	map(0x31, 0x33).rw(FUNC(octopus_state::bank_sel_r), FUNC(octopus_state::bank_sel_w));
 	map(0x50, 0x50).rw(m_kb_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x51, 0x51).rw(m_kb_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x70-73: HD controller
@@ -315,12 +315,12 @@ void octopus_state::octopus_io(address_map &map)
 	map(0xb0, 0xb1).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xb4, 0xb5).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xc0, 0xc7).rw(m_crtc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
-	map(0xc8, 0xc8).rw(this, FUNC(octopus_state::vidcontrol_r), FUNC(octopus_state::vidcontrol_w));
-	map(0xc9, 0xca).rw(this, FUNC(octopus_state::video_latch_r), FUNC(octopus_state::video_latch_w));
+	map(0xc8, 0xc8).rw(FUNC(octopus_state::vidcontrol_r), FUNC(octopus_state::vidcontrol_w));
+	map(0xc9, 0xca).rw(FUNC(octopus_state::video_latch_r), FUNC(octopus_state::video_latch_w));
 	// 0xcf: mode control
 	map(0xd0, 0xd3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0xe0, 0xe4).rw(this, FUNC(octopus_state::z80_vector_r), FUNC(octopus_state::z80_vector_w));
-	map(0xf0, 0xf1).rw(this, FUNC(octopus_state::parallel_r), FUNC(octopus_state::parallel_w));
+	map(0xe0, 0xe4).rw(FUNC(octopus_state::z80_vector_r), FUNC(octopus_state::z80_vector_w));
+	map(0xf0, 0xf1).rw(FUNC(octopus_state::parallel_r), FUNC(octopus_state::parallel_w));
 	map(0xf8, 0xff).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -333,12 +333,12 @@ void octopus_state::octopus_sub_mem(address_map &map)
 void octopus_state::octopus_sub_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(octopus_state::z80_io_r), FUNC(octopus_state::z80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(octopus_state::z80_io_r), FUNC(octopus_state::z80_io_w));
 }
 
 void octopus_state::octopus_vram(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(octopus_state::vram_r), FUNC(octopus_state::vram_w));
+	map(0x0000, 0xffff).rw(FUNC(octopus_state::vram_r), FUNC(octopus_state::vram_w));
 }
 
 /* Input ports */

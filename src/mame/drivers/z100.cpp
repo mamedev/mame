@@ -313,7 +313,7 @@ void z100_state::z100_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x3ffff).ram(); // 128*2 KB RAM
 //  AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
-	map(0xc0000, 0xeffff).rw(this, FUNC(z100_state::z100_vram_r), FUNC(z100_state::z100_vram_w)); // Blue / Red / Green
+	map(0xc0000, 0xeffff).rw(FUNC(z100_state::z100_vram_r), FUNC(z100_state::z100_vram_w)); // Blue / Red / Green
 //  AM_RANGE(0xf0000,0xf0fff) // network card (NET-100)
 //  AM_RANGE(0xf4000,0xf7fff) // MTRET-100 Firmware I expansion ROM
 //  AM_RANGE(0xf8000,0xfbfff) // MTRET-100 Firmware II expansion ROM check ID 0x4550
@@ -399,14 +399,14 @@ void z100_state::z100_io(address_map &map)
 //  AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
 //  AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
 	map(0xb0, 0xb3).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
-	map(0xb4, 0xb4).w(this, FUNC(z100_state::floppy_select_w));
-	map(0xb5, 0xb5).w(this, FUNC(z100_state::floppy_motor_w));
+	map(0xb4, 0xb4).w(FUNC(z100_state::floppy_select_w));
+	map(0xb5, 0xb5).w(FUNC(z100_state::floppy_motor_w));
 //  z-207 secondary disk controller (wd1797)
 //  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
 //  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
 	map(0xd8, 0xdb).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //video board
-	map(0xdc, 0xdc).w(this, FUNC(z100_state::z100_6845_address_w));
-	map(0xdd, 0xdd).w(this, FUNC(z100_state::z100_6845_data_w));
+	map(0xdc, 0xdc).w(FUNC(z100_state::z100_6845_address_w));
+	map(0xdd, 0xdd).w(FUNC(z100_state::z100_6845_data_w));
 //  AM_RANGE (0xde, 0xde) light pen
 	map(0xe0, 0xe3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
 //  AM_RANGE (0xe4, 0xe7) 8253 PIT
@@ -414,8 +414,8 @@ void z100_state::z100_io(address_map &map)
 //  AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
 	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw(m_picm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf4, 0xf4).r(this, FUNC(z100_state::keyb_data_r)); // -> 8041 MCU
-	map(0xf5, 0xf5).rw(this, FUNC(z100_state::keyb_status_r), FUNC(z100_state::keyb_command_w));
+	map(0xf4, 0xf4).r(FUNC(z100_state::keyb_data_r)); // -> 8041 MCU
+	map(0xf5, 0xf5).rw(FUNC(z100_state::keyb_status_r), FUNC(z100_state::keyb_command_w));
 //  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
 //  AM_RANGE (0xfb, 0xfb) timer irq status
 //  AM_RANGE (0xfc, 0xfc) memory latch

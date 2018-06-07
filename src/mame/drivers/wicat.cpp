@@ -169,9 +169,9 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0x000000, 0x001fff).rom().region("c2", 0x0000);
 	map(0x020000, 0x1fffff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0xdfffff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
-	map(0xeffc00, 0xeffc01).rw(this, FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
+	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
 	map(0xf00000, 0xf00007).rw(m_uart0, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
 	map(0xf00008, 0xf0000f).rw(m_uart1, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00010, 0xf00017).rw(m_uart2, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
@@ -179,12 +179,12 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0xf00020, 0xf00027).rw(m_uart4, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00028, 0xf0002f).rw(m_uart5, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00030, 0xf00037).rw(m_uart6, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00040, 0xf0005f).rw(this, FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
+	map(0xf00040, 0xf0005f).rw(FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
 	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
-	map(0xf00180, 0xf0018f).rw(this, FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
-	map(0xf00190, 0xf0019f).rw(this, FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
-	map(0xf00f00, 0xf00fff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0xf00180, 0xf0018f).rw(FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
+	map(0xf00190, 0xf0019f).rw(FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
+	map(0xf00f00, 0xf00fff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 }
 
 void wicat_state::wicat_video_mem(address_map &map)
@@ -196,16 +196,16 @@ void wicat_state::wicat_video_mem(address_map &map)
 void wicat_state::wicat_video_io(address_map &map)
 {
 	// these are largely wild guesses...
-	map(0x0000, 0x0003).rw(this, FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
-	map(0x0100, 0x0107).rw(this, FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
-	map(0x0200, 0x0207).rw(this, FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
-	map(0x0304, 0x0304).r(this, FUNC(wicat_state::video_status_r));
-	map(0x0400, 0x047f).rw(this, FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
-	map(0x0500, 0x0500).w(this, FUNC(wicat_state::videosram_recall_w));
-	map(0x0600, 0x0600).w(this, FUNC(wicat_state::videosram_store_w));
-	map(0x0800, 0x080f).rw(this, FUNC(wicat_state::video_ctrl_r), FUNC(wicat_state::video_ctrl_w));
-	map(0x0a00, 0x0a1f).rw(this, FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
-	map(0x0b00, 0x0b03).rw(this, FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
+	map(0x0000, 0x0003).rw(FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
+	map(0x0100, 0x0107).rw(FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
+	map(0x0200, 0x0207).rw(FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
+	map(0x0304, 0x0304).r(FUNC(wicat_state::video_status_r));
+	map(0x0400, 0x047f).rw(FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
+	map(0x0500, 0x0500).w(FUNC(wicat_state::videosram_recall_w));
+	map(0x0600, 0x0600).w(FUNC(wicat_state::videosram_store_w));
+	map(0x0800, 0x080f).rw(FUNC(wicat_state::video_ctrl_r), FUNC(wicat_state::video_ctrl_w));
+	map(0x0a00, 0x0a1f).rw(FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
+	map(0x0b00, 0x0b03).rw(FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
 	map(0x0e00, 0x0eff).ram();
 	map(0x4000, 0x5fff).ram().share("vram"); // video RAM?
 	map(0x8000, 0x8fff).rom().region("g2char", 0x0000);

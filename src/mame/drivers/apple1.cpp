@@ -434,7 +434,7 @@ WRITE8_MEMBER(apple1_state::ram_w)
 
 void apple1_state::apple1_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
+	map(0x0000, 0xbfff).rw(FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
 	map(0xd010, 0xd013).mirror(0x0fec).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe000, 0xefff).ram().share(A1_BASICRAM_TAG);
 	map(0xff00, 0xffff).rom().region(A1_CPU_TAG, 0);

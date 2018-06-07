@@ -729,7 +729,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	case MLGSOUND:
 		// sound
 		// ++++ ++++ ++++ ---+
-		m_sound->write(space, 0, data, 0xff);
+		m_sound->write(data);
 		LOGMASKED(LOG_WRITE, "Write sound <- %02x\n", data);
 		break;
 
@@ -781,7 +781,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// sound
 		// ++++ ++-- ---- ---+
 		// 1000 0100 0000 0000
-		m_sound->write(space, 0, data, 0xff);
+		m_sound->write(data);
 		LOGMASKED(LOG_WRITE, "Write sound <- %02x\n", data);
 		break;
 

@@ -331,8 +331,8 @@ void luckybal_state::main_map(address_map &map)
 void luckybal_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x90, 0x90).w(this, FUNC(luckybal_state::port90_bitswap_w));
-	map(0xc0, 0xc3).rw(this, FUNC(luckybal_state::ppi_bitswap_r), FUNC(luckybal_state::ppi_bitswap_w));
+	map(0x90, 0x90).w(FUNC(luckybal_state::port90_bitswap_w));
+	map(0xc0, 0xc3).rw(FUNC(luckybal_state::ppi_bitswap_r), FUNC(luckybal_state::ppi_bitswap_w));
 	map(0xe0, 0xe3).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
 /*

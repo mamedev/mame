@@ -81,25 +81,25 @@ public:
 	void set_force_ready(bool force_ready);
 	void set_disable_motor_control(bool _disable_motor_control);
 
-	void cmd_w(uint8_t val);
-	uint8_t status_r();
-	DECLARE_READ8_MEMBER( status_r ) { return status_r(); }
-	DECLARE_WRITE8_MEMBER( cmd_w ) { cmd_w(data); }
+	void write_cmd(uint8_t val);
+	uint8_t read_status();
+	DECLARE_READ8_MEMBER( status_r ) { return read_status(); }
+	DECLARE_WRITE8_MEMBER( cmd_w ) { write_cmd(data); }
 
-	void track_w(uint8_t val);
-	uint8_t track_r();
-	DECLARE_READ8_MEMBER( track_r ) { return track_r(); }
-	DECLARE_WRITE8_MEMBER( track_w ) { track_w(data); }
+	void write_track(uint8_t val);
+	uint8_t read_track();
+	DECLARE_READ8_MEMBER( track_r ) { return read_track(); }
+	DECLARE_WRITE8_MEMBER( track_w ) { write_track(data); }
 
-	void sector_w(uint8_t val);
-	uint8_t sector_r();
-	DECLARE_READ8_MEMBER( sector_r ) { return sector_r(); }
-	DECLARE_WRITE8_MEMBER( sector_w ) { sector_w(data); }
+	void write_sector(uint8_t val);
+	uint8_t read_sector();
+	DECLARE_READ8_MEMBER( sector_r ) { return read_sector(); }
+	DECLARE_WRITE8_MEMBER( sector_w ) { write_sector(data); }
 
-	void data_w(uint8_t val);
-	uint8_t data_r();
-	DECLARE_READ8_MEMBER( data_r ) { return data_r(); }
-	DECLARE_WRITE8_MEMBER( data_w ) { data_w(data); }
+	void write_data(uint8_t val);
+	uint8_t read_data();
+	DECLARE_READ8_MEMBER( data_r ) { return read_data(); }
+	DECLARE_WRITE8_MEMBER( data_w ) { write_data(data); }
 
 	void gen_w(int reg, uint8_t val);
 	uint8_t gen_r(int reg);

@@ -334,12 +334,12 @@ PALETTE_INIT_MEMBER(mt32_state, mt32)
 
 void mt32_state::mt32_map(address_map &map)
 {
-	map(0x0100, 0x0100).w(this, FUNC(mt32_state::bank_w));
-	map(0x0200, 0x0200).w(this, FUNC(mt32_state::so_w));
+	map(0x0100, 0x0100).w(FUNC(mt32_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(mt32_state::so_w));
 	map(0x021a, 0x021a).portr("SC0");
 	map(0x021c, 0x021c).portr("SC1");
-	map(0x0300, 0x0300).w(this, FUNC(mt32_state::lcd_data_w));
-	map(0x0380, 0x0380).rw(this, FUNC(mt32_state::lcd_ctrl_r), FUNC(mt32_state::lcd_ctrl_w));
+	map(0x0300, 0x0300).w(FUNC(mt32_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(mt32_state::lcd_ctrl_r), FUNC(mt32_state::lcd_ctrl_w));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
 	map(0x8000, 0xbfff).bankrw("bank");
 	map(0xc000, 0xffff).bankrw("fixed");
@@ -348,8 +348,8 @@ void mt32_state::mt32_map(address_map &map)
 void mt32_state::mt32_io(address_map &map)
 {
 	map(i8x9x_device::A7, i8x9x_device::A7).portr("A7");
-	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(this, FUNC(mt32_state::midi_w));
-	map(i8x9x_device::P0, i8x9x_device::P0).r(this, FUNC(mt32_state::port0_r));
+	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(mt32_state::midi_w));
+	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(mt32_state::port0_r));
 }
 
 MACHINE_CONFIG_START(mt32_state::mt32)

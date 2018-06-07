@@ -19,18 +19,18 @@ DEFINE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device, "iteagle_fpga", "ITEagle F
 
 void iteagle_fpga_device::fpga_map(address_map &map)
 {
-	map(0x000, 0x01f).rw(this, FUNC(iteagle_fpga_device::fpga_r), FUNC(iteagle_fpga_device::fpga_w));
+	map(0x000, 0x01f).rw(FUNC(iteagle_fpga_device::fpga_r), FUNC(iteagle_fpga_device::fpga_w));
 }
 
 void iteagle_fpga_device::rtc_map(address_map &map)
 {
-	map(0x000, 0x7ff).rw(this, FUNC(iteagle_fpga_device::rtc_r), FUNC(iteagle_fpga_device::rtc_w));
+	map(0x000, 0x7ff).rw(FUNC(iteagle_fpga_device::rtc_r), FUNC(iteagle_fpga_device::rtc_w));
 }
 
 void iteagle_fpga_device::ram_map(address_map &map)
 {
-	map(0x00000, 0x3f).rw(this, FUNC(iteagle_fpga_device::e1_nvram_r), FUNC(iteagle_fpga_device::e1_nvram_w));
-	map(0x10000, 0x1ffff).rw(this, FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
+	map(0x00000, 0x3f).rw(FUNC(iteagle_fpga_device::e1_nvram_r), FUNC(iteagle_fpga_device::e1_nvram_w));
+	map(0x10000, 0x1ffff).rw(FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
 }
 
 iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -647,7 +647,7 @@ DEFINE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device, "iteagle_eeprom", "ITE
 
 void iteagle_eeprom_device::eeprom_map(address_map &map)
 {
-	map(0x0000, 0x000F).rw(this, FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
+	map(0x0000, 0x000F).rw(FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
 }
 
 MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
@@ -774,7 +774,7 @@ DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITE
 
 void iteagle_periph_device::ctrl_map(address_map &map)
 {
-	map(0x000, 0x0cf).rw(this, FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
+	map(0x000, 0x0cf).rw(FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
 }
 
 iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
