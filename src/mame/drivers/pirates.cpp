@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(pirates_state::pirates)
 	MCFG_DEVICE_PROGRAM_MAP(pirates_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pirates)
 

@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 
 	SPEAKER(config, "lspeaker").front_left();

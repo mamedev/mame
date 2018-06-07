@@ -773,8 +773,7 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_DEVICE_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, EEPROM_SERIAL_ENABLE_STREAMING)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmmjprd)
 

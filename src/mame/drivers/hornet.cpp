@@ -1078,7 +1078,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 //  PCB description at top doesn't mention any EEPROM on the base board...
-//  MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+//  MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1210,7 +1210,7 @@ MACHINE_CONFIG_START(hornet_state::sscope2)
 	hornet_2board_v2(config);
 
 	MCFG_DEVICE_ADD("lan_serial_id", DS2401)
-	MCFG_EEPROM_SERIAL_93C46_ADD("lan_eeprom")
+	MCFG_DEVICE_ADD("lan_eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 

@@ -1633,7 +1633,7 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

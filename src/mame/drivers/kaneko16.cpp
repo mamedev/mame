@@ -1848,7 +1848,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2060,7 +2060,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2188,7 +2188,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2309,8 +2309,8 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(shogwarr_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(shogwarr_default_eeprom, 128)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2387,8 +2387,8 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
 	MCFG_KANEKO_HIT_TYPE(2)
 
 	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(brapboys_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(brapboys_default_eeprom, 128)
 MACHINE_CONFIG_END
 
 /***************************************************************************

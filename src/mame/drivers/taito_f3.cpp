@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(taito_f3_state::f3)
 	MCFG_DEVICE_PROGRAM_MAP(f3_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -513,16 +513,16 @@ MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
 	f3(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
 	f3_224b(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 static const gfx_layout bubsympb_sprite_layout =
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	MCFG_DEVICE_PROGRAM_MAP(bubsympb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

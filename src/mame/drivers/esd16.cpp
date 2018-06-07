@@ -705,7 +705,7 @@ MACHINE_CONFIG_START(esd16_state::hedpanio)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hedpanic_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */

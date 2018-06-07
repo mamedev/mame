@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -1598,7 +1598,7 @@ MACHINE_CONFIG_START(_39in1_state::_39in1)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

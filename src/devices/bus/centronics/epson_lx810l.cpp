@@ -159,7 +159,7 @@ MACHINE_CONFIG_START(epson_lx810l_device::device_add_mconfig)
 	MCFG_E05A30_CENTRONICS_SELECT_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_centronics_select))
 
 	/* 256-bit eeprom */
-	MCFG_EEPROM_SERIAL_93C06_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C06_16BIT)
 
 	/* steppers */
 	MCFG_STEPPER_ADD("pf_stepper")

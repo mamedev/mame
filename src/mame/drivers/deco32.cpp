@@ -1959,7 +1959,7 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
 	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_custom_latch_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -2089,7 +2089,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
 	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2223,7 +2223,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2309,7 +2309,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DEVICE_PROGRAM_MAP(tattass_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -2388,7 +2388,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)

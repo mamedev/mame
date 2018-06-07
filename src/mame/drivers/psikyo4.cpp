@@ -659,8 +659,8 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
 
-	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)
