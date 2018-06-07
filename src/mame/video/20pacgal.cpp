@@ -27,6 +27,7 @@
 
 void _20pacgal_state::get_pens()
 {
+	// TODO : Accurate palette when prom isn't exists
 	offs_t offs;
 	uint8_t *color_prom = m_proms->base() + (NUM_PENS * m_game_selected);
 
@@ -56,10 +57,14 @@ void _20pacgal_state::get_pens()
 
 		color_prom++;
 	}
+}
+
+PALETTE_INIT_MEMBER(_20pacgal_state,starpal_init)
+{
 	/* Star field */
 
 	/* palette for the stars */
-	for (offs = 0;offs < 64;offs++)
+	for (offs_t offs = 0;offs < 64;offs++)
 	{
 		int bits,r,g,b;
 		static const int map[4] = { 0x00, 0x47, 0x97 ,0xde };
@@ -71,7 +76,7 @@ void _20pacgal_state::get_pens()
 		bits = (offs >> 4) & 0x03;
 		b = map[bits];
 
-		m_palette->set_pen_color(NUM_PENS + offs, rgb_t(r, g, b));
+		palette.set_pen_color(NUM_PENS + offs, rgb_t(r, g, b));
 	}
 }
 
@@ -455,4 +460,5 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal_video)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, _20pacgal_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", NUM_PENS + NUM_STAR_PENS)
+	MCFG_PALETTE_INIT_OWNER(_20pacgal_state,starpal_init)
 MACHINE_CONFIG_END
